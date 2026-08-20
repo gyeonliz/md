@@ -1,0 +1,23 @@
+# Generated context-transfer packages and local imports
+handoffs/
+.work-context/
+.tmp-tests/
+*.zip
+__pycache__/
+*.py[cod]
+
+# Credentials and machine-local secrets must never enter this repository
+.env
+.env.*
+!.env.example
+auth.json
+credentials.*
+secrets.*
+*.pem
+*.key
+
+# Common local noise
+*.log
+*.tmp
+Thumbs.db
+Desktop.ini
