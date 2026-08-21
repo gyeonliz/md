@@ -419,13 +419,13 @@ Inbox → Todo → Doing → Done
 
 ## 21. 다음 작업
 
-### 1순위: PFN-06 Camera/Input 기준선
+### 완료: PFN-06 Camera/Input과 HUD-01 Telemetry
 
-사용자 승인안에 맞춰 Camera를 Drone 뒤 고정 추적으로 바꾸고 Mouse X Drone Yaw, Mouse Y Camera Pitch와 Gamepad 6축을 추가했다. 5개 Action/15개 Mapping, 새 PIE 3회 자동화, Standalone 수동 조작과 창 닫기 정상 종료를 확인해 PFN-06을 완료했다.
+사용자 승인안의 Camera/Input 기준선을 완료했다. 이어서 공용 Telemetry Component가 10Hz로 속도·기준면 대비 고도·수직 속도·Heading Snapshot을 제공하도록 구현했고 Drone 자동화 5/5와 Blueprint 0/0을 통과했다.
 
-### 2순위: 기능 우선 Greybox
+### 1순위: HUD-02와 기능 우선 Greybox
 
-`Telemetry/HUD → Tutorial Spline·Ring Gate·Lap/Segment 기록 → Flight 상태 → Operator↔Drone → NPC·Mission UI Story Shell → AI/MG/Jamming → 에셋 적용` 순서로 진행한다. 상세 기준은 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다.
+`HUD-02 화면 표시 → Tutorial Spline·Ring Gate·Lap/Segment 기록 → Flight 상태 → Operator↔Drone → NPC·Mission UI Story Shell → AI/MG/Jamming → 에셋 적용` 순서로 진행한다. 상세 기준은 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다.
 
 ### 병행: PC 간 공유 검증
 
@@ -452,7 +452,7 @@ Inbox → Todo → Doing → Done
 
 - 실제 Unreal 프로젝트는 `https://github.com/gyeonliz/drone` 저장소로 관리한다.
 - 현재 기본 작업 루트는 `D:\JGY\project`, Unreal 프로젝트는 `D:\JGY\project\drone`, 문서 저장소는 `D:\JGY\project\md`다.
-- Unreal 저장소의 로컬 `main`은 PFN-06 마감 Commit `2c38ebf`이고 `origin/main`은 별도 Push 전 `fb891fb`다. `91498b7` (`chore: initialize Drone project`)은 초기 Commit으로 보존하는 역사 기록이다.
+- Unreal 저장소의 로컬 `main`은 HUD-01 Commit `08e876a`이고 `origin/main`은 별도 Push 전 `fb891fb`다. `2c38ebf`는 PFN-06 마감, `91498b7`은 초기 Commit으로 보존하는 역사 기록이다.
 - 기준선 확인 당시 Unreal 프로젝트 작업 트리는 깨끗했고 `.uasset`·`.umap`은 Git LFS 추적 대상이다.
 - Markdown 작업 문맥·계획·가이드·안전한 보조 도구는 `https://github.com/gyeonliz/md.git` 저장소로 공유한다.
 - 문서 저장소의 첫 Stage·Commit·Push를 완료했으며 로컬 `main`과 `origin/main`은 `9e81de0`에서 일치한다. `MD-02`, `MD-03`은 Done이다.

@@ -14,11 +14,12 @@
 8. [`docs/DRONE_PROTOTYPE_IMPLEMENTATION.md`](docs/DRONE_PROTOTYPE_IMPLEMENTATION.md): 실제 C++ Prototype 구현·검증과 Editor 연결 절차
 9. [`docs/DRONE_PROTOTYPE_INPUT_CONTRACT.md`](docs/DRONE_PROTOTYPE_INPUT_CONTRACT.md): 현재 Prototype 전용 임시 입력 계약
 10. [`docs/DRONE_PROTOTYPE_PIE_CHECKLIST.md`](docs/DRONE_PROTOTYPE_PIE_CHECKLIST.md): PFN-06 자동화 결과와 수동 화면 체크리스트
-11. [`docs/DRONE_PREASSET_FUNCTION_PLAN.md`](docs/DRONE_PREASSET_FUNCTION_PLAN.md): 구매 소스 없이 Greybox 기능을 먼저 완성하는 실행 계획
-12. [`docs/DRONE_MVP_GUIDE.md`](docs/DRONE_MVP_GUIDE.md): Flight MVP부터 데모까지의 개발 단위
-13. [`docs/WORK_MANAGEMENT.md`](docs/WORK_MANAGEMENT.md): Inbox → Todo → Doing → Done 운영
-14. [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md): 확정 조작, Tutorial 코스·기록 UI, Story·NPC·Jamming·에셋 적용 계획
-15. [`docs/STUDY_PLANS.md`](docs/STUDY_PLANS.md): 정보처리산업기사·C++ 코딩테스트 병행 계획
+11. [`docs/DRONE_TELEMETRY_IMPLEMENTATION.md`](docs/DRONE_TELEMETRY_IMPLEMENTATION.md): HUD-01 Snapshot·10Hz Component 구현과 검증
+12. [`docs/DRONE_PREASSET_FUNCTION_PLAN.md`](docs/DRONE_PREASSET_FUNCTION_PLAN.md): 구매 소스 없이 Greybox 기능을 먼저 완성하는 실행 계획
+13. [`docs/DRONE_MVP_GUIDE.md`](docs/DRONE_MVP_GUIDE.md): Flight MVP부터 데모까지의 개발 단위
+14. [`docs/WORK_MANAGEMENT.md`](docs/WORK_MANAGEMENT.md): Inbox → Todo → Doing → Done 운영
+15. [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md): 확정 조작, Tutorial 코스·기록 UI, Story·NPC·Jamming·에셋 적용 계획
+16. [`docs/STUDY_PLANS.md`](docs/STUDY_PLANS.md): 정보처리산업기사·C++ 코딩테스트 병행 계획
 
 ## 구성
 
@@ -44,15 +45,16 @@ tools/unreal/              Prototype 자산 생성·재검증용 안전 실행 �
 
 현재 기본 작업 루트는 `D:\JGY\project`이며, 실제 Unreal 프로젝트는 `D:\JGY\project\drone`, 문서 저장소는 `D:\JGY\project\md`다. 별도 `ADronePrototypePawn`과 GameMode, 5개 Input Action, Keyboard·Mouse·Gamepad 15개 Mapping, BP Pawn/GameMode와 Greybox Map을 연결했다. Camera는 Drone 뒤 고정 추적, Mouse X는 Drone Yaw, Mouse Y는 Camera Pitch로 동작한다.
 
-확정 조작을 반영한 `Drone.Prototype.PIEInputLifecycle`는 Keyboard·Mouse·Gamepad 입력과 새 PIE 3회를 모두 통과했다. Standalone 수동 조작과 창 닫기 정상 종료 로그까지 확인해 PFN-06은 Done이다. 다음 구현은 `Telemetry/HUD → Tutorial Course/기록 → Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming` 순서이며 [`DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)를 우선 기준으로 한다.
+확정 조작을 반영한 PFN-06은 자동화와 Standalone 수동 조작을 통과해 Done이다. HUD-01 공용 Telemetry Component도 10Hz로 속도·고도·수직 속도·Heading Snapshot을 제공하며 자동화와 Blueprint 컴파일을 통과했다. 다음 구현은 `HUD-02 화면 표시 → Tutorial Course/기록 → Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming` 순서이며 [`DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)를 우선 기준으로 한다.
 
-2026-08-21 기준 Unreal 저장소 로컬 `main`은 PFN-06 마감 Commit `2c38ebf`이고 `origin/main`은 Push 전 기준 `fb891fb`다. 문서 저장소의 원격 기준은 `9e81de0`이며 이 문서 갱신은 별도 로컬 Commit으로 관리한다. `91498b7`은 Unreal 저장소의 초기 Commit이다. 자세한 현재 상태는 [`STATUS.md`](STATUS.md)를 따른다.
+2026-08-21 기준 Unreal 저장소 로컬 `main`은 HUD-01 Commit `08e876a`이고 `origin/main`은 Push 전 기준 `fb891fb`다. 문서 저장소의 원격 기준은 `9e81de0`이며 이 문서 갱신은 별도 로컬 Commit으로 관리한다. `91498b7`은 Unreal 저장소의 초기 Commit이다. 자세한 현재 상태는 [`STATUS.md`](STATUS.md)를 따른다.
 
 외부 구매 소스는 아직 확보되지 않았으므로 현재 개발은 Engine 기본 도형과 기존 Template만 사용하는 기능 우선 Greybox 방식으로 진행한다. 현재 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)가 우선하고 PFN 카드 번호와 교체 경계는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](docs/DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 
 ```text
-PFN-06 Camera/Input 기준선
-→ Telemetry/HUD
+PFN-06 Camera/Input 기준선 Done
+→ HUD-01 Telemetry Done
+→ HUD-02 Flight HUD
 → Tutorial Course/Gate/Lap 기록
 → Flight 상태
 → Operator↔Drone

@@ -9,7 +9,8 @@
 ```text
 PFN-01~05  Done
 PFN-06     Done, 자동화 3/3 Pass · Standalone 수동 Pass
-HUD-01     Ready
+HUD-01     Done
+HUD-02     Ready
 ```
 
 2026-08-19 사전 PIE 두 번에서 Prototype 입력 계열이 실제로 반응하는 것은 확인했다. 그러나 어느 실행도 한 번의 새 PIE 안에서 전체 체크리스트를 끝내지 못했으므로 Pass로 계산하지 않는다. 두 실행은 이미 종료된 역사적 부분 확인이며 현재 열린 PIE가 있다는 뜻이 아니다.

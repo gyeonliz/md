@@ -18,16 +18,16 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-21 11:55 KST
+마지막 갱신: 2026-08-21 12:30 KST
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | 1단계 Camera·Input 기준선 완료, 2단계 Telemetry/HUD 준비 |
+| 전체 단계 | 2단계 Telemetry/HUD 진행 중, HUD-01 완료 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | PFN-06 마감 완료, `HUD-01` 구현 시작 대기 |
-| 차단 조건 | 없음. 실제 Gamepad 체감은 미확인으로 별도 보존 |
-| 다음 행동 | `HUD-01` Telemetry C++ 설계·테스트 시작 |
-| 다음 기능 | `HUD-01` Telemetry Snapshot → `HUD-02` 공용 Flight HUD |
+| 지금 작업 중 | `HUD-01` 마감 완료, `HUD-02` 구현 시작 대기 |
+| 차단 조건 | 없음. 고도 기준은 Course/Mission이 지정하는 World Z 대비 값 |
+| 다음 행동 | `HUD-02` UMG Widget과 Telemetry Event 구독 구현 |
+| 다음 기능 | `HUD-02` 공용 Flight HUD → Tutorial Course |
 | 이후 | Tutorial Spline·Ring Gate·Lap/Segment 기록 → Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming |
 
 ## 2026-08-21 — Camera·Mouse·Gamepad 기준선 갱신
@@ -71,4 +71,47 @@ PFN-06 통과 후 `HUD-01`을 시작한다. Drone Telemetry를 10Hz Snapshot으�
 - Gamepad 체감: 연결 여부 미보고로 미확인
 - 최종 판정: PFN-06 Done, `HUD-01` Ready
 - Unreal 로컬 Commit: `2c38ebf` (`feat: finalize prototype camera and input lifecycle`)
+- 원격 Push: 수행하지 않음
+
+## 2026-08-21 — HUD-01 시작
+
+### 현재 설계
+
+- 공용 Snapshot은 속도 km/h, 기준면 대비 고도 m, 수직 속도 m/s, Heading 0~359°를 가진다.
+- `UDroneTelemetryComponent`가 0.1초 간격으로 값을 갱신하고 Blueprint가 구독할 수 있는 Event를 보낸다.
+- Component는 Prototype Pawn에 기본 부착하되 `/Source/Drone/Telemetry`의 재사용 가능한 생산 코드로 만든다.
+- 고도는 매번 지형을 Trace하지 않고 Course/Mission이 지정하는 기준 World Z 대비로 계산한다. Tutorial 코스가 만들어지면 시작 Pad 또는 Course 기준면을 전달한다.
+- Widget은 값을 계산하거나 매 프레임 Pawn을 검색하지 않는다. `HUD-02`에서 Snapshot Event를 구독한다.
+
+### 이번 완료 조건
+
+- Telemetry 계산과 10Hz 기본값 자동화 통과
+- Prototype Pawn이 Component를 한 개 소유
+- `DroneEditor Win64 Development` 빌드 성공
+- 기존 Prototype 자동화 회귀 통과
+- 검증 뒤 `HUD-01` Done, `HUD-02` Ready로 문서 갱신
+
+### 구현 결과
+
+- `FDroneTelemetrySnapshot`에 Speed km/h, Altitude m, Vertical Speed m/s, Heading degree를 정의했다.
+- `UDroneTelemetryComponent`가 BeginPlay 즉시 한 번, 이후 0.1초 Timer로 Snapshot을 갱신한다.
+- `OnTelemetryUpdated` Blueprint Event와 최신 Snapshot Getter를 제공한다.
+- Course/Mission 기준 World Z를 런타임에 설정하면 즉시 Snapshot을 다시 계산한다.
+- Prototype Pawn이 Component 한 개를 native 기본 Subobject로 소유한다.
+
+### 검증 결과
+
+- 최종 `DroneEditor Win64 Development` 빌드 성공
+- `Drone.Telemetry.Calculation`, `Drone.Telemetry.Defaults` 통과
+- `PawnDefaults`, `PIEInputLifecycle`, `SpawnPossess` 회귀 포함 최종 Report 5 succeeded, 0 warnings, 0 failed
+- Runtime Spawn Pawn의 Component 존재, Spawn 고도와 Reference Z 변경 즉시 갱신 확인
+- Blueprint 전체 Compile 0 errors, 0 warnings, failed load 0
+- 첫 빌드 시 따옴표 없는 CompilerVersion을 PowerShell이 분리한 명령 오류가 있었고, 문자열 인자로 고정한 뒤 성공했다. 코드 컴파일 실패로 분류하지 않는다.
+
+### 판정
+
+- `HUD-01` Done
+- `HUD-02` Ready
+- 상세 구현: [`DRONE_TELEMETRY_IMPLEMENTATION.md`](DRONE_TELEMETRY_IMPLEMENTATION.md)
+- Unreal 로컬 Commit: `08e876a` (`feat: add drone telemetry snapshot component`)
 - 원격 Push: 수행하지 않음

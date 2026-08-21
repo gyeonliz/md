@@ -1,6 +1,6 @@
 # 드론 프로젝트 MVP 개발 가이드
 
-> 현재 구현 지점: 별도 `APawn` 기반 C++ Prototype, native GameMode, 5개 Input Action과 Keyboard·Mouse·Gamepad 15개 Mapping, BP·Prototype Map 연결까지 완료했다. 고정 추적 Camera, Mouse X Drone Yaw와 Mouse Y Camera Pitch를 포함한 자동화 3/3, Standalone 수동 조작과 정상 종료를 확인해 PFN-06은 Done이다. 다음 카드는 Telemetry/HUD이며 자세한 결과는 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md)를 따른다.
+> 현재 구현 지점: Camera/Input PFN-06과 HUD-01 Telemetry를 완료했다. 공용 Component가 10Hz로 속도·고도·수직 속도·Heading Snapshot을 제공하며 Drone 자동화 5/5와 Blueprint 0/0을 통과했다. 다음 카드는 HUD-02 화면 표시다. 입력 결과는 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md), Telemetry 결과는 [`DRONE_TELEMETRY_IMPLEMENTATION.md`](DRONE_TELEMETRY_IMPLEMENTATION.md)를 따른다.
 
 > 현재 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)가 우선한다. PFN 카드 번호와 Placeholder 교체 경계는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 

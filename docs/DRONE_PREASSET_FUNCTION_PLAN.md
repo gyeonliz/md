@@ -29,7 +29,7 @@ Spawn
 확인된 현재 상태는 다음과 같다.
 
 - 기본 작업 루트: `D:\JGY\project`
-- UE 5.8.1 프로젝트: `D:\JGY\project\drone`, 로컬 기준 Commit `2c38ebf`, `origin/main` `fb891fb`
+- UE 5.8.1 프로젝트: `D:\JGY\project\drone`, 로컬 기준 Commit `08e876a`, `origin/main` `fb891fb`
 - 문서 저장소: `D:\JGY\project\md`, 기준 Commit `9e81de0`
 - 별도 `ADronePrototypePawn`과 `ADronePrototypeGameMode` C++ 구현 완료
 - 컴포넌트 기본값과 standalone Spawn/Possess 자동화 테스트 완료
@@ -39,7 +39,7 @@ Spawn
 - Camera와 장치별 역할은 v1으로 확정했지만 감도·Mouse Y 반전·물리·Mesh·멀티플레이 방식은 미정
 - Android는 현재 개발 범위에서 제외
 
-따라서 현재 실행 카드는 `HUD-01` Telemetry Snapshot이다. 이어서 공용 Flight HUD와 Tutorial Vertical Slice를 활성화한다.
+`HUD-01` Telemetry Snapshot은 완료했다. 현재 실행 카드는 `HUD-02` 공용 Flight HUD이며 이후 Tutorial Vertical Slice를 활성화한다.
 
 새 생산 코드는 `Source/Drone`, 새 자산은 `/Game/Drone` 아래에 둔다. ThirdPerson·Combat·Platforming·SideScrolling은 참고용 Legacy로 동결하고 신규 상속·참조를 만들지 않는다. Prototype IMC는 Pawn만 등록·제거하며 PlayerController와 Level Blueprint에는 같은 책임을 추가하지 않는다. 현재 검증 범위는 Standalone 싱글플레이이고 네트워크·Android·구매 에셋은 제외한다.
 

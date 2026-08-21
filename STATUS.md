@@ -19,7 +19,7 @@
 | Git 사용자 이메일 | 전역 `jkw6483@gmail.com` 설정 확인 |
 | GitHub CLI | 설치되어 있지 않음 |
 | 기본 작업 루트 | `D:\JGY\project` |
-| Unreal 프로젝트 저장소 | `D:\JGY\project\drone`, 로컬 `main`=`2c38ebf`, `origin/main`=`fb891fb`, PFN-06 로컬 Commit 완료 |
+| Unreal 프로젝트 저장소 | `D:\JGY\project\drone`, 로컬 `main`=`08e876a`, `origin/main`=`fb891fb`, HUD-01 로컬 Commit 완료 |
 | 문서 작업 저장소 | `D:\JGY\project\md`, `origin/main`=`9e81de0`, 현재 갱신은 로컬 Commit으로 관리 |
 
 GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도했으나 Windows Installer가 종료 코드 1602로 취소되어 설치되지 않았다. GitHub 웹과 Git Credential Manager만으로도 기본 Push/Clone 작업은 가능하다.
@@ -34,7 +34,7 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 D:\JGY\project\drone\Drone.uproject
 ```
 
-이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이며, 현재 경로와 로컬 기준 Commit은 각각 `D:\JGY\project\drone`, `2c38ebf`다.
+이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이며, 현재 경로와 로컬 기준 Commit은 각각 `D:\JGY\project\drone`, `08e876a`다.
 
 확인 결과:
 
@@ -63,11 +63,11 @@ D:\JGY\project\drone\Drone.uproject
 - 별도 `Lvl_DronePrototype` Greybox Map과 GameMode Override 구성
 - 863개 파일을 `91498b7` (`chore: initialize Drone project`)로 첫 Commit
 - GitHub `gyeonliz/drone`의 `origin/main`에 Push
-- PFN-06 마감 로컬 Commit `2c38ebf`; `origin/main`의 `fb891fb`보다 1개 Commit 앞서며 Push는 하지 않음
+- HUD-01 마감 로컬 Commit `08e876a`; `origin/main`의 `fb891fb`보다 2개 Commit 앞서며 Push는 하지 않음
 
 첫 Commit은 863개 파일이며 `Content`는 761개로 `.uasset` 756개와 `.umap` 5개다. 가장 큰 파일은 약 21.0 MB이고 100 MB를 넘는 파일은 없다. 새 Prototype `.uasset`과 `.umap`을 포함한 Unreal Asset에는 Git LFS의 filter·diff·merge 속성이 적용되며, 현재 원격으로 보낼 추가 LFS Object는 없다.
 
-현재 구현된 Drone 기능 기준선은 Prototype Pawn/GameMode와 Move·Altitude·Yaw·Camera 입력까지다. Take Off, Landing, Crash/실패, Mission, Enemy AI, MG 점유·공격, HUD/Evaluation은 아직 구현된 것으로 판정하지 않는다. 이전 기준 Commit `fb891fb`의 잘못된 `//test` 주석은 이력 재작성 없이 `2c38ebf`에서 제거했다.
+현재 구현된 Drone 기능 기준선은 Prototype Pawn/GameMode, Move·Altitude·Yaw·Camera 입력과 HUD용 Telemetry Snapshot까지다. 실제 UMG HUD, Take Off, Landing, Crash/실패, Mission, Enemy AI, MG 점유·공격, Evaluation은 아직 구현된 것으로 판정하지 않는다. 이전 기준 Commit `fb891fb`의 잘못된 `//test` 주석은 이력 재작성 없이 `2c38ebf`에서 제거했다.
 
 사용자는 이 프로젝트에서 Android를 사용하지 않는다고 확정했다. 이에 따라 `Config/DefaultEngine.ini`의 Android File Server Plugin과 네트워크 연결을 끄고 `SecurityToken` 할당을 비웠다. 검사 결과 활성 Plugin 0, 네트워크 허용 0, 비어 있지 않은 토큰 0이다. 기존 토큰 값은 이 문서나 로그에 기록하지 않았다. 향후 Android File Server를 다시 켤 경우 빈 토큰은 인증 없는 상태가 될 수 있으므로 보안 설정을 새로 검토해야 한다.
 
@@ -88,6 +88,9 @@ D:\JGY\project\drone\Drone.uproject
 - 과거 로그의 `LogAutomationTest: Error: Condition failed` 15줄은 UE 내부 `UE::UnifiedErrorTest` 출력 직후, 프로젝트 맵 로드 전에 발생했다. 이번 Prototype Report에는 warning/error가 없다.
 - 기준선 확인 당시 문서 저장소에만 있던 PFN-06 PIE lifecycle 테스트 초안은 Drone Source에 편입됐고 `UnrealEd` 의존성은 Editor 빌드 조건으로만 추가됐다. 런타임 공개 API 변경 없이 빌드와 Automation 3/3 Pass까지 확인했다.
 - `Invoke-DronePrototypeSetup.ps1 -Mode UpdateControls`와 `Validate`는 9개 Prototype 자산, 5개 IA 타입, IMC 15개 Mapping, BP 참조와 Map GameMode Override를 확인했다. `/Game/Drone`의 신규 Legacy 의존성은 0개이며 기본 ThirdPerson Map/GameMode도 유지된다.
+- HUD-01에서 `UDroneTelemetryComponent`와 `FDroneTelemetrySnapshot`을 추가했다. 0.1초 Timer로 Speed·Altitude·Vertical Speed·Heading을 제공하며 Prototype Pawn이 native Component 한 개를 소유한다.
+- 최종 `Drone.` Automation Report는 Prototype 회귀 3개와 Telemetry 2개를 합쳐 5 succeeded, 0 warnings, 0 failed다. Runtime Spawn에서 기준 고도 변경 즉시 Snapshot 갱신도 확인했다.
+- HUD-01 뒤 Blueprint 전체 Compile은 0 errors, 0 warnings, 0 blueprints failed to load로 정상 종료했다.
 
 상세 구현과 Editor 연결 절차는 [`docs/DRONE_PROTOTYPE_IMPLEMENTATION.md`](docs/DRONE_PROTOTYPE_IMPLEMENTATION.md)에 기록했다.
 
@@ -122,8 +125,8 @@ C:\Users\jkw11\Documents\Codex\2026-08-12\c-project-factoryenvironmentcollect\wo
 
 ## 다음 단계
 
-1. `HUD-01` Telemetry Snapshot 구현: 속도·고도·수직 속도·Heading을 10Hz Event로 제공
-2. `HUD-02` 공용 Flight HUD에서 네 수치를 표시
+1. `HUD-02` 공용 Flight HUD에서 Telemetry 네 수치를 표시
+2. Standalone에서 이동·고도·Yaw에 따라 표시가 변하는지 수동 확인
 3. 비충돌 Spline·순서형 Ring Gate·Lap/Segment 비교 UI가 있는 Tutorial Vertical Slice 구현
 4. 이후 Flight 상태, Operator↔Drone, NPC·Mission UI, Jamming Story 순으로 진행
 5. 병행 과제로 다른 PC Clone/LFS/UE 5.8.1 실행과 문서 Clone/Pull 확인
@@ -141,7 +144,8 @@ MD: gyeonliz/md origin 연결 완료
 → 다른 PC Clone/Pull과 문맥 확인
 
 PFN-06 Done
-→ Telemetry Snapshot·Flight HUD
+→ HUD-01 Telemetry Snapshot Done
+→ HUD-02 Flight HUD
 → Tutorial Course·Timing·비교 UI
 → Take Off·Landing·Crash
 → Operator↔Drone 전환

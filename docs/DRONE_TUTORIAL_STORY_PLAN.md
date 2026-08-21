@@ -178,7 +178,7 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 | STY-04 | AI·MG 통합 | Drone 탐지와 대응을 Mission 흐름에서 재현 |
 | AST-01 | 제공 Drone 에셋 감사·적용 | 기능 코드 변경 없이 Integration BP에서 외형 교체 |
 
-현재 `CTRL-01`은 자동화 3/3과 Standalone 수동 조작·정상 종료까지 통과해 완료했다. 다음 활성 카드는 `HUD-01`이다.
+현재 `CTRL-01`과 `HUD-01`은 완료했다. Telemetry는 자동화 5/5 회귀와 Blueprint 0/0을 통과했으며 다음 활성 카드는 `HUD-02`다.
 
 ## 8. 검증 게이트
 
