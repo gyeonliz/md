@@ -9,8 +9,8 @@
 - 다만 `UE_5.8` 폴더명이나 `.uproject`의 `EngineAssociation` 값만으로 패치 버전을 판정해서는 안 된다. 메인컴 설치본과 실제 Drone 프로젝트의 엔진 연결 상태는 별도로 확인해야 한다.
 - 실제 Drone GitHub 저장소는 **`gyeonliz/drone`**으로 확정했다.
 - GitHub 저장소 공개 범위(Public/Private)는 **현재 미정**이다.
-- `C:\project\Drone`의 `main`과 `origin/main`은 첫 Commit `91498b7`에서 일치한다. 다른 PC Clone/LFS/UE 실행 검증은 아직 남았다.
-- 사용자는 현재 Drone 프로젝트에서 Android를 사용하지 않는다고 확정했다. 작업 대상 `C:\project\Drone`에서는 Android File Server Plugin과 네트워크 연결을 끄고 `SecurityToken`을 빈 할당으로 정리했다.
+- 현재 작업 루트는 `D:\JGY\project`, 실제 프로젝트는 `D:\JGY\project\drone`이다. 로컬 `main`은 PFN-06 마감 Commit `2c38ebf`, `origin/main`은 Push 전 `fb891fb`이며 `91498b7`은 첫 Commit의 역사 기록이다. 다른 PC Clone/LFS/UE 실행 검증은 아직 남았다.
+- 사용자는 현재 Drone 프로젝트에서 Android를 사용하지 않는다고 확정했다. 작업 대상 `D:\JGY\project\drone`에서는 Android File Server Plugin과 네트워크 연결을 끄고 `SecurityToken`을 빈 할당으로 정리했다.
 - 아래 브랜치 구조는 현재 컨텍스트에 맞춘 권장 시작안이며, 최종 팀 규칙으로 확정된 것은 아니다.
 - 이 가이드는 명령줄 Git을 기준으로 한다. Unreal Editor 안의 Git 플러그인 제공 여부와 동작은 실제 UE 5.8 환경에서 확인하기 전까지 전제하지 않는다.
 
@@ -253,7 +253,7 @@ if ($EngineConfig -match '(?m)^SecurityToken=.+$') {
 
 Android File Server를 사용하지 않는지, 토큰을 비울지, 비공개 팀 저장소에서 공유할지, 별도 설정으로 관리할지는 프로젝트 요구와 저장소 공개 범위를 확인한 뒤 결정한다. 이미 외부에 노출했다면 기존 값을 다시 사용하지 않고 회전한다. 토큰 값을 Issue, 채팅, Commit 메시지, 로그에 붙여 넣지 않는다.
 
-현재 `C:\project\Drone`에서는 사용하지 않는 것으로 결정되어 `bEnablePlugin=False`, `bAllowNetworkConnection=False`, 빈 `SecurityToken`을 확인했다. 향후 AFS를 다시 켜면 빈 토큰을 유지하지 말고 인증과 노출 범위를 새로 검토한다.
+현재 `D:\JGY\project\drone`에서는 사용하지 않는 것으로 결정되어 `bEnablePlugin=False`, `bAllowNetworkConnection=False`, 빈 `SecurityToken`을 확인했다. 향후 AFS를 다시 켜면 빈 토큰을 유지하지 말고 인증과 노출 범위를 새로 검토한다.
 
 ## 7. 첫 Commit
 

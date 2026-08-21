@@ -1,14 +1,14 @@
 # Drone Unreal 프로젝트 읽기 전용 감사
 
-> 이 문서는 Prototype 구현 전의 읽기 전용 스냅샷이다. 이후 추가한 C++ Prototype과 검증 결과는 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md)에 기록한다.
+> 이 문서는 2026-08-19 Prototype 구현 전의 읽기 전용 스냅샷이다. 당시 감사 경로는 `C:\project\Drone`이었고, 현재 작업 프로젝트는 `D:\JGY\project\drone`이다. 이후 추가한 C++ Prototype과 검증 결과는 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md)에 기록한다.
 
 ## 1. 감사 범위와 안전 기준
 
-- 감사 대상: `C:\project\Drone`
+- 당시 감사 대상: `C:\project\Drone` (역사적 경로)
 - 감사 방식: 읽기 전용
 - 확인 대상: `.uproject`, `Source`, 필요한 `Config` 키, `Content` 파일명
 - 작성 대상: 이 도구 저장소의 `docs/DRONE_PROJECT_AUDIT.md`
-- 감사 중 `C:\project\Drone`의 파일은 수정하지 않았다.
+- 감사 중 당시 `C:\project\Drone`의 파일은 수정하지 않았다.
 - `Content`의 `.uasset`/`.umap` 내부는 열거나 해석하지 않고 파일명과 경로만 조사했다.
 - `Config\DefaultEngine.ini`에 `SecurityToken` 키가 존재하는 사실만 확인했다. 값은 읽거나 이 문서에 기록하지 않았다.
 

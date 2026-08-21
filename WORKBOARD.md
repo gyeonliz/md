@@ -4,6 +4,24 @@
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
+Unreal 작업 기준은 로컬 `main`의 PFN-06 마감 Commit `2c38ebf`이며 `origin/main`은 Push 전 `fb891fb`다. 문서 원격 기준은 `9e81de0`이고 이 현황 갱신은 로컬 Commit으로 관리한다. 현재 기능 실행 순서는 `Telemetry/HUD → Tutorial Course → Flight 상태 → Operator↔Drone → Story/NPC/Mission → AI/MG/Jamming → 에셋 적용`이다.
+
+## 현재 작업 스냅샷
+
+마지막 갱신: 2026-08-21 11:55 KST
+
+| 항목 | 상태 |
+|---|---|
+| 현재 단계 | 1단계 Camera·Input 기준선 완료, 2단계 Telemetry/HUD 준비 |
+| 진행 정도 | PFN-06 필수 게이트 5/5 Pass |
+| 지금 작업 중 | PFN-06 마감 완료, `HUD-01` 구현 시작 대기 |
+| 완료 근거 | Build 성공, Blueprint 0/0, Prototype 9개·Mapping 15개, Automation 3/3, 수동 조작·정상 종료, Legacy 의존성 0 |
+| 현재 차단 | 없음. 실제 Gamepad 체감은 장치 연결 여부 미보고로 별도 미확인 |
+| 다음 행동 | `HUD-01`을 Doing으로 이동하고 Telemetry C++ 설계·테스트 시작 |
+| 다음 기능 | `HUD-01` Telemetry Snapshot → `HUD-02` 공용 Flight HUD |
+
+상세 변경 이력은 [`docs/DRONE_WORKLOG.md`](docs/DRONE_WORKLOG.md)에 계속 추가한다. 매 구현 작업 종료 시 이 스냅샷의 현재 작업·완료 근거·다음 작업을 함께 갱신한다.
+
 ## Inbox
 
 | ID | 태그 | 작업 | 활성화 조건 |
@@ -12,10 +30,13 @@
 | STUDY-CT-01 | Coding Test | 첫 C++ 문제 세트 선택 | 주간 프로젝트 시간 배분 결정 |
 | PF-01 | Portfolio | 데모 기능별 기록 시작 | 첫 재현 가능한 Drone 기능 완료 |
 | DR-FUTURE-01 | Drone | 배터리·통신·재밍·멀티 후보 평가 | Flight MVP 이후 |
-| PFN-P2 | Drone | Flight MVP 카드 PFN-07~14 활성화 | PFN-06 통과 |
+| PFN-P2 | Drone | Flight MVP 카드 PFN-07~14 활성화 | Tutorial Vertical Slice 통과 |
 | PFN-P3 | Drone | Mission Shell 카드 PFN-15~21 활성화 | PFN-14 통과 |
 | PFN-P4 | Drone / Unreal | Enemy AI·Turret 카드 PFN-22~32 활성화 | PFN-21 통과 |
 | PFN-P5 | Drone / Unreal | 통합 Greybox 카드 PFN-33~38 활성화 | PFN-32 통과 |
+| TUT-01 | Drone / Tutorial | 비충돌 Spline과 순서형 Ring Gate 코스 | HUD-01 통과 |
+| CTRL-02 | Drone / Story | Operator↔Drone Possess·Camera 전환 | Tutorial Vertical Slice 통과 |
+| STY-01 | Drone / Story | NPC 대화·Mission UI Story Shell | CTRL-02 통과 |
 | PFN-P6 | Drone / Unreal | 에셋 교체 준비 카드 PFN-39~43 활성화 | PFN-38 완료 + 최신 PFN-37 결과 3회 Pass |
 | ASSET-GATE-01 | Drone / Unreal | 구매 소스 후보 비교와 구매 결정 | Greybox Vertical Slice 3회 Pass와 차단 결함 0건 |
 
@@ -24,15 +45,15 @@
 | ID | 태그 | 작업 | 완료 조건 |
 |---|---|---|---|
 | GIT-10 | Git / Unreal | 다른 PC Clone과 실행 | LFS 포함 Clone 후 UE 5.8.1에서 열림 |
-| MD-02 | Codex Sync / Git | `md` 저장소 첫 Stage 범위 검토 | 민감 정보·생성 패키지 없이 공유 문서·도구만 선택 |
-| MD-03 | Codex Sync / Git | `md` 저장소 첫 Commit과 Push | 명시적으로 승인한 파일만 Commit하고 `origin/main`에서 확인 |
 | SYNC-04 | Codex Sync | 두 PC 간 실제 수동 인계 시험 | Git 흐름과 문맥 패키지 흐름을 각각 완료 |
+| HUD-01 | Drone / UI | Telemetry Snapshot Component | 속도·고도·수직 속도·Heading을 10Hz Event로 제공 |
+| HUD-02 | Drone / UI | 공용 Flight HUD | Drone 조작 중 네 Telemetry 수치를 화면에서 확인 |
 
 ## Doing
 
 | ID | 태그 | 작업 | 현재 확인 | 남은 완료 조건 |
 |---|---|---|---|---|
-| PFN-06 | Drone / Unreal | Spawn/Input 반복 PIE | 0/3 Pass. 첫 실행에서 IMC 한 개와 네 Callback 계열은 동작했지만 `S`와 복합·중복 조건을 끝내지 못했고, 두 번째 실행도 일부 확인 뒤 사용자 직접 조작 보호를 위해 중단함 | 새 PIE 3회 전체 반복. 매회 Pawn 한 대 Spawn/Possess, IMC 한 개, 모든 매핑과 네 입력 동작, 중복 없음 확인 |
+| — | — | 현재 활성 구현 없음 | Todo의 HUD-01 시작 대기 | — |
 
 ## Done
 
@@ -51,6 +72,8 @@
 | GIT-08 | Git / Unreal | 863개 파일의 첫 Stage 범위를 검토하고 생성물·민감 정보 제외 확인 |
 | GIT-09 | Git / Unreal | `91498b7` 첫 Commit을 `gyeonliz/drone`의 `origin/main`에 Push하고 LFS 추적 확인 |
 | MD-01 | Codex Sync / Git | 현재 문서 작업 폴더의 `origin`을 `https://github.com/gyeonliz/md.git`로 연결 |
+| MD-02 | Codex Sync / Git | `md` 저장소 첫 Stage 범위를 검토하고 민감 정보·생성 패키지를 제외 |
+| MD-03 | Codex Sync / Git | `9e81de0` 첫 Commit을 `gyeonliz/md`의 `origin/main`에 Push하고 로컬·원격 일치 확인 |
 | GIT-ANDROID-01 | Git / Unreal | 사용자 결정에 따라 Android File Server Plugin·네트워크를 끄고 토큰 할당을 비움 |
 | BUILD-01 | Drone / Unreal | `DroneEditor Win64 Development` 빌드 성공 |
 | BP-COMPILE-01 | Drone / Unreal | 전체 Blueprint Commandlet 컴파일 0 errors, 0 warnings 및 정상 종료 |
@@ -61,10 +84,11 @@
 | DR-PROTOTYPE-04 | Drone / Unreal | 기존 맵 저장 변경 없이 명령줄 GameMode Override 실행과 정상 종료 확인 |
 | DR-PLAN-PREASSET | Drone / Unreal | Placeholder만으로 Greybox Vertical Slice를 완성하고 구매 후 교체하는 계획 작성 |
 | PFN-01 | Drone / Unreal | Prototype 전용 임시 키·Value Type·Modifier·기대 부호를 입력 계약에 기록 |
-| PFN-02 | Drone / Unreal | Input Action 4개와 전용 IMC 생성, 네 Action 타입과 9개 Mapping 검증 |
-| PFN-03 | Drone / Unreal | BP Pawn에 IMC·Input Action 4개와 Engine Cube Placeholder 연결 |
+| PFN-02 | Drone / Unreal | Input Action 5개와 전용 IMC 생성, Action 타입과 Keyboard·Mouse·Gamepad 15개 Mapping 검증 |
+| PFN-03 | Drone / Unreal | BP Pawn에 IMC·Input Action 5개와 Engine Cube Placeholder 연결 |
 | PFN-04 | Drone / Unreal | BP GameMode의 Default Pawn을 BP Prototype Pawn으로 연결 |
 | PFN-05 | Drone / Unreal | 별도 Map에 GameMode Override, PlayerStart 한 개, 배치 Pawn 0개와 Greybox 시험 요소 구성 |
+| PFN-06 | Drone / Unreal | Camera·Spawn/Input 반복 PIE: 확정 조작 Automation 3/3, Standalone Keyboard·Mouse 조작과 창 닫기 정상 종료 Pass. 실제 Gamepad 체감은 미확인 |
 | SYNC-01 | Codex Sync | 목표·완료·진행·결정·미정·다음 작업 형식 정의 |
 | SYNC-02 | Codex Sync | `handoff.md` + `manifest.json` Export/Import 구현 |
 | SYNC-03 | Codex Sync | 인증·토큰·원시 세션 제외 기준과 검사 구현 |
@@ -73,6 +97,6 @@
 
 ## 이번 인계의 정지선
 
-Unreal 프로젝트는 `91498b7` 첫 Commit과 LFS 객체를 `gyeonliz/drone`의 `origin/main`에 Push했으며 현재 작업 트리는 깨끗하다. 다른 PC Clone·LFS·UE 5.8.1 실행 검증 전까지 Git + Unreal의 PC 간 전체 흐름은 완료로 닫지 않는다. 문서 작업 폴더는 `gyeonliz/md`를 원격으로 연결했지만 첫 Stage·Commit·Push 전이다.
+Unreal 프로젝트의 초기 Commit은 `91498b7`, Push 전 원격 기준은 `fb891fb`, 현재 로컬 기준은 PFN-06 마감 Commit `2c38ebf`다. 문서 저장소 원격 기준은 `9e81de0`이며 현재 문서 갱신은 로컬 Commit으로 보존한다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
 
-Android 제외, Prototype C++ Spawn/Possess, 구매 전 기능 계획과 PFN-01~05는 완료했다. 두 번의 PIE에서 핵심 입력 동작을 부분 확인했지만 한 실행 안에서 전체 체크리스트를 끝내지 못했으므로 PFN-06은 0/3 Pass다. 새 PIE 3회 전체 반복 전까지 PFN-P2와 PFN-07~14를 활성화하지 않는다. 구매 소스는 현재 구현의 선행 조건으로 두지 않으며 최종 조작·물리·게임 규칙은 계속 미정이다.
+Android 제외와 PFN-01~06을 완료했다. 사용자 승인 조작안의 고정 추적 Camera와 Gamepad Mapping, 자동화 새 PIE 3회, Standalone Keyboard·Mouse 조작과 창 닫기 정상 종료를 확인했다. 다음 카드는 HUD-01이며 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다. 구매 소스는 현재 구현의 선행 조건으로 두지 않는다.

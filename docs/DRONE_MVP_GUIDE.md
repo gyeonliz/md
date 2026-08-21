@@ -1,8 +1,8 @@
 # 드론 프로젝트 MVP 개발 가이드
 
-> 현재 구현 지점: 별도 `APawn` 기반 C++ Prototype, native GameMode, 기본값 및 Spawn/Possess 자동화 테스트까지 완료했다. 실제 입력 자산·키·Mesh·Prototype Map 연결은 아직 미완료다. 자세한 결과는 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md)를 따른다.
+> 현재 구현 지점: 별도 `APawn` 기반 C++ Prototype, native GameMode, 5개 Input Action과 Keyboard·Mouse·Gamepad 15개 Mapping, BP·Prototype Map 연결까지 완료했다. 고정 추적 Camera, Mouse X Drone Yaw와 Mouse Y Camera Pitch를 포함한 자동화 3/3, Standalone 수동 조작과 정상 종료를 확인해 PFN-06은 Done이다. 다음 카드는 Telemetry/HUD이며 자세한 결과는 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md)를 따른다.
 
-> 외부 구매 소스가 없는 현재 기간의 구체적인 실행 순서와 Placeholder 교체 규칙은 [`DRONE_PREASSET_FUNCTION_PLAN.md`](DRONE_PREASSET_FUNCTION_PLAN.md)를 따른다.
+> 현재 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)가 우선한다. PFN 카드 번호와 Placeholder 교체 경계는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 
 ## 1. 문서 목적
 
@@ -21,11 +21,13 @@
 - 기존 논의 기준: 개발 1명, 모델링/콘텐츠 작업 인원 다수
 - 첫 구현 대상: 정찰용 멀티콥터 1종
 - 핵심 요소: 드론 운용, 정찰, 침투, 탐지, 적 AI 반응, 임무, 귀환, 평가
+- 현재 v1 조작: 고정 추적 Camera, Actor-relative 이동, World Up 고도, Mouse X Drone Yaw, Mouse Y Camera Pitch, Gamepad Left Stick·Trigger·Right Stick
+- 현재 기능 우선 순서: Telemetry/HUD → Tutorial Spline·순서형 Ring Gate·Lap/Segment 기록 → Flight 상태 → Operator↔Drone → NPC·Mission UI·Jamming → AI/MG → 에셋 통합
 - J3C: 프로젝트 콘셉트에서 사용하는 가상의 외주 발주처 설정일 뿐이며, 실제 계약·협력·지원·공식 관계가 아니다.
 
 ### 현재 미정이며 구현 중에도 확정된 것처럼 다루지 않을 항목
 
-- 세부 입력 키와 조작 방식
+- 입력 감도, Mouse Y 반전, 조종 보조와 최종 물리 반응
 - 최종 물리 모델과 비행 보조 수준
 - 최종 드론 종류·이름·디자인
 - 군·국가·적군 국적 및 세계관 설정
@@ -59,7 +61,7 @@
 
 ## 4. 프로젝트 구조 초안
 
-아래 이름은 구현을 시작하기 위한 후보이며 최종 클래스명은 아니다.
+아래 이름은 초기 가이드의 역사적 후보이며 최종 클래스명은 아니다. 현재 새 생산 코드는 `Source/Drone`, 새 자산은 `/Game/Drone` 아래에 두므로 이 초안을 따라 중복 루트를 만들지 않는다.
 
 ```text
 Source/<ProjectName>/
@@ -92,23 +94,20 @@ Content/
 
 ## 5. 현재 추천 작업 순서와 단계별 통과 기준
 
-아래 순서는 MVP를 작은 단위로 검증하기 위한 현재 추천 작업 순서다. 최종 게임 규칙이나 변경 불가능한 제작 순서를 확정한 것이 아니며, 실제 테스트 결과와 팀 상황에 따라 갱신한다.
+현재 실행 순서는 PFN 카드와 [`DRONE_PREASSET_FUNCTION_PLAN.md`](DRONE_PREASSET_FUNCTION_PLAN.md)를 따른다. 아래 상세 작업 목록의 장별 배치보다 이 순서가 우선한다.
 
 ```text
-Flight MVP
-  ↓
-Enemy AI MVP
-  ↓
-Mission
-  ↓
-UI / Evaluation
-  ↓
-통합 데모
+PFN-06 Spawn/Input 기준선
+→ PFN-07~14 Flight MVP
+→ PFN-15~21 최소 Mission Shell
+→ PFN-22~32 Enemy AI/MG
+→ PFN-33~38 HUD·Evaluation·통합 Greybox
+→ PFN-39~43 에셋 교체 준비
 ```
 
 - Flight MVP 통과: 한 대가 생성되어 이륙·이동·Yaw·고도 변경·카메라 확인·착륙을 수행하고 충돌/실패를 확인할 수 있다.
-- Enemy AI MVP 통과: 순찰 중인 AI가 드론을 감지하고, 한 명이 빈 터렛을 점유해 공격 상태로 전환한다. 점유되지 못한 AI는 현재 테스트에서 선택한 Prototype 대응 한 가지를 수행한다. 점유자 사망·소멸 후 다른 AI가 이어서 사용하는 승계 기능은 이 통과 기준에 포함하지 않는다.
-- Mission 통과: 출격부터 정보 획득, 귀환, 완료/실패 판정까지 상태가 이어진다.
+- 최소 Mission Shell 통과: 출격부터 정보 획득, 귀환, 완료/실패 판정까지 최소 상태가 이어진다.
+- Enemy AI/MG 통과: 순찰 중인 AI가 드론을 감지하고, 한 명이 빈 터렛을 점유해 공격 상태로 전환한다. 점유되지 못한 AI는 현재 테스트에서 선택한 Prototype 대응 한 가지를 수행한다. 점유자 사망·소멸 후 다른 AI가 이어서 사용하는 승계 기능은 이 통과 기준에 포함하지 않는다.
 - UI/Evaluation 통과: 플레이어가 필요한 상태를 확인하고 종료 시 결과를 볼 수 있다. 세부 점수 공식은 별도 확정 전까지 임시 판정만 사용한다.
 - 통합 데모 통과: 위 흐름을 새 실행에서 반복 재현할 수 있다.
 

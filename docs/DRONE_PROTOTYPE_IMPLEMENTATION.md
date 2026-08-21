@@ -1,51 +1,52 @@
 # Drone Prototype Pawn 구현 및 검증 기록
 
-기준일: 2026-08-19 (Asia/Seoul)
+기준일: 2026-08-21 (Asia/Seoul)
 
 ## 1. 현재 결과
 
-`C:\project\Drone`에 기존 Third Person 경로와 분리된 최소 Drone Prototype을 추가했다.
+현재 프로젝트 `D:\JGY\project\drone`에 기존 Third Person 경로와 분리된 최소 Drone Prototype이 있다. 구현은 2026-08-19 당시 `C:\project\Drone`에서 시작했으며 해당 경로는 역사 기록일 뿐 현재 작업 경로가 아니다.
 
 - `ADronePrototypePawn` C++ 클래스가 컴파일된다.
 - `ADronePrototypeGameMode`가 native fallback으로 해당 Pawn을 Spawn한다.
-- 자동화 테스트에서 컴포넌트 기본값과 Spawn/Possess를 검증했다.
-- Prototype Input Action 4개와 전용 IMC를 생성했다.
+- 자동화 테스트에서 컴포넌트 기본값, Spawn/Possess와 PIE 입력 lifecycle을 검증했다.
+- Prototype Input Action 5개와 Keyboard·Mouse·Gamepad 15개 Mapping의 전용 IMC를 생성했다.
 - BP Pawn에 입력 자산과 Engine Cube Placeholder를 연결했다.
 - BP GameMode와 별도 `Lvl_DronePrototype` Greybox Map을 연결했다.
 - 새 자산 재로드 검증과 Map Check를 통과했다.
-- GUI PIE 1회차에서 IMC 한 개와 Move·Altitude·Yaw·Look의 실제 동작을 확인했다.
+- 2026-08-21 Automation에서 새 PIE 3회 모두 IMC 한 개와 Keyboard·Mouse·Gamepad 입력을 확인했다.
 - 기존 기본 맵과 전역 기본 GameMode는 변경하지 않았다.
 - Android File Server는 사용하지 않는다는 사용자 결정을 반영해 비활성화했다.
 
-현재 PFN-01~05는 완료했고 PFN-06은 **0/3 Pass**다. GUI에서 핵심 동작은 부분 확인했지만 한 실행 안에서 전체 체크리스트를 끝내지 못했다. 다음은 아직 완료되지 않았다.
+현재 PFN-01~06은 완료했다. 새 PIE 자동화 세 회와 Standalone Keyboard·Mouse 수동 조작을 통과했고, 사용자가 창을 닫은 뒤 로그에서 `Win RequestExit`, `Game engine shut down`, `Exiting`을 확인했다. 실제 Gamepad 체감은 미확인이다. 항목과 결과는 [`DRONE_PROTOTYPE_PIE_CHECKLIST.md`](DRONE_PROTOTYPE_PIE_CHECKLIST.md)를 단일 기준으로 사용한다. 다음은 아직 완료되지 않았다.
 
-- 새 PIE 3회에서 Pawn 한 대 Spawn/Possess, IMC 한 개와 모든 매핑을 확인
-- PIE 재시작 뒤 입력 세기와 Callback이 중복되지 않는지 확인
 - 최종 입력 키·감도·Mouse Y 반전 기본값 결정
 - 최종 Drone Mesh 선택·연결
 - 착륙·충돌 실패 처리
 
-첫 번째 PIE는 `S`와 복합·중복 조건을 끝내지 못했고, 두 번째 PIE는 Pawn Spawn/Possess, IMC 한 개와 Move까지 확인한 뒤 사용자가 다른 앱을 직접 조작하는 것을 감지해 입력 충돌 방지를 위해 중단했다. 두 실행 모두 Pass 횟수에 포함하지 않는다. 따라서 현재 상태를 PFN-06 완료나 Flight MVP 완료라고 표현하지 않는다.
+2026-08-19의 두 GUI PIE는 역사적 부분 확인이며 Pass 횟수에는 포함하지 않는다. PFN-06의 정식 판정은 2026-08-21 자동화와 별도 Standalone 수동 회차를 근거로 한다.
 
 ## 2. 변경된 실제 프로젝트 파일
 
 ```text
-C:\project\Drone\Config\DefaultEngine.ini
-C:\project\Drone\Source\Drone\Prototype\DronePrototypePawn.h
-C:\project\Drone\Source\Drone\Prototype\DronePrototypePawn.cpp
-C:\project\Drone\Source\Drone\Prototype\DronePrototypeGameMode.h
-C:\project\Drone\Source\Drone\Prototype\DronePrototypeGameMode.cpp
-C:\project\Drone\Source\Drone\Prototype\Tests\DronePrototypeDefaultsTest.cpp
-C:\project\Drone\Source\Drone\Prototype\Tests\DronePrototypeSpawnPossessTest.cpp
-C:\project\Drone\Content\Drone\Prototype\Input\Actions\IA_DronePrototype_Move.uasset
-C:\project\Drone\Content\Drone\Prototype\Input\Actions\IA_DronePrototype_Altitude.uasset
-C:\project\Drone\Content\Drone\Prototype\Input\Actions\IA_DronePrototype_Yaw.uasset
-C:\project\Drone\Content\Drone\Prototype\Input\Actions\IA_DronePrototype_Look.uasset
-C:\project\Drone\Content\Drone\Prototype\Input\IMC_DronePrototype.uasset
-C:\project\Drone\Content\Drone\Prototype\Blueprints\BP_DronePrototypePawn.uasset
-C:\project\Drone\Content\Drone\Prototype\Blueprints\BP_DronePrototypeGameMode.uasset
-C:\project\Drone\Content\Drone\Prototype\Maps\Lvl_DronePrototype.umap
+D:\JGY\project\drone\Config\DefaultEngine.ini
+D:\JGY\project\drone\Source\Drone\Prototype\DronePrototypePawn.h
+D:\JGY\project\drone\Source\Drone\Prototype\DronePrototypePawn.cpp
+D:\JGY\project\drone\Source\Drone\Prototype\DronePrototypeGameMode.h
+D:\JGY\project\drone\Source\Drone\Prototype\DronePrototypeGameMode.cpp
+D:\JGY\project\drone\Source\Drone\Prototype\Tests\DronePrototypeDefaultsTest.cpp
+D:\JGY\project\drone\Source\Drone\Prototype\Tests\DronePrototypeSpawnPossessTest.cpp
+D:\JGY\project\drone\Content\Drone\Prototype\Input\Actions\IA_DronePrototype_Move.uasset
+D:\JGY\project\drone\Content\Drone\Prototype\Input\Actions\IA_DronePrototype_Altitude.uasset
+D:\JGY\project\drone\Content\Drone\Prototype\Input\Actions\IA_DronePrototype_Yaw.uasset
+D:\JGY\project\drone\Content\Drone\Prototype\Input\Actions\IA_DronePrototype_Look.uasset
+D:\JGY\project\drone\Content\Drone\Prototype\Input\Actions\IA_DronePrototype_CameraPitchRate.uasset
+D:\JGY\project\drone\Content\Drone\Prototype\Input\IMC_DronePrototype.uasset
+D:\JGY\project\drone\Content\Drone\Prototype\Blueprints\BP_DronePrototypePawn.uasset
+D:\JGY\project\drone\Content\Drone\Prototype\Blueprints\BP_DronePrototypeGameMode.uasset
+D:\JGY\project\drone\Content\Drone\Prototype\Maps\Lvl_DronePrototype.umap
 ```
+
+현재 PFN-06 작업 트리에는 `Source/Drone/Drone.Build.cs`의 Editor 전용 `UnrealEd` 의존성과 `Source/Drone/Prototype/Tests/DronePrototypePIEInputLifecycleTest.cpp`도 추가되어 있다. 두 변경은 `DroneEditor Win64 Development` 빌드와 Automation Report 3 succeeded, 0 warnings, 0 errors로 검증했다.
 
 `DefaultEngine.ini`에서는 Android File Server 관련 Plugin과 네트워크 사용을 끄고 기존 토큰 할당을 비웠다. 토큰 값은 이 문서나 로그에 기록하지 않았다.
 
@@ -85,6 +86,7 @@ C:\project\Drone\Content\Drone\Prototype\Maps\Lvl_DronePrototype.umap
 
 - `Drone.Prototype.PawnDefaults`: Root, Collision, Camera, Movement, GameMode 기본값 검증
 - `Drone.Prototype.SpawnPossess`: 임시 Game World에서 GameMode 생성, Pawn Spawn, PlayerController Possess 검증
+- `Drone.Prototype.PIEInputLifecycle`: `Lvl_DronePrototype` 새 PIE 3회에서 BP Pawn/IMC/입력 매핑과 단일 입력·복합 입력·반대 입력·재시작 간 입력 세기를 검증
 
 두 번째 테스트에는 실제 `ULocalPlayer`가 없으므로 IMC 등록과 실제 입력 전달까지 검증하는 테스트는 아니다.
 
@@ -93,10 +95,10 @@ C:\project\Drone\Content\Drone\Prototype\Maps\Lvl_DronePrototype.umap
 `DronePrototypePawn.h`에는 다음 선언이 있다.
 
 - 다섯 개의 컴포넌트 `TObjectPtr`
-- Prototype IMC와 네 Input Action용 `TObjectPtr`
-- Mapping Priority와 임시 Yaw Rate
+- Prototype IMC와 다섯 Input Action용 `TObjectPtr`
+- Mapping Priority, Mouse Yaw/Pitch 감도, Gamepad Camera Pitch Rate와 Camera Pitch 범위
 - `PawnClientRestart`, `SetupPlayerInputComponent`, `UnPossessed`, `EndPlay`
-- 이동·고도·Yaw·Look 처리 함수
+- 이동·고도·Yaw·Mouse Look·Gamepad Camera Pitch 처리 함수
 - 이 Pawn이 실제로 추가한 IMC만 제거하기 위한 약한 참조와 소유 플래그
 
 `ClearAllMappings()`는 사용하지 않는다. 다른 시스템이 등록한 Mapping Context까지 지우지 않기 위해서다.
@@ -142,7 +144,9 @@ Yaw Rate     90 degrees/second
 - Move: Actor Forward/Right 방향 이동 입력
 - Altitude: World Up 방향 이동 입력
 - Yaw: Delta Seconds를 적용한 Local Yaw 회전
-- Look: Controller Yaw/Pitch 입력
+- Mouse Look X: Actor Local Yaw 회전
+- Mouse Look Y: SpringArm 상대 Pitch 조정
+- Gamepad Camera Pitch: Delta Seconds를 적용한 SpringArm 상대 Pitch Rate
 
 Input Action이 배정되지 않았으면 크래시 대신 진단 로그를 남긴다.
 
@@ -155,22 +159,27 @@ Input Action이 배정되지 않았으면 크래시 대신 진단 로그를 남�
 /Game/Drone/Prototype/Input/Actions/IA_DronePrototype_Altitude   Axis1D
 /Game/Drone/Prototype/Input/Actions/IA_DronePrototype_Yaw        Axis1D
 /Game/Drone/Prototype/Input/Actions/IA_DronePrototype_Look       Axis2D
+/Game/Drone/Prototype/Input/Actions/IA_DronePrototype_CameraPitchRate Axis1D
 /Game/Drone/Prototype/Input/IMC_DronePrototype
 /Game/Drone/Prototype/Blueprints/BP_DronePrototypePawn
 /Game/Drone/Prototype/Blueprints/BP_DronePrototypeGameMode
 /Game/Drone/Prototype/Maps/Lvl_DronePrototype
 ```
 
-현재 IMC에는 9개 Mapping이 있다.
+현재 IMC에는 15개 Mapping이 있다.
 
 - Move: `W/S/A/D`
 - Altitude: `Space Bar/Left Ctrl`
 - Yaw: `E/Q`
 - Look: `Mouse XY 2D-Axis`
+- Move: Gamepad Left Stick X/Y
+- Altitude: Gamepad `RT/LT`
+- Yaw: Gamepad Right Stick X
+- Camera Pitch Rate: Gamepad Right Stick Y
 
-Modifier와 기대 부호는 [`DRONE_PROTOTYPE_INPUT_CONTRACT.md`](DRONE_PROTOTYPE_INPUT_CONTRACT.md)에 기록했다. 이 키는 PFN 시험 전용이며 최종 조작 승인안이 아니다.
+Modifier와 기대 부호는 [`DRONE_PROTOTYPE_INPUT_CONTRACT.md`](DRONE_PROTOTYPE_INPUT_CONTRACT.md)에 기록했다. 역할 배치는 사용자 승인 v1 기준이며 감도·반전·최종 물리는 수동 체감 뒤 조정한다.
 
-`BP_DronePrototypePawn`은 `ADronePrototypePawn` 자식이다. Class Defaults에 IMC와 네 Action을 연결했고, Visual Mesh에는 외부 구매 소스가 아닌 Engine 기본 Cube를 Placeholder로 연결했다. Event Graph에서 IMC를 추가하거나 Action을 다시 바인딩하지 않는다.
+`BP_DronePrototypePawn`은 `ADronePrototypePawn` 자식이다. Class Defaults에 IMC와 다섯 Action을 연결했고, Visual Mesh에는 외부 구매 소스가 아닌 Engine 기본 Cube를 Placeholder로 연결했다. Event Graph에서 IMC를 추가하거나 Action을 다시 바인딩하지 않는다.
 
 `BP_DronePrototypeGameMode`는 `ADronePrototypeGameMode` 자식이며 Default Pawn은 BP Prototype Pawn이다. PlayerController Class는 기존 Third Person BP Controller가 아니라 기본 `APlayerController`를 유지한다. Third Person Controller가 추가하는 기존 IMC와 키가 겹쳐 중복되는 것을 막기 위해서다.
 
@@ -184,12 +193,13 @@ Modifier와 기대 부호는 [`DRONE_PROTOTYPE_INPUT_CONTRACT.md`](DRONE_PROTOTY
 4. Map에 `PlayerStart`가 한 개이고 Pawn이 직접 배치되지 않았는지 확인한다.
 5. PIE를 시작하고 BP Prototype Pawn 한 대가 Spawn되어 PlayerController에 Possess되는지 확인한다.
 6. Enhanced Input Debug에서 `IMC_DronePrototype`이 Priority 1로 한 번만 등록되는지 확인한다.
-7. `W/S/A/D`, `Space/Left Ctrl`, `Q/E`, Mouse를 각각 시험해 Move, Altitude, Yaw, Look의 방향을 확인한다.
-8. Mouse Look 뒤 Actor Yaw는 그대로이고 Camera Control Rotation만 바뀌는지 확인한다.
-9. Output Log에서 Input Asset 누락, IMC 등록 실패, 다른 경로 소유 진단이 없는지 확인한다.
-10. PIE를 종료하고 새로 두 번 더 실행해 Pawn·IMC·Callback·입력 세기가 중복되지 않는지 확인한다.
+7. `W/S/A/D`, `Space/Left Ctrl`, `Q/E`를 시험해 Move, Altitude와 보조 Yaw 방향을 확인한다.
+8. Mouse X가 Drone Actor Yaw를 바꾸며 추적 Camera가 기체 뒤를 따라가는지, Mouse Y가 기체 Yaw 없이 CameraBoom Pitch만 바꾸는지 확인한다.
+9. Gamepad가 연결되어 있으면 Left Stick 이동, `RT/LT` 고도, Right Stick X Drone Yaw와 Y Camera Pitch를 확인한다.
+10. Output Log에서 Input Asset 누락, IMC 등록 실패, 다른 경로 소유 진단이 없는지 확인한다.
+11. PIE를 종료하고 새로 두 번 더 실행해 Pawn·IMC·Callback·입력 세기가 중복되지 않는지 확인한다.
 
-두 번의 실행에서 핵심 동작을 부분 확인했지만 전체 체크리스트를 끝낸 실행은 없다. 사용자 직접 조작 보호를 위해 GUI 조작을 중단했으며 새 PIE 3회 전체 반복이 필요하다.
+새 계약의 자동화 PIE 3회는 모두 통과했다. 실제 화면에서 고정 추적 Camera와 Mouse 방향·감도, 연결된 경우 Gamepad 체감을 확인하는 수동 회차 한 번이 남아 있다.
 
 ## 9. 정상 결과
 
@@ -216,7 +226,7 @@ Blueprint와 Input 연결까지 완료했을 때의 정상 기준은 다음과 �
 ### Pawn은 생기지만 입력이 없음
 
 - native GameMode가 native Pawn을 Spawn하고 있지 않은지
-- `BP_DronePrototypePawn`의 IMC와 네 Action이 모두 연결됐는지
+- `BP_DronePrototypePawn`의 IMC와 다섯 Action이 모두 연결됐는지
 - Project Settings의 Default Input Component Class가 Enhanced Input인지
 - Output Log의 누락 자산 또는 Mapping 등록 메시지
 - IMC에 실제 키 Mapping이 추가됐는지
@@ -228,9 +238,10 @@ Blueprint와 Input 연결까지 완료했을 때의 정상 기준은 다음과 �
 - Visual Mesh Collision과 Simulate Physics가 꺼져 있는지
 - Root를 다른 컴포넌트로 바꾼 Blueprint Override가 없는지
 
-### Camera가 두 번 회전함
+### Camera가 기체와 분리되거나 두 번 회전함
 
-- SpringArm의 `Use Pawn Control Rotation`은 켜져 있는지
+- SpringArm의 `Use Pawn Control Rotation`은 꺼져 있는지
+- SpringArm이 Pawn Yaw를 상속하는지
 - Camera의 `Use Pawn Control Rotation`은 꺼져 있는지
 
 ### 멀티플레이 또는 Pawn 교체에서 IMC가 남음
@@ -247,14 +258,15 @@ Engine: UE 5.8.1
 Result: Succeeded
 ```
 
-설치된 MSVC `14.51.36252`가 UE가 표시한 선호 버전 `14.50.35717`보다 새 버전이라는 경고가 있었지만 이번 빌드는 성공했다.
+기본 선택되는 MSVC 14.38은 UE 5.8 Engine PCH 컴파일 오류를 내므로, 설치된 MSVC `14.51.36256`을 `-CompilerVersion=14.51.36256`으로 명시했다. 이 버전은 UE가 표시한 선호 버전 `14.50.35717`보다 새 버전이라는 경고가 있었지만 이번 빌드는 성공했다.
 
 ### 자동화 테스트
 
 ```text
 Drone.Prototype.PawnDefaults  Success, 0 warnings, 0 errors
+Drone.Prototype.PIEInputLifecycle  Success, 0 warnings, 0 errors
 Drone.Prototype.SpawnPossess  Success, 0 warnings, 0 errors
-Total                        2 succeeded, 0 failed
+Total                        3 succeeded, 0 failed
 Process exit code            0
 ```
 
@@ -262,12 +274,12 @@ Process exit code            0
 
 ### Prototype 자산 생성과 재로드 검증
 
-Editor Python은 프로젝트 Plugin 설정을 바꾸지 않고 실행 시점에만 `PythonScriptPlugin`을 활성화했다. 생성기는 8개 대상 경로를 먼저 검사하고 기존 자산이 하나라도 있으면 덮어쓰지 않고 중단한다.
+Editor Python은 프로젝트 Plugin 설정을 바꾸지 않고 실행 시점에만 `PythonScriptPlugin`을 활성화했다. 최초 생성기는 8개 대상 경로를 먼저 검사하고 기존 자산이 하나라도 있으면 덮어쓰지 않고 중단한다. 이후 전용 `UpdateControls` 도구로 Camera Pitch Rate Action과 새 Mapping만 안전하게 추가했다.
 
 확인 결과:
 
-- Input Action 4개와 IMC 한 개 생성
-- 정확히 9개 Mapping과 Modifier 순서·부호 검증
+- Input Action 5개와 IMC 한 개 생성
+- 정확히 15개 Mapping과 Modifier 순서·부호 검증
 - BP Pawn/GameMode 부모와 CDO 참조 검증
 - Map GameMode Override, PlayerStart 한 개, 배치 Pawn 0개와 Greybox Actor 검증
 - `CompileAllBlueprints` 종료 코드 0, 0 errors, 0 warnings
@@ -290,17 +302,9 @@ Editor Python은 프로젝트 Plugin 설정을 바꾸지 않고 실행 시점에
 
 ### GUI PIE PFN-06
 
-첫 번째 새 PIE에서 다음을 부분 확인했다.
+2026-08-19의 사전 PIE 두 번은 Spawn/Possess, IMC 한 개와 입력 반응을 부분 확인한 역사적 기록이다. 이후 2026-08-21 lifecycle 자동화 새 PIE 3회와 별도 Standalone Keyboard·Mouse 수동 회차, 정상 종료가 통과해 PFN-06은 Done이다.
 
-- BP Prototype Pawn 한 대 Spawn/Possess
-- `IMC_DronePrototype` 한 개, Priority 1
-- W와 A/D가 기대 수평 방향으로 동작. `S`는 미확인
-- Space/Left Ctrl이 고도 `+1/-1` 방향으로 동작
-- E/Q가 기체 Yaw의 반대 방향으로 동작
-- Mouse가 Actor Yaw를 바꾸지 않고 Camera Look만 변경
-- Prototype 관련 금지 진단 문자열 0회
-
-두 번째 PIE도 Pawn Spawn/Possess와 IMC 한 개, Move까지 확인했다. 이후 사용자가 다른 앱을 직접 조작하는 것을 감지해 입력을 빼앗지 않도록 GUI 조작을 중단했다. 어느 실행도 완전한 Pass가 아니며 PFN-06은 0/3 Pass다.
+정식 검증의 체크 항목, 실행별 결과와 수동 화면 확인은 [`DRONE_PROTOTYPE_PIE_CHECKLIST.md`](DRONE_PROTOTYPE_PIE_CHECKLIST.md)에만 기록한다.
 
 ### 과거 native fallback 실행
 
@@ -319,24 +323,22 @@ Editor Python은 프로젝트 Plugin 설정을 바꾸지 않고 실행 시점에
 - Prototype Source 6개 모두 strict UTF-8
 - 충돌 마커 0
 - 후행 공백 0
-- Prototype 8개 자산 모두 Git LFS 속성 적용
+- Prototype 9개 자산 모두 Git LFS 속성 적용
 - 기존 전역 Map/GameMode는 Third Person 설정 그대로 유지
 - Python Plugin을 `.uproject`에 영구 추가하지 않음
-- 자산 8개의 디스크 수정 시각은 생성 시점 그대로이며 이후 검증·PIE에서 저장 변경 흔적 없음
-- 현재 두 번째 PIE를 시작한 Unreal Editor는 열려 있으므로 유휴 상태라고 기록하지 않음
+- 새 Input Action과 갱신한 BP/IMC를 포함한 9개 Prototype 자산을 별도 프로세스에서 재로드 검증
 
 ## 12. 다음 완료 게이트
 
-구매 소스 확보 전 전체 실행 순서와 Greybox 기준은 [`DRONE_PREASSET_FUNCTION_PLAN.md`](DRONE_PREASSET_FUNCTION_PLAN.md)를 따른다.
+현재 Tutorial/Story 우선 실행 순서와 Greybox 기준은 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)를 우선하며, PFN 카드 세부 정의는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 
-다음 완료 게이트는 PFN-06의 새 PIE 3회 전체 반복이다.
+다음 완료 게이트는 `HUD-01` Telemetry Snapshot과 `HUD-02` 공용 Flight HUD다.
 
 ```text
-현재 두 번째 PIE를 안전하게 종료
-→ 새 PIE 3회에서 각각 Pawn 1대·IMC 1개·모든 매핑 확인
-→ 3회 Pass와 중복 없음 기록
-→ PFN-06 Done
-→ PFN-07~14 Flight MVP 활성화
+PFN-06 Done
+→ Telemetry Snapshot 10Hz Event
+→ 속도·고도·수직 속도·Heading HUD 표시
+→ Tutorial Course Vertical Slice 활성화
 ```
 
-이 게이트를 통과하기 전에는 Flight MVP 카드를 완료로 이동하지 않는다. 통과한 뒤 Take Off, Landing, Crash/실패 처리를 각각 별도 기능 단위로 진행한다.
+이후 순서는 `Telemetry/HUD → Tutorial Course·Gate·Lap 기록 → Flight 상태 → Operator↔Drone → Story NPC·Mission·Jamming → Enemy AI/MG → 에셋 통합`이다.

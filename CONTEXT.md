@@ -1,6 +1,6 @@
 # 작업컴 Codex/GPT 기준 컨텍스트
 
-기준일: 2026-08-19 (Asia/Seoul)
+기준일: 2026-08-21 (Asia/Seoul)
 
 이 문서는 메인컴 ChatGPT/Codex에서 진행하던 작업을 작업컴에서 이어가기 위한 기준 컨텍스트다. 추측해서 내용을 추가하지 않고, 사용자가 실제 진행 상황을 알려준 경우에만 상태를 갱신한다.
 
@@ -390,12 +390,12 @@ Inbox → Todo → Doing → Done
 2. Git + Unreal 환경 구축
 3. Codex/GPT PC 간 작업 공유 환경 구축
 4. Drone 프로젝트 기본 구조
-5. Drone Flight MVP
-6. Enemy AI MVP
-7. Mission 시스템
-8. UI / 평가 시스템
-9. 데모 완성
-10. 포트폴리오 정리
+5. PFN-06 Spawn/Input 기준선 검증
+6. Drone Flight MVP
+7. 최소 Mission Shell
+8. Enemy AI·MG
+9. 통합 Greybox와 평가
+10. 에셋 교체 준비와 포트폴리오 정리
 
 공부는 별도로 병행한다.
 
@@ -419,17 +419,17 @@ Inbox → Todo → Doing → Done
 
 ## 21. 다음 작업
 
-### 1순위: Unreal + Git 실전 환경 구축
+### 1순위: PFN-06 Camera/Input 기준선
 
-Git 설치 확인 → GitHub → Unreal `.gitignore` → Git LFS → 기존 Unreal 프로젝트 연결 → 첫 Commit → Push → 다른 PC Clone → Unreal 실행 테스트
+사용자 승인안에 맞춰 Camera를 Drone 뒤 고정 추적으로 바꾸고 Mouse X Drone Yaw, Mouse Y Camera Pitch와 Gamepad 6축을 추가했다. 5개 Action/15개 Mapping, 새 PIE 3회 자동화, Standalone 수동 조작과 창 닫기 정상 종료를 확인해 PFN-06을 완료했다.
 
-### 2순위: Codex/GPT 컨텍스트 이동
+### 2순위: 기능 우선 Greybox
 
-메인컴과 작업컴 간에는 수동 복사에서 시작하고 이후 자동화한다.
+`Telemetry/HUD → Tutorial Spline·Ring Gate·Lap/Segment 기록 → Flight 상태 → Operator↔Drone → NPC·Mission UI Story Shell → AI/MG/Jamming → 에셋 적용` 순서로 진행한다. 상세 기준은 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다.
 
-### 3순위: 드론 프로젝트 개발
+### 병행: PC 간 공유 검증
 
-프로젝트 구조와 첫 Drone Pawn/Character 개발을 시작한다.
+`drone`과 `md`의 첫 Push는 완료했다. 다른 PC Clone/LFS/UE 5.8.1 실행과 문서 Clone/Pull을 확인하면 PC 간 전체 공유 흐름을 닫는다.
 
 ## 22. 이후 사용자가 확정한 사항
 
@@ -438,22 +438,44 @@ Git 설치 확인 → GitHub → Unreal `.gitignore` → Git LFS → 기존 Unre
 - 외부 구매 소스는 아직 확보되지 않았다.
 - 구매 소스를 확보하기 전에는 완성형 외형보다 기능 구현과 Greybox 플레이 사이클 검증을 우선한다.
 
-## 23. 2026-08-19 실제 진행 상태
+## 23. 2026-08-19 실제 진행 상태 (역사적 스냅샷)
 
 - Prototype 시험 전용 입력 계약을 기록했다. 현재 키는 `W/S/A/D`, `Space/Left Ctrl`, `Q/E`, `Mouse XY`다. 이는 PFN 실행을 위한 임시값이며 최종 조작 방식의 승인이 아니다.
 - PFN-01~05를 완료했다. Input Action 4개, `IMC_DronePrototype`, `BP_DronePrototypePawn`, `BP_DronePrototypeGameMode`, `Lvl_DronePrototype`을 생성·연결했다.
 - BP Pawn에는 네 Input Action과 IMC, Engine Cube Placeholder를 연결했다. BP GameMode의 Default Pawn과 Prototype Map의 GameMode Override도 연결했다.
 - 자산 생성 직후 검증과 수정된 별도 프로세스 재로드 검증에서 IA 타입, 9개 Mapping, BP 부모·참조, Map 설정과 Greybox Actor 구성을 확인했다. Map Check는 0 errors, 0 warnings였다.
 - GUI PIE에서 `IMC_DronePrototype` 한 개와 Move·Altitude·Yaw·Look Callback 계열의 실제 동작을 부분 확인했다. 첫 실행은 `S`와 복합·중복 조건을 끝내지 못했고 두 번째 실행도 일부 확인 뒤 중단했다.
-- PFN-06은 0/3 Pass다. 사용자가 다른 앱을 직접 조작하는 것을 감지해 입력 충돌 방지를 위해 중단했으며, 새 PIE 3회 전체 반복과 중복 입력 확인 전까지 PFN-06과 Flight MVP는 완료가 아니다.
+- PFN-06 자동화는 3/3 Pass다. 수동 화면 확인 1회가 남았으므로 PFN-06과 Flight MVP는 아직 완료가 아니다.
 - 최종 키·Look 감도·Mouse Y 반전 기본값·최종 Mesh·최종 물리·멀티플레이 방식은 계속 미정이다.
 
 ## 24. 2026-08-21 GitHub 저장소 역할과 실제 상태
 
 - 실제 Unreal 프로젝트는 `https://github.com/gyeonliz/drone` 저장소로 관리한다.
-- `C:\project\Drone`은 GitHub Desktop과 연결되어 있으며 로컬 `main`과 `origin/main`이 `91498b7` (`chore: initialize Drone project`)에서 일치한다.
-- Unreal 프로젝트 작업 트리는 현재 깨끗하고 `.uasset`·`.umap`은 Git LFS 추적 대상이다.
+- 현재 기본 작업 루트는 `D:\JGY\project`, Unreal 프로젝트는 `D:\JGY\project\drone`, 문서 저장소는 `D:\JGY\project\md`다.
+- Unreal 저장소의 로컬 `main`은 PFN-06 마감 Commit `2c38ebf`이고 `origin/main`은 별도 Push 전 `fb891fb`다. `91498b7` (`chore: initialize Drone project`)은 초기 Commit으로 보존하는 역사 기록이다.
+- 기준선 확인 당시 Unreal 프로젝트 작업 트리는 깨끗했고 `.uasset`·`.umap`은 Git LFS 추적 대상이다.
 - Markdown 작업 문맥·계획·가이드·안전한 보조 도구는 `https://github.com/gyeonliz/md.git` 저장소로 공유한다.
-- 현재 문서 작업 폴더의 `origin`은 `gyeonliz/md.git`로 연결했다. 원격은 아직 비어 있고 로컬 문서는 첫 Stage·Commit·Push 전이다.
+- 문서 저장소의 첫 Stage·Commit·Push를 완료했으며 로컬 `main`과 `origin/main`은 `9e81de0`에서 일치한다. `MD-02`, `MD-03`은 Done이다.
 - `drone`과 `md`는 서로 다른 저장소다. Unreal Content/Source를 `md`에 복제하거나 Codex 인증·원시 세션 파일을 어느 저장소에도 넣지 않는다.
 - 다른 PC에서 `drone` Clone/LFS/UE 5.8.1 실행과 `md` Clone/Pull을 모두 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 처리하지 않는다.
+
+## 25. 현재 작업 기준
+
+- 실제 Git·코드·설정·실행 로그를 최우선 근거로 삼고, 상태는 `WORKBOARD.md`, 현재 실행 순서는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다. 기존 Preasset 계획은 카드 번호와 에셋 교체 경계 참고용으로 유지한다.
+- 새 생산 코드는 `Source/Drone`, 새 자산은 `/Game/Drone` 아래에 둔다.
+- ThirdPerson·Combat·Platforming·SideScrolling은 참고용 Legacy로 동결한다. 신규 상속·참조를 만들지 않고 Vertical Slice 전에는 삭제하지 않는다.
+- Prototype IMC의 등록·제거 책임은 Pawn 한 곳에만 둔다. PlayerController나 Level Blueprint에 중복 등록하지 않는다.
+- C++는 상태와 기능, Blueprint는 자산 연결과 Greybox 조정을 담당한다. Collision Root와 Visual Mesh를 분리한다.
+- PFN-06 v1 조작은 Actor-relative 수평 이동, World Up 고도, Q/E와 Mouse X Actor Yaw, Mouse Y CameraBoom Pitch, Gamepad Left Stick 이동·Trigger 고도·Right Stick Yaw/Pitch로 확정했다. Keyboard·Mouse 시험 감도는 수동 Pass했으며 실제 Gamepad 체감과 최종 물리 조정은 이후 별도 카드로 남긴다.
+- Standalone 싱글플레이만 현재 검증 범위로 두며 네트워크·Android·구매 에셋은 제외한다.
+- C++ 변경과 전체 빌드 전에는 열려 있는 Unreal Editor를 저장하고 종료한다.
+- Drone 작업을 진행할 때 `WORKBOARD.md`에 현재 단계·진행 정도·지금 작업·완료 근거·다음 작업을 갱신하고, 실제 변경과 검증 이력은 `docs/DRONE_WORKLOG.md`에 같은 작업에서 추가한다.
+
+## 26. 2026-08-21 Tutorial·Story 방향 확정
+
+- Tutorial은 비충돌 Spline 안내선과 순서형 원형 Gate를 따라 비행하는 훈련 모드다.
+- 상시 HUD에는 속도·고도·수직 속도·Heading을 표시한다.
+- Gate마다 Segment Time과 실제 이동 거리 기준 평균 속도를 계산하고 이전 성공 기록 평균·Best 대비 ± 차이를 표시한다.
+- Story는 Operator Character, NPC 대화, Mission 안내 UI, Operator↔Drone 화면/Possess 전환을 포함한다.
+- Jamming은 신호 경고 → HUD Noise → 조작/통신 저하의 재현 가능한 단계형 규칙으로 만든다.
+- 제공 Drone 에셋은 기능 부모로 상속하지 않고 `/Game/Drone` 아래 Integration Blueprint에서 Visual만 교체한다.

@@ -1,0 +1,196 @@
+# Drone Tutorial·Story 구현 계획
+
+기준일: 2026-08-21 (Asia/Seoul)
+
+## 1. 목표와 우선순위
+
+현재 Drone Prototype을 다음 두 플레이 모드의 공통 기반으로 확장한다.
+
+1. **Tutorial**: 표시용 비충돌 경로와 순서형 Ring Gate를 따라 비행하고, 속도·고도·Lap/구간 기록을 비교하는 훈련 모드
+2. **Story**: Operator Character가 NPC와 상호작용하고 Mission 안내를 받은 뒤 Drone 조작으로 전환해 정찰·재밍·전투 방해 요소를 해결하는 모드
+
+구현 순서는 아래와 같이 고정한다.
+
+```text
+카메라·Mouse·Gamepad 조작 기준선
+→ Telemetry·공용 HUD 기반
+→ Tutorial 코스·Gate·Timing Vertical Slice
+→ Take Off·Landing·Crash Flight 상태
+→ Operator ↔ Drone 전환
+→ NPC 대화·Mission UI Story Shell
+→ Enemy AI·MG·Jamming Mission
+→ 통합 Greybox와 외부 Drone 에셋 적용
+```
+
+Tutorial을 먼저 완성해 조작감, 카메라, HUD, 비행 기록 계산을 검증한 뒤 Story에 재사용한다.
+
+## 2. 확정 조작 계약
+
+카메라는 Controller Rotation을 따라 자유 회전하지 않는다. Drone 뒤에서 함께 Yaw하는 SpringArm 추적 카메라를 사용하고 입력별 책임을 분리한다.
+
+| 장치 | 입력 | 기능 |
+|---|---|---|
+| Keyboard | `W/S`, `A/D` | Actor-relative 전후·좌우 이동 |
+| Keyboard | `Space/Left Ctrl` | World Up 기준 상승·하강 |
+| Keyboard | `Q/E` | 세밀한 좌/우 Drone Yaw |
+| Mouse | X | Drone Actor Yaw, 추적 카메라도 함께 회전 |
+| Mouse | Y | SpringArm Camera Pitch만 조정 |
+| Gamepad | Left Stick | 전후·좌우 이동 |
+| Gamepad | `RT/LT` | 상승·하강 |
+| Gamepad | Right Stick X | Drone Yaw |
+| Gamepad | Right Stick Y | Camera Pitch |
+| 공통 | `Tab` / Gamepad `Y` | Story의 Operator ↔ Drone 전환 후보 |
+| 공통 | `F` / Gamepad `A` | NPC·오브젝트 상호작용 후보 |
+
+현재 Camera Pitch 범위는 `-70°~20°`, Keyboard/Gamepad Yaw Rate는 `90°/s`, Mouse 감도는 `1.0°/input`의 시험값이다. Mouse Y 반전과 최종 감도는 수동 체감 검증 뒤 조정한다.
+
+입력 소유권은 다음과 같이 고정한다.
+
+- Drone 전용 IMC는 Drone Pawn이 Possess 수명주기에 맞춰 한 번만 등록·제거한다.
+- Operator 전용 IMC는 Operator Pawn이 소유한다.
+- 화면 전환, Pause, 공용 UI 입력만 프로젝트 소유 PlayerController의 Common IMC가 담당한다.
+- 같은 IMC를 PlayerController, Pawn, Level Blueprint에서 중복 등록하지 않는다.
+
+## 3. 공용 런타임 구조
+
+### Control과 화면 전환
+
+- Story 전용 프로젝트 소유 PlayerController가 Operator와 지정 Drone 참조를 관리한다.
+- `Tab` 또는 Gamepad `Y` 입력 시 `SetViewTargetWithBlend(0.35s)`와 Possess 전환을 수행한다.
+- Drone 모드 진입 시 Operator는 위치를 유지하고 이동 입력을 받지 않는다.
+- Operator 복귀 시 Drone Movement 입력과 속도를 정리하고 현재 위치에서 Hover 상태를 유지한다.
+- `Character`, `TransitionToDrone`, `Drone`, `TransitionToCharacter`, `Dialogue` 상태에서 중복 전환을 차단한다.
+- HUD는 PlayerController 수명에 연결해 Pawn이 바뀌어도 다시 생성하지 않고 데이터 공급자만 교체한다.
+
+### Telemetry
+
+Drone에 공용 Telemetry Component를 두고 10Hz 이벤트로 UI에 다음 Snapshot을 전달한다.
+
+- 속도: `Velocity.Size() × 0.036`, km/h
+- 고도: 코스/미션 기준 지면 높이 대비 m
+- 수직 속도: m/s
+- Heading: 0~359°
+- 현재 Flight·Control·Mission 상태
+- 신호 세기와 Jamming 단계
+
+Widget에서 매 프레임 Pawn을 검색하거나 Property Binding으로 계산하지 않는다. C++ 상태가 Multicast Event를 보내고 Blueprint Widget은 표시와 애니메이션만 담당한다.
+
+## 4. Tutorial Vertical Slice
+
+### 코스 구조
+
+- 별도 `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining` Map을 만든다.
+- `ADroneTrainingCourse`가 `USplineComponent`와 순서형 Gate 목록을 소유한다.
+- Spline/SplineMesh는 안내선 표시 전용이며 Collision과 Navigation 영향을 끈다.
+- `ADroneTrainingGate`는 원형 Visual과 별도 Overlap Trigger를 분리한다.
+- Visual Ring은 충돌하지 않고 Trigger만 Drone Pawn Overlap을 받는다.
+- Gate는 `CourseId`, `GateIndex`, `ForwardDirection`, `SegmentDistance`를 가진다.
+- 현재 목표 Gate만 강조하고 이미 통과한 Gate는 완료 색, 이후 Gate는 비활성 색으로 표시한다.
+- 현재 순서가 아니거나 역방향으로 통과한 Gate는 기록하지 않는다.
+
+### Lap과 구간 기록
+
+- Gate 0 통과 시 Lap을 시작하고 마지막 Gate 통과 시 완료한다.
+- Segment Time은 이전 정상 Gate부터 현재 Gate까지의 World Game Time으로 계산한다.
+- Segment Average Speed는 구간 동안 누적한 실제 이동 거리 ÷ 시간으로 계산한다.
+- 첫 성공 시도에는 `기준 기록 생성 중`을 표시한다.
+- 두 번째 시도부터 현재 결과를 **현재 시도를 제외한 이전 성공 기록 평균**과 비교한다.
+- Time Delta는 음수면 빠름, 양수면 느림으로 표시한다.
+- Speed Delta는 양수면 빠름, 음수면 느림으로 표시한다.
+- Best Lap과 Best Segment는 평균 기록과 별도로 보존한다.
+
+표시 예시는 다음과 같다.
+
+```text
+구간 03
+현재        4.82초
+이전 평균   5.10초
+차이       -0.28초 빠름
+
+평균 속도   42.5 km/h
+평균 대비   +2.3 km/h
+```
+
+### Tutorial UI
+
+- 상시 Flight HUD: 속도, 고도, 수직 속도, Heading
+- Course HUD: 다음 Gate, 현재 Lap Time, 현재 Segment Time
+- Gate 결과 Toast: 구간 시간, 구간 평균 속도, 이전 평균 대비 차이
+- Lap 결과: 총시간, 평균 속도, Best/평균 대비, 구간별 표
+- 잘못된 Gate: `다음 Gate를 통과하세요` 안내만 표시하고 기록은 변경하지 않음
+- Restart: 현재 시도를 폐기하고 Gate 0 상태로 초기화
+
+기록은 첫 Vertical Slice에서 현재 실행 동안 유지하고, 계산 검증 뒤 `USaveGame`으로 Course별 Attempt Count, 평균, Best 기록을 영속화한다.
+
+## 5. Story Mode
+
+### Operator와 NPC
+
+- Legacy ThirdPerson/Variant를 상속하지 않는 `ACharacter` 기반 Operator를 `/Game/Drone` 전용으로 만든다.
+- `IDroneInteractable` Interface로 NPC·콘솔·목표물을 동일한 상호작용 입력에 연결한다.
+- NPC 대화는 Speaker, Text, Portrait 후보, 다음 Line, Mission Event를 가진 Data Asset으로 구성한다.
+- 첫 버전은 선택지 없는 순차 대화이며 실제 분기 요구가 생길 때 Choice를 추가한다.
+- Dialogue 중 Character/Drone 이동 입력과 전환 입력을 잠근다.
+
+### Mission
+
+- Mission Definition은 Data Asset, 실행 상태는 Map의 Mission Director가 소유한다.
+- 공통 상태는 `Briefing`, `Deploy`, `Recon`, `Objective`, `Egress`, `Evaluation`, `Failed`로 시작한다.
+- Mission UI는 현재 목표, 거리, 상호작용 Prompt, Drone/Operator 전환 가능 여부를 표시한다.
+- Crash, 목표 획득, 귀환, NPC 대화 완료를 중복 없이 Mission Event로 연결한다.
+
+### Jamming
+
+Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 규칙으로 시작한다.
+
+1. 약함: 신호 경고와 Signal Meter 변화
+2. 중간: HUD Noise와 목표 정보 일부 손실
+3. 강함: 조작 반응 저하 또는 통신 두절
+
+`ADroneJammingVolume`의 범위와 정규화된 세기로 상태를 계산한다. Jammer 회피, 범위 이탈, 전원 차단 또는 파괴를 Mission 목표로 연결한다. 실제 전자전 장비를 1:1 재현하지 않는다.
+
+## 6. 외부 Drone 에셋 적용
+
+- 원본은 `/Game/Drone/ThirdParty/<PackName>` 아래에 보존한다.
+- 실제 사용 Blueprint는 `/Game/Drone/Drones` 아래에 만들고 프로젝트 기능 Pawn에 연결한다.
+- C++ Collision Root, Movement, Camera/Sensor 기준점은 유지한다.
+- 외부 Mesh, Rotor, Material, Animation, VFX만 Integration Blueprint가 연결한다.
+- 외부 Pawn/GameMode/Input Mapping을 신규 게임플레이 부모로 사용하지 않는다.
+- 적용 전에 Plugin, 부모 클래스, Collision, Pivot/Forward, Scale, Socket/Bone, Animation, License, LFS 용량을 감사한다.
+
+## 7. 작업 카드
+
+| ID | 작업 | 완료 조건 |
+|---|---|---|
+| CTRL-01 | 고정 추적 Camera와 Mouse/Gamepad 입력 | 5 Action, 15 Mapping, 자동화 3/3과 수동 체감 확인 |
+| HUD-01 | Telemetry Snapshot Component | 속도·고도·수직 속도·Heading을 10Hz Event로 제공 |
+| HUD-02 | 공용 Flight HUD | Drone Possess 중 네 수치를 화면에서 확인 |
+| TUT-01 | Training Map과 비충돌 Spline | 표시선이 비행·Collision·Nav에 영향 없음 |
+| TUT-02 | 순서형 Ring Gate | 정방향 현재 Gate만 한 번 통과 처리 |
+| TUT-03 | Segment/Lap 기록 | 시간·실제 이동 거리·평균 속도 계산 |
+| TUT-04 | 비교와 결과 UI | 이전 평균·Best 대비 ± 결과 표시 |
+| TUT-05 | Tutorial 회귀 테스트 | 정상 Lap, 역순, 재통과, Restart를 자동/수동 검증 |
+| FLT-01 | Take Off·Landing·Crash | 비행 상태와 Mission 실패 Event 연결 가능 |
+| CTRL-02 | Operator·Drone 전환 | Blend, Possess, IMC 정리, Drone Hover 복귀 확인 |
+| STY-01 | NPC 상호작용·대화 | 이동 잠금과 순차 대화 완료 Event 확인 |
+| STY-02 | Mission Director·UI | Briefing부터 Evaluation까지 상태 전환 |
+| STY-03 | Jamming Mission | 세 단계 효과와 회피/해제 목표 재현 |
+| STY-04 | AI·MG 통합 | Drone 탐지와 대응을 Mission 흐름에서 재현 |
+| AST-01 | 제공 Drone 에셋 감사·적용 | 기능 코드 변경 없이 Integration BP에서 외형 교체 |
+
+현재 `CTRL-01`은 자동화 3/3과 Standalone 수동 조작·정상 종료까지 통과해 완료했다. 다음 활성 카드는 `HUD-01`이다.
+
+## 8. 검증 게이트
+
+- 각 카드 시작·중간 검증·종료 시 `WORKBOARD.md`의 현재 스냅샷과 `DRONE_WORKLOG.md`의 변경 이력을 함께 갱신
+- C++ 변경마다 `DroneEditor Win64 Development` 빌드
+- Blueprint 변경마다 Compile errors/warnings 0
+- 새 `/Game/Drone` 자산에서 Legacy Variant 신규 의존성 0
+- 각 입력 Mapping은 한 경로에서만 등록
+- Tutorial 계산은 순수 C++ 단위 테스트로 시간·평균·Delta·첫 시도 예외 검증
+- Gate는 정상 순서, 역순, 중복 Overlap, 잘못된 Pawn을 자동화 검증
+- Operator↔Drone 전환을 새 PIE 3회 반복해 Pawn, Camera, IMC, HUD 중복 없음 확인
+- Story Mission은 성공·Crash 실패·Jamming 해제 경로를 각각 반복
+- 제공 에셋 적용 전후 Collision Root와 조작 테스트 결과가 동일해야 함
+
+네트워크, Android, 협동 플레이, 구매 에셋 세부 튜닝은 현재 범위에서 제외한다.

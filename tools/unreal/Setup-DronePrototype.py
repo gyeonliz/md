@@ -22,6 +22,7 @@ ASSET_PATHS = {
     "altitude": f"{ACTION_FOLDER}/IA_DronePrototype_Altitude",
     "yaw": f"{ACTION_FOLDER}/IA_DronePrototype_Yaw",
     "look": f"{ACTION_FOLDER}/IA_DronePrototype_Look",
+    "camera_pitch_rate": f"{ACTION_FOLDER}/IA_DronePrototype_CameraPitchRate",
     "imc": f"{INPUT_FOLDER}/IMC_DronePrototype",
     "pawn_bp": f"{BLUEPRINT_FOLDER}/BP_DronePrototypePawn",
     "game_mode_bp": f"{BLUEPRINT_FOLDER}/BP_DronePrototypeGameMode",
@@ -64,6 +65,12 @@ EXPECTED_MAPPINGS = {
     ("yaw", "E"): (),
     ("yaw", "Q"): ("InputModifierNegate",),
     ("look", "Mouse2D"): (),
+    ("move", "Gamepad_LeftX"): ("InputModifierDeadZone",),
+    ("move", "Gamepad_LeftY"): ("InputModifierDeadZone", "InputModifierSwizzleAxis"),
+    ("altitude", "Gamepad_RightTriggerAxis"): (),
+    ("altitude", "Gamepad_LeftTriggerAxis"): ("InputModifierNegate",),
+    ("yaw", "Gamepad_RightX"): ("InputModifierDeadZone",),
+    ("camera_pitch_rate", "Gamepad_RightY"): ("InputModifierDeadZone",),
 }
 
 
@@ -109,6 +116,10 @@ def make_swizzle_yxz(outer: unreal.Object) -> unreal.InputModifierSwizzleAxis:
     modifier = unreal.InputModifierSwizzleAxis(outer=outer)
     modifier.set_editor_property("order", unreal.InputAxisSwizzle.YXZ)
     return modifier
+
+
+def make_dead_zone(outer: unreal.Object) -> unreal.InputModifierDeadZone:
+    return unreal.InputModifierDeadZone(outer=outer)
 
 
 def create_data_asset(path: str, asset_class: unreal.Class) -> unreal.DataAsset:
@@ -172,6 +183,44 @@ def mapping(
     return result
 
 
+def build_mappings(
+    context: unreal.InputMappingContext,
+    actions: dict[str, unreal.InputAction],
+) -> list[unreal.EnhancedActionKeyMapping]:
+    return [
+        mapping(context, actions["move"], "W", [make_swizzle_yxz(context)]),
+        mapping(context, actions["move"], "S", [make_negate_x(context), make_swizzle_yxz(context)]),
+        mapping(context, actions["move"], "A", [make_negate_x(context)]),
+        mapping(context, actions["move"], "D", []),
+        mapping(context, actions["altitude"], "SpaceBar", []),
+        mapping(context, actions["altitude"], "LeftControl", [make_negate_x(context)]),
+        mapping(context, actions["yaw"], "E", []),
+        mapping(context, actions["yaw"], "Q", [make_negate_x(context)]),
+        mapping(context, actions["look"], "Mouse2D", []),
+        mapping(context, actions["move"], "Gamepad_LeftX", [make_dead_zone(context)]),
+        mapping(
+            context,
+            actions["move"],
+            "Gamepad_LeftY",
+            [make_dead_zone(context), make_swizzle_yxz(context)],
+        ),
+        mapping(context, actions["altitude"], "Gamepad_RightTriggerAxis", []),
+        mapping(
+            context,
+            actions["altitude"],
+            "Gamepad_LeftTriggerAxis",
+            [make_negate_x(context)],
+        ),
+        mapping(context, actions["yaw"], "Gamepad_RightX", [make_dead_zone(context)]),
+        mapping(
+            context,
+            actions["camera_pitch_rate"],
+            "Gamepad_RightY",
+            [make_dead_zone(context)],
+        ),
+    ]
+
+
 def spawn_actor(
     actors: unreal.EditorActorSubsystem,
     actor_class: unreal.Class,
@@ -231,24 +280,18 @@ def create_assets() -> None:
         "altitude": create_data_asset(ASSET_PATHS["altitude"], unreal.InputAction.static_class()),
         "yaw": create_data_asset(ASSET_PATHS["yaw"], unreal.InputAction.static_class()),
         "look": create_data_asset(ASSET_PATHS["look"], unreal.InputAction.static_class()),
+        "camera_pitch_rate": create_data_asset(
+            ASSET_PATHS["camera_pitch_rate"], unreal.InputAction.static_class()
+        ),
     }
     actions["move"].set_editor_property("value_type", unreal.InputActionValueType.AXIS2D)
     actions["altitude"].set_editor_property("value_type", unreal.InputActionValueType.AXIS1D)
     actions["yaw"].set_editor_property("value_type", unreal.InputActionValueType.AXIS1D)
     actions["look"].set_editor_property("value_type", unreal.InputActionValueType.AXIS2D)
+    actions["camera_pitch_rate"].set_editor_property("value_type", unreal.InputActionValueType.AXIS1D)
 
     context = create_data_asset(ASSET_PATHS["imc"], unreal.InputMappingContext.static_class())
-    mappings = [
-        mapping(context, actions["move"], "W", [make_swizzle_yxz(context)]),
-        mapping(context, actions["move"], "S", [make_negate_x(context), make_swizzle_yxz(context)]),
-        mapping(context, actions["move"], "A", [make_negate_x(context)]),
-        mapping(context, actions["move"], "D", []),
-        mapping(context, actions["altitude"], "SpaceBar", []),
-        mapping(context, actions["altitude"], "LeftControl", [make_negate_x(context)]),
-        mapping(context, actions["yaw"], "E", []),
-        mapping(context, actions["yaw"], "Q", [make_negate_x(context)]),
-        mapping(context, actions["look"], "Mouse2D", []),
-    ]
+    mappings = build_mappings(context, actions)
     mapping_data = unreal.InputMappingContextMappingData()
     mapping_data.set_editor_property("mappings", mappings)
     context.set_editor_property("default_key_mappings", mapping_data)
@@ -266,6 +309,7 @@ def create_assets() -> None:
             "altitude_action": actions["altitude"],
             "yaw_action": actions["yaw"],
             "look_action": actions["look"],
+            "camera_pitch_rate_action": actions["camera_pitch_rate"],
         }
     )
     placeholder_mesh = unreal.load_asset("/Engine/BasicShapes/Cube.Cube")
@@ -378,6 +422,7 @@ def validate_assets() -> None:
         "altitude": unreal.InputActionValueType.AXIS1D,
         "yaw": unreal.InputActionValueType.AXIS1D,
         "look": unreal.InputActionValueType.AXIS2D,
+        "camera_pitch_rate": unreal.InputActionValueType.AXIS1D,
     }
     for name, expected_type in expected_types.items():
         action = loaded[name]
@@ -388,7 +433,10 @@ def validate_assets() -> None:
     action_lookup = {loaded[name].get_path_name(): name for name in expected_types}
     mapping_data = loaded["imc"].get_editor_property("default_key_mappings")
     mappings = list(mapping_data.get_editor_property("mappings"))
-    require(len(mappings) == len(EXPECTED_MAPPINGS), f"Expected 9 IMC mappings, found {len(mappings)}")
+    require(
+        len(mappings) == len(EXPECTED_MAPPINGS),
+        f"Expected {len(EXPECTED_MAPPINGS)} IMC mappings, found {len(mappings)}",
+    )
 
     actual_keys = set()
     for item in mappings:
@@ -433,6 +481,7 @@ def validate_assets() -> None:
         ("altitude_action", "altitude"),
         ("yaw_action", "yaw"),
         ("look_action", "look"),
+        ("camera_pitch_rate_action", "camera_pitch_rate"),
     ):
         require(
             pawn_cdo.get_editor_property(property_name) == loaded[asset_id],
@@ -486,9 +535,10 @@ def main() -> None:
         validate_assets()
 
 
-try:
-    main()
-except Exception as error:
-    unreal.log_error(f"DRONE_SETUP|FAILED|{error}")
-    unreal.log_error(traceback.format_exc())
-    raise
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as error:
+        unreal.log_error(f"DRONE_SETUP|FAILED|{error}")
+        unreal.log_error(traceback.format_exc())
+        raise

@@ -1,16 +1,18 @@
 # Drone Prototype PFN-06 PIE 검증 기록
 
-기준일: 2026-08-19 (Asia/Seoul)
+기준일: 2026-08-21 (Asia/Seoul)
+
+이 문서는 PFN-06의 체크 항목과 실행별 결과를 기록하는 **단일 기준 문서**다. `STATUS.md`, `WORKBOARD.md`, 구현 문서는 판정 요약과 이 문서 링크만 유지하며 체크리스트를 복제하지 않는다.
 
 ## 현재 판정
 
 ```text
 PFN-01~05  Done
-PFN-06     Doing, 0/3 Pass
-PFN-P2     잠금
+PFN-06     Done, 자동화 3/3 Pass · Standalone 수동 Pass
+HUD-01     Ready
 ```
 
-두 번의 PIE에서 Prototype 입력 계열이 실제로 반응하는 것은 확인했다. 그러나 어느 실행도 한 번의 새 PIE 안에서 전체 체크리스트를 끝내지 못했으므로 Pass로 계산하지 않는다.
+2026-08-19 사전 PIE 두 번에서 Prototype 입력 계열이 실제로 반응하는 것은 확인했다. 그러나 어느 실행도 한 번의 새 PIE 안에서 전체 체크리스트를 끝내지 못했으므로 Pass로 계산하지 않는다. 두 실행은 이미 종료된 역사적 부분 확인이며 현재 열린 PIE가 있다는 뜻이 아니다.
 
 ## 실제로 확인한 내용
 
@@ -39,11 +41,11 @@ PFN-P2     잠금
 - `IMC_DronePrototype` 한 개 확인
 - `W` Move 반응 확인
 - 사용자가 다른 앱을 직접 조작하는 것을 감지해 GUI 입력을 즉시 중단
-- 감사 시점에는 두 번째 PIE가 열린 상태였으므로 Pass 또는 Fail로 판정하지 않음
+- 당시 감사 도중 입력을 중단했고 이후 종료함. 전체 조건을 끝내지 않았으므로 Pass 또는 Fail로 산정하지 않음
 
 ## 로그 근거
 
-`C:\project\Drone\Saved\Logs\Drone.log`에서 확인한 현재 세션 기준:
+2026-08-19 당시 경로 `C:\project\Drone\Saved\Logs\Drone.log`에서 확인한 역사적 세션 기준:
 
 - `Lvl_DronePrototype` PIE 시작 2회
 - `BP_DronePrototypeGameMode_C` 로드 2회
@@ -53,37 +55,46 @@ PFN-P2     잠금
 
 엔진 자체 오류 출력을 시험하는 `UE::UnifiedErrorTest`의 시작 로그와 렌더 설정 경고는 Prototype 기능 오류와 분리한다. 따라서 전체 로그가 warning/error 0이라고 표현하지 않는다.
 
-## 다음 3회 공통 체크리스트
+## 정식 3회 공통 체크리스트
 
-각 실행은 아래 항목을 전부 만족해야 한 번의 Pass다.
+기본 작업 프로젝트는 `D:\JGY\project\drone\Drone.uproject`다. 확정된 고정 추적 Camera와 Gamepad 계약을 반영한 `Drone.Prototype.PIEInputLifecycle`가 2026-08-21 Automation Report에서 새 PIE 3회를 모두 통과했다. 각 실행은 아래 항목을 전부 만족해야 한 번의 Pass다.
 
-- [ ] `Lvl_DronePrototype`에서 새 PIE 시작
-- [ ] BP Prototype Pawn 정확히 한 대 Spawn
-- [ ] `PlayerController_0`가 해당 Pawn Possess
-- [ ] `IMC_DronePrototype` 정확히 한 개, Priority 1
-- [ ] `W` Forward, `S` Backward
-- [ ] `A` Left, `D` Right
-- [ ] `Space Bar` Up, `Left Ctrl` Down
-- [ ] `E` Right Yaw, `Q` Left Yaw
-- [ ] Mouse X/Y가 Camera Look에 반영
-- [ ] Mouse Look 중 Actor Yaw는 변하지 않음
-- [ ] `W+Space`, `D+E` 같은 복합 입력이 한 번씩 반응
-- [ ] `W+S`, `A+D` 반대 입력에서 비정상 가속이나 이중 전달 없음
-- [ ] Input Action/IMC 누락·등록 실패·다른 경로 소유 진단 없음
-- [ ] PIE 정상 종료
+- [x] `Lvl_DronePrototype`에서 새 PIE 시작
+- [x] BP Prototype Pawn 정확히 한 대 Spawn
+- [x] `PlayerController_0`가 해당 Pawn Possess
+- [x] `IMC_DronePrototype` 정확히 한 개, Priority 1, 15개 Mapping
+- [x] `W` Forward, `S` Backward
+- [x] `A` Left, `D` Right
+- [x] `Space Bar` Up, `Left Ctrl` Down
+- [x] `E` Right Yaw, `Q` Left Yaw
+- [x] Mouse X가 Drone Actor Yaw를 바꾸고 추적 Camera가 함께 회전
+- [x] Mouse Y가 CameraBoom Pitch만 바꾸고 Actor/Controller 회전은 변경하지 않음
+- [x] Gamepad Left Stick 전후좌우, `RT/LT` 상승·하강
+- [x] Gamepad Right Stick X Drone Yaw, Y Camera Pitch
+- [x] `W+Space`, `D+E` 같은 복합 입력이 한 번씩 반응
+- [x] `W+S`, `A+D` 반대 입력에서 비정상 가속이나 이중 전달 없음
+- [x] 같은 입력 시간 기준으로 이전 PIE보다 입력 세기가 갑자기 두 배가 되지 않음
+- [x] Input Action/IMC 누락·등록 실패·다른 경로 소유 진단 없음
+- [x] PIE 정상 종료
 
 세 번의 위치 절대값을 같게 만드는 것이 목적은 아니다. 각 새 PIE의 시작 위치와 같은 입력 시간 기준으로 반응이 갑자기 두 배가 되지 않는지 비교한다.
 
+자동화 3회가 모두 통과한 뒤 `Lvl_DronePrototype`을 한 번 화면으로 확인한다. BP Prototype Pawn 한 대, Drone 뒤에 고정된 추적 Camera, Mouse X Drone Yaw, Mouse Y Camera Pitch, 기체 이동 방향과 정상 종료를 직접 확인한다. 실제 Gamepad가 연결돼 있으면 동일 회차에서 Stick과 Trigger 체감도 기록한다. 자동화 3/3과 이 수동 확인을 모두 완료한 경우에만 PFN-06을 Done으로 옮긴다.
+
 ## 반복 결과표
 
-| 실행 | Pawn/IMC | 모든 키·Look | 복합·반대 입력 | 중복 없음 | 종료 | 판정 |
+| 실행 | Pawn/IMC | Keyboard·Mouse·Gamepad | 복합·반대 입력 | 중복 없음 | 종료 | 판정 |
 |---|---|---|---|---|---|---|
 | 사전 부분 확인 1 | 확인 | `S` 제외 부분 확인 | 미확인 | 미확인 | 확인 | 미산정 |
-| 사전 부분 확인 2 | 확인 | Move 일부 | 미확인 | 미확인 | 판정 전 | 미산정 |
-| 정식 1 | 대기 | 대기 | 대기 | 대기 | 대기 | 대기 |
-| 정식 2 | 대기 | 대기 | 대기 | 대기 | 대기 | 대기 |
-| 정식 3 | 대기 | 대기 | 대기 | 대기 | 대기 | 대기 |
+| 사전 부분 확인 2 | 확인 | Move 일부 | 미확인 | 미확인 | 종료 | 미산정 |
+| 정식 1 | Pawn 1 / IMC 1 | Pass | Pass | Pass | 정상 종료 | 자동화 Pass |
+| 정식 2 | Pawn 1 / IMC 1 | Pass | Pass | Pass | 정상 종료 | 자동화 Pass |
+| 정식 3 | Pawn 1 / IMC 1 | Pass | Pass | Pass | 정상 종료 | 자동화 Pass |
 
-## 안전한 재개 조건
+| 수동 화면 확인 | Pawn/고정 Camera | 이동·Mouse 방향 | Gamepad 체감 | 종료 | 판정 |
+|---|---|---|---|---|---|
+| 새 조작 자동화 3회 통과 후 1회 | Pawn 1·고정 Camera 정상 | Keyboard·Mouse Pass | 연결 여부 미보고 | 창 닫기 정상 종료 | 수동 Pass |
 
-사용자가 다른 앱을 직접 조작 중일 때는 GUI 자동 입력을 보내지 않는다. Unreal Editor를 직접 사용할 수 있는 상태에서 현재 PIE를 먼저 정상 종료하고, 새 PIE 3회를 처음부터 수행한다. 이 검증이 끝나기 전에는 PFN-06을 Done으로 옮기거나 PFN-07 이후 Flight MVP 카드를 활성화하지 않는다.
+## 완료 판정
+
+사용자는 수정된 조작이 정상이라고 확인했다. `Esc`로 종료되지는 않았지만 창 닫기 뒤 로그가 `Win RequestExit → Game engine shut down → Exiting`으로 끝났고 Fatal·Assertion은 없었다. 실제 Gamepad 체감은 장치 연결 여부가 보고되지 않아 미확인으로 남기되 필수 자동화 입력 Probe가 통과했으므로 PFN-06 완료를 차단하지 않는다.

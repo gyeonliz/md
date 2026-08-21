@@ -1,6 +1,6 @@
 # 구매 소스 확보 전 Drone 기능 우선 개발 계획
 
-기준일: 2026-08-19 (Asia/Seoul)
+기준일: 2026-08-21 (Asia/Seoul)
 
 ## 1. 목적
 
@@ -22,21 +22,26 @@ Spawn
 
 구매 소스가 예상보다 늦어져도 이 사이클까지는 Placeholder만으로 완성할 수 있게 한다.
 
+사용자가 Tutorial과 Story 구성을 확정한 뒤의 최신 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)가 우선한다. 이 문서는 기존 PFN 카드, Placeholder 원칙과 에셋 교체 경계를 보존하는 참고 기준이다.
+
 ## 2. 현재 출발점
 
 확인된 현재 상태는 다음과 같다.
 
-- UE 5.8.1 프로젝트: `C:\project\Drone`
+- 기본 작업 루트: `D:\JGY\project`
+- UE 5.8.1 프로젝트: `D:\JGY\project\drone`, 로컬 기준 Commit `2c38ebf`, `origin/main` `fb891fb`
+- 문서 저장소: `D:\JGY\project\md`, 기준 Commit `9e81de0`
 - 별도 `ADronePrototypePawn`과 `ADronePrototypeGameMode` C++ 구현 완료
 - 컴포넌트 기본값과 standalone Spawn/Possess 자동화 테스트 완료
 - 기존 Third Person 기본 맵과 전역 GameMode 유지
 - PFN-01~05 완료: Prototype Input Action, IMC, Blueprint Pawn/GameMode, 전용 Greybox Map 생성·연결
-- GUI PIE 두 번에서 입력을 부분 확인했지만 전체 체크리스트를 끝낸 실행은 없어 PFN-06은 0/3 Pass
-- 사용자 직접 조작 보호를 위해 GUI 입력을 중단했으며 새 PIE 3회 전체 반복이 남음
-- Prototype 임시 키는 기록했지만 최종 키·감도·물리·Mesh·멀티플레이 방식은 미정
+- 고정 추적 Camera, Mouse X Drone Yaw, Mouse Y Camera Pitch와 Gamepad 6축을 구현했다. 새 계약의 `PIEInputLifecycle` 자동화 3/3, Standalone Keyboard·Mouse 수동 조작과 창 닫기 정상 종료를 확인해 PFN-06은 Done이다.
+- Camera와 장치별 역할은 v1으로 확정했지만 감도·Mouse Y 반전·물리·Mesh·멀티플레이 방식은 미정
 - Android는 현재 개발 범위에서 제외
 
-따라서 현재 실행 카드는 PFN-06의 새 PIE 3회 전체 반복이다. 이 게이트를 통과하기 전에는 PFN-07 이후 Flight MVP 카드를 활성화하지 않는다. Pawn이나 Input/Blueprint/Map을 다시 처음부터 만드는 작업은 하지 않는다.
+따라서 현재 실행 카드는 `HUD-01` Telemetry Snapshot이다. 이어서 공용 Flight HUD와 Tutorial Vertical Slice를 활성화한다.
+
+새 생산 코드는 `Source/Drone`, 새 자산은 `/Game/Drone` 아래에 둔다. ThirdPerson·Combat·Platforming·SideScrolling은 참고용 Legacy로 동결하고 신규 상속·참조를 만들지 않는다. Prototype IMC는 Pawn만 등록·제거하며 PlayerController와 Level Blueprint에는 같은 책임을 추가하지 않는다. 현재 검증 범위는 Standalone 싱글플레이이고 네트워크·Android·구매 에셋은 제외한다.
 
 ## 3. 구매 전 범위
 
@@ -130,18 +135,18 @@ P0. 현재 C++ 기준선
   ↓
 P1. 입력·BP·Greybox 시험장
   ↓
-P2. Flight MVP
+P2. Telemetry HUD + Tutorial Vertical Slice
   ↓
-P3. 최소 Mission Shell
+P3. Flight 상태 + Operator ↔ Drone
   ↓
-P4. Enemy AI + MG Turret
+P4. NPC·Mission UI Story Shell
   ↓
-P5. HUD·Evaluation·통합 Greybox
+P5. Enemy AI + MG + Jamming
   ↓
-P6. 에셋 구매 요구사항 확정과 교체 준비
+P6. 통합 Greybox + 에셋 교체 준비
 ```
 
-기존 전체 MVP 순서는 `Flight → Enemy AI → Mission → UI/Evaluation`이다. 구매 전 계획에서는 AI를 실제 플레이 흐름 안에서 바로 시험할 수 있도록 Flight 뒤에 **최소 Mission Shell만 먼저** 둔다. Mission의 세부 규칙과 UI 완성은 Enemy AI 뒤에서 진행한다.
+기존 PFN 번호는 유지하지만 실제 활성화 순서는 Tutorial에서 조작·Telemetry·기록 UI를 먼저 검증한 뒤 Story의 Operator·NPC·Mission·Jamming으로 확장한다.
 
 경진대회 마감일과 팀원별 주간 투입 시간이 현재 문서에 확정되어 있지 않으므로 주차별 완료일은 임의로 만들지 않는다. 우선 모든 작업을 1~3시간 카드로 운영하고, 일정이 정해지면 이 의존 순서를 유지한 채 주차 계획으로 배치한다.
 
@@ -150,8 +155,8 @@ P6. 에셋 구매 요구사항 확정과 교체 준비
 | ID | 작업 | 예상 크기 | 의존성 | 완료 조건 |
 |---|---|---:|---|---|
 | PFN-01 | 임시 입력 계약 결정 | 1시간 | 없음 | Move·Altitude·Yaw·Look의 테스트 키와 Action Value Type 기록 |
-| PFN-02 | Input Action 4개와 전용 IMC 생성 | 1~2시간 | PFN-01 | Move·Look은 Axis2D, Altitude·Yaw는 Axis1D이며 임시 Mapping이 기록됨 |
-| PFN-03 | `BP_DronePrototypePawn` 생성·자산 연결 | 1~2시간 | PFN-02 | IMC와 네 Action이 BP Class Defaults에 연결됨 |
+| PFN-02 | Input Action 5개와 전용 IMC 생성 | 1~2시간 | PFN-01 | 5개 Action과 Keyboard·Mouse·Gamepad 15개 Mapping이 기록됨 |
+| PFN-03 | `BP_DronePrototypePawn` 생성·자산 연결 | 1~2시간 | PFN-02 | IMC와 5개 Action이 BP Class Defaults에 연결됨 |
 | PFN-04 | `BP_DronePrototypeGameMode` 연결 | 1시간 | PFN-03 | Default Pawn이 BP Prototype Pawn을 사용함 |
 | PFN-05 | `Lvl_DronePrototype` Greybox 생성 | 2~3시간 | PFN-04 | PlayerStart·지면·장애물·높이 표식이 있는 별도 Map 실행 |
 | PFN-06 | Spawn/Input 기준선 반복 PIE | 1시간 | PFN-05 | 새 PIE 3회 모두 Pawn 한 대 Spawn·Possess, 네 Callback 값 전달, IMC·입력 중복 없음 |
@@ -172,11 +177,11 @@ P6. 에셋 구매 요구사항 확정과 교체 준비
 
 ### P1 결정 게이트
 
-다음은 임의로 확정하지 않고 구현 직전에 기록한다.
+다음은 최종 조작 방식으로 임의 확정하지 않는다.
 
-- 임시 입력 키
-- Look 반전 여부
-- 현재 Actor 기준 수평 이동을 그대로 시험할지 여부
+- 현재 임시 입력 키는 PFN-06 동안 유지한다.
+- Look 반전과 감도는 현재값을 유지하고 수동 화면 확인에서 체감만 기록한다.
+- PFN-06 수평 이동은 현재 구현인 Actor-relative 기준으로 검증한다. 최종 Actor-relative/Camera-relative 선택은 별도 결정이다.
 
 입력 계약은 Prototype 전용이며 최종 조작 방식 승인이 아니다.
 
@@ -358,10 +363,12 @@ PFN-37의 최신 결과가 **3회 연속 Pass**여야 이 게이트를 통과한
 
 ```text
 PFN-01~05 Done
-→ PFN-06 Doing (0/3 Pass, 부분 동작 확인)
-→ 새 PIE 3회 전체 검증
-→ PFN-06 Done
-→ PFN-07~14 활성화
+→ PFN-06 Done (자동화 3/3 + Standalone 수동 Pass)
+→ Telemetry/HUD와 Tutorial Course·Timing
+→ Take Off·Landing·Crash
+→ Operator↔Drone와 NPC·Mission UI
+→ Enemy AI·MG·Jamming
+→ 통합 Greybox·에셋 교체 준비
 ```
 
-이 여섯 카드를 통과한 다음에만 Take Off와 Landing 상태 구현으로 넘어간다.
+PFN-06을 통과한 다음에는 Telemetry/HUD와 Tutorial Vertical Slice를 우선하고, 그 결과를 기준으로 Take Off와 Landing 상태 구현으로 넘어간다.
