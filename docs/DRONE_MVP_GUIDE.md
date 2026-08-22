@@ -1,6 +1,6 @@
 # 드론 프로젝트 MVP 개발 가이드
 
-> 현재 구현 지점: Camera/Input PFN-06과 HUD-01 Telemetry를 완료했다. 공용 Component가 10Hz로 속도·고도·수직 속도·Heading Snapshot을 제공하며 Drone 자동화 5/5와 Blueprint 0/0을 통과했다. 다음 카드는 HUD-02 화면 표시다. 입력 결과는 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md), Telemetry 결과는 [`DRONE_TELEMETRY_IMPLEMENTATION.md`](DRONE_TELEMETRY_IMPLEMENTATION.md)를 따른다.
+> 현재 구현 지점: Camera/Input PFN-06, HUD-01 Telemetry와 HUD-02 Flight HUD를 완료했다. 공용 Component의 10Hz Snapshot을 PlayerController 소유 HUD가 Event 기반으로 표시하며 Drone 자동화 6/6, Blueprint 0/0과 Standalone 네 수치 변화를 통과했다. 다음 카드는 TUT-01 Training Map과 비충돌 Spline이다. 입력 결과는 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md), Telemetry/HUD 결과는 [`DRONE_TELEMETRY_IMPLEMENTATION.md`](DRONE_TELEMETRY_IMPLEMENTATION.md)를 따른다.
 
 > 현재 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)가 우선한다. PFN 카드 번호와 Placeholder 교체 경계는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 
@@ -22,7 +22,7 @@
 - 첫 구현 대상: 정찰용 멀티콥터 1종
 - 핵심 요소: 드론 운용, 정찰, 침투, 탐지, 적 AI 반응, 임무, 귀환, 평가
 - 현재 v1 조작: 고정 추적 Camera, Actor-relative 이동, World Up 고도, Mouse X Drone Yaw, Mouse Y Camera Pitch, Gamepad Left Stick·Trigger·Right Stick
-- 현재 기능 우선 순서: Telemetry/HUD → Tutorial Spline·순서형 Ring Gate·Lap/Segment 기록 → Flight 상태 → Operator↔Drone → NPC·Mission UI·Jamming → AI/MG → 에셋 통합
+- 현재 기능 우선 순서: Tutorial Spline·순서형 Ring Gate·Lap/Segment 기록 → Flight 상태 → Operator↔Drone → NPC·Mission UI·Jamming → AI/MG → 에셋 통합
 - J3C: 프로젝트 콘셉트에서 사용하는 가상의 외주 발주처 설정일 뿐이며, 실제 계약·협력·지원·공식 관계가 아니다.
 
 ### 현재 미정이며 구현 중에도 확정된 것처럼 다루지 않을 항목

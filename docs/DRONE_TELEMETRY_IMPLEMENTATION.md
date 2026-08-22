@@ -1,10 +1,10 @@
 # Drone Telemetry 구현 및 검증 기록
 
-기준일: 2026-08-21 (Asia/Seoul)
+기준일: 2026-08-23 (Asia/Seoul)
 
 ## 1. 현재 결과
 
-`HUD-01`의 공용 Telemetry Snapshot과 `UDroneTelemetryComponent`를 구현했다. Component는 Prototype Pawn에 기본 부착되며, 매 프레임 Tick 대신 0.1초 Timer를 사용해 10Hz로 Snapshot을 갱신하고 Blueprint Event를 보낸다.
+`HUD-01`의 공용 Telemetry Snapshot 공급 계층과 `HUD-02`의 실제 Flight HUD 화면 계층을 구현했다. Component는 Prototype Pawn에 기본 부착되며, 매 프레임 Tick 대신 0.1초 Timer를 사용해 10Hz로 Snapshot Event를 보낸다. PlayerController 소유 HUD는 현재 Possess Drone의 Event를 받아 네 수치를 표시한다.
 
 현재 제공 값은 다음 네 가지다.
 
@@ -16,6 +16,8 @@
 | Heading | degree | Actor Yaw를 `0~359°`로 정규화 |
 
 ## 2. 실제 코드 위치
+
+아래 절대 경로는 작업컴 기준이다. 이번 검증 PC의 루트는 `C:\URproject\drone`이며 저장소 안의 상대 경로는 동일하다.
 
 ```text
 D:\JGY\project\drone\Source\Drone\Telemetry\DroneTelemetryTypes.h
@@ -31,6 +33,17 @@ D:\JGY\project\drone\Source\Drone\Prototype\DronePrototypePawn.h
 D:\JGY\project\drone\Source\Drone\Prototype\DronePrototypePawn.cpp
 D:\JGY\project\drone\Source\Drone\Prototype\Tests\DronePrototypeDefaultsTest.cpp
 D:\JGY\project\drone\Source\Drone\Prototype\Tests\DronePrototypeSpawnPossessTest.cpp
+```
+
+HUD-02 화면·Controller·수명주기 테스트 위치는 저장소 기준 다음과 같다. 이번 검증 PC의 저장소 루트는 `C:\URproject\drone`이다.
+
+```text
+Source\Drone\UI\DroneFlightHUDWidget.h
+Source\Drone\UI\DroneFlightHUDWidget.cpp
+Source\Drone\Prototype\DronePrototypePlayerController.h
+Source\Drone\Prototype\DronePrototypePlayerController.cpp
+Source\Drone\UI\Tests\DroneFlightHUDTest.cpp
+Source\Drone\Prototype\Tests\DronePrototypePIEInputLifecycleTest.cpp
 ```
 
 ## 3. Snapshot 책임
@@ -67,15 +80,17 @@ Tutorial에서는 시작 Pad 또는 `ADroneTrainingCourse`가 Reference Z를 지
 
 ## 6. HUD-02 연결 기준
 
-공용 Flight HUD는 다음 방식으로 연결한다.
+공용 Flight HUD는 다음 방식으로 연결했다.
 
-1. 현재 Possess한 Drone에서 `UDroneTelemetryComponent`를 가져온다.
-2. `OnTelemetryUpdated`를 한 번만 구독한다.
-3. 새 Snapshot을 받으면 네 Text 값을 갱신한다.
-4. Pawn 전환·Widget 종료 시 기존 Component Event를 해제한다.
-5. Widget은 표시 자릿수와 색상만 담당하고 단위 변환은 하지 않는다.
+1. `ADronePrototypePlayerController`가 로컬 Player 화면에 `UDroneFlightHUDWidget` 하나를 생성하고 수명 동안 재사용한다.
+2. 현재 Possess Pawn에서 `UDroneTelemetryComponent`를 가져온다.
+3. 기존 Source를 해제한 뒤 `OnTelemetryUpdated`를 `AddUniqueDynamic`으로 한 번만 구독한다.
+4. 연결 직후 `GetLatestSnapshot()`을 한 번 적용해 초기 Event를 놓쳐도 빈 화면이 되지 않게 한다.
+5. 새 Snapshot을 받으면 네 Text 값을 갱신한다.
+6. Pawn 전환·UnPossess·Widget 종료·Controller 종료 시 기존 Component Event를 해제한다.
+7. Widget은 표시 형식만 담당하고 단위 변환이나 Telemetry 재계산은 하지 않는다.
 
-초기 표시 후보:
+현재 Prototype에서 채택한 표시 형식:
 
 ```text
 SPD  42.5 km/h
@@ -84,17 +99,20 @@ V/S  +1.4 m/s
 HDG  315°
 ```
 
+소수점 자릿수와 3자리 Heading은 현재 읽기 쉬운 초기값이며 최종 배치·폰트·색상·Animation 계약은 아직 미정이다.
+
 ## 7. 자동화와 빌드 결과
 
 ### C++ 빌드
 
 ```text
 Target: DroneEditor Win64 Development
-CompilerVersion: 14.51.36256
+CompilerVersion argument: 14.51.36231
+Reported toolchain: 14.51.36252
 Result: Succeeded
 ```
 
-첫 실행은 PowerShell이 따옴표 없는 CompilerVersion을 분리해 UBT Rules 인자 오류가 났다. 코드는 컴파일되지 않은 실행 명령 문제였고, 전체 버전 인자를 문자열로 전달한 뒤 빌드가 성공했다.
+HUD-01 검증의 첫 실행에서는 PowerShell이 따옴표 없는 CompilerVersion을 분리해 UBT Rules 인자 오류가 났다. 코드는 컴파일되지 않은 실행 명령 문제였고, 전체 버전 인자를 문자열로 전달한 뒤 빌드가 성공했다. HUD-02 최종 빌드는 위 인자로 정상 성공했다.
 
 ### 자동화
 
@@ -106,10 +124,13 @@ Drone.Prototype.PIEInputLifecycle  Success
 Drone.Prototype.SpawnPossess       Success
 Drone.Telemetry.Calculation        Success
 Drone.Telemetry.Defaults           Success
-Total                              5 succeeded, 0 warnings, 0 failed
+Drone.UI.FlightHUDTelemetryBinding Success
+Total                              6 succeeded, 0 warnings, 0 failed
 ```
 
-`SpawnPossess`는 실제 생성된 Prototype Pawn이 Telemetry Component 한 개를 소유하고 Spawn Z를 고도로 보고하며, Reference Z 변경 직후 Snapshot이 갱신되는 것까지 확인한다.
+`SpawnPossess`는 실제 생성된 Prototype Pawn이 Telemetry Component 한 개를 소유하고 Spawn Z를 고도로 보고하며, Reference Z 변경 직후 Snapshot이 갱신되는 것까지 확인한다. `FlightHUDTelemetryBinding`은 동일 Source 중복 연결 방지, 이전 Source 해제, 새 Source 연결과 네 표시 형식을 확인한다.
+
+`PIEInputLifecycle`은 새 PIE 3회에서 실제 Prototype PlayerController·HUD 한 개·Viewport·현재 Telemetry 연결을 확인한다. 각 회차에서 UnPossess 시 숨김/구독 해제, 같은 Widget 재사용 Re-Possess와 구독 복구, PIE 종료 뒤 잔존 Delegate 없음까지 검증하면서 기존 Keyboard·Mouse·Gamepad 입력 회귀도 유지한다.
 
 ### Blueprint
 
@@ -120,9 +141,23 @@ CompileAllBlueprints
 0 blueprints failed to load
 ```
 
+### Standalone 화면
+
+실제 Development Standalone에서 다음 변화가 보였다.
+
+```text
+초기    SPD 0.0 km/h   ALT 1.5 m   V/S +0.0 m/s
+이동    SPD 43.2 km/h
+상승    ALT 2.7 m      V/S +10.0 m/s
+하강                    V/S -7.2 m/s
+Yaw     HDG 002° → 025°/045°
+```
+
+10Hz HUD에 단일 자동 입력을 확실히 포착하기 위해 실행 인자에서만 Movement 가속·감속을 임시 조정했다. 프로젝트 기본 이동값과 소스 파일은 변경하지 않았다. 기준면 아래 Altitude의 음수 보존은 `Drone.Telemetry.Calculation` 자동화에서 검증했다.
+
 ## 8. 현재 경계와 다음 작업
 
-`HUD-01`은 C++ 데이터 공급 계층까지 완료한다. 다음 `HUD-02`에서 UMG Widget과 화면 배치를 만들고 Standalone에서 실제 숫자가 이동에 따라 변하는지 확인한다.
+`HUD-01` 데이터 공급 계층과 `HUD-02` 화면 계층을 완료했다. Unreal 기준 Commit은 `410c940`이며 로컬 `main`과 `origin/main`에 반영됐다. 다음 활성 카드는 `TUT-01` Training Map과 비충돌 Spline이다.
 
 아직 포함하지 않는 항목:
 

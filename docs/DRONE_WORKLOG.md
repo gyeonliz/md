@@ -1,6 +1,6 @@
 # Drone 개발 진행 기록
 
-기준일: 2026-08-21 (Asia/Seoul)
+기준일: 2026-08-23 (Asia/Seoul)
 
 이 문서는 Drone 개발의 **진행 이력**을 시간순으로 남긴다. 가장 최신의 현재 상태는 [`../WORKBOARD.md`](../WORKBOARD.md), 확정 구현 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)를 따른다.
 
@@ -18,16 +18,16 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-21 12:30 KST
+마지막 갱신: 2026-08-23 04:30 KST
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | 2단계 Telemetry/HUD 진행 중, HUD-01 완료 |
+| 전체 단계 | 2단계 Telemetry/HUD 완료, Tutorial Vertical Slice 시작 대기 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | `HUD-01` 마감 완료, `HUD-02` 구현 시작 대기 |
+| 지금 작업 중 | `HUD-02` 마감 완료, `TUT-01` 구현 시작 대기 |
 | 차단 조건 | 없음. 고도 기준은 Course/Mission이 지정하는 World Z 대비 값 |
-| 다음 행동 | `HUD-02` UMG Widget과 Telemetry Event 구독 구현 |
-| 다음 기능 | `HUD-02` 공용 Flight HUD → Tutorial Course |
+| 다음 행동 | `TUT-01` Training Map과 비충돌 Spline 구현 |
+| 다음 기능 | `TUT-01` Training Map·Spline → `TUT-02` 순서형 Ring Gate |
 | 이후 | Tutorial Spline·Ring Gate·Lap/Segment 기록 → Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming |
 
 ## 2026-08-21 — Camera·Mouse·Gamepad 기준선 갱신
@@ -115,3 +115,49 @@ PFN-06 통과 후 `HUD-01`을 시작한다. Drone Telemetry를 10Hz Snapshot으�
 - 상세 구현: [`DRONE_TELEMETRY_IMPLEMENTATION.md`](DRONE_TELEMETRY_IMPLEMENTATION.md)
 - Unreal 로컬 Commit: `08e876a` (`feat: add drone telemetry snapshot component`)
 - 원격 Push: 수행하지 않음
+
+## 2026-08-23 — HUD-02 구현·검증 완료
+
+### 실제 변경
+
+- `Source/Drone/UI/DroneFlightHUDWidget.*`에 C++ native UMG Flight HUD를 추가했다.
+- `Source/Drone/Prototype/DronePrototypePlayerController.*`가 로컬 Player 화면에 HUD 하나를 만들고 PlayerController 수명 동안 재사용한다.
+- Prototype GameMode가 전용 PlayerController를 사용하도록 연결했다.
+- Widget은 현재 Possess Pawn의 `UDroneTelemetryComponent`를 찾아 `OnTelemetryUpdated`를 `AddUniqueDynamic`으로 구독하고, 연결 직후 최신 Snapshot을 한 번 적용한다.
+- Pawn 전환 시 이전 Component Event를 해제하고 새 Source로 교체한다. UnPossess, Widget 종료와 Controller 종료에서도 해제를 멱등적으로 수행한다.
+- Tick, UMG Property Binding, 매 프레임 Pawn 검색과 Widget 내부 단위 재계산은 사용하지 않는다.
+- 현재 Prototype 표시는 `SPD %.1f km/h`, `ALT %.1f m`, `V/S %+.1f m/s`, `HDG %03d°` 형식이다. 배치·폰트·색상·Animation은 최종 디자인 확정이 아니라 교체 가능한 초기값이다.
+- 현재 PC의 실제 저장소 경로는 `C:\URproject\drone`이며, 뒤처진 `C:\project\Drone` 복제본은 수정하지 않았다.
+
+### 자동화와 수명주기 검증
+
+- `Drone.UI.FlightHUDTelemetryBinding`이 동일 Source 중복 연결 방지, 이전 Source 해제, 새 Source 연결, 네 Text 포맷과 Clear를 확인한다.
+- 기존 `PIEInputLifecycle`을 확장해 새 PIE 3회마다 Prototype PlayerController와 HUD가 정확히 하나인지, Viewport와 현재 Telemetry Source가 연결됐는지 확인한다.
+- 각 PIE에서 `UnPossess → HUD Collapsed·Event 해제 → 같은 Widget 재사용 Re-Possess·Event 재연결`을 실행하고, 종료 뒤 Viewport·Telemetry·Possession Delegate 잔존이 없는지 확인한다.
+- Keyboard·Mouse·Gamepad, 복합·반대 입력과 입력 세기 회귀도 같은 테스트에서 계속 통과했다.
+
+### 최종 검증 결과
+
+- `DroneEditor Win64 Development` 빌드 성공
+- 최종 `Drone.` Automation: 6 succeeded, 0 warnings, 0 failed
+- `CompileAllBlueprints`: 0 errors, 0 warnings, 0 blueprints failed to load
+- 새 `.uasset`/`.umap`을 만들지 않아 `/Game/Drone`의 Legacy Variant 신규 의존성 0
+- Standalone 초기 화면: `SPD 0.0 km/h`, `ALT 1.5 m`, `V/S +0.0 m/s`
+- Standalone 이동: `SPD 43.2 km/h`
+- Standalone 상승: `ALT 2.7 m`, `V/S +10.0 m/s`
+- Standalone 하강: `V/S -7.2 m/s`
+- Standalone Yaw: Heading `002° → 025°/045°`
+- 단일 자동 입력을 10Hz 화면에 확실히 포착하기 위해 실행 중에만 Movement 가속·감속을 임시 조정했으며 프로젝트 기본값과 소스는 변경하지 않았다.
+
+### 발견·수정한 문제
+
+- 첫 테스트 빌드에서 Dynamic Multicast 검사 API 선택과 C++ 멤버 이름 가림 오류를 발견해 `Contains` 검사와 명확한 변수명으로 수정했다.
+- `AddToPlayerScreen` 실패가 조용히 넘어가지 않도록 반환값 검사와 오류 로그를 추가했다.
+- 기본 UMG 글자 크기가 작은 문제를 초기 Prototype 읽기 크기로 조정했다. 이는 최종 HUD 디자인 확정이 아니다.
+
+### 판정과 Git
+
+- `HUD-02` Done
+- `TUT-01` Ready
+- Unreal Commit: `410c940` (`feat: add event-driven drone flight HUD`)
+- `codex/hud-02-flight-hud`와 `origin/main`에 Push 완료, 로컬 `main=origin/main=410c940`

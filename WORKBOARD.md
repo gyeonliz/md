@@ -1,24 +1,24 @@
 # 현재 작업 보드
 
-기준일: 2026-08-21 (Asia/Seoul)
+기준일: 2026-08-23 (Asia/Seoul)
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 작업 기준은 로컬 `main`의 HUD-01 Commit `08e876a`이며 `origin/main`은 Push 전 `fb891fb`다. 문서 원격 기준은 `9e81de0`이고 이 현황 갱신은 로컬 Commit으로 관리한다. 현재 기능 실행 순서는 `HUD-02 → Tutorial Course → Flight 상태 → Operator↔Drone → Story/NPC/Mission → AI/MG/Jamming → 에셋 적용`이다.
+Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 HUD-02 Commit `410c940`이다. 문서 저장소는 이번 갱신 직전 `origin/main=f6a7be7`이었고 이 현황 갱신도 Commit·Push해 두 PC 기준을 맞춘다. 현재 기능 실행 순서는 `Tutorial Course → Flight 상태 → Operator↔Drone → Story/NPC/Mission → AI/MG/Jamming → 에셋 적용`이다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-08-21 12:30 KST
+마지막 갱신: 2026-08-23 04:30 KST
 
 | 항목 | 상태 |
 |---|---|
-| 현재 단계 | 2단계 Telemetry/HUD 진행 중, `HUD-01` 완료 |
-| 진행 정도 | Telemetry C++·10Hz Event·런타임 부착·자동화 완료 |
-| 지금 작업 중 | `HUD-01` 마감 완료, `HUD-02` 구현 시작 대기 |
-| 완료 근거 | Editor Build 성공, Drone 자동화 5/5, Blueprint 0/0, Runtime Reference 갱신 Pass |
+| 현재 단계 | 2단계 Telemetry/HUD 완료, Tutorial Vertical Slice 시작 대기 |
+| 진행 정도 | Telemetry 공급·Flight HUD 표시·Possession 수명주기·Standalone 네 수치 변화 검증 완료 |
+| 지금 작업 중 | `HUD-02` 마감 완료, `TUT-01` 구현 시작 대기 |
+| 완료 근거 | Editor Build 성공, Drone 자동화 6/6, Blueprint 0/0, Standalone SPD·ALT·V/S·HDG 변화 확인 |
 | 현재 차단 | 없음. 고도는 Tutorial/Mission이 지정하는 기준 Z 대비 값으로 확정 |
-| 다음 행동 | `HUD-02` 공용 Flight HUD Widget과 화면 연결 시작 |
-| 다음 기능 | `HUD-02` HUD → `TUT-01` Training Map·비충돌 Spline |
+| 다음 행동 | `TUT-01` Training Map과 비충돌 Spline 구현 시작 |
+| 다음 기능 | `TUT-01` Training Map·비충돌 Spline → `TUT-02` 순서형 Ring Gate |
 
 상세 변경 이력은 [`docs/DRONE_WORKLOG.md`](docs/DRONE_WORKLOG.md)에 계속 추가한다. 매 구현 작업 종료 시 이 스냅샷의 현재 작업·완료 근거·다음 작업을 함께 갱신한다.
 
@@ -34,7 +34,6 @@ Unreal 작업 기준은 로컬 `main`의 HUD-01 Commit `08e876a`이며 `origin/m
 | PFN-P3 | Drone | Mission Shell 카드 PFN-15~21 활성화 | PFN-14 통과 |
 | PFN-P4 | Drone / Unreal | Enemy AI·Turret 카드 PFN-22~32 활성화 | PFN-21 통과 |
 | PFN-P5 | Drone / Unreal | 통합 Greybox 카드 PFN-33~38 활성화 | PFN-32 통과 |
-| TUT-01 | Drone / Tutorial | 비충돌 Spline과 순서형 Ring Gate 코스 | HUD-02 통과 |
 | CTRL-02 | Drone / Story | Operator↔Drone Possess·Camera 전환 | Tutorial Vertical Slice 통과 |
 | STY-01 | Drone / Story | NPC 대화·Mission UI Story Shell | CTRL-02 통과 |
 | PFN-P6 | Drone / Unreal | 에셋 교체 준비 카드 PFN-39~43 활성화 | PFN-38 완료 + 최신 PFN-37 결과 3회 Pass |
@@ -46,13 +45,13 @@ Unreal 작업 기준은 로컬 `main`의 HUD-01 Commit `08e876a`이며 `origin/m
 |---|---|---|---|
 | GIT-10 | Git / Unreal | 다른 PC Clone과 실행 | LFS 포함 Clone 후 UE 5.8.1에서 열림 |
 | SYNC-04 | Codex Sync | 두 PC 간 실제 수동 인계 시험 | Git 흐름과 문맥 패키지 흐름을 각각 완료 |
-| HUD-02 | Drone / UI | 공용 Flight HUD | Drone 조작 중 네 Telemetry 수치를 화면에서 확인 |
+| TUT-01 | Drone / Tutorial | Training Map과 비충돌 Spline | 표시선이 비행·Collision·Nav에 영향 없음 |
 
 ## Doing
 
 | ID | 태그 | 작업 | 현재 확인 | 남은 완료 조건 |
 |---|---|---|---|---|
-| — | — | 현재 활성 구현 없음 | Todo의 HUD-02 시작 대기 | — |
+| — | — | 현재 활성 구현 없음 | Todo의 TUT-01 시작 대기 | — |
 
 ## Done
 
@@ -89,6 +88,7 @@ Unreal 작업 기준은 로컬 `main`의 HUD-01 Commit `08e876a`이며 `origin/m
 | PFN-05 | Drone / Unreal | 별도 Map에 GameMode Override, PlayerStart 한 개, 배치 Pawn 0개와 Greybox 시험 요소 구성 |
 | PFN-06 | Drone / Unreal | Camera·Spawn/Input 반복 PIE: 확정 조작 Automation 3/3, Standalone Keyboard·Mouse 조작과 창 닫기 정상 종료 Pass. 실제 Gamepad 체감은 미확인 |
 | HUD-01 | Drone / UI | 공용 Telemetry Snapshot과 10Hz Timer Event 구현. 계산·기본값·Runtime Spawn 검증, Drone 자동화 5/5, Blueprint 0/0 |
+| HUD-02 | Drone / UI | native UMG Flight HUD와 전용 PlayerController 구현. Event 단일 구독·Pawn 전환 해제/재연결·PIE 3회 수명주기 검증, Drone 자동화 6/6, Blueprint 0/0, Standalone 네 수치 변화 확인 |
 | SYNC-01 | Codex Sync | 목표·완료·진행·결정·미정·다음 작업 형식 정의 |
 | SYNC-02 | Codex Sync | `handoff.md` + `manifest.json` Export/Import 구현 |
 | SYNC-03 | Codex Sync | 인증·토큰·원시 세션 제외 기준과 검사 구현 |
@@ -97,6 +97,6 @@ Unreal 작업 기준은 로컬 `main`의 HUD-01 Commit `08e876a`이며 `origin/m
 
 ## 이번 인계의 정지선
 
-Unreal 프로젝트의 초기 Commit은 `91498b7`, Push 전 원격 기준은 `fb891fb`, 현재 로컬 기준은 HUD-01 Commit `08e876a`다. 문서 저장소 원격 기준은 `9e81de0`이며 현재 문서 갱신은 로컬 Commit으로 보존한다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
+Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 로컬 `main`과 `origin/main`은 HUD-02 Commit `410c940`으로 일치한다. 문서 저장소는 이번 갱신 직전 `origin/main=f6a7be7`이었다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
 
-Android 제외와 PFN-01~06, HUD-01을 완료했다. 공용 Telemetry Component는 10Hz로 속도·고도·수직 속도·Heading Snapshot을 제공한다. 다음 카드는 HUD-02이며 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다. 구매 소스는 현재 구현의 선행 조건으로 두지 않는다.
+Android 제외와 PFN-01~06, HUD-01, HUD-02를 완료했다. 공용 Telemetry Component는 10Hz Snapshot을 제공하고 PlayerController 소유 Flight HUD가 현재 Possess Drone의 네 수치를 Event 기반으로 표시한다. 다음 카드는 TUT-01이며 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다. 구매 소스는 현재 구현의 선행 조건으로 두지 않는다.

@@ -1,6 +1,6 @@
 # Drone Prototype PFN-06 PIE 검증 기록
 
-기준일: 2026-08-21 (Asia/Seoul)
+기준일: 2026-08-23 (Asia/Seoul)
 
 이 문서는 PFN-06의 체크 항목과 실행별 결과를 기록하는 **단일 기준 문서**다. `STATUS.md`, `WORKBOARD.md`, 구현 문서는 판정 요약과 이 문서 링크만 유지하며 체크리스트를 복제하지 않는다.
 
@@ -10,7 +10,8 @@
 PFN-01~05  Done
 PFN-06     Done, 자동화 3/3 Pass · Standalone 수동 Pass
 HUD-01     Done
-HUD-02     Ready
+HUD-02     Done
+TUT-01     Ready
 ```
 
 2026-08-19 사전 PIE 두 번에서 Prototype 입력 계열이 실제로 반응하는 것은 확인했다. 그러나 어느 실행도 한 번의 새 PIE 안에서 전체 체크리스트를 끝내지 못했으므로 Pass로 계산하지 않는다. 두 실행은 이미 종료된 역사적 부분 확인이며 현재 열린 PIE가 있다는 뜻이 아니다.
@@ -58,7 +59,7 @@ HUD-02     Ready
 
 ## 정식 3회 공통 체크리스트
 
-기본 작업 프로젝트는 `D:\JGY\project\drone\Drone.uproject`다. 확정된 고정 추적 Camera와 Gamepad 계약을 반영한 `Drone.Prototype.PIEInputLifecycle`가 2026-08-21 Automation Report에서 새 PIE 3회를 모두 통과했다. 각 실행은 아래 항목을 전부 만족해야 한 번의 Pass다.
+2026-08-21 PFN-06 검증 당시 작업컴 프로젝트는 `D:\JGY\project\drone\Drone.uproject`였다. 이번 확인 PC의 현재 저장소는 `C:\URproject\drone`이다. 확정된 고정 추적 Camera와 Gamepad 계약을 반영한 `Drone.Prototype.PIEInputLifecycle`가 당시 Automation Report에서 새 PIE 3회를 모두 통과했다. 각 실행은 아래 항목을 전부 만족해야 한 번의 Pass다.
 
 - [x] `Lvl_DronePrototype`에서 새 PIE 시작
 - [x] BP Prototype Pawn 정확히 한 대 Spawn

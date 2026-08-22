@@ -1,12 +1,14 @@
 # 현재 작업 상태
 
-기준일: 2026-08-21 (Asia/Seoul)
+기준일: 2026-08-23 (Asia/Seoul)
 
-이 문서는 명령으로 확인된 작업컴 상태와 사용자가 아직 결정하지 않은 항목을 분리한다.
+이 문서는 PC별로 명령으로 확인된 상태와 사용자가 아직 결정하지 않은 항목을 분리한다. 작업컴 기록과 이번 확인 PC의 결과를 같은 항목에서 섞지 않고 경로와 검증 시점을 함께 적는다.
 
 실시간 작업 위치와 바로 다음 행동은 [`WORKBOARD.md`](WORKBOARD.md), 날짜별 변경과 검증 이력은 [`docs/DRONE_WORKLOG.md`](docs/DRONE_WORKLOG.md)에 기록한다. 이 문서는 검증된 기준선이 달라질 때 함께 갱신한다.
 
-## 작업컴에서 확인 완료
+## PC별 확인 완료
+
+아래 Git·Unreal·Visual Studio 설치 정보는 작업컴에서 확인한 값이다. 저장소 상태는 같은 표에서 작업컴 기록 경로와 이번 확인 PC 경로를 구분한다.
 
 | 항목 | 확인 결과 |
 |---|---|
@@ -19,22 +21,22 @@
 | Git 사용자 이메일 | 전역 `jkw6483@gmail.com` 설정 확인 |
 | GitHub CLI | 설치되어 있지 않음 |
 | 기본 작업 루트 | `D:\JGY\project` |
-| Unreal 프로젝트 저장소 | `D:\JGY\project\drone`, 로컬 `main`=`08e876a`, `origin/main`=`fb891fb`, HUD-01 로컬 Commit 완료 |
-| 문서 작업 저장소 | `D:\JGY\project\md`, `origin/main`=`9e81de0`, 현재 갱신은 로컬 Commit으로 관리 |
+| Unreal 프로젝트 저장소 | 작업컴 기록 경로 `D:\JGY\project\drone`; 이번 확인 PC `C:\URproject\drone`의 로컬 `main`=`origin/main`=`410c940`, HUD-02 Push 완료 |
+| 문서 작업 저장소 | 작업컴 기록 경로 `D:\JGY\project\md`; 이번 갱신 직전 `origin/main`=`f6a7be7`, 이번 현황 갱신도 Commit·Push해 공유 |
 
 GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도했으나 Windows Installer가 종료 코드 1602로 취소되어 설치되지 않았다. GitHub 웹과 Git Credential Manager만으로도 기본 Push/Clone 작업은 가능하다.
 
 전역 Git 작성자 정보는 `gyeonliz <jkw6483@gmail.com>`으로 설정되어 있다. Unreal 프로젝트는 `https://github.com/gyeonliz/drone.git`, 문서 저장소는 `https://github.com/gyeonliz/md.git`를 `origin`으로 사용하며 둘 다 첫 Commit과 Push를 완료했다. 기준선 확인 시 각 로컬 `main`과 `origin/main`이 일치했다. 작업컴 기본 PowerShell 정책은 `.ps1` 직접 실행을 차단하므로 컨텍스트 도구 검증에는 영구 설정 변경 없이 실행 1회에만 `-ExecutionPolicy Bypass`를 적용했다.
 
-## 현재 작업 Drone 프로젝트
+## PC별 Drone 프로젝트 기준
 
-현재 기본 프로젝트 경로는 다음과 같다.
+작업컴에서 기록한 기본 프로젝트 경로는 `D:\JGY\project\drone`이고, 이번 HUD-02를 구현·검증한 현재 PC 경로는 다음과 같다.
 
 ```text
-D:\JGY\project\drone\Drone.uproject
+C:\URproject\drone\Drone.uproject
 ```
 
-이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이며, 현재 경로와 로컬 기준 Commit은 각각 `D:\JGY\project\drone`, `08e876a`다.
+이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않았고, 현재 로컬·원격 기준 Commit은 `410c940`이다.
 
 확인 결과:
 
@@ -63,11 +65,12 @@ D:\JGY\project\drone\Drone.uproject
 - 별도 `Lvl_DronePrototype` Greybox Map과 GameMode Override 구성
 - 863개 파일을 `91498b7` (`chore: initialize Drone project`)로 첫 Commit
 - GitHub `gyeonliz/drone`의 `origin/main`에 Push
-- HUD-01 마감 로컬 Commit `08e876a`; `origin/main`의 `fb891fb`보다 2개 Commit 앞서며 Push는 하지 않음
+- HUD-01 Commit `08e876a` Push 완료
+- HUD-02 Commit `410c940` (`feat: add event-driven drone flight HUD`)을 기능 브랜치와 `origin/main`에 Push
 
 첫 Commit은 863개 파일이며 `Content`는 761개로 `.uasset` 756개와 `.umap` 5개다. 가장 큰 파일은 약 21.0 MB이고 100 MB를 넘는 파일은 없다. 새 Prototype `.uasset`과 `.umap`을 포함한 Unreal Asset에는 Git LFS의 filter·diff·merge 속성이 적용되며, 현재 원격으로 보낼 추가 LFS Object는 없다.
 
-현재 구현된 Drone 기능 기준선은 Prototype Pawn/GameMode, Move·Altitude·Yaw·Camera 입력과 HUD용 Telemetry Snapshot까지다. 실제 UMG HUD, Take Off, Landing, Crash/실패, Mission, Enemy AI, MG 점유·공격, Evaluation은 아직 구현된 것으로 판정하지 않는다. 이전 기준 Commit `fb891fb`의 잘못된 `//test` 주석은 이력 재작성 없이 `2c38ebf`에서 제거했다.
+현재 구현된 Drone 기능 기준선은 Prototype Pawn/GameMode, Move·Altitude·Yaw·Camera 입력, Telemetry Snapshot과 실제 Flight HUD까지다. PlayerController가 HUD를 한 번 생성하고 현재 Possess Drone의 Telemetry Event를 연결해 Speed·Altitude·Vertical Speed·Heading을 표시한다. Take Off, Landing, Crash/실패, Mission, Enemy AI, MG 점유·공격, Evaluation은 아직 구현된 것으로 판정하지 않는다. 이전 기준 Commit `fb891fb`의 잘못된 `//test` 주석은 이력 재작성 없이 `2c38ebf`에서 제거했다.
 
 사용자는 이 프로젝트에서 Android를 사용하지 않는다고 확정했다. 이에 따라 `Config/DefaultEngine.ini`의 Android File Server Plugin과 네트워크 연결을 끄고 `SecurityToken` 할당을 비웠다. 검사 결과 활성 Plugin 0, 네트워크 허용 0, 비어 있지 않은 토큰 0이다. 기존 토큰 값은 이 문서나 로그에 기록하지 않았다. 향후 Android File Server를 다시 켤 경우 빈 토큰은 인증 없는 상태가 될 수 있으므로 보안 설정을 새로 검토해야 한다.
 
@@ -75,9 +78,9 @@ D:\JGY\project\drone\Drone.uproject
 
 ## 프로젝트 빌드와 실행 점검
 
-- 고정 추적 Camera, Mouse Drone Yaw와 Gamepad 입력을 포함해 `DroneEditor Win64 Development`를 `-NoUBTMakefiles -CompilerVersion=14.51.36256`으로 다시 빌드했고 `Result: Succeeded`였다.
+- 작업컴 PFN-06 검증에서는 고정 추적 Camera, Mouse Drone Yaw와 Gamepad 입력을 포함해 `DroneEditor Win64 Development`를 `-NoUBTMakefiles -CompilerVersion=14.51.36256`으로 다시 빌드했고 `Result: Succeeded`였다.
 - 새 Action과 BP 참조 저장 뒤 `CompileAllBlueprints` Commandlet은 `0 error(s), 0 warning(s), 0 failed to load`로 정상 종료했다.
-- 기본 선택되는 MSVC 14.38은 UE 5.8 Engine PCH 컴파일 오류를 냈다. 설치된 14.51.36256을 명시하면 빌드는 성공한다. 14.51은 UE가 표시한 선호 버전 14.50.35717보다 새 버전이라는 주의 메시지가 있으므로 빌드 명령에는 명시 버전을 유지한다.
+- 작업컴에서 기본 선택된 MSVC 14.38은 UE 5.8 Engine PCH 컴파일 오류를 냈다. 그 PC에 설치된 14.51.36256을 명시하면 빌드는 성공했다. 14.51은 UE가 표시한 선호 버전 14.50.35717보다 새 버전이라는 주의 메시지가 있으므로 PC마다 실제 설치 Toolchain을 확인해 명시한다.
 - `Drone.Prototype.PawnDefaults`, `Drone.Prototype.PIEInputLifecycle`, `Drone.Prototype.SpawnPossess` Automation을 새 조작으로 다시 실행했다. Report 기준 3 succeeded, 0 warnings, 0 errors, 0 failed다. lifecycle은 새 PIE 3회 모두 Keyboard·Mouse·Gamepad 6축, 복합·반대 입력과 입력 세기 비교를 통과했다.
 - 기존 `Lvl_ThirdPerson`을 저장 변경하지 않고 명령줄 URL로 `DronePrototypeGameMode`만 Override했다. GameMode 로드, `DronePrototypePawn` Spawn/Possess, 정상 종료를 확인했고 프로젝트 코드 Fatal/Error는 없었다.
 - native Prototype Pawn CDO의 Mesh·IMC·5개 Input Action 기본값은 계속 `null`이다. 실제 Prototype Map은 BP 자식에 자산과 Engine Cube를 배정하고 BP GameMode가 그 BP Pawn을 Spawn하도록 분리했다.
@@ -89,10 +92,15 @@ D:\JGY\project\drone\Drone.uproject
 - 기준선 확인 당시 문서 저장소에만 있던 PFN-06 PIE lifecycle 테스트 초안은 Drone Source에 편입됐고 `UnrealEd` 의존성은 Editor 빌드 조건으로만 추가됐다. 런타임 공개 API 변경 없이 빌드와 Automation 3/3 Pass까지 확인했다.
 - `Invoke-DronePrototypeSetup.ps1 -Mode UpdateControls`와 `Validate`는 9개 Prototype 자산, 5개 IA 타입, IMC 15개 Mapping, BP 참조와 Map GameMode Override를 확인했다. `/Game/Drone`의 신규 Legacy 의존성은 0개이며 기본 ThirdPerson Map/GameMode도 유지된다.
 - HUD-01에서 `UDroneTelemetryComponent`와 `FDroneTelemetrySnapshot`을 추가했다. 0.1초 Timer로 Speed·Altitude·Vertical Speed·Heading을 제공하며 Prototype Pawn이 native Component 한 개를 소유한다.
-- 최종 `Drone.` Automation Report는 Prototype 회귀 3개와 Telemetry 2개를 합쳐 5 succeeded, 0 warnings, 0 failed다. Runtime Spawn에서 기준 고도 변경 즉시 Snapshot 갱신도 확인했다.
+- HUD-01 당시 `Drone.` Automation Report는 Prototype 회귀 3개와 Telemetry 2개를 합쳐 5 succeeded, 0 warnings, 0 failed였다. Runtime Spawn에서 기준 고도 변경 즉시 Snapshot 갱신도 확인했다.
 - HUD-01 뒤 Blueprint 전체 Compile은 0 errors, 0 warnings, 0 blueprints failed to load로 정상 종료했다.
+- HUD-02에서 `UDroneFlightHUDWidget`과 `ADronePrototypePlayerController`를 추가했다. Widget은 Tick·Property Binding 없이 `OnTelemetryUpdated`를 구독하고, Pawn 변경·Widget/Controller 종료 시 기존 구독을 해제한다.
+- 현재 PC에서 `CompilerVersion=14.51.36231`로 지정한 최종 `DroneEditor Win64 Development` 빌드는 성공했다. 실제 Toolchain은 14.51.36252로 보고됐고 UE의 선호 버전 14.50보다 새 버전이라는 주의만 있었다.
+- 최종 `Drone.` Automation Report는 HUD Binding 테스트를 포함해 6 succeeded, 0 warnings, 0 failed다. `PIEInputLifecycle`은 새 PIE 3회마다 HUD 한 개, Viewport 연결, 현재 Telemetry Source, UnPossess 해제, 같은 Widget 재사용·Re-Possess 재연결과 종료 후 잔존 구독 없음까지 확인했다.
+- HUD-02 뒤 전체 `CompileAllBlueprints`는 종료 코드 0, 0 errors, 0 warnings, 0 blueprints failed to load였다. 새 `.uasset`/`.umap`은 추가하지 않아 Legacy Variant 신규 의존성도 생기지 않았다.
+- 실제 Standalone 화면에서 초기 `SPD 0.0 km/h`, `ALT 1.5 m`, `V/S +0.0 m/s` 표시를 확인했다. 실행 중에만 단일 자동 입력을 포착하도록 Movement 가속·감속을 임시 조정한 뒤 `SPD 43.2 km/h`, `ALT 2.7 m`, `V/S +10.0 m/s`, 이후 `V/S -7.2 m/s`, Heading `002° → 025°/045°` 변화를 확인했다. 프로젝트 기본 이동값은 변경하지 않았다.
 
-상세 구현과 Editor 연결 절차는 [`docs/DRONE_PROTOTYPE_IMPLEMENTATION.md`](docs/DRONE_PROTOTYPE_IMPLEMENTATION.md)에 기록했다.
+Prototype 입력·Editor 연결 절차는 [`docs/DRONE_PROTOTYPE_IMPLEMENTATION.md`](docs/DRONE_PROTOTYPE_IMPLEMENTATION.md), Telemetry와 Flight HUD 구현·검증은 [`docs/DRONE_TELEMETRY_IMPLEMENTATION.md`](docs/DRONE_TELEMETRY_IMPLEMENTATION.md)에 기록했다.
 
 ## 발견했지만 사용하지 않은 Unreal 프로젝트
 
@@ -119,17 +127,19 @@ C:\Users\jkw11\Documents\Codex\2026-08-12\c-project-factoryenvironmentcollect\wo
 - 최종 빌드, 구조·Spawn/Possess·PIE Input Lifecycle 테스트, 헤드리스 게임 실행 검증
 - Prototype Input Action·IMC·BP Pawn/GameMode·전용 Greybox Map 생성 도구와 재검증 도구
 - 사전 GUI PIE의 역사적 부분 확인과 2026-08-21 Standalone 수동 조작 Pass 기록
+- Event 기반 native Flight HUD, 전용 PlayerController와 Possession 전환·종료 수명주기 자동화
+- 2026-08-23 Standalone에서 Speed·Altitude·Vertical Speed·Heading 실제 화면 변화 확인
 - 구매 소스 없이 Engine 기본 도형으로 진행하는 기능 우선 Greybox 사전계획
 - 전체 작업 관리 및 병행 학습 계획
 - 실제 진행 상태를 담는 `WORKBOARD.md`
 
 ## 다음 단계
 
-1. `HUD-02` 공용 Flight HUD에서 Telemetry 네 수치를 표시
-2. Standalone에서 이동·고도·Yaw에 따라 표시가 변하는지 수동 확인
-3. 비충돌 Spline·순서형 Ring Gate·Lap/Segment 비교 UI가 있는 Tutorial Vertical Slice 구현
-4. 이후 Flight 상태, Operator↔Drone, NPC·Mission UI, Jamming Story 순으로 진행
-5. 병행 과제로 다른 PC Clone/LFS/UE 5.8.1 실행과 문서 Clone/Pull 확인
+1. `TUT-01` 별도 Training Map과 비충돌 Spline 구현
+2. `TUT-02` 현재 순서·정방향 Gate만 인정하는 Ring Gate 구현
+3. 이후 Lap/Segment 기록·비교 UI와 Tutorial 회귀를 완성
+4. 그 다음 Flight 상태, Operator↔Drone, NPC·Mission UI, Jamming Story 순으로 진행
+5. 병행 과제로 다른 PC에서 `410c940` Pull, LFS/UE 5.8.1 실행과 문서 Pull 확인
 
 Camera·Mouse·Gamepad 역할은 v1 조작으로 확정했다. Keyboard·Mouse 체감은 현재 시험값으로 통과했으며 실제 Gamepad 체감, 최종 물리와 최종 감도 조정은 이후 별도 카드로 남긴다. 구매 소스와 최종 Mesh는 선행 조건이 아니며 상세 계획은 [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)를 따른다.
 
@@ -145,7 +155,7 @@ MD: gyeonliz/md origin 연결 완료
 
 PFN-06 Done
 → HUD-01 Telemetry Snapshot Done
-→ HUD-02 Flight HUD
+→ HUD-02 Flight HUD Done
 → Tutorial Course·Timing·비교 UI
 → Take Off·Landing·Crash
 → Operator↔Drone 전환

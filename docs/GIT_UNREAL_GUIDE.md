@@ -5,11 +5,12 @@
 ## 0. 현재 기준과 미정 사항
 
 - 사용자가 밝힌 프로젝트 기준 버전은 **Unreal Engine 5.8.1**이다.
-- 현재 작업컴의 설치 식별자는 **`UE_5.8`**이며, `C:\Program Files\Epic Games\UE_5.8\Engine\Build\Build.version`에서 `MajorVersion=5`, `MinorVersion=8`, `PatchVersion=1`을 확인했다. 따라서 작업컴 설치본은 **UE 5.8.1로 검증됨** 상태다.
-- 다만 `UE_5.8` 폴더명이나 `.uproject`의 `EngineAssociation` 값만으로 패치 버전을 판정해서는 안 된다. 메인컴 설치본과 실제 Drone 프로젝트의 엔진 연결 상태는 별도로 확인해야 한다.
+- 작업컴의 설치 식별자는 **`UE_5.8`**이며, 당시 `Build.version`에서 `MajorVersion=5`, `MinorVersion=8`, `PatchVersion=1`을 확인했다. 따라서 작업컴 설치본은 **UE 5.8.1로 검증됨** 상태다.
+- 이번 확인 PC도 `C:\Program Files\Epic Games\UE_5.8\Engine\Build\Build.version`에서 UE 5.8.1, Changelist 56057345를 확인했고 실제 프로젝트의 `EngineAssociation`은 `5.8`이다.
+- 다만 `UE_5.8` 폴더명이나 `.uproject`의 `EngineAssociation` 값만으로 패치 버전을 판정해서는 안 된다. 이번 확인 PC를 메인컴 또는 작업컴 중 어느 역할로 부를지는 이 문서에서 임의로 정하지 않으므로, 메인컴 설치 버전과 두 PC 일치 판정은 PC 역할을 확인한 뒤 닫는다.
 - 실제 Drone GitHub 저장소는 **`gyeonliz/drone`**으로 확정했다.
 - GitHub 저장소 공개 범위(Public/Private)는 **현재 미정**이다.
-- 현재 작업 루트는 `D:\JGY\project`, 실제 프로젝트는 `D:\JGY\project\drone`이다. 로컬 `main`은 HUD-01 Commit `08e876a`, `origin/main`은 Push 전 `fb891fb`이며 `2c38ebf`는 PFN-06 마감, `91498b7`은 첫 Commit의 역사 기록이다. 다른 PC Clone/LFS/UE 실행 검증은 아직 남았다.
+- 작업컴 기록 루트는 `D:\JGY\project`, Drone 경로는 `D:\JGY\project\drone`이다. 이번 확인 PC의 실제 저장소는 `C:\URproject\drone`이며 로컬 `main`과 `origin/main`은 HUD-02 Commit `410c940`으로 일치한다. `2c38ebf`는 PFN-06 마감, `91498b7`은 첫 Commit의 역사 기록이다. 다른 PC Pull/LFS/UE 실행 검증은 아직 남았다.
 - 사용자는 현재 Drone 프로젝트에서 Android를 사용하지 않는다고 확정했다. 작업 대상 `D:\JGY\project\drone`에서는 Android File Server Plugin과 네트워크 연결을 끄고 `SecurityToken`을 빈 할당으로 정리했다.
 - 아래 브랜치 구조는 현재 컨텍스트에 맞춘 권장 시작안이며, 최종 팀 규칙으로 확정된 것은 아니다.
 - 이 가이드는 명령줄 Git을 기준으로 한다. Unreal Editor 안의 Git 플러그인 제공 여부와 동작은 실제 UE 5.8 환경에서 확인하기 전까지 전제하지 않는다.
@@ -127,19 +128,20 @@ GitHub 이메일 공개를 원하지 않으면 GitHub가 제공하는 `noreply` 
 | 프로젝트 기준 | UE 5.8.1이라고 전달받음 |
 | 작업컴 설치 식별자 | `UE_5.8` |
 | 작업컴 `Build.version` | 5.8.1 확인 완료 |
+| 이번 확인 PC `Build.version` | 5.8.1, Changelist 56057345 확인 완료 |
 | 메인컴 설치 버전 | 아직 확인 필요 |
-| 실제 프로젝트 `EngineAssociation` | 프로젝트를 받으면 확인 필요 |
+| 실제 프로젝트 `EngineAssociation` | `C:\URproject\drone\Drone.uproject`에서 `5.8` 확인 |
 
-작업컴의 엔진 패치 버전은 확인되었지만, 메인컴과 실제 프로젝트의 연결 상태가 확인되기 전에는 프로젝트 연결 버전을 임의로 바꾸거나 버전 변경으로 생성된 `.uproject` 수정사항을 커밋하지 않는다.
+작업컴과 이번 확인 PC의 엔진 패치 버전, 이번 확인 PC의 실제 프로젝트 `EngineAssociation`은 확인했다. 이번 확인 PC의 메인컴/작업컴 역할과 나머지 PC 설치 버전을 확인해 두 PC 일치 여부를 닫기 전에는 프로젝트 연결 버전을 임의로 바꾸거나 버전 변경으로 생성된 `.uproject` 수정사항을 커밋하지 않는다.
 
 ## 5. GitHub 저장소 생성
 
-저장소 이름과 공개 범위는 아직 미정이므로 먼저 사용자가 결정한다. 팀 프로젝트와 미공개 경진대회 자료가 들어갈 가능성이 있다면 공개 범위는 내용 검토 후 정한다.
+현재 Drone 저장소 이름은 `gyeonliz/drone`으로 확정했고 생성·첫 Push까지 완료했다. 공개 범위는 아직 미정이므로 팀 프로젝트와 미공개 경진대회 자료를 고려해 별도로 확인한다. 아래 절차는 새 저장소를 다시 만들 때의 기준으로 유지한다.
 
 GitHub 웹에서 새 저장소를 만들 때 기존 로컬 프로젝트를 처음 연결할 예정이라면 다음처럼 만든다.
 
 1. Owner를 선택한다.
-2. Repository name을 입력한다. 현재 이름은 미정이다.
+2. Repository name을 입력한다. 현재 Drone 프로젝트는 `drone`을 사용한다.
 3. Public 또는 Private를 선택한다. 현재 공개 범위는 미정이다.
 4. `Add a README file`을 선택하지 않는다.
 5. `.gitignore` 템플릿을 GitHub에서 추가하지 않는다.

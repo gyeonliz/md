@@ -1,6 +1,6 @@
 # 작업컴 Codex/GPT 기준 컨텍스트
 
-기준일: 2026-08-21 (Asia/Seoul)
+기준일: 2026-08-23 (Asia/Seoul)
 
 이 문서는 메인컴 ChatGPT/Codex에서 진행하던 작업을 작업컴에서 이어가기 위한 기준 컨텍스트다. 추측해서 내용을 추가하지 않고, 사용자가 실제 진행 상황을 알려준 경우에만 상태를 갱신한다.
 
@@ -419,13 +419,13 @@ Inbox → Todo → Doing → Done
 
 ## 21. 다음 작업
 
-### 완료: PFN-06 Camera/Input과 HUD-01 Telemetry
+### 완료: PFN-06 Camera/Input, HUD-01 Telemetry와 HUD-02 Flight HUD
 
-사용자 승인안의 Camera/Input 기준선을 완료했다. 이어서 공용 Telemetry Component가 10Hz로 속도·기준면 대비 고도·수직 속도·Heading Snapshot을 제공하도록 구현했고 Drone 자동화 5/5와 Blueprint 0/0을 통과했다.
+사용자 승인안의 Camera/Input 기준선을 완료했다. 공용 Telemetry Component의 10Hz Snapshot과 이를 Event 기반으로 표시하는 native Flight HUD도 구현했으며, 최종 Drone 자동화 6/6, Blueprint 0/0과 Standalone 네 수치 변화를 통과했다.
 
-### 1순위: HUD-02와 기능 우선 Greybox
+### 1순위: Tutorial Vertical Slice와 기능 우선 Greybox
 
-`HUD-02 화면 표시 → Tutorial Spline·Ring Gate·Lap/Segment 기록 → Flight 상태 → Operator↔Drone → NPC·Mission UI Story Shell → AI/MG/Jamming → 에셋 적용` 순서로 진행한다. 상세 기준은 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다.
+`TUT-01 Training Map·비충돌 Spline → 순서형 Ring Gate → Lap/Segment 기록 → Flight 상태 → Operator↔Drone → NPC·Mission UI Story Shell → AI/MG/Jamming → 에셋 적용` 순서로 진행한다. 상세 기준은 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다.
 
 ### 병행: PC 간 공유 검증
 
@@ -448,7 +448,7 @@ Inbox → Todo → Doing → Done
 - PFN-06 자동화는 3/3 Pass다. 수동 화면 확인 1회가 남았으므로 PFN-06과 Flight MVP는 아직 완료가 아니다.
 - 최종 키·Look 감도·Mouse Y 반전 기본값·최종 Mesh·최종 물리·멀티플레이 방식은 계속 미정이다.
 
-## 24. 2026-08-21 GitHub 저장소 역할과 실제 상태
+## 24. 2026-08-21 GitHub 저장소 역할과 실제 상태 (역사적 스냅샷)
 
 - 실제 Unreal 프로젝트는 `https://github.com/gyeonliz/drone` 저장소로 관리한다.
 - 현재 기본 작업 루트는 `D:\JGY\project`, Unreal 프로젝트는 `D:\JGY\project\drone`, 문서 저장소는 `D:\JGY\project\md`다.
@@ -479,3 +479,12 @@ Inbox → Todo → Doing → Done
 - Story는 Operator Character, NPC 대화, Mission 안내 UI, Operator↔Drone 화면/Possess 전환을 포함한다.
 - Jamming은 신호 경고 → HUD Noise → 조작/통신 저하의 재현 가능한 단계형 규칙으로 만든다.
 - 제공 Drone 에셋은 기능 부모로 상속하지 않고 `/Game/Drone` 아래 Integration Blueprint에서 Visual만 교체한다.
+
+## 27. 2026-08-23 HUD-02 완료와 현재 기준
+
+- 이번 확인 PC의 실제 Unreal 저장소는 `C:\URproject\drone`이다. 뒤처진 `C:\project\Drone` 복제본은 현재 작업에 사용하지 않는다.
+- Unreal 저장소의 로컬 `main`과 `origin/main`은 HUD-02 Commit `410c940`으로 일치하며 `codex/hud-02-flight-hud` 기능 브랜치도 원격에 Push했다.
+- `UDroneFlightHUDWidget`과 전용 PlayerController가 현재 Possess Drone의 Telemetry Event를 받아 `SPD`, `ALT`, `V/S`, `HDG`를 표시한다. Tick·Property Binding·매 프레임 Pawn 검색은 사용하지 않는다.
+- 최종 `Drone.` 자동화는 6 succeeded, 0 warnings, 0 failed이고 `CompileAllBlueprints`는 0 errors, 0 warnings, 0 blueprints failed to load다. Standalone에서도 네 수치 변화를 확인했다.
+- 다음 활성 카드는 `TUT-01` Training Map과 비충돌 Spline이다. 배터리·신호·Jamming 표시와 최종 HUD 디자인은 구현 완료로 간주하지 않는다.
+- 문서 저장소는 이번 갱신 직전 `origin/main=f6a7be7`이었으며, 이 상태·계획 갱신도 Commit·Push해 PC 간 공유 기준에 반영한다.

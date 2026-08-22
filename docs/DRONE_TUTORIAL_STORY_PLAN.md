@@ -1,6 +1,6 @@
 # Drone Tutorial·Story 구현 계획
 
-기준일: 2026-08-21 (Asia/Seoul)
+기준일: 2026-08-23 (Asia/Seoul)
 
 ## 1. 목표와 우선순위
 
@@ -64,16 +64,16 @@ Tutorial을 먼저 완성해 조작감, 카메라, HUD, 비행 기록 계산을 
 
 ### Telemetry
 
-Drone에 공용 Telemetry Component를 두고 10Hz 이벤트로 UI에 다음 Snapshot을 전달한다.
+Drone에 공용 Telemetry Component를 두고 10Hz 이벤트로 UI에 Snapshot을 전달한다. HUD-01·02에서 현재 구현·표시하는 범위는 아래 네 비행 수치다.
 
 - 속도: `Velocity.Size() × 0.036`, km/h
 - 고도: 코스/미션 기준 지면 높이 대비 m
 - 수직 속도: m/s
 - Heading: 0~359°
-- 현재 Flight·Control·Mission 상태
-- 신호 세기와 Jamming 단계
 
-Widget에서 매 프레임 Pawn을 검색하거나 Property Binding으로 계산하지 않는다. C++ 상태가 Multicast Event를 보내고 Blueprint Widget은 표시와 애니메이션만 담당한다.
+Flight·Control·Mission 상태와 신호 세기·Jamming 단계는 후속 카드의 확장 후보이며 HUD-02가 구현한 기능으로 간주하지 않는다.
+
+Widget에서 매 프레임 Pawn을 검색하거나 Property Binding으로 계산하지 않는다. C++ Telemetry가 Multicast Event를 보내고 native 또는 후속 Blueprint Widget은 표시만 담당한다.
 
 ## 4. Tutorial Vertical Slice
 
@@ -178,7 +178,7 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 | STY-04 | AI·MG 통합 | Drone 탐지와 대응을 Mission 흐름에서 재현 |
 | AST-01 | 제공 Drone 에셋 감사·적용 | 기능 코드 변경 없이 Integration BP에서 외형 교체 |
 
-현재 `CTRL-01`과 `HUD-01`은 완료했다. Telemetry는 자동화 5/5 회귀와 Blueprint 0/0을 통과했으며 다음 활성 카드는 `HUD-02`다.
+현재 `CTRL-01`, `HUD-01`, `HUD-02`를 완료했다. Flight HUD는 자동화 6/6, Blueprint 0/0과 Standalone 네 수치 변화를 통과했으며 다음 활성 카드는 `TUT-01`이다.
 
 ## 8. 검증 게이트
 

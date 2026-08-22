@@ -1,10 +1,10 @@
 # Drone Prototype Pawn 구현 및 검증 기록
 
-기준일: 2026-08-21 (Asia/Seoul)
+기준일: 2026-08-23 (Asia/Seoul)
 
 ## 1. 현재 결과
 
-현재 프로젝트 `D:\JGY\project\drone`에 기존 Third Person 경로와 분리된 최소 Drone Prototype이 있다. 구현은 2026-08-19 당시 `C:\project\Drone`에서 시작했으며 해당 경로는 역사 기록일 뿐 현재 작업 경로가 아니다.
+작업컴 기록 경로 `D:\JGY\project\drone`에 기존 Third Person 경로와 분리된 최소 Drone Prototype이 있다. 이번 확인 PC의 현재 저장소는 `C:\URproject\drone`이다. 구현을 시작한 2026-08-19 당시 `C:\project\Drone` 경로는 역사 기록일 뿐 현재 작업 경로가 아니다.
 
 - `ADronePrototypePawn` C++ 클래스가 컴파일된다.
 - `ADronePrototypeGameMode`가 native fallback으로 해당 Pawn을 Spawn한다.
@@ -328,17 +328,17 @@ Editor Python은 프로젝트 Plugin 설정을 바꾸지 않고 실행 시점에
 - Python Plugin을 `.uproject`에 영구 추가하지 않음
 - 새 Input Action과 갱신한 BP/IMC를 포함한 9개 Prototype 자산을 별도 프로세스에서 재로드 검증
 
-## 12. 다음 완료 게이트
+## 12. 현재 다음 완료 게이트
 
 현재 Tutorial/Story 우선 실행 순서와 Greybox 기준은 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)를 우선하며, PFN 카드 세부 정의는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 
-다음 완료 게이트는 `HUD-01` Telemetry Snapshot과 `HUD-02` 공용 Flight HUD다.
+`HUD-01` Telemetry Snapshot과 `HUD-02` 공용 Flight HUD는 완료했다. 다음 완료 게이트는 `TUT-01` Training Map과 비충돌 Spline이다.
 
 ```text
 PFN-06 Done
-→ Telemetry Snapshot 10Hz Event
-→ 속도·고도·수직 속도·Heading HUD 표시
-→ Tutorial Course Vertical Slice 활성화
+→ HUD-01 Telemetry Snapshot Done
+→ HUD-02 Flight HUD Done
+→ TUT-01 Training Map·비충돌 Spline
 ```
 
-이후 순서는 `Telemetry/HUD → Tutorial Course·Gate·Lap 기록 → Flight 상태 → Operator↔Drone → Story NPC·Mission·Jamming → Enemy AI/MG → 에셋 통합`이다.
+이후 순서는 `Tutorial Course·Gate·Lap 기록 → Flight 상태 → Operator↔Drone → Story NPC·Mission·Jamming → Enemy AI/MG → 에셋 통합`이다.
