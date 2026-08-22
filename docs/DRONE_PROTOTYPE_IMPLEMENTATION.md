@@ -7,11 +7,12 @@
 작업컴 기록 경로 `D:\JGY\project\drone`에 기존 Third Person 경로와 분리된 최소 Drone Prototype이 있다. 이번 확인 PC의 현재 저장소는 `C:\URproject\drone`이다. 구현을 시작한 2026-08-19 당시 `C:\project\Drone` 경로는 역사 기록일 뿐 현재 작업 경로가 아니다.
 
 - `ADronePrototypePawn` C++ 클래스가 컴파일된다.
-- `ADronePrototypeGameMode`가 native fallback으로 해당 Pawn을 Spawn한다.
+- `ADronePrototypeGameMode`를 직접 선택하면 native 기본값으로 해당 Pawn을 Spawn한다.
 - 자동화 테스트에서 컴포넌트 기본값, Spawn/Possess와 PIE 입력 lifecycle을 검증했다.
 - Prototype Input Action 5개와 Keyboard·Mouse·Gamepad 15개 Mapping의 전용 IMC를 생성했다.
 - BP Pawn에 입력 자산과 Engine Cube Placeholder를 연결했다.
 - BP GameMode와 별도 `Lvl_DronePrototype` Greybox Map을 연결했다.
+- BP PlayerController와 실제 WBP Flight HUD를 연결했다. C++는 생성·Possession·Delegate 수명주기, WBP는 Designer 외형을 담당한다.
 - 새 자산 재로드 검증과 Map Check를 통과했다.
 - 2026-08-21 Automation에서 새 PIE 3회 모두 IMC 한 개와 Keyboard·Mouse·Gamepad 입력을 확인했다.
 - 기존 기본 맵과 전역 기본 GameMode는 변경하지 않았다.
@@ -33,6 +34,10 @@ D:\JGY\project\drone\Source\Drone\Prototype\DronePrototypePawn.h
 D:\JGY\project\drone\Source\Drone\Prototype\DronePrototypePawn.cpp
 D:\JGY\project\drone\Source\Drone\Prototype\DronePrototypeGameMode.h
 D:\JGY\project\drone\Source\Drone\Prototype\DronePrototypeGameMode.cpp
+D:\JGY\project\drone\Source\Drone\Prototype\DronePrototypePlayerController.h
+D:\JGY\project\drone\Source\Drone\Prototype\DronePrototypePlayerController.cpp
+D:\JGY\project\drone\Source\Drone\UI\DroneFlightHUDWidget.h
+D:\JGY\project\drone\Source\Drone\UI\DroneFlightHUDWidget.cpp
 D:\JGY\project\drone\Source\Drone\Prototype\Tests\DronePrototypeDefaultsTest.cpp
 D:\JGY\project\drone\Source\Drone\Prototype\Tests\DronePrototypeSpawnPossessTest.cpp
 D:\JGY\project\drone\Content\Drone\Prototype\Input\Actions\IA_DronePrototype_Move.uasset
@@ -43,6 +48,8 @@ D:\JGY\project\drone\Content\Drone\Prototype\Input\Actions\IA_DronePrototype_Cam
 D:\JGY\project\drone\Content\Drone\Prototype\Input\IMC_DronePrototype.uasset
 D:\JGY\project\drone\Content\Drone\Prototype\Blueprints\BP_DronePrototypePawn.uasset
 D:\JGY\project\drone\Content\Drone\Prototype\Blueprints\BP_DronePrototypeGameMode.uasset
+D:\JGY\project\drone\Content\Drone\Prototype\Blueprints\BP_DronePrototypePlayerController.uasset
+D:\JGY\project\drone\Content\Drone\Prototype\UI\WBP_DroneFlightHUD.uasset
 D:\JGY\project\drone\Content\Drone\Prototype\Maps\Lvl_DronePrototype.umap
 ```
 
@@ -78,9 +85,13 @@ D:\JGY\project\drone\Content\Drone\Prototype\Maps\Lvl_DronePrototype.umap
 
 ### `ADronePrototypeGameMode`
 
-격리 테스트에서 `ADronePrototypePawn`을 기본 Pawn으로 Spawn하는 native fallback이다.
+격리 테스트나 native GameMode 직접 실행에서 `ADronePrototypePawn`을 기본 Pawn으로 Spawn하는 native 기본값이다.
 
 주의: native Pawn의 Input Asset과 Mesh 기본값은 계속 `null`이다. 현재 실제 Prototype Map에서는 BP 자식에 자산을 배정하고 BP GameMode의 Default Pawn도 그 BP Pawn으로 바꿨다. native GameMode만 직접 쓰면 BP에 지정한 값이 적용되지 않는다는 경계는 그대로 유지한다.
+
+### `ADronePrototypePlayerController`
+
+로컬 화면의 Flight HUD 하나를 생성해 PlayerController 수명 동안 재사용한다. Pawn이 바뀌면 Widget을 새로 만들지 않고 현재 Pawn의 `UDroneTelemetryComponent`만 교체한다. `BP_DronePrototypePlayerController`는 `FlightHUDWidgetClass`에 `WBP_DroneFlightHUD`를 지정하며, Event Graph에서 생성·구독 로직을 중복 구현하지 않는다.
 
 ### 자동화 테스트
 
@@ -163,8 +174,12 @@ Input Action이 배정되지 않았으면 크래시 대신 진단 로그를 남�
 /Game/Drone/Prototype/Input/IMC_DronePrototype
 /Game/Drone/Prototype/Blueprints/BP_DronePrototypePawn
 /Game/Drone/Prototype/Blueprints/BP_DronePrototypeGameMode
+/Game/Drone/Prototype/Blueprints/BP_DronePrototypePlayerController
+/Game/Drone/Prototype/UI/WBP_DroneFlightHUD
 /Game/Drone/Prototype/Maps/Lvl_DronePrototype
 ```
+
+기존 Setup 도구는 Input·Pawn·GameMode·Map 9개 자산을 계속 검증한다. 추가한 BP Controller와 WBP 2개는 `Drone.UI.FlightHUDBlueprintAsset` 자동화가 부모 Class, 필수 TextBlock·Font와 Class 연결을 별도로 검증한다. 현재 Prototype 전체 자산은 이 둘을 포함해 11개다.
 
 현재 IMC에는 15개 Mapping이 있다.
 
@@ -181,7 +196,7 @@ Modifier와 기대 부호는 [`DRONE_PROTOTYPE_INPUT_CONTRACT.md`](DRONE_PROTOTY
 
 `BP_DronePrototypePawn`은 `ADronePrototypePawn` 자식이다. Class Defaults에 IMC와 다섯 Action을 연결했고, Visual Mesh에는 외부 구매 소스가 아닌 Engine 기본 Cube를 Placeholder로 연결했다. Event Graph에서 IMC를 추가하거나 Action을 다시 바인딩하지 않는다.
 
-`BP_DronePrototypeGameMode`는 `ADronePrototypeGameMode` 자식이며 Default Pawn은 BP Prototype Pawn이다. PlayerController Class는 기존 Third Person BP Controller가 아니라 기본 `APlayerController`를 유지한다. Third Person Controller가 추가하는 기존 IMC와 키가 겹쳐 중복되는 것을 막기 위해서다.
+`BP_DronePrototypeGameMode`는 `ADronePrototypeGameMode` 자식이며 Default Pawn은 BP Prototype Pawn, PlayerController Class는 `BP_DronePrototypePlayerController`다. 해당 BP Controller의 `FlightHUDWidgetClass`는 `WBP_DroneFlightHUD`다. 입력 IMC는 계속 Pawn 한 곳에서만 관리하고 BP Controller/Event Graph에는 중복 등록하지 않는다. native `ADronePrototypePlayerController`와 `UDroneFlightHUDWidget`은 직접 선택했을 때 사용할 기본 Class/레이아웃을 유지한다.
 
 `Lvl_DronePrototype`은 기존 World Partition Template Map을 복제하지 않고 새로 만든 작은 비-World-Partition 시험장이다. Map-level GameMode Override, PlayerStart 한 개, 배치 Pawn 0개, 지면·이륙 Pad·벽·높이 표식·목표·귀환·Patrol·Turret 위치 표시를 포함한다. 위치와 크기는 모두 Greybox 임시값이다.
 
@@ -191,22 +206,25 @@ Modifier와 기대 부호는 [`DRONE_PROTOTYPE_INPUT_CONTRACT.md`](DRONE_PROTOTY
 2. `Lvl_DronePrototype`을 연다.
 3. World Settings의 GameMode Override가 `BP_DronePrototypeGameMode`인지 확인한다.
 4. Map에 `PlayerStart`가 한 개이고 Pawn이 직접 배치되지 않았는지 확인한다.
-5. PIE를 시작하고 BP Prototype Pawn 한 대가 Spawn되어 PlayerController에 Possess되는지 확인한다.
-6. Enhanced Input Debug에서 `IMC_DronePrototype`이 Priority 1로 한 번만 등록되는지 확인한다.
-7. `W/S/A/D`, `Space/Left Ctrl`, `Q/E`를 시험해 Move, Altitude와 보조 Yaw 방향을 확인한다.
-8. Mouse X가 Drone Actor Yaw를 바꾸며 추적 Camera가 기체 뒤를 따라가는지, Mouse Y가 기체 Yaw 없이 CameraBoom Pitch만 바꾸는지 확인한다.
-9. Gamepad가 연결되어 있으면 Left Stick 이동, `RT/LT` 고도, Right Stick X Drone Yaw와 Y Camera Pitch를 확인한다.
-10. Output Log에서 Input Asset 누락, IMC 등록 실패, 다른 경로 소유 진단이 없는지 확인한다.
-11. PIE를 종료하고 새로 두 번 더 실행해 Pawn·IMC·Callback·입력 세기가 중복되지 않는지 확인한다.
+5. BP GameMode의 PlayerController Class가 `BP_DronePrototypePlayerController`인지 확인한다.
+6. BP Controller의 Flight HUD Widget Class가 `WBP_DroneFlightHUD`인지 확인한다.
+7. PIE를 시작하고 BP Prototype Pawn 한 대가 BP Controller에 Possess되는지, 좌측 상단 WBP가 표시되는지 확인한다.
+8. Enhanced Input Debug에서 `IMC_DronePrototype`이 Priority 1로 한 번만 등록되는지 확인한다.
+9. `W/S/A/D`, `Space/Left Ctrl`, `Q/E`를 시험해 Move, Altitude와 보조 Yaw 방향을 확인한다.
+10. Mouse X가 Drone Actor Yaw를 바꾸며 추적 Camera가 기체 뒤를 따라가는지, Mouse Y가 기체 Yaw 없이 CameraBoom Pitch만 바꾸는지 확인한다.
+11. Gamepad가 연결되어 있으면 Left Stick 이동, `RT/LT` 고도, Right Stick X Drone Yaw와 Y Camera Pitch를 확인한다.
+12. Output Log에서 Input Asset 누락, IMC 등록 실패, 다른 경로 소유 진단이 없는지 확인한다.
+13. PIE를 종료하고 새로 두 번 더 실행해 Pawn·IMC·HUD·Callback·입력 세기가 중복되지 않는지 확인한다.
 
-새 계약의 자동화 PIE 3회는 모두 통과했다. 실제 화면에서 고정 추적 Camera와 Mouse 방향·감도, 연결된 경우 Gamepad 체감을 확인하는 수동 회차 한 번이 남아 있다.
+새 계약의 자동화 PIE 3회와 Standalone Keyboard·Mouse 수동 회차는 모두 통과했다. 실제 Gamepad 연결 여부가 보고되지 않아 Stick·Trigger 체감만 미확인이다.
 
 ## 9. 정상 결과
 
 Blueprint와 Input 연결까지 완료했을 때의 정상 기준은 다음과 같다.
 
 - Prototype 맵에서 Pawn이 한 대만 Spawn된다.
-- PlayerController가 해당 Pawn을 Possess한다.
+- `BP_DronePrototypePlayerController`가 해당 Pawn을 Possess한다.
+- `WBP_DroneFlightHUD`가 한 개만 표시되고 현재 Pawn Telemetry를 사용한다.
 - Camera가 SpringArm 기준으로 표시된다.
 - 수평 이동, 고도, Yaw, Look 입력이 서로 독립적으로 반응한다.
 - PIE를 반복해도 입력이 중복되지 않는다.
@@ -323,10 +341,11 @@ Editor Python은 프로젝트 Plugin 설정을 바꾸지 않고 실행 시점에
 - Prototype Source 6개 모두 strict UTF-8
 - 충돌 마커 0
 - 후행 공백 0
-- Prototype 9개 자산 모두 Git LFS 속성 적용
+- Setup 도구 대상 Prototype 9개와 추가 UI 2개를 합친 11개 자산 모두 Git LFS 속성 적용
 - 기존 전역 Map/GameMode는 Third Person 설정 그대로 유지
 - Python Plugin을 `.uproject`에 영구 추가하지 않음
-- 새 Input Action과 갱신한 BP/IMC를 포함한 9개 Prototype 자산을 별도 프로세스에서 재로드 검증
+- 새 Input Action과 갱신한 BP/IMC를 포함한 기존 9개 자산은 Setup 별도 프로세스에서 재로드 검증
+- 추가 BP Controller와 WBP 2개는 Blueprint Asset 자동화와 PIE 실제 Class 검증
 
 ## 12. 현재 다음 완료 게이트
 

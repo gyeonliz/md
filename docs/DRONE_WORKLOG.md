@@ -18,13 +18,13 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-23 04:30 KST
+마지막 갱신: 2026-08-23 05:40 KST
 
 | 구분 | 현재 상태 |
 |---|---|
 | 전체 단계 | 2단계 Telemetry/HUD 완료, Tutorial Vertical Slice 시작 대기 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | `HUD-02` 마감 완료, `TUT-01` 구현 시작 대기 |
+| 지금 작업 중 | `HUD-02` WBP/BP 연결과 학습 주석 보강 완료, `TUT-01` 구현 시작 대기 |
 | 차단 조건 | 없음. 고도 기준은 Course/Mission이 지정하는 World Z 대비 값 |
 | 다음 행동 | `TUT-01` Training Map과 비충돌 Spline 구현 |
 | 다음 기능 | `TUT-01` Training Map·Spline → `TUT-02` 순서형 Ring Gate |
@@ -161,3 +161,48 @@ PFN-06 통과 후 `HUD-01`을 시작한다. Drone Telemetry를 10Hz Snapshot으�
 - `TUT-01` Ready
 - Unreal Commit: `410c940` (`feat: add event-driven drone flight HUD`)
 - `codex/hud-02-flight-hud`와 `origin/main`에 Push 완료, 로컬 `main=origin/main=410c940`
+
+## 2026-08-23 — HUD-02 WBP/BP 연결과 학습 주석 보강
+
+### 실제 변경
+
+- native `UDroneFlightHUDWidget` 자식인 `WBP_DroneFlightHUD`를 생성해 Designer에서 패널 배치·색·폰트를 편집할 수 있게 했다.
+- `BP_DronePrototypePlayerController`를 만들고 `FlightHUDWidgetClass`에 `WBP_DroneFlightHUD`를 지정했다.
+- `BP_DronePrototypeGameMode`의 PlayerController Class를 새 BP Controller로 연결했다.
+- WBP Designer에는 C++ `BindWidget` 계약과 정확히 같은 이름의 TextBlock 4개를 둔다.
+
+```text
+SpeedValueText
+AltitudeValueText
+VerticalSpeedValueText
+HeadingValueText
+```
+
+- C++는 Telemetry 계산, Widget 생성, Possession 동기화, Delegate 해제와 표시 문자열 포맷을 계속 담당한다. WBP는 위치·크기·색·폰트 같은 표시 외형만 담당하며 Event Graph Tick과 Property Binding은 사용하지 않는다.
+- Designer Tree가 없는 native HUD Class를 직접 실행할 때의 C++ 기본 레이아웃은 유지했다. 정상 컴파일된 WBP는 필수 TextBlock 4개를 사용하며 런타임 누락 경로는 방어 코드다.
+- Pawn, GameMode, PlayerController와 HUD 기반 Class를 Blueprintable로 명시하고 Blueprint에서 확인할 Getter를 정리했다.
+- 입력·이동·Telemetry 단위·Widget/Controller 수명주기·C++↔WBP 이름 계약·테스트 목적을 설명하는 한국어 주석을 보강했다. 이 주석 작업은 최종 비행 물리·감도·게임 규칙을 새로 확정한 것이 아니다.
+
+### 발견·수정한 문제
+
+- 첫 Standalone 화면에서 WBP TextBlock의 FontObject가 비어 있어 글자가 대체 글리프로 깨졌다.
+- Engine `Roboto` Font를 WBP Asset에 직렬화해 저장했고, 필수 TextBlock과 Header Font 유효성을 자동화에서 검사하도록 했다.
+- “BP Asset이 사라지면 native로 자동 복구”, “항상 10Hz”, “Heading 000°는 진북”처럼 구현보다 강하게 읽히는 주석을 실제 동작에 맞게 교정했다.
+
+### 최종 검증
+
+- `DroneEditor Win64 Development` 빌드 성공
+- `Drone.` Automation: 7 succeeded, 0 warnings, 0 failed
+- 새 `Drone.UI.FlightHUDBlueprintAsset`이 WBP 부모, 필수 TextBlock 4개·Font, BP Controller→WBP, BP GameMode→BP Controller를 확인
+- `PIEInputLifecycle` 새 PIE 3회에서 실제 BP Controller와 WBP Class 사용, native fallback 미사용, Widget 재사용·Delegate 정리 확인
+- `CompileAllBlueprints`: 0 errors, 0 warnings, 0 blueprints failed to load
+- Standalone에서 실제 WBP의 `FLIGHT DATA`, `SPD`, `ALT`, `V/S`, `HDG` 글자가 깨짐 없이 표시됨
+- WBP·BP Controller 신규 Asset과 갱신 BP GameMode 모두 Git LFS 적용 확인
+
+### 판정과 Git
+
+- `HUD-02` Blueprint presentation follow-up 완료
+- 최종 아트·Animation, 배터리·신호·Jamming 표시는 아직 미정/미구현
+- `TUT-01` Ready
+- Unreal Commit: `9f91bb6` (`feat: add Blueprint-backed flight HUD`)
+- `codex/hud-blueprint-ready-comments`와 `origin/main`에 Push 완료, 로컬 `main=origin/main=9f91bb6`

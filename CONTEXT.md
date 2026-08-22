@@ -421,7 +421,7 @@ Inbox → Todo → Doing → Done
 
 ### 완료: PFN-06 Camera/Input, HUD-01 Telemetry와 HUD-02 Flight HUD
 
-사용자 승인안의 Camera/Input 기준선을 완료했다. 공용 Telemetry Component의 10Hz Snapshot과 이를 Event 기반으로 표시하는 native Flight HUD도 구현했으며, 최종 Drone 자동화 6/6, Blueprint 0/0과 Standalone 네 수치 변화를 통과했다.
+사용자 승인안의 Camera/Input 기준선을 완료했다. 공용 Telemetry Component의 기본 10Hz Snapshot Event와 이를 표시하는 C++ HUD 기능·실제 WBP 외형을 구현했다. BP Controller/GameMode 연결까지 포함해 최종 Drone 자동화 7/7, Blueprint 0/0, PIE 실제 WBP 사용과 Standalone WBP 표시를 통과했다.
 
 ### 1순위: Tutorial Vertical Slice와 기능 우선 Greybox
 
@@ -465,7 +465,7 @@ Inbox → Todo → Doing → Done
 - 새 생산 코드는 `Source/Drone`, 새 자산은 `/Game/Drone` 아래에 둔다.
 - ThirdPerson·Combat·Platforming·SideScrolling은 참고용 Legacy로 동결한다. 신규 상속·참조를 만들지 않고 Vertical Slice 전에는 삭제하지 않는다.
 - Prototype IMC의 등록·제거 책임은 Pawn 한 곳에만 둔다. PlayerController나 Level Blueprint에 중복 등록하지 않는다.
-- C++는 상태와 기능, Blueprint는 자산 연결과 Greybox 조정을 담당한다. Collision Root와 Visual Mesh를 분리한다.
+- C++는 상태·계산·수명주기, Blueprint는 자산 연결·Greybox 조정과 UI 표시 외형을 담당한다. Collision Root와 Visual Mesh를 분리한다.
 - PFN-06 v1 조작은 Actor-relative 수평 이동, World Up 고도, Q/E와 Mouse X Actor Yaw, Mouse Y CameraBoom Pitch, Gamepad Left Stick 이동·Trigger 고도·Right Stick Yaw/Pitch로 확정했다. Keyboard·Mouse 시험 감도는 수동 Pass했으며 실제 Gamepad 체감과 최종 물리 조정은 이후 별도 카드로 남긴다.
 - Standalone 싱글플레이만 현재 검증 범위로 두며 네트워크·Android·구매 에셋은 제외한다.
 - C++ 변경과 전체 빌드 전에는 열려 있는 Unreal Editor를 저장하고 종료한다.
@@ -483,8 +483,8 @@ Inbox → Todo → Doing → Done
 ## 27. 2026-08-23 HUD-02 완료와 현재 기준
 
 - 이번 확인 PC의 실제 Unreal 저장소는 `C:\URproject\drone`이다. 뒤처진 `C:\project\Drone` 복제본은 현재 작업에 사용하지 않는다.
-- Unreal 저장소의 로컬 `main`과 `origin/main`은 HUD-02 Commit `410c940`으로 일치하며 `codex/hud-02-flight-hud` 기능 브랜치도 원격에 Push했다.
-- `UDroneFlightHUDWidget`과 전용 PlayerController가 현재 Possess Drone의 Telemetry Event를 받아 `SPD`, `ALT`, `V/S`, `HDG`를 표시한다. Tick·Property Binding·매 프레임 Pawn 검색은 사용하지 않는다.
-- 최종 `Drone.` 자동화는 6 succeeded, 0 warnings, 0 failed이고 `CompileAllBlueprints`는 0 errors, 0 warnings, 0 blueprints failed to load다. Standalone에서도 네 수치 변화를 확인했다.
+- Unreal 저장소의 로컬 `main`과 `origin/main`은 WBP/BP 보강 Commit `9f91bb6`으로 일치하며 `codex/hud-blueprint-ready-comments` 기능 브랜치도 원격에 Push했다. `410c940`은 native HUD 기준선으로 보존한다.
+- C++ `UDroneFlightHUDWidget`과 PlayerController가 현재 Possess Drone의 Telemetry Event·Widget 생성·Delegate 정리를 담당하고, 실제 `WBP_DroneFlightHUD`가 `SPD`, `ALT`, `V/S`, `HDG`의 배치·폰트·색을 담당한다. BP Controller가 WBP를 선택하고 BP GameMode가 BP Controller를 선택한다. Tick·Property Binding·매 프레임 Pawn 검색은 사용하지 않는다.
+- 최종 `Drone.` 자동화는 7 succeeded, 0 warnings, 0 failed이고 `CompileAllBlueprints`는 0 errors, 0 warnings, 0 blueprints failed to load다. PIE 3회에서 실제 WBP 사용과 native fallback 미사용, Standalone에서 WBP 글자 정상 표시를 확인했다.
 - 다음 활성 카드는 `TUT-01` Training Map과 비충돌 Spline이다. 배터리·신호·Jamming 표시와 최종 HUD 디자인은 구현 완료로 간주하지 않는다.
-- 문서 저장소는 이번 갱신 직전 `origin/main=f6a7be7`이었으며, 이 상태·계획 갱신도 Commit·Push해 PC 간 공유 기준에 반영한다.
+- 문서 저장소는 이번 갱신 직전 `origin/main=7e3a9ec`이었으며, 이 상태·계획 갱신도 Commit·Push해 PC 간 공유 기준에 반영한다.

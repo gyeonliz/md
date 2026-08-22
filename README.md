@@ -45,9 +45,9 @@ tools/unreal/              Prototype 자산 생성·재검증용 안전 실행 �
 
 작업컴 기본 작업 루트는 `D:\JGY\project`이고, 이번 HUD-02를 구현·검증한 현재 PC의 Unreal 저장소는 `C:\URproject\drone`이다. 별도 `ADronePrototypePawn`과 GameMode, 5개 Input Action, Keyboard·Mouse·Gamepad 15개 Mapping, BP Pawn/GameMode와 Greybox Map을 연결했다. Camera는 Drone 뒤 고정 추적, Mouse X는 Drone Yaw, Mouse Y는 Camera Pitch로 동작한다.
 
-확정 조작을 반영한 PFN-06은 자동화와 Standalone 수동 조작을 통과해 Done이다. HUD-01 공용 Telemetry Component는 10Hz Snapshot을 제공하고, HUD-02 native UMG가 현재 Possess Drone의 Event를 받아 네 수치를 화면에 표시한다. 최종 자동화 6/6, Blueprint 0/0과 Standalone 수치 변화를 통과했다. 다음 구현은 `Tutorial Course/기록 → Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming` 순서이며 [`DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)를 우선 기준으로 한다.
+확정 조작을 반영한 PFN-06은 자동화와 Standalone 수동 조작을 통과해 Done이다. HUD-01 공용 Telemetry Component는 기본 10Hz Snapshot Event를 제공한다. HUD-02는 C++가 계산·생성·Possession·Delegate 수명주기를 맡고 실제 `WBP_DroneFlightHUD`가 배치·색·폰트 같은 화면 외형을 맡도록 연결했다. BP PlayerController와 BP GameMode 연결, native 직접 실행용 fallback, 자동화 7/7, Blueprint 0/0과 Standalone WBP 표시를 검증했다. 다음 구현은 `Tutorial Course/기록 → Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming` 순서이며 [`DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)를 우선 기준으로 한다.
 
-2026-08-23 기준 Unreal 저장소 로컬 `main`과 `origin/main`은 HUD-02 Commit `410c940`으로 일치한다. 문서 저장소는 이번 갱신 직전 `origin/main=f6a7be7`이었으며 이번 문서 갱신도 Commit·Push해 공유한다. `91498b7`은 Unreal 저장소의 초기 Commit이다. 자세한 현재 상태는 [`STATUS.md`](STATUS.md)를 따른다.
+2026-08-23 기준 Unreal 저장소 로컬 `main`과 `origin/main`은 WBP/BP 연결 보강 Commit `9f91bb6`으로 일치한다. 문서 저장소는 이번 갱신 직전 `origin/main=7e3a9ec`이었으며 이번 문서 갱신도 Commit·Push해 공유한다. `410c940`은 native HUD 기준선, `91498b7`은 Unreal 저장소의 초기 Commit이다. 자세한 현재 상태는 [`STATUS.md`](STATUS.md)를 따른다.
 
 외부 구매 소스는 아직 확보되지 않았으므로 현재 개발은 Engine 기본 도형과 기존 Template만 사용하는 기능 우선 Greybox 방식으로 진행한다. 현재 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)가 우선하고 PFN 카드 번호와 교체 경계는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](docs/DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 

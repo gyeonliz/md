@@ -4,18 +4,18 @@
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 HUD-02 Commit `410c940`이다. 문서 저장소는 이번 갱신 직전 `origin/main=f6a7be7`이었고 이 현황 갱신도 Commit·Push해 두 PC 기준을 맞춘다. 현재 기능 실행 순서는 `Tutorial Course → Flight 상태 → Operator↔Drone → Story/NPC/Mission → AI/MG/Jamming → 에셋 적용`이다.
+Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 WBP/BP 연결 보강 Commit `9f91bb6`이다. 문서 저장소는 이번 갱신 직전 `origin/main=7e3a9ec`이었고 이 현황 갱신도 Commit·Push해 두 PC 기준을 맞춘다. 현재 기능 실행 순서는 `Tutorial Course → Flight 상태 → Operator↔Drone → Story/NPC/Mission → AI/MG/Jamming → 에셋 적용`이다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-08-23 04:30 KST
+마지막 갱신: 2026-08-23 05:40 KST
 
 | 항목 | 상태 |
 |---|---|
 | 현재 단계 | 2단계 Telemetry/HUD 완료, Tutorial Vertical Slice 시작 대기 |
-| 진행 정도 | Telemetry 공급·Flight HUD 표시·Possession 수명주기·Standalone 네 수치 변화 검증 완료 |
+| 진행 정도 | Telemetry 공급·C++ 수명주기·실제 WBP 외형·BP Controller/GameMode 연결 검증 완료 |
 | 지금 작업 중 | `HUD-02` 마감 완료, `TUT-01` 구현 시작 대기 |
-| 완료 근거 | Editor Build 성공, Drone 자동화 6/6, Blueprint 0/0, Standalone SPD·ALT·V/S·HDG 변화 확인 |
+| 완료 근거 | Editor Build 성공, Drone 자동화 7/7, Blueprint 0/0, PIE 3회 실제 WBP·fallback 미사용, Standalone WBP 글자 표시 확인 |
 | 현재 차단 | 없음. 고도는 Tutorial/Mission이 지정하는 기준 Z 대비 값으로 확정 |
 | 다음 행동 | `TUT-01` Training Map과 비충돌 Spline 구현 시작 |
 | 다음 기능 | `TUT-01` Training Map·비충돌 Spline → `TUT-02` 순서형 Ring Gate |
@@ -88,7 +88,7 @@ Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 HUD-02 Co
 | PFN-05 | Drone / Unreal | 별도 Map에 GameMode Override, PlayerStart 한 개, 배치 Pawn 0개와 Greybox 시험 요소 구성 |
 | PFN-06 | Drone / Unreal | Camera·Spawn/Input 반복 PIE: 확정 조작 Automation 3/3, Standalone Keyboard·Mouse 조작과 창 닫기 정상 종료 Pass. 실제 Gamepad 체감은 미확인 |
 | HUD-01 | Drone / UI | 공용 Telemetry Snapshot과 10Hz Timer Event 구현. 계산·기본값·Runtime Spawn 검증, Drone 자동화 5/5, Blueprint 0/0 |
-| HUD-02 | Drone / UI | native UMG Flight HUD와 전용 PlayerController 구현. Event 단일 구독·Pawn 전환 해제/재연결·PIE 3회 수명주기 검증, Drone 자동화 6/6, Blueprint 0/0, Standalone 네 수치 변화 확인 |
+| HUD-02 | Drone / UI | C++ Flight HUD 기능·native 직접 실행 fallback과 실제 `WBP_DroneFlightHUD` 외형 구현. BP Controller→WBP, BP GameMode→BP Controller 연결, 필수 TextBlock·폰트·PIE 3회 수명주기 검증, Drone 자동화 7/7, Blueprint 0/0, Standalone WBP 표시 확인 |
 | SYNC-01 | Codex Sync | 목표·완료·진행·결정·미정·다음 작업 형식 정의 |
 | SYNC-02 | Codex Sync | `handoff.md` + `manifest.json` Export/Import 구현 |
 | SYNC-03 | Codex Sync | 인증·토큰·원시 세션 제외 기준과 검사 구현 |
@@ -97,6 +97,6 @@ Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 HUD-02 Co
 
 ## 이번 인계의 정지선
 
-Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 로컬 `main`과 `origin/main`은 HUD-02 Commit `410c940`으로 일치한다. 문서 저장소는 이번 갱신 직전 `origin/main=f6a7be7`이었다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
+Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 로컬 `main`과 `origin/main`은 WBP/BP 연결 보강 Commit `9f91bb6`으로 일치한다. `410c940`은 native HUD 기준선이다. 문서 저장소는 이번 갱신 직전 `origin/main=7e3a9ec`이었다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
 
-Android 제외와 PFN-01~06, HUD-01, HUD-02를 완료했다. 공용 Telemetry Component는 10Hz Snapshot을 제공하고 PlayerController 소유 Flight HUD가 현재 Possess Drone의 네 수치를 Event 기반으로 표시한다. 다음 카드는 TUT-01이며 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다. 구매 소스는 현재 구현의 선행 조건으로 두지 않는다.
+Android 제외와 PFN-01~06, HUD-01, HUD-02를 완료했다. 공용 Telemetry Component는 기본 10Hz Snapshot Event를 제공하고 C++ PlayerController/HUD 기능과 실제 WBP가 현재 Possess Drone의 네 수치를 표시한다. 다음 카드는 TUT-01이며 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다. 구매 소스는 현재 구현의 선행 조건으로 두지 않는다.

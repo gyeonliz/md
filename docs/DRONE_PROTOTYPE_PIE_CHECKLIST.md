@@ -10,7 +10,7 @@
 PFN-01~05  Done
 PFN-06     Done, 자동화 3/3 Pass · Standalone 수동 Pass
 HUD-01     Done
-HUD-02     Done
+HUD-02     Done, WBP/BP 실제 연결 · 전체 자동화 7/7
 TUT-01     Ready
 ```
 
@@ -96,6 +96,21 @@ TUT-01     Ready
 | 수동 화면 확인 | Pawn/고정 Camera | 이동·Mouse 방향 | Gamepad 체감 | 종료 | 판정 |
 |---|---|---|---|---|---|
 | 새 조작 자동화 3회 통과 후 1회 | Pawn 1·고정 Camera 정상 | Keyboard·Mouse Pass | 연결 여부 미보고 | 창 닫기 정상 종료 | 수동 Pass |
+
+## 2026-08-23 HUD WBP/BP 최신 검증
+
+PFN-06의 2026-08-21 입력 결과는 그대로 유지한다. `9f91bb6` WBP/BP 보강 뒤 같은 `Drone.Prototype.PIEInputLifecycle`의 새 PIE 3회에 다음 HUD 조건을 추가해 모두 통과했다.
+
+- [x] 실제 Controller Class가 `BP_DronePrototypePlayerController_C`
+- [x] 실제 HUD Class가 `WBP_DroneFlightHUD_C`
+- [x] `IsUsingNativeFallbackLayout()`이 `false`
+- [x] HUD 인스턴스가 로컬 Player 화면에 정확히 한 개
+- [x] 현재 Possess Pawn의 Telemetry Component 연결
+- [x] UnPossess 시 Telemetry Event 해제와 HUD 숨김
+- [x] Re-Possess 시 같은 Widget 인스턴스 재사용과 Event 재연결
+- [x] 각 PIE 종료 후 Possession Delegate·Telemetry Delegate·Viewport Widget 잔존 없음
+
+전체 `Drone.` 자동화는 `Drone.UI.FlightHUDBlueprintAsset`을 포함해 7 succeeded, 0 warnings, 0 failed다. 전체 Blueprint Compile도 0 errors, 0 warnings, 0 failed to load다. 별도 Development Standalone에서는 실제 WBP의 `FLIGHT DATA`, `SPD`, `ALT`, `V/S`, `HDG`가 깨짐 없이 표시되는 것을 화면으로 확인하고 정상 종료했다.
 
 ## 완료 판정
 

@@ -164,7 +164,7 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 |---|---|---|
 | CTRL-01 | 고정 추적 Camera와 Mouse/Gamepad 입력 | 5 Action, 15 Mapping, 자동화 3/3과 수동 체감 확인 |
 | HUD-01 | Telemetry Snapshot Component | 속도·고도·수직 속도·Heading을 10Hz Event로 제공 |
-| HUD-02 | 공용 Flight HUD | Drone Possess 중 네 수치를 화면에서 확인 |
+| HUD-02 | C++ 기능 + WBP Flight HUD | Drone Possess 중 실제 WBP로 네 수치를 화면에서 확인 |
 | TUT-01 | Training Map과 비충돌 Spline | 표시선이 비행·Collision·Nav에 영향 없음 |
 | TUT-02 | 순서형 Ring Gate | 정방향 현재 Gate만 한 번 통과 처리 |
 | TUT-03 | Segment/Lap 기록 | 시간·실제 이동 거리·평균 속도 계산 |
@@ -178,7 +178,7 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 | STY-04 | AI·MG 통합 | Drone 탐지와 대응을 Mission 흐름에서 재현 |
 | AST-01 | 제공 Drone 에셋 감사·적용 | 기능 코드 변경 없이 Integration BP에서 외형 교체 |
 
-현재 `CTRL-01`, `HUD-01`, `HUD-02`를 완료했다. Flight HUD는 자동화 6/6, Blueprint 0/0과 Standalone 네 수치 변화를 통과했으며 다음 활성 카드는 `TUT-01`이다.
+현재 `CTRL-01`, `HUD-01`, `HUD-02`를 완료했다. Flight HUD는 BP Controller/GameMode와 실제 WBP 연결, 자동화 7/7, Blueprint 0/0, PIE 실제 WBP 사용과 Standalone WBP 표시를 통과했으며 다음 활성 카드는 `TUT-01`이다.
 
 ## 8. 검증 게이트
 
