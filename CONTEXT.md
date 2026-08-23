@@ -1,6 +1,6 @@
 # 작업컴 Codex/GPT 기준 컨텍스트
 
-기준일: 2026-08-23 (Asia/Seoul)
+기준일: 2026-08-24 (Asia/Seoul)
 
 이 문서는 메인컴 ChatGPT/Codex에서 진행하던 작업을 작업컴에서 이어가기 위한 기준 컨텍스트다. 추측해서 내용을 추가하지 않고, 사용자가 실제 진행 상황을 알려준 경우에만 상태를 갱신한다.
 
@@ -419,13 +419,13 @@ Inbox → Todo → Doing → Done
 
 ## 21. 다음 작업
 
-### 완료: PFN-06 Camera/Input, HUD-01 Telemetry, HUD-02 Flight HUD와 TUT-01 Training Course
+### 완료: PFN-06 Camera/Input, HUD-01 Telemetry, HUD-02 Flight HUD, TUT-01 Course와 TUT-02 Ring Gate
 
-사용자 승인안의 Camera/Input 기준선을 완료했다. 공용 Telemetry Component의 기본 10Hz Snapshot Event와 이를 표시하는 C++ HUD 기능·실제 WBP 외형을 구현했다. 이어서 TUT-01의 별도 Training Map, 편집 가능한 비충돌 Spline Course, 실제 BP Course와 Cyan 안내 Material을 구현했다. 현재 전체 `Drone.` 자동화 10/10, Blueprint 0 errors·0 warnings·0 load failures, Standalone 실제 BP Controller/Pawn/WBP와 안내선 표시까지 통과했다.
+사용자 승인안의 Camera/Input과 Telemetry/HUD 기준선, TUT-01 Training Map·비충돌 Spline을 완료했다. TUT-02에서는 실제 `BP_DroneTrainingGate` 네 개, 비충돌 Ring Visual과 별도 Pawn Overlap Trigger, Course의 명시적 Gate 배열과 순서·정방향·중복 통과 판정을 구현했다. 전체 `Drone.` 자동화 11/11, Tutorial 4/4, Blueprint 0 errors·0 warnings·0 load failures를 통과했고 Standalone에서 실제 BP Controller/Pawn/WBP, Course 안내선과 Current/Inactive Gate 표시를 확인했다.
 
 ### 1순위: Tutorial Vertical Slice와 기능 우선 Greybox
 
-`TUT-02 순서형 Ring Gate·정방향 판정 → Lap/Segment 기록 → Flight 상태 → Operator↔Drone → NPC·Mission UI Story Shell → AI/MG/Jamming → 에셋 적용` 순서로 진행한다. Gate·순서·정방향 판정·Lap·Timing은 아직 구현되지 않았으며 TUT-02 이후 범위다. 상세 기준은 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다.
+`TUT-03 Segment/Lap 기록 → TUT-04 비교·결과 UI → Flight 상태 → Operator↔Drone → NPC·Mission UI Story Shell → AI/MG/Jamming → 에셋 적용` 순서로 진행한다. Gate·Trigger·순서·정방향 판정은 구현됐지만 Lap 시작·완료, Segment/Lap Timing, 거리·평균 속도와 기록 UI는 아직 구현되지 않았다. 상세 기준은 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다.
 
 ### 병행: PC 간 공유 검증
 
@@ -481,14 +481,15 @@ Inbox → Todo → Doing → Done
 - Jamming은 신호 경고 → HUD Noise → 조작/통신 저하의 재현 가능한 단계형 규칙으로 만든다.
 - 제공 Drone 에셋은 기능 부모로 상속하지 않고 `/Game/Drone` 아래 Integration Blueprint에서 Visual만 교체한다.
 
-## 27. 2026-08-23 HUD-02·TUT-01 완료와 현재 기준
+## 27. 2026-08-24 HUD-02·TUT-01·TUT-02 완료와 현재 기준
 
 - 이번 확인 PC의 실제 Unreal 저장소는 `C:\URproject\drone`이다. 뒤처진 `C:\project\Drone` 복제본은 현재 작업에 사용하지 않는다.
-- Unreal 저장소의 로컬 `main`과 `origin/main`은 TUT-01 Commit `5a9a2faed4591a574988b649278cb0f166e31267`으로 일치한다. `9f91bb6`은 WBP/BP 연결 보강, `410c940`은 native HUD 기준선으로 보존한다.
+- Unreal 저장소의 로컬 `main`과 `origin/main`은 TUT-02 Commit `800a7baaf8247bf0a3ee7bccc2272e12d0098f2b`으로 일치한다. `5a9a2fa`는 TUT-01, `9f91bb6`은 WBP/BP 연결 보강, `410c940`은 native HUD 기준선으로 보존한다.
 - C++ `UDroneFlightHUDWidget`과 PlayerController가 현재 Possess Drone의 Telemetry Event·Widget 생성·Delegate 정리를 담당하고, 실제 `WBP_DroneFlightHUD`가 `SPD`, `ALT`, `V/S`, `HDG`의 배치·폰트·색을 담당한다. BP Controller가 WBP를 선택하고 BP GameMode가 BP Controller를 선택한다. Tick·Property Binding·매 프레임 Pawn 검색은 사용하지 않는다.
 - TUT-01은 `ADroneTrainingCourse`, `BP_DroneTrainingCourse`, `Lvl_DroneTraining`, `M_DroneTrainingGuide`와 Tutorial 자동화 테스트 3개로 구성한다. Course가 편집 가능한 Spline과 런타임 표시용 Spline Mesh를 소유하고, Material은 Opaque·Unlit·Emissive와 Spline Mesh 사용 설정으로 Cyan 안내선을 표시한다.
-- TUT-01 `DroneEditor Win64 Development` 빌드는 성공했다. `Drone.Tutorial`은 3/3, 전체 `Drone.` 자동화는 10/10이며 warning과 failure가 없다. `CompileAllBlueprints`도 0 errors, 0 warnings, 0 blueprints failed to load다.
-- Standalone에서 실제 BP Controller/Pawn/WBP HUD와 Cyan 안내선을 확인했고 Material fallback 경고는 없었다. 자동화 Sweep에서 안내선이 이동을 막지 않으며 Course Primitive의 Collision·Overlap·Physics·Navigation 영향이 꺼진 것을 확인했다. Training Map에는 저장된 Recast NavMesh Actor가 있다.
-- 다음 활성 카드는 `TUT-02` Gate·순서·정방향 판정이다. Gate·Lap·Segment Timing은 아직 구현되지 않았다. 배터리·신호·Jamming 표시와 최종 HUD 디자인도 구현 완료로 간주하지 않는다.
-- Android는 개발 범위에서 제외하고 구매 소스는 TUT-02의 선행 조건으로 두지 않는다.
-- 문서 저장소는 이번 갱신 직전 로컬 `main`과 `origin/main`이 `b63eee1`에서 일치했으며, 이 상태·계획 갱신도 Commit·Push해 PC 간 공유 기준에 반영한다.
+- TUT-02는 `ADroneTrainingGate`, `UDroneTrainingGateSequenceComponent`, 실제 `BP_DroneTrainingGate` 네 개와 갱신한 Training Map으로 구성한다. Ring Visual은 충돌하지 않고 별도 Trigger만 Pawn Overlap을 받으며, Sequence Component가 현재 순서·정방향·중복 통과와 Current/Completed/Inactive 상태를 판정한다.
+- TUT-02 `DroneEditor Win64 Development` 빌드는 성공했다. Gate Sequence 1/1과 실제 BP PIE Smoke 1/1, 전체 `Drone.Tutorial` 4/4, 전체 `Drone.` 11/11이 warning·failure 없이 통과했다. `CompileAllBlueprints`도 0 errors, 0 warnings, 0 blueprints failed to load다.
+- Standalone에서 실제 BP Controller/Pawn/WBP HUD, Cyan Course 안내선과 Current/Inactive Gate 표시를 확인했다. 신규 BP Gate와 갱신 Map 두 Asset은 Git LFS로 Push했다.
+- 다음 활성 카드는 `TUT-03` Segment/Lap 기록이다. Gate·순서·방향은 구현됐지만 Lap·Timing·거리·평균 속도·기록 UI는 아직 구현되지 않았다. 배터리·신호·Jamming 표시와 최종 HUD 디자인도 구현 완료로 간주하지 않는다.
+- Android는 개발 범위에서 제외하고 구매 소스는 TUT-03의 선행 조건으로 두지 않는다.
+- 문서 저장소는 이번 갱신 직전 로컬 `main`과 `origin/main`이 `e6395f1`에서 일치했으며, 이 상태·계획 갱신도 Commit·Push해 PC 간 공유 기준에 반영한다.

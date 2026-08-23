@@ -1,6 +1,6 @@
 # TUT-01 Training Course 구현 가이드
 
-기준일: 2026-08-23 (Asia/Seoul)
+기준일: 2026-08-24 (Asia/Seoul)
 
 이 문서는 `C:\URproject\drone`의 실제 `ADroneTrainingCourse` 소스, 자동화 테스트, `BP_DroneTrainingCourse`, `Lvl_DroneTraining` 자산을 기준으로 한다.
 
@@ -9,9 +9,9 @@ TUT-01의 범위는 다음 두 가지뿐이다.
 - 편집 가능한 비행 경로 `Spline`
 - 플레이 중 보이지만 Drone 이동과 Navigation에는 간섭하지 않는 안내선
 
-Gate, 통과 Trigger, 통과 순서, 정·역방향 판정, Segment/Lap 기록, Timing은 구현된 것으로 취급하지 않는다. 이 기능들은 모두 다음 카드인 **TUT-02 이후 범위**다.
+TUT-01 완료 범위에는 Gate, 통과 Trigger, 통과 순서, 정·역방향 판정, Segment/Lap 기록과 Timing을 포함하지 않는다. 이후 TUT-02에서 Gate·Trigger·순서·정방향 판정은 구현했지만 Segment/Lap 기록과 Timing은 계속 미구현이며 TUT-03 범위다.
 
-현재 검증 기준선은 Unreal Commit `5a9a2fa`다. `DroneEditor` 빌드, Tutorial 자동화 3/3, 전체 `Drone.` 자동화 10/10, 전체 Blueprint Compile 0 errors/0 warnings를 통과했고, Standalone에서 실제 BP Pawn·Controller·WBP HUD와 밝은 청록 안내선을 확인했다.
+TUT-01 자체 완료 기준선은 Unreal Commit `5a9a2fa`다. 현재 프로젝트 기준선 `800a7ba`에는 TUT-02 Gate가 추가됐으며 Editor Build, Tutorial 4/4, 전체 `Drone.` 11/11, 전체 Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다. Standalone에서는 실제 BP Pawn·Controller·WBP HUD, 밝은 청록 안내선과 Current/Inactive Gate를 확인했다.
 
 ## 1. 왜 필요한가
 
@@ -22,7 +22,7 @@ Tutorial을 처음부터 Gate와 기록 시스템까지 한 번에 만들면 경
 - 구매한 코스나 Drone 에셋 없이 Engine Cube와 프로젝트 전용 단순 Material만으로 비행 동선을 시험할 수 있다.
 - Level을 다시 모델링하지 않고 Spline 점만 움직여 접근 방향과 난이도를 바꿀 수 있다.
 - 화면용 안내선과 이후의 판정용 Gate를 분리해, 표시 Mesh 때문에 Overlap이나 이동 판정이 잘못되는 일을 막는다.
-- TUT-02에서 Gate를 추가할 때 같은 Spline을 배치 기준으로 재사용할 수 있다.
+- TUT-02 Gate를 추가할 때 같은 Spline과 별도 Training Map을 배치 기준으로 재사용했다.
 
 현재 기본 S자 경로와 표시 크기는 Greybox 시험값이다. 최종 코스 형태나 아트 스타일을 확정한 값이 아니다.
 
@@ -184,7 +184,7 @@ Visible                 true
 Hidden In Game          false
 ```
 
-안내선은 “보이는 길”이지 비행 판정용 Trigger가 아니다. TUT-02에서도 Ring Visual과 판정 Trigger를 분리해야 하며, 이 SplineMesh에 Overlap을 켜서 Gate 역할을 맡기지 않는다.
+안내선은 “보이는 길”이지 비행 판정용 Trigger가 아니다. TUT-02에서도 Ring Visual과 판정 Trigger를 별도 Component로 분리했으며, 이 SplineMesh에는 Overlap을 켜거나 Gate 역할을 맡기지 않는다.
 
 ## 5. Blueprint와 Map에서 무엇을 설정하는가
 
@@ -197,7 +197,7 @@ Hidden In Game          false
 5. Class Defaults의 `Tutorial | Course | Visual`에서 Mesh, Material, 폭, 두께, Z Offset과 색을 조정한다.
 6. Compile 후 안내선이 현재 Spline을 따라 다시 만들어지는지 확인한다.
 
-외형을 바꾸더라도 새 Mesh에 Collision을 켜지 않는다. C++은 Construction과 BeginPlay마다 Course가 소유한 모든 Primitive에 비간섭 값을 다시 적용한다. Gate Trigger는 이 BP에 섞지 않고 TUT-02의 별도 Actor로 만든다.
+외형을 바꾸더라도 새 Mesh에 Collision을 켜지 않는다. C++은 Construction과 BeginPlay마다 Course가 소유한 모든 Primitive에 비간섭 값을 다시 적용한다. Gate Trigger는 이 BP의 SplineMesh에 섞지 않고 TUT-02의 별도 `BP_DroneTrainingGate` Actor에 둔다.
 
 ### `Lvl_DroneTraining`
 
@@ -208,7 +208,7 @@ Hidden In Game          false
 5. 배치된 Course Actor를 선택해 Level 전용 경로를 조정할 수 있다.
 6. 맵과 BP를 모두 저장한다.
 
-현재 경로는 코스 흐름을 시험하는 Greybox다. Gate Actor나 Lap UI를 미리 추가해 TUT-01 완료 조건과 섞지 않는다.
+현재 경로는 코스 흐름을 시험하는 Greybox다. TUT-02의 실제 BP Gate 네 개는 별도 Actor로 배치됐으며, Course Spline을 수정할 때 Gate 배열 순서와 GateIndex가 자동으로 바뀐다고 가정하지 않는다. Lap UI는 아직 추가하지 않았다.
 
 ## 6. Editor에서 테스트하는 방법
 
@@ -256,7 +256,7 @@ TUT-01의 정상 기준은 다음과 같다.
 - 안내선은 Physics를 사용하지 않고 NavMesh에 영향을 주지 않는다.
 - Course Actor는 Tick을 사용하지 않는다.
 
-Gate 통과 표시, 다음 Gate 선택, 역방향 거부, Lap 시작·완료, 구간 시간과 평균 속도는 이 정상 결과에 포함하지 않는다. 다음 작업은 **TUT-02 순서형 Ring Gate**다.
+Gate 통과 표시, 다음 Gate 선택과 역방향 거부는 TUT-02에서 별도 Actor·Component로 구현됐다. 그러나 TUT-01의 정상 결과에는 포함하지 않으며, Lap 시작·완료, 구간 시간·실제 이동 거리·평균 속도도 아직 구현되지 않았다. 다음 작업은 **TUT-03 Segment/Lap 기록**이다.
 
 ## 8. 문제가 생겼을 때 확인할 항목
 
@@ -316,9 +316,11 @@ ADroneTrainingCourse
 → BP_DroneTrainingCourse
 → Lvl_DroneTraining에서 기존 Prototype GameMode/Pawn/HUD 재사용
 
-TUT-02 이후
+TUT-02 Done
 → Ring Gate
 → 통과 Trigger와 순서
 → 정·역방향 판정
+
+TUT-03 Todo
 → Segment/Lap/Timing
 ```

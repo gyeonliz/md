@@ -8,18 +8,19 @@
 2. [`STATUS.md`](STATUS.md): 현재 작업컴에서 실제 확인한 환경과 남은 선택
 3. [`WORKBOARD.md`](WORKBOARD.md): 실제 확인 결과를 반영한 현재 보드
 4. [`docs/DRONE_WORKLOG.md`](docs/DRONE_WORKLOG.md): 현재 작업 위치와 날짜별 변경·검증·다음 작업 기록
-5. [`docs/GIT_UNREAL_GUIDE.md`](docs/GIT_UNREAL_GUIDE.md): Unreal 프로젝트 Git/GitHub 실전 절차
-6. [`docs/CODEX_CONTEXT_SYNC.md`](docs/CODEX_CONTEXT_SYNC.md): 메인컴 ↔ 작업컴 문맥 전달 절차
-7. [`docs/DRONE_PROJECT_AUDIT.md`](docs/DRONE_PROJECT_AUDIT.md): 현재 후보 프로젝트의 실제 C++·입력·맵 구조 감사
-8. [`docs/DRONE_PROTOTYPE_IMPLEMENTATION.md`](docs/DRONE_PROTOTYPE_IMPLEMENTATION.md): 실제 C++ Prototype 구현·검증과 Editor 연결 절차
-9. [`docs/DRONE_PROTOTYPE_INPUT_CONTRACT.md`](docs/DRONE_PROTOTYPE_INPUT_CONTRACT.md): 현재 Prototype 전용 임시 입력 계약
-10. [`docs/DRONE_PROTOTYPE_PIE_CHECKLIST.md`](docs/DRONE_PROTOTYPE_PIE_CHECKLIST.md): PFN-06 자동화 결과와 수동 화면 체크리스트
-11. [`docs/DRONE_TELEMETRY_IMPLEMENTATION.md`](docs/DRONE_TELEMETRY_IMPLEMENTATION.md): HUD-01 Snapshot 공급과 HUD-02 Flight HUD 구현·검증
-12. [`docs/DRONE_PREASSET_FUNCTION_PLAN.md`](docs/DRONE_PREASSET_FUNCTION_PLAN.md): 구매 소스 없이 Greybox 기능을 먼저 완성하는 실행 계획
-13. [`docs/DRONE_MVP_GUIDE.md`](docs/DRONE_MVP_GUIDE.md): Flight MVP부터 데모까지의 개발 단위
-14. [`docs/WORK_MANAGEMENT.md`](docs/WORK_MANAGEMENT.md): Inbox → Todo → Doing → Done 운영
-15. [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md): 확정 조작, Tutorial 코스·기록 UI, Story·NPC·Jamming·에셋 적용 계획
-16. [`docs/STUDY_PLANS.md`](docs/STUDY_PLANS.md): 정보처리산업기사·C++ 코딩테스트 병행 계획
+5. [`docs/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](docs/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md): 현재 코드·Asset 책임, 구현 경계와 사용자가 직접 확인할 작업
+6. [`docs/GIT_UNREAL_GUIDE.md`](docs/GIT_UNREAL_GUIDE.md): Unreal 프로젝트 Git/GitHub 실전 절차
+7. [`docs/CODEX_CONTEXT_SYNC.md`](docs/CODEX_CONTEXT_SYNC.md): 메인컴 ↔ 작업컴 문맥 전달 절차
+8. [`docs/DRONE_PROJECT_AUDIT.md`](docs/DRONE_PROJECT_AUDIT.md): 현재 후보 프로젝트의 실제 C++·입력·맵 구조 감사
+9. [`docs/DRONE_PROTOTYPE_IMPLEMENTATION.md`](docs/DRONE_PROTOTYPE_IMPLEMENTATION.md): 실제 C++ Prototype 구현·검증과 Editor 연결 절차
+10. [`docs/DRONE_PROTOTYPE_INPUT_CONTRACT.md`](docs/DRONE_PROTOTYPE_INPUT_CONTRACT.md): 현재 Prototype 전용 임시 입력 계약
+11. [`docs/DRONE_PROTOTYPE_PIE_CHECKLIST.md`](docs/DRONE_PROTOTYPE_PIE_CHECKLIST.md): PFN-06 자동화 결과와 수동 화면 체크리스트
+12. [`docs/DRONE_TELEMETRY_IMPLEMENTATION.md`](docs/DRONE_TELEMETRY_IMPLEMENTATION.md): HUD-01 Snapshot 공급과 HUD-02 Flight HUD 구현·검증
+13. [`docs/DRONE_PREASSET_FUNCTION_PLAN.md`](docs/DRONE_PREASSET_FUNCTION_PLAN.md): 구매 소스 없이 Greybox 기능을 먼저 완성하는 실행 계획
+14. [`docs/DRONE_MVP_GUIDE.md`](docs/DRONE_MVP_GUIDE.md): Flight MVP부터 데모까지의 개발 단위
+15. [`docs/WORK_MANAGEMENT.md`](docs/WORK_MANAGEMENT.md): Inbox → Todo → Doing → Done 운영
+16. [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md): 확정 조작, Tutorial 코스·기록 UI, Story·NPC·Jamming·에셋 적용 계획
+17. [`docs/STUDY_PLANS.md`](docs/STUDY_PLANS.md): 정보처리산업기사·C++ 코딩테스트 병행 계획
 
 ## 구성
 
@@ -30,7 +31,7 @@ WORKBOARD.md               현재 Inbox/Todo/Doing/Done
 docs/                      실행 가이드와 계획
 templates/unreal/          Unreal 프로젝트 루트용 Git 템플릿
 tools/context-sync/        검토 가능한 작업 문맥 Export/Import 도구
-tools/unreal/              Prototype 자산 생성·재검증용 안전 실행 도구
+tools/unreal/              Prototype·Tutorial 자산 생성·재검증용 안전 실행 도구
 ```
 
 ## 중요한 경계
@@ -47,11 +48,11 @@ tools/unreal/              Prototype 자산 생성·재검증용 안전 실행 �
 
 확정 조작을 반영한 PFN-06은 자동화와 Standalone 수동 조작을 통과해 Done이다. HUD-01 공용 Telemetry Component는 기본 10Hz Snapshot Event를 제공한다. HUD-02는 C++가 계산·생성·Possession·Delegate 수명주기를 맡고 실제 `WBP_DroneFlightHUD`가 화면 외형을 맡도록 연결했다.
 
-TUT-01도 완료했다. 별도 `Lvl_DroneTraining` Map과 실제 `BP_DroneTrainingCourse`를 만들었으며, `ADroneTrainingCourse`가 Editor에서 수정 가능한 Spline과 Runtime 표시용 SplineMesh를 소유한다. 안내선은 프로젝트 소유 불투명·Unlit·Emissive `M_DroneTrainingGuide`를 사용하고 Collision·Overlap·Physics·Navigation 영향은 모두 껐다. 기존 Prototype BP GameMode·Pawn·PlayerController·WBP를 그대로 재사용한다. 전체 `Drone` 자동화 10/10, Tutorial 3/3, Blueprint Compile 오류·경고 0/0과 Standalone 안내선 표시를 검증했다.
+TUT-01에 이어 TUT-02도 완료했다. 별도 `Lvl_DroneTraining` Map의 실제 `BP_DroneTrainingCourse`가 편집 가능한 Spline과 Runtime 표시용 SplineMesh를 소유한다. `ADroneTrainingGate`는 비충돌 Ring Visual과 별도 Pawn Overlap Trigger를 분리하고, `UDroneTrainingGateSequenceComponent`가 Course의 명시적 Gate 배열을 기준으로 현재 순서·정방향·중복 통과를 판정한다. 실제 `BP_DroneTrainingGate` 네 개를 Map에 연결했으며 기존 Prototype BP GameMode·Pawn·PlayerController·WBP를 그대로 재사용한다.
 
-TUT-01 범위는 **Spline 코스와 표시선까지**다. Gate 목록, Gate Actor·Trigger, 순서·방향 판정, Lap·Timing은 아직 구현하지 않았으며 TUT-02 이후 범위다. 다음 활성 카드는 `TUT-02 순서형 Ring Gate`이고, 이후 `기록 → Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming` 순서로 진행한다. 세부 기준은 [`DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)를 따른다.
+TUT-02 범위는 **Gate·Trigger·순서·정방향 판정과 Current/Completed/Inactive 표시 상태까지**다. Lap 시작·완료, Segment/Lap Timing, 실제 이동 거리·평균 속도와 기록 UI는 아직 구현하지 않았다. 최종 검증은 Editor Build, Gate Sequence 1/1, 실제 BP PIE Smoke 1/1, Tutorial 4/4, 전체 `Drone.` 11/11, Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다. Standalone에서는 HUD·Course 안내선과 Current/Inactive Gate를 확인했다. 다음 활성 카드는 `TUT-03 Segment/Lap 기록`이다.
 
-2026-08-23 기준 Unreal 저장소 로컬 `main`과 `origin/main`은 TUT-01 완료 Commit `5a9a2faed4591a574988b649278cb0f166e31267`로 일치한다. `9f91bb6`은 WBP/BP 연결 보강 기준선, `410c940`은 native HUD 기준선, `91498b7`은 Unreal 저장소의 초기 Commit이다. 문서 저장소의 최신 동기화 상태는 [`STATUS.md`](STATUS.md)를 따른다.
+2026-08-24 기준 Unreal 저장소 로컬 `main`과 `origin/main`은 TUT-02 완료 Commit `800a7baaf8247bf0a3ee7bccc2272e12d0098f2b`로 일치한다. 신규 `BP_DroneTrainingGate`와 갱신한 `Lvl_DroneTraining` 두 Asset은 Git LFS로 Push했다. `5a9a2fa`는 TUT-01 기준선, `9f91bb6`은 WBP/BP 연결 보강 기준선, `410c940`은 native HUD 기준선, `91498b7`은 Unreal 저장소의 초기 Commit이다. 문서 저장소의 최신 동기화 상태는 [`STATUS.md`](STATUS.md)를 따른다.
 
 외부 구매 소스는 아직 확보되지 않았으므로 현재 개발은 Engine 기본 도형과 기존 Template만 사용하는 기능 우선 Greybox 방식으로 진행한다. 현재 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)가 우선하고 PFN 카드 번호와 교체 경계는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](docs/DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 
@@ -60,8 +61,9 @@ PFN-06 Camera/Input 기준선 Done
 → HUD-01 Telemetry Done
 → HUD-02 Flight HUD Done
 → TUT-01 Training Course/Spline Done
-→ TUT-02 Gate
-→ TUT-03~04 Lap 기록·결과 UI
+→ TUT-02 Gate·순서·정방향 Done
+→ TUT-03 Segment/Lap 기록
+→ TUT-04 결과 UI
 → Flight 상태
 → Operator↔Drone
 → Story/NPC/Mission/Jamming

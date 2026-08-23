@@ -1,0 +1,575 @@
+# Drone 현재 코드 구조와 사용자 확인 작업
+
+기준일: 2026-08-24 (Asia/Seoul)
+
+이 문서는 현재 작업컴의 Unreal 저장소 `C:\URproject\drone`을 직접 확인한 결과만 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
+
+현재 TUT-02 완료 기준은 Unreal Commit `800a7baaf8247bf0a3ee7bccc2272e12d0098f2b`이다. `codex/tutorial-ring-gates` Branch와 `main`을 모두 Push했으며 로컬 `main`과 `origin/main`이 이 Commit으로 일치한다.
+
+## 현재 검증 기준선
+
+| 검증 항목 | 현재 확인 결과 |
+|---|---|
+| `DroneEditor Win64 Development` | Build 성공 |
+| `Drone.Tutorial` Automation | 4/4 통과 |
+| 전체 `Drone.` Automation | 11/11 통과 |
+| `CompileAllBlueprints` | Errors 0, Warnings 0, Load Failures 0 |
+| Standalone 시각 확인 | 실제 WBP HUD, Cyan 안내선, Gate 0 Current 녹색, Gate 1~3 Inactive 표시 확인 |
+| 사용자 수동 비행 확인 | 실제 조종 체감과 네 Gate 완주 확인은 이 문서의 절차로 확인할 차례 |
+
+현재 결과는 위 Source Commit을 대상으로 한 검증값이다. 다른 PC에서는 `main`을 Pull한 뒤 `800a7ba`인지 확인하고 같은 기준선을 사용한다.
+
+## 1. 런타임 연결 구조
+
+### Training Map 전체 흐름
+
+```text
+/Game/Drone/Tutorial/Maps/Lvl_DroneTraining
+│
+├─ WorldSettings
+│  └─ BP_DronePrototypeGameMode
+│     ├─ BP_DronePrototypePawn Spawn·Possess
+│     │  ├─ CollisionComponent (Sphere Root)
+│     │  ├─ VisualMeshComponent
+│     │  ├─ CameraBoom → FollowCamera
+│     │  ├─ UFloatingPawnMovement
+│     │  └─ UDroneTelemetryComponent
+│     │     └─ OnTelemetryUpdated Snapshot Event
+│     │
+│     └─ BP_DronePrototypePlayerController
+│        └─ WBP_DroneFlightHUD 생성·재사용
+│           └─ 현재 Possess Pawn의 Telemetry Event 구독
+│
+├─ BP_DroneTrainingCourse 1개
+│  └─ ADroneTrainingCourse
+│     ├─ CourseSpline
+│     ├─ 비충돌 안내용 SplineMesh Segment
+│     ├─ CourseId
+│     ├─ OrderedGates[4]
+│     └─ UDroneTrainingGateSequenceComponent
+│        ├─ 현재 통과할 Gate 위치
+│        ├─ 순서·방향·중복 통과 판정
+│        └─ Gate Visual State 갱신
+│
+└─ BP_DroneTrainingGate 4개
+   └─ ADroneTrainingGate
+      ├─ GateRoot
+      ├─ GateTrigger (Box, QueryOnly, Pawn Overlap)
+      └─ RingVisualSegment 16개 (표시 전용, NoCollision)
+```
+
+실제 Asset 테스트는 Training Map에 다음 구성이 저장되어 있음을 확인한다.
+
+- `BP_DronePrototypeGameMode` WorldSettings Override
+- `PlayerStart` 정확히 1개
+- 미리 배치된 Prototype Pawn 0개
+- `BP_DroneTrainingCourse` 정확히 1개
+- `BP_DroneTrainingGate` 정확히 4개
+- Course의 `OrderedGates` 배열에 네 Gate가 중복 없이 명시적으로 연결됨
+- 네 Gate의 `CourseId`가 Course와 같음
+- Gate의 `GateIndex`가 배열 위치 `0, 1, 2, 3`과 같음
+- 각 Gate가 비음수가 아닌 `SegmentDistance` 메타데이터를 저장함
+- 저장된 `RecastNavMesh` Actor가 PIE에서 존재함
+- `/Game/ThirdPerson`, `/Game/Variant_` Actor를 Training Map에 직접 배치하지 않음
+
+### Pawn·Input·HUD 연결
+
+```text
+IMC_DronePrototype
+├─ IA_DronePrototype_Move
+├─ IA_DronePrototype_Altitude
+├─ IA_DronePrototype_Yaw
+├─ IA_DronePrototype_Look
+└─ IA_DronePrototype_CameraPitchRate
+
+BP_DronePrototypePawn
+└─ UDroneTelemetryComponent
+   └─ FDroneTelemetrySnapshot
+      ├─ SpeedKilometersPerHour
+      ├─ AltitudeMeters
+      ├─ VerticalSpeedMetersPerSecond
+      └─ HeadingDegrees
+
+BP_DronePrototypePlayerController
+└─ WBP_DroneFlightHUD
+   ├─ SpeedValueText
+   ├─ AltitudeValueText
+   ├─ VerticalSpeedValueText
+   └─ HeadingValueText
+```
+
+Prototype Pawn이 Input Mapping Context를 로컬 Player에 한 번 적용하고, UnPossess 또는 EndPlay에서 자신이 적용한 Context를 제거한다. PlayerController는 HUD를 한 개만 만들고 Pawn이 바뀌면 Widget을 다시 만들지 않고 Telemetry Source만 교체한다.
+
+## 2. 디렉터리와 클래스 책임
+
+### 현재 Drone 기능 소스
+
+```text
+Source/Drone/
+├─ Prototype/
+│  ├─ DronePrototypeGameMode.h/.cpp
+│  ├─ DronePrototypePawn.h/.cpp
+│  ├─ DronePrototypePlayerController.h/.cpp
+│  └─ Tests/
+│     ├─ DronePrototypeDefaultsTest.cpp
+│     ├─ DronePrototypePIEInputLifecycleTest.cpp
+│     └─ DronePrototypeSpawnPossessTest.cpp
+├─ Telemetry/
+│  ├─ DroneTelemetryTypes.h
+│  ├─ DroneTelemetryComponent.h/.cpp
+│  └─ Tests/DroneTelemetryTest.cpp
+├─ UI/
+│  ├─ DroneFlightHUDWidget.h/.cpp
+│  └─ Tests/
+│     ├─ DroneFlightHUDBlueprintAssetTest.cpp
+│     └─ DroneFlightHUDTest.cpp
+└─ Tutorial/
+   ├─ DroneTrainingCourse.h/.cpp
+   ├─ DroneTrainingGateTypes.h
+   ├─ DroneTrainingGate.h/.cpp
+   ├─ DroneTrainingGateSequenceComponent.h/.cpp
+   └─ Tests/
+      ├─ DroneTrainingCourseTest.cpp
+      ├─ DroneTrainingGateSequenceTest.cpp
+      ├─ DroneTrainingAssetTest.cpp
+      └─ DroneTrainingPIESmokeTest.cpp
+```
+
+### 핵심 클래스 책임
+
+| 클래스·구조체 | 담당 책임 | 담당하지 않는 책임 |
+|---|---|---|
+| `ADronePrototypeGameMode` | Prototype Pawn과 PlayerController의 native 기본 Class 제공 | Mission·Lap·점수 규칙 |
+| `ADronePrototypePawn` | Enhanced Input Binding, 이동, 고도 이동, Actor Yaw, Camera Pitch, Component 소유 | HUD 생성, Gate 순서 판정, 최종 비행 물리 |
+| `UDroneTelemetryComponent` | 0.1초 기본 Timer와 즉시 갱신으로 Telemetry Snapshot 계산·Broadcast | 화면 배치, Gate 기록, 지형 AGL 계산 |
+| `ADronePrototypePlayerController` | 로컬 HUD 한 개의 생성·재사용·정리, Possess Pawn과 Telemetry 연결 | Telemetry 수치 계산, HUD Designer 외형 |
+| `UDroneFlightHUDWidget` | Snapshot 표시 문자열 생성, C++↔WBP TextBlock 연결, native fallback | Pawn 검색 Tick, 비행 수치 계산, Gate 안내 UI |
+| `ADroneTrainingCourse` | Spline·안내선, `CourseId`, 명시적 `OrderedGates`, Sequence Component 소유 | Trigger 감지, 방향 수학, Lap·Timing |
+| `ADroneTrainingGate` | Ring Visual, Box Trigger, 진입 위치 보존, 이탈 시 Sequence에 통과 시도 전달 | 현재 Gate 결정, 순서 진행, Lap 기록 |
+| `UDroneTrainingGateSequenceComponent` | 구성 검증, 현재 Gate, 순서·방향·중복 판정, Visual State, `OnGateAccepted` | Visual Mesh 생성, Overlap 감지, 시간·점수·SaveGame |
+| `FDroneTelemetrySnapshot` | HUD와 후속 기록 계층에 전달하는 비행 수치 묶음 | 자체 갱신·표시 |
+| `EDroneTrainingGatePassResult` | 통과 성공 또는 거부 이유 표현 | 사용자 메시지 표시 |
+| `EDroneTrainingGateVisualState` | `Inactive`, `Current`, `Completed` 상태 표현 | Lap 상태 표현 |
+
+### Tutorial Asset
+
+```text
+Content/Drone/Tutorial/
+├─ Blueprints/
+│  ├─ BP_DroneTrainingCourse.uasset
+│  └─ BP_DroneTrainingGate.uasset
+├─ Maps/
+│  └─ Lvl_DroneTraining.umap
+└─ Materials/
+   └─ M_DroneTrainingGuide.uasset
+```
+
+`M_DroneTrainingGuide`는 Course 안내선과 Gate Ring이 함께 사용한다. 자동화에서는 Opaque, Unlit, Spline Mesh Usage를 확인한다.
+
+### Prototype Asset
+
+```text
+Content/Drone/Prototype/
+├─ Blueprints/
+│  ├─ BP_DronePrototypeGameMode.uasset
+│  ├─ BP_DronePrototypePawn.uasset
+│  └─ BP_DronePrototypePlayerController.uasset
+├─ Input/
+│  ├─ IMC_DronePrototype.uasset
+│  └─ Actions/
+│     ├─ IA_DronePrototype_Move.uasset
+│     ├─ IA_DronePrototype_Altitude.uasset
+│     ├─ IA_DronePrototype_Yaw.uasset
+│     ├─ IA_DronePrototype_Look.uasset
+│     └─ IA_DronePrototype_CameraPitchRate.uasset
+├─ Maps/
+│  └─ Lvl_DronePrototype.umap
+└─ UI/
+   └─ WBP_DroneFlightHUD.uasset
+```
+
+### 기존 Template·Variant 영역
+
+다음 영역은 저장소에 남아 있지만 현재 Drone Tutorial 실행 흐름으로 사용한다고 판단하면 안 된다.
+
+```text
+Source/Drone/DroneCharacter.*
+Source/Drone/DroneGameMode.*
+Source/Drone/DronePlayerController.*
+Source/Drone/Variant_Combat/
+Source/Drone/Variant_Platforming/
+Source/Drone/Variant_SideScrolling/
+```
+
+`Config/DefaultEngine.ini`의 전역 시작 Map과 GameMode도 아직 `/Game/ThirdPerson`을 가리킨다. 현재 Drone 검증은 `Lvl_DronePrototype` 또는 `Lvl_DroneTraining`을 명시적으로 열어 진행한다. Variant에 AI·StateTree 코드가 있다는 사실은 Enemy AI MVP가 구현됐다는 뜻이 아니다.
+
+## 3. C++와 Blueprint·Editor의 경계
+
+### C++에서 고정하는 부분
+
+- Pawn Component 구조와 이동·Camera 입력 함수
+- Input Action Binding과 Mapping Context 적용·제거 수명주기
+- Telemetry 단위 변환, Timer, Snapshot Event
+- PlayerController의 HUD 생성·재사용·Delegate 정리
+- HUD 표시 문자열 형식과 C++↔WBP TextBlock 이름 계약
+- Course 안내선 재생성과 Collision·Overlap·Physics·Navigation 비간섭 규칙
+- Gate Trigger의 Pawn Overlap 설정
+- Gate Ring Visual의 NoCollision·NoOverlap·NoPhysics·NoNavigation 규칙
+- Gate 구성 유효성 검사
+- 순서·정방향·중복 통과 판정
+- `Inactive → Current → Completed` 상태 전환
+- 정상 통과 때 `OnGateAccepted` Broadcast
+
+위 규칙은 BP나 Level 저장값이 잘못 바뀌어도 Construction 또는 BeginPlay에서 다시 적용되는 항목이 있다. 특히 Course 표시선과 Gate Visual의 Collision을 Editor에서 임의로 켜지 않는다.
+
+### Blueprint와 Editor에서 조정하는 부분
+
+- `BP_DronePrototypePawn`에 IMC와 Input Action Asset 연결
+- `BP_DronePrototypeGameMode`의 BP Pawn·BP PlayerController Class 선택
+- `BP_DronePrototypePlayerController`의 `WBP_DroneFlightHUD` Class 선택
+- WBP Designer의 위치·크기·색·폰트
+- Course Spline Point와 Tangent 편집
+- Course Actor의 `CourseId`와 `OrderedGates` 배열
+- Gate Actor의 위치·회전
+- Gate별 `CourseId`, `GateIndex`, `SegmentDistance`
+- Gate Radius, Ring Thickness, Trigger 크기, 상태별 색, Mesh·Material 같은 Greybox 외형값
+
+현재 Gate 규칙을 위해 BP Event Graph에 별도의 Overlap·순서 판정 로직을 다시 만들 필요가 없다. 실제 Trigger Delegate와 판정은 native C++에 있다. Blueprint는 배치·참조·외형 조정 계층으로 유지한다.
+
+### 반드시 지킬 데이터 계약
+
+1. `OrderedGates` 배열 위치가 유일한 통과 순서다.
+2. 첫 Gate의 배열 위치와 `GateIndex`는 `0`이다. `1`부터 시작하지 않는다.
+3. 각 `GateIndex`는 자신의 배열 위치와 정확히 같아야 한다.
+4. 한 Gate를 배열에 두 번 넣지 않는다.
+5. Course와 모든 Gate의 `CourseId`가 같아야 한다.
+6. `SegmentDistance`는 현재 비음수 메타데이터이며 TUT-02의 순서·통과 판정에는 사용하지 않는다.
+7. Gate Actor의 로컬 `+X`가 유일한 정방향이다. Actor 회전이 바뀌면 World 정방향도 함께 바뀐다.
+
+이 계약을 어기면 Sequence 전체가 Invalid Configuration이 되고 Gate 진행이 시작되지 않는다.
+
+## 4. Gate 통과 흐름
+
+### 초기 구성
+
+1. Course의 `OnConstruction` 또는 `BeginPlay`가 실행된다.
+2. Course가 Spline 표시선을 재생성하고 비간섭 규칙을 적용한다.
+3. Course가 `CourseId`와 `OrderedGates`를 Sequence Component에 전달한다.
+4. Sequence는 빈 CourseId, 빈 배열, null Gate, 중복 Gate, CourseId 불일치, GateIndex 불일치를 검사한다.
+5. 구성이 유효하면 각 Gate에 자신을 담당 Sequence로 연결한다.
+6. Gate 0은 `Current`, 나머지는 `Inactive`가 된다.
+
+### 실제 Overlap 처리
+
+```text
+Drone이 GateTrigger에 들어감
+→ BeginOverlap
+→ ADronePrototypePawn인지 확인
+→ 최초 Entry World Location 저장
+
+Drone이 GateTrigger를 완전히 빠져나감
+→ EndOverlap
+→ 저장한 Entry Location 회수
+→ 현재 Exit World Location과 함께 Sequence에 전달
+→ TryAcceptTraversal 판정
+```
+
+중요한 점은 Trigger에 들어오는 순간이 아니라 완전히 빠져나와 `EndOverlap`이 발생할 때 통과가 판정된다는 것이다. Trigger 안에서 멈추면 아직 통과로 기록되지 않는다.
+
+### 판정 순서
+
+`TryAcceptTraversal`은 다음 순서로 검사한다.
+
+1. Sequence 구성이 유효한가
+2. 통과 Actor가 `ADronePrototypePawn` 또는 그 BP 자식인가
+3. Gate가 현재 Sequence의 `OrderedGates`에 들어 있는가
+4. 이미 완료한 Gate인가
+5. 현재 기대하는 배열 위치의 Gate인가
+6. Gate 평면을 로컬 `+X` 방향으로 관통했는가
+
+정방향 판정의 현재 C++ 기준은 다음과 같다.
+
+- Entry와 Exit 사이 이동 거리가 최소 1 cm 이상
+- Entry가 Gate 중심 기준 Forward 반대편 1 cm 바깥
+- Exit가 Gate 중심 기준 Forward 앞쪽 1 cm 바깥
+- 이동 선분과 Gate 평면의 교차점이 원형 Trigger aperture 안쪽
+
+Box Trigger는 Overlap 수집용이라 모서리가 원 바깥으로 튀어나오지만, 최종 판정은 교차점을 Gate local space로 바꿔 YZ 원형 반경을 다시 검사한다. 따라서 Box 모서리만 지나거나 같은 쪽으로 되돌아가면 정상 관통으로 인정하지 않는다. Actor Scale을 바꾸더라도 같은 local aperture 기준을 사용하므로 화면 Ring·Trigger와 판정 크기가 함께 변한다.
+
+### 판정 결과
+
+| 결과 | 의미 | 진행 변화 |
+|---|---|---|
+| `Accepted` | 현재 Gate를 정방향으로 정상 통과 | 정확히 한 칸 진행 |
+| `InvalidActor` | Prototype Drone이 아닌 Actor | 없음 |
+| `InvalidConfiguration` | Course·Gate 배열 계약 오류 | 없음 |
+| `GateNotInSequence` | 현재 Course 목록에 없는 Gate | 없음 |
+| `WrongOrder` | 아직 차례가 아닌 미래 Gate | 없음 |
+| `WrongDirection` | 역방향, 평면 미관통, 원형 aperture 밖, 이동량 부족 | 없음 |
+| `AlreadyCompleted` | 이미 끝난 Gate 재통과 | 없음 |
+
+정상 통과하면 다음 처리가 이어진다.
+
+```text
+NextExpectedGatePosition + 1
+→ 이전 Gate = Completed
+→ 다음 Gate = Current
+→ 나머지 Gate = Inactive
+→ OnGateAccepted(Gate, AcceptedGateCount) Broadcast
+```
+
+마지막 Gate를 통과하면 모든 Gate가 `Completed`가 되고 `GetCurrentGate()`는 null, `GetCurrentGateIndex()`는 `INDEX_NONE`이 된다. 현재는 이 완료 상태를 Lap·평가 화면으로 연결하지 않는다.
+
+### Visual과 Trigger의 분리
+
+| 구성 | 현재 규칙 |
+|---|---|
+| Gate Actor | Trigger를 사용하므로 Actor Collision Enabled |
+| `GateTrigger` | `QueryOnly`, `WorldDynamic`, Pawn만 `Overlap`, 다른 채널 Ignore |
+| `GateTrigger` | Overlap 생성 On, Physics Off, Navigation 영향 Off, 게임 화면에서는 숨김 |
+| Ring Visual 16개 | Collision Off, Overlap Off, Physics Off, Navigation 영향 Off |
+| Course Spline·안내선 | Collision Off, Overlap Off, Physics Off, Navigation 영향 Off |
+
+Gate Actor의 Collision이 켜져 있는 것은 Ring이 Drone을 막는다는 뜻이 아니다. 판정용 Box Trigger만 Query Overlap에 참여하며 Ring Mesh는 비충돌이다.
+
+### 상태별 기본 색
+
+| 상태 | 기본 색 | 의미 |
+|---|---|---|
+| `Inactive` | 어두운 남색 `(0.02, 0.08, 0.18, 1)` | 아직 차례가 아님 |
+| `Current` | 밝은 녹색 `(0.10, 1.00, 0.18, 1)` | 지금 통과할 Gate |
+| `Completed` | Cyan `(0.02, 0.70, 1.00, 1)` | 정상 통과 완료 |
+
+Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 cm, Ring Thickness는 24 cm다. Trigger 기본 Half Depth는 60 cm, Y·Z Half Size는 175 cm다. 최종 아트나 최종 난이도 수치로 확정된 값은 아니다.
+
+## 5. 현재 구현과 미구현
+
+### 현재 `main`에 구현된 것
+
+- 별도 Prototype Drone Pawn과 Enhanced Input
+- 전후·좌우·상승·하강·Yaw·Camera Pitch 조작
+- Telemetry Snapshot과 WBP Flight HUD
+- 별도 `Lvl_DroneTraining`
+- 비충돌 Spline Course 안내선
+- 실제 `BP_DroneTrainingGate`
+- Training Map에 배치된 Greybox Gate 4개
+- Course의 명시적 `OrderedGates[4]`
+- CourseId·GateIndex·중복 Gate 구성 검증
+- Prototype Drone만 허용하는 Box Trigger
+- 정방향 평면 관통 판정
+- Gate 순서 판정
+- 완료 Gate 중복 통과 방지
+- `Inactive`, `Current`, `Completed` Visual 전환
+- Sequence Reset 함수
+- Reset 시 진행 중인 BeginOverlap 기록 폐기
+- Gate 또는 Course가 먼저 파괴돼도 Sequence 유효성·역참조를 안전하게 정리
+- 정상 통과 경계 Event `OnGateAccepted`
+- Gate Trigger·Ring·Course 안내선의 Collision·Navigation 안전 규칙
+- native World, 실제 Asset, 실제 PIE를 포함한 TUT-02 자동화
+
+### 아직 구현하지 않은 것
+
+- Lap 수와 Lap 시작·완료 규칙
+- Gate별 Segment Time, 전체 Lap Time, Best Time
+- 평균 속도·통과 품질·점수·평가
+- Gate 진행 HUD, 다음 Gate 화살표, Wrong Order·Wrong Direction 메시지
+- `OnGateAccepted`를 구독하는 실제 기록 시스템
+- `SegmentDistance`를 이용한 시간·거리 계산
+- Spline에서 Gate를 자동 생성하거나 자동 정렬하는 Editor Tool
+- Gate 완료와 Mission·귀환·평가 시스템 연결
+- SaveGame 또는 기록 저장
+- Network Replication과 Multiplayer 권한 처리
+- Prototype Pawn 이외의 Drone Class 허용 정책
+- 최종 Gate Mesh·VFX·SFX·Animation
+- 최종 코스 배치·크기·난이도
+- 배터리·통신거리·재밍 같은 후보 시스템
+
+`SegmentDistance`와 `OnGateAccepted`는 후속 기록 계층을 연결하기 위한 경계만 준비된 상태다. 데이터가 존재한다고 해서 Lap·Timing이 구현됐다고 말하면 안 된다.
+
+## 6. 사용자가 지금 할 일과 반복하지 않아도 되는 일
+
+### 지금 사용자가 할 일
+
+1. 다른 PC에서는 Unreal 저장소 `main`을 Pull하고 Commit이 `800a7ba`인지 확인한다.
+2. UE 5.8.1에서 `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`을 연다.
+3. World Outliner에서 Course와 Gate 네 개의 배치가 의도한 비행 경로처럼 보이는지 확인한다.
+4. Course의 `OrderedGates` 순서와 실제 공간 배치 순서가 자연스러운지 확인한다.
+5. Gate의 크기, 간격, 높이, 색 대비가 직접 조종할 때 읽기 쉬운지 확인한다.
+6. PIE 또는 Standalone에서 Gate 0부터 정방향으로 차례대로 통과한다.
+7. 한 번은 미래 Gate를 먼저 통과하고, 한 번은 현재 Gate를 역방향으로 통과해 상태가 바뀌지 않는지 확인한다.
+8. 네 Gate를 모두 정상 통과한 뒤 모두 Completed 색이 되는지 확인한다.
+9. 조종 감각상 너무 작음, 너무 큼, 간격 과도, 방향 이해 어려움이 있으면 수치와 체감만 기록한다.
+
+사용자가 지금 판단해야 하는 것은 코드 정답이 아니라 플레이할 때의 가독성과 조종 난이도다. 자동화는 규칙을 확인하지만 Gate 크기·배치·색이 사람에게 편한지는 직접 확인이 필요하다.
+
+### 반복하지 않아도 되는 일
+
+- `ADroneTrainingGate`와 Sequence Component를 다시 만들 필요 없음
+- `BP_DroneTrainingGate`를 새로 생성할 필요 없음
+- Training Map에 Gate 네 개를 다시 배치할 필요 없음
+- Course의 Ordered Array를 처음부터 다시 연결할 필요 없음
+- Course 안내 Material을 새로 만들 필요 없음
+- BP Event Graph에 Begin/End Overlap 판정을 중복 구현할 필요 없음
+- Gate를 Level에서 검색해 거리순으로 자동 정렬하는 BP를 만들 필요 없음
+- GateIndex를 보기 편하다는 이유로 `1~4`로 바꾸면 안 됨
+- Ring Mesh에 Block Collision을 켤 필요 없음
+- 단순 시각 확인만 했다면 Build·11개 자동화를 매번 다시 돌릴 필요 없음
+- Android 설정을 진행할 필요 없음
+- Greybox 확인 전에 구매 Asset을 준비할 필요 없음
+- TUT-02 확인 중 Lap·Timing·Mission UI까지 함께 구현할 필요 없음
+- 현재 작업과 무관하게 전역 Default Map을 바꿀 필요 없음
+
+코드나 BP·Map Asset을 실제로 수정했다면 그때 Build, Tutorial 테스트, 전체 회귀, Blueprint Compile을 다시 실행한다.
+
+## 7. 추천 코드 읽기 순서
+
+### Gate 기능만 먼저 이해할 때
+
+1. `Source/Drone/Tutorial/DroneTrainingGateTypes.h`
+   - Visual State와 Pass Result 종류를 먼저 확인한다.
+2. `Source/Drone/Tutorial/DroneTrainingGateSequenceComponent.h`
+   - Sequence가 공개하는 상태·함수·Event 계약을 읽는다.
+3. `Source/Drone/Tutorial/DroneTrainingGateSequenceComponent.cpp`
+   - 구성 검증, 판정 순서, 방향 수학, 상태 전환을 읽는다.
+4. `Source/Drone/Tutorial/DroneTrainingGate.h`
+   - Gate가 보관하는 Definition·Visual·Trigger 값을 확인한다.
+5. `Source/Drone/Tutorial/DroneTrainingGate.cpp`
+   - Ring 생성, Collision 분리, Begin/End Overlap 전달 과정을 읽는다.
+6. `Source/Drone/Tutorial/DroneTrainingCourse.h`
+   - Course가 `OrderedGates`와 Sequence를 어떻게 소유하는지 확인한다.
+7. `Source/Drone/Tutorial/DroneTrainingCourse.cpp`
+   - Construction·BeginPlay에서 Course와 Gate 상태가 연결되는 순서를 읽는다.
+
+### 검증 의도를 이해할 때
+
+8. `Source/Drone/Tutorial/Tests/DroneTrainingGateSequenceTest.cpp`
+   - 잘못된 Actor, Wrong Order, Wrong Direction, 중복, 정상 완료, Reset, 실제 Overlap 검증을 읽는다.
+9. `Source/Drone/Tutorial/Tests/DroneTrainingAssetTest.cpp`
+   - 실제 BP 부모 Class, Map Actor 수, Ordered Array, GateIndex, Collision 계약을 읽는다.
+10. `Source/Drone/Tutorial/Tests/DroneTrainingPIESmokeTest.cpp`
+    - 실제 BP Pawn·Controller·WBP·Course·Gate가 PIE에서 함께 연결되는지 확인한다.
+11. `Source/Drone/Tutorial/Tests/DroneTrainingCourseTest.cpp`
+    - TUT-01 안내선이 Gate 추가 뒤에도 비행을 막지 않는지 확인한다.
+
+### Drone 전체 데이터 흐름까지 이어서 읽을 때
+
+12. `Source/Drone/Prototype/DronePrototypePawn.h/.cpp`
+13. `Source/Drone/Telemetry/DroneTelemetryTypes.h`
+14. `Source/Drone/Telemetry/DroneTelemetryComponent.h/.cpp`
+15. `Source/Drone/Prototype/DronePrototypePlayerController.h/.cpp`
+16. `Source/Drone/UI/DroneFlightHUDWidget.h/.cpp`
+17. `Source/Drone/Prototype/DronePrototypeGameMode.h/.cpp`
+
+이 순서는 `Gate 판정 규칙 → Overlap 입력 → Course 구성 → 자동화 근거 → Pawn·HUD 실행 경로` 순으로 책임을 따라가게 한다.
+
+## 8. Editor 수동 확인법과 정상 결과
+
+### A. Play 전 Asset 연결 확인
+
+1. UE 5.8.1로 프로젝트를 연다.
+2. Content Browser에서 `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`을 연다.
+3. World Outliner에서 `BP_DroneTrainingCourse` Class의 Course Actor를 선택한다.
+4. Details에서 `CourseId`가 비어 있지 않은지 확인한다.
+5. `OrderedGates` 배열 크기가 4인지 확인한다.
+6. 배열의 각 Gate를 차례로 선택해 다음을 확인한다.
+   - Course와 같은 `CourseId`
+   - `GateIndex`가 `0, 1, 2, 3`
+   - 같은 Gate를 중복 참조하지 않음
+   - `SegmentDistance`가 0 이상임. 현재 저장값은 Spline 배치 거리지만 아직 Timing 규칙은 아님
+7. 각 Gate Actor를 선택하고 Local Transform 표시로 로컬 빨간 X축 방향을 확인한다. 그 방향만 정방향이다.
+8. Course Spline과 Gate 공간 순서가 대체로 같은 진행 방향인지 확인한다.
+
+정상 결과:
+
+- Course 1개와 Ring Gate 4개가 보인다.
+- Gate 0은 밝은 녹색 Current, Gate 1~3은 어두운 Inactive로 보인다.
+- Cyan Course 안내선이 계속 보인다.
+- Map에 미리 배치된 Drone Pawn은 없고 PlayerStart에서 GameMode가 Spawn한다.
+
+### B. 정상 순서 비행 확인
+
+현재 검증된 Keyboard 입력은 다음과 같다.
+
+| 입력 | 동작 |
+|---|---|
+| `W / S` | 전진 / 후진 |
+| `A / D` | 좌 / 우 이동 |
+| `Space / Left Ctrl` | 상승 / 하강 |
+| `Q / E` | Actor Yaw 음 / 양 방향 |
+| Mouse X | Actor Yaw |
+| Mouse Y | Camera Pitch |
+
+1. PIE 또는 Standalone을 시작한다.
+2. 실제 WBP Flight HUD가 표시되는지 확인한다.
+3. 녹색 Gate 0을 향해 접근한다.
+4. Gate Actor 로컬 `+X` 방향으로 중앙 Trigger 영역을 완전히 통과한다.
+5. Gate 0이 Cyan Completed, Gate 1이 녹색 Current로 바뀌는지 확인한다.
+6. 같은 방식으로 Gate 1, 2, 3을 통과한다.
+
+정상 결과:
+
+- Ring Visual이나 Trigger가 Drone 이동을 물리적으로 막지 않는다.
+- Gate 하나를 정상 통과할 때 진행이 정확히 한 칸만 바뀐다.
+- 방금 통과한 Gate는 Cyan, 다음 Gate는 녹색이 된다.
+- 마지막 Gate까지 통과하면 네 Gate가 모두 Cyan이 된다.
+- 현재는 Lap Time, 완료 팝업, 점수 화면이 나타나지 않는다. 이것이 정상이다.
+
+### C. 실패 흐름 확인
+
+1. 새 PIE를 시작해 Gate 0이 Current인 상태로 만든다.
+2. Gate 1 또는 더 뒤의 Gate를 먼저 통과해 본다.
+3. Gate 0의 녹색 Current가 유지되는지 확인한다.
+4. Gate 0을 로컬 `+X` 반대 방향으로 통과해 본다.
+5. Gate 0의 상태가 유지되는지 확인한다.
+6. Gate 0을 정상 통과한 뒤 다시 Gate 0을 통과해 본다.
+7. Gate 1이 Current인 상태가 그대로 유지되는지 확인한다.
+
+정상 결과:
+
+- 미래 Gate 통과는 진행하지 않는다.
+- 역방향 통과는 진행하지 않는다.
+- 완료 Gate 중복 통과는 진행하지 않는다.
+- 현재는 실패 이유를 HUD Text로 표시하지 않는다. Visual 상태가 그대로인 것이 유일한 플레이 화면 피드백이다.
+
+### D. Collision·Navigation 확인
+
+1. Gate를 통과할 때 Ring 테두리나 중앙 Box에 걸려 멈추지 않는지 확인한다.
+2. Editor에서 Gate의 `GateTrigger` Component를 선택한다.
+3. Collision Enabled가 `Query Only`, Pawn Response가 `Overlap`인지 확인한다.
+4. Ring의 Static Mesh Component는 `No Collision`인지 확인한다.
+5. Navigation 표시를 사용하는 경우 Gate와 Course 안내선 때문에 NavMesh에 구멍이 생기지 않는지 확인한다.
+
+정상 결과:
+
+- Trigger는 Overlap Event만 만들고 Blocking Hit를 만들지 않는다.
+- Ring Visual은 Hit·Overlap을 만들지 않는다.
+- Gate와 Course 표시 구성요소는 Navigation에 영향을 주지 않는다.
+
+### E. 이상이 있을 때 확인 순서
+
+Gate 색이 전혀 바뀌지 않으면 다음 순서로 본다.
+
+1. Course `OrderedGates`가 4개인지
+2. GateIndex가 배열 위치와 같은지
+3. CourseId가 모두 같은지
+4. Gate를 로컬 `+X` 방향으로 통과했는지
+5. Trigger 안에서 멈춘 것이 아니라 완전히 빠져나왔는지
+6. 실제 Pawn Class가 `BP_DronePrototypePawn`인지
+7. `GateTrigger`가 QueryOnly·Pawn Overlap인지
+
+Ring이 보이지 않으면 다음을 확인한다.
+
+1. Gate의 Ring Segment Mesh가 설정되어 있는지
+2. `M_DroneTrainingGuide`가 연결되어 있는지
+3. Gate 상태 색의 밝기와 배경 대비
+4. Ring 크기와 Camera 거리
+
+Drone 조작이나 HUD가 나오지 않으면 다음을 확인한다.
+
+1. 현재 Map이 `Lvl_DroneTraining`인지
+2. Map WorldSettings가 `BP_DronePrototypeGameMode`인지
+3. 실제 Controller와 Pawn이 BP Prototype Class인지
+4. `IMC_DronePrototype`과 Input Action이 BP Pawn에 연결되어 있는지
+5. BP Controller의 HUD Class가 `WBP_DroneFlightHUD`인지
+
+수동 확인에서 문제가 없으면 TUT-02의 사용자 확인 결과를 기록하고, 다음 카드에서는 `OnGateAccepted`를 구독하는 Lap·Segment Timing 계층을 별도 책임으로 설계한다.

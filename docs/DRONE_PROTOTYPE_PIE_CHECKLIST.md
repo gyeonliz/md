@@ -1,6 +1,6 @@
 # Drone Prototype PFN-06 PIE 검증 기록
 
-기준일: 2026-08-23 (Asia/Seoul)
+기준일: 2026-08-24 (Asia/Seoul)
 
 이 문서는 PFN-06의 체크 항목과 실행별 결과를 기록하는 **단일 기준 문서**다. `STATUS.md`, `WORKBOARD.md`, 구현 문서는 판정 요약과 이 문서 링크만 유지하며 체크리스트를 복제하지 않는다.
 
@@ -12,8 +12,11 @@ PFN-06     Done, 자동화 3/3 Pass · Standalone 수동 Pass
 HUD-01     Done
 HUD-02     Done, WBP/BP 실제 연결 · 전체 자동화 7/7
 TUT-01     Done, Training Map · 비충돌 Cyan Spline
-TUT-02     Todo
+TUT-02     Done, Gate · 명시적 순서 · 정방향 판정
+TUT-03     Next, Segment/Lap 기록
 ```
+
+현재 Source 기준은 `main=origin/main=800a7ba`다. TUT-02까지 포함한 전체 `Drone.` 자동화 11/11, Tutorial 4/4, Blueprint Compile Errors/Warnings/Load Failures 0/0/0과 Standalone Gate 시각 확인을 통과했다. Gate·순서·정방향까지만 완료했으며 Segment/Lap 기록은 아직 구현하지 않았다. 현재 구조와 사용자 수동 확인 절차는 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
 
 2026-08-19 사전 PIE 두 번에서 Prototype 입력 계열이 실제로 반응하는 것은 확인했다. 그러나 어느 실행도 한 번의 새 PIE 안에서 전체 체크리스트를 끝내지 못했으므로 Pass로 계산하지 않는다. 두 실행은 이미 종료된 역사적 부분 확인이며 현재 열린 PIE가 있다는 뜻이 아니다.
 
@@ -112,6 +115,18 @@ PFN-06의 2026-08-21 입력 결과는 그대로 유지한다. `9f91bb6` WBP/BP �
 - [x] 각 PIE 종료 후 Possession Delegate·Telemetry Delegate·Viewport Widget 잔존 없음
 
 전체 `Drone.` 자동화는 `Drone.UI.FlightHUDBlueprintAsset`을 포함해 7 succeeded, 0 warnings, 0 failed다. 전체 Blueprint Compile도 0 errors, 0 warnings, 0 failed to load다. 별도 Development Standalone에서는 실제 WBP의 `FLIGHT DATA`, `SPD`, `ALT`, `V/S`, `HDG`가 깨짐 없이 표시되는 것을 화면으로 확인하고 정상 종료했다.
+
+## 2026-08-24 TUT-02 최신 회귀 기준선
+
+PFN-06의 입력 3/3과 HUD WBP/BP 7/7은 위의 역사적 단계 결과로 그대로 유지한다. `800a7ba` TUT-02 통합 뒤에는 실제 `BP_DroneTrainingGate` 4개, Course의 명시적 Gate 순서, 정방향 판정과 기존 Prototype 입력·HUD 회귀를 함께 검증했다.
+
+- `DroneEditor Win64 Development` Build 성공
+- `Drone.Tutorial` Automation 4/4
+- 전체 `Drone.` Automation 11/11
+- Blueprint Compile Errors/Warnings/Load Failures 0/0/0
+- Standalone에서 Gate Ring과 상태 시각 표시 확인
+- 현재 Done 범위: Gate·순서·정방향
+- 다음 카드: TUT-03 Segment/Lap 기록
 
 ## 완료 판정
 

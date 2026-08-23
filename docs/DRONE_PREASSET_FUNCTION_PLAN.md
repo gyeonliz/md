@@ -1,6 +1,6 @@
 # 구매 소스 확보 전 Drone 기능 우선 개발 계획
 
-기준일: 2026-08-23 (Asia/Seoul)
+기준일: 2026-08-24 (Asia/Seoul)
 
 ## 1. 목적
 
@@ -29,8 +29,8 @@ Spawn
 확인된 현재 상태는 다음과 같다.
 
 - 작업컴 기본 작업 루트: `D:\JGY\project`
-- UE 5.8.1 프로젝트: 작업컴 기록 경로 `D:\JGY\project\drone`; 이번 확인 PC `C:\URproject\drone`의 로컬 `main`과 `origin/main`은 TUT-01 완료 Commit `5a9a2faed4591a574988b649278cb0f166e31267`
-- 문서 저장소: 작업컴 기록 경로 `D:\JGY\project\md`; 이번 갱신 직전 로컬 `main`과 `origin/main`은 `b63eee1`
+- UE 5.8.1 프로젝트: 작업컴 기록 경로 `D:\JGY\project\drone`; 이번 확인 PC `C:\URproject\drone`의 로컬 `main`과 `origin/main`은 TUT-02 완료 Commit `800a7ba`
+- 문서 저장소: 작업컴 기록 경로 `D:\JGY\project\md`; 이번 갱신 직전 로컬 `main`과 `origin/main`은 `e6395f1`
 - 별도 `ADronePrototypePawn`과 `ADronePrototypeGameMode` C++ 구현 완료
 - 컴포넌트 기본값과 standalone Spawn/Possess 자동화 테스트 완료
 - 기존 Third Person 기본 맵과 전역 GameMode 유지
@@ -39,9 +39,11 @@ Spawn
 - Camera와 장치별 역할은 v1으로 확정했지만 감도·Mouse Y 반전·물리·Mesh·멀티플레이 방식은 미정
 - Android는 현재 개발 범위에서 제외
 
-`HUD-01` Telemetry Snapshot과 `HUD-02` C++ HUD 기능·실제 WBP 표시를 완료했다. 이어서 `TUT-01` Training Map과 비충돌 Spline도 완료했다. 별도 Map의 실제 `BP_DroneTrainingCourse`가 수정 가능한 Spline과 Runtime SplineMesh 안내선을 제공하며, 프로젝트 소유 불투명·Unlit·Emissive `M_DroneTrainingGuide`를 사용한다. Course Actor, Spline과 표시선은 Collision·Overlap·Physics·Navigation 영향을 모두 끈다. 기존 Prototype BP GameMode·Pawn·PlayerController·WBP를 재사용했고 전체 `Drone` 자동화 10/10, Tutorial 3/3, Blueprint Compile 오류·경고 0/0과 Standalone 표시를 확인했다.
+`HUD-01` Telemetry Snapshot과 `HUD-02` C++ HUD 기능·실제 WBP 표시를 완료했다. 이어서 `TUT-01` Training Map과 비충돌 Spline도 완료했다. 별도 Map의 실제 `BP_DroneTrainingCourse`가 수정 가능한 Spline과 Runtime SplineMesh 안내선을 제공하며, 프로젝트 소유 불투명·Unlit·Emissive `M_DroneTrainingGuide`를 사용한다. Course Actor, Spline과 표시선은 Collision·Overlap·Physics·Navigation 영향을 모두 끈다. TUT-01 당시 전체 `Drone` 자동화 10/10, Tutorial 3/3, Blueprint Compile 오류·경고 0/0과 Standalone 안내선 표시를 확인했다.
 
-현재 실행 카드는 `TUT-02 순서형 Ring Gate`다. TUT-01은 Spline 코스와 표시선만 소유하며 Gate 목록, Gate Actor·Trigger, 순서·방향 판정, Lap·Timing은 아직 구현하지 않았다. 이 기능들은 TUT-02 이후에 순서대로 추가한다.
+`TUT-02`에서는 실제 `BP_DroneTrainingGate` 4개, Course의 명시적 Gate 순서와 정방향 통과 판정을 구현했다. `main=origin/main=800a7ba`이며 전체 `Drone.` 자동화 11/11, Tutorial 4/4, Blueprint Compile Errors/Warnings/Load Failures 0/0/0과 Standalone Gate 시각 확인을 통과했다. Gate·순서·정방향까지만 Done이고 Segment/Lap 기록과 Timing은 아직 구현하지 않았다.
+
+현재 실행 카드는 `TUT-03 Segment/Lap 기록`이다. 현재 C++·BP·Editor 책임과 Gate 수동 확인법은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
 
 새 생산 코드는 `Source/Drone`, 새 자산은 `/Game/Drone` 아래에 둔다. ThirdPerson·Combat·Platforming·SideScrolling은 참고용 Legacy로 동결하고 신규 상속·참조를 만들지 않는다. Prototype IMC는 Pawn만 등록·제거하며 PlayerController와 Level Blueprint에는 같은 책임을 추가하지 않는다. 현재 검증 범위는 Standalone 싱글플레이이고 네트워크·Android·구매 에셋은 제외한다.
 
@@ -137,7 +139,7 @@ P0. 현재 C++ 기준선
   ↓
 P1. 입력·BP·Greybox 시험장
   ↓
-P2. Telemetry HUD + Tutorial Vertical Slice (TUT-01 완료, TUT-02 진행 예정)
+P2. Telemetry HUD + Tutorial Vertical Slice (TUT-01~02 완료, TUT-03 Segment/Lap 기록 진행 예정)
   ↓
 P3. Flight 상태 + Operator ↔ Drone
   ↓
@@ -368,12 +370,13 @@ PFN-01~05 Done
 → PFN-06 Done (자동화 3/3 + Standalone 수동 Pass)
 → HUD-01·02 Done
 → TUT-01 Training Course/Spline Done
-→ TUT-02 Gate
-→ TUT-03~04 Timing·결과 UI
+→ TUT-02 Gate·순서·정방향 Done
+→ TUT-03 Segment/Lap 기록
+→ TUT-04 결과 UI
 → Take Off·Landing·Crash
 → Operator↔Drone와 NPC·Mission UI
 → Enemy AI·MG·Jamming
 → 통합 Greybox·에셋 교체 준비
 ```
 
-현재는 TUT-01까지 통과했으므로 TUT-02 Gate부터 Tutorial Vertical Slice를 이어간다. TUT-03~04의 Timing·결과 UI까지 검증한 뒤 Take Off와 Landing 상태 구현으로 넘어간다. 외부 구매 에셋은 이 순서의 선행 조건이 아니며 Android는 현재 범위에서 제외한다.
+현재는 TUT-02 Gate·순서·정방향까지 통과했으므로 TUT-03 Segment/Lap 기록부터 Tutorial Vertical Slice를 이어간다. TUT-03~04의 기록·Timing·결과 UI까지 검증한 뒤 Take Off와 Landing 상태 구현으로 넘어간다. 외부 구매 에셋은 이 순서의 선행 조건이 아니며 Android는 현재 범위에서 제외한다.

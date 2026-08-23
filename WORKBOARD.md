@@ -1,24 +1,24 @@
 # 현재 작업 보드
 
-기준일: 2026-08-23 (Asia/Seoul)
+기준일: 2026-08-24 (Asia/Seoul)
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-01 완료 Commit `5a9a2fa`이다. 소스 Branch `codex/tutorial-training-course`도 Push했다. 현재 기능 실행 순서는 `TUT-02 Gate → TUT-03~04 기록·결과 UI → Flight 상태 → Operator↔Drone → Story/NPC/Mission → AI/MG/Jamming → 에셋 적용`이다.
+Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-02 완료 Commit `800a7ba`이다. 소스 Branch `codex/tutorial-ring-gates`도 Push했다. 현재 기능 실행 순서는 `TUT-03 Segment/Lap 기록 → TUT-04 결과 UI → Flight 상태 → Operator↔Drone → Story/NPC/Mission → AI/MG/Jamming → 에셋 적용`이다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-08-23 15:42 KST
+마지막 갱신: 2026-08-24 05:57 KST
 
 | 항목 | 상태 |
 |---|---|
-| 현재 단계 | 3단계 Tutorial Vertical Slice — `TUT-01` 완료, `TUT-02` Todo |
-| 진행 정도 | Training Map·편집용 Spline·Standalone 표시선과 비간섭 검증 완료 |
-| 지금 작업 중 | 없음. 다음 카드 `TUT-02`의 담당자는 현재 미정 |
-| 완료 근거 | Editor Build 성공, `Drone.Tutorial` 3/3 및 전체 `Drone.` 10/10 경고·실패 0, Blueprint Compile 오류·경고·Load 실패 0, Standalone 실제 BP Pawn·Controller·WBP HUD와 밝은 Cyan Spline 확인 |
+| 현재 단계 | 3단계 Tutorial Vertical Slice — `TUT-02` 완료, `TUT-03` Todo |
+| 진행 정도 | Training Course와 네 Ring Gate의 Trigger·순서·정방향·중복 통과 및 시각 상태 검증 완료 |
+| 지금 작업 중 | 없음. 다음 카드 `TUT-03`의 담당자는 현재 미정 |
+| 완료 근거 | Editor Build 성공, Gate Sequence 1/1·실제 BP PIE Smoke 1/1·`Drone.Tutorial` 4/4·전체 `Drone.` 11/11 경고·실패 0, Blueprint Compile 0/0/0, Standalone HUD·Course·Current/Inactive Gate 확인 |
 | 현재 차단 | 없음. Android는 사용자 결정에 따라 작업 범위에서 제외 |
-| 다음 행동 | `TUT-02` 순서형 Ring Gate의 Trigger·순서·방향 판정 설계와 구현 |
-| 다음 기능 | `TUT-02` 순서형 Ring Gate. Lap·Timing은 아직 미구현 |
+| 다음 행동 | `TUT-03` 정상 Gate 승인 Event를 구독해 Segment/Lap 기록 계층 구현 |
+| 다음 기능 | `TUT-03` Segment/Lap 기록. Lap·Timing·거리·평균 속도 계산은 아직 미구현 |
 
 상세 변경 이력은 [`docs/DRONE_WORKLOG.md`](docs/DRONE_WORKLOG.md)에 계속 추가한다. 매 구현 작업 종료 시 이 스냅샷의 현재 작업·완료 근거·다음 작업을 함께 갱신한다.
 
@@ -45,13 +45,13 @@ Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-01 �
 |---|---|---|---|
 | GIT-10 | Git / Unreal | 다른 PC Clone과 실행 | LFS 포함 Clone 후 UE 5.8.1에서 열림 |
 | SYNC-04 | Codex Sync | 두 PC 간 실제 수동 인계 시험 | Git 흐름과 문맥 패키지 흐름을 각각 완료 |
-| TUT-02 | Drone / Tutorial | 순서형 Ring Gate | Gate Trigger와 순서·방향 판정을 구현하고 성공·실패 흐름 검증. 담당자는 현재 미정 |
+| TUT-03 | Drone / Tutorial | Segment/Lap 기록 | 정상 Gate 승인 Event로 시간·실제 이동 거리·평균 속도를 계산. 담당자는 현재 미정 |
 
 ## Doing
 
 | ID | 태그 | 작업 | 현재 확인 | 남은 완료 조건 |
 |---|---|---|---|---|
-| — | — | 현재 Doing 카드 없음 | `TUT-02`는 Todo, 담당자는 현재 미정 | — |
+| — | — | 현재 Doing 카드 없음 | `TUT-03`은 Todo, 담당자는 현재 미정 | — |
 
 ## Done
 
@@ -90,6 +90,7 @@ Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-01 �
 | HUD-01 | Drone / UI | 공용 Telemetry Snapshot과 10Hz Timer Event 구현. 계산·기본값·Runtime Spawn 검증, Drone 자동화 5/5, Blueprint 0/0 |
 | HUD-02 | Drone / UI | C++ Flight HUD 기능·native 직접 실행 fallback과 실제 `WBP_DroneFlightHUD` 외형 구현. BP Controller→WBP, BP GameMode→BP Controller 연결, 필수 TextBlock·폰트·PIE 3회 수명주기 검증, Drone 자동화 7/7, Blueprint 0/0, Standalone WBP 표시 확인 |
 | TUT-01 | Drone / Tutorial | `ADroneTrainingCourse`, 실제 `BP_DroneTrainingCourse`, `Lvl_DroneTraining`, 밝은 Cyan `M_DroneTrainingGuide` 구현. Editor Build, Tutorial 3/3, 전체 Drone 10/10, Blueprint Compile, Standalone 시각 확인 통과. Pawn Sweep을 막지 않고 Course 표시 구성요소의 Collision·Overlap·Physics·Navigation 영향이 꺼졌으며 저장된 Recast Actor를 확인함. Map 담당자는 미정 유지 |
+| TUT-02 | Drone / Tutorial | `ADroneTrainingGate`, Gate Sequence Component, 실제 `BP_DroneTrainingGate` 네 개 구현. Ring Visual·Pawn Trigger 분리, 현재 순서·정방향·중복 통과와 Current/Completed/Inactive 상태를 검증. Build, Gate Sequence 1/1, 실제 BP PIE Smoke 1/1, Tutorial 4/4, 전체 Drone 11/11, Blueprint 0/0/0, Standalone Current/Inactive 표시 통과. 신규 BP와 갱신 Map 두 Asset LFS Push 완료 |
 | SYNC-01 | Codex Sync | 목표·완료·진행·결정·미정·다음 작업 형식 정의 |
 | SYNC-02 | Codex Sync | `handoff.md` + `manifest.json` Export/Import 구현 |
 | SYNC-03 | Codex Sync | 인증·토큰·원시 세션 제외 기준과 검사 구현 |
@@ -98,6 +99,6 @@ Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-01 �
 
 ## 이번 인계의 정지선
 
-Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 로컬 `main`과 `origin/main`은 TUT-01 완료 Commit `5a9a2faed4591a574988b649278cb0f166e31267` (`feat: add tutorial training course`)로 일치한다. 소스 Branch `codex/tutorial-training-course`도 Push했다. `410c940`은 native HUD 기준선이고 `9f91bb6`은 WBP/BP 연결 기준선이다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
+Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 로컬 `main`과 `origin/main`은 TUT-02 완료 Commit `800a7baaf8247bf0a3ee7bccc2272e12d0098f2b` (`feat: add ordered tutorial ring gates`)로 일치한다. 소스 Branch `codex/tutorial-ring-gates`도 Push했다. `5a9a2fa`는 TUT-01, `410c940`은 native HUD, `9f91bb6`은 WBP/BP 연결 기준선이다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
 
-Android 제외와 PFN-01~06, HUD-01, HUD-02, TUT-01을 완료했다. 공용 Telemetry Component는 기본 10Hz Snapshot Event를 제공하고 C++ PlayerController/HUD 기능과 실제 WBP가 현재 Possess Drone의 네 수치를 표시한다. 별도 Training Map에서는 실제 BP Course의 밝은 Cyan Spline이 비행·Collision·Navigation을 방해하지 않는다. 다음 카드는 TUT-02이며 Gate·Trigger·순서·방향·Lap·Timing은 아직 구현된 기능으로 보지 않는다. 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다. 구매 소스는 현재 구현의 선행 조건으로 두지 않는다.
+Android 제외와 PFN-01~06, HUD-01, HUD-02, TUT-01, TUT-02를 완료했다. 별도 Training Map에서 실제 BP Course의 Cyan Spline과 네 BP Gate를 사용하며, Gate·Trigger·순서·정방향 판정은 구현됐다. 다음 카드는 TUT-03이며 Lap·Timing·거리·평균 속도·기록 UI는 아직 구현된 기능으로 보지 않는다. 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다. 구매 소스는 현재 구현의 선행 조건으로 두지 않는다.

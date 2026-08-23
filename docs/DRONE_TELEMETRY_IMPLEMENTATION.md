@@ -199,7 +199,7 @@ Yaw     HDG 002° → 025°/045°
 
 ## 8. 현재 경계와 다음 작업
 
-`HUD-01` 데이터 공급 계층과 `HUD-02` C++ 기능·WBP 표시 계층을 완료했고, 이어서 `TUT-01` Training Map과 비충돌 Spline도 완료했다. 현재 Unreal 기준 Commit은 `5a9a2fa`이며 로컬 `main`과 `origin/main`에 반영됐다. 다음 활성 카드는 `TUT-02` 순서형 Ring Gate다. TUT-01의 구현·검증 기준은 [`DRONE_TRAINING_COURSE_IMPLEMENTATION.md`](DRONE_TRAINING_COURSE_IMPLEMENTATION.md)를 따른다.
+`HUD-01` 데이터 공급 계층과 `HUD-02` C++ 기능·WBP 표시 계층, `TUT-01` Training Course와 `TUT-02` Ordered Ring Gate를 완료했다. 현재 Unreal 기준 Commit은 `800a7ba`이며 로컬 `main`과 `origin/main`에 반영됐다. Gate·Trigger·순서·정방향 판정은 구현됐고 다음 활성 카드는 `TUT-03` Segment/Lap 기록이다. TUT-01의 구현·검증 기준은 [`DRONE_TRAINING_COURSE_IMPLEMENTATION.md`](DRONE_TRAINING_COURSE_IMPLEMENTATION.md)를 따른다.
 
 아직 포함하지 않는 항목:
 
@@ -207,4 +207,4 @@ Yaw     HDG 002° → 025°/045°
 - 배터리·신호·Jamming 표시
 - 지형 Line Trace 기반 AGL
 - SaveGame 기록
-- Tutorial Lap/Segment 통계
+- Tutorial Lap/Segment Timing·거리·평균 속도와 기록 통계

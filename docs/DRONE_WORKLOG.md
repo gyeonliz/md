@@ -18,17 +18,17 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-23 15:42 KST
+마지막 갱신: 2026-08-24 05:57 KST
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | 3단계 Tutorial Vertical Slice — `TUT-01` 완료, `TUT-02` Todo |
+| 전체 단계 | 3단계 Tutorial Vertical Slice — `TUT-02` 완료, `TUT-03` Todo |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | 없음. 다음 카드 `TUT-02`의 담당자는 현재 미정 |
+| 지금 작업 중 | 없음. 다음 카드 `TUT-03`의 담당자는 현재 미정 |
 | 차단 조건 | 없음. Android는 사용자 결정에 따라 작업 범위에서 제외 |
-| 다음 행동 | `TUT-02` 순서형 Ring Gate의 Trigger·순서·방향 판정 설계와 구현 |
-| 다음 기능 | `TUT-02` 순서형 Ring Gate. Gate·Trigger·순서·방향·Lap·Timing은 현재 미구현 |
-| 이후 | `TUT-03~04` Lap/Segment 기록·결과 UI → Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming |
+| 다음 행동 | `TUT-03` 정상 Gate 승인 Event를 구독하는 Segment/Lap 기록 계층 구현 |
+| 다음 기능 | `TUT-03` Segment/Lap 기록. Lap·Timing·거리·평균 속도는 현재 미구현 |
+| 이후 | `TUT-04` 비교·결과 UI → Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming |
 
 ## 2026-08-21 — Camera·Mouse·Gamepad 기준선 갱신
 
@@ -266,3 +266,40 @@ HeadingValueText
 - `TUT-02` Todo
 - Unreal Commit: `5a9a2faed4591a574988b649278cb0f166e31267` (`feat: add tutorial training course`)
 - `codex/tutorial-training-course`와 `origin/main`에 Push 완료, 로컬 `main=origin/main=5a9a2faed4591a574988b649278cb0f166e31267`
+
+## 2026-08-24 — TUT-02 Ordered Ring Gate 구현·검증 완료
+
+### 실제 변경
+
+- `ADroneTrainingGate`에 Engine Cube 16조각으로 만든 비충돌 Ring Visual과 별도 `UBoxComponent` Pawn Overlap Trigger를 구현했다.
+- `UDroneTrainingGateSequenceComponent`가 Course의 명시적 `OrderedGates` 배열을 단일 순서 기준으로 사용하도록 구성했다.
+- 현재 Gate의 정방향 통과만 한 번 승인하고 잘못된 Actor, 미래 Gate, 역방향, 중복 통과와 잘못된 구성을 거부하도록 구현했다.
+- Gate 외형은 `Current`, `Completed`, `Inactive` 상태로 분리하고, 정상 승인 시 다음 Gate로 정확히 한 칸 진행한다.
+- 실제 `BP_DroneTrainingGate`를 추가하고 `Lvl_DroneTraining`에 네 Gate를 배치해 Course 배열과 연결했다.
+- `SegmentDistance`는 후속 기록용 메타데이터로만 저장한다. TUT-02 판정에서 Lap·Timing·거리·평균 속도 계산에는 사용하지 않는다.
+- 정상 Gate 승인 Event를 제공하되 기록 계층은 TUT-03에서 별도로 구독하도록 경계를 유지했다.
+
+### 최종 검증 결과
+
+- `DroneEditor Win64 Development` 빌드 성공
+- `Drone.Tutorial.TrainingGateSequence`: 1 succeeded, 0 warnings, 0 failed
+- 실제 BP Gate Begin/End Overlap을 포함한 `Drone.Tutorial.TrainingPIESmoke`: 1 succeeded, 0 warnings, 0 failed
+- 전체 `Drone.Tutorial`: 4 succeeded, 0 warnings, 0 failed
+- 전체 `Drone.`: 11 succeeded, 0 warnings, 0 failed
+- `CompileAllBlueprints`: 0 errors, 0 warnings, 0 blueprints failed to load
+- Standalone에서 실제 WBP HUD, Cyan Course 안내선과 Current/Inactive Gate 표시 확인
+- 신규 `BP_DroneTrainingGate`와 갱신한 `Lvl_DroneTraining` 두 Asset의 Git LFS 적용과 Push 확인
+
+### 범위 정지선
+
+- Gate Visual·Trigger, 명시적 순서, 정방향·중복 통과 판정과 시각 상태까지 TUT-02로 완료했다.
+- Lap 시작·완료, Segment/Lap Timing, 실제 이동 거리·평균 속도, 이전 기록 비교와 결과 UI는 구현하지 않았다.
+- 다음 활성 카드는 `TUT-03 Segment/Lap 기록`이다.
+- Android와 구매 에셋은 현재 범위에서 제외한다.
+
+### 판정과 Git
+
+- `TUT-02` Done
+- `TUT-03` Todo
+- Unreal Commit: `800a7baaf8247bf0a3ee7bccc2272e12d0098f2b` (`feat: add ordered tutorial ring gates`)
+- `codex/tutorial-ring-gates`와 `origin/main`에 Push 완료, 로컬 `main=origin/main=800a7baaf8247bf0a3ee7bccc2272e12d0098f2b`
