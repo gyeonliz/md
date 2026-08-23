@@ -199,7 +199,7 @@ Yaw     HDG 002° → 025°/045°
 
 ## 8. 현재 경계와 다음 작업
 
-`HUD-01` 데이터 공급 계층과 `HUD-02` C++ 기능·WBP 표시 계층을 완료했다. Unreal 기준 Commit은 `9f91bb6`이며 로컬 `main`과 `origin/main`에 반영됐다. 다음 활성 카드는 `TUT-01` Training Map과 비충돌 Spline이다.
+`HUD-01` 데이터 공급 계층과 `HUD-02` C++ 기능·WBP 표시 계층을 완료했고, 이어서 `TUT-01` Training Map과 비충돌 Spline도 완료했다. 현재 Unreal 기준 Commit은 `5a9a2fa`이며 로컬 `main`과 `origin/main`에 반영됐다. 다음 활성 카드는 `TUT-02` 순서형 Ring Gate다. TUT-01의 구현·검증 기준은 [`DRONE_TRAINING_COURSE_IMPLEMENTATION.md`](DRONE_TRAINING_COURSE_IMPLEMENTATION.md)를 따른다.
 
 아직 포함하지 않는 항목:
 

@@ -419,13 +419,13 @@ Inbox → Todo → Doing → Done
 
 ## 21. 다음 작업
 
-### 완료: PFN-06 Camera/Input, HUD-01 Telemetry와 HUD-02 Flight HUD
+### 완료: PFN-06 Camera/Input, HUD-01 Telemetry, HUD-02 Flight HUD와 TUT-01 Training Course
 
-사용자 승인안의 Camera/Input 기준선을 완료했다. 공용 Telemetry Component의 기본 10Hz Snapshot Event와 이를 표시하는 C++ HUD 기능·실제 WBP 외형을 구현했다. BP Controller/GameMode 연결까지 포함해 최종 Drone 자동화 7/7, Blueprint 0/0, PIE 실제 WBP 사용과 Standalone WBP 표시를 통과했다.
+사용자 승인안의 Camera/Input 기준선을 완료했다. 공용 Telemetry Component의 기본 10Hz Snapshot Event와 이를 표시하는 C++ HUD 기능·실제 WBP 외형을 구현했다. 이어서 TUT-01의 별도 Training Map, 편집 가능한 비충돌 Spline Course, 실제 BP Course와 Cyan 안내 Material을 구현했다. 현재 전체 `Drone.` 자동화 10/10, Blueprint 0 errors·0 warnings·0 load failures, Standalone 실제 BP Controller/Pawn/WBP와 안내선 표시까지 통과했다.
 
 ### 1순위: Tutorial Vertical Slice와 기능 우선 Greybox
 
-`TUT-01 Training Map·비충돌 Spline → 순서형 Ring Gate → Lap/Segment 기록 → Flight 상태 → Operator↔Drone → NPC·Mission UI Story Shell → AI/MG/Jamming → 에셋 적용` 순서로 진행한다. 상세 기준은 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다.
+`TUT-02 순서형 Ring Gate·정방향 판정 → Lap/Segment 기록 → Flight 상태 → Operator↔Drone → NPC·Mission UI Story Shell → AI/MG/Jamming → 에셋 적용` 순서로 진행한다. Gate·순서·정방향 판정·Lap·Timing은 아직 구현되지 않았으며 TUT-02 이후 범위다. 상세 기준은 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다.
 
 ### 병행: PC 간 공유 검증
 
@@ -466,6 +466,7 @@ Inbox → Todo → Doing → Done
 - ThirdPerson·Combat·Platforming·SideScrolling은 참고용 Legacy로 동결한다. 신규 상속·참조를 만들지 않고 Vertical Slice 전에는 삭제하지 않는다.
 - Prototype IMC의 등록·제거 책임은 Pawn 한 곳에만 둔다. PlayerController나 Level Blueprint에 중복 등록하지 않는다.
 - C++는 상태·계산·수명주기, Blueprint는 자산 연결·Greybox 조정과 UI 표시 외형을 담당한다. Collision Root와 Visual Mesh를 분리한다.
+- Tutorial Course의 안내선은 경로 표시만 담당한다. Collision·Overlap·Physics·Navigation에 영향을 주지 않으며 Gate 판정 책임을 섞지 않는다.
 - PFN-06 v1 조작은 Actor-relative 수평 이동, World Up 고도, Q/E와 Mouse X Actor Yaw, Mouse Y CameraBoom Pitch, Gamepad Left Stick 이동·Trigger 고도·Right Stick Yaw/Pitch로 확정했다. Keyboard·Mouse 시험 감도는 수동 Pass했으며 실제 Gamepad 체감과 최종 물리 조정은 이후 별도 카드로 남긴다.
 - Standalone 싱글플레이만 현재 검증 범위로 두며 네트워크·Android·구매 에셋은 제외한다.
 - C++ 변경과 전체 빌드 전에는 열려 있는 Unreal Editor를 저장하고 종료한다.
@@ -480,11 +481,14 @@ Inbox → Todo → Doing → Done
 - Jamming은 신호 경고 → HUD Noise → 조작/통신 저하의 재현 가능한 단계형 규칙으로 만든다.
 - 제공 Drone 에셋은 기능 부모로 상속하지 않고 `/Game/Drone` 아래 Integration Blueprint에서 Visual만 교체한다.
 
-## 27. 2026-08-23 HUD-02 완료와 현재 기준
+## 27. 2026-08-23 HUD-02·TUT-01 완료와 현재 기준
 
 - 이번 확인 PC의 실제 Unreal 저장소는 `C:\URproject\drone`이다. 뒤처진 `C:\project\Drone` 복제본은 현재 작업에 사용하지 않는다.
-- Unreal 저장소의 로컬 `main`과 `origin/main`은 WBP/BP 보강 Commit `9f91bb6`으로 일치하며 `codex/hud-blueprint-ready-comments` 기능 브랜치도 원격에 Push했다. `410c940`은 native HUD 기준선으로 보존한다.
+- Unreal 저장소의 로컬 `main`과 `origin/main`은 TUT-01 Commit `5a9a2faed4591a574988b649278cb0f166e31267`으로 일치한다. `9f91bb6`은 WBP/BP 연결 보강, `410c940`은 native HUD 기준선으로 보존한다.
 - C++ `UDroneFlightHUDWidget`과 PlayerController가 현재 Possess Drone의 Telemetry Event·Widget 생성·Delegate 정리를 담당하고, 실제 `WBP_DroneFlightHUD`가 `SPD`, `ALT`, `V/S`, `HDG`의 배치·폰트·색을 담당한다. BP Controller가 WBP를 선택하고 BP GameMode가 BP Controller를 선택한다. Tick·Property Binding·매 프레임 Pawn 검색은 사용하지 않는다.
-- 최종 `Drone.` 자동화는 7 succeeded, 0 warnings, 0 failed이고 `CompileAllBlueprints`는 0 errors, 0 warnings, 0 blueprints failed to load다. PIE 3회에서 실제 WBP 사용과 native fallback 미사용, Standalone에서 WBP 글자 정상 표시를 확인했다.
-- 다음 활성 카드는 `TUT-01` Training Map과 비충돌 Spline이다. 배터리·신호·Jamming 표시와 최종 HUD 디자인은 구현 완료로 간주하지 않는다.
-- 문서 저장소는 이번 갱신 직전 `origin/main=7e3a9ec`이었으며, 이 상태·계획 갱신도 Commit·Push해 PC 간 공유 기준에 반영한다.
+- TUT-01은 `ADroneTrainingCourse`, `BP_DroneTrainingCourse`, `Lvl_DroneTraining`, `M_DroneTrainingGuide`와 Tutorial 자동화 테스트 3개로 구성한다. Course가 편집 가능한 Spline과 런타임 표시용 Spline Mesh를 소유하고, Material은 Opaque·Unlit·Emissive와 Spline Mesh 사용 설정으로 Cyan 안내선을 표시한다.
+- TUT-01 `DroneEditor Win64 Development` 빌드는 성공했다. `Drone.Tutorial`은 3/3, 전체 `Drone.` 자동화는 10/10이며 warning과 failure가 없다. `CompileAllBlueprints`도 0 errors, 0 warnings, 0 blueprints failed to load다.
+- Standalone에서 실제 BP Controller/Pawn/WBP HUD와 Cyan 안내선을 확인했고 Material fallback 경고는 없었다. 자동화 Sweep에서 안내선이 이동을 막지 않으며 Course Primitive의 Collision·Overlap·Physics·Navigation 영향이 꺼진 것을 확인했다. Training Map에는 저장된 Recast NavMesh Actor가 있다.
+- 다음 활성 카드는 `TUT-02` Gate·순서·정방향 판정이다. Gate·Lap·Segment Timing은 아직 구현되지 않았다. 배터리·신호·Jamming 표시와 최종 HUD 디자인도 구현 완료로 간주하지 않는다.
+- Android는 개발 범위에서 제외하고 구매 소스는 TUT-02의 선행 조건으로 두지 않는다.
+- 문서 저장소는 이번 갱신 직전 로컬 `main`과 `origin/main`이 `b63eee1`에서 일치했으며, 이 상태·계획 갱신도 Commit·Push해 PC 간 공유 기준에 반영한다.

@@ -1,6 +1,6 @@
 # 드론 프로젝트 MVP 개발 가이드
 
-> 현재 구현 지점: Camera/Input PFN-06, HUD-01 Telemetry와 HUD-02 Flight HUD를 완료했다. 공용 Component의 기본 10Hz Snapshot Event를 C++ PlayerController/HUD 기능이 관리하고 실제 WBP가 표시한다. BP Controller/GameMode 연결, Drone 자동화 7/7, Blueprint 0/0, PIE 실제 WBP 사용과 Standalone WBP 표시를 통과했다. 다음 카드는 TUT-01 Training Map과 비충돌 Spline이다. 입력 결과는 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md), Telemetry/HUD 결과는 [`DRONE_TELEMETRY_IMPLEMENTATION.md`](DRONE_TELEMETRY_IMPLEMENTATION.md)를 따른다.
+> 현재 구현 지점: Camera/Input PFN-06, HUD-01 Telemetry, HUD-02 Flight HUD와 TUT-01 Training Course를 완료했다. 공용 Component의 기본 10Hz Snapshot Event를 C++ PlayerController/HUD 기능이 관리하고 실제 WBP가 표시한다. 별도 Training Map에서는 실제 BP Course의 편집 가능한 Spline과 밝은 Cyan 안내선이 Collision·Overlap·Physics·Navigation 영향을 주지 않도록 구성했다. 전체 `Drone.` 자동화 10/10, Tutorial 전용 3/3, Blueprint Compile 오류·경고 0/0과 Standalone 표시를 통과했다. 다음 카드는 TUT-02 순서형 Ring Gate다. 입력 결과는 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md), Telemetry/HUD 결과는 [`DRONE_TELEMETRY_IMPLEMENTATION.md`](DRONE_TELEMETRY_IMPLEMENTATION.md), TUT-01 결과는 [`DRONE_TRAINING_COURSE_IMPLEMENTATION.md`](DRONE_TRAINING_COURSE_IMPLEMENTATION.md)를 따른다.
 
 > 현재 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)가 우선한다. PFN 카드 번호와 Placeholder 교체 경계는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 

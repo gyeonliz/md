@@ -18,17 +18,17 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-23 05:40 KST
+마지막 갱신: 2026-08-23 15:42 KST
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | 2단계 Telemetry/HUD 완료, Tutorial Vertical Slice 시작 대기 |
+| 전체 단계 | 3단계 Tutorial Vertical Slice — `TUT-01` 완료, `TUT-02` Todo |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | `HUD-02` WBP/BP 연결과 학습 주석 보강 완료, `TUT-01` 구현 시작 대기 |
-| 차단 조건 | 없음. 고도 기준은 Course/Mission이 지정하는 World Z 대비 값 |
-| 다음 행동 | `TUT-01` Training Map과 비충돌 Spline 구현 |
-| 다음 기능 | `TUT-01` Training Map·Spline → `TUT-02` 순서형 Ring Gate |
-| 이후 | Tutorial Spline·Ring Gate·Lap/Segment 기록 → Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming |
+| 지금 작업 중 | 없음. 다음 카드 `TUT-02`의 담당자는 현재 미정 |
+| 차단 조건 | 없음. Android는 사용자 결정에 따라 작업 범위에서 제외 |
+| 다음 행동 | `TUT-02` 순서형 Ring Gate의 Trigger·순서·방향 판정 설계와 구현 |
+| 다음 기능 | `TUT-02` 순서형 Ring Gate. Gate·Trigger·순서·방향·Lap·Timing은 현재 미구현 |
+| 이후 | `TUT-03~04` Lap/Segment 기록·결과 UI → Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming |
 
 ## 2026-08-21 — Camera·Mouse·Gamepad 기준선 갱신
 
@@ -206,3 +206,63 @@ HeadingValueText
 - `TUT-01` Ready
 - Unreal Commit: `9f91bb6` (`feat: add Blueprint-backed flight HUD`)
 - `codex/hud-blueprint-ready-comments`와 `origin/main`에 Push 완료, 로컬 `main=origin/main=9f91bb6`
+
+## 2026-08-23 — TUT-01 Training Map과 비충돌 Spline 착수
+
+### 확정 범위
+
+- 별도 `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining` Map을 만든다.
+- `ADroneTrainingCourse`가 편집 가능한 `USplineComponent`와 Standalone에서도 보이는 표시용 구성요소를 소유한다.
+- 표시용 Actor·Spline·Mesh의 Collision, Overlap, Physics, Navigation 영향을 모두 끈다.
+- 기존 `BP_DronePrototypeGameMode`를 재사용해 Prototype Pawn/Input/HUD 기준선을 유지한다.
+- Gate Trigger, 순서·방향 판정, Lap/Segment 기록은 다음 `TUT-02` 이후 범위로 남긴다.
+
+### 검증 예정
+
+- native Course 기본값과 Pawn 크기 Sweep 비간섭 자동화
+- 실제 BP Course와 Training Map 계약 자동화
+- Training Map PIE에서 BP Pawn·Controller·WBP와 표시선 생성 확인
+- Editor Build, 전체 Blueprint Compile, 전체 `Drone.` 회귀, Standalone 시각·비행 확인
+
+### 현재 판정
+
+- `TUT-01` Doing
+- Unreal 작업 Branch: `codex/tutorial-training-course`
+- Unreal Commit: 아직 미커밋
+
+## 2026-08-23 — TUT-01 Training Course 구현·검증 완료
+
+### 실제 변경
+
+- `ADroneTrainingCourse`에 편집 가능한 `USplineComponent`와 런타임 표시용 `USplineMeshComponent` 구성을 구현했다.
+- 실제 `BP_DroneTrainingCourse`와 별도 `Lvl_DroneTraining` Map을 만들고 기존 `BP_DronePrototypeGameMode`를 재사용했다.
+- `M_DroneTrainingGuide`를 Opaque·Unlit·Emissive·Spline Mesh 용도로 만들고 Standalone에서 식별 가능한 밝은 Cyan 표시선을 구성했다.
+- Course Actor와 Spline 표시 구성요소의 Collision, Overlap, Physics, Navigation 영향을 모두 껐다.
+- native Course 기본 계약, 실제 BP/Map Asset 계약, Training Map PIE 수명주기와 비간섭을 검사하는 Tutorial 자동화 테스트 3개를 추가했다.
+- 학습할 때 구현 의도와 C++·Blueprint 역할을 따라갈 수 있도록 Course와 테스트 코드에 한국어 주석을 추가했다.
+
+### 최종 검증 결과
+
+- `DroneEditor Win64 Development` 빌드 성공
+- `Drone.Tutorial` Automation: 3 succeeded, 0 warnings, 0 failed
+- 전체 `Drone.` Automation: 10 succeeded, 0 warnings, 0 failed
+- `CompileAllBlueprints`: 0 errors, 0 warnings, 0 blueprints failed to load
+- Standalone에서 실제 BP Pawn·Controller·WBP HUD와 밝은 Cyan Course Spline 표시 확인
+- Spline Mesh Material Usage 경고 없음
+- 실제 Pawn Sweep이 표시선을 통과하고 목표 위치에 도달해 Blocking 없음 확인
+- Course 소유 표시 구성요소의 Collision·Overlap·Physics·Navigation 관련 Flag가 모두 꺼져 있음 확인
+- Training Map에 저장된 Recast Actor 확인
+
+### 범위 정지선
+
+- TUT-01은 Training Map, 편집 가능한 Course Spline과 비간섭 표시선까지만 완료했다.
+- Gate, Trigger, 순서, 방향, Lap, Timing은 구현하지 않았으며 `TUT-02` 이후 범위다.
+- Android는 사용자 결정에 따라 작업 범위에서 제외한다.
+- Map과 다음 카드 담당자는 현재 미정이다.
+
+### 판정과 Git
+
+- `TUT-01` Done
+- `TUT-02` Todo
+- Unreal Commit: `5a9a2faed4591a574988b649278cb0f166e31267` (`feat: add tutorial training course`)
+- `codex/tutorial-training-course`와 `origin/main`에 Push 완료, 로컬 `main=origin/main=5a9a2faed4591a574988b649278cb0f166e31267`

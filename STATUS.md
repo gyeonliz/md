@@ -21,8 +21,8 @@
 | Git 사용자 이메일 | 전역 `jkw6483@gmail.com` 설정 확인 |
 | GitHub CLI | 설치되어 있지 않음 |
 | 기본 작업 루트 | `D:\JGY\project` |
-| Unreal 프로젝트 저장소 | 작업컴 기록 경로 `D:\JGY\project\drone`; 이번 확인 PC `C:\URproject\drone`의 로컬 `main`=`origin/main`=`9f91bb6`, WBP/BP 연결 보강 Push 완료 |
-| 문서 작업 저장소 | 작업컴 기록 경로 `D:\JGY\project\md`; 이번 갱신 직전 `origin/main`=`7e3a9ec`, 이번 현황 갱신도 Commit·Push해 공유 |
+| Unreal 프로젝트 저장소 | 작업컴 기록 경로 `D:\JGY\project\drone`; 이번 확인 PC `C:\URproject\drone`의 로컬 `main`=`origin/main`=`5a9a2fa`, TUT-01 Training Course Push 완료 |
+| 문서 작업 저장소 | 작업컴 기록 경로 `D:\JGY\project\md`; 이번 갱신 직전 로컬 `main`=`origin/main`=`b63eee1`, 이번 현황 갱신도 Commit·Push해 공유 |
 
 GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도했으나 Windows Installer가 종료 코드 1602로 취소되어 설치되지 않았다. GitHub 웹과 Git Credential Manager만으로도 기본 Push/Clone 작업은 가능하다.
 
@@ -30,13 +30,13 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 
 ## PC별 Drone 프로젝트 기준
 
-작업컴에서 기록한 기본 프로젝트 경로는 `D:\JGY\project\drone`이고, 이번 HUD-02를 구현·검증한 현재 PC 경로는 다음과 같다.
+작업컴에서 기록한 기본 프로젝트 경로는 `D:\JGY\project\drone`이고, 이번 TUT-01을 구현·검증한 현재 PC 경로는 다음과 같다.
 
 ```text
 C:\URproject\drone\Drone.uproject
 ```
 
-이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않았고, 현재 로컬·원격 기준 Commit은 `9f91bb6`이다.
+이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않았고, 현재 로컬·원격 기준 Commit은 `5a9a2faed4591a574988b649278cb0f166e31267`이다.
 
 확인 결과:
 
@@ -68,10 +68,11 @@ C:\URproject\drone\Drone.uproject
 - HUD-01 Commit `08e876a` Push 완료
 - HUD-02 Commit `410c940` (`feat: add event-driven drone flight HUD`)을 기능 브랜치와 `origin/main`에 Push
 - WBP/BP 연결 보강 Commit `9f91bb6` (`feat: add Blueprint-backed flight HUD`)을 `codex/hud-blueprint-ready-comments`와 `origin/main`에 Push
+- TUT-01 Commit `5a9a2fa`를 `origin/main`에 Push하고 Training Map·비충돌 Spline 안내선 기준선을 반영
 
-첫 Commit은 863개 파일이며 `Content`는 761개로 `.uasset` 756개와 `.umap` 5개다. 가장 큰 파일은 약 21.0 MB이고 100 MB를 넘는 파일은 없다. 새 Prototype `.uasset`과 `.umap`을 포함한 Unreal Asset에는 Git LFS의 filter·diff·merge 속성이 적용된다. 이번 보강의 WBP와 BP Controller 신규 Asset 2개, 갱신한 BP GameMode 1개도 LFS Object로 Push했으며 현재 원격으로 보낼 추가 LFS Object는 없다.
+첫 Commit은 863개 파일이며 `Content`는 761개로 `.uasset` 756개와 `.umap` 5개다. 가장 큰 파일은 약 21.0 MB이고 100 MB를 넘는 파일은 없다. 새 Prototype `.uasset`과 `.umap`을 포함한 Unreal Asset에는 Git LFS의 filter·diff·merge 속성이 적용된다. WBP와 BP Controller 신규 Asset, 갱신한 BP GameMode에 이어 TUT-01의 Blueprint·Map·Material Asset도 같은 Unreal Asset 관리 기준으로 Push했다.
 
-현재 구현된 Drone 기능 기준선은 Prototype Pawn/GameMode, Move·Altitude·Yaw·Camera 입력, Telemetry Snapshot과 실제 Flight HUD까지다. C++ PlayerController가 HUD를 한 번 생성하고 현재 Possess Drone의 Telemetry Event를 연결하며, `WBP_DroneFlightHUD`가 Speed·Altitude·Vertical Speed·Heading의 Designer 외형을 표시한다. `BP_DronePrototypePlayerController`가 WBP Class를 선택하고 `BP_DronePrototypeGameMode`가 그 BP Controller를 선택한다. Take Off, Landing, Crash/실패, Mission, Enemy AI, MG 점유·공격, Evaluation은 아직 구현된 것으로 판정하지 않는다. 이전 기준 Commit `fb891fb`의 잘못된 `//test` 주석은 이력 재작성 없이 `2c38ebf`에서 제거했다.
+현재 구현된 Drone 기능 기준선은 Prototype Pawn/GameMode, Move·Altitude·Yaw·Camera 입력, Telemetry Snapshot, 실제 Flight HUD, TUT-01 Training Map과 비충돌 Spline 안내선까지다. C++ PlayerController가 HUD를 한 번 생성하고 현재 Possess Drone의 Telemetry Event를 연결하며, `WBP_DroneFlightHUD`가 Speed·Altitude·Vertical Speed·Heading의 Designer 외형을 표시한다. `BP_DronePrototypePlayerController`가 WBP Class를 선택하고 `BP_DronePrototypeGameMode`가 그 BP Controller를 선택한다. `ADroneTrainingCourse`는 편집 가능한 Spline과 런타임 안내선 생성을 담당하고, `BP_DroneTrainingCourse`와 `Lvl_DroneTraining`이 실제 훈련 맵 연결을 담당한다. Gate·순서·정방향 판정·Lap·Timing은 TUT-02 이후 범위이며 아직 구현되지 않았다. Take Off, Landing, Crash/실패, Mission, Enemy AI, MG 점유·공격, Evaluation도 아직 구현된 것으로 판정하지 않는다. 이전 기준 Commit `fb891fb`의 잘못된 `//test` 주석은 이력 재작성 없이 `2c38ebf`에서 제거했다.
 
 사용자는 이 프로젝트에서 Android를 사용하지 않는다고 확정했다. 이에 따라 `Config/DefaultEngine.ini`의 Android File Server Plugin과 네트워크 연결을 끄고 `SecurityToken` 할당을 비웠다. 검사 결과 활성 Plugin 0, 네트워크 허용 0, 비어 있지 않은 토큰 0이다. 기존 토큰 값은 이 문서나 로그에 기록하지 않았다. 향후 Android File Server를 다시 켤 경우 빈 토큰은 인증 없는 상태가 될 수 있으므로 보안 설정을 새로 검토해야 한다.
 
@@ -102,6 +103,11 @@ C:\URproject\drone\Drone.uproject
 - `410c940` 당시에는 새 Asset이 없었다. 이번 보강에서는 `WBP_DroneFlightHUD`와 `BP_DronePrototypePlayerController`를 추가하고 `BP_DronePrototypeGameMode`를 갱신했다. 별도 Asset 테스트가 부모 Class, 필수 TextBlock 4개, 유효 Font와 BP 연결 체인을 검사한다.
 - WBP/BP 보강 뒤 전체 `CompileAllBlueprints`는 종료 코드 0, 0 errors, 0 warnings, 0 blueprints failed to load였다.
 - `410c940` Standalone에서 `SPD 43.2 km/h`, `ALT 2.7 m`, `V/S +10.0/-7.2 m/s`, Heading `002° → 025°/045°` 변화를 확인했다. 이번 보강 뒤 Standalone에서는 실제 WBP Class의 `FLIGHT DATA`, `SPD 0.0 km/h`, `ALT 1.5 m`, `V/S +0.0 m/s`, `HDG 000°`가 깨짐 없이 표시되는 것을 다시 확인했다.
+- TUT-01에서 `ADroneTrainingCourse`, `BP_DroneTrainingCourse`, `Lvl_DroneTraining`, `M_DroneTrainingGuide`를 추가했다. 안내선 Material은 Opaque·Unlit·Emissive이며 Spline Mesh 사용 설정을 적용했다.
+- TUT-01 최종 `DroneEditor Win64 Development` 빌드는 성공했다. `Drone.Tutorial` 전용 자동화는 3/3, 전체 `Drone.` 자동화는 10/10이며 두 결과 모두 warning과 failure가 없다.
+- TUT-01 뒤 전체 `CompileAllBlueprints`는 0 errors, 0 warnings, 0 blueprints failed to load로 통과했다.
+- Standalone에서 실제 `BP_DronePrototypePlayerController`, `BP_DronePrototypePawn`, `WBP_DroneFlightHUD` 사용과 Cyan 안내선 표시를 확인했다. Spline Mesh가 Material 기본값으로 대체됐다는 경고도 발생하지 않았다.
+- 자동화 Sweep에서 Drone이 안내선을 막힘 없이 통과했고, Course가 만든 Primitive는 Collision·Overlap·Physics·Navigation 영향을 사용하지 않는 것을 확인했다. Training Map에는 저장된 Recast NavMesh Actor가 존재한다.
 
 Prototype 입력·Editor 연결 절차는 [`docs/DRONE_PROTOTYPE_IMPLEMENTATION.md`](docs/DRONE_PROTOTYPE_IMPLEMENTATION.md), Telemetry와 Flight HUD 구현·검증은 [`docs/DRONE_TELEMETRY_IMPLEMENTATION.md`](docs/DRONE_TELEMETRY_IMPLEMENTATION.md)에 기록했다.
 
@@ -132,17 +138,18 @@ C:\Users\jkw11\Documents\Codex\2026-08-12\c-project-factoryenvironmentcollect\wo
 - 사전 GUI PIE의 역사적 부분 확인과 2026-08-21 Standalone 수동 조작 Pass 기록
 - Event 기반 C++ Flight HUD 기능, 실제 WBP Designer 외형, BP PlayerController/GameMode 연결과 Possession 전환·종료 수명주기 자동화
 - 2026-08-23 Standalone에서 Speed·Altitude·Vertical Speed·Heading 실제 화면 변화 확인
+- `ADroneTrainingCourse`, 실제 BP Course, 별도 Training Map과 Opaque·Unlit·Emissive Cyan 안내 Material로 TUT-01 완료
+- TUT-01 전용 자동화 3개, 전체 Drone 자동화 10/10, Blueprint 전체 Compile과 Standalone 표시·비충돌 검증
 - 구매 소스 없이 Engine 기본 도형으로 진행하는 기능 우선 Greybox 사전계획
 - 전체 작업 관리 및 병행 학습 계획
 - 실제 진행 상태를 담는 `WORKBOARD.md`
 
 ## 다음 단계
 
-1. `TUT-01` 별도 Training Map과 비충돌 Spline 구현
-2. `TUT-02` 현재 순서·정방향 Gate만 인정하는 Ring Gate 구현
-3. 이후 Lap/Segment 기록·비교 UI와 Tutorial 회귀를 완성
-4. 그 다음 Flight 상태, Operator↔Drone, NPC·Mission UI, Jamming Story 순으로 진행
-5. 병행 과제로 다른 PC에서 `9f91bb6` Pull, LFS/UE 5.8.1 실행과 문서 Pull 확인
+1. `TUT-02` 현재 순서·정방향 Gate만 인정하는 Ring Gate 구현
+2. 이후 Lap/Segment 기록·비교 UI와 Tutorial 회귀를 완성
+3. 그 다음 Flight 상태, Operator↔Drone, NPC·Mission UI, Jamming Story 순으로 진행
+4. 병행 과제로 다른 PC에서 `5a9a2fa` Pull, LFS/UE 5.8.1 실행과 문서 Pull 확인
 
 Camera·Mouse·Gamepad 역할은 v1 조작으로 확정했다. Keyboard·Mouse 체감은 현재 시험값으로 통과했으며 실제 Gamepad 체감, 최종 물리와 최종 감도 조정은 이후 별도 카드로 남긴다. 구매 소스와 최종 Mesh는 선행 조건이 아니며 상세 계획은 [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)를 따른다.
 
@@ -159,7 +166,9 @@ MD: gyeonliz/md origin 연결 완료
 PFN-06 Done
 → HUD-01 Telemetry Snapshot Done
 → HUD-02 Flight HUD Done
-→ Tutorial Course·Timing·비교 UI
+→ TUT-01 Training Map·비충돌 Spline Done
+→ TUT-02 Gate·순서·정방향 판정
+→ Tutorial Timing·비교 UI
 → Take Off·Landing·Crash
 → Operator↔Drone 전환
 → NPC·Mission UI Story Shell

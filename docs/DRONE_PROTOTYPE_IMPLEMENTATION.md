@@ -351,13 +351,14 @@ Editor Python은 프로젝트 Plugin 설정을 바꾸지 않고 실행 시점에
 
 현재 Tutorial/Story 우선 실행 순서와 Greybox 기준은 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)를 우선하며, PFN 카드 세부 정의는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 
-`HUD-01` Telemetry Snapshot과 `HUD-02` 공용 Flight HUD는 완료했다. 다음 완료 게이트는 `TUT-01` Training Map과 비충돌 Spline이다.
+`HUD-01` Telemetry Snapshot, `HUD-02` 공용 Flight HUD와 `TUT-01` Training Map·비충돌 Spline은 완료했다. 다음 완료 게이트는 `TUT-02` 순서형 Ring Gate다.
 
 ```text
 PFN-06 Done
 → HUD-01 Telemetry Snapshot Done
 → HUD-02 Flight HUD Done
-→ TUT-01 Training Map·비충돌 Spline
+→ TUT-01 Training Map·비충돌 Spline Done
+→ TUT-02 순서형 Ring Gate
 ```
 
-이후 순서는 `Tutorial Course·Gate·Lap 기록 → Flight 상태 → Operator↔Drone → Story NPC·Mission·Jamming → Enemy AI/MG → 에셋 통합`이다.
+이후 순서는 `TUT-02 Gate → TUT-03~04 Lap 기록·결과 UI → Flight 상태 → Operator↔Drone → Story NPC·Mission·Jamming → Enemy AI/MG → 에셋 통합`이다.

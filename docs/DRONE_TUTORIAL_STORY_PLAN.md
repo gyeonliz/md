@@ -77,18 +77,34 @@ Widget에서 매 프레임 Pawn을 검색하거나 Property Binding으로 계산
 
 ## 4. Tutorial Vertical Slice
 
-### 코스 구조
+현재 구현 경계는 다음과 같다.
+
+- `TUT-01` 완료: Training Map, 수정 가능한 Spline, Runtime 안내선과 비충돌·비탐색 안전 설정
+- `TUT-02` 다음 활성 카드: Gate 목록, Gate Actor와 Trigger, 순서·방향 판정
+- `TUT-03` 이후: Segment/Lap Timing과 기록 계산
+
+구매 에셋은 이 Vertical Slice의 선행 조건이 아니다. 현재는 Engine 기본 도형과 프로젝트 소유 Material로 기능을 검증하며, Android는 범위에서 제외한다.
+
+### TUT-01 — 코스와 표시선 (완료)
 
 - 별도 `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining` Map을 만든다.
-- `ADroneTrainingCourse`가 `USplineComponent`와 순서형 Gate 목록을 소유한다.
-- Spline/SplineMesh는 안내선 표시 전용이며 Collision과 Navigation 영향을 끈다.
+- `ADroneTrainingCourse`가 Editor에서 수정 가능한 `USplineComponent`를 소유한다.
+- Runtime 표시선은 `USplineMeshComponent`로 만들고 프로젝트 소유 불투명·Unlit·Emissive `M_DroneTrainingGuide`를 사용한다.
+- Course Actor, Spline과 생성된 표시선은 Collision·Overlap·Physics·Navigation 영향을 모두 끈다.
+- 실제 `BP_DroneTrainingCourse`를 Map에 배치하고 기존 Prototype BP GameMode·Pawn·PlayerController·WBP를 재사용한다.
+
+TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경로는 기능 검증용 Greybox 값이며 최종 코스 확정이 아니다.
+
+### TUT-02 — 순서형 Ring Gate (미구현·다음 카드)
+
+- `ADroneTrainingCourse`에 순서형 Gate 목록을 연결한다.
 - `ADroneTrainingGate`는 원형 Visual과 별도 Overlap Trigger를 분리한다.
 - Visual Ring은 충돌하지 않고 Trigger만 Drone Pawn Overlap을 받는다.
 - Gate는 `CourseId`, `GateIndex`, `ForwardDirection`, `SegmentDistance`를 가진다.
 - 현재 목표 Gate만 강조하고 이미 통과한 Gate는 완료 색, 이후 Gate는 비활성 색으로 표시한다.
 - 현재 순서가 아니거나 역방향으로 통과한 Gate는 기록하지 않는다.
 
-### Lap과 구간 기록
+### TUT-03 이후 — Lap과 구간 기록 (미구현)
 
 - Gate 0 통과 시 Lap을 시작하고 마지막 Gate 통과 시 완료한다.
 - Segment Time은 이전 정상 Gate부터 현재 Gate까지의 World Game Time으로 계산한다.
@@ -165,7 +181,7 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 | CTRL-01 | 고정 추적 Camera와 Mouse/Gamepad 입력 | 5 Action, 15 Mapping, 자동화 3/3과 수동 체감 확인 |
 | HUD-01 | Telemetry Snapshot Component | 속도·고도·수직 속도·Heading을 10Hz Event로 제공 |
 | HUD-02 | C++ 기능 + WBP Flight HUD | Drone Possess 중 실제 WBP로 네 수치를 화면에서 확인 |
-| TUT-01 | Training Map과 비충돌 Spline | 표시선이 비행·Collision·Nav에 영향 없음 |
+| TUT-01 | Training Map과 비충돌 Spline | 별도 Map에서 수정 가능한 Spline과 Runtime 표시선이 비행·Collision·Overlap·Physics·Nav에 영향 없음 |
 | TUT-02 | 순서형 Ring Gate | 정방향 현재 Gate만 한 번 통과 처리 |
 | TUT-03 | Segment/Lap 기록 | 시간·실제 이동 거리·평균 속도 계산 |
 | TUT-04 | 비교와 결과 UI | 이전 평균·Best 대비 ± 결과 표시 |
@@ -178,7 +194,9 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 | STY-04 | AI·MG 통합 | Drone 탐지와 대응을 Mission 흐름에서 재현 |
 | AST-01 | 제공 Drone 에셋 감사·적용 | 기능 코드 변경 없이 Integration BP에서 외형 교체 |
 
-현재 `CTRL-01`, `HUD-01`, `HUD-02`를 완료했다. Flight HUD는 BP Controller/GameMode와 실제 WBP 연결, 자동화 7/7, Blueprint 0/0, PIE 실제 WBP 사용과 Standalone WBP 표시를 통과했으며 다음 활성 카드는 `TUT-01`이다.
+현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`을 완료했다. TUT-01은 실제 Training Map·BP Course, 수정 가능한 Spline, 프로젝트 Material을 사용하는 Runtime SplineMesh 안내선을 포함한다. 기존 Prototype BP GameMode·Pawn·PlayerController·WBP를 재사용하며 전체 `Drone` 자동화 10/10, Tutorial 3/3, Blueprint Compile 오류·경고 0/0, Standalone 안내선 표시를 통과했다. Unreal 저장소 로컬 `main`과 `origin/main`의 완료 기준선은 `5a9a2faed4591a574988b649278cb0f166e31267`이다.
+
+다음 활성 카드는 `TUT-02`다. Gate 목록, Gate Actor·Trigger, 순서·방향 판정, Lap·Timing은 TUT-01 완료 항목이 아니며 현재 미구현이다.
 
 ## 8. 검증 게이트
 
