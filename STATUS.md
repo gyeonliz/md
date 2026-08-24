@@ -1,6 +1,6 @@
 # 현재 작업 상태
 
-기준일: 2026-08-24 (Asia/Seoul)
+기준일: 2026-08-25 (Asia/Seoul)
 
 이 문서는 PC별로 명령으로 확인된 상태와 사용자가 아직 결정하지 않은 항목을 분리한다. 작업컴 기록과 이번 확인 PC의 결과를 같은 항목에서 섞지 않고 경로와 검증 시점을 함께 적는다.
 
@@ -22,7 +22,7 @@
 | GitHub CLI | 설치되어 있지 않음 |
 | 기본 작업 루트 | `D:\JGY\project` |
 | Unreal 프로젝트 저장소 | 작업컴 기록 경로 `D:\JGY\project\drone`; 이번 확인 PC `C:\URproject\drone`의 로컬 `main`=`origin/main`=`800a7ba`, TUT-02 Ordered Ring Gate Push 완료 |
-| 문서 작업 저장소 | 작업컴 기록 경로 `D:\JGY\project\md`; 이번 갱신 직전 로컬 `main`=`origin/main`=`e6395f1`, 이번 현황 갱신도 Commit·Push해 공유 |
+| 문서 작업 저장소 | 작업컴 기록 경로 `D:\JGY\project\md`; 이번 갱신 직전 로컬 `main`=`origin/main`=`d6953e3`, 이번 이동용 현황·학습 일정 갱신도 Commit·Push해 공유 |
 
 GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도했으나 Windows Installer가 종료 코드 1602로 취소되어 설치되지 않았다. GitHub 웹과 Git Credential Manager만으로도 기본 Push/Clone 작업은 가능하다.
 
@@ -148,6 +148,7 @@ C:\Users\jkw11\Documents\Codex\2026-08-12\c-project-factoryenvironmentcollect\wo
 - TUT-01 전용 자동화 3개, 전체 Drone 자동화 10/10, Blueprint 전체 Compile과 Standalone 표시·비충돌 검증
 - `ADroneTrainingGate`, Gate Sequence Component, 실제 BP Gate 네 개와 분리된 Ring Visual·Trigger로 TUT-02 완료
 - Gate Sequence 1/1, 실제 BP PIE Smoke 1/1, Tutorial 4/4, 전체 Drone 11/11과 Standalone Current/Inactive Gate 표시 검증
+- Q-Net 공식 정보처리산업기사 2026 일정과 시험 구성을 확인하고, 개인 접수·필기면제 상태별 Track A/B/C 및 C++ 코딩테스트 병행 계획을 `docs/MOBILE_CURRENT_BRIEF.md`와 `docs/STUDY_PLANS.md`에 정리
 - 구매 소스 없이 Engine 기본 도형으로 진행하는 기능 우선 Greybox 사전계획
 - 전체 작업 관리 및 병행 학습 계획
 - 실제 진행 상태를 담는 `WORKBOARD.md`
@@ -158,8 +159,9 @@ C:\Users\jkw11\Documents\Codex\2026-08-12\c-project-factoryenvironmentcollect\wo
 2. `TUT-04` 이전 평균·Best 비교와 결과 UI를 구현하고 Tutorial 회귀를 완성
 3. 그 다음 Flight 상태, Operator↔Drone, NPC·Mission UI, Jamming Story 순으로 진행
 4. 병행 과제로 다른 PC에서 `800a7ba` Pull, LFS/UE 5.8.1 실행과 문서 Pull 확인
+5. 정보처리산업기사는 Q-Net 개인 접수·수험일·필기면제 상태를 확인해 Track A/B/C를 선택하고, 코딩테스트는 주간 반복으로 병행
 
-Camera·Mouse·Gamepad 역할은 v1 조작으로 확정했다. Keyboard·Mouse 체감은 현재 시험값으로 통과했으며 실제 Gamepad 체감, 최종 물리와 최종 감도 조정은 이후 별도 카드로 남긴다. 구매 소스와 최종 Mesh는 선행 조건이 아니며 상세 계획은 [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)를 따른다.
+Camera·Mouse·Gamepad 역할은 v1 조작으로 확정했다. Keyboard·Mouse 체감은 현재 시험값으로 통과했으며 실제 Gamepad 체감, 최종 물리와 최종 감도 조정은 이후 별도 카드로 남긴다. 구매 소스와 최종 Mesh는 선행 조건이 아니며 상세 계획은 [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)를 따른다. 이동 중 볼 통합 요약과 날짜별 학습안은 [`docs/MOBILE_CURRENT_BRIEF.md`](docs/MOBILE_CURRENT_BRIEF.md)를 따른다.
 
 Git 공유 작업과 Drone 기능 작업은 서로를 불필요하게 막지 않고 다음 세 흐름으로 이어간다.
 

@@ -1,6 +1,6 @@
 # 현재 작업 보드
 
-기준일: 2026-08-24 (Asia/Seoul)
+기준일: 2026-08-25 (Asia/Seoul)
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
@@ -8,7 +8,7 @@ Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-02 �
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-08-24 05:57 KST
+마지막 갱신: 2026-08-25 08:10 KST
 
 | 항목 | 상태 |
 |---|---|
@@ -19,6 +19,8 @@ Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-02 �
 | 현재 차단 | 없음. Android는 사용자 결정에 따라 작업 범위에서 제외 |
 | 다음 행동 | `TUT-03` 정상 Gate 승인 Event를 구독해 Segment/Lap 기록 계층 구현 |
 | 다음 기능 | `TUT-03` Segment/Lap 기록. Lap·Timing·거리·평균 속도 계산은 아직 미구현 |
+| 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
+| 학습 다음 행동 | Q-Net 상태를 확인해 Track A/B/C를 고르고 첫 학습 블록 실행 |
 
 상세 변경 이력은 [`docs/DRONE_WORKLOG.md`](docs/DRONE_WORKLOG.md)에 계속 추가한다. 매 구현 작업 종료 시 이 스냅샷의 현재 작업·완료 근거·다음 작업을 함께 갱신한다.
 
@@ -26,8 +28,6 @@ Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-02 �
 
 | ID | 태그 | 작업 | 활성화 조건 |
 |---|---|---|---|
-| STUDY-EXAM-01 | 정보처리산업기사 | D-Day 세부 계획 작성 | 시험 날짜 확정 |
-| STUDY-CT-01 | Coding Test | 첫 C++ 문제 세트 선택 | 주간 프로젝트 시간 배분 결정 |
 | PF-01 | Portfolio | 데모 기능별 기록 시작 | 첫 재현 가능한 Drone 기능 완료 |
 | DR-FUTURE-01 | Drone | 배터리·통신·재밍·멀티 후보 평가 | Flight MVP 이후 |
 | PFN-P2 | Drone | Flight MVP 카드 PFN-07~14 활성화 | Tutorial Vertical Slice 통과 |
@@ -46,6 +46,9 @@ Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-02 �
 | GIT-10 | Git / Unreal | 다른 PC Clone과 실행 | LFS 포함 Clone 후 UE 5.8.1에서 열림 |
 | SYNC-04 | Codex Sync | 두 PC 간 실제 수동 인계 시험 | Git 흐름과 문맥 패키지 흐름을 각각 완료 |
 | TUT-03 | Drone / Tutorial | Segment/Lap 기록 | 정상 Gate 승인 Event로 시간·실제 이동 거리·평균 속도를 계산. 담당자는 현재 미정 |
+| STUDY-EXAM-01 | 정보처리산업기사 | Q-Net 개인 상태 확인 | 3회 접수·수험일·응시 여부·필기 합격/면제 상태를 확인하고 Track A/B/C 기록 |
+| STUDY-EXAM-02 | 정보처리산업기사 | 선택 Track 첫 학습 | 필기 60문항 진단 또는 실기 기초 1블록과 오답 기록 완료 |
+| STUDY-CT-01 | Coding Test | C++ 기본 진단 시작 | 첫 문제 직접 풀이·실패 이유·재풀이 날짜 기록 |
 
 ## Doing
 
@@ -91,6 +94,7 @@ Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-02 �
 | HUD-02 | Drone / UI | C++ Flight HUD 기능·native 직접 실행 fallback과 실제 `WBP_DroneFlightHUD` 외형 구현. BP Controller→WBP, BP GameMode→BP Controller 연결, 필수 TextBlock·폰트·PIE 3회 수명주기 검증, Drone 자동화 7/7, Blueprint 0/0, Standalone WBP 표시 확인 |
 | TUT-01 | Drone / Tutorial | `ADroneTrainingCourse`, 실제 `BP_DroneTrainingCourse`, `Lvl_DroneTraining`, 밝은 Cyan `M_DroneTrainingGuide` 구현. Editor Build, Tutorial 3/3, 전체 Drone 10/10, Blueprint Compile, Standalone 시각 확인 통과. Pawn Sweep을 막지 않고 Course 표시 구성요소의 Collision·Overlap·Physics·Navigation 영향이 꺼졌으며 저장된 Recast Actor를 확인함. Map 담당자는 미정 유지 |
 | TUT-02 | Drone / Tutorial | `ADroneTrainingGate`, Gate Sequence Component, 실제 `BP_DroneTrainingGate` 네 개 구현. Ring Visual·Pawn Trigger 분리, 현재 순서·정방향·중복 통과와 Current/Completed/Inactive 상태를 검증. Build, Gate Sequence 1/1, 실제 BP PIE Smoke 1/1, Tutorial 4/4, 전체 Drone 11/11, Blueprint 0/0/0, Standalone Current/Inactive 표시 통과. 신규 BP와 갱신 Map 두 Asset LFS Push 완료 |
+| STUDY-PLAN-01 | 정보처리산업기사 / Coding Test | Q-Net 공식 2026 일정·시험 구성을 확인하고 접수 상태별 Track A/B/C, C++ 주간 병행안과 이동용 통합 문서를 작성 |
 | SYNC-01 | Codex Sync | 목표·완료·진행·결정·미정·다음 작업 형식 정의 |
 | SYNC-02 | Codex Sync | `handoff.md` + `manifest.json` Export/Import 구현 |
 | SYNC-03 | Codex Sync | 인증·토큰·원시 세션 제외 기준과 검사 구현 |
