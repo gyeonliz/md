@@ -1,8 +1,8 @@
 # Drone 현재 코드 구조와 사용자 확인 작업
 
-기준일: 2026-08-24 (Asia/Seoul)
+기준일: 2026-08-25 (Asia/Seoul)
 
-이 문서는 현재 작업컴의 Unreal 저장소 `C:\URproject\drone`을 직접 확인한 결과만 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
+이 문서는 현재 작업컴의 Unreal 저장소 `D:\JGY\project\drone`을 직접 확인한 결과를 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
 
 현재 TUT-02 완료 기준은 Unreal Commit `800a7baaf8247bf0a3ee7bccc2272e12d0098f2b`이다. `codex/tutorial-ring-gates` Branch와 `main`을 모두 Push했으며 로컬 `main`과 `origin/main`이 이 Commit으로 일치한다.
 
@@ -12,12 +12,12 @@
 |---|---|
 | `DroneEditor Win64 Development` | Build 성공 |
 | `Drone.Tutorial` Automation | 4/4 통과 |
-| 전체 `Drone.` Automation | 11/11 통과 |
+| 전체 `Drone.` Automation | AST-01 작업 트리 12/12 통과 |
 | `CompileAllBlueprints` | Errors 0, Warnings 0, Load Failures 0 |
-| Standalone 시각 확인 | 실제 WBP HUD, Cyan 안내선, Gate 0 Current 녹색, Gate 1~3 Inactive 표시 확인 |
+| Standalone 시각 확인 | FPV 외형, 고정 추적 Camera, 실제 WBP HUD, Cyan 안내선, Current/Inactive Gate 표시 확인 |
 | 사용자 수동 비행 확인 | 실제 조종 체감과 네 Gate 완주 확인은 이 문서의 절차로 확인할 차례 |
 
-현재 결과는 위 Source Commit을 대상으로 한 검증값이다. 다른 PC에서는 `main`을 Pull한 뒤 `800a7ba`인지 확인하고 같은 기준선을 사용한다.
+TUT-02 Git 기준은 `800a7ba`이고, 12/12 결과는 그 위의 로컬 미커밋 AST-01 작업 트리를 대상으로 한 검증값이다. 다른 PC에서는 AST-01이 Commit·Push되기 전까지 이 결과를 재현할 수 없다.
 
 ## 1. 런타임 연결 구조
 
@@ -28,7 +28,7 @@
 │
 ├─ WorldSettings
 │  └─ BP_DronePrototypeGameMode
-│     ├─ BP_DronePrototypePawn Spawn·Possess
+│     ├─ BP_DroneFPVIntegration Spawn·Possess
 │     │  ├─ CollisionComponent (Sphere Root)
 │     │  ├─ VisualMeshComponent
 │     │  ├─ CameraBoom → FollowCamera
@@ -82,7 +82,12 @@ IMC_DronePrototype
 ├─ IA_DronePrototype_Look
 └─ IA_DronePrototype_CameraPitchRate
 
-BP_DronePrototypePawn
+BP_DroneFPVIntegration
+├─ ADronePrototypePawn native 기능·Input 계약
+├─ CollisionComponent (Sphere Root)
+├─ VisualMeshComponent (FPV Body, NoCollision)
+├─ FPVRotorA~D (NoCollision)
+├─ DroneEngineLoop (44.1 kHz Cue)
 └─ UDroneTelemetryComponent
    └─ FDroneTelemetrySnapshot
       ├─ SpeedKilometersPerHour
@@ -554,7 +559,7 @@ Gate 색이 전혀 바뀌지 않으면 다음 순서로 본다.
 3. CourseId가 모두 같은지
 4. Gate를 로컬 `+X` 방향으로 통과했는지
 5. Trigger 안에서 멈춘 것이 아니라 완전히 빠져나왔는지
-6. 실제 Pawn Class가 `BP_DronePrototypePawn`인지
+6. 실제 Pawn Class가 `BP_DroneFPVIntegration`인지
 7. `GateTrigger`가 QueryOnly·Pawn Overlap인지
 
 Ring이 보이지 않으면 다음을 확인한다.

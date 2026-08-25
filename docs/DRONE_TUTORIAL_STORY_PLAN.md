@@ -167,12 +167,16 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 
 ## 6. 외부 Drone 에셋 적용
 
-- 원본은 `/Game/Drone/ThirdParty/<PackName>` 아래에 보존한다.
+- ZIP과 최초 해제본은 `D:\JGY\project\Unreal_260821`에 원본으로 보존하고 Drone Git 저장소에 전체 복사하지 않는다.
+- Loose `.uasset`은 UE 5.8 스테이징 프로젝트에서 먼저 원래 `/Game/<PackRoot>` 경로로 로드한다. Explorer에서 바로 `/Game/Drone` 아래로 옮기지 않는다.
+- 필요한 의존성만 고른 뒤 스테이징 Content Browser에서 `/Game/Drone/ThirdParty/<PackName>`으로 이동·재저장하고 Redirector를 정리한다.
 - 실제 사용 Blueprint는 `/Game/Drone/Drones` 아래에 만들고 프로젝트 기능 Pawn에 연결한다.
 - C++ Collision Root, Movement, Camera/Sensor 기준점은 유지한다.
 - 외부 Mesh, Rotor, Material, Animation, VFX만 Integration Blueprint가 연결한다.
 - 외부 Pawn/GameMode/Input Mapping을 신규 게임플레이 부모로 사용하지 않는다.
 - 적용 전에 Plugin, 부모 클래스, Collision, Pivot/Forward, Scale, Socket/Bone, Animation, License, LFS 용량을 감사한다.
+
+2026-08-25 제공 ZIP 14개 감사 결과와 팩별 UE 버전·경로·위험, 첫 `DronePack FPV + Drone-Sounds` Spike 절차는 [`DRONE_ASSET_INTAKE_2026-08-25.md`](DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다. `GC_DroneS` 기능 Blueprint는 UE 4.24 `PhysXVehicles` 의존성이 있어 메시·재질·Turret Part만 후보로 보고 기능은 프로젝트 코드로 재구현한다.
 
 ## 7. 작업 카드
 
@@ -192,7 +196,8 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 | STY-02 | Mission Director·UI | Briefing부터 Evaluation까지 상태 전환 |
 | STY-03 | Jamming Mission | 세 단계 효과와 회피/해제 목표 재현 |
 | STY-04 | AI·MG 통합 | Drone 탐지와 대응을 Mission 흐름에서 재현 |
-| AST-01 | 제공 Drone 에셋 감사·적용 | 기능 코드 변경 없이 Integration BP에서 외형 교체 |
+| AST-00 | 제공 에셋 인수 감사 | ZIP 14개와 해제본의 상대 경로·크기 일치 및 팩별 호환성·이식 위험 기록 |
+| AST-01 | 제공 Drone 에셋 선별 적용 | UE 5.8 스테이징 검증 후 기능 코드 변경 없이 Integration BP에서 외형 교체 |
 
 현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`를 완료했다. TUT-02는 실제 BP Gate 네 개, 분리된 Ring Visual·Pawn Trigger, 명시적 Gate 순서와 정방향·중복 통과 판정을 포함한다. Editor Build, Gate Sequence 1/1, 실제 BP PIE Smoke 1/1, Tutorial 4/4, 전체 `Drone.` 11/11, Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다. Standalone에서는 실제 HUD·Course와 Current/Inactive Gate 표시를 확인했다. Unreal 저장소 로컬 `main`과 `origin/main`의 완료 기준선은 `800a7baaf8247bf0a3ee7bccc2272e12d0098f2b`이다.
 

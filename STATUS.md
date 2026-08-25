@@ -21,8 +21,9 @@
 | Git 사용자 이메일 | 전역 `jkw6483@gmail.com` 설정 확인 |
 | GitHub CLI | 설치되어 있지 않음 |
 | 기본 작업 루트 | `D:\JGY\project` |
-| Unreal 프로젝트 저장소 | 작업컴 기록 경로 `D:\JGY\project\drone`; 이번 확인 PC `C:\URproject\drone`의 로컬 `main`=`origin/main`=`800a7ba`, TUT-02 Ordered Ring Gate Push 완료 |
-| 문서 작업 저장소 | 작업컴 기록 경로 `D:\JGY\project\md`; 이번 갱신 직전 로컬 `main`=`origin/main`=`d6953e3`, 이번 이동용 현황·학습 일정 갱신도 Commit·Push해 공유 |
+| Unreal 프로젝트 저장소 | 현재 작업 경로 `D:\JGY\project\drone`; 로컬 `main`=`origin/main`=`800a7ba`, 그 위 AST-01·Unreal MCP 변경은 로컬 미커밋 |
+| 문서 작업 저장소 | 현재 작업 경로 `D:\JGY\project\md`; 로컬 `main`=`origin/main`=`c05f4b0`, 에셋·MCP·작업 현황 문서는 로컬 미커밋 |
+| Commit·Push 담당 | 사용자가 직접 수행. 현재 문서 최신화 작업에서는 Stage·Commit·Push하지 않음 |
 
 GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도했으나 Windows Installer가 종료 코드 1602로 취소되어 설치되지 않았다. GitHub 웹과 Git Credential Manager만으로도 기본 Push/Clone 작업은 가능하다.
 
@@ -30,10 +31,10 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 
 ## PC별 Drone 프로젝트 기준
 
-작업컴에서 기록한 기본 프로젝트 경로는 `D:\JGY\project\drone`이고, 이번 TUT-02를 구현·검증한 현재 PC 경로는 다음과 같다.
+현재 작업컴의 기본 프로젝트 경로는 다음과 같다.
 
 ```text
-C:\URproject\drone\Drone.uproject
+D:\JGY\project\drone\Drone.uproject
 ```
 
 이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않았고, 현재 로컬·원격 기준 Commit은 `800a7baaf8247bf0a3ee7bccc2272e12d0098f2b`이다.
@@ -79,6 +80,38 @@ C:\URproject\drone\Drone.uproject
 
 `.vsconfig`를 확인한 결과 Visual Studio workload와 component ID만 있으며 자격 증명이나 개인 경로는 없다. UE가 선호한다고 표시한 14.50 계열 도구 구성도 포함해 첫 Commit에 반영했다.
 
+## 2026-08-25 제공 에셋 인수 감사
+
+사용자가 알려준 `D:\JGY\project\Unreal\_260821` 대신 실제 파일시스템에는 `D:\JGY\project\Unreal_260821`이 존재한다. 이 폴더의 최상위 ZIP 14개와 같은 이름의 해제 폴더 14개를 파일별 상대 경로·크기로 대조했다.
+
+- 14팩 모두 `Missing 0 / Extra 0 / SizeMismatch 0`
+- 해제본 10,499개 파일, 35,677,612,290 bytes
+- `.uasset` 10,445개, `.umap` 25개
+- 실제 Drone 저장소에는 FPV/Sound 선택 자산 12개·21,753,071 bytes와 프로젝트 소유 Integration BP 1개만 이식
+- `Non-Pilot Drones KITBASH SET`에는 개별 FBX 55개가 든 내부 `FBX.zip`이 남아 있음
+- 제공 Unreal 자산은 UE 4.23~5.6 제작 단서가 있어 UE 5.8 스테이징 변환과 참조 감사 후 선별 이식 필요
+- `GC_DroneS` 기능 Blueprint는 구형 `PhysXVehicles` 의존성이 있어 기능 재사용 금지, Mesh·Material·Turret Part만 후보
+- `OilRigLiope_Tr`의 실제 패키지 루트는 `/Game/Liope_Tr`이므로 해제 폴더명을 그대로 Content Root로 사용하지 않음
+
+전체 35.7 GB 해제본은 Git LFS 저장소에 복사하지 않았다. UE 5.8 스테이징에서 `DronePack_Project` FPV Body·Rotor·Material/Texture와 `Drone-Sounds` 44.1 kHz Cue/Wave만 `/Game/Drone/ThirdParty`로 이동·재저장했다. `/Game/Drone/Integrations/DronePackFPV/BP_DroneFPVIntegration`이 기존 native Collision Root·Movement·Camera·Telemetry를 유지한 채 외형과 Audio를 소유하며, Prototype BP GameMode가 이 Pawn을 생성한다. 자동 검증과 Standalone 초기 렌더는 통과했다. 실제 스피커의 Loop 단일 재생과 Standalone 종료 후 정지는 아직 사람이 확인하지 않았으므로 `미확인`이며, Pass·Fail 판정과 `AST-01` 완료 처리를 보류한다. 상세 결과는 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다.
+
+## 2026-08-25 UE 5.8 공식 Unreal MCP 연결
+
+사용자가 전달한 Unreal Engine KR의 UEFN MCP 게시물에서 출발해 Epic의 UEFN 소식, UE 5.8 Unreal MCP 문서와 Codex MCP 문서를 대조했다. 현재 설치된 UE 5.8.1에는 `ModelContextProtocol`, `ToolsetRegistry`와 공식 Toolset 플러그인·Win64 Binary가 실제 포함되어 있다.
+
+- 자체 통신 플러그인 초안은 공식 기능과 중복되어 제거
+- `ModelContextProtocol`, `EditorToolset`, `AutomationTestToolset`, `UMGToolSet`, `StateTreeToolset`, `AIModuleToolset`을 `Editor` Target으로만 활성화
+- 불필요한 PCG·Niagara·GAS 등을 함께 켜는 `AllToolsets`는 사용하지 않음
+- `Config/DefaultEditorPerProjectUserSettings.ini`에서 `127.0.0.1:8000/mcp` 자동 시작 기본값 구성
+- `.codex/config.toml`에 프로젝트 범위 `unreal-mcp` Streamable HTTP 연결과 변경성 Tool 승인 정책 구성
+- `DroneEditor Win64 Development`와 `Drone Win64 Development` 모두 성공
+- Course/Gate Editor 자동화 2개를 `WITH_EDITOR && WITH_DEV_AUTOMATION_TESTS`로 제한해 게임 타깃의 Editor API 컴파일 오류 수정
+- 전체 `Drone.` 자동화 12/12 Success, Exit Code 0
+- 실제 Editor MCP `initialize 200`, `initialized 202`, `tools/list 200`, 23개 Toolset 확인
+- MCP를 통해 Training Map·PIE·Selected Actor·Content Browser 상태를 실제 조회하고 `Drone.` 테스트 12개 탐색 확인
+
+현재 Unreal Editor PID가 `127.0.0.1:8000`을 소유한 상태로 실행 중이다. 이 Codex 작업은 문서 작업공간에서 시작되어 새 프로젝트 MCP 설정이 대화 중간에 Tool 목록으로 다시 주입되지는 않는다. Codex 앱 번들 CLI도 WindowsApps 실행 권한 거부로 셸의 `codex mcp list` 검증은 불가능했다. 이후에는 Editor를 먼저 실행하고 `D:\JGY\project\drone` 루트에서 Codex 작업을 열어 프로젝트 `.codex/config.toml`을 로드한 뒤 네이티브 Tool 노출을 한 번 확인한다. 세부 사용법과 보안 경계는 [`docs/DRONE_UNREAL_MCP.md`](docs/DRONE_UNREAL_MCP.md)에 기록했다.
+
 ## 프로젝트 빌드와 실행 점검
 
 - 작업컴 PFN-06 검증에서는 고정 추적 Camera, Mouse Drone Yaw와 Gamepad 입력을 포함해 `DroneEditor Win64 Development`를 `-NoUBTMakefiles -CompilerVersion=14.51.36256`으로 다시 빌드했고 `Result: Succeeded`였다.
@@ -114,6 +147,11 @@ C:\URproject\drone\Drone.uproject
 - TUT-02 뒤 전체 `CompileAllBlueprints`는 0 errors, 0 warnings, 0 blueprints failed to load로 통과했다.
 - 자동화는 잘못된 Actor·미래 Gate·역방향·중복 통과를 거부하고 현재 Gate의 정방향 통과만 한 번 승인하는 것, Ring 비충돌·Trigger Pawn Overlap과 Current/Completed/Inactive 상태 전환을 확인했다.
 - Standalone에서 실제 HUD·Course 안내선과 Current/Inactive Gate 표시를 확인했다. Lap·Timing·거리·평균 속도 계산이나 기록 UI는 이 검증에 포함하지 않았다.
+- AST-01에서 FPV 본체·로터 4·재질/Texture와 44.1 kHz Drone Loop Cue/Wave를 선별 이식했다. 공급사 Blueprint 전체 Compile은 0 errors·27 warnings로 구형 Input Axis와 Mannequin Rig 의존성을 드러내 기능 BP 재사용 금지 판정을 유지했다.
+- 제공 Cue는 이름과 달리 실제 반복 설정이 꺼져 있었다. SoundNode Wave Player의 Looping을 명시적으로 켜고 `USoundBase::IsLooping()` 계약을 자동화에 추가해 재검증했다.
+- 선택 자산 12개는 `/Game/Drone/ThirdParty` 내부 의존성만 사용하며 ThirdPerson·Variant·원본 `/Game/Drone_Pack`·`/Game/Drone-Sounds` 신규 의존성이 0이다. Integration BP는 실제 런타임 본체 1·Rotor 4·Audio 1, Visual Collision/Overlap/Physics/Navigation 비활성, BP GameMode의 FPV Pawn·BP PlayerController 연결을 검사한다.
+- 최종 `DroneEditor Win64 Development` Build, Blueprint Compile 0 errors·0 warnings·0 load failures, Map Check 0 errors·0 warnings, 전체 `Drone.` Automation 12/12를 통과했다. `PIEInputLifecycle` 새 PIE 3회와 Training PIE도 FPV Integration Pawn으로 통과했다.
+- `Lvl_DroneTraining` Standalone 렌더 캡처에서 FPV 외형, 고정 추적 Camera, HUD·Course·Gate 표시와 정상 종료를 확인했다. 실행 시 처음 한 번 4K Texture DDC를 생성해 종료가 약 76초 지연됐지만 `Game engine shut down`과 `Exiting`까지 정상 완료했다. 실제 스피커 Drone Loop 청감은 아직 수동 확인 대기다.
 
 Prototype 입력·Editor 연결 절차는 [`docs/DRONE_PROTOTYPE_IMPLEMENTATION.md`](docs/DRONE_PROTOTYPE_IMPLEMENTATION.md), Telemetry와 Flight HUD 구현·검증은 [`docs/DRONE_TELEMETRY_IMPLEMENTATION.md`](docs/DRONE_TELEMETRY_IMPLEMENTATION.md)에 기록했다.
 

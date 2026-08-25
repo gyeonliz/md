@@ -21,7 +21,9 @@
 15. [`docs/DRONE_MVP_GUIDE.md`](docs/DRONE_MVP_GUIDE.md): Flight MVP부터 데모까지의 개발 단위
 16. [`docs/WORK_MANAGEMENT.md`](docs/WORK_MANAGEMENT.md): Inbox → Todo → Doing → Done 운영
 17. [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md): 확정 조작, Tutorial 코스·기록 UI, Story·NPC·Jamming·에셋 적용 계획
-18. [`docs/STUDY_PLANS.md`](docs/STUDY_PLANS.md): 정보처리산업기사·C++ 코딩테스트 병행 계획
+18. [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md): 제공 에셋 14팩 압축 완전성, UE 버전·의존성 위험과 선별 이식 절차
+19. [`docs/DRONE_UNREAL_MCP.md`](docs/DRONE_UNREAL_MCP.md): UE 5.8 공식 Unreal MCP·Codex 연결, 선택 Toolset과 검증 기준
+20. [`docs/STUDY_PLANS.md`](docs/STUDY_PLANS.md): 정보처리산업기사·C++ 코딩테스트 병행 계획
 
 ## 구성
 
@@ -53,9 +55,13 @@ TUT-01에 이어 TUT-02도 완료했다. 별도 `Lvl_DroneTraining` Map의 실�
 
 TUT-02 범위는 **Gate·Trigger·순서·정방향 판정과 Current/Completed/Inactive 표시 상태까지**다. Lap 시작·완료, Segment/Lap Timing, 실제 이동 거리·평균 속도와 기록 UI는 아직 구현하지 않았다. 최종 검증은 Editor Build, Gate Sequence 1/1, 실제 BP PIE Smoke 1/1, Tutorial 4/4, 전체 `Drone.` 11/11, Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다. Standalone에서는 HUD·Course 안내선과 Current/Inactive Gate를 확인했다. 다음 활성 카드는 `TUT-03 Segment/Lap 기록`이다.
 
+2026-08-25에는 `D:\JGY\project\Unreal_260821`의 제공 에셋 ZIP 14개와 해제 폴더 14개를 파일별 경로·크기로 대조했다. 외부 ZIP은 모두 `Missing 0 / Extra 0 / SizeMismatch 0`이다. 이어 UE 5.8 스테이징에서 `DronePack_Project` FPV 외형과 `Drone-Sounds` 44.1 kHz Loop를 선별해 실제 프로젝트에 12개·21,753,071 bytes만 이식하고 프로젝트 소유 Integration BP로 연결했다. 전체 35.7 GB 팩은 복사하지 않았다. Build·자동화·Standalone 렌더는 통과했지만 실제 스피커의 Loop 단일 재생과 종료 정지는 수동 미확인이므로 `AST-01`은 Doing이다. 상세 결과는 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다.
+
 2026-08-24 기준 Unreal 저장소 로컬 `main`과 `origin/main`은 TUT-02 완료 Commit `800a7baaf8247bf0a3ee7bccc2272e12d0098f2b`로 일치한다. 신규 `BP_DroneTrainingGate`와 갱신한 `Lvl_DroneTraining` 두 Asset은 Git LFS로 Push했다. `5a9a2fa`는 TUT-01 기준선, `9f91bb6`은 WBP/BP 연결 보강 기준선, `410c940`은 native HUD 기준선, `91498b7`은 Unreal 저장소의 초기 Commit이다. 문서 저장소의 최신 동기화 상태는 [`STATUS.md`](STATUS.md)를 따른다.
 
-외부 구매 소스는 아직 확보되지 않았으므로 현재 개발은 Engine 기본 도형과 기존 Template만 사용하는 기능 우선 Greybox 방식으로 진행한다. 현재 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)가 우선하고 PFN 카드 번호와 교체 경계는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](docs/DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
+외부 제공 소스는 전체 팩을 흡수하지 않고 FPV 최소 외형·Loop만 Integration 경계로 이식했다. 기능 구현은 계속 프로젝트 C++와 Greybox 기준을 유지하며 외부 Pawn·GameMode·Input은 사용하지 않는다. 현재 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)가 우선하고 PFN 카드 번호와 교체 경계는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](docs/DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
+
+2026-08-25에는 UE 5.8.1에 포함된 Epic 공식 `Unreal MCP`를 프로젝트에 Editor 전용으로 연결했다. 전체 `AllToolsets` 대신 Editor·Automation·UMG·StateTree·AI Toolset만 선택했고, Codex 프로젝트 설정과 자동 시작 기본값을 추가했다. 실제 HTTP MCP 초기화, 23개 Toolset, 현재 Training Map 조회와 12개 Drone 테스트 탐색까지 통과했다. 상세 기준은 [`docs/DRONE_UNREAL_MCP.md`](docs/DRONE_UNREAL_MCP.md)를 따른다.
 
 ```text
 PFN-06 Camera/Input 기준선 Done
