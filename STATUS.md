@@ -82,20 +82,20 @@ D:\JGY\project\drone\Drone.uproject
 
 `.vsconfig`를 확인한 결과 Visual Studio workload와 component ID만 있으며 자격 증명이나 개인 경로는 없다. UE가 선호한다고 표시한 14.50 계열 도구 구성도 포함해 첫 Commit에 반영했다.
 
-## 2026-08-25 제공 에셋 인수 감사
+## 2026-08-25 제공 에셋 인수·이식 재검증
 
-사용자가 알려준 `D:\JGY\project\Unreal\_260821` 대신 실제 파일시스템에는 `D:\JGY\project\Unreal_260821`이 존재한다. 이 폴더의 최상위 ZIP 14개와 같은 이름의 해제 폴더 14개를 파일별 상대 경로·크기로 대조했다.
+현재 이 PC에서 확인한 제공 에셋 위치는 `C:\에셋`이다. 이전 `D:\JGY\project\Unreal_260821`과 `D:\JGY\project\Unreal\_260821`은 이 PC에 없다. 최초 D 드라이브 감사의 ZIP 14개 대조 결과는 역사 기록이며, 현재 C 드라이브에는 그 최상위 ZIP 14개가 없어 같은 검사를 다시 실행할 수 없다.
 
-- 14팩 모두 `Missing 0 / Extra 0 / SizeMismatch 0`
-- 해제본 10,499개 파일, 35,677,612,290 bytes
-- `.uasset` 10,445개, `.umap` 25개
-- 실제 Drone 저장소에는 FPV/Sound 선택 자산 12개·21,753,071 bytes와 프로젝트 소유 Integration BP 1개만 이식
-- `Non-Pilot Drones KITBASH SET`에는 개별 FBX 55개가 든 내부 `FBX.zip`이 남아 있음
-- 제공 Unreal 자산은 UE 4.23~5.6 제작 단서가 있어 UE 5.8 스테이징 변환과 참조 감사 후 선별 이식 필요
-- `GC_DroneS` 기능 Blueprint는 구형 `PhysXVehicles` 의존성이 있어 기능 재사용 금지, Mesh·Material·Turret Part만 후보
-- `OilRigLiope_Tr`의 실제 패키지 루트는 `/Game/Liope_Tr`이므로 해제 폴더명을 그대로 Content Root로 사용하지 않음
+- 공급사 해제본 14개 기준선: 10,499개, 35,677,612,290 bytes
+- `_Staging`, 내부 FBX 해제본, 생성 캐시를 포함한 `C:\에셋` 현재 전체: 10,928개, 36,360,181,427 bytes
+- 현재 확장자 합계: `.uasset` 10,734개, `.umap` 26개, `.fbx` 66개, `.png` 13개, `.zip` 1개
+- 남은 ZIP은 `Non-Pilot Drones KITBASH SET\FBX.zip` 하나이며, 내부 55개 FBX와 현재 해제된 55개를 SHA-256으로 대조해 불일치 0을 확인
+- 파일명 기준 라이선스·EULA·README·Manual 문서는 없음. 구매 영수증과 사용 라이선스는 별도 보존 필요
+- 제공 Unreal 패키지는 UE 4.23~5.6 단서가 섞여 있고, 선택 자산은 UE 5.8 스테이징에서 상향 재저장
+- `GC_DroneS`의 7개 패키지에서 구형 `PhysXVehicles` 문자열 참조 단서가 확인되어 기능 Blueprint 재사용 금지
+- `C:\에셋\DronePack_Project\Config\DefaultEngine.ini`에는 활성 Android File Server 설정과 비어 있지 않은 토큰이 있으므로 이 Config는 복사·Commit하지 않음. 토큰 값은 기록하지 않았고 실제 Drone 프로젝트 설정은 Plugin·네트워크 꺼짐, 토큰 빈 값 유지
 
-전체 35.7 GB 해제본은 Git LFS 저장소에 복사하지 않았다. UE 5.8 스테이징에서 `DronePack_Project` FPV Body·Rotor·Material/Texture와 `Drone-Sounds` 44.1 kHz Cue/Wave만 `/Game/Drone/ThirdParty`로 이동·재저장했다. `/Game/Drone/Integrations/DronePackFPV/BP_DroneFPVIntegration`이 기존 native Collision Root·Movement·Camera·Telemetry를 유지한 채 외형과 Audio를 소유하며, Prototype BP GameMode가 이 Pawn을 생성한다. 자동 검증과 Standalone 초기 렌더는 통과했다. 실제 스피커의 Loop 단일 재생과 Standalone 종료 후 정지는 아직 사람이 확인하지 않았으므로 `미확인`이며, Pass·Fail 판정과 `AST-01` 완료 처리를 보류한다. 상세 결과는 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다.
+실제 Drone 저장소에는 FPV/Sound 선택 자산 12개·21,753,071 bytes와 프로젝트 소유 Integration BP 1개, 합계 13개·21,787,555 bytes만 들어 있다. 10개 FPV 자산과 Wave는 UE 5.8 스테이징본과 SHA-256이 일치하고, Cue만 프로젝트에서 `Looping=true`로 재저장해 의도적으로 다르다. 스테이징 선택 자산 감사와 현재 Integration Asset Registry 재감사 결과 원본 `/Game/Drone_Pack`, `/Game/Drone-Sounds`, ThirdPerson, Variant 금지 의존성은 0이다. 13개 모두 Git LFS 대상이며 `git lfs fsck`를 통과했다. 이번 재검증에서 `Drone.Integration.FPVAsset` 1/1과 전체 Blueprint Compile 0 errors·0 warnings·0 load failures를 다시 통과했다. 전체 `Drone.` 14/14는 같은 현재 Commit에서 TUT-03 완료 때 통과한 기준선이며 이번 재감사에서는 다시 실행하지 않았다. 기존 Standalone 초기 렌더는 통과했지만 이번 재감사에서 새 화면·청감 수동 검사는 하지 않았다. 실제 스피커의 Loop 단일 재생과 종료 정지는 계속 `미확인`이므로 `AST-01`은 Doing이다. 상세 결과는 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다.
 
 ## 2026-08-25 UE 5.8 공식 Unreal MCP 연결
 

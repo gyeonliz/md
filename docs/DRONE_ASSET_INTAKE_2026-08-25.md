@@ -2,9 +2,40 @@
 
 기준일: 2026-08-25 (Asia/Seoul)
 
-> 이 문서는 AST-01 에셋 이식 시점의 감사 기록이다. 이후 구현·Git 상태는 [`STATUS.md`](../STATUS.md)와 [`DRONE_WORKLOG.md`](DRONE_WORKLOG.md)를 따른다.
+> 최초 D 드라이브 감사 기록은 역사 자료로 보존하고, 같은 날짜에 확인한 현재 `C:\에셋` 상태와 실제 프로젝트 이식 재검증을 앞부분과 7절에 덧붙였다. 이후 구현·Git 상태는 [`STATUS.md`](../STATUS.md)와 [`DRONE_WORKLOG.md`](DRONE_WORKLOG.md)를 따른다.
 
-## 1. 감사 범위와 판정
+## 0. 현재 `C:\에셋` 재감사 요약
+
+현재 이 PC에서 제공 에셋이 실제로 있는 위치는 `C:\에셋`이다. 이전 기록의 두 D 드라이브 경로는 이 PC에 없다. 현재 폴더에는 공급사 해제본 14개와 `_Staging`이 있으며, 최초 감사에 사용한 최상위 ZIP 14개는 없다. 따라서 1절의 ZIP 대조 결과는 당시의 역사적 증거이고 현재 C 드라이브에서 다시 실행한 결과가 아니다.
+
+| 최상위 항목 | 현재 파일 수 | 현재 크기(bytes) |
+|---|---:|---:|
+| `_Staging` | 348 | 480,636,195 |
+| `ArmyVFX` | 147 | 185,086,080 |
+| `Battlefield` | 1,192 | 4,347,332,483 |
+| `cplomedia_InfantrySFX` | 4,288 | 2,611,067,865 |
+| `Drone-Sounds` | 48 | 139,485,217 |
+| `DronePack_Project` | 274 | 338,626,778 |
+| `FC_MilitaryCamp` | 668 | 7,231,564,285 |
+| `GC_DroneS` | 436 | 729,800,325 |
+| `MillitaryBase` | 1,474 | 8,564,009,222 |
+| `Modular_Insurgents` | 207 | 1,193,429,704 |
+| `Modular_Soldier` | 970 | 5,505,904,898 |
+| `NavigationArrows` | 11 | 1,364,087 |
+| `Non-Pilot Drones KITBASH SET` | 57 | 212,245,701 |
+| `OilRigLiope_Tr` | 795 | 4,670,839,064 |
+| `PBR_Sting_Counter-Drone_Interceptor_UAV___Anti-Drone___Loitering_Munition-62a9ca6e` | 13 | 148,789,523 |
+
+- 현재 전체: 10,928개 파일, 866개 폴더, 36,360,181,427 bytes
+- 현재 확장자: `.uasset` 10,734개, `.umap` 26개, `.fbx` 66개, `.png` 13개, `.zip` 1개
+- `.uproject`는 `DronePack_Project\DronePack.uproject`와 `_Staging\DroneAssetStage\DroneAssetStage.uproject` 두 개이고 둘 다 현재 Engine Association 5.8. `.uplugin`은 0개
+- 공급사 해제본 14개에서 스테이징과 현재 추가로 존재하는 내부 FBX 해제본·Unreal 생성 캐시를 제외한 기준선은 최초 감사와 같은 10,499개·35,677,612,290 bytes
+- 현재 유일한 ZIP `Non-Pilot Drones KITBASH SET\FBX.zip`의 내부 FBX 55개와 현재 `FBX` 폴더의 55개는 파일별 SHA-256 불일치 0. 통합 `Drones-all.fbx`도 별도로 존재
+- 라이선스·EULA·README·Documentation·Manual 문서는 확인되지 않음. 구매 계정의 영수증과 라이선스 증빙을 별도 보존해야 함
+- `PBR Sting`의 Fab Metadata에는 대상 버전 `UE_5.7`, `isAiForbidden: true`, 실제 Ukraine 전쟁·Counter-Drone 설정 문구가 있으나 이것은 라이선스 문서나 프로젝트 설정 확정 근거가 아님. 권리 조건을 별도로 확인하기 전에는 해당 자산을 생성형 도구에 업로드하지 않고, 프로젝트의 국가·적군·세계관을 이 Metadata에서 가져오지 않음
+- `C:\에셋\DronePack_Project\Config\DefaultEngine.ini`에는 활성 Android File Server와 비어 있지 않은 토큰이 있음. 값을 출력·복사·Commit하지 않으며, 실제 Drone 프로젝트의 Android File Server 꺼짐·네트워크 꺼짐·빈 토큰 설정을 유지
+
+## 1. 최초 D 드라이브 감사 범위와 판정 (역사 기록)
 
 - 사용자가 알려준 `D:\JGY\project\Unreal\_260821`은 실제 파일시스템에는 없었다.
 - 실제 인수 폴더는 `D:\JGY\project\Unreal_260821`이다.
@@ -12,7 +43,7 @@
 - ZIP 내부의 파일별 상대 경로와 크기를 해제 폴더와 비교한 결과 14개 모두 `Missing 0 / Extra 0 / SizeMismatch 0`이다.
 - 해제 결과는 10,499개 파일, 35,677,612,290 bytes다. 주요 Unreal 파일은 `.uasset` 10,445개와 `.umap` 25개다.
 - 최상위 ZIP 14개의 원본 크기는 33,730,171,781 bytes다. 원본과 해제본을 합쳐 약 64.6 GiB이므로 전체를 Drone 저장소에 복사하지 않는다.
-- 외부 ZIP 14개는 정상 해제됐지만 `Non-Pilot Drones KITBASH SET\FBX.zip`에는 개별 FBX 55개가 한 번 더 압축되어 있다. 현재 해제 폴더에는 통합 `Drones-all.fbx`와 내부 `FBX.zip`만 있다.
+- 최초 감사 당시 외부 ZIP 14개는 정상 해제됐고 `Non-Pilot Drones KITBASH SET\FBX.zip`에는 개별 FBX 55개가 한 번 더 압축되어 있었다. 현재 C 드라이브에는 그 55개도 `FBX` 폴더에 해제되어 있으며 내부 ZIP과 SHA-256이 모두 일치한다.
 - 해제본에서 파일명 기준 `LICENSE`, `EULA`, `README`, `Documentation`, `Manual` 문서를 찾지 못했다. 배포·포트폴리오 사용 전 구매 계정의 라이선스와 영수증을 별도로 보존한다.
 - 이 감사는 제공된 ZIP과 해제본의 완전성을 확인한 것이다. 판매 페이지의 상품 구성, 라이선스 증빙, 최신 판매자 업데이트 포함 여부까지 증명하지는 않는다.
 
@@ -24,14 +55,14 @@
 | Battlefield | 1,192 | `/Game/Battlefield`, ControlRig·Niagara·구형 NV Clothing 참조 | 4.35 GB급 환경 팩. 전체 이식 금지, Overview/Demo를 스테이징에서 본 뒤 필요한 건물·장애물만 선택한다. |
 | cplomedia_InfantrySFX | 4,288 | `/Game/cplomedia_InfantrySFX`, UE 5.0 | 보병·무기·환경음 후보. Cue 하나를 고르면 연결 WAV만 함께 이식한다. |
 | Drone-Sounds | 48 | `/Game/Drone-Sounds`, UE 5.2 | 44.1 kHz와 96 kHz Drone Loop가 중복 제공된다. 첫 적용은 용량이 작은 44.1 kHz Cue 한 세트로 제한한다. |
-| DronePack_Project | 248 | 완전한 UE 5.1 프로젝트, `/Game/Drone_Pack` | FPV·Delivery·Police·Spy·Baba Drone 메시와 Blueprint가 있다. 기능 Blueprint 대신 FPV Body·Rotor·Material만 우선 사용한다. |
+| DronePack_Project | 248 | 선택 FPV 패키지 UE 5.1, 전체 패키지 4.24/5.0/5.1 혼합, 현재 `.uproject` Association 5.8, `/Game/Drone_Pack` | FPV·Delivery·Police·Spy·Baba Drone 메시와 Blueprint가 있다. 기능 Blueprint 대신 FPV Body·Rotor·Material만 우선 사용한다. |
 | FC_MilitaryCamp | 668 | `/Game/FC_MilitaryCamp`, UE 5.1/5.3 혼합 | 군사 캠프·지형 후보. 7.23 GB라 Map 전체보다 선택한 건물·소품 의존성만 이식한다. |
 | GC_DroneS | 436 | `/Game/GC_DroneS`, UE 4.24, `PhysXVehicles` | 궤도형 Drone·MG·Missile Turret 메시 후보. 구형 차량 Blueprint는 UE 5.8에 그대로 적용하지 않고 프로젝트 코드로 기능을 재구현한다. |
 | MillitaryBase | 1,474 | `/Game/MillitaryBase`, UE 5.3 | 대형 기지 환경 후보. `/Game/RacingTrack` 참조 문자열이 있어 스테이징에서 누락 의존성을 확인한다. |
 | Modular_Insurgents | 207 | `/Game/Modular_Insurgents`, UE 4.23 | 적 NPC 외형 후보. Demo AnimBP는 제외하고 Skeletal Mesh·Material 중심으로 평가한다. |
 | Modular_Soldier | 970 | `/Game/Modular_Soldier`, UE 5.6 | Operator·아군 NPC 외형 후보. Demo Input·ControlRig·Widget을 프로젝트 게임플레이에 상속하지 않는다. |
 | NavigationArrows | 11 | `/Game/NavigationArrows`, UE 5.2/5.3 | 목표 안내 후보. 현재 Tutorial Gate 표시와 비교한 뒤 필요한 경우에만 Wrapper로 사용한다. |
-| Non-Pilot Drones KITBASH SET | 외부 2 + 내부 FBX 55 | Raw FBX | 개별 조립형 Drone 후보. 내부 `FBX.zip`을 별도 원본 폴더에 해제한 뒤 필요한 부품만 임포트한다. |
+| Non-Pilot Drones KITBASH SET | 외부 2 + 내부 FBX 55 | Raw FBX | 개별 조립형 Drone 후보. 현재 해제된 `FBX` 폴더에서 필요한 부품만 선별 임포트한다. 내부 ZIP과 해제본 55개는 SHA-256이 일치한다. |
 | OilRigLiope_Tr | 795 | 실제 경로 `/Game/Liope_Tr`, UE 5.3 | 해제 폴더명과 패키지 경로가 다르다. `Content/OilRigLiope_Tr`로 직접 복사하면 참조가 깨지므로 스테이징에는 `Content/Liope_Tr`로 배치한다. |
 | PBR Sting Counter-Drone | 13 | Raw FBX·PNG | 직접 임포트 가능한 Anti-Drone 외형 후보. Import Scale·Forward·Pivot·재질 채널을 먼저 확인한다. |
 
@@ -39,8 +70,8 @@
 
 ## 3. 이식 원칙
 
-1. 원본 ZIP과 현재 해제본은 읽기 전용 원본으로 보존한다.
-2. `D:\JGY\project\drone\Content`에 외부 팩 전체를 Explorer로 직접 복사하지 않는다.
+1. 현재 확보한 공급사 해제본과 남아 있는 Archive는 읽기 전용 제공 소스로 보존한다.
+2. `C:\URproject\drone\Content`에 외부 팩 전체를 Explorer로 직접 복사하지 않는다.
 3. UE 5.8 전용 임시 스테이징 프로젝트의 복사본에서 팩을 하나씩 연다.
 4. Loose `.uasset`은 내부에 기록된 원래 Content Root를 유지해 먼저 로드한다. `OilRigLiope_Tr`만 `Liope_Tr` 경로를 사용한다.
 5. Blueprint Compile, Asset Audit, Reference Viewer와 Demo Map Check로 누락 클래스·플러그인·참조를 확인한다.
@@ -100,9 +131,9 @@
 - 새 `.uasset`·`.umap` Git LFS 적용 확인
 - Git에 추가할 실제 선택 자산의 파일 수와 LFS 용량을 Commit 전에 별도 검토
 
-## 6. 현재 정지선
+## 6. AST-01 최초 이식 시점의 정지선
 
-- `D:\JGY\project\Unreal_260821\_Staging\DroneAssetStage` UE 5.8 스테이징에서 DronePack과 Drone-Sounds를 복사·상향 재저장했다.
+- 최초 이식 작업은 당시 `D:\JGY\project\Unreal_260821\_Staging\DroneAssetStage`의 UE 5.8 스테이징에서 수행했다. 현재 대응 스테이징 경로는 `C:\에셋\_Staging\DroneAssetStage`이며 선택 자산 대조 결과는 7절에 기록한다.
 - 공급사 Blueprint 전체 Compile은 `0 errors / 27 warnings / 0 load failures`였다. 경고는 구형 `MoveForward` 등 Input Axis와 누락 Mannequin Rig 참조이므로 외부 기능 Blueprint는 사용하지 않는다.
 - 실제 Drone 저장소에는 FPV Body·Rotor A~D·Material·Texture 4개와 44.1 kHz Cue/Wave, 합계 12개·21,753,071 bytes만 `/Game/Drone/ThirdParty`로 이식했다.
 - `/Game/Drone/Integrations/DronePackFPV/BP_DroneFPVIntegration`은 `ADronePrototypePawn` 자식이다. 기존 Sphere Collision Root·Movement·고정 추적 Camera·Input·Telemetry를 유지하고 본체 1, Rotor 4, Engine Loop Audio 1을 소유한다.
@@ -115,3 +146,45 @@
 - 실제 스피커에서 Loop가 한 번만 재생되고 종료 시 멈추는지는 아직 수동 확인하지 않았다. 자동 Loop 계약 통과와 실제 청감 통과는 별개이며, 현재 청감 상태는 Pass·Fail이 아닌 `미확인`이다.
 - 따라서 `AST-01`은 Doing으로 유지한다. 수동 결과를 확보하면 판정을 갱신한다. 이 시점의 다음 기능 카드는 `TUT-03 Segment/Lap 기록`이었다.
 - 이 시점에는 Drone/문서 변경이 로컬 작업 트리에 남아 있었고 아직 Commit·Push하지 않은 상태였다. 이후 동기화 결과는 현재 상태 문서에서 확인한다.
+
+## 7. 현재 프로젝트 이식 재검증
+
+### 실제 이식 수량과 출처
+
+- 프로젝트 `/Game/Drone/ThirdParty`: 12개, 21,753,071 bytes
+- 프로젝트 `/Game/Drone/Integrations`: `BP_DroneFPVIntegration` 1개, 34,484 bytes
+- 합계: 13개, 21,787,555 bytes
+- FPV 10개 출처: `C:\에셋\DronePack_Project\Content\Drone_Pack\D_Mesh\DroneFPV`
+- Sound 2개 출처: `C:\에셋\Drone-Sounds\Cue\44_1kHz-24bit`과 `C:\에셋\Drone-Sounds\Wav\44_1kHz-24bit`의 첫 Standard Drone Loop Cue/Wave
+
+선택한 12개는 FPV Body 1, Rotor A~D 4, Material 1, Texture 4, Sound Cue 1, Sound Wave 1이다. Raw 원본은 패키지 경로가 `/Game/Drone_Pack`과 `/Game/Drone-Sounds`이고 UE 5.1/5.2 헤더이므로, `/Game/Drone/ThirdParty` 이동과 UE 5.8 재저장 뒤 SHA-256이 같아야 하는 파일이 아니다.
+
+### 스테이징·프로젝트 대조
+
+- UE 5.8 스테이징 12개와 프로젝트 12개 중 FPV 10개와 Wave 1개는 SHA-256이 정확히 일치
+- Cue 1개만 프로젝트에서 Wave Player의 `Looping=true`를 저장해 스테이징본과 의도적으로 다름
+- 전용 자동화의 `SoundBase::IsLooping()` 검사가 이 변경을 확인
+- Integration BP는 외부 팩에서 가져온 기능 BP가 아니라 프로젝트에서 만든 `ADronePrototypePawn` 자식
+- 구성은 Body 1, Rotor 4, Auto Activate Audio 1이며 Visual의 Collision·Overlap·Physics·Navigation은 꺼짐. native Collision Root·Movement·Camera·Input·Telemetry는 유지
+- Prototype BP GameMode의 Default Pawn은 이 Integration BP를 가리킴
+
+### 의존성·Git·Unreal 검증
+
+- 현재 Integration Asset Registry 재감사에서 Engine Audio 아이콘 2개, 프로젝트 Input Action 5개와 IMC 1개, FPV Mesh 5개, 프로젝트 Cue 1개, `/Script/Drone`만 확인
+- 원본 `/Game/Drone_Pack`, `/Game/Drone-Sounds`, ThirdPerson, Variant 금지 의존성 0
+- 이식 자산 13개 모두 Git LFS 추적, `git lfs fsck` 통과
+- 이번 재검증 `Drone.Integration.FPVAsset`: 1/1 Success
+- 이번 재검증 전체 Blueprint Compile: 0 errors, 0 warnings, 0 failed to load
+- 현재 Commit의 전체 자동화 기준선: `Drone.` 14/14. 이 전체 묶음은 TUT-03 완료 때 실행한 기준선이며 이번 재감사에서는 FPV 전용 테스트만 다시 실행
+- 프로젝트 전역 기본 Map/GameMode는 아직 ThirdPerson이다. 현재 통합 Pawn 확인은 `Lvl_DronePrototype` 또는 `Lvl_DroneTraining`을 직접 열어 수행
+
+### 남은 사람 확인
+
+전용 자동화·Asset Registry 감사·Git 검증은 파일 존재·참조·구성요소 수·Loop 설정·의존성·LFS를 나누어 확인하지만 실제 화면과 스피커 결과를 대신하지 않는다. `Lvl_DroneTraining` 또는 `Lvl_DronePrototype`에서 다음을 확인한다.
+
+1. FPV Body와 Rotor 4개가 보이고 Camera를 가리거나 비정상 크기·방향·위치로 나오지 않는지 확인한다.
+2. 재생 중 Drone 소리가 한 겹만 들리는지 확인한다.
+3. 여러 Loop 경계를 지나도 끊김이나 겹침이 없는지 듣는다.
+4. PIE/Standalone을 종료했을 때 소리가 즉시 멈추는지 확인한다.
+
+청감 결과가 없으므로 `AST-01`은 계속 Doing이다. 이번 재검증은 이식 파일과 구조가 정상이라는 판정이며 실제 청감 Pass를 뜻하지 않는다.

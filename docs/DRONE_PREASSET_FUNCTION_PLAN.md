@@ -2,6 +2,8 @@
 
 기준일: 2026-08-24 (Asia/Seoul)
 
+> 이 문서는 에셋 확보 전 수립한 기능 우선 계획이다. 현재 제공 에셋은 `C:\에셋`에 있으며 FPV 외형·Loop 최소 이식까지 완료했지만, 기능 우선 순서와 Greybox 기준은 그대로 유지한다.
+
 ## 1. 목적
 
 외부 구매 소스가 아직 없는 동안 모델·환경·애니메이션·효과·사운드의 완성도를 기다리지 않고, Unreal Engine 기본 도형과 기존 Template 자산만으로 게임의 핵심 기능을 먼저 검증한다.
@@ -45,7 +47,7 @@ Spawn
 
 현재 실행 카드는 `TUT-04 이전 기록 비교·Best·결과 UI`다. 비교 규칙과 표시 형식은 구현 전에 확정하며, 현재 C++·BP·Editor 책임과 사용자 수동 확인법은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
 
-새 생산 코드는 `Source/Drone`, 새 자산은 `/Game/Drone` 아래에 둔다. ThirdPerson·Combat·Platforming·SideScrolling은 참고용 Legacy로 동결하고 신규 상속·참조를 만들지 않는다. Prototype IMC는 Pawn만 등록·제거하며 PlayerController와 Level Blueprint에는 같은 책임을 추가하지 않는다. 현재 검증 범위는 Standalone 싱글플레이이고 네트워크·Android·구매 에셋은 제외한다.
+새 생산 코드는 `Source/Drone`, 새 자산은 `/Game/Drone` 아래에 둔다. ThirdPerson·Combat·Platforming·SideScrolling은 참고용 Legacy로 동결하고 신규 상속·참조를 만들지 않는다. Prototype IMC는 Pawn만 등록·제거하며 PlayerController와 Level Blueprint에는 같은 책임을 추가하지 않는다. 이 계획을 세울 당시 검증 범위는 Standalone 싱글플레이였고 네트워크·Android·구매 에셋을 제외했다. 현재도 네트워크·Android는 제외하지만, 검증을 통과한 FPV 외형·Loop 최소 이식은 적용된 상태다.
 
 ## 3. 구매 전 범위
 

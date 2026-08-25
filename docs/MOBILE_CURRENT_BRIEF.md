@@ -9,6 +9,7 @@
 - Unreal 저장소 `main`과 GitHub `origin/main`은 `551e287`로 일치한다.
 - Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개와 Segment/Lap 원본 기록까지 구현됐다.
 - 현재 개발 완료 지점은 `TUT-03`, 다음 구현 카드는 `TUT-04 비교·결과 UI`다.
+- 제공 에셋 루트는 `C:\에셋`이다. FPV·Loop 선택 자산 12개와 프로젝트 Integration BP 1개의 파일·참조·LFS·자동 검증은 통과했다.
 - 사용자는 Gate나 기록 C++를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도와 Drone Loop를 확인하면 된다.
 - 확정된 학습 항목은 `정보처리산업기사`와 `C++ 코딩테스트` 두 가지뿐이다.
 - 정보처리산업기사 2026년 3회 필기 접수는 끝났다. 오늘 가장 먼저 Q-Net에서 자신의 접수·면제·응시 상태를 확인해야 한다.
@@ -27,6 +28,7 @@
 | 전체 `Drone.` 자동화 | 14/14 통과 |
 | Blueprint Compile | Errors 0, Warnings 0, Load Failures 0 |
 | Standalone | 실제 WBP HUD·Cyan Course·Current/Inactive Gate 표시 확인 |
+| 에셋 이식 | FPV 전용 자동화 1/1, 금지 의존성 0, LFS fsck 통과 |
 
 이번 TUT-03 작업에서 Editor Build, Tutorial 6개, 전체 Drone 14개와 Blueprint 전체 Compile을 실제로 다시 실행했다. 모든 자동화는 warning·error 없이 통과했다.
 
@@ -123,7 +125,7 @@ Lvl_DroneTraining
 - Mission·귀환·평가
 - Drone Enemy AI·MG Turret 점유·공격
 - 배터리·통신거리·재밍
-- SaveGame·Multiplayer·최종 구매 Asset 적용
+- SaveGame·Multiplayer·최종 에셋 전면 적용
 
 Template의 `Variant_Combat`에 AI와 StateTree 코드가 있어도 Drone Enemy AI가 구현됐다는 뜻은 아니다. 현재 전역 시작 Map도 ThirdPerson 기준이므로 Training Map을 직접 열어야 한다.
 
@@ -153,7 +155,8 @@ Template의 `Variant_Combat`에 AI와 StateTree 코드가 있어도 Drone Enemy 
 6. 마지막 Gate 뒤 네 Gate가 모두 Completed 색인지 확인한다.
 7. 현재 화면에 Lap 결과 UI가 없는 것이 정상임을 확인한다. 계산 원본은 자동화 14/14로 검증된 TUT-03 범위다.
 8. Gate 크기·높이·간격·색 대비와 Keyboard/Gamepad 조종 체감을 메모한다.
-9. 실제 스피커에서 Drone Loop가 한 겹으로 이어지고 종료 후 멈추는지 기록한다.
+9. FPV Body와 Rotor 4개의 크기·방향·Camera 가림이 정상인지 확인한다.
+10. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가고 종료 후 즉시 멈추는지 기록한다.
 
 다시 만들 필요가 없는 것:
 

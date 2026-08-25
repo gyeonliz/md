@@ -8,19 +8,19 @@ Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-03 �
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-08-25 20:04 KST
+마지막 갱신: 2026-08-25 20:53 KST
 
 | 항목 | 상태 |
 |---|---|
 | 현재 단계 | 3단계 Tutorial Vertical Slice — `TUT-03` 완료, `TUT-04` Todo |
-| 진행 정도 | TUT-03 Segment/Lap 원본 기록과 Blueprint 구독 경계 완료. `AST-01` 선별 이식·Standalone 초기 렌더와 UE-MCP-01 공식 연결도 유지. 실제 Drone Loop 청감 결과는 아직 미확인 |
-| 지금 작업 중 | `AST-01` 제공 에셋 최소 외형 Spike — FPV 외형·Drone Loop 연결 완료, 수동 청감 미확인 상태로 판정 보류 |
-| 완료 근거 | `DroneEditor Win64 Development` Build, Tutorial 6/6, 전체 `Drone.` 14/14, Blueprint Compile 0 errors·0 warnings·0 load failures. 정상 Lap·Reset·오류 Gate·Pawn 파괴·실제 BP Gate Overlap 검증 통과 |
-| 수동 미확인 | 실제 스피커에서 Loop가 한 번만 재생되는지, Standalone 종료 후 멈추는지는 아직 확인하지 않음. Pass·Fail 어느 쪽으로도 판정하지 않음 |
+| 진행 정도 | TUT-03 Segment/Lap 원본 기록과 Blueprint 구독 경계 완료. `C:\에셋` 원본·스테이징·프로젝트 이식본 재감사 완료. `AST-01` 실제 Drone Loop 청감 결과는 아직 미확인 |
+| 지금 작업 중 | `AST-01` 제공 에셋 최소 외형 Spike — FPV 외형·Drone Loop 연결과 자동 검증 완료, 수동 청감 미확인 상태로 판정 보류 |
+| 완료 근거 | TUT-03 당시 Build·Tutorial 6/6·전체 `Drone.` 14/14. 이번 에셋 재검증은 FPV 전용 자동화 1/1, Blueprint Compile 0/0/0, 스테이징 선택 자산·현재 Integration 금지 의존성 0, LFS fsck 통과. 전체 14/14는 이번에 재실행하지 않음 |
+| 수동 미확인 | 기존 Standalone 초기 렌더는 통과했지만 이번 재감사에서는 새 화면 확인을 하지 않음. 실제 스피커의 Loop 단일 재생·종료 정지는 계속 미확인 |
 | 현재 차단 | 기능 구현 차단 없음. 다만 수동 청감 근거가 없으므로 `AST-01`은 Done 처리하지 않음. Android는 사용자 결정에 따라 작업 범위에서 제외 |
 | 다음 행동 | Editor에서 실제 Drone으로 Gate 0→3 한 Lap을 비행해 통과 감각을 확인하고, 스피커 Loop 결과가 생기면 `AST-01` 판정을 갱신 |
 | 다음 기능 | `TUT-04` 이전 성공 평균·Best 비교와 결과 UI. 비교 규칙과 표시 형식은 구현 전에 확정 |
-| 에셋 인수 | ZIP 14/14 완전성 통과. FPV·Sound 선택 자산 12개 21,753,071 bytes와 Integration BP 1개 이식, 전체 35.7 GB 팩은 미이식 |
+| 에셋 인수 | 현재 제공 에셋 루트는 `C:\에셋`. 14개 공급사 해제본 기준선 10,499개·35,677,612,290 bytes. 선택 자산 12개·21,753,071 bytes와 Integration BP 1개만 이식. 최상위 원본 ZIP 14개는 현재 없어 과거 ZIP 대조 결과와 구분 |
 | Git 처리 | Drone `551e287`을 feature Branch와 `origin/main`에 Push 완료. 이 보드가 포함된 `gyeonliz/md`의 `origin/main`을 문서 동기화 기준으로 사용 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
 | 학습 다음 행동 | Q-Net 상태를 확인해 Track A/B/C를 고르고 첫 학습 블록 실행 |
@@ -58,7 +58,7 @@ Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-03 �
 
 | ID | 태그 | 작업 | 현재 확인 | 남은 완료 조건 |
 |---|---|---|---|---|
-| AST-01 | Drone / Unreal | 제공 에셋 최소 외형 Spike | FPV 본체·로터 4·재질/Texture와 44.1 kHz Loop Cue/Wave를 `/Game/Drone/ThirdParty`로 선별 이식. Integration BP와 GameMode 연결, 현재 전체 Automation 14/14·Standalone 렌더 통과 | 실제 스피커 출력의 Loop 단일 재생·종료 정지는 미확인. 결과 확보 전까지 Doing 유지 |
+| AST-01 | Drone / Unreal | 제공 에셋 최소 외형 Spike | FPV 본체·로터 4·재질/Texture와 44.1 kHz Loop Cue/Wave를 `/Game/Drone/ThirdParty`로 선별 이식. Integration BP와 GameMode 연결. 이번 재검증에서 전용 자동화 1/1·의존성 감사·Blueprint 0/0/0·LFS fsck 통과. 전체 14/14는 TUT-03 당시 같은 Commit의 기준선이며 이번에 미재실행 | 실제 스피커 출력의 Loop 단일 재생·종료 정지는 미확인. 결과 확보 전까지 Doing 유지 |
 
 ## Done
 
@@ -99,7 +99,8 @@ Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-03 �
 | TUT-01 | Drone / Tutorial | `ADroneTrainingCourse`, 실제 `BP_DroneTrainingCourse`, `Lvl_DroneTraining`, 밝은 Cyan `M_DroneTrainingGuide` 구현. Editor Build, Tutorial 3/3, 전체 Drone 10/10, Blueprint Compile, Standalone 시각 확인 통과. Pawn Sweep을 막지 않고 Course 표시 구성요소의 Collision·Overlap·Physics·Navigation 영향이 꺼졌으며 저장된 Recast Actor를 확인함. Map 담당자는 미정 유지 |
 | TUT-02 | Drone / Tutorial | `ADroneTrainingGate`, Gate Sequence Component, 실제 `BP_DroneTrainingGate` 네 개 구현. Ring Visual·Pawn Trigger 분리, 현재 순서·정방향·중복 통과와 Current/Completed/Inactive 상태를 검증. Build, Gate Sequence 1/1, 실제 BP PIE Smoke 1/1, Tutorial 4/4, 전체 Drone 11/11, Blueprint 0/0/0, Standalone Current/Inactive 표시 통과. 신규 BP와 갱신 Map 두 Asset LFS Push 완료 |
 | TUT-03 | Drone / Tutorial | Course 소유 `UDroneTrainingLapRecorderComponent`와 BlueprintType 기록 Struct 구현. Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료. World Game Time과 Telemetry 10Hz 3차원 위치 표본으로 실제 거리·평균속도를 계산하고 Reset·재구성·Pawn 파괴 시 부분 시도를 폐기. Build, Tutorial 6/6, 전체 Drone 14/14, Blueprint 0/0/0 통과. `551e287`을 feature Branch와 main에 Push |
-| AST-00 | Drone / Unreal | 제공 ZIP 14개와 해제 폴더 14개의 파일별 상대 경로·크기를 대조해 Missing/Extra/SizeMismatch 0 확인. 10,499개·35,677,612,290 bytes 인수 감사와 UE 4.23~5.6 의존성·스테이징 이식 계획 기록. 실제 이식은 아직 0건 |
+| AST-00 | Drone / Unreal | 최초 D 드라이브 감사 당시 제공 ZIP 14개와 해제 폴더 14개의 상대 경로·크기를 대조해 Missing/Extra/SizeMismatch 0 확인. 10,499개·35,677,612,290 bytes 기준선과 UE 4.23~5.6 이식 계획 기록. 이 행의 이식 0건은 당시 시점의 역사 기록 |
+| AST-VERIFY-01 | Drone / Unreal | 현재 `C:\에셋` 14개 공급사 해제본·스테이징·내부 FBX를 재감사. 내부 FBX 55개 SHA-256 불일치 0, 프로젝트 선택 자산 12개+Integration BP 1개 존재, 스테이징 선택 자산·현재 Integration 금지 의존성 0, LFS fsck·FPV 자동화 1/1·Blueprint 0/0/0 통과. 소스 팩 Config의 활성 Android 토큰은 값 노출 없이 복사 금지로 기록 |
 | UE-MCP-01 | Drone / Unreal / Codex Sync | UE 5.8 공식 `ModelContextProtocol`과 Editor·Automation·UMG·StateTree·AI Toolset을 Editor Target으로 연결. Codex 프로젝트 설정·자동 시작 기본값 추가, Editor/Game Build, 전체 Drone 12/12, HTTP MCP 초기화·23 Toolset·Training Map 상태 조회·12개 테스트 탐색 통과. 새 Codex 작업의 네이티브 노출 확인은 UE-MCP-02로 분리 |
 | STUDY-PLAN-01 | 정보처리산업기사 / Coding Test | Q-Net 공식 2026 일정·시험 구성을 확인하고 접수 상태별 Track A/B/C, C++ 주간 병행안과 이동용 통합 문서를 작성 |
 | SYNC-01 | Codex Sync | 목표·완료·진행·결정·미정·다음 작업 형식 정의 |
@@ -112,6 +113,6 @@ Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-03 �
 
 Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 로컬 `main`과 `origin/main`은 TUT-03 완료 Commit `551e287e8a5de7fa33f28d1911f8a7a957bd66fa` (`feat: record tutorial lap timing and distance`)로 일치한다. 소스 Branch `codex/tutorial-lap-recording`도 Push했다. `800a7ba`는 TUT-02, `5a9a2fa`는 TUT-01, `410c940`은 native HUD, `9f91bb6`은 WBP/BP 연결 기준선이다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
 
-Android 제외와 PFN-01~06, HUD-01, HUD-02, TUT-01~03, 제공 에셋 인수 감사 `AST-00`을 완료했다. `AST-01`은 선택 자산 12개와 Integration BP 이식, 전체 자동 회귀 및 Standalone 초기 렌더까지 통과했다. 실제 Loop 단일 재생·종료 정지는 수동 미확인이므로 Pass나 Fail로 간주하지 않고 Doing을 유지한다. 다음 기능 카드는 `TUT-04`이며 이전 평균·Best 비교와 기록 결과 UI는 아직 구현된 기능으로 보지 않는다. 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다.
+Android 제외와 PFN-01~06, HUD-01, HUD-02, TUT-01~03, 최초 에셋 인수 감사 `AST-00`, 현재 `C:\에셋` 재검증 `AST-VERIFY-01`을 완료했다. `AST-01`은 선택 자산 12개와 Integration BP 이식 뒤 기존 전체 회귀와 Standalone 초기 렌더를 통과했고, 이번에는 FPV 1/1·Blueprint 0/0/0·의존성·LFS만 다시 검증했다. 실제 Loop 단일 재생·종료 정지는 수동 미확인이므로 Pass나 Fail로 간주하지 않고 Doing을 유지한다. 다음 기능 카드는 `TUT-04`이며 이전 평균·Best 비교와 기록 결과 UI는 아직 구현된 기능으로 보지 않는다. 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다.
 
 UE-MCP-01도 완료했다. 이후 Editor 내부 Actor·Asset·Blueprint·UMG·Automation 작업은 가능한 범위에서 공식 Unreal MCP를 우선 사용하되, Experimental 기능이므로 실제 Git diff·빌드·자동화 로그를 최종 판정 기준으로 유지한다.

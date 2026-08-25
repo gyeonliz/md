@@ -14,10 +14,11 @@
 | `Drone.Tutorial` Automation | 6/6 통과 |
 | 전체 `Drone.` Automation | 14/14 통과 |
 | `CompileAllBlueprints` | Errors 0, Warnings 0, Load Failures 0 |
-| Standalone 시각 확인 | FPV 외형, 고정 추적 Camera, 실제 WBP HUD, Cyan 안내선, Current/Inactive Gate 표시 확인 |
-| 사용자 수동 확인 | 실제 조종으로 네 Gate 1 Lap을 완주한 뒤 기록값과 같은 PIE 안의 Reset을 확인할 차례 |
+| 현재 에셋 이식 재검증 | FPV 전용 1/1, Blueprint 0/0/0, 스테이징 선택 자산·현재 Integration 금지 의존성 0, 이식 13개 LFS와 fsck 통과 |
+| 기존 Standalone 시각 기록 | FPV 외형, 고정 추적 Camera, 실제 WBP HUD, Cyan 안내선, Current/Inactive Gate 표시 확인 |
+| 사용자 수동 확인 | 실제 조종으로 네 Gate 1 Lap을 완주하고 FPV Body·Rotor·Camera 배치, Drone Loop 단일 재생·종료 정지를 확인할 차례 |
 
-TUT-03 Git 기준 `551e287`에서 Gate 순서 판정과 Segment/Lap 기록을 함께 재현할 수 있다. 수치 비교·Best와 결과 UI는 다음 카드인 TUT-04 범위이므로 현재 화면에 Lap 결과가 나타나지 않는 것이 정상이다.
+TUT-03 Git 기준 `551e287`에서 Gate 순서 판정과 Segment/Lap 기록을 함께 재현할 수 있다. 전체 `Drone.` 14/14는 TUT-03 완료 때 실행한 같은 Commit의 기준선이며, 이번 에셋 재감사에서는 FPV 전용 1/1과 Blueprint Compile만 다시 실행했다. 수치 비교·Best와 결과 UI는 다음 카드인 TUT-04 범위이므로 현재 화면에 Lap 결과가 나타나지 않는 것이 정상이다.
 
 ## 1. 런타임 연결 구조
 
@@ -482,8 +483,10 @@ TUT-03의 원본 시간·거리·평균 속도 계산과 실행 중 성공 Histo
 11. Reset 뒤에도 방금 완료한 성공 Lap 1개가 유지되고, 진행 중 값과 미완료 Segment만 초기화되는지 확인한다.
 12. 한 번은 미래 Gate를 먼저 통과하고, 한 번은 현재 Gate를 역방향으로 통과해 Gate 진행과 기록이 바뀌지 않는지 확인한다.
 13. 조종 감각상 너무 작음, 너무 큼, 간격 과도, 방향 이해 어려움이 있으면 수치와 체감만 기록한다.
+14. FPV Body와 Rotor 4개의 크기·방향·위치가 자연스럽고 Camera를 가리지 않는지 확인한다.
+15. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가며 PIE/Standalone 종료 즉시 멈추는지 확인한다.
 
-사용자가 지금 판단해야 하는 것은 플레이할 때의 가독성·조종 난이도와 실제 비행에서 기록값이 자연스럽게 증가하는지다. 정확한 공식과 수명주기는 자동화가 검증했지만, Gate 배치와 사람이 체감하는 시간·거리·속도의 자연스러움은 직접 확인이 필요하다.
+사용자가 지금 판단해야 하는 것은 플레이할 때의 가독성·조종 난이도, 실제 비행에서 기록값이 자연스럽게 증가하는지, FPV 외형·Camera·소리가 실제 환경에서 자연스러운지다. 정확한 공식과 파일·참조 구조는 자동 검증했지만, Gate 배치와 사람이 체감하는 시간·거리·속도·청감은 직접 확인이 필요하다.
 
 ### 반복하지 않아도 되는 일
 
@@ -501,7 +504,7 @@ TUT-03의 원본 시간·거리·평균 속도 계산과 실행 중 성공 Histo
 - Ring Mesh에 Block Collision을 켤 필요 없음
 - 단순 시각·수동 비행 확인만 했다면 Build·14개 자동화를 매번 다시 돌릴 필요 없음
 - Android 설정을 진행할 필요 없음
-- Greybox 확인 전에 구매 Asset을 준비할 필요 없음
+- Greybox 확인 전에 추가 에셋 구매나 전체 외형 교체를 진행할 필요 없음
 - TUT-03 확인 중 비교·Best·결과 UI·Mission UI까지 함께 구현할 필요 없음
 - 현재 작업과 무관하게 전역 Default Map을 바꿀 필요 없음
 

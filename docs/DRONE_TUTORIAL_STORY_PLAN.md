@@ -179,10 +179,10 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 
 ## 6. 외부 Drone 에셋 적용
 
-- ZIP과 최초 해제본은 `D:\JGY\project\Unreal_260821`에 원본으로 보존하고 Drone Git 저장소에 전체 복사하지 않는다.
+- 현재 제공 에셋 해제본·스테이징 보관 루트는 `C:\에셋`으로 두고 Drone Git 저장소에 전체 복사하지 않는다. 최초 감사의 최상위 ZIP 14개는 현재 C 드라이브에 없으므로 과거 ZIP 대조 기록과 현재 해제본 감사를 구분한다.
 - Loose `.uasset`은 UE 5.8 스테이징 프로젝트에서 먼저 원래 `/Game/<PackRoot>` 경로로 로드한다. Explorer에서 바로 `/Game/Drone` 아래로 옮기지 않는다.
 - 필요한 의존성만 고른 뒤 스테이징 Content Browser에서 `/Game/Drone/ThirdParty/<PackName>`으로 이동·재저장하고 Redirector를 정리한다.
-- 실제 사용 Blueprint는 `/Game/Drone/Drones` 아래에 만들고 프로젝트 기능 Pawn에 연결한다.
+- 실제 사용 Blueprint는 `/Game/Drone/Integrations/<PackName>` 아래에 만들고 프로젝트 기능 Pawn에 연결한다.
 - C++ Collision Root, Movement, Camera/Sensor 기준점은 유지한다.
 - 외부 Mesh, Rotor, Material, Animation, VFX만 Integration Blueprint가 연결한다.
 - 외부 Pawn/GameMode/Input Mapping을 신규 게임플레이 부모로 사용하지 않는다.

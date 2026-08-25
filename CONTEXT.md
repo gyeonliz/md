@@ -435,8 +435,7 @@ Inbox → Todo → Doing → Done
 
 - 현재 Drone 프로젝트에서는 Android를 사용하지 않는다.
 - 이에 따라 Android 전용 기능은 현재 개발 범위에 포함하지 않는다.
-- 외부 구매 소스는 아직 확보되지 않았다.
-- 구매 소스를 확보하기 전에는 완성형 외형보다 기능 구현과 Greybox 플레이 사이클 검증을 우선한다.
+- 제공 에셋 위치는 현재 `C:\에셋`이다.
 
 ## 23. 2026-08-19 실제 진행 상태 (역사적 스냅샷)
 
@@ -468,7 +467,7 @@ Inbox → Todo → Doing → Done
 - C++는 상태·계산·수명주기, Blueprint는 자산 연결·Greybox 조정과 UI 표시 외형을 담당한다. Collision Root와 Visual Mesh를 분리한다.
 - Tutorial Course의 안내선은 경로 표시만 담당한다. Collision·Overlap·Physics·Navigation에 영향을 주지 않으며 Gate 판정 책임을 섞지 않는다.
 - PFN-06 v1 조작은 Actor-relative 수평 이동, World Up 고도, Q/E와 Mouse X Actor Yaw, Mouse Y CameraBoom Pitch, Gamepad Left Stick 이동·Trigger 고도·Right Stick Yaw/Pitch로 확정했다. Keyboard·Mouse 시험 감도는 수동 Pass했으며 실제 Gamepad 체감과 최종 물리 조정은 이후 별도 카드로 남긴다.
-- Standalone 싱글플레이만 현재 검증 범위로 두며 네트워크·Android·구매 에셋은 제외한다.
+- Standalone 싱글플레이만 현재 검증 범위로 두며 네트워크·Android는 제외한다. 제공 에셋은 검증된 FPV 외형·Loop 최소 이식만 허용하고 전면 교체는 제외한다.
 - C++ 변경과 전체 빌드 전에는 열려 있는 Unreal Editor를 저장하고 종료한다.
 - Drone 작업을 진행할 때 `WORKBOARD.md`에 현재 단계·진행 정도·지금 작업·완료 근거·다음 작업을 갱신하고, 실제 변경과 검증 이력은 `docs/DRONE_WORKLOG.md`에 같은 작업에서 추가한다.
 
@@ -493,3 +492,14 @@ Inbox → Todo → Doing → Done
 - 다음 활성 카드는 `TUT-03` Segment/Lap 기록이다. Gate·순서·방향은 구현됐지만 Lap·Timing·거리·평균 속도·기록 UI는 아직 구현되지 않았다. 배터리·신호·Jamming 표시와 최종 HUD 디자인도 구현 완료로 간주하지 않는다.
 - Android는 개발 범위에서 제외하고 구매 소스는 TUT-03의 선행 조건으로 두지 않는다.
 - 문서 저장소는 이번 갱신 직전 로컬 `main`과 `origin/main`이 `e6395f1`에서 일치했으며, 이 상태·계획 갱신도 Commit·Push해 PC 간 공유 기준에 반영한다.
+
+## 28. 2026-08-25 TUT-03·현재 에셋 재검증
+
+- 현재 Unreal 기준 Commit은 로컬·원격이 일치하는 `551e287e8a5de7fa33f28d1911f8a7a957bd66fa`다. TUT-03 Segment/Lap 원본 기록을 완료했고 다음 기능 카드는 TUT-04 비교·결과 UI다.
+- 현재 제공 에셋 루트는 `C:\에셋`이다. 14개 공급사 해제본 기준선은 10,499개·35,677,612,290 bytes이고, `_Staging`·내부 FBX 해제본·생성 캐시를 포함한 현재 전체는 10,928개·36,360,181,427 bytes다.
+- 현재 C 드라이브에는 최초 감사의 최상위 ZIP 14개가 없으므로 과거 `Missing 0 / Extra 0 / SizeMismatch 0` 결과는 역사 기록으로만 취급한다. 남아 있는 내부 `FBX.zip`의 55개 FBX는 현재 해제본과 SHA-256 불일치 0이다.
+- 해당 루트에서 구매 영수증·사용 라이선스 증빙 파일은 확인되지 않았다. 제공 소스가 있어도 전체 팩을 프로젝트에 흡수하지 않고 기능·Greybox를 우선하며 검증된 선택 자산만 Integration 경계로 이식한다.
+- 실제 Drone 프로젝트에는 `/Game/Drone/ThirdParty` 선택 자산 12개·21,753,071 bytes와 `/Game/Drone/Integrations/DronePackFPV/BP_DroneFPVIntegration` 1개만 있다. 스테이징 선택 자산·현재 Integration 감사에서 외부 Game Root·ThirdPerson·Variant 금지 의존성은 0이고 13개 모두 Git LFS 대상이다.
+- `C:\에셋\DronePack_Project\Config\DefaultEngine.ini`의 Android File Server에는 비어 있지 않은 토큰이 있으므로 Config를 이식하거나 Commit하지 않는다. 값은 기록하지 않으며 실제 Drone 프로젝트는 Plugin·네트워크 꺼짐, 빈 토큰을 유지한다.
+- 이번 재검증에서 `Drone.Integration.FPVAsset` 1/1, Blueprint Compile 0/0/0, LFS fsck를 통과했다. 전체 `Drone.` 14/14는 현재 Commit에서 TUT-03 완료 때 통과한 기준선이며 이번에는 미재실행이다.
+- 기존 Standalone 초기 렌더는 통과했지만 실제 스피커 Loop 단일 재생과 종료 정지는 여전히 사람이 확인하지 않았다. `AST-01`은 Doing으로 유지한다.
