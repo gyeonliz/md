@@ -6,10 +6,10 @@
 
 ## 30초 요약
 
-- Unreal 저장소 `main`과 GitHub `origin/main`은 `800a7ba`로 일치한다.
-- Drone 입력·Telemetry·실제 WBP HUD·Training Course·순서형 Ring Gate 4개까지 구현됐다.
-- 현재 개발 완료 지점은 `TUT-02`, 다음 구현 카드는 `TUT-03 Segment/Lap 기록`이다.
-- 사용자는 Gate 코드나 BP를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도를 확인하면 된다.
+- Unreal 저장소 `main`과 GitHub `origin/main`은 `551e287`로 일치한다.
+- Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개와 Segment/Lap 원본 기록까지 구현됐다.
+- 현재 개발 완료 지점은 `TUT-03`, 다음 구현 카드는 `TUT-04 비교·결과 UI`다.
+- 사용자는 Gate나 기록 C++를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도와 Drone Loop를 확인하면 된다.
 - 확정된 학습 항목은 `정보처리산업기사`와 `C++ 코딩테스트` 두 가지뿐이다.
 - 정보처리산업기사 2026년 3회 필기 접수는 끝났다. 오늘 가장 먼저 Q-Net에서 자신의 접수·면제·응시 상태를 확인해야 한다.
 - 코딩테스트는 공통 시험일이 없으므로 자격시험 일정에 맞춰 주간 반복 학습으로 운영한다.
@@ -19,16 +19,16 @@
 | 구분 | 현재 상태 |
 |---|---|
 | Unreal 저장소 | `C:\URproject\drone` |
-| Unreal 기준 Commit | `800a7baaf8247bf0a3ee7bccc2272e12d0098f2b` |
+| Unreal 기준 Commit | `551e287e8a5de7fa33f28d1911f8a7a957bd66fa` |
 | Git 상태 | 깨끗한 `main`, 로컬·원격 일치 |
 | Git LFS | `fsck` 정상 |
 | 최종 Editor Build | 성공 |
-| Tutorial 자동화 | 4/4 통과 |
-| 전체 `Drone.` 자동화 | 11/11 통과 |
+| Tutorial 자동화 | 6/6 통과 |
+| 전체 `Drone.` 자동화 | 14/14 통과 |
 | Blueprint Compile | Errors 0, Warnings 0, Load Failures 0 |
 | Standalone | 실제 WBP HUD·Cyan Course·Current/Inactive Gate 표시 확인 |
 
-이번 확인은 저장소와 소스가 기존 검증 기준선에서 바뀌지 않았는지 재감사한 것이다. 자동화 11개를 이번 문서 작업에서 다시 실행한 것은 아니며, 같은 Commit에서 기록된 최종 통과 결과를 유지한다.
+이번 TUT-03 작업에서 Editor Build, Tutorial 6개, 전체 Drone 14개와 Blueprint 전체 Compile을 실제로 다시 실행했다. 모든 자동화는 warning·error 없이 통과했다.
 
 ## 2. 코드가 어떻게 연결되는가
 
@@ -49,8 +49,11 @@ Lvl_DroneTraining
 │  ├─ 편집 가능한 Spline
 │  ├─ 비충돌 Cyan 안내선
 │  ├─ OrderedGates[4]
-│  └─ UDroneTrainingGateSequenceComponent
-│     └─ 순서·정방향·중복 통과·색 상태 판정
+│  ├─ UDroneTrainingGateSequenceComponent
+│  │  └─ 순서·정방향·중복 통과·색 상태 판정
+│  └─ UDroneTrainingLapRecorderComponent
+│     ├─ Gate 0 시작 → Gate별 Segment → 마지막 Gate Lap 완료
+│     └─ World Time·Telemetry 위치로 실제 거리·평균속도 기록
 │
 └─ ADroneTrainingGate × 4
    ├─ Pawn Overlap Box Trigger
@@ -65,17 +68,19 @@ Lvl_DroneTraining
 | `UDroneTelemetryComponent` | 0.1초 기본 주기로 네 비행 수치를 계산해 Event로 전달 |
 | `ADronePrototypePlayerController` | HUD 한 개를 만들고 현재 Possess Drone의 Telemetry에 연결 |
 | `UDroneFlightHUDWidget` | WBP의 `SPD`, `ALT`, `V/S`, `HDG` Text를 갱신 |
-| `ADroneTrainingCourse` | Spline·안내선·Gate 순서 배열을 소유 |
+| `ADroneTrainingCourse` | Spline·안내선·Gate 순서 배열·Lap Recorder를 소유 |
 | `ADroneTrainingGate` | Ring과 Overlap Trigger를 소유하고 진입·이탈 위치를 전달 |
 | `UDroneTrainingGateSequenceComponent` | 현재 Gate와 정상 통과 여부를 판정하고 `OnGateAccepted`를 발생 |
+| `UDroneTrainingLapRecorderComponent` | 정상 승인·Telemetry Event를 구독해 Segment/Lap 원본 기록 생성 |
 
 ### C++와 Blueprint의 경계
 
-- C++: 이동 규칙, Telemetry 계산, HUD 수명주기, Gate 순서·방향·중복 판정, Collision 안전 규칙
+- C++: 이동 규칙, Telemetry 계산, HUD 수명주기, Gate 순서·방향·중복 판정, Segment/Lap 원본 계산, Collision·Delegate 안전 규칙
 - Blueprint·Editor: 실제 Pawn/GameMode/Controller/WBP Class 연결, HUD 외형, Course Spline, Gate 위치·회전·크기·색
 - Gate Actor의 로컬 `+X`가 유일한 정방향이다.
 - `OrderedGates` 배열 위치가 통과 순서의 단일 기준이며 `GateIndex`는 `0, 1, 2, 3`이다.
 - BP Event Graph에 Gate 판정 로직을 다시 만들 필요가 없다.
+- TUT-04 UI는 Recorder의 `OnLapStarted`, `OnSegmentRecorded`, `OnLapCompleted`와 Getter를 사용하며 계산을 BP에 중복 작성하지 않는다.
 
 ### 현재 UI 상태
 
@@ -89,7 +94,7 @@ Lvl_DroneTraining
 
 - 다음 Gate 번호·화살표
 - Wrong Order·Wrong Direction 메시지
-- Lap Time·Segment Time·Best 기록
+- Lap/Segment 실시간 표시·이전 평균·Best 표시
 - 완주 팝업·결과·평가 화면
 
 ## 3. 구현된 것과 아직 남은 것
@@ -105,12 +110,15 @@ Lvl_DroneTraining
 - 미래 Gate·역방향·완료 Gate 중복 통과 거부
 - Current·Completed·Inactive 색 상태
 - Reset과 Gate·Course·Pawn 수명 종료 안전 처리
-- 후속 기록 시스템이 구독할 `OnGateAccepted` Event
+- Gate 0 시작, Gate별 Segment와 마지막 Gate Lap 완료 원본 기록
+- World Game Time·Telemetry 10Hz 3차원 위치 기반 실제 이동 거리·평균 속도
+- Reset 시 부분 기록 폐기, 성공 History 유지, Course 재구성 시 History 초기화
+- 후속 결과 UI가 구독할 Blueprint Event와 Getter
 
 ### 미구현
 
-- Segment/Lap 시간·실제 이동 거리·평균 속도·Best 기록
-- Gate 진행·실패·완료 UI
+- 이전 성공 평균·Best 비교 계산
+- Gate 진행·실패·Segment/Lap 결과 UI
 - 명시적인 Take Off·Landing·Crash 상태와 최종 비행 물리
 - Mission·귀환·평가
 - Drone Enemy AI·MG Turret 점유·공격
@@ -138,16 +146,19 @@ Template의 `Variant_Combat`에 AI와 StateTree 코드가 있어도 Drone Enemy 
 ### PC 앞에서 할 일
 
 1. 다른 PC라면 `drone`과 `md` 저장소를 Pull한다.
-2. Unreal Commit이 `800a7ba`인지, LFS Asset이 내려왔는지 확인한다.
+2. Unreal Commit이 `551e287`인지, LFS Asset이 내려왔는지 확인한다.
 3. UE 5.8.1에서 `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`을 직접 연다.
 4. Gate 0→1→2→3을 정방향으로 완주한다.
 5. 미래 Gate를 먼저 통과하거나 현재 Gate를 역방향으로 통과해 진행되지 않는지 확인한다.
 6. 마지막 Gate 뒤 네 Gate가 모두 Completed 색인지 확인한다.
-7. Gate 크기·높이·간격·색 대비와 Keyboard/Gamepad 조종 체감을 메모한다.
+7. 현재 화면에 Lap 결과 UI가 없는 것이 정상임을 확인한다. 계산 원본은 자동화 14/14로 검증된 TUT-03 범위다.
+8. Gate 크기·높이·간격·색 대비와 Keyboard/Gamepad 조종 체감을 메모한다.
+9. 실제 스피커에서 Drone Loop가 한 겹으로 이어지고 종료 후 멈추는지 기록한다.
 
 다시 만들 필요가 없는 것:
 
 - Gate C++ Class와 Sequence Component
+- Lap Recorder와 Segment/Lap 기록 Struct
 - `BP_DroneTrainingGate`
 - Map의 Gate 4개 배치와 Course 배열 연결
 - WBP Flight HUD
@@ -157,7 +168,7 @@ Template의 `Variant_Combat`에 AI와 StateTree 코드가 있어도 Drone Enemy 
 ### Codex가 다음에 구현할 카드
 
 ```text
-TUT-03 Segment/Lap 기록
+TUT-03 Segment/Lap 기록 Done
 → TUT-04 비교·결과 UI
 → Take Off·Landing·Crash
 → Operator↔Drone
@@ -165,7 +176,7 @@ TUT-03 Segment/Lap 기록
 → Enemy AI·MG·Jamming
 ```
 
-TUT-03은 기존 `OnGateAccepted`를 구독하는 별도 기록 계층으로 만든다. Gate 판정 코드를 Timing 코드와 섞지 않는 것이 현재 경계다.
+TUT-03은 기존 Gate 판정과 분리된 Recorder가 정상 `OnGateAccepted`와 Telemetry Event를 구독하도록 완료했다. TUT-04도 이 원본 Event/Getter를 사용하고 Timing·거리 계산을 Widget에 중복 작성하지 않는다.
 
 ## 5. 정보처리산업기사 공식 일정
 

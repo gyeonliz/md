@@ -21,9 +21,9 @@
 | Git 사용자 이메일 | 전역 `jkw6483@gmail.com` 설정 확인 |
 | GitHub CLI | 설치되어 있지 않음 |
 | 기본 작업 루트 | `D:\JGY\project` |
-| Unreal 프로젝트 저장소 | 현재 작업 경로 `D:\JGY\project\drone`; 로컬 `main`=`origin/main`=`800a7ba`, 그 위 AST-01·Unreal MCP 변경은 로컬 미커밋 |
-| 문서 작업 저장소 | 현재 작업 경로 `D:\JGY\project\md`; 로컬 `main`=`origin/main`=`c05f4b0`, 에셋·MCP·작업 현황 문서는 로컬 미커밋 |
-| Commit·Push 담당 | 사용자가 직접 수행. 현재 문서 최신화 작업에서는 Stage·Commit·Push하지 않음 |
+| Unreal 프로젝트 저장소 | 작업컴 기록 경로 `D:\JGY\project\drone`; 이번 확인 PC `C:\URproject\drone`의 로컬 `main`=`origin/main`=`551e287` |
+| 문서 작업 저장소 | 작업컴 기록 경로 `D:\JGY\project\md`; 이번 확인 PC에서는 이 스냅샷이 포함된 `gyeonliz/md`의 `origin/main`을 동기화 기준으로 사용 |
+| Commit·Push 처리 | TUT-03 Drone Commit `551e287`을 기능 Branch와 `origin/main`에 Push 완료. 문서 변경도 `gyeonliz/md`의 `origin/main`으로 관리 |
 
 GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도했으나 Windows Installer가 종료 코드 1602로 취소되어 설치되지 않았다. GitHub 웹과 Git Credential Manager만으로도 기본 Push/Clone 작업은 가능하다.
 
@@ -37,7 +37,7 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 D:\JGY\project\drone\Drone.uproject
 ```
 
-이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않았고, 현재 로컬·원격 기준 Commit은 `800a7baaf8247bf0a3ee7bccc2272e12d0098f2b`이다.
+이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않았고, 이번 확인 PC의 현재 로컬·원격 기준 Commit은 `551e287e8a5de7fa33f28d1911f8a7a957bd66fa`이다.
 
 확인 결과:
 
@@ -71,10 +71,12 @@ D:\JGY\project\drone\Drone.uproject
 - WBP/BP 연결 보강 Commit `9f91bb6` (`feat: add Blueprint-backed flight HUD`)을 `codex/hud-blueprint-ready-comments`와 `origin/main`에 Push
 - TUT-01 Commit `5a9a2fa`를 `origin/main`에 Push하고 Training Map·비충돌 Spline 안내선 기준선을 반영
 - TUT-02 Commit `800a7ba` (`feat: add ordered tutorial ring gates`)를 `codex/tutorial-ring-gates`와 `origin/main`에 Push
+- FPV Integration·공식 Unreal MCP 기준 Commit `2159382` (`0825/12:30`) Push 상태 확인
+- TUT-03 Commit `551e287` (`feat: record tutorial lap timing and distance`)을 `codex/tutorial-lap-recording`과 `origin/main`에 Push
 
 첫 Commit은 863개 파일이며 `Content`는 761개로 `.uasset` 756개와 `.umap` 5개다. 가장 큰 파일은 약 21.0 MB이고 100 MB를 넘는 파일은 없다. 새 Prototype `.uasset`과 `.umap`을 포함한 Unreal Asset에는 Git LFS의 filter·diff·merge 속성이 적용된다. WBP·BP Controller·TUT-01 Asset에 이어 TUT-02의 신규 `BP_DroneTrainingGate`와 갱신한 `Lvl_DroneTraining` 두 Asset도 Git LFS로 Push했다.
 
-현재 구현된 Drone 기능 기준선은 Prototype Pawn/GameMode, Move·Altitude·Yaw·Camera 입력, Telemetry Snapshot, 실제 Flight HUD, TUT-01 Training Map·비충돌 Spline과 TUT-02 Ordered Ring Gate까지다. `ADroneTrainingGate`는 비충돌 Ring Visual과 별도 Pawn Overlap Trigger를 분리하고, `UDroneTrainingGateSequenceComponent`는 Course의 명시적 Gate 배열에서 현재 순서·정방향·중복 통과와 Current/Completed/Inactive 상태를 판정한다. 실제 Training Map에는 `BP_DroneTrainingGate` 네 개를 연결했다. Gate·Trigger·순서·방향은 구현됐지만 Lap 시작·완료, Segment/Lap Timing, 거리·평균 속도와 결과 UI는 아직 구현되지 않았다. Take Off, Landing, Crash/실패, Mission, Enemy AI, MG 점유·공격, Evaluation도 아직 구현된 것으로 판정하지 않는다. 이전 기준 Commit `fb891fb`의 잘못된 `//test` 주석은 이력 재작성 없이 `2c38ebf`에서 제거했다.
+현재 구현된 Drone 기능 기준선은 Prototype Pawn/GameMode, Move·Altitude·Yaw·Camera 입력, Telemetry Snapshot, 실제 Flight HUD, TUT-01 Training Map·비충돌 Spline, TUT-02 Ordered Ring Gate와 TUT-03 Segment/Lap 원본 기록까지다. `ADroneTrainingGate`는 비충돌 Ring Visual과 별도 Pawn Overlap Trigger를 분리하고, `UDroneTrainingGateSequenceComponent`는 순서·정방향·중복 통과를 판정한다. Course 소유 `UDroneTrainingLapRecorderComponent`는 정상 Gate Event와 기존 Telemetry 10Hz 위치 표본으로 World Game Time, 실제 3차원 이동 거리와 평균 속도를 기록한다. 이전 평균·Best 비교와 결과 UI는 아직 TUT-04 범위다. Take Off, Landing, Crash/실패, Mission, Enemy AI, MG 점유·공격, Evaluation도 아직 구현된 것으로 판정하지 않는다. 이전 기준 Commit `fb891fb`의 잘못된 `//test` 주석은 이력 재작성 없이 `2c38ebf`에서 제거했다.
 
 사용자는 이 프로젝트에서 Android를 사용하지 않는다고 확정했다. 이에 따라 `Config/DefaultEngine.ini`의 Android File Server Plugin과 네트워크 연결을 끄고 `SecurityToken` 할당을 비웠다. 검사 결과 활성 Plugin 0, 네트워크 허용 0, 비어 있지 않은 토큰 0이다. 기존 토큰 값은 이 문서나 로그에 기록하지 않았다. 향후 Android File Server를 다시 켤 경우 빈 토큰은 인증 없는 상태가 될 수 있으므로 보안 설정을 새로 검토해야 한다.
 
@@ -152,6 +154,10 @@ D:\JGY\project\drone\Drone.uproject
 - 선택 자산 12개는 `/Game/Drone/ThirdParty` 내부 의존성만 사용하며 ThirdPerson·Variant·원본 `/Game/Drone_Pack`·`/Game/Drone-Sounds` 신규 의존성이 0이다. Integration BP는 실제 런타임 본체 1·Rotor 4·Audio 1, Visual Collision/Overlap/Physics/Navigation 비활성, BP GameMode의 FPV Pawn·BP PlayerController 연결을 검사한다.
 - 최종 `DroneEditor Win64 Development` Build, Blueprint Compile 0 errors·0 warnings·0 load failures, Map Check 0 errors·0 warnings, 전체 `Drone.` Automation 12/12를 통과했다. `PIEInputLifecycle` 새 PIE 3회와 Training PIE도 FPV Integration Pawn으로 통과했다.
 - `Lvl_DroneTraining` Standalone 렌더 캡처에서 FPV 외형, 고정 추적 Camera, HUD·Course·Gate 표시와 정상 종료를 확인했다. 실행 시 처음 한 번 4K Texture DDC를 생성해 종료가 약 76초 지연됐지만 `Game engine shut down`과 `Exiting`까지 정상 완료했다. 실제 스피커 Drone Loop 청감은 아직 수동 확인 대기다.
+- TUT-03에서 `FDroneTrainingSegmentRecord`, `FDroneTrainingLapRecord`와 Course 소유 `UDroneTrainingLapRecorderComponent`를 추가했다. Gate 0은 시작선이며 이후 Gate마다 Segment를 확정하고 마지막 Gate에서 성공 Lap 원본을 실행 중 History에 보존한다.
+- 위치는 기존 Telemetry 10Hz Event에서 같은 Drone의 World 위치를 표본화하고 Gate 승인 위치를 끝점으로 추가한다. `SegmentDistance` 메타데이터나 Gate 간 직선거리는 실제 이동 거리 계산에 사용하지 않는다.
+- Reset·Course 재구성·구성 무효화·Pawn 파괴 시 부분 시도와 Delegate를 정리하며, 같은 Frame 0초 순간이동은 성공 기록으로 남기지 않는다. 성공 History는 Reset에는 유지하고 Course 재구성에는 비운다.
+- TUT-03 최종 `DroneEditor Win64 Development` Build, `Drone.Tutorial` 6/6, 전체 `Drone.` 14/14, Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다. 실제 저장 BP Course/네 Gate/FPV Integration Pawn PIE Overlap도 포함한다.
 
 Prototype 입력·Editor 연결 절차는 [`docs/DRONE_PROTOTYPE_IMPLEMENTATION.md`](docs/DRONE_PROTOTYPE_IMPLEMENTATION.md), Telemetry와 Flight HUD 구현·검증은 [`docs/DRONE_TELEMETRY_IMPLEMENTATION.md`](docs/DRONE_TELEMETRY_IMPLEMENTATION.md)에 기록했다.
 
@@ -186,6 +192,8 @@ C:\Users\jkw11\Documents\Codex\2026-08-12\c-project-factoryenvironmentcollect\wo
 - TUT-01 전용 자동화 3개, 전체 Drone 자동화 10/10, Blueprint 전체 Compile과 Standalone 표시·비충돌 검증
 - `ADroneTrainingGate`, Gate Sequence Component, 실제 BP Gate 네 개와 분리된 Ring Visual·Trigger로 TUT-02 완료
 - Gate Sequence 1/1, 실제 BP PIE Smoke 1/1, Tutorial 4/4, 전체 Drone 11/11과 Standalone Current/Inactive Gate 표시 검증
+- `UDroneTrainingLapRecorderComponent`, BlueprintType 기록 Struct와 BlueprintAssignable Event로 TUT-03 완료
+- Tutorial 6/6, 전체 Drone 14/14, Blueprint 0/0/0으로 시간·3차원 실제 이동 거리·평균속도와 Reset/Pawn 수명주기 검증
 - Q-Net 공식 정보처리산업기사 2026 일정과 시험 구성을 확인하고, 개인 접수·필기면제 상태별 Track A/B/C 및 C++ 코딩테스트 병행 계획을 `docs/MOBILE_CURRENT_BRIEF.md`와 `docs/STUDY_PLANS.md`에 정리
 - 구매 소스 없이 Engine 기본 도형으로 진행하는 기능 우선 Greybox 사전계획
 - 전체 작업 관리 및 병행 학습 계획
@@ -193,10 +201,10 @@ C:\Users\jkw11\Documents\Codex\2026-08-12\c-project-factoryenvironmentcollect\wo
 
 ## 다음 단계
 
-1. `TUT-03` 정상 Gate 승인 Event를 구독하는 Segment/Lap 기록 구현
-2. `TUT-04` 이전 평균·Best 비교와 결과 UI를 구현하고 Tutorial 회귀를 완성
+1. 사용자가 실제 Training Map에서 Gate 0→3 한 Lap과 Drone Loop 단일 재생·종료 정지를 수동 확인
+2. `TUT-04` 이전 평균·Best 비교 규칙을 확정하고 결과 UI와 Tutorial 회귀 구현
 3. 그 다음 Flight 상태, Operator↔Drone, NPC·Mission UI, Jamming Story 순으로 진행
-4. 병행 과제로 다른 PC에서 `800a7ba` Pull, LFS/UE 5.8.1 실행과 문서 Pull 확인
+4. 병행 과제로 다른 PC에서 `551e287` Pull, LFS/UE 5.8.1 실행과 문서 Pull 확인
 5. 정보처리산업기사는 Q-Net 개인 접수·수험일·필기면제 상태를 확인해 Track A/B/C를 선택하고, 코딩테스트는 주간 반복으로 병행
 
 Camera·Mouse·Gamepad 역할은 v1 조작으로 확정했다. Keyboard·Mouse 체감은 현재 시험값으로 통과했으며 실제 Gamepad 체감, 최종 물리와 최종 감도 조정은 이후 별도 카드로 남긴다. 구매 소스와 최종 Mesh는 선행 조건이 아니며 상세 계획은 [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)를 따른다. 이동 중 볼 통합 요약과 날짜별 학습안은 [`docs/MOBILE_CURRENT_BRIEF.md`](docs/MOBILE_CURRENT_BRIEF.md)를 따른다.
@@ -216,7 +224,7 @@ PFN-06 Done
 → HUD-02 Flight HUD Done
 → TUT-01 Training Map·비충돌 Spline Done
 → TUT-02 Gate·순서·정방향 판정 Done
-→ TUT-03 Segment/Lap 기록
+→ TUT-03 Segment/Lap 기록 Done
 → TUT-04 비교·결과 UI
 → Take Off·Landing·Crash
 → Operator↔Drone 전환

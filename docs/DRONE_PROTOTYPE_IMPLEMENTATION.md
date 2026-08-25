@@ -351,7 +351,7 @@ Editor Python은 프로젝트 Plugin 설정을 바꾸지 않고 실행 시점에
 
 현재 Tutorial/Story 우선 실행 순서와 Greybox 기준은 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)를 우선하며, PFN 카드 세부 정의는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 
-`HUD-01` Telemetry Snapshot, `HUD-02` 공용 Flight HUD, `TUT-01` Training Map·비충돌 Spline과 `TUT-02` 순서형 Ring Gate를 완료했다. TUT-02는 Gate·명시적 순서·정방향 통과 판정까지만 Done이며 Segment/Lap 기록은 포함하지 않는다. Source 기준은 `main=origin/main=800a7ba`이고 전체 `Drone.` 자동화 11/11, Tutorial 4/4, Blueprint Compile Errors/Warnings/Load Failures 0/0/0과 Standalone Gate 시각 확인을 통과했다. 현재 코드 책임과 Editor 확인법은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다. 다음 완료 게이트는 `TUT-03` Segment/Lap 기록이다.
+`HUD-01` Telemetry Snapshot, `HUD-02` 공용 Flight HUD, `TUT-01` Training Map·비충돌 Spline, `TUT-02` 순서형 Ring Gate와 `TUT-03` Segment/Lap 원본 기록을 완료했다. Source 기준은 `main=origin/main=551e287`이고 전체 `Drone.` 자동화 14/14, Tutorial 6/6, Blueprint Compile Errors/Warnings/Load Failures 0/0/0을 통과했다. 현재 코드 책임과 Editor 확인법은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다. 다음 완료 게이트는 `TUT-04` 이전 기록 비교·Best·결과 UI다.
 
 ```text
 PFN-06 Done
@@ -359,7 +359,8 @@ PFN-06 Done
 → HUD-02 Flight HUD Done
 → TUT-01 Training Map·비충돌 Spline Done
 → TUT-02 Gate·순서·정방향 Done
-→ TUT-03 Segment/Lap 기록
+→ TUT-03 Segment/Lap 원본 기록 Done
+→ TUT-04 이전 기록 비교·Best·결과 UI
 ```
 
-이후 순서는 `TUT-03 Segment/Lap 기록 → TUT-04 결과 UI → Flight 상태 → Operator↔Drone → Story NPC·Mission·Jamming → Enemy AI/MG → 에셋 통합`이다.
+이후 순서는 `TUT-04 결과 UI → Flight 상태 → Operator↔Drone → Story NPC·Mission·Jamming → Enemy AI/MG → 에셋 통합`이다.

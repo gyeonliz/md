@@ -81,7 +81,8 @@ Widget에서 매 프레임 Pawn을 검색하거나 Property Binding으로 계산
 
 - `TUT-01` 완료: Training Map, 수정 가능한 Spline, Runtime 안내선과 비충돌·비탐색 안전 설정
 - `TUT-02` 완료: Gate 목록, Gate Actor와 Trigger, 순서·정방향·중복 통과 판정과 시각 상태
-- `TUT-03` 다음 활성 카드: Segment/Lap Timing, 실제 이동 거리와 평균 속도 기록 계산
+- `TUT-03` 완료: Segment/Lap World Game Time, 실제 3차원 이동 거리와 평균 속도 원본 기록
+- `TUT-04` 다음 활성 카드: 이전 성공 평균·Best 비교 규칙과 결과 UI
 
 구매 에셋은 이 Vertical Slice의 선행 조건이 아니다. 현재는 Engine 기본 도형과 프로젝트 소유 Material로 기능을 검증하며, Android는 범위에서 제외한다.
 
@@ -99,16 +100,27 @@ TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경
 
 - `ADroneTrainingCourse`에 명시적 순서의 Gate 목록과 비-Primitive Gate Sequence Component를 연결했다.
 - `ADroneTrainingGate`는 비충돌 원형 Visual과 별도 Pawn Overlap Trigger를 분리한다.
-- Gate는 `CourseId`, `GateIndex`, `SegmentDistance`를 가지며 Actor 로컬 `+X`를 유일한 정방향으로 사용한다. `SegmentDistance`는 TUT-03용 메타데이터이며 현재 Timing 계산에는 사용하지 않는다.
+- Gate는 `CourseId`, `GateIndex`, `SegmentDistance`를 가지며 Actor 로컬 `+X`를 유일한 정방향으로 사용한다. `SegmentDistance`는 배치/표시용 메타데이터이며 TUT-03 실제 이동 거리 계산에는 사용하지 않는다.
 - 실제 `BP_DroneTrainingGate` 네 개를 Training Map에 배치하고 Course 배열 순서와 GateIndex를 일치시켰다.
 - 현재 목표 Gate는 Current, 정상 통과한 Gate는 Completed, 이후 Gate는 Inactive로 표시한다.
 - 현재 순서가 아닌 Gate, 역방향, 중복 통과와 잘못된 Actor는 진행 상태를 바꾸지 않는다.
 
-### TUT-03 — Lap과 구간 기록 (미구현·다음 카드)
+### TUT-03 — Lap과 구간 원본 기록 (완료)
 
-- Gate 0 통과 시 Lap을 시작하고 마지막 Gate 통과 시 완료한다.
-- Segment Time은 이전 정상 Gate부터 현재 Gate까지의 World Game Time으로 계산한다.
-- Segment Average Speed는 구간 동안 누적한 실제 이동 거리 ÷ 시간으로 계산한다.
+- Course가 별도 `UDroneTrainingLapRecorderComponent`를 소유하고 Gate Sequence의 정상 승인 Event만 구독한다.
+- Gate 0 통과 시 Lap을 시작하고 이후 Gate마다 Segment를 확정하며 마지막 Gate 통과 시 완료한다. Gate 네 개면 Segment는 `0→1`, `1→2`, `2→3` 세 개다.
+- Segment Time은 이전 정상 Gate 승인부터 현재 Gate 승인까지의 World Game Time으로 계산한다.
+- 실제 이동 거리는 같은 Drone의 Telemetry 10Hz World 위치 표본 사이 3차원 거리를 합산하고 Gate 승인 위치를 끝점으로 추가한다.
+- Segment/Lap 평균 속도는 해당 누적 거리 ÷ 시간이며 cm/s에서 km/h로 변환한다.
+- 잘못된 순서·역방향·중복 Gate는 승인 Event가 없어 기록 경계를 만들지 않는다.
+- Restart는 부분 시도만 폐기하고 성공 원본 History는 유지한다. Course 재구성은 비교 기준이 달라지므로 History도 비운다.
+- Pawn 파괴, 구성 무효화와 같은 Frame 0초 순간이동은 성공 기록으로 남기지 않는다.
+- 결과 Struct, Getter, `OnLapStarted`, `OnSegmentRecorded`, `OnLapCompleted`는 Blueprint에 노출한다.
+
+완료 원본은 첫 Vertical Slice에서 현재 실행 동안만 유지한다. `USaveGame` 영속화, 비교, Best와 표시 문자열은 이 카드에 포함하지 않는다.
+
+### TUT-04 — 이전 기록 비교와 결과 UI (미구현·다음 카드)
+
 - 첫 성공 시도에는 `기준 기록 생성 중`을 표시한다.
 - 두 번째 시도부터 현재 결과를 **현재 시도를 제외한 이전 성공 기록 평균**과 비교한다.
 - Time Delta는 음수면 빠름, 양수면 느림으로 표시한다.
@@ -136,7 +148,7 @@ TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경
 - 잘못된 Gate: `다음 Gate를 통과하세요` 안내만 표시하고 기록은 변경하지 않음
 - Restart: 현재 시도를 폐기하고 Gate 0 상태로 초기화
 
-기록은 첫 Vertical Slice에서 현재 실행 동안 유지하고, 계산 검증 뒤 `USaveGame`으로 Course별 Attempt Count, 평균, Best 기록을 영속화한다.
+기록은 현재 실행 동안만 유지한다. TUT-04 비교·표시 계산을 검증한 뒤에만 `USaveGame`으로 Course별 Attempt Count, 평균, Best 기록을 영속화한다.
 
 ## 5. Story Mode
 
@@ -199,9 +211,9 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 | AST-00 | 제공 에셋 인수 감사 | ZIP 14개와 해제본의 상대 경로·크기 일치 및 팩별 호환성·이식 위험 기록 |
 | AST-01 | 제공 Drone 에셋 선별 적용 | UE 5.8 스테이징 검증 후 기능 코드 변경 없이 Integration BP에서 외형 교체 |
 
-현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`를 완료했다. TUT-02는 실제 BP Gate 네 개, 분리된 Ring Visual·Pawn Trigger, 명시적 Gate 순서와 정방향·중복 통과 판정을 포함한다. Editor Build, Gate Sequence 1/1, 실제 BP PIE Smoke 1/1, Tutorial 4/4, 전체 `Drone.` 11/11, Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다. Standalone에서는 실제 HUD·Course와 Current/Inactive Gate 표시를 확인했다. Unreal 저장소 로컬 `main`과 `origin/main`의 완료 기준선은 `800a7baaf8247bf0a3ee7bccc2272e12d0098f2b`이다.
+현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`, `TUT-03`을 완료했다. TUT-03은 Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료와 World Game Time·Telemetry 위치 표본 기반 실제 거리·평균 속도 원본 기록을 포함한다. Editor Build, 실제 BP PIE Smoke를 포함한 Tutorial 6/6, 전체 `Drone.` 14/14, Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다. Unreal 저장소 로컬 `main`과 `origin/main`의 완료 기준선은 `551e287e8a5de7fa33f28d1911f8a7a957bd66fa`이다.
 
-다음 활성 카드는 `TUT-03`이다. Gate·Trigger·순서·정방향 판정은 구현됐지만 Lap·Timing·거리·평균 속도와 기록 UI는 현재 미구현이다.
+다음 활성 카드는 `TUT-04`다. 이전 성공 평균·Best의 정확한 집계 규칙과 결과 UI는 현재 미구현이며, TUT-03의 성공 원본 History를 입력으로 사용한다.
 
 ## 8. 검증 게이트
 
@@ -210,7 +222,7 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 - Blueprint 변경마다 Compile errors/warnings 0
 - 새 `/Game/Drone` 자산에서 Legacy Variant 신규 의존성 0
 - 각 입력 Mapping은 한 경로에서만 등록
-- Tutorial 계산은 순수 C++ 단위 테스트로 시간·평균·Delta·첫 시도 예외 검증
+- TUT-03 시간·거리·평균 속도와 TUT-04 Delta·첫 시도 예외는 각 카드에서 순수 C++ 자동화로 검증
 - Gate는 정상 순서, 역순, 중복 Overlap, 잘못된 Pawn을 자동화 검증
 - Operator↔Drone 전환을 새 PIE 3회 반복해 Pawn, Camera, IMC, HUD 중복 없음 확인
 - Story Mission은 성공·Crash 실패·Jamming 해제 경로를 각각 반복

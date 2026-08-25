@@ -419,13 +419,13 @@ Inbox → Todo → Doing → Done
 
 ## 21. 다음 작업
 
-### 완료: PFN-06 Camera/Input, HUD-01 Telemetry, HUD-02 Flight HUD, TUT-01 Course와 TUT-02 Ring Gate
+### 완료: PFN-06 Camera/Input, HUD-01 Telemetry, HUD-02 Flight HUD, TUT-01 Course, TUT-02 Ring Gate와 TUT-03 Segment/Lap 기록
 
-사용자 승인안의 Camera/Input과 Telemetry/HUD 기준선, TUT-01 Training Map·비충돌 Spline을 완료했다. TUT-02에서는 실제 `BP_DroneTrainingGate` 네 개, 비충돌 Ring Visual과 별도 Pawn Overlap Trigger, Course의 명시적 Gate 배열과 순서·정방향·중복 통과 판정을 구현했다. 전체 `Drone.` 자동화 11/11, Tutorial 4/4, Blueprint 0 errors·0 warnings·0 load failures를 통과했고 Standalone에서 실제 BP Controller/Pawn/WBP, Course 안내선과 Current/Inactive Gate 표시를 확인했다.
+사용자 승인안의 Camera/Input과 Telemetry/HUD 기준선, TUT-01 Training Map·비충돌 Spline을 완료했다. TUT-02에서는 실제 `BP_DroneTrainingGate` 네 개, 비충돌 Ring Visual과 별도 Pawn Overlap Trigger, Course의 명시적 Gate 배열과 순서·정방향·중복 통과 판정을 구현했다. TUT-03에서는 Course 소유 `UDroneTrainingLapRecorderComponent`가 정상 Gate Event와 Telemetry 10Hz 위치 표본을 이용해 Segment/Lap 시간, 3차원 누적 이동 거리와 평균 속도 원본을 기록하도록 구현했다. Unreal 기준은 `main=origin/main=551e287`이며 전체 `Drone.` 자동화 14/14, Tutorial 6/6, Blueprint 0 errors·0 warnings·0 load failures를 통과했다.
 
 ### 1순위: Tutorial Vertical Slice와 기능 우선 Greybox
 
-`TUT-03 Segment/Lap 기록 → TUT-04 비교·결과 UI → Flight 상태 → Operator↔Drone → NPC·Mission UI Story Shell → AI/MG/Jamming → 에셋 적용` 순서로 진행한다. Gate·Trigger·순서·정방향 판정은 구현됐지만 Lap 시작·완료, Segment/Lap Timing, 거리·평균 속도와 기록 UI는 아직 구현되지 않았다. 상세 기준은 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다.
+`TUT-04 비교·결과 UI → Flight 상태 → Operator↔Drone → NPC·Mission UI Story Shell → AI/MG/Jamming → 에셋 적용` 순서로 진행한다. TUT-03에서 Lap 시작·완료, Segment/Lap Timing, 10Hz 위치 표본 기반 이동 거리와 평균 속도 원본까지 구현했다. 이전 성공 평균·Best 비교와 화면 표시는 아직 구현하지 않았으며 TUT-04 범위다. 상세 기준은 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다.
 
 ### 병행: PC 간 공유 검증
 

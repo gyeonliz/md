@@ -2,22 +2,22 @@
 
 기준일: 2026-08-25 (Asia/Seoul)
 
-이 문서는 현재 작업컴의 Unreal 저장소 `D:\JGY\project\drone`을 직접 확인한 결과를 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
+이 문서는 현재 Unreal `drone` 저장소를 직접 확인한 결과를 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
 
-현재 TUT-02 완료 기준은 Unreal Commit `800a7baaf8247bf0a3ee7bccc2272e12d0098f2b`이다. `codex/tutorial-ring-gates` Branch와 `main`을 모두 Push했으며 로컬 `main`과 `origin/main`이 이 Commit으로 일치한다.
+현재 TUT-03 완료 기준은 Unreal Commit `551e287` (`feat: record tutorial lap timing and distance`)이다. `codex/tutorial-lap-recording` Branch와 `main`을 모두 Push했으며 로컬 `main`과 `origin/main`이 이 Commit으로 일치한다.
 
 ## 현재 검증 기준선
 
 | 검증 항목 | 현재 확인 결과 |
 |---|---|
 | `DroneEditor Win64 Development` | Build 성공 |
-| `Drone.Tutorial` Automation | 4/4 통과 |
-| 전체 `Drone.` Automation | AST-01 작업 트리 12/12 통과 |
+| `Drone.Tutorial` Automation | 6/6 통과 |
+| 전체 `Drone.` Automation | 14/14 통과 |
 | `CompileAllBlueprints` | Errors 0, Warnings 0, Load Failures 0 |
 | Standalone 시각 확인 | FPV 외형, 고정 추적 Camera, 실제 WBP HUD, Cyan 안내선, Current/Inactive Gate 표시 확인 |
-| 사용자 수동 비행 확인 | 실제 조종 체감과 네 Gate 완주 확인은 이 문서의 절차로 확인할 차례 |
+| 사용자 수동 확인 | 실제 조종으로 네 Gate 1 Lap을 완주한 뒤 기록값과 같은 PIE 안의 Reset을 확인할 차례 |
 
-TUT-02 Git 기준은 `800a7ba`이고, 12/12 결과는 그 위의 로컬 미커밋 AST-01 작업 트리를 대상으로 한 검증값이다. 다른 PC에서는 AST-01이 Commit·Push되기 전까지 이 결과를 재현할 수 없다.
+TUT-03 Git 기준 `551e287`에서 Gate 순서 판정과 Segment/Lap 기록을 함께 재현할 수 있다. 수치 비교·Best와 결과 UI는 다음 카드인 TUT-04 범위이므로 현재 화면에 Lap 결과가 나타나지 않는 것이 정상이다.
 
 ## 1. 런타임 연결 구조
 
@@ -46,10 +46,18 @@ TUT-02 Git 기준은 `800a7ba`이고, 12/12 결과는 그 위의 로컬 미커�
 │     ├─ 비충돌 안내용 SplineMesh Segment
 │     ├─ CourseId
 │     ├─ OrderedGates[4]
-│     └─ UDroneTrainingGateSequenceComponent
-│        ├─ 현재 통과할 Gate 위치
-│        ├─ 순서·방향·중복 통과 판정
-│        └─ Gate Visual State 갱신
+│     ├─ UDroneTrainingGateSequenceComponent
+│     │  ├─ 현재 통과할 Gate 위치
+│     │  ├─ 순서·방향·중복 통과 판정
+│     │  ├─ Gate Visual State 갱신
+│     │  ├─ OnGateAccepted(Gate, Actor, Count, Location)
+│     │  ├─ OnSequenceReset
+│     │  └─ OnSequenceReconfigured
+│     └─ UDroneTrainingLapRecorderComponent
+│        ├─ Idle → Recording → Completed
+│        ├─ Telemetry 10Hz 위치 표본으로 실제 이동 거리 누적
+│        ├─ Segment/Lap 시간·거리·평균 속도 기록
+│        └─ OnLapStarted / OnSegmentRecorded / OnLapCompleted
 │
 └─ BP_DroneTrainingGate 4개
    └─ ADroneTrainingGate
@@ -66,6 +74,7 @@ TUT-02 Git 기준은 `800a7ba`이고, 12/12 결과는 그 위의 로컬 미커�
 - `BP_DroneTrainingCourse` 정확히 1개
 - `BP_DroneTrainingGate` 정확히 4개
 - Course의 `OrderedGates` 배열에 네 Gate가 중복 없이 명시적으로 연결됨
+- Course가 native `GateSequenceComponent`와 `LapRecorderComponent`를 각각 한 개 소유함
 - 네 Gate의 `CourseId`가 Course와 같음
 - Gate의 `GateIndex`가 배열 위치 `0, 1, 2, 3`과 같음
 - 각 Gate가 비음수가 아닌 `SegmentDistance` 메타데이터를 저장함
@@ -116,6 +125,7 @@ Source/Drone/
 │  ├─ DronePrototypePawn.h/.cpp
 │  ├─ DronePrototypePlayerController.h/.cpp
 │  └─ Tests/
+│     ├─ DroneFPVIntegrationAssetTest.cpp
 │     ├─ DronePrototypeDefaultsTest.cpp
 │     ├─ DronePrototypePIEInputLifecycleTest.cpp
 │     └─ DronePrototypeSpawnPossessTest.cpp
@@ -133,9 +143,13 @@ Source/Drone/
    ├─ DroneTrainingGateTypes.h
    ├─ DroneTrainingGate.h/.cpp
    ├─ DroneTrainingGateSequenceComponent.h/.cpp
+   ├─ DroneTrainingRecordTypes.h
+   ├─ DroneTrainingLapRecorderComponent.h/.cpp
    └─ Tests/
       ├─ DroneTrainingCourseTest.cpp
       ├─ DroneTrainingGateSequenceTest.cpp
+      ├─ DroneTrainingRecordCalculationTest.cpp
+      ├─ DroneTrainingLapRecorderTest.cpp
       ├─ DroneTrainingAssetTest.cpp
       └─ DroneTrainingPIESmokeTest.cpp
 ```
@@ -146,15 +160,19 @@ Source/Drone/
 |---|---|---|
 | `ADronePrototypeGameMode` | Prototype Pawn과 PlayerController의 native 기본 Class 제공 | Mission·Lap·점수 규칙 |
 | `ADronePrototypePawn` | Enhanced Input Binding, 이동, 고도 이동, Actor Yaw, Camera Pitch, Component 소유 | HUD 생성, Gate 순서 판정, 최종 비행 물리 |
-| `UDroneTelemetryComponent` | 0.1초 기본 Timer와 즉시 갱신으로 Telemetry Snapshot 계산·Broadcast | 화면 배치, Gate 기록, 지형 AGL 계산 |
+| `UDroneTelemetryComponent` | 0.1초 기본 Timer와 즉시 갱신으로 Telemetry Snapshot 계산·Broadcast, Lap Recorder의 위치 표본 주기 제공 | 화면 배치, Lap 계산, 지형 AGL 계산 |
 | `ADronePrototypePlayerController` | 로컬 HUD 한 개의 생성·재사용·정리, Possess Pawn과 Telemetry 연결 | Telemetry 수치 계산, HUD Designer 외형 |
 | `UDroneFlightHUDWidget` | Snapshot 표시 문자열 생성, C++↔WBP TextBlock 연결, native fallback | Pawn 검색 Tick, 비행 수치 계산, Gate 안내 UI |
-| `ADroneTrainingCourse` | Spline·안내선, `CourseId`, 명시적 `OrderedGates`, Sequence Component 소유 | Trigger 감지, 방향 수학, Lap·Timing |
+| `ADroneTrainingCourse` | Spline·안내선, `CourseId`, 명시적 `OrderedGates`, Sequence와 Lap Recorder Component 소유 | Trigger 감지, 방향 수학, 결과 UI |
 | `ADroneTrainingGate` | Ring Visual, Box Trigger, 진입 위치 보존, 이탈 시 Sequence에 통과 시도 전달 | 현재 Gate 결정, 순서 진행, Lap 기록 |
-| `UDroneTrainingGateSequenceComponent` | 구성 검증, 현재 Gate, 순서·방향·중복 판정, Visual State, `OnGateAccepted` | Visual Mesh 생성, Overlap 감지, 시간·점수·SaveGame |
+| `UDroneTrainingGateSequenceComponent` | 구성 검증, 현재 Gate, 순서·방향·중복 판정, Visual State, 승인 Actor·위치를 포함한 `OnGateAccepted`, Reset·Reconfigure Event | Visual Mesh 생성, Overlap 감지, 시간·점수·SaveGame |
+| `UDroneTrainingLapRecorderComponent` | Gate 0 시작, Segment/Lap 완료, World Game Time, Telemetry 10Hz 위치 거리, 평균 속도, 실행 중 성공 History와 Blueprint Event | 이전 평균·Best 비교, 점수, UMG, SaveGame, Multiplayer |
+| `FDroneTrainingSegmentRecord` | 이전 정상 Gate부터 현재 Gate까지 Index·시간·실제 이동 거리·평균 속도 보관 | 비교·표시 문자열 |
+| `FDroneTrainingLapRecord` | Gate 0부터 마지막 Gate까지 완료 여부·총시간·총거리·평균 속도·Segment 배열 보관 | 영구 저장·점수 |
 | `FDroneTelemetrySnapshot` | HUD와 후속 기록 계층에 전달하는 비행 수치 묶음 | 자체 갱신·표시 |
 | `EDroneTrainingGatePassResult` | 통과 성공 또는 거부 이유 표현 | 사용자 메시지 표시 |
 | `EDroneTrainingGateVisualState` | `Inactive`, `Current`, `Completed` 상태 표현 | Lap 상태 표현 |
+| `EDroneTrainingLapRecordState` | `Idle`, `Recording`, `Completed` 기록 상태 표현 | Gate 시각 상태 표현 |
 
 ### Tutorial Asset
 
@@ -223,7 +241,12 @@ Source/Drone/Variant_SideScrolling/
 - Gate 구성 유효성 검사
 - 순서·정방향·중복 통과 판정
 - `Inactive → Current → Completed` 상태 전환
-- 정상 통과 때 `OnGateAccepted` Broadcast
+- 정상 통과 때 Gate·통과 Actor·승인 수·승인 위치를 포함한 `OnGateAccepted` Broadcast
+- Sequence Reset과 Reconfigure Event 및 부분 기록 정리 수명주기
+- Gate 0부터 마지막 Gate까지 World Game Time 기반 Segment/Lap 기록
+- Telemetry 10Hz 위치 표본과 Gate 승인 끝점을 합산한 3차원 실제 이동 거리
+- Segment/Lap 평균 속도 계산과 실행 중 성공 History
+- `OnLapStarted`, `OnSegmentRecorded`, `OnLapCompleted` Blueprint Event
 
 위 규칙은 BP나 Level 저장값이 잘못 바뀌어도 Construction 또는 BeginPlay에서 다시 적용되는 항목이 있다. 특히 Course 표시선과 Gate Visual의 Collision을 Editor에서 임의로 켜지 않는다.
 
@@ -238,8 +261,9 @@ Source/Drone/Variant_SideScrolling/
 - Gate Actor의 위치·회전
 - Gate별 `CourseId`, `GateIndex`, `SegmentDistance`
 - Gate Radius, Ring Thickness, Trigger 크기, 상태별 색, Mesh·Material 같은 Greybox 외형값
+- 후속 TUT-04에서 Lap Recorder의 Blueprint Event와 Getter를 사용하는 결과 UI 외형
 
-현재 Gate 규칙을 위해 BP Event Graph에 별도의 Overlap·순서 판정 로직을 다시 만들 필요가 없다. 실제 Trigger Delegate와 판정은 native C++에 있다. Blueprint는 배치·참조·외형 조정 계층으로 유지한다.
+현재 Gate와 기록 규칙을 위해 BP Event Graph에 별도의 Overlap·순서·시간·거리 계산을 다시 만들 필요가 없다. 실제 Trigger Delegate, Gate 판정과 기록 계산은 native C++에 있다. Blueprint는 배치·참조·외형과 TUT-04 표시 계층으로 유지한다.
 
 ### 반드시 지킬 데이터 계약
 
@@ -248,10 +272,15 @@ Source/Drone/Variant_SideScrolling/
 3. 각 `GateIndex`는 자신의 배열 위치와 정확히 같아야 한다.
 4. 한 Gate를 배열에 두 번 넣지 않는다.
 5. Course와 모든 Gate의 `CourseId`가 같아야 한다.
-6. `SegmentDistance`는 현재 비음수 메타데이터이며 TUT-02의 순서·통과 판정에는 사용하지 않는다.
+6. `SegmentDistance`는 비음수 배치 메타데이터다. TUT-02의 순서 판정과 TUT-03의 실제 이동 거리 계산에는 사용하지 않는다.
 7. Gate Actor의 로컬 `+X`가 유일한 정방향이다. Actor 회전이 바뀌면 World 정방향도 함께 바뀐다.
 
-이 계약을 어기면 Sequence 전체가 Invalid Configuration이 되고 Gate 진행이 시작되지 않는다.
+1~7의 Sequence 구성 계약을 어기면 전체 구성이 Invalid Configuration이 되고 Gate 진행이 시작되지 않는다.
+
+기록 계층에는 다음 규칙이 추가된다.
+
+- 한 Lap은 Gate 0을 통과한 같은 Drone만 이어서 기록한다. 중간에 다른 Drone이 승인되면 Sequence에 멀티플레이 규칙을 추가하지 않고 현재 부분 기록만 폐기한다.
+- 현재 네 Gate Map에서 Gate 0은 출발선이며 기록 Segment는 `0→1`, `1→2`, `2→3`의 세 개다.
 
 ## 4. Gate 통과 흐름
 
@@ -320,10 +349,47 @@ NextExpectedGatePosition + 1
 → 이전 Gate = Completed
 → 다음 Gate = Current
 → 나머지 Gate = Inactive
-→ OnGateAccepted(Gate, AcceptedGateCount) Broadcast
+→ OnGateAccepted(Gate, PassingActor, AcceptedGateCount, AcceptedWorldLocation) Broadcast
 ```
 
-마지막 Gate를 통과하면 모든 Gate가 `Completed`가 되고 `GetCurrentGate()`는 null, `GetCurrentGateIndex()`는 `INDEX_NONE`이 된다. 현재는 이 완료 상태를 Lap·평가 화면으로 연결하지 않는다.
+마지막 Gate를 통과하면 모든 Gate가 `Completed`가 되고 `GetCurrentGate()`는 null, `GetCurrentGateIndex()`는 `INDEX_NONE`이 된다. TUT-03 Recorder는 이 승인 Event로 Lap 원본 기록을 완성하지만, 아직 결과 UI나 평가 화면은 띄우지 않는다.
+
+### Segment/Lap 기록 흐름
+
+```text
+Gate 0 정상 승인
+→ Lap Recorder = Recording
+→ World Game Time과 승인 위치를 Lap·첫 Segment 시작점으로 저장
+→ 같은 Drone의 기존 Telemetry 10Hz Event 구독
+
+Telemetry Event
+→ 직전 World 위치부터 현재 World 위치까지 3차원 거리 누적
+
+Gate 1~마지막 Gate 정상 승인
+→ 승인 위치를 정확한 마지막 표본으로 추가
+→ 이전 정상 Gate부터 현재 Gate까지 Segment 확정
+→ ElapsedSeconds / TravelDistanceMeters / AverageSpeedKilometersPerHour 계산
+→ OnSegmentRecorded Broadcast
+
+마지막 Gate 정상 승인
+→ Lap 총시간·총거리·평균 속도와 Segment 배열 확정
+→ 실행 중 SuccessfulLaps에 성공 기록 1개 추가
+→ Recorder = Completed
+→ OnLapCompleted Broadcast
+```
+
+시간은 Gate 승인 시점의 World Game Time 차이로 계산한다. 거리는 Gate에 저장된 `SegmentDistance`나 Spline 길이가 아니라, Gate 0 승인 뒤 Telemetry의 기본 0.1초 주기마다 얻은 Drone World 위치 사이의 거리를 합산한다. 각 Gate 승인 위치도 마지막 표본으로 추가하므로 Segment 경계가 10Hz 표본 사이에 있어도 끝점을 놓치지 않는다. 평균 속도는 `실제 이동 거리 ÷ 시간`을 km/h로 변환한 값이다.
+
+`ResetSequence()`는 Gate 진행과 진행 중인 Lap을 Gate 0·`Idle`로 되돌린다. 아직 완료하지 않은 시간·거리·Segment는 폐기하지만, 같은 실행에서 이미 완료한 `SuccessfulLaps` History는 유지한다. 반대로 Gate 배열이나 Course 구성을 다시 적용하면 서로 다른 코스 기록이 섞이지 않도록 성공 History까지 비운다. Recorder와 Sequence는 별도 Tick을 사용하지 않으며, Pawn·Course 종료와 활성 Drone 파괴 때 Delegate를 정리한다.
+
+Blueprint에서 사용할 수 있는 현재 데이터 경계는 다음과 같다.
+
+- 상태·준비 여부: `GetRecordState`, `IsRecordingReady`, `IsLapRecording`
+- 진행 중 값: `GetCurrentLapElapsedSeconds`, `GetCurrentSegmentElapsedSeconds`, 현재 Lap·Segment 이동 거리
+- 성공 기록: `HasCompletedLap`, `GetSuccessfulLapCount`, `GetSuccessfulLaps`, `GetLastCompletedLap`
+- Event: `OnLapStarted`, `OnSegmentRecorded`, `OnLapCompleted`
+
+이 API가 준비됐다는 것은 TUT-04 UI가 연결될 수 있다는 뜻이지, 현재 결과 Widget이 이미 존재한다는 뜻은 아니다.
 
 ### Visual과 Trigger의 분리
 
@@ -368,18 +434,26 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
 - Sequence Reset 함수
 - Reset 시 진행 중인 BeginOverlap 기록 폐기
 - Gate 또는 Course가 먼저 파괴돼도 Sequence 유효성·역참조를 안전하게 정리
-- 정상 통과 경계 Event `OnGateAccepted`
+- 통과 Actor와 승인 위치를 포함하는 정상 통과 경계 Event `OnGateAccepted`
+- Sequence의 Reset·Reconfigure Event
+- Course가 소유하는 `UDroneTrainingLapRecorderComponent`
+- Gate 0 승인 시 Lap 시작, 마지막 Gate 승인 시 Lap 완료
+- World Game Time 기반 Gate별 Segment Time과 전체 Lap Time
+- Telemetry 기본 10Hz World 위치 표본과 Gate 승인 끝점을 이용한 실제 3차원 이동 거리
+- Segment/Lap 평균 속도와 `FDroneTrainingSegmentRecord`, `FDroneTrainingLapRecord`
+- `Idle`, `Recording`, `Completed` 기록 상태
+- 실행 중 성공 Lap History와 Reset 시 성공 History 보존
+- `OnLapStarted`, `OnSegmentRecorded`, `OnLapCompleted` Blueprint Event
 - Gate Trigger·Ring·Course 안내선의 Collision·Navigation 안전 규칙
-- native World, 실제 Asset, 실제 PIE를 포함한 TUT-02 자동화
+- 순수 계산, native World, 실제 Asset, 실제 PIE를 포함한 Tutorial 자동화 6개
 
 ### 아직 구현하지 않은 것
 
-- Lap 수와 Lap 시작·완료 규칙
-- Gate별 Segment Time, 전체 Lap Time, Best Time
-- 평균 속도·통과 품질·점수·평가
+- 이전 성공 기록 평균과 현재 기록의 Time·Speed Delta
+- Best Lap과 Best Segment 비교
+- 통과 품질·점수·평가
 - Gate 진행 HUD, 다음 Gate 화살표, Wrong Order·Wrong Direction 메시지
-- `OnGateAccepted`를 구독하는 실제 기록 시스템
-- `SegmentDistance`를 이용한 시간·거리 계산
+- Course HUD, Gate 결과 Toast, Lap 결과 화면
 - Spline에서 Gate를 자동 생성하거나 자동 정렬하는 Editor Tool
 - Gate 완료와 Mission·귀환·평가 시스템 연결
 - SaveGame 또는 기록 저장
@@ -389,23 +463,27 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
 - 최종 코스 배치·크기·난이도
 - 배터리·통신거리·재밍 같은 후보 시스템
 
-`SegmentDistance`와 `OnGateAccepted`는 후속 기록 계층을 연결하기 위한 경계만 준비된 상태다. 데이터가 존재한다고 해서 Lap·Timing이 구현됐다고 말하면 안 된다.
+TUT-03의 원본 시간·거리·평균 속도 계산과 실행 중 성공 History는 구현됐다. 다만 이전 평균·Best 비교, 차이 계산, 화면 표시와 SaveGame은 아직 구현하지 않았으므로 TUT-04 이후 기능처럼 말하면 안 된다. `SegmentDistance`는 현재도 배치 메타데이터이며 실제 이동 거리 계산에 사용하지 않는다.
 
 ## 6. 사용자가 지금 할 일과 반복하지 않아도 되는 일
 
 ### 지금 사용자가 할 일
 
-1. 다른 PC에서는 Unreal 저장소 `main`을 Pull하고 Commit이 `800a7ba`인지 확인한다.
+1. 다른 PC에서는 Unreal 저장소 `main`을 Pull하고 Commit이 `551e287`인지 확인한다.
 2. UE 5.8.1에서 `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`을 연다.
 3. World Outliner에서 Course와 Gate 네 개의 배치가 의도한 비행 경로처럼 보이는지 확인한다.
 4. Course의 `OrderedGates` 순서와 실제 공간 배치 순서가 자연스러운지 확인한다.
 5. Gate의 크기, 간격, 높이, 색 대비가 직접 조종할 때 읽기 쉬운지 확인한다.
-6. PIE 또는 Standalone에서 Gate 0부터 정방향으로 차례대로 통과한다.
-7. 한 번은 미래 Gate를 먼저 통과하고, 한 번은 현재 Gate를 역방향으로 통과해 상태가 바뀌지 않는지 확인한다.
-8. 네 Gate를 모두 정상 통과한 뒤 모두 Completed 색이 되는지 확인한다.
-9. 조종 감각상 너무 작음, 너무 큼, 간격 과도, 방향 이해 어려움이 있으면 수치와 체감만 기록한다.
+6. PIE에서 Gate 0부터 3까지 정방향으로 한 번 완주한다.
+7. Gate 0 통과 뒤 Recorder가 `Recording`, Gate 3 통과 뒤 `Completed`가 되는지 확인한다.
+8. 완료 기록이 1개이고 Segment가 `0→1`, `1→2`, `2→3` 세 개인지 확인한다.
+9. Lap과 각 Segment의 시간이 0보다 크고, 이동 거리가 실제 비행 경로만큼 누적되며, 평균 속도가 유한한 양수인지 확인한다.
+10. 같은 PIE에서 `ResetSequence()`를 실행해 Gate 0이 Current, Recorder가 `Idle`, `IsRecordingReady=true`가 되는지 확인한다.
+11. Reset 뒤에도 방금 완료한 성공 Lap 1개가 유지되고, 진행 중 값과 미완료 Segment만 초기화되는지 확인한다.
+12. 한 번은 미래 Gate를 먼저 통과하고, 한 번은 현재 Gate를 역방향으로 통과해 Gate 진행과 기록이 바뀌지 않는지 확인한다.
+13. 조종 감각상 너무 작음, 너무 큼, 간격 과도, 방향 이해 어려움이 있으면 수치와 체감만 기록한다.
 
-사용자가 지금 판단해야 하는 것은 코드 정답이 아니라 플레이할 때의 가독성과 조종 난이도다. 자동화는 규칙을 확인하지만 Gate 크기·배치·색이 사람에게 편한지는 직접 확인이 필요하다.
+사용자가 지금 판단해야 하는 것은 플레이할 때의 가독성·조종 난이도와 실제 비행에서 기록값이 자연스럽게 증가하는지다. 정확한 공식과 수명주기는 자동화가 검증했지만, Gate 배치와 사람이 체감하는 시간·거리·속도의 자연스러움은 직접 확인이 필요하다.
 
 ### 반복하지 않아도 되는 일
 
@@ -415,57 +493,66 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
 - Course의 Ordered Array를 처음부터 다시 연결할 필요 없음
 - Course 안내 Material을 새로 만들 필요 없음
 - BP Event Graph에 Begin/End Overlap 판정을 중복 구현할 필요 없음
+- BP Event Graph나 Tick에서 Lap 시간·거리·평균 속도를 다시 계산할 필요 없음
+- Lap Recorder에 별도 Tick이나 Timer를 추가할 필요 없음
+- 실제 이동 거리에 Gate의 `SegmentDistance`나 Spline 길이를 대입할 필요 없음
 - Gate를 Level에서 검색해 거리순으로 자동 정렬하는 BP를 만들 필요 없음
 - GateIndex를 보기 편하다는 이유로 `1~4`로 바꾸면 안 됨
 - Ring Mesh에 Block Collision을 켤 필요 없음
-- 단순 시각 확인만 했다면 Build·11개 자동화를 매번 다시 돌릴 필요 없음
+- 단순 시각·수동 비행 확인만 했다면 Build·14개 자동화를 매번 다시 돌릴 필요 없음
 - Android 설정을 진행할 필요 없음
 - Greybox 확인 전에 구매 Asset을 준비할 필요 없음
-- TUT-02 확인 중 Lap·Timing·Mission UI까지 함께 구현할 필요 없음
+- TUT-03 확인 중 비교·Best·결과 UI·Mission UI까지 함께 구현할 필요 없음
 - 현재 작업과 무관하게 전역 Default Map을 바꿀 필요 없음
 
 코드나 BP·Map Asset을 실제로 수정했다면 그때 Build, Tutorial 테스트, 전체 회귀, Blueprint Compile을 다시 실행한다.
 
 ## 7. 추천 코드 읽기 순서
 
-### Gate 기능만 먼저 이해할 때
+### Gate와 TUT-03 기록 기능을 먼저 이해할 때
 
 1. `Source/Drone/Tutorial/DroneTrainingGateTypes.h`
-   - Visual State와 Pass Result 종류를 먼저 확인한다.
+   - Visual State, Pass Result와 Gate 승인·Reset·Reconfigure Event 계약을 먼저 확인한다.
 2. `Source/Drone/Tutorial/DroneTrainingGateSequenceComponent.h`
    - Sequence가 공개하는 상태·함수·Event 계약을 읽는다.
 3. `Source/Drone/Tutorial/DroneTrainingGateSequenceComponent.cpp`
-   - 구성 검증, 판정 순서, 방향 수학, 상태 전환을 읽는다.
+   - 구성 검증, 판정 순서, 방향 수학, 상태 전환과 Event 발생 시점을 읽는다.
 4. `Source/Drone/Tutorial/DroneTrainingGate.h`
    - Gate가 보관하는 Definition·Visual·Trigger 값을 확인한다.
 5. `Source/Drone/Tutorial/DroneTrainingGate.cpp`
    - Ring 생성, Collision 분리, Begin/End Overlap 전달 과정을 읽는다.
-6. `Source/Drone/Tutorial/DroneTrainingCourse.h`
-   - Course가 `OrderedGates`와 Sequence를 어떻게 소유하는지 확인한다.
-7. `Source/Drone/Tutorial/DroneTrainingCourse.cpp`
-   - Construction·BeginPlay에서 Course와 Gate 상태가 연결되는 순서를 읽는다.
+6. `Source/Drone/Tutorial/DroneTrainingRecordTypes.h`
+   - Segment/Lap 원본 데이터와 `Idle`, `Recording`, `Completed` 상태를 확인한다.
+7. `Source/Drone/Tutorial/DroneTrainingLapRecorderComponent.h/.cpp`
+   - Gate 0 시작, Telemetry 거리 표본, Segment/Lap 완료, Reset·History·Delegate 수명주기를 읽는다.
+8. `Source/Drone/Tutorial/DroneTrainingCourse.h/.cpp`
+   - Course가 `OrderedGates`, Sequence와 Lap Recorder를 소유하고 Play 전에 연결하는 순서를 읽는다.
 
 ### 검증 의도를 이해할 때
 
-8. `Source/Drone/Tutorial/Tests/DroneTrainingGateSequenceTest.cpp`
+9. `Source/Drone/Tutorial/Tests/DroneTrainingRecordCalculationTest.cpp`
+   - cm·초를 km/h로 변환하는 순수 계산과 0·음수·NaN·무한대 방어를 읽는다.
+10. `Source/Drone/Tutorial/Tests/DroneTrainingLapRecorderTest.cpp`
+    - Gate 0 시작, 꺾인 실제 이동 거리, Segment/Lap 완료, Reset·History·Pawn 파괴·재구성을 읽는다.
+11. `Source/Drone/Tutorial/Tests/DroneTrainingGateSequenceTest.cpp`
    - 잘못된 Actor, Wrong Order, Wrong Direction, 중복, 정상 완료, Reset, 실제 Overlap 검증을 읽는다.
-9. `Source/Drone/Tutorial/Tests/DroneTrainingAssetTest.cpp`
-   - 실제 BP 부모 Class, Map Actor 수, Ordered Array, GateIndex, Collision 계약을 읽는다.
-10. `Source/Drone/Tutorial/Tests/DroneTrainingPIESmokeTest.cpp`
-    - 실제 BP Pawn·Controller·WBP·Course·Gate가 PIE에서 함께 연결되는지 확인한다.
-11. `Source/Drone/Tutorial/Tests/DroneTrainingCourseTest.cpp`
-    - TUT-01 안내선이 Gate 추가 뒤에도 비행을 막지 않는지 확인한다.
+12. `Source/Drone/Tutorial/Tests/DroneTrainingAssetTest.cpp`
+    - 실제 BP 부모 Class, Map Actor 수, Ordered Array, GateIndex, Recorder와 Collision 계약을 읽는다.
+13. `Source/Drone/Tutorial/Tests/DroneTrainingPIESmokeTest.cpp`
+    - 실제 BP Pawn·Controller·WBP·Course·Gate·Recorder가 PIE에서 함께 연결되는지 확인한다.
+14. `Source/Drone/Tutorial/Tests/DroneTrainingCourseTest.cpp`
+    - TUT-01 안내선이 Gate와 Recorder 추가 뒤에도 비행을 막지 않는지 확인한다.
 
 ### Drone 전체 데이터 흐름까지 이어서 읽을 때
 
-12. `Source/Drone/Prototype/DronePrototypePawn.h/.cpp`
-13. `Source/Drone/Telemetry/DroneTelemetryTypes.h`
-14. `Source/Drone/Telemetry/DroneTelemetryComponent.h/.cpp`
-15. `Source/Drone/Prototype/DronePrototypePlayerController.h/.cpp`
-16. `Source/Drone/UI/DroneFlightHUDWidget.h/.cpp`
-17. `Source/Drone/Prototype/DronePrototypeGameMode.h/.cpp`
+15. `Source/Drone/Prototype/DronePrototypePawn.h/.cpp`
+16. `Source/Drone/Telemetry/DroneTelemetryTypes.h`
+17. `Source/Drone/Telemetry/DroneTelemetryComponent.h/.cpp`
+18. `Source/Drone/Prototype/DronePrototypePlayerController.h/.cpp`
+19. `Source/Drone/UI/DroneFlightHUDWidget.h/.cpp`
+20. `Source/Drone/Prototype/DronePrototypeGameMode.h/.cpp`
 
-이 순서는 `Gate 판정 규칙 → Overlap 입력 → Course 구성 → 자동화 근거 → Pawn·HUD 실행 경로` 순으로 책임을 따라가게 한다.
+이 순서는 `Gate 판정 규칙 → Overlap 입력 → 기록 데이터 → Lap Recorder → Course 연결 → 자동화 근거 → Pawn·Telemetry·HUD 실행 경로` 순으로 책임을 따라가게 한다.
 
 ## 8. Editor 수동 확인법과 정상 결과
 
@@ -480,7 +567,7 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
    - Course와 같은 `CourseId`
    - `GateIndex`가 `0, 1, 2, 3`
    - 같은 Gate를 중복 참조하지 않음
-   - `SegmentDistance`가 0 이상임. 현재 저장값은 Spline 배치 거리지만 아직 Timing 규칙은 아님
+   - `SegmentDistance`가 0 이상임. 현재 저장값은 배치 메타데이터이며 TUT-03 실제 거리 계산값은 아님
 7. 각 Gate Actor를 선택하고 Local Transform 표시로 로컬 빨간 X축 방향을 확인한다. 그 방향만 정방향이다.
 8. Course Spline과 Gate 공간 순서가 대체로 같은 진행 방향인지 확인한다.
 
@@ -517,9 +604,49 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
 - Gate 하나를 정상 통과할 때 진행이 정확히 한 칸만 바뀐다.
 - 방금 통과한 Gate는 Cyan, 다음 Gate는 녹색이 된다.
 - 마지막 Gate까지 통과하면 네 Gate가 모두 Cyan이 된다.
-- 현재는 Lap Time, 완료 팝업, 점수 화면이 나타나지 않는다. 이것이 정상이다.
+- Gate 0 승인 뒤 Lap Recorder는 `Recording`, 마지막 Gate 승인 뒤 `Completed`가 된다.
+- 화면에는 아직 Lap Time, 완료 팝업, 비교·점수 화면이 나타나지 않는다. TUT-03은 계산·기록 계층까지이므로 이것이 정상이다.
 
-### C. 실패 흐름 확인
+### C. TUT-03 기록값과 Reset 확인
+
+현재는 결과 Widget이 없으므로 값은 `BP_DroneTrainingCourse`의 native `LapRecorderComponent`가 공개하는 Getter와 Blueprint Event를 Editor Blueprint Debugger에서 확인한다. 수동 확인을 위해 `OnSegmentRecorded`와 `OnLapCompleted`를 임시 Print String 또는 Breakpoint에 연결했다면 테스트 뒤 저장·Commit하지 않는다. 정확한 계산식은 이미 `Drone.Tutorial.TrainingRecordCalculation`과 `Drone.Tutorial.TrainingLapRecorder` 자동화가 검증한다.
+
+한 번의 4 Gate 정상 Lap에서 확인할 값은 다음과 같다.
+
+1. Gate 0 통과 직후:
+   - `GetRecordState = Recording`
+   - `IsLapRecording = true`
+   - `GetRecordedSegmentCount = 0`
+   - 현재 Lap·Segment 시간은 이후 증가하기 시작함
+   - 현재 Lap·Segment 이동 거리는 Gate 0 승인 위치에서 `0`으로 시작함
+2. Gate 1 통과 직후:
+   - `OnSegmentRecorded`가 한 번 발생함
+   - Segment `0`, `FromGateIndex=0`, `ToGateIndex=1`
+   - 시간과 실제 이동 거리가 0보다 크고 평균 속도가 유한한 값임
+3. Gate 2 통과 직후:
+   - Segment `1`, `FromGateIndex=1`, `ToGateIndex=2`
+4. Gate 3 통과 직후:
+   - Segment `2`, `FromGateIndex=2`, `ToGateIndex=3`
+   - `OnLapCompleted`가 한 번 발생함
+   - `GetRecordState = Completed`
+   - `GetSuccessfulLapCount = 1`
+   - `GetLastCompletedLap().bCompleted = true`
+   - 완료 Lap의 Segment 배열 크기 `3`
+   - Lap 시간·거리·평균 속도가 모두 유한하며, 실제로 이동했다면 0보다 큼
+   - 세 Segment 시간의 합과 Lap 시간이 거의 같고, 세 Segment 거리의 합과 Lap 거리가 거의 같음
+
+같은 PIE에서 Reset을 확인한다.
+
+1. Course의 `GateSequenceComponent`에서 `ResetSequence()`를 호출한다.
+2. Gate 0이 다시 밝은 녹색 `Current`, Gate 1~3이 `Inactive`인지 확인한다.
+3. `GetRecordState = Idle`, `IsRecordingReady = true`, `IsLapRecording = false`인지 확인한다.
+4. 진행 중 시간·거리와 미완료 Segment가 0으로 초기화됐는지 확인한다.
+5. `GetSuccessfulLapCount = 1`과 마지막 완료 Lap 값은 그대로 유지되는지 확인한다.
+6. Gate 0을 다시 통과하면 새 Lap이 `Recording`으로 시작되는지 확인한다.
+
+Reset은 새 시도를 시작하는 기능이며 같은 Course 구성의 완료 기록을 삭제하지 않는다. Gate 배열이나 Course 구성을 다시 적용하는 Reconfigure는 비교 기준 자체가 달라지는 경우이므로 성공 History도 비운다.
+
+### D. 실패 흐름 확인
 
 1. 새 PIE를 시작해 Gate 0이 Current인 상태로 만든다.
 2. Gate 1 또는 더 뒤의 Gate를 먼저 통과해 본다.
@@ -534,9 +661,10 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
 - 미래 Gate 통과는 진행하지 않는다.
 - 역방향 통과는 진행하지 않는다.
 - 완료 Gate 중복 통과는 진행하지 않는다.
+- 거부된 통과는 `OnGateAccepted`를 발생시키지 않으므로 Lap 상태·Segment 수·누적 거리도 바꾸지 않는다.
 - 현재는 실패 이유를 HUD Text로 표시하지 않는다. Visual 상태가 그대로인 것이 유일한 플레이 화면 피드백이다.
 
-### D. Collision·Navigation 확인
+### E. Collision·Navigation 확인
 
 1. Gate를 통과할 때 Ring 테두리나 중앙 Box에 걸려 멈추지 않는지 확인한다.
 2. Editor에서 Gate의 `GateTrigger` Component를 선택한다.
@@ -550,7 +678,7 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
 - Ring Visual은 Hit·Overlap을 만들지 않는다.
 - Gate와 Course 표시 구성요소는 Navigation에 영향을 주지 않는다.
 
-### E. 이상이 있을 때 확인 순서
+### F. 이상이 있을 때 확인 순서
 
 Gate 색이 전혀 바뀌지 않으면 다음 순서로 본다.
 
@@ -577,4 +705,13 @@ Drone 조작이나 HUD가 나오지 않으면 다음을 확인한다.
 4. `IMC_DronePrototype`과 Input Action이 BP Pawn에 연결되어 있는지
 5. BP Controller의 HUD Class가 `WBP_DroneFlightHUD`인지
 
-수동 확인에서 문제가 없으면 TUT-02의 사용자 확인 결과를 기록하고, 다음 카드에서는 `OnGateAccepted`를 구독하는 Lap·Segment Timing 계층을 별도 책임으로 설계한다.
+Gate는 정상 완료되지만 기록이 만들어지지 않으면 다음을 확인한다.
+
+1. Course에 native `LapRecorderComponent`가 존재하는지
+2. Gate 0부터 같은 Drone으로 순서대로 통과했는지
+3. Gate 사이에서 실제 World Game Time이 0보다 크게 흘렀는지
+4. Prototype Drone의 `UDroneTelemetryComponent`가 정상 갱신 중인지
+5. 중간에 `ResetSequence`, Course Reconfigure 또는 Pawn 파괴가 발생하지 않았는지
+6. 4 Gate 완료 기록의 Segment 수가 `Gate 수 - 1`, 즉 3인지
+
+수동 확인에서 문제가 없으면 TUT-03 사용자 확인 결과를 기록한다. 다음 카드는 현재 실행에 보존된 성공 기록을 이용해 이전 평균·Best·현재 대비 차이를 계산하고 Course HUD·Gate Toast·Lap 결과를 표시하는 `TUT-04 비교·결과 UI`다.

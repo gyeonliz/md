@@ -1,6 +1,6 @@
 # 드론 프로젝트 MVP 개발 가이드
 
-> 현재 구현 지점: Camera/Input PFN-06, HUD-01 Telemetry, HUD-02 Flight HUD, TUT-01 Training Course와 TUT-02 순서형 Ring Gate를 완료했다. TUT-02는 실제 BP Gate 4개, Course의 명시적 순서, 정방향 통과 판정과 상태 색 전환까지이며 Segment/Lap 기록은 아직 포함하지 않는다. Source 기준은 `main=origin/main=800a7ba`이고, 전체 `Drone.` 자동화 11/11, Tutorial 전용 4/4, Blueprint Compile Errors/Warnings/Load Failures 0/0/0과 Standalone Gate 시각 확인을 통과했다. 다음 카드는 TUT-03 Segment/Lap 기록이다. 입력 결과는 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md), Telemetry/HUD 결과는 [`DRONE_TELEMETRY_IMPLEMENTATION.md`](DRONE_TELEMETRY_IMPLEMENTATION.md), TUT-01 결과는 [`DRONE_TRAINING_COURSE_IMPLEMENTATION.md`](DRONE_TRAINING_COURSE_IMPLEMENTATION.md), 현재 C++·BP 책임과 사용자 확인 절차는 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
+> 현재 구현 지점: Camera/Input PFN-06, HUD-01 Telemetry, HUD-02 Flight HUD, TUT-01 Training Course, TUT-02 순서형 Ring Gate와 TUT-03 Segment/Lap 원본 기록까지 완료했다. Course가 소유한 Recorder가 정상 Gate Event와 기존 Telemetry 10Hz 위치 표본을 사용해 World Game Time, 실제 3차원 이동 거리와 평균 속도를 기록한다. Source 기준은 `main=origin/main=551e287`이고, 전체 `Drone.` 자동화 14/14, Tutorial 전용 6/6, Blueprint Compile Errors/Warnings/Load Failures 0/0/0을 통과했다. 다음 카드는 TUT-04 이전 기록 비교·Best·결과 UI다. 입력 결과는 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md), Telemetry/HUD 결과는 [`DRONE_TELEMETRY_IMPLEMENTATION.md`](DRONE_TELEMETRY_IMPLEMENTATION.md), TUT-01 결과는 [`DRONE_TRAINING_COURSE_IMPLEMENTATION.md`](DRONE_TRAINING_COURSE_IMPLEMENTATION.md), TUT-03 결과는 [`DRONE_TRAINING_RECORDING_IMPLEMENTATION.md`](DRONE_TRAINING_RECORDING_IMPLEMENTATION.md), 현재 C++·BP 책임과 사용자 확인 절차는 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
 
 > 현재 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)가 우선한다. PFN 카드 번호와 Placeholder 교체 경계는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 
@@ -22,7 +22,7 @@
 - 첫 구현 대상: 정찰용 멀티콥터 1종
 - 핵심 요소: 드론 운용, 정찰, 침투, 탐지, 적 AI 반응, 임무, 귀환, 평가
 - 현재 v1 조작: 고정 추적 Camera, Actor-relative 이동, World Up 고도, Mouse X Drone Yaw, Mouse Y Camera Pitch, Gamepad Left Stick·Trigger·Right Stick
-- 현재 기능 우선 순서: Tutorial Spline·순서형 Ring Gate·Lap/Segment 기록 → Flight 상태 → Operator↔Drone → NPC·Mission UI·Jamming → AI/MG → 에셋 통합
+- 현재 기능 우선 순서: TUT-04 이전 기록 비교·결과 UI → Flight 상태 → Operator↔Drone → NPC·Mission UI·Jamming → AI/MG → 에셋 통합
 - J3C: 프로젝트 콘셉트에서 사용하는 가상의 외주 발주처 설정일 뿐이며, 실제 계약·협력·지원·공식 관계가 아니다.
 
 ### 현재 미정이며 구현 중에도 확정된 것처럼 다루지 않을 항목

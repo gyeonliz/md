@@ -18,18 +18,20 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-25 12:28 KST
+마지막 갱신: 2026-08-25 20:05 KST
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | 3단계 Tutorial Vertical Slice — `TUT-02` 완료, `TUT-03` Todo |
+| 전체 단계 | 3단계 Tutorial Vertical Slice — `TUT-03` 완료, `TUT-04` Todo |
+| Unreal 기준선 | 로컬 `main=origin/main=551e287`, `DroneEditor Win64 Development` Build 성공 |
+| 자동 검증 | Tutorial `6/6`, 전체 `Drone.` `14/14`, Blueprint Compile `0 errors / 0 warnings / 0 load failures` |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
 | 지금 작업 중 | `AST-01` FPV 최소 외형·Loop Spike. 자동 검증 완료, 실제 Loop 청감은 Pass·Fail 판정 없이 미확인 |
 | 차단 조건 | 기능 구현 차단 없음. 수동 근거가 없어 `AST-01` Done 판정만 보류. Android는 작업 범위에서 제외 |
-| 다음 행동 | 청감 결과가 생기면 `AST-01` 판정을 갱신하고 다음 기능 `TUT-03` 구현 |
-| 다음 기능 | `TUT-03` Segment/Lap 기록. Lap·Timing·거리·평균 속도는 현재 미구현 |
-| 이후 | `TUT-04` 비교·결과 UI → Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming |
-| Git 처리 | Stage·Commit·Push는 사용자가 직접 수행 |
+| 다음 행동 | 실제 스피커 Loop 청감과 Training Map 4-Gate 수동 비행 결과가 생기면 별도로 기록하고, 기능 작업은 `TUT-04`로 진행 |
+| 다음 기능 | `TUT-04` 이전 평균·Best 비교와 결과 UI. 기록 계산은 `TUT-03`에서 완료 |
+| 이후 | Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming |
+| Git 처리 | Unreal `551e287`을 `codex/tutorial-lap-recording`과 `origin/main`에 Push 완료 |
 
 ## 2026-08-21 — Camera·Mouse·Gamepad 기준선 갱신
 
@@ -439,3 +441,47 @@ HeadingValueText
 - `AST-01`은 Doing으로 유지하고 수동 청감 결과가 생길 때 판정만 갱신한다.
 - 다음 기능 카드는 `TUT-03 Segment/Lap 기록`이다.
 - 현재 Drone·문서 작업 트리의 Stage·Commit·Push는 사용자가 직접 수행한다. 이번 문서 최신화에서는 Git 변경을 전송하지 않는다.
+
+## 2026-08-25 — TUT-03 Segment/Lap 원본 기록
+
+### 실제 구현
+
+- `FDroneTrainingSegmentRecord`와 `FDroneTrainingLapRecord`에 Gate 구간, World Game Time 기준 경과 시간, 실제 이동 거리와 평균 속도 원본 값을 정의했다.
+- `UDroneTrainingLapRecorderComponent`를 `ADroneTrainingCourse`가 소유하도록 추가하고 실제 Play 수명주기에서 Gate Sequence에 연결했다.
+- Gate 0의 정상 승인을 Lap 시작선으로 사용한다. Gate가 N개면 Gate 0 이후 정상 Gate마다 Segment를 하나 완성하므로 성공 Lap은 N-1개 Segment를 가진다.
+- 기록기는 기존 `UDroneTelemetryComponent`의 기본 10 Hz Snapshot Event에서 같은 Drone의 3차원 World 위치를 표본화한다. 별도 Actor Tick이나 Timer는 추가하지 않았다.
+- Segment와 Lap 평균 속도는 `실제 이동 거리 / World Game Time`으로 계산하고 Unreal cm를 m와 km/h로 변환한다.
+- Gate Sequence의 정상 승인 Event에 실제 통과 Actor와 승인 위치를 추가하고, Restart·재구성 시 부분 기록을 폐기할 수 있도록 Reset Event를 추가했다.
+
+### 확정한 기록 경계
+
+- Gate 0 이전 이동은 기록하지 않고 Gate 0 승인 위치부터 거리를 누적한다.
+- `SegmentDistance`는 계속 후속 도구용 메타데이터이며 기록 거리 계산에 사용하지 않는다. 실제 경로는 Telemetry 위치 표본 사이의 3차원 거리 합으로 계산한다.
+- 현재 Lap은 Gate 0을 통과한 같은 Drone만 이어 쓴다. 진행 중인 Drone이 파괴되거나 다른 Actor가 다음 Gate를 통과하면 부분 시도를 성공 기록으로 남기지 않는다.
+- `ResetSequence()`는 진행 중인 시간·거리·부분 Segment만 폐기하고 이미 완료한 성공 Lap History는 현재 실행 동안 유지한다. Course 재구성은 코스 호환성이 달라질 수 있으므로 부분 시도와 성공 History를 함께 비운다.
+- 평균 계산 함수는 0초·음수 시간이나 비정상 거리 입력에서 NaN·Infinity 대신 0을 반환한다. Recorder가 같은 Frame의 0초 Gate 경계를 받으면 가짜 기록을 확정하지 않고 해당 부분 시도를 취소한다.
+- 이전 평균·Best·점수·결과 화면과 `USaveGame` 영속화는 TUT-03에 포함하지 않고 다음 `TUT-04` 이후 책임으로 유지한다.
+
+### 자동화와 최종 검증
+
+- `Drone.Tutorial.TrainingRecordCalculation`에서 cm/s 변환, 정상 평균 속도와 0·음수·NaN·Infinity 입력 안전성을 검증했다.
+- `Drone.Tutorial.TrainingLapRecorder`에서 실제 `FTestWorldWrapper`의 Course, Gate 3개, Drone, Sequence와 Telemetry를 사용해 정상 2-Segment Lap을 검증했다.
+- Lap Recorder 테스트는 꺾인 위치 표본의 실제 거리 합, World Game Time, Segment/Lap 평균 속도, 미래·역방향·중복 Gate 불변, 중간 Reset과 성공 History 보존, Course 재구성 시 History 초기화, 활성 Pawn 파괴 취소를 확인했다.
+- `Drone.Tutorial.TrainingPIESmoke`를 실제 저장된 BP Gate 0→3 Overlap과 Recorder 상태까지 확장했다.
+- `DroneEditor Win64 Development` Build 성공
+- 전체 Tutorial 자동화: `6 succeeded / 0 failed / 0 warnings`
+- 전체 `Drone.` 자동화: `14 succeeded / 0 failed / 0 warnings`
+- 전체 Blueprint Compile: `0 errors / 0 warnings / 0 load failures`
+
+### Git과 현재 판정
+
+- `TUT-03` Done
+- `TUT-04` Todo — 이전 성공 기록 평균·Best 비교와 Course/Gate/Lap 결과 UI
+- Unreal Commit: `551e287e8a5de7fa33f28d1911f8a7a957bd66fa` (`feat: record tutorial lap timing and distance`)
+- `codex/tutorial-lap-recording`과 `origin/main`에 Push 완료, 로컬 `main=origin/main=551e287e8a5de7fa33f28d1911f8a7a957bd66fa`
+
+### 남은 사용자 수동 확인
+
+- `Lvl_DroneTraining`에서 실제 Drone으로 Gate 0→3을 순서대로 통과해 조작감, Gate 간격과 시각 전환에 불편이 없는지 확인한다.
+- TUT-03은 계산과 원본 기록까지라 결과 UI는 아직 없다. 시간·거리·평균·Best 비교 화면은 `TUT-04`에서 연결한다.
+- `AST-01`의 실제 스피커 Drone Loop 단일 반복 재생과 Standalone 종료 후 정지는 여전히 미확인이다. 이 항목은 TUT-03 완료와 섞지 않고 별도 Doing으로 유지한다.

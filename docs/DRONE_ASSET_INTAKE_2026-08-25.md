@@ -2,6 +2,8 @@
 
 기준일: 2026-08-25 (Asia/Seoul)
 
+> 이 문서는 AST-01 에셋 이식 시점의 감사 기록이다. 이후 구현·Git 상태는 [`STATUS.md`](../STATUS.md)와 [`DRONE_WORKLOG.md`](DRONE_WORKLOG.md)를 따른다.
+
 ## 1. 감사 범위와 판정
 
 - 사용자가 알려준 `D:\JGY\project\Unreal\_260821`은 실제 파일시스템에는 없었다.
@@ -111,5 +113,5 @@
 - 제공 Cue는 이름에 `Loop`가 있지만 실제 Wave Player 반복 설정은 꺼져 있었다. 프로젝트 이식본의 Looping을 켜고 `SoundBase::IsLooping()` 자동 계약을 추가했다.
 - 실제 렌더러 Standalone 캡처에서 FPV 외형과 고정 추적 Camera, 기존 HUD·Course·Gate 표시 및 정상 종료를 확인했다.
 - 실제 스피커에서 Loop가 한 번만 재생되고 종료 시 멈추는지는 아직 수동 확인하지 않았다. 자동 Loop 계약 통과와 실제 청감 통과는 별개이며, 현재 청감 상태는 Pass·Fail이 아닌 `미확인`이다.
-- 따라서 `AST-01`은 Doing으로 유지한다. 수동 결과를 확보하면 판정을 갱신하며 다음 기능 카드는 `TUT-03 Segment/Lap 기록`이다.
-- 모든 Drone/문서 변경은 현재 로컬 작업 트리에 있으며 아직 Commit·Push하지 않았다. Commit·Push는 사용자가 직접 수행한다.
+- 따라서 `AST-01`은 Doing으로 유지한다. 수동 결과를 확보하면 판정을 갱신한다. 이 시점의 다음 기능 카드는 `TUT-03 Segment/Lap 기록`이었다.
+- 이 시점에는 Drone/문서 변경이 로컬 작업 트리에 남아 있었고 아직 Commit·Push하지 않은 상태였다. 이후 동기화 결과는 현재 상태 문서에서 확인한다.
