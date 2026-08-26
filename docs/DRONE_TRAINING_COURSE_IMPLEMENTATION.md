@@ -2,7 +2,7 @@
 
 기준일: 2026-08-26 (Asia/Seoul)
 
-이 문서는 `D:\JGY\project\drone`의 실제 `ADroneTrainingCourse` 소스, 자동화 테스트, `BP_DroneTrainingCourse`, `Lvl_DroneTraining` 자산을 기준으로 한다. Editor에서 Gate를 설치하고 Spline 점을 추가하는 실제 절차는 [`DRONE_TRAINING_AUTHORING_GUIDE.md`](DRONE_TRAINING_AUTHORING_GUIDE.md)를 따른다.
+이 문서는 현재 기준 프로젝트 `C:\URproject\drone`의 실제 `ADroneTrainingCourse` 소스, 자동화 테스트, `BP_DroneTrainingCourse`, `Lvl_DroneTraining` 자산을 기준으로 한다. Editor에서 Gate를 설치하고 Spline 점을 추가하는 실제 절차는 [`DRONE_TRAINING_AUTHORING_GUIDE.md`](DRONE_TRAINING_AUTHORING_GUIDE.md)를 따른다.
 
 TUT-01의 범위는 다음 두 가지뿐이다.
 
@@ -11,7 +11,7 @@ TUT-01의 범위는 다음 두 가지뿐이다.
 
 TUT-01 자체 완료 범위에는 Gate, 통과 Trigger, 통과 순서, 정·역방향 판정, Segment/Lap 기록과 Timing을 포함하지 않는다. 이후 TUT-02에서 Gate·Trigger·순서·정방향 판정을, TUT-03에서 Segment/Lap 시간·실제 이동 거리·평균 속도 원본 기록을 각각 별도 책임으로 구현했다.
 
-TUT-01 자체 완료 기준선은 Unreal Commit `5a9a2fa`다. 현재 프로젝트 기준선 `551e287`에는 TUT-02 Gate와 TUT-03 Lap Recorder가 추가됐으며 Editor Build, Tutorial 6/6, 전체 `Drone.` 14/14, 전체 Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다. Standalone에서는 TUT-02 기준 실제 BP Pawn·Controller·WBP HUD, 밝은 청록 안내선과 Current/Inactive Gate를 확인했다.
+TUT-01 자체 완료 기준선은 Unreal Commit `5a9a2fa`다. 현재 프로젝트 기준선 `2cc5d79`에는 TUT-02 Gate와 TUT-03 Lap Recorder, 자산 이식과 맵 중앙화가 추가됐으며 Editor Build, 전체 `Drone.` 15/15, 전체 Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다. Standalone에서는 TUT-02 기준 실제 BP Pawn·Controller·WBP HUD, 밝은 청록 안내선과 Current/Inactive Gate를 확인했다.
 
 ## 1. 왜 필요한가
 
@@ -58,7 +58,7 @@ Source/Drone/Tutorial/DroneTrainingCourse.cpp
 ### `Lvl_DroneTraining`
 
 ```text
-/Game/Drone/Tutorial/Maps/Lvl_DroneTraining
+/Game/Drone/Maps/Lvl_DroneTraining
 ```
 
 기존 Template Map을 그대로 사용하는 것이 아니라 Tutorial용으로 분리된 맵이다. 현재 자산 계약은 다음과 같다.
@@ -204,7 +204,7 @@ Hidden In Game          false
 
 ### `Lvl_DroneTraining`
 
-1. `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`을 연다.
+1. `/Game/Drone/Maps/Lvl_DroneTraining`을 연다.
 2. World Settings의 GameMode Override가 `BP_DronePrototypeGameMode`인지 확인한다.
 3. World Outliner에서 `BP_DroneTrainingCourse`가 한 개만 있는지 확인한다.
 4. `PlayerStart`가 한 개이고 Prototype Pawn이 직접 배치되지 않았는지 확인한다.

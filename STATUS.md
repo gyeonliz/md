@@ -21,10 +21,10 @@
 | Git 사용자 이메일 | 전역 `jkw6483@gmail.com` 설정 확인 |
 | GitHub CLI | 설치되어 있지 않음 |
 | 이번 확인 PC 작업 루트 | Unreal `C:\URproject\drone`; 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
-| Unreal 프로젝트 저장소 | 로컬 `main`=`origin/main`=`fb1d7ad`; 작업 트리 Clean |
-| 문서 작업 저장소 | 이 갱신 전 로컬 `main`=`origin/main`=`8017286`; 작업 트리 Clean |
-| Commit·Push 처리 | 기존 `main`의 `5540c6b`를 보존하고 NavigationArrows `5a052c8`을 Merge Commit `fb1d7ad`로 `origin/main`에 Push 완료 |
-| 실행 상태 | 2026-08-26 13:11 KST 확인 시 `UnrealEditor`와 `UnrealEditor-Cmd` 실행 0 |
+| Unreal 프로젝트 저장소 | 로컬 `main`=`origin/main`=`2cc5d79`; 작업 트리 Clean |
+| 문서 작업 저장소 | 이 갱신 전 로컬 `main`=`origin/main`=`846b4db`; 이 문서 갱신도 Commit·Push 후 일치 상태로 마감 |
+| Commit·Push 처리 | 맵 중앙화·미사용 템플릿 콘텐츠 정리 Commit `1c8f391`을 Merge Commit `2cc5d79`로 `origin/main`에 Push 완료 |
+| 실행 상태 | 2026-08-26 17:31 KST 확인 시 `UnrealEditor`와 `UnrealEditor-Cmd` 실행 0 |
 | 별도 `droner` 주의 | `main=origin/main=551e287`; `Config/DefaultEditor.ini` 변경과 `Content/Asset` 10,928개·36,360,181,427 bytes 전체가 Untracked. 공급사 원본·스테이징 복사본이므로 일괄 Stage·Commit 금지 |
 
 GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도했으나 Windows Installer가 종료 코드 1602로 취소되어 설치되지 않았다. GitHub 웹과 Git Credential Manager만으로도 기본 Push/Clone 작업은 가능하다.
@@ -39,7 +39,7 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 D:\JGY\project\drone\Drone.uproject
 ```
 
-이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 2026-08-26 이번 확인 PC의 기준 프로젝트는 `C:\URproject\drone`이고 로컬·원격 main은 `fb1d7ad2c23d6bf3b1c854ca7c1c0cddba2062ef`로 일치한다.
+이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 2026-08-26 이번 확인 PC의 기준 프로젝트는 `C:\URproject\drone`이고 로컬·원격 main은 `2cc5d79`로 일치한다.
 
 확인 결과:
 
@@ -50,7 +50,7 @@ D:\JGY\project\drone\Drone.uproject
 - 시작 시 Git 저장소가 아니었음
 - 작업 시작 시 Content에는 `.uasset` 749개와 `.umap` 4개가 있었음
 
-기존 Third Person 기본 맵과 전역 기본 GameMode는 유지하면서 Git 준비, Android 제외 설정, 별도 Drone Prototype Source를 적용했다.
+초기에는 Third Person 기본 맵과 전역 기본 GameMode를 유지한 채 Git 준비, Android 제외 설정, 별도 Drone Prototype Source를 적용했다. 이후 `2cc5d79`에서 시작 맵을 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode를 프로젝트 소유 `BP_DronePrototypeGameMode`로 바꾸고 미사용 템플릿 콘텐츠를 제거했다.
 
 - `main` Branch의 로컬 Git 저장소 초기화
 - 프로젝트 로컬 Git LFS 초기화
@@ -130,7 +130,7 @@ D:\JGY\project\drone\Drone.uproject
 - 과거 전체 Editor 무창 점검 한 번은 `Quit` 뒤 프로세스가 종료되지 않아 해당 테스트 프로세스만 종료했다. 이번 Automation `Quit` 경로와 Prototype 게임 실행은 모두 종료 코드 0으로 정상 종료했다.
 - 과거 로그의 `LogAutomationTest: Error: Condition failed` 15줄은 UE 내부 `UE::UnifiedErrorTest` 출력 직후, 프로젝트 맵 로드 전에 발생했다. 이번 Prototype Report에는 warning/error가 없다.
 - 기준선 확인 당시 문서 저장소에만 있던 PFN-06 PIE lifecycle 테스트 초안은 Drone Source에 편입됐고 `UnrealEd` 의존성은 Editor 빌드 조건으로만 추가됐다. 런타임 공개 API 변경 없이 빌드와 Automation 3/3 Pass까지 확인했다.
-- `Invoke-DronePrototypeSetup.ps1 -Mode UpdateControls`와 `Validate`는 9개 Prototype 자산, 5개 IA 타입, IMC 15개 Mapping, BP 참조와 Map GameMode Override를 확인했다. `/Game/Drone`의 신규 Legacy 의존성은 0개이며 기본 ThirdPerson Map/GameMode도 유지된다.
+- 당시 `Invoke-DronePrototypeSetup.ps1 -Mode UpdateControls`와 `Validate`는 9개 Prototype 자산, 5개 IA 타입, IMC 15개 Mapping, BP 참조와 Map GameMode Override를 확인했다. 그 검증 시점에는 기본 ThirdPerson Map/GameMode를 유지했다. 현재 기본 경로는 아래 맵 중앙화 절을 따른다.
 - HUD-01에서 `UDroneTelemetryComponent`와 `FDroneTelemetrySnapshot`을 추가했다. 0.1초 Timer로 Speed·Altitude·Vertical Speed·Heading을 제공하며 Prototype Pawn이 native Component 한 개를 소유한다.
 - HUD-01 당시 `Drone.` Automation Report는 Prototype 회귀 3개와 Telemetry 2개를 합쳐 5 succeeded, 0 warnings, 0 failed였다. Runtime Spawn에서 기준 고도 변경 즉시 Snapshot 갱신도 확인했다.
 - HUD-01 뒤 Blueprint 전체 Compile은 0 errors, 0 warnings, 0 blueprints failed to load로 정상 종료했다.
@@ -259,13 +259,24 @@ PFN-06 Done
 
 자동 UI 입력은 키를 지속해서 누르는 비행을 재현하지 못했으므로 Gate 0→3 한 Lap 후 실제 구간 숫자 갱신은 미확인이다. TUT-04A는 초기 화면 수동 Pass만 추가하고 전체 Done으로 올리지 않는다. PIE와 Editor를 정상 종료했으며 13:21 KST 기준 Unreal 프로세스 0, Drone 작업 트리 Clean이다.
 
-## 2026-08-26 16:55 맵 이식 상태 재확인
+## 2026-08-26 맵 중앙화·미사용 템플릿 콘텐츠 정리
 
-- 프로젝트 소유 훈련 맵: `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`이 main에 있고 UE 5.8.1 Editor·PIE 초기 화면을 확인했다.
-- DronePack 정리 맵: `/Game/Drone/ThirdParty/DronePack/Map/Map_Demo`가 Commit `5540c6b`로 main에 포함되어 있다. 외부 `/Game`·누락 의존성 0, Map Check 0 errors·0 warnings, Blueprint 0/0/0, LFS 검증을 통과했다. 드론 6종·재질·스케일·조명을 Editor에서 보는 최종 시각 검토는 아직이다.
+- RabbitHole 실제 프로젝트의 프로젝트 소유 맵 중앙화 방식을 확인하고 Drone 프로젝트 규칙에 맞게 적용했다.
+- 중앙 맵 폴더: `/Game/Drone/Maps`
+- 프로젝트 소유 훈련 맵: `Lvl_DroneTraining`. UE 5.8.1 Editor·PIE 초기 화면 확인 완료.
+- 프로토타입 맵: `Lvl_DronePrototype`.
+- DronePack 검토 맵: 기존 `Map_Demo`를 `Lvl_DronePackShowcase`로 이름·위치 정리. 드론 6종·재질·스케일·조명 최종 시각 검토는 아직이다.
+- 제거한 콘텐츠 루트: `/Game/ThirdPerson`, `/Game/Variant_Combat`, `/Game/Variant_Platforming`, `/Game/Variant_SideScrolling` 및 대응 ExternalActors/ExternalObjects.
+- 제거 전 의존성 감사에서 중앙화 대상 맵 3개의 위 템플릿 루트 의존성 0, `/Game/Drone`에서 위 루트를 참조하는 자산 0을 확인했다.
+- 시작 맵·Editor 시작 맵: `/Game/Drone/Maps/Lvl_DroneTraining`.
+- 전역 GameMode: `/Game/Drone/Prototype/Blueprints/BP_DronePrototypeGameMode`.
+- C++ `DroneCharacter`·기존 GameMode/Controller와 Variant Source는 별도 Source/Build.cs 감사 전까지 삭제하지 않았다.
+- Git 감지 기준 변경 규모: 599개 경로, 삭제 589개, 이름·위치 변경 2개, 새 경로 추가 2개.
+- 검증: 중앙 맵 3개와 BuiltData 로드, 이전 경로·템플릿 루트 부재, `DroneEditor Win64 Development` Build, Blueprint Compile 0/0/0, 전체 `Drone.` 15/15, `git lfs fsck`, `git diff --check` 통과.
+- Git: 기능 Commit `1c8f391`, main Merge Commit `2cc5d79`; 로컬 `main=origin/main`, 작업 트리 Clean.
 - 환경 맵 3팩: Battlefield·MilitaryCamp·MilitaryBase `.umap`은 현재 Drone 저장소에 없다. Battlefield는 별도 스테이징 변환 도중 중단됐고 세 팩의 실제 `/Game/Drone/ThirdParty/Environments` 이식·대표 Map 검증은 `AST-03A` Doing이다.
 
-따라서 맵 이식 전체를 완료로 판정하지 않는다. `DronePack Map_Demo 1개 기술 이식 완료 / 환경 맵 3팩 미이식`이 현재 기준이다.
+따라서 현재 프로젝트 맵 정리는 완료지만 외부 환경 맵 이식 전체는 완료가 아니다. `프로젝트 맵 중앙화·템플릿 콘텐츠 정리 완료 / 환경 맵 3팩 미이식`이 현재 기준이다. 상세 규칙은 [`docs/DRONE_CONTENT_FOLDER_GUIDE.md`](docs/DRONE_CONTENT_FOLDER_GUIDE.md)를 따른다.
 
 ## 2026-08-26 Dataflow·Chaos 물리 환경 후보
 

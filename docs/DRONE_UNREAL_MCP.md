@@ -82,14 +82,14 @@ ModelContextProtocol.GenerateClientConfig Codex
 - `tools/list`: HTTP 200, `list_toolsets`, `describe_toolset`, `call_tool` 확인
 - `list_toolsets`: 23개 Toolset 확인
 - 실제 Editor 조회:
-  - Current Level: `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`
+  - Current Level: 당시 `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`, 현재 `/Game/Drone/Maps/Lvl_DroneTraining`
   - PIE: `false`
   - Selected Actors: 0
-  - Content Browser: `/Game/Drone/Prototype/Maps`
+  - Content Browser: 당시 `/Game/Drone/Prototype/Maps`, 현재 기본 선택 `/Game/Drone`
 - `AutomationTestToolset.DiscoverTests`: `ready`
 - `AutomationTestToolset.ListTests`의 `Drone.` 필터: 총 12개 반환
 - Codex 앱 번들 `codex.exe`는 WindowsApps 실행 권한 거부로 현재 PowerShell에서 `codex mcp list`를 직접 검증하지 못함
 
-위 12/12는 MCP 연결 당시의 검증 기록이다. 이후 TUT-03을 포함한 현재 Source 기준선 `551e287`에서는 전체 `Drone.` 14/14와 Tutorial 6/6을 통과했다. Drone 루트에서 새 Codex 작업을 열 때 `unreal-mcp`가 네이티브 Tool 목록에 나타나는지와 Current Level 호출을 한 번 확인해 `UE-MCP-02`를 닫는다. 이 연결 작업은 `AST-01`의 실제 스피커 Loop 청감 확인을 대신하지 않으며, 다음 기능 카드는 `TUT-04 이전 기록 비교·Best·결과 UI`다.
+위 12/12는 MCP 연결 당시의 검증 기록이다. 현재 Source 기준선 `2cc5d79`에서는 전체 `Drone.` 15/15와 Blueprint 0/0/0을 통과했다. Drone 루트에서 새 Codex 작업을 열 때 `unreal-mcp`가 네이티브 Tool 목록에 나타나는지와 Current Level 호출을 한 번 확인해 `UE-MCP-02`를 닫는다. 이 연결 작업은 `AST-01`의 실제 스피커 Loop 청감 확인을 대신하지 않으며, 다음 기능 카드는 `TUT-04 이전 기록 비교·Best·결과 UI`다.
 
 2026-08-26 09:17 KST에는 D 드라이브 프로젝트의 새 Editor PID 9884에서 MCP 서버 시작, 23 Toolset 등록과 `127.0.0.1:8000/mcp` HTTP 응답을 다시 확인했다. 현재 작업은 문서 루트에서 시작했으므로 이 재확인도 `UE-MCP-02`의 Codex 네이티브 Tool 노출 완료로 간주하지 않는다.

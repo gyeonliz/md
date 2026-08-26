@@ -176,7 +176,7 @@
 - 이번 재검증 `Drone.Integration.FPVAsset`: 1/1 Success
 - 이번 재검증 전체 Blueprint Compile: 0 errors, 0 warnings, 0 failed to load
 - 현재 Commit의 전체 자동화 기준선: `Drone.` 14/14. 이 전체 묶음은 TUT-03 완료 때 실행한 기준선이며 이번 재감사에서는 FPV 전용 테스트만 다시 실행
-- 프로젝트 전역 기본 Map/GameMode는 아직 ThirdPerson이다. 현재 통합 Pawn 확인은 `Lvl_DronePrototype` 또는 `Lvl_DroneTraining`을 직접 열어 수행
+- 이 재감사 시점의 프로젝트 전역 기본 Map/GameMode는 ThirdPerson이었다. 현재 `2cc5d79`에서는 기본 Map이 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode가 `BP_DronePrototypeGameMode`다.
 
 ### 남은 사람 확인
 
@@ -275,8 +275,8 @@ Commit `5a052c8bab2eb0dd8bc9ab16cfc7b3784e8e4cd7`을 `origin/codex/navigation-ar
 
 ### 현재 경계와 다음 단계
 
-`Map_Demo`를 전역 시작 Map이나 Training Map으로 지정하지 않았다. 기존 ThirdPerson 기본 실행 경로와 프로젝트 소유 Prototype Pawn·입력·Camera·Telemetry도 바꾸지 않았다. 다음 확인은 Editor에서 맵을 열어 드론 6종, 환경 배치, 재질, 스케일, 조명과 카메라 구도를 눈으로 확인하는 것이다. 이후 선택한 외형만 프로젝트 소유 Integration BP에 연결한다. 공급사 기능 Blueprint를 다시 상속하거나 입력·GameMode를 가져오지 않는다.
+당시 `Map_Demo`를 전역 시작 Map이나 Training Map으로 지정하지 않았고 기존 ThirdPerson 기본 실행 경로도 유지했다. 이후 Commit `2cc5d79`에서 이 맵을 `/Game/Drone/Maps/Lvl_DronePackShowcase`로 중앙화하고, 기본 실행 경로는 `/Game/Drone/Maps/Lvl_DroneTraining`으로 교체했다. 다음 확인은 Editor에서 Showcase 맵을 열어 드론 6종, 환경 배치, 재질, 스케일, 조명과 카메라 구도를 눈으로 확인하는 것이다. 이후 선택한 외형만 프로젝트 소유 Integration BP에 연결한다. 공급사 기능 Blueprint를 다시 상속하거나 입력·GameMode를 가져오지 않는다.
 
-위 문장은 11:50 당시의 중간 상태였으며 이후 완료됐다. 2026-08-26 16:55 KST 재확인 기준 154개는 Commit `5540c6b`로 main에 포함되어 있고, 최종 Merge 뒤 `main=origin/main=fb1d7ad`, 작업 트리 Clean이다. `Map_Demo`의 기술 이식은 완료했지만 Editor에서 드론 6종·재질·스케일·조명을 보는 시각 검토는 아직이다.
+위 문장은 11:50 당시의 중간 상태였으며 이후 완료됐다. 154개 원본 이식은 Commit `5540c6b`로 main에 포함됐고, 이후 맵 중앙화·템플릿 콘텐츠 정리 Merge `2cc5d79`까지 반영되어 `main=origin/main`, 작업 트리 Clean이다. 현재 맵 이름은 `Lvl_DronePackShowcase`이며 Editor에서 드론 6종·재질·스케일·조명을 보는 시각 검토는 아직이다.
 
 Battlefield·MilitaryCamp·MilitaryBase는 이 AST-01C 범위에 포함되지 않는다. 세 환경 팩의 `.umap`은 현재 Drone 저장소에 없으며 별도 `AST-03A`에서 이식·대표 Map 검증해야 한다.

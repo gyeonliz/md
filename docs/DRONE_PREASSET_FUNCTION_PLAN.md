@@ -6,7 +6,7 @@
 
 ## 1. 목적
 
-외부 구매 소스가 아직 없는 동안 모델·환경·애니메이션·효과·사운드의 완성도를 기다리지 않고, Unreal Engine 기본 도형과 기존 Template 자산만으로 게임의 핵심 기능을 먼저 검증한다.
+외부 구매 소스가 아직 없는 동안 모델·환경·애니메이션·효과·사운드의 완성도를 기다리지 않고, Unreal Engine 기본 도형과 프로젝트 소유 Placeholder로 게임의 핵심 기능을 먼저 검증한다. 초기에는 Template 자산도 참고했지만 현재 미사용 Template Content Root는 제거했다.
 
 구매 전 목표는 완성된 그래픽 데모가 아니라 다음 Greybox 플레이 사이클이다.
 
@@ -31,11 +31,11 @@ Spawn
 확인된 현재 상태는 다음과 같다.
 
 - 작업컴 기본 작업 루트: `D:\JGY\project`
-- UE 5.8.1 프로젝트: 현재 작업 경로 `D:\JGY\project\drone`; 로컬 `main`과 `origin/main`은 TUT-03 완료 Commit `551e287`
+- UE 5.8.1 프로젝트: 이번 확인 PC 작업 경로 `C:\URproject\drone`; 로컬 `main=origin/main=2cc5d79`
 - 문서 저장소: 현재 작업 경로 `D:\JGY\project\md`; 최신화 직전 로컬 `main=origin/main=466609d`이며 이후 상태는 [`STATUS.md`](../STATUS.md)를 따른다.
 - 별도 `ADronePrototypePawn`과 `ADronePrototypeGameMode` C++ 구현 완료
 - 컴포넌트 기본값과 standalone Spawn/Possess 자동화 테스트 완료
-- 기존 Third Person 기본 맵과 전역 GameMode 유지
+- 현재 기본 실행·Editor 시작 맵은 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode는 `BP_DronePrototypeGameMode`
 - PFN-01~05 완료: Prototype Input Action, IMC, Blueprint Pawn/GameMode, 전용 Greybox Map 생성·연결
 - 고정 추적 Camera, Mouse X Drone Yaw, Mouse Y Camera Pitch와 Gamepad 6축을 구현했다. 새 계약의 `PIEInputLifecycle` 자동화 3/3, Standalone Keyboard·Mouse 수동 조작과 창 닫기 정상 종료를 확인해 PFN-06은 Done이다.
 - Camera와 장치별 역할은 v1으로 확정했지만 감도·Mouse Y 반전·물리·Mesh·멀티플레이 방식은 미정
@@ -43,11 +43,11 @@ Spawn
 
 `HUD-01` Telemetry Snapshot과 `HUD-02` C++ HUD 기능·실제 WBP 표시를 완료했다. 이어서 `TUT-01` Training Map과 비충돌 Spline도 완료했다. 별도 Map의 실제 `BP_DroneTrainingCourse`가 수정 가능한 Spline과 Runtime SplineMesh 안내선을 제공하며, 프로젝트 소유 불투명·Unlit·Emissive `M_DroneTrainingGuide`를 사용한다. Course Actor, Spline과 표시선은 Collision·Overlap·Physics·Navigation 영향을 모두 끈다. TUT-01 당시 전체 `Drone` 자동화 10/10, Tutorial 3/3, Blueprint Compile 오류·경고 0/0과 Standalone 안내선 표시를 확인했다.
 
-`TUT-02`에서는 실제 `BP_DroneTrainingGate` 4개, Course의 명시적 Gate 순서와 정방향 통과 판정을 구현했다. 이어진 `TUT-03`에서는 정상 Gate Event만 구독하는 Course 소유 Recorder를 추가해 Segment/Lap 시간, 실제 3차원 이동 거리와 평균 속도 원본을 기록한다. 현재 `main=origin/main=551e287`이며 전체 `Drone.` 자동화 14/14, Tutorial 6/6, Blueprint Compile Errors/Warnings/Load Failures 0/0/0을 통과했다.
+`TUT-02`에서는 실제 `BP_DroneTrainingGate` 4개, Course의 명시적 Gate 순서와 정방향 통과 판정을 구현했다. 이어진 `TUT-03`에서는 정상 Gate Event만 구독하는 Course 소유 Recorder를 추가해 Segment/Lap 시간, 실제 3차원 이동 거리와 평균 속도 원본을 기록한다. 현재 `main=origin/main=2cc5d79`이며 전체 `Drone.` 자동화 15/15, Blueprint Compile Errors/Warnings/Load Failures 0/0/0을 통과했다.
 
 현재 실행 카드는 `TUT-04 이전 기록 비교·Best·결과 UI`다. 비교 규칙과 표시 형식은 구현 전에 확정하며, 현재 C++·BP·Editor 책임과 사용자 수동 확인법은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
 
-새 생산 코드는 `Source/Drone`, 새 자산은 `/Game/Drone` 아래에 둔다. ThirdPerson·Combat·Platforming·SideScrolling은 참고용 Legacy로 동결하고 신규 상속·참조를 만들지 않는다. Prototype IMC는 Pawn만 등록·제거하며 PlayerController와 Level Blueprint에는 같은 책임을 추가하지 않는다. 이 계획을 세울 당시 검증 범위는 Standalone 싱글플레이였고 네트워크·Android·구매 에셋을 제외했다. 현재도 네트워크·Android는 제외하지만, 검증을 통과한 FPV 외형·Loop 최소 이식은 적용된 상태다.
+새 생산 코드는 `Source/Drone`, 새 자산은 `/Game/Drone` 아래에 둔다. ThirdPerson·Combat·Platforming·SideScrolling Content Root는 제거했으며 남은 C++ Legacy/Variant Source에는 신규 상속·참조를 만들지 않는다. Prototype IMC는 Pawn만 등록·제거하며 PlayerController와 Level Blueprint에는 같은 책임을 추가하지 않는다. 이 계획을 세울 당시 검증 범위는 Standalone 싱글플레이였고 네트워크·Android·구매 에셋을 제외했다. 현재도 네트워크·Android는 제외하지만, 검증을 통과한 FPV 외형·Loop 최소 이식은 적용된 상태다.
 
 ## 3. 구매 전 범위
 

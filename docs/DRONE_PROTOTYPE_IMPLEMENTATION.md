@@ -176,7 +176,7 @@ Input Action이 배정되지 않았으면 크래시 대신 진단 로그를 남�
 /Game/Drone/Prototype/Blueprints/BP_DronePrototypeGameMode
 /Game/Drone/Prototype/Blueprints/BP_DronePrototypePlayerController
 /Game/Drone/Prototype/UI/WBP_DroneFlightHUD
-/Game/Drone/Prototype/Maps/Lvl_DronePrototype
+/Game/Drone/Maps/Lvl_DronePrototype
 ```
 
 기존 Setup 도구는 Input·Pawn·GameMode·Map 9개 자산을 계속 검증한다. 추가한 BP Controller와 WBP 2개는 `Drone.UI.FlightHUDBlueprintAsset` 자동화가 부모 Class, 필수 TextBlock·Font와 Class 연결을 별도로 검증한다. 현재 Prototype 전체 자산은 이 둘을 포함해 11개다.

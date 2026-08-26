@@ -17,7 +17,7 @@ TUT-03     Done, Segment/Lap 시간 · 실제 이동 거리 · 평균 속도 원
 TUT-04     Next, 이전 기록 비교 · Best · 결과 UI
 ```
 
-현재 Source 기준은 `main=origin/main=551e287`이다. TUT-03까지 포함한 전체 `Drone.` 자동화 14/14, Tutorial 6/6, Blueprint Compile Errors/Warnings/Load Failures 0/0/0을 통과했다. 결과 UI는 아직 TUT-04 범위이므로 화면에 Lap 수치가 나타나지 않는 것이 정상이다. 현재 구조와 사용자 수동 확인 절차는 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
+현재 Source 기준은 `main=origin/main=2cc5d79`이다. 전체 `Drone.` 자동화 15/15, Blueprint Compile Errors/Warnings/Load Failures 0/0/0을 통과했다. 결과 UI는 아직 TUT-04 범위이므로 화면에 Lap 수치가 나타나지 않는 것이 정상이다. 현재 구조와 사용자 수동 확인 절차는 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
 
 2026-08-19 사전 PIE 두 번에서 Prototype 입력 계열이 실제로 반응하는 것은 확인했다. 그러나 어느 실행도 한 번의 새 PIE 안에서 전체 체크리스트를 끝내지 못했으므로 Pass로 계산하지 않는다. 두 실행은 이미 종료된 역사적 부분 확인이며 현재 열린 PIE가 있다는 뜻이 아니다.
 

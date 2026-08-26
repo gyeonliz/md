@@ -291,7 +291,7 @@ Event는 상태를 먼저 반영한 뒤 Broadcast한다. Blueprint가 Event 안�
 ### 준비
 
 1. UE 5.8.1에서 프로젝트를 연다.
-2. `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`을 연다.
+2. `/Game/Drone/Maps/Lvl_DroneTraining`을 연다.
 3. World Outliner에서 `BP_DroneTrainingCourse`를 선택한다.
 4. Course의 `OrderedGates`가 Gate 0, 1, 2, 3 순서인지 확인한다.
 5. PIE를 시작하고 Gate 0이 Current 상태인지 확인한다.

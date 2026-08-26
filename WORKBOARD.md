@@ -4,27 +4,27 @@
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 현재 기준선은 로컬 `main`과 `origin/main`이 일치하는 Merge Commit `fb1d7ad`이다. 기존 `main`의 `5540c6b` 작업을 보존하고 `AST-02A` Commit `5a052c8`을 병합했으며 작업 트리는 Clean이다. 기능 실행 순서는 `TUT-04 비교·결과 UI → Flight 상태 → Operator↔Drone → Story/NPC/Mission → AI/MG/Jamming`이며, 검증된 소형 에셋 이식은 기능 작업과 병행한다.
+Unreal 현재 기준선은 로컬 `main`과 `origin/main`이 일치하는 Merge Commit `2cc5d79`이다. `fb1d7ad` 이후 맵 중앙화와 미사용 템플릿 콘텐츠 제거 Commit `1c8f391`을 병합했으며 작업 트리는 Clean이다. 기능 실행 순서는 `TUT-04 비교·결과 UI → Flight 상태 → Operator↔Drone → Story/NPC/Mission → AI/MG/Jamming`이며, 검증된 소형 에셋 이식은 기능 작업과 병행한다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-08-26 16:55 KST — 맵 이식 상태 재확인
+마지막 갱신: 2026-08-26 17:31 KST — 맵 중앙화·미사용 템플릿 콘텐츠 정리 완료
 
 | 항목 | 상태 |
 |---|---|
 | 현재 단계 | 3단계 Tutorial Vertical Slice — `TUT-04A` 자동 검증과 PIE 초기 화면 통과, 한 Lap 구간 값 갱신 확인 대기 |
 | 진행 정도 | 한글 현재 속도·고도·수직속도·방향과 구간 기록 패널, 현재 Gate와 세분화 코스 선을 실제 PIE에서 확인했다. 최근·평균 구간 값은 코드·자동화 검증을 통과했지만 실제 Gate 0→3 비행 후 숫자 갱신은 아직 확인하지 않았다 |
-| 지금 작업 중 | NavigationArrows main 병합·Push, 전체 회귀 검증과 TUT-04A 초기 화면 확인까지 완료했다. Unreal 실행은 0이며 실제 한 Lap 수동 비행 확인이 남았다. 환경 맵 이식은 별도 일시 중단 상태다 |
-| 완료 근거 | 병합 main에서 `DroneEditor` Build, 전체 `Drone.` 15/15, Blueprint 0/0/0, LFS fsck 통과. 이전 Training Map 감사에서 Course 1, Curve Spline 6점·약 64.9 m, Gate 4개 확인 |
+| 지금 작업 중 | 맵 중앙화·템플릿 콘텐츠 정리와 원격 반영까지 완료했다. Unreal 실행은 0이며 실제 한 Lap 수동 비행 확인이 남았다. 환경 맵 이식은 별도 일시 중단 상태다 |
+| 완료 근거 | `main=origin/main=2cc5d79`. 중앙 맵 3개와 BuiltData 로드, 이전 경로·템플릿 루트 부재, `DroneEditor` Build, 전체 `Drone.` 15/15, Blueprint 0/0/0, LFS fsck 통과 |
 | 수동 미확인 | Gate 0→3 한 Lap 후 최근·완료 구간 숫자 갱신, 저장 Map의 GateIndex 0~3 상세 확인, DronePack 화면·Loop 청감, 환경 맵 3종 로드·Map Check는 미확인 |
 | 현재 차단 | 기능 코드의 기술 차단은 없다. 자동 UI 제어는 지속 키 입력이 짧아 한 Lap을 재현하지 못했다. TUT-04A 완료 판정에는 사람이 실제 한 바퀴를 비행한 화면 결과가 남아 있다 |
 | 다음 행동 | `Lvl_DroneTraining`에서 Gate 0→3을 실제로 한 바퀴 비행해 방금 구간·완료 구간 속도/거리/시간 갱신을 확인한다. 통과 후 `TUT-04B` 이전 성공 Lap 평균·Best 비교로 진행한다 |
 | 다음 기능 | TUT-04A 한 Lap 수동 확인 후 이전 성공 Lap 평균·Best 대비 `+/-` 비교를 `TUT-04B`로 구현 |
 | 에셋 인수 | 이번 확인 PC의 제공 에셋 루트는 `C:\에셋`. NavigationArrows 6개는 main 반영 완료. D 드라이브 환경 팩 스테이징은 별도 PC의 중단 기록으로 보존 |
-| 맵 이식 | DronePack 정리 `Map_Demo` 1개는 Commit `5540c6b`로 main 반영·기술 검증 완료, Editor 시각 검토 대기. Battlefield·MilitaryCamp·MilitaryBase 대표 맵은 실제 저장소 미이식, AST-03A Doing |
-| Editor/MCP | 2026-08-26 13:21 KST 현재 `UnrealEditor`와 `UnrealEditor-Cmd` 실행 0. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
+| 맵 이식 | 프로젝트 맵 3개를 `/Game/Drone/Maps`로 중앙화했다. 기존 `Map_Demo`는 `Lvl_DronePackShowcase`로 변경했고 Editor 시각 검토는 대기 중이다. Battlefield·MilitaryCamp·MilitaryBase 대표 맵은 실제 저장소 미이식, AST-03A Doing |
+| Editor/MCP | 2026-08-26 17:31 KST 현재 `UnrealEditor`와 `UnrealEditor-Cmd` 실행 0. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
-| Git 처리 | 이번 확인 PC의 `C:\URproject\drone`은 `main=origin/main=fb1d7ad`, 작업 트리 Clean. `5540c6b`를 보존한 Merge이며 NavigationArrows `5a052c8`이 main 이력에 포함됨 |
+| Git 처리 | 이번 확인 PC의 `C:\URproject\drone`은 `main=origin/main=2cc5d79`, 작업 트리 Clean. 맵 중앙화·템플릿 정리 기능 Commit은 `1c8f391`, main 병합 Commit은 `2cc5d79` |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
 | 학습 다음 행동 | Q-Net 상태를 확인해 Track A/B/C를 고르고 첫 학습 블록 실행 |
 
@@ -111,6 +111,7 @@ Unreal 현재 기준선은 로컬 `main`과 `origin/main`이 일치하는 Merge 
 | AST-00 | Drone / Unreal | 최초 D 드라이브 감사 당시 제공 ZIP 14개와 해제 폴더 14개의 상대 경로·크기를 대조해 Missing/Extra/SizeMismatch 0 확인. 10,499개·35,677,612,290 bytes 기준선과 UE 4.23~5.6 이식 계획 기록. 이 행의 이식 0건은 당시 시점의 역사 기록 |
 | AST-VERIFY-01 | Drone / Unreal | 다른 PC의 `C:\에셋` 14개 공급사 해제본·스테이징·내부 FBX를 재감사. 내부 FBX 55개 SHA-256 불일치 0, 프로젝트 선택 자산 12개+Integration BP 1개 존재, 스테이징 선택 자산·현재 Integration 금지 의존성 0, LFS fsck·FPV 자동화 1/1·Blueprint 0/0/0 통과. 소스 팩 Config의 활성 Android 토큰은 값 노출 없이 복사 금지로 기록 |
 | AST-02A | Drone / Unreal / UI | NavigationArrows 최소 이식과 main 공유 완료. 기능 폐쇄 집합 6개, 외부 Game 의존성 0. Commit `5a052c8`을 기능 Branch에 Push하고 `fb1d7ad`로 main 병합·Push. 병합 main에서 Build, 전용 1/1, 전체 15/15, BP 0/0/0, LFS 검증 통과. 실제 화면 Host/Wrapper 미구현은 후속 경계 |
+| AST-CLEAN-01 | Drone / Unreal / Asset | RabbitHole의 프로젝트 소유 맵 중앙화 방식을 참고해 `/Game/Drone/Maps`로 맵 3개를 모았다. 미사용 `ThirdPerson`과 Variant 콘텐츠 3종 및 대응 ExternalActors/ExternalObjects를 제거했다. 중앙 맵 로드·이전 경로 부재·Build·전체 15/15·BP 0/0/0·LFS 검증 뒤 `2cc5d79`로 main Push 완료. C++ Legacy/Variant 코드는 별도 감사 전까지 보존 |
 | UE-MCP-01 | Drone / Unreal / Codex Sync | UE 5.8 공식 `ModelContextProtocol`과 Editor·Automation·UMG·StateTree·AI Toolset을 Editor Target으로 연결. Codex 프로젝트 설정·자동 시작 기본값 추가, Editor/Game Build, 전체 Drone 12/12, HTTP MCP 초기화·23 Toolset·Training Map 상태 조회·12개 테스트 탐색 통과. 새 Codex 작업의 네이티브 노출 확인은 UE-MCP-02로 분리 |
 | STUDY-PLAN-01 | 정보처리산업기사 / Coding Test | Q-Net 공식 2026 일정·시험 구성을 확인하고 접수 상태별 Track A/B/C, C++ 주간 병행안과 이동용 통합 문서를 작성 |
 | SYNC-01 | Codex Sync | 목표·완료·진행·결정·미정·다음 작업 형식 정의 |
@@ -121,7 +122,7 @@ Unreal 현재 기준선은 로컬 `main`과 `origin/main`이 일치하는 Merge 
 
 ## 이번 인계의 정지선
 
-Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 로컬 `main`과 `origin/main`은 Merge Commit `fb1d7ad2c23d6bf3b1c854ca7c1c0cddba2062ef`로 일치한다. `5540c6b`는 병합 전 main, `5a052c8`은 NavigationArrows 기능 Commit, `551e287`은 TUT-03 기준선이다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
+Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 로컬 `main`과 `origin/main`은 Merge Commit `2cc5d79`로 일치한다. `1c8f391`은 맵 중앙화·템플릿 콘텐츠 정리 기능 Commit, `fb1d7ad`는 그 직전 NavigationArrows 병합 기준선, `551e287`은 TUT-03 기준선이다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
 
 Android 제외와 PFN-01~06, HUD-01, HUD-02, TUT-01~03, 최초 에셋 인수 감사 `AST-00`, 다른 PC의 `C:\에셋` 재검증 `AST-VERIFY-01`, NavigationArrows 최소 이식·원격 공유 `AST-02A`를 완료했다. `AST-01`은 선택 자산 12개와 Integration BP 이식 뒤 기존 전체 회귀와 Standalone 초기 렌더를 통과했고, 이번에는 FPV 1/1·Blueprint 0/0/0·의존성·LFS만 다시 검증했다. 실제 Loop 단일 재생·종료 정지는 수동 미확인이므로 Pass나 Fail로 간주하지 않고 Doing을 유지한다. 다음 기능 카드는 `TUT-04`이며 이전 평균·Best 비교와 기록 결과 UI는 아직 구현된 기능으로 보지 않는다. 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다.
 
@@ -132,4 +133,5 @@ UE-MCP-01도 완료했다. 이후 Editor 내부 Actor·Asset·Blueprint·UMG·Au
 - 제공 에셋의 프로젝트 사용 권리는 사용자가 지원과정 구매·지급 근거로 확인했다. 로컬 증빙 파일 미발견은 별도 보관 상태로 기록한다.
 - `AST-02A`의 기술 이식·검증·기능 Branch와 `main` Push는 완료했다. 실제 Training HUD 연결은 아직 하지 않았다.
 - HUD 연결 전에도 자산은 안전하게 로드 가능한 상태지만, 화면에 보이는 구현으로 과장하지 않는다.
+- 프로젝트 소유 맵은 `/Game/Drone/Maps` 한 곳에서 관리한다. 공급사 원본 맵을 추가할 때도 검토용 사본만 이 폴더에 두고 의존 자산은 각 ThirdParty 폴더에 유지한다.
 - 바로 다음 기능은 기존 우선순위의 `TUT-04`다. 프로젝트 소유 Navigation Host/Wrapper 화면 연결은 별도 후속 카드로 시작한다.

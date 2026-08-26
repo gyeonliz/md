@@ -6,11 +6,12 @@
 
 ## 30초 요약
 
-- Unreal 저장소 `main`과 GitHub `origin/main`은 `551e287`로 일치한다.
+- Unreal 저장소 `main`과 GitHub `origin/main`은 `2cc5d79`로 일치한다.
 - Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개와 Segment/Lap 원본 기록까지 구현됐다.
 - 현재 개발 완료 지점은 `TUT-03`, 다음 구현 카드는 `TUT-04 비교·결과 UI`다.
-- 현재 D 드라이브 작업 PC의 제공 에셋 루트는 `D:\JGY\project\Unreal_260821`이다. FPV·Loop 선택 자산 12개와 프로젝트 Integration BP 1개의 파일·참조·LFS·자동 검증은 통과했다.
-- NavigationArrows 최소 자산 6개와 전용 테스트는 Commit `5a052c8`로 원격 기능 Branch에 Push됐지만 main 미병합·화면 Host 미구현이다.
+- 이번 확인 PC의 제공 에셋 루트는 `C:\에셋`이다. FPV·Loop 선택 자산 12개와 프로젝트 Integration BP 1개의 파일·참조·LFS·자동 검증은 통과했다.
+- NavigationArrows 최소 자산 6개와 전용 테스트는 main에 병합됐다. 화면 Host는 아직 미구현이다.
+- 프로젝트 맵 3개는 `/Game/Drone/Maps`로 중앙화했고 미사용 ThirdPerson·Variant Template Content는 제거했다.
 - 사용자는 Gate나 기록 C++를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도와 Drone Loop를 확인하면 된다.
 - 확정된 학습 항목은 `정보처리산업기사`와 `C++ 코딩테스트` 두 가지뿐이다.
 - 정보처리산업기사 2026년 3회 필기 접수는 끝났다. 오늘 가장 먼저 Q-Net에서 자신의 접수·면제·응시 상태를 확인해야 한다.
@@ -20,18 +21,18 @@
 
 | 구분 | 현재 상태 |
 |---|---|
-| Unreal 저장소 | `D:\JGY\project\drone` |
-| Unreal 기준 Commit | `551e287e8a5de7fa33f28d1911f8a7a957bd66fa` |
-| Git 상태 | 깨끗한 `main`, 로컬·원격 `551e287` 일치. NavigationArrows `5a052c8`은 원격 기능 Branch·main 미병합 |
+| Unreal 저장소 | `C:\URproject\drone` |
+| Unreal 기준 Commit | `2cc5d79` |
+| Git 상태 | 깨끗한 `main`, 로컬·원격 `2cc5d79` 일치 |
 | Git LFS | `fsck` 정상 |
 | 최종 Editor Build | 성공 |
 | Tutorial 자동화 | 6/6 통과 |
-| 전체 `Drone.` 자동화 | 14/14 통과 |
+| 전체 `Drone.` 자동화 | 15/15 통과 |
 | Blueprint Compile | Errors 0, Warnings 0, Load Failures 0 |
 | Standalone | 실제 WBP HUD·Cyan Course·Current/Inactive Gate 표시 확인 |
 | 에셋 이식 | FPV 전용 자동화 1/1, 금지 의존성 0, LFS fsck 통과 |
 
-이번 TUT-03 작업에서 Editor Build, Tutorial 6개, 전체 Drone 14개와 Blueprint 전체 Compile을 실제로 다시 실행했다. 모든 자동화는 warning·error 없이 통과했다.
+현재 맵 중앙화·템플릿 정리 기준에서 Editor Build, 전체 Drone 15개와 Blueprint 전체 Compile을 다시 실행했다. 모든 자동화는 warning·error 없이 통과했다.
 
 ## 2. 코드가 어떻게 연결되는가
 
@@ -128,7 +129,7 @@ Lvl_DroneTraining
 - 배터리·통신거리·재밍
 - SaveGame·Multiplayer·최종 에셋 전면 적용
 
-Template의 `Variant_Combat`에 AI와 StateTree 코드가 있어도 Drone Enemy AI가 구현됐다는 뜻은 아니다. 현재 전역 시작 Map도 ThirdPerson 기준이므로 Training Map을 직접 열어야 한다.
+남아 있는 C++ `Variant_Combat`에 AI와 StateTree 코드가 있어도 Drone Enemy AI가 구현됐다는 뜻은 아니다. 대응 Template Content는 제거했고 현재 전역 시작 Map은 `/Game/Drone/Maps/Lvl_DroneTraining`이다.
 
 ## 4. 사용자가 지금 해야 하는 일
 
@@ -149,12 +150,12 @@ Template의 `Variant_Combat`에 AI와 StateTree 코드가 있어도 Drone Enemy 
 ### PC 앞에서 할 일
 
 1. 다른 PC라면 `drone`과 `md` 저장소를 Pull한다.
-2. Unreal Commit이 `551e287`인지, LFS Asset이 내려왔는지 확인한다.
-3. UE 5.8.1에서 `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`을 직접 연다.
+2. Unreal Commit이 `2cc5d79`인지, LFS Asset이 내려왔는지 확인한다.
+3. UE 5.8.1에서 `/Game/Drone/Maps/Lvl_DroneTraining`을 직접 연다.
 4. Gate 0→1→2→3을 정방향으로 완주한다.
 5. 미래 Gate를 먼저 통과하거나 현재 Gate를 역방향으로 통과해 진행되지 않는지 확인한다.
 6. 마지막 Gate 뒤 네 Gate가 모두 Completed 색인지 확인한다.
-7. 현재 화면에 Lap 결과 UI가 없는 것이 정상임을 확인한다. 계산 원본은 자동화 14/14로 검증된 TUT-03 범위다.
+7. 현재 화면에 Lap 결과 UI가 없는 것이 정상임을 확인한다. 계산 원본을 포함한 현재 전체 자동화는 15/15다.
 8. Gate 크기·높이·간격·색 대비와 Keyboard/Gamepad 조종 체감을 메모한다.
 9. FPV Body와 Rotor 4개의 크기·방향·Camera 가림이 정상인지 확인한다.
 10. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가고 종료 후 즉시 멈추는지 기록한다.

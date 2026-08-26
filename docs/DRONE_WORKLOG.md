@@ -18,20 +18,20 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-26 13:21 KST
+마지막 갱신: 2026-08-26 17:31 KST — 맵 중앙화·템플릿 콘텐츠 정리
 
 | 구분 | 현재 상태 |
 |---|---|
 | 전체 단계 | 3단계 Tutorial Vertical Slice — `TUT-03` 완료, `TUT-04A` 자동 검증·PIE 초기 화면 통과, 한 Lap 확인 대기 |
-| Unreal 기준선 | 이번 확인 PC 로컬 `main=origin/main=fb1d7ad`, `DroneEditor Win64 Development` Build 성공 |
+| Unreal 기준선 | 이번 확인 PC 로컬 `main=origin/main=2cc5d79`, `DroneEditor Win64 Development` Build 성공 |
 | 자동 검증 | 전체 `Drone.` `15/15`, Blueprint Compile `0 errors / 0 warnings / 0 load failures`, LFS fsck 정상 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | NavigationArrows main 병합·Push와 회귀 검증, `TUT-04A` PIE 초기 HUD·코스 화면 확인 완료. 실제 한 Lap 기록 갱신 확인 대기 |
+| 지금 작업 중 | 맵 중앙화·미사용 템플릿 콘텐츠 정리와 원격 반영 완료. `TUT-04A` 실제 한 Lap 기록 갱신 확인 대기 |
 | 차단 조건 | 기능 코드의 기술 차단은 없음. 자동 UI 제어로 지속 비행을 재현하지 못해 사람이 Gate 0→3 한 바퀴를 비행해야 함 |
 | 다음 행동 | 실제 한 Lap 뒤 방금 구간·완료 구간 속도/거리/시간 갱신을 확인하고 결과 기록 |
 | 다음 기능 | TUT-04A 한 Lap 수동 확인 후 이전 평균·Best `+/-` 비교를 `TUT-04B`로 구현 |
 | 이후 | Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming |
-| Git 처리 | 기존 main `5540c6b`를 보존하고 NavigationArrows `5a052c8`을 Merge Commit `fb1d7ad`로 `origin/main`에 Push 완료. Drone 작업 트리 Clean |
+| Git 처리 | 맵 정리 기능 Commit `1c8f391`을 Merge Commit `2cc5d79`로 `origin/main`에 Push 완료. Drone 작업 트리 Clean |
 
 ## 2026-08-21 — Camera·Mouse·Gamepad 기준선 갱신
 
@@ -214,7 +214,7 @@ HeadingValueText
 
 ### 확정 범위
 
-- 별도 `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining` Map을 만든다.
+- 별도 Training Map을 만든다. 당시 경로는 `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`이며 현재는 `/Game/Drone/Maps/Lvl_DroneTraining`으로 중앙화했다.
 - `ADroneTrainingCourse`가 편집 가능한 `USplineComponent`와 Standalone에서도 보이는 표시용 구성요소를 소유한다.
 - 표시용 Actor·Spline·Mesh의 Collision, Overlap, Physics, Navigation 영향을 모두 끈다.
 - 기존 `BP_DronePrototypeGameMode`를 재사용해 Prototype Pawn/Input/HUD 기준선을 유지한다.
@@ -413,7 +413,7 @@ HeadingValueText
 - MCP `initialize` HTTP 200과 Session ID, `notifications/initialized` 202, `tools/list` 200을 확인했다.
 - Tool Search 메타 툴 `list_toolsets`, `describe_toolset`, `call_tool`이 반환됐다.
 - 선택 Plugin 구성에서 총 23개 Toolset이 검색됐다.
-- 실제 MCP 호출로 Current Level `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`, PIE false, Selected Actors 0, Content Browser `/Game/Drone/Prototype/Maps`를 조회했다.
+- 실제 MCP 호출로 당시 Current Level `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`, PIE false, Selected Actors 0, Content Browser `/Game/Drone/Prototype/Maps`를 조회했다. 현재 Map 경로는 `/Game/Drone/Maps/Lvl_DroneTraining`이다.
 - `AutomationTestToolset.DiscoverTests`는 `ready`, `ListTests`의 `Drone.` 필터는 12개를 반환했다.
 - Codex 앱 번들 CLI는 WindowsApps 권한 거부로 PowerShell의 `codex mcp list`를 실행하지 못했다. 이는 Unreal MCP 서버나 프로젝트 TOML 오류가 아니라 현재 앱 패키지 실행 경계다.
 
@@ -674,3 +674,43 @@ HeadingValueText
 - `Map_Demo`에서 드론 6종·재질·스케일·조명을 직접 보는 최종 시각 검토는 아직 하지 않았다.
 - Battlefield·MilitaryCamp·MilitaryBase 이름의 `.umap`은 현재 Drone 저장소에 0개다. Battlefield 스테이징 변환과 세 팩 실제 이식·대표 맵 검증은 `AST-03A` Doing으로 남긴다.
 - `Lvl_DroneTraining`은 외부 맵 이식 결과가 아니라 프로젝트 소유 Tutorial Map이다.
+
+## 2026-08-26 — RabbitHole 참고·맵 중앙화·템플릿 콘텐츠 정리
+
+### 참고 구조와 결정
+
+- 실제 최신 RabbitHole 프로젝트 `C:\project\Fractured\GoDownTheRabbitHole.uproject`의 Content와 Config를 확인했다.
+- RabbitHole은 프로젝트 소유 맵을 `Content/Maps`에 모으고 Blueprint를 AI·GameMode·PlayerManager·Widget 등 역할별 폴더로 나눈다. 공급사 맵은 공급사 폴더에 유지한다.
+- Drone에는 프로젝트에서 실제 사용하는 맵만 `/Game/Drone/Maps`에 모으는 규칙을 적용했다. 공급사 Mesh·Material 등 의존 자산은 ThirdParty 경계를 유지한다.
+
+### 실제 변경
+
+- `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining` → `/Game/Drone/Maps/Lvl_DroneTraining`
+- `/Game/Drone/Prototype/Maps/Lvl_DronePrototype` → `/Game/Drone/Maps/Lvl_DronePrototype`
+- `/Game/Drone/ThirdParty/DronePack/Map/Map_Demo` → `/Game/Drone/Maps/Lvl_DronePackShowcase`
+- Showcase BuiltData도 같은 중앙 맵 폴더로 이동했다.
+- `/Game/ThirdPerson`, `/Game/Variant_Combat`, `/Game/Variant_Platforming`, `/Game/Variant_SideScrolling`과 대응 ExternalActors/ExternalObjects를 제거했다.
+- `DefaultEngine.ini`, `DefaultEditor.ini`, Editor Content Browser 기본 경로와 자동화 테스트의 맵 경로를 새 기준으로 갱신했다.
+- 기본 실행·Editor 시작 맵은 `Lvl_DroneTraining`, 전역 GameMode는 프로젝트 소유 `BP_DronePrototypeGameMode`다.
+- C++ `DroneCharacter`, 기존 GameMode/Controller와 Variant Source는 Source/Build.cs 별도 감사가 필요해 보존했다.
+- Git 감지 기준 변경 규모는 599개 경로, 삭제 589개, 이름·위치 변경 2개, 새 경로 추가 2개다. 삭제 파일은 Git 이력에서 복구할 수 있다.
+
+### 감사와 검증
+
+- 삭제 전 프로젝트 맵 3개의 네 Template Root 의존성 0, `/Game/Drone` 자산의 외부 참조 0을 확인했다.
+- 중앙 맵 3개와 Showcase BuiltData 로드 성공.
+- 이전 맵 경로와 제거 대상 Template Root 자산 0.
+- `DroneEditor Win64 Development` Build 성공.
+- Blueprint Compile `0 errors / 0 warnings / 0 failed loads`.
+- 전체 `Drone.` 자동화 `15/15` 성공.
+- 중앙 맵 4개 LFS 속성, `git lfs fsck`, `git diff --check` 통과.
+
+### Git과 남은 확인
+
+- 기능 Commit: `1c8f391 chore: centralize drone maps and remove templates`
+- main Merge Commit: `2cc5d79 merge: centralize drone maps and remove templates`
+- 기능 Branch와 `origin/main` Push 완료. 최종 `main=origin/main=2cc5d79`, Drone 작업 트리 Clean.
+- 프로젝트 맵 중앙화와 템플릿 콘텐츠 정리는 완료다.
+- `Lvl_DronePackShowcase`의 드론 6종·재질·스케일·조명 시각 검토와 `Lvl_DroneTraining` 한 Lap 수동 비행은 아직이다.
+- Battlefield·MilitaryCamp·MilitaryBase 환경 맵은 여전히 미이식이다.
+- 현재 폴더 규칙: [`DRONE_CONTENT_FOLDER_GUIDE.md`](DRONE_CONTENT_FOLDER_GUIDE.md)

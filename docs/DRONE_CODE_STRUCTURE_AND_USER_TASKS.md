@@ -4,9 +4,9 @@
 
 이 문서는 현재 Unreal `drone` 저장소를 직접 확인한 결과를 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
 
-현재 TUT-03 완료 기준은 Unreal Commit `551e287` (`feat: record tutorial lap timing and distance`)이다. `codex/tutorial-lap-recording` Branch와 `main`을 모두 Push했으며 로컬 `main`과 `origin/main`이 이 Commit으로 일치한다.
+TUT-03 완료 기능 Commit은 `551e287`이다. 현재 Unreal 기준선은 맵 중앙화·미사용 템플릿 콘텐츠 정리를 포함한 `main=origin/main=2cc5d79`이며 작업 트리는 Clean이다.
 
-NavigationArrows 최소 이식 Commit `5a052c8`은 `origin/codex/navigation-arrows-migration`에만 있고 main에는 아직 병합하지 않았다. 따라서 아래 main 런타임 구조에는 NavigationArrows Widget Host가 없으며 화면에 나타나지 않는 것이 정상이다.
+NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합됐다. 자산은 main에 있지만 프로젝트 소유 Widget Host는 아직 구현하지 않았으므로 화면에 나타나지 않는 것이 정상이다.
 
 ## 현재 검증 기준선
 
@@ -14,7 +14,7 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `origin/codex/navigation-arro
 |---|---|
 | `DroneEditor Win64 Development` | Build 성공 |
 | `Drone.Tutorial` Automation | 6/6 통과 |
-| 전체 `Drone.` Automation | 14/14 통과 |
+| 전체 `Drone.` Automation | 15/15 통과 |
 | `CompileAllBlueprints` | Errors 0, Warnings 0, Load Failures 0 |
 | 현재 에셋 이식 재검증 | FPV 전용 1/1, Blueprint 0/0/0, 스테이징 선택 자산·현재 Integration 금지 의존성 0, 이식 13개 LFS와 fsck 통과 |
 | 기존 Standalone 시각 기록 | FPV 외형, 고정 추적 Camera, 실제 WBP HUD, Cyan 안내선, Current/Inactive Gate 표시 확인 |
@@ -27,7 +27,7 @@ TUT-03 Git 기준 `551e287`에서 Gate 순서 판정과 Segment/Lap 기록을 �
 ### Training Map 전체 흐름
 
 ```text
-/Game/Drone/Tutorial/Maps/Lvl_DroneTraining
+/Game/Drone/Maps/Lvl_DroneTraining
 │
 ├─ WorldSettings
 │  └─ BP_DronePrototypeGameMode
@@ -177,6 +177,16 @@ Source/Drone/
 | `EDroneTrainingGateVisualState` | `Inactive`, `Current`, `Completed` 상태 표현 | Lap 상태 표현 |
 | `EDroneTrainingLapRecordState` | `Idle`, `Recording`, `Completed` 기록 상태 표현 | Gate 시각 상태 표현 |
 
+### 중앙 Map Asset
+
+```text
+Content/Drone/Maps/
+├─ Lvl_DroneTraining.umap
+├─ Lvl_DronePrototype.umap
+├─ Lvl_DronePackShowcase.umap
+└─ Lvl_DronePackShowcase_BuiltData.uasset
+```
+
 ### Tutorial Asset
 
 ```text
@@ -184,8 +194,6 @@ Content/Drone/Tutorial/
 ├─ Blueprints/
 │  ├─ BP_DroneTrainingCourse.uasset
 │  └─ BP_DroneTrainingGate.uasset
-├─ Maps/
-│  └─ Lvl_DroneTraining.umap
 └─ Materials/
    └─ M_DroneTrainingGuide.uasset
 ```
@@ -208,15 +216,13 @@ Content/Drone/Prototype/
 │     ├─ IA_DronePrototype_Yaw.uasset
 │     ├─ IA_DronePrototype_Look.uasset
 │     └─ IA_DronePrototype_CameraPitchRate.uasset
-├─ Maps/
-│  └─ Lvl_DronePrototype.umap
 └─ UI/
    └─ WBP_DroneFlightHUD.uasset
 ```
 
-### 기존 Template·Variant 영역
+### 기존 C++ Template·Variant 영역
 
-다음 영역은 저장소에 남아 있지만 현재 Drone Tutorial 실행 흐름으로 사용한다고 판단하면 안 된다.
+다음 C++ 영역은 저장소에 남아 있지만 현재 Drone Tutorial 실행 흐름으로 사용한다고 판단하면 안 된다. 대응하던 `/Game/ThirdPerson`과 세 `/Game/Variant_*` Content Root 및 Template Map은 Commit `2cc5d79`에서 제거했다.
 
 ```text
 Source/Drone/DroneCharacter.*
@@ -227,7 +233,7 @@ Source/Drone/Variant_Platforming/
 Source/Drone/Variant_SideScrolling/
 ```
 
-`Config/DefaultEngine.ini`의 전역 시작 Map과 GameMode도 아직 `/Game/ThirdPerson`을 가리킨다. 현재 Drone 검증은 `Lvl_DronePrototype` 또는 `Lvl_DroneTraining`을 명시적으로 열어 진행한다. Variant에 AI·StateTree 코드가 있다는 사실은 Enemy AI MVP가 구현됐다는 뜻이 아니다.
+`Config/DefaultEngine.ini`의 Game·Editor 시작 Map은 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode는 프로젝트 소유 `BP_DronePrototypeGameMode`를 가리킨다. 세 제작 Map의 현재 구조와 추가 규칙은 [`DRONE_CONTENT_FOLDER_GUIDE.md`](DRONE_CONTENT_FOLDER_GUIDE.md)를 따른다. Variant에 AI·StateTree 코드가 남아 있다는 사실은 Enemy AI MVP가 구현됐다는 뜻이 아니다.
 
 ## 3. C++와 Blueprint·Editor의 경계
 
@@ -473,7 +479,7 @@ TUT-03의 원본 시간·거리·평균 속도 계산과 실행 중 성공 Histo
 ### 지금 사용자가 할 일
 
 1. 다른 PC에서는 Unreal 저장소 `main`을 Pull하고 Commit이 `551e287`인지 확인한다.
-2. UE 5.8.1에서 `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`을 연다.
+2. UE 5.8.1에서 `/Game/Drone/Maps/Lvl_DroneTraining`을 연다.
 3. World Outliner에서 Course와 Gate 네 개의 배치가 의도한 비행 경로처럼 보이는지 확인한다.
 4. Course의 `OrderedGates` 순서와 실제 공간 배치 순서가 자연스러운지 확인한다.
 5. Gate의 크기, 간격, 높이, 색 대비가 직접 조종할 때 읽기 쉬운지 확인한다.
@@ -564,7 +570,7 @@ TUT-03의 원본 시간·거리·평균 속도 계산과 실행 중 성공 Histo
 ### A. Play 전 Asset 연결 확인
 
 1. UE 5.8.1로 프로젝트를 연다.
-2. Content Browser에서 `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`을 연다.
+2. Content Browser에서 `/Game/Drone/Maps/Lvl_DroneTraining`을 연다.
 3. World Outliner에서 `BP_DroneTrainingCourse` Class의 Course Actor를 선택한다.
 4. Details에서 `CourseId`가 비어 있지 않은지 확인한다.
 5. `OrderedGates` 배열 크기가 4인지 확인한다.

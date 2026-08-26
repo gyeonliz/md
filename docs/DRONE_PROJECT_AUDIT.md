@@ -1,6 +1,6 @@
 # Drone Unreal 프로젝트 읽기 전용 감사
 
-> 이 문서는 2026-08-19 Prototype 구현 전의 읽기 전용 스냅샷이다. 당시 감사 경로는 `C:\project\Drone`이었고, 현재 작업 프로젝트는 `D:\JGY\project\drone`이다. 이후 추가한 C++ Prototype과 검증 결과는 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md)에 기록한다.
+> 이 문서는 2026-08-19 Prototype 구현 전의 읽기 전용 스냅샷이다. 당시 감사 경로는 `C:\project\Drone`이었다. 현재 기준은 `C:\URproject\drone`, `main=origin/main=2cc5d79`이며 이후 구현은 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md), 현재 폴더 구조는 [`DRONE_CONTENT_FOLDER_GUIDE.md`](DRONE_CONTENT_FOLDER_GUIDE.md)를 따른다. 아래의 “현재” 표현은 모두 감사 당시 상태를 뜻한다.
 
 ## 1. 감사 범위와 안전 기준
 
@@ -16,7 +16,7 @@
 
 ## 2. 핵심 결론
 
-1. 현재 기본 실행 경로는 드론 전용 맵이 아니라 `Lvl_ThirdPerson`과 `BP_ThirdPersonGameMode`다.
+1. 당시 기본 실행 경로는 드론 전용 맵이 아니라 `Lvl_ThirdPerson`과 `BP_ThirdPersonGameMode`였다.
 2. 핵심 C++ 타입인 `ADroneCharacter`, `ADroneGameMode`, `ADronePlayerController`는 모두 `abstract`이며 Third Person 템플릿 구조를 가진다.
 3. `ADroneCharacter`는 `ACharacter` 기반으로 Capsule, Character Movement, Jump, 보행 이동, SpringArm/Follow Camera를 사용한다.
 4. Enhanced Input 모듈·입력 클래스·Input Action/Mapping Context 자산은 이미 존재한다.

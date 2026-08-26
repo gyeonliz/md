@@ -553,3 +553,17 @@ Inbox → Todo → Doing → Done
 - 이 완료는 자산 인수·공유 완료를 뜻한다. NavigationArrows를 실제 Training HUD에 표시하는 프로젝트 소유 Host/Wrapper와 PIE/Standalone 시각 검증은 아직 남아 있다.
 - 같은 기준선의 `Lvl_DroneTraining` PIE에서 한글 Flight HUD·구간 기록 패널·현재 Gate·세분화 코스 선의 초기 렌더는 확인했다. Gate 0→3 한 Lap 뒤 구간 숫자 갱신과 NavigationArrows Host/Wrapper는 아직 확인·구현하지 않았다.
 - 맵 이식은 DronePack의 정리 `Map_Demo` 1개만 기술 검증·main 반영까지 완료했다. Battlefield·MilitaryCamp·MilitaryBase 환경 맵은 실제 Drone 저장소에 아직 없으며 `AST-03A`로 계속 분리한다.
+
+## 34. 2026-08-26 맵 중앙화와 템플릿 콘텐츠 정리
+
+- 위 33절은 `fb1d7ad` 시점의 역사 상태다. 현재 Unreal 기준선은 `main=origin/main=2cc5d79`, 작업 트리 Clean이다.
+- 실제 RabbitHole 프로젝트 `C:\project\Fractured\GoDownTheRabbitHole.uproject`를 확인했다. 프로젝트 소유 맵을 `Content/Maps`에 모으고 역할별 Blueprint 폴더와 공급사 폴더를 분리하는 방식을 참고했다.
+- Drone 프로젝트 소유 맵은 `/Game/Drone/Maps`로 중앙화했다: `Lvl_DroneTraining`, `Lvl_DronePrototype`, `Lvl_DronePackShowcase`.
+- 기존 공급사 정리 맵 `Map_Demo`는 `Lvl_DronePackShowcase`로 이름과 위치를 바꿨다. 공급사 Mesh·Material 등 의존 자산은 `/Game/Drone/ThirdParty/DronePack`에 유지한다.
+- 미사용 콘텐츠 루트 `/Game/ThirdPerson`, `/Game/Variant_Combat`, `/Game/Variant_Platforming`, `/Game/Variant_SideScrolling`과 대응 ExternalActors/ExternalObjects를 제거했다. 제거 전 프로젝트 맵 3개와 `/Game/Drone` 자산에서 해당 루트 의존성 0을 확인했다.
+- 시작 맵·Editor 시작 맵은 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode는 프로젝트 소유 `BP_DronePrototypeGameMode`다.
+- C++ `DroneCharacter`, 기존 GameMode/Controller, Variant Source는 별도 Source/Build.cs 감사 없이 지우지 않았다.
+- 중앙 맵과 BuiltData 로드, 이전 경로·템플릿 루트 부재, Build, Blueprint 0/0/0, 전체 `Drone.` 15/15, LFS, diff 검증을 통과했다.
+- 기능 Commit `1c8f391`을 Merge Commit `2cc5d79`로 main에 병합·Push했다. 삭제 내용은 Git 이력에서 복구할 수 있다.
+- Battlefield·MilitaryCamp·MilitaryBase 환경 맵은 아직 미이식이다. 현재 남은 수동 확인은 `Lvl_DronePackShowcase`의 시각 검토와 `Lvl_DroneTraining` 한 Lap 비행이다.
+- 상세 폴더 규칙과 현재 트리는 `docs/DRONE_CONTENT_FOLDER_GUIDE.md`를 따른다.
