@@ -551,3 +551,5 @@ Inbox → Todo → Doing → Done
 - 병합된 main에서 `DroneEditor Win64 Development` Build, NavigationArrows 1/1, 전체 `Drone.` 15/15, Blueprint Compile 0/0/0과 `git lfs fsck`를 다시 통과했다.
 - 로컬 `main=origin/main=fb1d7ad`이고 Drone 작업 트리는 Clean이다.
 - 이 완료는 자산 인수·공유 완료를 뜻한다. NavigationArrows를 실제 Training HUD에 표시하는 프로젝트 소유 Host/Wrapper와 PIE/Standalone 시각 검증은 아직 남아 있다.
+- 같은 기준선의 `Lvl_DroneTraining` PIE에서 한글 Flight HUD·구간 기록 패널·현재 Gate·세분화 코스 선의 초기 렌더는 확인했다. Gate 0→3 한 Lap 뒤 구간 숫자 갱신과 NavigationArrows Host/Wrapper는 아직 확인·구현하지 않았다.
+- 맵 이식은 DronePack의 정리 `Map_Demo` 1개만 기술 검증·main 반영까지 완료했다. Battlefield·MilitaryCamp·MilitaryBase 환경 맵은 실제 Drone 저장소에 아직 없으며 `AST-03A`로 계속 분리한다.

@@ -253,6 +253,20 @@ PFN-06 Done
 
 `AST-02A`의 최소 이식·검증·`main` 원격 공유는 완료했다. 실제 화면 Host/Wrapper는 아직 미구현이다. `AST-01`의 실제 스피커 Loop 단일 재생·종료 정지는 계속 미확인이므로 Doing이다. 다음 기능 카드는 계속 `TUT-04`이며 NavigationArrows 화면 연결과 섞어 완료 처리하지 않는다.
 
+## 2026-08-26 TUT-04A PIE 초기 화면 확인
+
+`C:\URproject\drone`의 `Lvl_DroneTraining`을 실제 UE 5.8.1 Editor에서 열고 PIE를 실행했다. 한글 `드론 비행 정보`와 `코스 구간 기록` 패널, 현재 속도·고도·수직 속도·진행 방향, 최근·완료 구간 자리표시자, 현재 Gate와 세분화된 코스 선이 정상 렌더됐다. NavigationArrows Host/Wrapper는 아직 연결하지 않았으므로 공급사 화살표 UI가 없는 것이 현재 구현과 일치한다.
+
+자동 UI 입력은 키를 지속해서 누르는 비행을 재현하지 못했으므로 Gate 0→3 한 Lap 후 실제 구간 숫자 갱신은 미확인이다. TUT-04A는 초기 화면 수동 Pass만 추가하고 전체 Done으로 올리지 않는다. PIE와 Editor를 정상 종료했으며 13:21 KST 기준 Unreal 프로세스 0, Drone 작업 트리 Clean이다.
+
+## 2026-08-26 16:55 맵 이식 상태 재확인
+
+- 프로젝트 소유 훈련 맵: `/Game/Drone/Tutorial/Maps/Lvl_DroneTraining`이 main에 있고 UE 5.8.1 Editor·PIE 초기 화면을 확인했다.
+- DronePack 정리 맵: `/Game/Drone/ThirdParty/DronePack/Map/Map_Demo`가 Commit `5540c6b`로 main에 포함되어 있다. 외부 `/Game`·누락 의존성 0, Map Check 0 errors·0 warnings, Blueprint 0/0/0, LFS 검증을 통과했다. 드론 6종·재질·스케일·조명을 Editor에서 보는 최종 시각 검토는 아직이다.
+- 환경 맵 3팩: Battlefield·MilitaryCamp·MilitaryBase `.umap`은 현재 Drone 저장소에 없다. Battlefield는 별도 스테이징 변환 도중 중단됐고 세 팩의 실제 `/Game/Drone/ThirdParty/Environments` 이식·대표 Map 검증은 `AST-03A` Doing이다.
+
+따라서 맵 이식 전체를 완료로 판정하지 않는다. `DronePack Map_Demo 1개 기술 이식 완료 / 환경 맵 3팩 미이식`이 현재 기준이다.
+
 ## 2026-08-26 Dataflow·Chaos 물리 환경 후보
 
 UE 5.8의 Dataflow·Chaos Cloth·Chaos Destruction을 부분 고정 그물과 선택형 맵 파괴의 후속 기술로 채택했다.

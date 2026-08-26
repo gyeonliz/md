@@ -18,18 +18,18 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-26 12:57 KST
+마지막 갱신: 2026-08-26 13:21 KST
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | 3단계 Tutorial Vertical Slice — `TUT-03` 완료, `TUT-04A` 자동 검증 통과·수동 화면 확인 대기 |
+| 전체 단계 | 3단계 Tutorial Vertical Slice — `TUT-03` 완료, `TUT-04A` 자동 검증·PIE 초기 화면 통과, 한 Lap 확인 대기 |
 | Unreal 기준선 | 이번 확인 PC 로컬 `main=origin/main=fb1d7ad`, `DroneEditor Win64 Development` Build 성공 |
 | 자동 검증 | 전체 `Drone.` `15/15`, Blueprint Compile `0 errors / 0 warnings / 0 load failures`, LFS fsck 정상 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | NavigationArrows main 병합·Push와 병합 기준 회귀 검증 완료. `TUT-04A` 실제 Training Map/HUD 화면 확인 대기 |
-| 차단 조건 | 기능 코드의 기술 차단은 없음. TUT-04A 완료 판정을 위한 수동 화면 확인과 별도 환경 팩의 비호환 Demo 자산 분리가 남음 |
-| 다음 행동 | `Lvl_DroneTraining`에서 한글 HUD·세분화 코스·GateIndex·한 Lap 기록을 확인하고 결과를 기록 |
-| 다음 기능 | TUT-04A 수동 확인 후 이전 평균·Best `+/-` 비교를 `TUT-04B`로 구현 |
+| 지금 작업 중 | NavigationArrows main 병합·Push와 회귀 검증, `TUT-04A` PIE 초기 HUD·코스 화면 확인 완료. 실제 한 Lap 기록 갱신 확인 대기 |
+| 차단 조건 | 기능 코드의 기술 차단은 없음. 자동 UI 제어로 지속 비행을 재현하지 못해 사람이 Gate 0→3 한 바퀴를 비행해야 함 |
+| 다음 행동 | 실제 한 Lap 뒤 방금 구간·완료 구간 속도/거리/시간 갱신을 확인하고 결과 기록 |
+| 다음 기능 | TUT-04A 한 Lap 수동 확인 후 이전 평균·Best `+/-` 비교를 `TUT-04B`로 구현 |
 | 이후 | Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming |
 | Git 처리 | 기존 main `5540c6b`를 보존하고 NavigationArrows `5a052c8`을 Merge Commit `fb1d7ad`로 `origin/main`에 Push 완료. Drone 작업 트리 Clean |
 
@@ -655,3 +655,22 @@ HeadingValueText
 - NavigationArrows LFS 속성과 `git lfs fsck` 통과.
 - 최종 `main=origin/main=fb1d7ad`, Drone 작업 트리 Clean.
 - 실제 Training HUD Host/Wrapper와 PIE/Standalone 시각 확인은 구현하지 않았으므로 완료로 기록하지 않는다.
+
+## 2026-08-26 13:21 — TUT-04A PIE 초기 화면 확인
+
+- 정확한 `C:\URproject\drone\Drone.uproject`를 UE 5.8.1로 열고 `Lvl_DroneTraining`을 PIE 실행했다.
+- 화면 좌측 상단에서 한글 `드론 비행 정보`, 현재 속도·고도·수직 속도·진행 방향이 정상 표시됐다.
+- 화면 좌측 하단에서 한글 `코스 구간 기록`과 최근·완료 구간 속도/거리/시간 자리표시자가 정상 표시됐다.
+- 현재 Gate Ring, 뒤쪽 Gate들, 세분화된 발광 코스 선이 뷰포트에 표시됐다.
+- 공급사 NavigationArrows Host/Wrapper는 아직 미구현이므로 별도 화살표 Widget은 표시되지 않았다.
+- 자동 UI의 짧은 키 입력으로는 지속 전진이 되지 않아 Gate 0→3 한 Lap과 구간 숫자 갱신은 확인하지 못했다.
+- PIE와 Editor를 정상 종료했다. 13:21 KST Unreal 프로세스 0, Drone 작업 트리 Clean이다.
+
+## 2026-08-26 16:55 — 맵 이식 상태 재확인
+
+- 실제 저장소의 ThirdParty `.umap`은 `Content/Drone/ThirdParty/DronePack/Map/Map_Demo.umap` 1개다.
+- 이 맵은 Commit `5540c6b`로 main에 포함됐고 Git LFS 대상이다.
+- 기존 AST-01C 결과인 외부 Game·누락 의존성 0, Map Check 0/0, Blueprint 0/0/0과 LFS 검증을 현재 기술 완료 근거로 유지한다.
+- `Map_Demo`에서 드론 6종·재질·스케일·조명을 직접 보는 최종 시각 검토는 아직 하지 않았다.
+- Battlefield·MilitaryCamp·MilitaryBase 이름의 `.umap`은 현재 Drone 저장소에 0개다. Battlefield 스테이징 변환과 세 팩 실제 이식·대표 맵 검증은 `AST-03A` Doing으로 남긴다.
+- `Lvl_DroneTraining`은 외부 맵 이식 결과가 아니라 프로젝트 소유 Tutorial Map이다.

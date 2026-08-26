@@ -8,20 +8,21 @@ Unreal 현재 기준선은 로컬 `main`과 `origin/main`이 일치하는 Merge 
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-08-26 13:11 KST — 중단된 NavigationArrows main 병합·검증·Push 재개 완료
+마지막 갱신: 2026-08-26 16:55 KST — 맵 이식 상태 재확인
 
 | 항목 | 상태 |
 |---|---|
-| 현재 단계 | 3단계 Tutorial Vertical Slice — `TUT-04A` 최근·평균 구간 HUD와 Course Authoring 보강의 자동 검증 통과, 실제 화면 확인 대기 |
-| 진행 정도 | 한글 현재 속도·고도·수직속도·방향과 최근 구간 속도·거리·시간, 완료 구간 평균 속도·거리·시간을 코드에 연결했다. 코스 선을 약 200 cm 거리 샘플로 세분화하고 Gate 순서를 `OrderedGates`에서 자동 동기화했다. 병합 main의 최종 자동 검증은 통과했지만 화면 판정은 아직이다 |
-| 지금 작업 중 | NavigationArrows main 병합·Push와 전체 회귀 검증을 완료했다. Unreal 실행은 0이며 TUT-04A Training Map/HUD 수동 화면 확인을 다음 실행으로 남겼다. 환경 맵 이식은 별도 일시 중단 상태다 |
+| 현재 단계 | 3단계 Tutorial Vertical Slice — `TUT-04A` 자동 검증과 PIE 초기 화면 통과, 한 Lap 구간 값 갱신 확인 대기 |
+| 진행 정도 | 한글 현재 속도·고도·수직속도·방향과 구간 기록 패널, 현재 Gate와 세분화 코스 선을 실제 PIE에서 확인했다. 최근·평균 구간 값은 코드·자동화 검증을 통과했지만 실제 Gate 0→3 비행 후 숫자 갱신은 아직 확인하지 않았다 |
+| 지금 작업 중 | NavigationArrows main 병합·Push, 전체 회귀 검증과 TUT-04A 초기 화면 확인까지 완료했다. Unreal 실행은 0이며 실제 한 Lap 수동 비행 확인이 남았다. 환경 맵 이식은 별도 일시 중단 상태다 |
 | 완료 근거 | 병합 main에서 `DroneEditor` Build, 전체 `Drone.` 15/15, Blueprint 0/0/0, LFS fsck 통과. 이전 Training Map 감사에서 Course 1, Curve Spline 6점·약 64.9 m, Gate 4개 확인 |
-| 수동 미확인 | 세분화된 빛나는 코스와 한글 HUD 실제 화면, 저장 Map의 GateIndex 0~3 재저장, DronePack 화면·Loop 청감, 환경 맵 3종 로드·Map Check 모두 미확인 |
-| 현재 차단 | 기능 코드의 기술 차단은 없다. TUT-04A 완료 판정에는 Training Map/HUD 실제 화면 확인이 남아 있다. 환경 팩의 비호환 예제 분리는 별도 자산 작업의 남은 조건이다 |
-| 다음 행동 | `Lvl_DroneTraining`을 열어 한글 HUD, 세분화 코스 선, GateIndex 0~3과 한 Lap 기록을 실제 화면에서 확인한다. 통과 후 `TUT-04B` 이전 성공 Lap 평균·Best 비교로 진행한다 |
-| 다음 기능 | `TUT-04A` 화면 확인 후, 이전 성공 Lap 평균·Best 대비 `+/-` 비교를 `TUT-04B`로 구현 |
+| 수동 미확인 | Gate 0→3 한 Lap 후 최근·완료 구간 숫자 갱신, 저장 Map의 GateIndex 0~3 상세 확인, DronePack 화면·Loop 청감, 환경 맵 3종 로드·Map Check는 미확인 |
+| 현재 차단 | 기능 코드의 기술 차단은 없다. 자동 UI 제어는 지속 키 입력이 짧아 한 Lap을 재현하지 못했다. TUT-04A 완료 판정에는 사람이 실제 한 바퀴를 비행한 화면 결과가 남아 있다 |
+| 다음 행동 | `Lvl_DroneTraining`에서 Gate 0→3을 실제로 한 바퀴 비행해 방금 구간·완료 구간 속도/거리/시간 갱신을 확인한다. 통과 후 `TUT-04B` 이전 성공 Lap 평균·Best 비교로 진행한다 |
+| 다음 기능 | TUT-04A 한 Lap 수동 확인 후 이전 성공 Lap 평균·Best 대비 `+/-` 비교를 `TUT-04B`로 구현 |
 | 에셋 인수 | 이번 확인 PC의 제공 에셋 루트는 `C:\에셋`. NavigationArrows 6개는 main 반영 완료. D 드라이브 환경 팩 스테이징은 별도 PC의 중단 기록으로 보존 |
-| Editor/MCP | 2026-08-26 13:11 KST 현재 `UnrealEditor`와 `UnrealEditor-Cmd` 실행 0. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
+| 맵 이식 | DronePack 정리 `Map_Demo` 1개는 Commit `5540c6b`로 main 반영·기술 검증 완료, Editor 시각 검토 대기. Battlefield·MilitaryCamp·MilitaryBase 대표 맵은 실제 저장소 미이식, AST-03A Doing |
+| Editor/MCP | 2026-08-26 13:21 KST 현재 `UnrealEditor`와 `UnrealEditor-Cmd` 실행 0. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
 | Git 처리 | 이번 확인 PC의 `C:\URproject\drone`은 `main=origin/main=fb1d7ad`, 작업 트리 Clean. `5540c6b`를 보존한 Merge이며 NavigationArrows `5a052c8`이 main 이력에 포함됨 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
@@ -65,7 +66,7 @@ Unreal 현재 기준선은 로컬 `main`과 `origin/main`이 일치하는 Merge 
 |---|---|---|---|---|
 | AST-01 | Drone / Unreal | 제공 에셋 최소 외형 Spike | FPV 본체·로터 4·재질/Texture와 44.1 kHz Loop Cue/Wave를 `/Game/Drone/ThirdParty`로 선별 이식. Integration BP와 GameMode 연결. 이번 재검증에서 전용 자동화 1/1·의존성 감사·Blueprint 0/0/0·LFS fsck 통과. 전체 14/14는 TUT-03 당시 같은 Commit의 기준선이며 이번에 미재실행 | 실제 스피커 출력의 Loop 단일 재생·종료 정지는 미확인. 결과 확보 전까지 Doing 유지 |
 | AST-01C | Drone / Unreal / Asset | DronePack 드론 시각 라이브러리·데모 맵 | 드론 Mesh·Material·Texture와 정리 Map 154개를 `/Game/Drone/ThirdParty/DronePack`에 선별 이식. Build·전체 14/14·BP 0/0/0·Map Check 0/0·의존성·LFS 검증 통과 | Editor에서 드론 6종·맵 화면을 확인하고 재질·스케일·조명 이상 유무를 기록 |
-| TUT-04A | Drone / Tutorial / UI | 한글 비행·구간 통계 HUD와 Course Authoring 보강 | 코드·집중 자동화 8/8까지 확인. 현재/최근/완료 평균 표기, Gate 배열 자동 동기화와 거리 샘플 코스 선 구현 | 최종 Build·전체 `Drone.`·BP Compile·Map Check·Map 재저장과 실제 화면 확인 |
+| TUT-04A | Drone / Tutorial / UI | 한글 비행·구간 통계 HUD와 Course Authoring 보강 | 병합 main Build·전체 15/15·BP 0/0/0 통과. PIE에서 한글 HUD 두 패널·현재 Gate·세분화 코스 선 초기 렌더 확인 | Gate 0→3 실제 한 Lap 뒤 최근·완료 구간 숫자 갱신 확인 |
 | AST-03A | Drone / Unreal / Asset | Battlefield·MilitaryCamp·MilitaryBase 환경 맵 이식 | 원본 3팩 3,334개·약 20.14 GB, Map 10개 감사. Battlefield 1,191개는 스테이징 새 경로 변환, 원본 쪽에 비호환 Demo Character 102개 잔류 | 팩별 변환·의존성 검사 완료 후 실제 `/Game/Drone/ThirdParty/Environments` 복사와 세 대표 Map 검증 |
 
 ## Done
