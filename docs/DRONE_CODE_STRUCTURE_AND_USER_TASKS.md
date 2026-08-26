@@ -4,7 +4,7 @@
 
 이 문서는 현재 Unreal `drone` 저장소를 직접 확인한 결과를 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
 
-TUT-03 완료 기능 Commit은 `551e287`이다. 현재 Unreal 기준선은 맵 중앙화·미사용 템플릿 콘텐츠 정리를 포함한 `main=origin/main=2cc5d79`이며 작업 트리는 Clean이다.
+TUT-03 완료 기능 Commit은 `551e287`이다. 현재 기준은 `main=origin/main=204e34b`이며 기본 Template Map 정리 교정 `909f6a3`과 환경 맵 이식 `f8c8fb2`를 포함한다. 세 환경 Map은 후보 공간이며 현재 Tutorial 기본 실행 구조를 바꾸지 않는다.
 
 NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합됐다. 자산은 main에 있지만 프로젝트 소유 Widget Host는 아직 구현하지 않았으므로 화면에 나타나지 않는 것이 정상이다.
 
@@ -222,7 +222,7 @@ Content/Drone/Prototype/
 
 ### 기존 C++ Template·Variant 영역
 
-다음 C++ 영역은 저장소에 남아 있지만 현재 Drone Tutorial 실행 흐름으로 사용한다고 판단하면 안 된다. 대응하던 `/Game/ThirdPerson`과 세 `/Game/Variant_*` Content Root 및 Template Map은 Commit `2cc5d79`에서 제거했다.
+다음 C++ 영역과 대응 `/Game/ThirdPerson`, 세 `/Game/Variant_*` 비맵 Content는 저장소에 남아 있지만 현재 Drone Tutorial 실행 흐름으로 사용한다고 판단하면 안 된다. Content Root 전체 삭제는 범위가 넓어 `909f6a3`에서 62개를 복구했고, Unreal 생성 기본 Map 4개만 삭제 상태다.
 
 ```text
 Source/Drone/DroneCharacter.*

@@ -1,8 +1,8 @@
-"""Read-only audit for centralizing Drone maps and removing template maps.
+"""Read-only audit for centralized maps and retained template support assets.
 
 Run from UnrealEditor-Cmd against the Drone project.  The script reports
-dependencies of the project maps and external referencers of each candidate
-template root.  It never changes or saves an asset.
+dependencies of project maps and external referencers of each restored
+template root. It never changes or saves an asset.
 """
 
 import json
@@ -13,9 +13,12 @@ PROJECT_MAPS = (
     "/Game/Drone/Maps/Lvl_DronePrototype",
     "/Game/Drone/Maps/Lvl_DroneTraining",
     "/Game/Drone/Maps/Lvl_DronePackShowcase",
+    "/Game/Drone/Maps/Lvl_Battlefield",
+    "/Game/Drone/Maps/Lvl_MilitaryCamp",
+    "/Game/Drone/Maps/Lvl_MilitaryBase",
 )
 
-CANDIDATE_ROOTS = (
+TEMPLATE_ROOTS = (
     "/Game/ThirdPerson",
     "/Game/Variant_Combat",
     "/Game/Variant_Platforming",
@@ -43,13 +46,13 @@ for map_package in PROJECT_MAPS:
     map_dependencies[map_package] = sorted(
         str(package)
         for package in dependencies
-        if str(package).startswith(CANDIDATE_ROOTS)
+        if str(package).startswith(TEMPLATE_ROOTS)
     )
 
 root_results = {}
-for candidate_root in CANDIDATE_ROOTS:
+for template_root in TEMPLATE_ROOTS:
     assets = sorted(
-        registry.get_assets_by_path(candidate_root, recursive=True) or [],
+        registry.get_assets_by_path(template_root, recursive=True) or [],
         key=lambda item: str(item.package_name),
     )
     outside_referencers = {}
@@ -59,19 +62,19 @@ for candidate_root in CANDIDATE_ROOTS:
         outside = sorted(
             str(package)
             for package in referencers
-            if not str(package).startswith(candidate_root + "/")
+            if not str(package).startswith(template_root + "/")
         )
         if outside:
             outside_referencers[package_name] = outside
 
-    root_results[candidate_root] = {
+    root_results[template_root] = {
         "asset_count": len(assets),
         "outside_referencers": outside_referencers,
     }
 
 result = {
     "project_map_dependencies_on_template_roots": map_dependencies,
-    "candidate_roots": root_results,
+    "restored_template_roots": root_results,
 }
 
 unreal.log("DRONE_CONTENT_CLEANUP_AUDIT_JSON_BEGIN")

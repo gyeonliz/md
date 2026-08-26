@@ -279,4 +279,4 @@ Commit `5a052c8bab2eb0dd8bc9ab16cfc7b3784e8e4cd7`을 `origin/codex/navigation-ar
 
 위 문장은 11:50 당시의 중간 상태였으며 이후 완료됐다. 154개 원본 이식은 Commit `5540c6b`로 main에 포함됐고, 이후 맵 중앙화·템플릿 콘텐츠 정리 Merge `2cc5d79`까지 반영되어 `main=origin/main`, 작업 트리 Clean이다. 현재 맵 이름은 `Lvl_DronePackShowcase`이며 Editor에서 드론 6종·재질·스케일·조명을 보는 시각 검토는 아직이다.
 
-Battlefield·MilitaryCamp·MilitaryBase는 이 AST-01C 범위에 포함되지 않는다. 세 환경 팩의 `.umap`은 현재 Drone 저장소에 없으며 별도 `AST-03A`에서 이식·대표 Map 검증해야 한다.
+Battlefield·MilitaryCamp·MilitaryBase는 AST-01C와 분리된 `AST-03A`에서 이후 이식했다. 현재 중앙 Map 3종과 정확한 의존성 2,723개·16.96 GiB가 Commit `f8c8fb2`에 있으며, 기술 검증 결과와 수동 확인 경계는 [`DRONE_CONTENT_FOLDER_GUIDE.md`](DRONE_CONTENT_FOLDER_GUIDE.md)를 따른다.

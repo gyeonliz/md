@@ -1,4 +1,4 @@
-"""Validate the centralized Drone map folder after template cleanup."""
+"""Validate centralized Drone maps and the corrected starter-map cleanup."""
 
 import json
 import unreal
@@ -9,13 +9,23 @@ EXPECTED_ASSETS = {
     "/Game/Drone/Maps/Lvl_DroneTraining": "World",
     "/Game/Drone/Maps/Lvl_DronePackShowcase": "World",
     "/Game/Drone/Maps/Lvl_DronePackShowcase_BuiltData": "MapBuildDataRegistry",
+    "/Game/Drone/Maps/Lvl_Battlefield": "World",
+    "/Game/Drone/Maps/Lvl_MilitaryCamp": "World",
+    "/Game/Drone/Maps/Lvl_MilitaryBase": "World",
 }
 
-REMOVED_ROOTS = (
+RESTORED_TEMPLATE_ROOTS = (
     "/Game/ThirdPerson",
     "/Game/Variant_Combat",
     "/Game/Variant_Platforming",
     "/Game/Variant_SideScrolling",
+)
+
+REMOVED_STARTER_MAPS = (
+    "/Game/ThirdPerson/Lvl_ThirdPerson",
+    "/Game/Variant_Combat/Lvl_Combat",
+    "/Game/Variant_Platforming/Lvl_Platforming",
+    "/Game/Variant_SideScrolling/Lvl_SideScrolling",
 )
 
 REMOVED_ASSET_PATHS = (
@@ -51,15 +61,23 @@ for package_name, expected_class in EXPECTED_ASSETS.items():
         )
     loaded[package_name] = actual_class
 
-remaining_removed_roots = {
+restored_template_roots = {
     root: [str(item.package_name) for item in registry.get_assets_by_path(root, recursive=True) or []]
-    for root in REMOVED_ROOTS
+    for root in RESTORED_TEMPLATE_ROOTS
 }
-remaining_removed_roots = {
-    root: packages for root, packages in remaining_removed_roots.items() if packages
+missing_restored_roots = {
+    root: packages for root, packages in restored_template_roots.items() if not packages
 }
-if remaining_removed_roots:
-    raise RuntimeError(f"Removed template assets remain: {remaining_removed_roots}")
+if missing_restored_roots:
+    raise RuntimeError(f"Restored template root is empty: {missing_restored_roots}")
+
+starter_maps_still_present = [
+    package_name
+    for package_name in REMOVED_STARTER_MAPS
+    if unreal.EditorAssetLibrary.does_asset_exist(package_name)
+]
+if starter_maps_still_present:
+    raise RuntimeError(f"Starter maps still exist: {starter_maps_still_present}")
 
 old_assets_still_present = [
     package_name
@@ -71,11 +89,13 @@ if old_assets_still_present:
 
 result = {
     "central_map_assets": loaded,
-    "removed_roots_absent": list(REMOVED_ROOTS),
+    "restored_template_root_asset_counts": {
+        root: len(packages) for root, packages in restored_template_roots.items()
+    },
+    "starter_maps_absent": list(REMOVED_STARTER_MAPS),
     "old_map_paths_absent": list(REMOVED_ASSET_PATHS),
 }
 
 unreal.log("DRONE_MAP_ORGANIZATION_VALIDATION_JSON_BEGIN")
 unreal.log(json.dumps(result, ensure_ascii=False, indent=2))
 unreal.log("DRONE_MAP_ORGANIZATION_VALIDATION_JSON_END")
-

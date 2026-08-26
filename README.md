@@ -60,7 +60,7 @@ TUT-03에서는 Course 소유 `UDroneTrainingLapRecorderComponent`를 Gate 판�
 
 현재 D 드라이브 작업 PC의 제공 에셋 루트는 `D:\JGY\project\Unreal_260821`이며 최상위 ZIP 14개·공급사 폴더 14개와 `_Staging`이 있다. 다른 PC에서 확인한 `C:\에셋` 재감사 수치는 PC별 역사 기록으로 분리한다. UE 5.8 스테이징에서 선별한 `DronePack_Project` FPV 외형과 `Drone-Sounds` 44.1 kHz Loop 12개·21,753,071 bytes, 프로젝트 소유 Integration BP 1개가 `main`의 실제 프로젝트에 들어 있으며 LFS·의존성·전용 자동화·Blueprint Compile 재검증을 통과했다. 실제 스피커의 Loop 단일 재생과 종료 정지는 수동 미확인이므로 `AST-01`은 Doing이다. 상세 결과는 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다.
 
-2026-08-26 현재 Unreal 저장소 로컬 `main`과 `origin/main`은 Merge Commit `2cc5d79`로 일치한다. 이 기준선은 `fb1d7ad` 이후 맵 중앙화와 미사용 템플릿 콘텐츠 제거 Commit `1c8f391`을 병합한 상태다. `551e287`은 TUT-03, `800a7ba`는 TUT-02, `5a9a2fa`는 TUT-01, `91498b7`은 Unreal 저장소의 초기 기준선이다. 문서 저장소의 최신 동기화 상태는 [`STATUS.md`](STATUS.md)를 따른다.
+2026-08-26 현재 Unreal 저장소 로컬 `main`과 `origin/main`은 Merge Commit `204e34b`로 일치한다. 복구 Commit `909f6a3`과 환경 이식 Commit `f8c8fb2`가 포함된다. `1c8f391`에서 사용자 의도보다 넓게 삭제했던 ThirdPerson·Variant 비맵 자산 62개를 복구하고 Unreal 생성 기본 Map 4개만 삭제 상태로 유지했다. Battlefield·MilitaryCamp·MilitaryBase 중앙 사본과 정확한 의존성 2,723개·16.96 GiB를 이식했다. `551e287`은 TUT-03, `800a7ba`는 TUT-02, `5a9a2fa`는 TUT-01, `91498b7`은 Unreal 저장소의 초기 기준선이다.
 
 외부 제공 소스는 전체 팩을 흡수하지 않고 FPV 최소 외형·Loop만 Integration 경계로 이식했다. 기능 구현은 계속 프로젝트 C++와 Greybox 기준을 유지하며 외부 Pawn·GameMode·Input은 사용하지 않는다. 현재 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)가 우선하고 PFN 카드 번호와 교체 경계는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](docs/DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 
@@ -84,4 +84,4 @@ PFN-06 Camera/Input 기준선 Done
 
 `NavigationArrows` 원본 11개를 UE 5.8에서 감사해 기능에 필요한 6개만 `/Game/Drone/ThirdParty/NavigationArrows`로 이식했다. Commit `5a052c8`을 기능 Branch에 Push한 뒤 Merge Commit `fb1d7ad`로 `origin/main`에도 반영했다. 병합된 `main`에서 Build, 전용 자동화 1/1, 전체 `Drone.` 15/15, Blueprint Compile 0/0/0과 LFS 검증을 다시 통과했다. 자산 인수와 main 공유는 완료했지만 Training Map/HUD의 실제 Host/Wrapper 화면 연결은 아직 하지 않았다. 상세 내용은 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다.
 
-프로젝트 맵은 `/Game/Drone/Maps`로 중앙화했고 미사용 `ThirdPerson`·Variant 템플릿 콘텐츠를 제거했다. RabbitHole 참고 근거, 현재 폴더 트리, 삭제 경계와 검증 결과는 [`docs/DRONE_CONTENT_FOLDER_GUIDE.md`](docs/DRONE_CONTENT_FOLDER_GUIDE.md)에 정리했다.
+프로젝트 사용 맵은 `/Game/Drone/Maps`로 중앙화했다. Unreal 생성 기본 Map 4개만 제거했고 ThirdPerson·Variant 비맵 콘텐츠 62개는 복구했다. 환경 맵 3종은 중앙 사본으로 두되 대형 공급사 의존성 Root는 참조 안정성을 위해 보존했다. RabbitHole 참고 근거, 현재 폴더 트리, 삭제 경계와 검증 결과는 [`docs/DRONE_CONTENT_FOLDER_GUIDE.md`](docs/DRONE_CONTENT_FOLDER_GUIDE.md)에 정리했다.

@@ -18,20 +18,20 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-26 17:31 KST — 맵 중앙화·템플릿 콘텐츠 정리
+마지막 갱신: 2026-08-26 19:46 KST — 기본 Map 정리 범위 교정·환경 맵 3종 기술 이식
 
 | 구분 | 현재 상태 |
 |---|---|
 | 전체 단계 | 3단계 Tutorial Vertical Slice — `TUT-03` 완료, `TUT-04A` 자동 검증·PIE 초기 화면 통과, 한 Lap 확인 대기 |
-| Unreal 기준선 | 이번 확인 PC 로컬 `main=origin/main=2cc5d79`, `DroneEditor Win64 Development` Build 성공 |
-| 자동 검증 | 전체 `Drone.` `15/15`, Blueprint Compile `0 errors / 0 warnings / 0 load failures`, LFS fsck 정상 |
+| Unreal 기준선 | `main=origin/main=204e34b`, `DroneEditor Win64 Development` Build 성공 |
+| 자동 검증 | 전체 `Drone.` `15/15`, Blueprint Compile `0 errors / 0 warnings / 0 load failures`, 환경 의존성 누락 0, LFS fsck 정상 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | 맵 중앙화·미사용 템플릿 콘텐츠 정리와 원격 반영 완료. `TUT-04A` 실제 한 Lap 기록 갱신 확인 대기 |
+| 지금 작업 중 | 환경 이식·LFS 원격 반영 완료. 기술 검증 뒤 환경 맵 시각 검토·`TUT-04A` 한 Lap 확인 대기 |
 | 차단 조건 | 기능 코드의 기술 차단은 없음. 자동 UI 제어로 지속 비행을 재현하지 못해 사람이 Gate 0→3 한 바퀴를 비행해야 함 |
 | 다음 행동 | 실제 한 Lap 뒤 방금 구간·완료 구간 속도/거리/시간 갱신을 확인하고 결과 기록 |
 | 다음 기능 | TUT-04A 한 Lap 수동 확인 후 이전 평균·Best `+/-` 비교를 `TUT-04B`로 구현 |
 | 이후 | Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming |
-| Git 처리 | 맵 정리 기능 Commit `1c8f391`을 Merge Commit `2cc5d79`로 `origin/main`에 Push 완료. Drone 작업 트리 Clean |
+| Git 처리 | 비맵 복구 `909f6a3`, 환경 이식 `f8c8fb2`, main 병합 `204e34b` Push 완료. LFS 2,785개·약 18GB 업로드 성공 |
 
 ## 2026-08-21 — Camera·Mouse·Gamepad 기준선 갱신
 
@@ -714,3 +714,42 @@ HeadingValueText
 - `Lvl_DronePackShowcase`의 드론 6종·재질·스케일·조명 시각 검토와 `Lvl_DroneTraining` 한 Lap 수동 비행은 아직이다.
 - Battlefield·MilitaryCamp·MilitaryBase 환경 맵은 여전히 미이식이다.
 - 현재 폴더 규칙: [`DRONE_CONTENT_FOLDER_GUIDE.md`](DRONE_CONTENT_FOLDER_GUIDE.md)
+
+## 2026-08-26 19:35 — 삭제 범위 교정·환경 맵 3종 실제 이식
+
+### 삭제 범위 교정
+
+- 사용자가 삭제를 허용한 대상은 Unreal 프로젝트 생성 때 포함된 기본 Map이었다. Content Root 전체 삭제로 해석한 것은 범위가 넓었다.
+- `fb1d7ad`에서 비맵 자산 62개를 복구해 `909f6a3 fix: restore template assets while keeping starter maps removed`로 분리했다.
+- 복구 후 Asset Registry 수는 ThirdPerson 4, Variant_Combat 30, Variant_Platforming 10, Variant_SideScrolling 18이다.
+- 삭제 상태를 유지한 것은 `Lvl_ThirdPerson`, `Lvl_Combat`, `Lvl_Platforming`, `Lvl_SideScrolling`과 각 Map 전용 ExternalActors/ExternalObjects뿐이다.
+
+### 스테이징과 선택
+
+- 원본 `C:\에셋`은 수정하지 않고 `C:\에셋\_Staging\EnvironmentStage`에서 3팩 3,334개·18.76 GiB와 Map 10개를 감사했다.
+- 대표 Map은 Battlefield `PL_Battlefield`, MilitaryCamp `Map_MilitaryCamp`, MilitaryBase `MilitaryBase`로 선정했다.
+- 프로젝트 중앙 사본은 `/Game/Drone/Maps/Lvl_Battlefield`, `Lvl_MilitaryCamp`, `Lvl_MilitaryBase`다. 세 Map의 공급사 GameMode Override는 제거해 프로젝트 기본 GameMode를 상속한다.
+- 대형 팩 내부 경로 수천 개를 강제로 재작성하지 않고 검증된 정확한 의존성만 공급사 Root 그대로 보존했다.
+
+### 호환 보강과 이식 규모
+
+- Battlefield의 Manny/Quinn 구 경로 2개는 팩 내부 실제 Mesh로 정확 경로 호환 사본을 만들었다.
+- MilitaryCamp의 누락 직접 Map 참조 `Map_MilitaryCampValley3`는 현재 공급 `Map_RockyGrassland`의 호환 사본으로 닫았다.
+- MilitaryBase의 Grass Preview Mesh 경로와 Glow Material 기본 Texture Override를 정리하고, 외부 RacingTrack Blueprint를 끌던 TireTrack 데모 Actor 6개를 중앙 Map 사본에서 제거했다. `/Game/Textures/T_Linear_Grad` 호환 Texture도 로컬 자산에서 만들었다.
+- 최종 이식은 2,723개·18,211,844,112 bytes(16.96 GiB): Battlefield 710, MilitaryCamp 593, MilitaryBase 1,414, 중앙 Map 3, 호환 3이다.
+- Battlefield Map Check에서 완전히 빈 독립 StaticMeshActor 1개를 중앙 Map에서 제거했다. 건물 Blueprint 14개는 일부 선택적 컴포넌트만 비어 있고 다른 실제 Mesh가 정상 연결되어 있어 삭제하지 않았다.
+
+### 최종 검증
+
+- `DroneEditor Win64 Development` Build 성공. 처음 지정한 미설치 MSVC 14.51.36256 호출은 컴파일 전 실패했고, 실제 설치 14.51.36231로 다시 실행해 성공했다.
+- 전체 Blueprint Compile: `0 errors / 0 warnings / 0 failed loads`. 별도 자산 로그에는 Battlefield Manny/Quinn Pose GUID 경고 28건과 MCP EULA 안내 1건이 있다.
+- 전체 `Drone.` Automation: 15/15 성공. 14개 무경고, 기존 `PIEInputLifecycle`의 RecastNavMesh 미발견 경고 포함 성공 1개다.
+- Map Check: Battlefield 오류 0·공급 Blueprint NULL StaticMesh 메시지 14건, MilitaryCamp 0/0, MilitaryBase 0/0.
+- 환경별 Game 의존성 누락 0, 허용 외 경로 0, 중앙 Map World Load와 GameMode None 확인.
+- 신규 2,723개 전부 3줄 Git LFS Pointer, `git diff --check`, `git lfs fsck` 통과.
+- 환경 이식 Commit: `f8c8fb2 feat: migrate validated environment maps`.
+
+### 남은 사람 확인
+
+- UE 5.8.1 Editor에서 환경 Map 3개를 각각 열어 조명·재질·스케일·Landscape·Collision과 드론 Spawn 위치를 눈으로 확인한다.
+- 세 맵 중 어느 것을 데모 주력 Map으로 쓸지는 현재 미정이며, 기술 이식 완료를 최종 채택으로 표현하지 않는다.

@@ -21,10 +21,10 @@
 | Git 사용자 이메일 | 전역 `jkw6483@gmail.com` 설정 확인 |
 | GitHub CLI | 설치되어 있지 않음 |
 | 이번 확인 PC 작업 루트 | Unreal `C:\URproject\drone`; 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
-| Unreal 프로젝트 저장소 | 로컬 `main`=`origin/main`=`2cc5d79`; 작업 트리 Clean |
-| 문서 작업 저장소 | 이 갱신 전 로컬 `main`=`origin/main`=`846b4db`; 이 문서 갱신도 Commit·Push 후 일치 상태로 마감 |
-| Commit·Push 처리 | 맵 중앙화·미사용 템플릿 콘텐츠 정리 Commit `1c8f391`을 Merge Commit `2cc5d79`로 `origin/main`에 Push 완료 |
-| 실행 상태 | 2026-08-26 17:31 KST 확인 시 `UnrealEditor`와 `UnrealEditor-Cmd` 실행 0 |
+| Unreal 프로젝트 저장소 | 로컬 `main`=`origin/main`=`204e34b`; 작업 트리 Clean |
+| 문서 작업 저장소 | 이 갱신 전 로컬 `main`=`origin/main`=`58f2a08`; 이 문서 갱신도 Commit·Push 후 로컬·원격 일치 상태로 마감 |
+| Commit·Push 처리 | 비맵 복구 `909f6a3`, 환경 이식 `f8c8fb2`를 Merge Commit `204e34b`로 `origin/main`에 Push 완료. LFS 2,785개·약 18GB 업로드 성공 |
+| 실행 상태 | 2026-08-26 19:46 KST 확인 시 `UnrealEditor`와 `UnrealEditor-Cmd` 실행 0 |
 | 별도 `droner` 주의 | `main=origin/main=551e287`; `Config/DefaultEditor.ini` 변경과 `Content/Asset` 10,928개·36,360,181,427 bytes 전체가 Untracked. 공급사 원본·스테이징 복사본이므로 일괄 Stage·Commit 금지 |
 
 GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도했으나 Windows Installer가 종료 코드 1602로 취소되어 설치되지 않았다. GitHub 웹과 Git Credential Manager만으로도 기본 Push/Clone 작업은 가능하다.
@@ -39,7 +39,7 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 D:\JGY\project\drone\Drone.uproject
 ```
 
-이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 2026-08-26 이번 확인 PC의 기준 프로젝트는 `C:\URproject\drone`이고 로컬·원격 main은 `2cc5d79`로 일치한다.
+이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 2026-08-26 이번 확인 PC의 기준 프로젝트는 `C:\URproject\drone`이고 로컬·원격 main은 `204e34b`로 일치한다.
 
 확인 결과:
 
@@ -50,7 +50,7 @@ D:\JGY\project\drone\Drone.uproject
 - 시작 시 Git 저장소가 아니었음
 - 작업 시작 시 Content에는 `.uasset` 749개와 `.umap` 4개가 있었음
 
-초기에는 Third Person 기본 맵과 전역 기본 GameMode를 유지한 채 Git 준비, Android 제외 설정, 별도 Drone Prototype Source를 적용했다. 이후 `2cc5d79`에서 시작 맵을 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode를 프로젝트 소유 `BP_DronePrototypeGameMode`로 바꾸고 미사용 템플릿 콘텐츠를 제거했다.
+초기에는 Third Person 기본 맵과 전역 기본 GameMode를 유지한 채 Git 준비, Android 제외 설정, 별도 Drone Prototype Source를 적용했다. 이후 시작 맵을 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode를 프로젝트 소유 `BP_DronePrototypeGameMode`로 바꿨다. 현재 `204e34b`에서는 Unreal 생성 기본 Map 4개만 제거하고 Template 비맵 자산은 복구한 상태다.
 
 - `main` Branch의 로컬 Git 저장소 초기화
 - 프로젝트 로컬 Git LFS 초기화
@@ -97,7 +97,7 @@ D:\JGY\project\drone\Drone.uproject
 - `GC_DroneS`의 7개 패키지에서 구형 `PhysXVehicles` 문자열 참조 단서가 확인되어 기능 Blueprint 재사용 금지
 - `C:\에셋\DronePack_Project\Config\DefaultEngine.ini`에는 활성 Android File Server 설정과 비어 있지 않은 토큰이 있으므로 이 Config는 복사·Commit하지 않음. 토큰 값은 기록하지 않았고 실제 Drone 프로젝트 설정은 Plugin·네트워크 꺼짐, 토큰 빈 값 유지
 
-실제 Drone 저장소에는 FPV/Sound 선택 자산 12개·21,753,071 bytes와 프로젝트 소유 Integration BP 1개, 합계 13개·21,787,555 bytes만 들어 있다. 10개 FPV 자산과 Wave는 UE 5.8 스테이징본과 SHA-256이 일치하고, Cue만 프로젝트에서 `Looping=true`로 재저장해 의도적으로 다르다. 스테이징 선택 자산 감사와 현재 Integration Asset Registry 재감사 결과 원본 `/Game/Drone_Pack`, `/Game/Drone-Sounds`, ThirdPerson, Variant 금지 의존성은 0이다. 13개 모두 Git LFS 대상이며 `git lfs fsck`를 통과했다. 이번 재검증에서 `Drone.Integration.FPVAsset` 1/1과 전체 Blueprint Compile 0 errors·0 warnings·0 load failures를 다시 통과했다. 전체 `Drone.` 14/14는 같은 현재 Commit에서 TUT-03 완료 때 통과한 기준선이며 이번 재감사에서는 다시 실행하지 않았다. 기존 Standalone 초기 렌더는 통과했지만 이번 재감사에서 새 화면·청감 수동 검사는 하지 않았다. 실제 스피커의 Loop 단일 재생과 종료 정지는 계속 `미확인`이므로 `AST-01`은 Doing이다. 상세 결과는 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다.
+FPV 최소 이식 범위에는 FPV/Sound 선택 자산 12개·21,753,071 bytes와 프로젝트 소유 Integration BP 1개, 합계 13개·21,787,555 bytes가 들어 있다. 10개 FPV 자산과 Wave는 UE 5.8 스테이징본과 SHA-256이 일치하고, Cue만 프로젝트에서 `Looping=true`로 재저장해 의도적으로 다르다. 스테이징 선택 자산 감사와 현재 Integration Asset Registry 재감사 결과 원본 `/Game/Drone_Pack`, `/Game/Drone-Sounds`, ThirdPerson, Variant 금지 의존성은 0이다. 13개 모두 Git LFS 대상이며 `git lfs fsck`를 통과했다. 이번 재검증에서 `Drone.Integration.FPVAsset` 1/1과 전체 Blueprint Compile 0 errors·0 warnings·0 load failures를 다시 통과했다. 전체 `Drone.` 14/14는 TUT-03 완료 당시 기준선이며, 환경 이식 뒤 전체 자동화 15/15를 다시 통과했다. 기존 Standalone 초기 렌더는 통과했지만 이번 재감사에서 새 화면·청감 수동 검사는 하지 않았다. 실제 스피커의 Loop 단일 재생과 종료 정지는 계속 `미확인`이므로 `AST-01`은 Doing이다. 상세 결과는 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다.
 
 ## 2026-08-25 UE 5.8 공식 Unreal MCP 연결
 
@@ -259,24 +259,27 @@ PFN-06 Done
 
 자동 UI 입력은 키를 지속해서 누르는 비행을 재현하지 못했으므로 Gate 0→3 한 Lap 후 실제 구간 숫자 갱신은 미확인이다. TUT-04A는 초기 화면 수동 Pass만 추가하고 전체 Done으로 올리지 않는다. PIE와 Editor를 정상 종료했으며 13:21 KST 기준 Unreal 프로세스 0, Drone 작업 트리 Clean이다.
 
-## 2026-08-26 맵 중앙화·미사용 템플릿 콘텐츠 정리
+## 2026-08-26 맵 중앙화·기본 Map 정리·환경 맵 이식
 
 - RabbitHole 실제 프로젝트의 프로젝트 소유 맵 중앙화 방식을 확인하고 Drone 프로젝트 규칙에 맞게 적용했다.
 - 중앙 맵 폴더: `/Game/Drone/Maps`
 - 프로젝트 소유 훈련 맵: `Lvl_DroneTraining`. UE 5.8.1 Editor·PIE 초기 화면 확인 완료.
 - 프로토타입 맵: `Lvl_DronePrototype`.
 - DronePack 검토 맵: 기존 `Map_Demo`를 `Lvl_DronePackShowcase`로 이름·위치 정리. 드론 6종·재질·스케일·조명 최종 시각 검토는 아직이다.
-- 제거한 콘텐츠 루트: `/Game/ThirdPerson`, `/Game/Variant_Combat`, `/Game/Variant_Platforming`, `/Game/Variant_SideScrolling` 및 대응 ExternalActors/ExternalObjects.
-- 제거 전 의존성 감사에서 중앙화 대상 맵 3개의 위 템플릿 루트 의존성 0, `/Game/Drone`에서 위 루트를 참조하는 자산 0을 확인했다.
+- 실제 삭제 범위는 Unreal 생성 기본 Map 4개(`/Game/ThirdPerson/Lvl_ThirdPerson`, Combat·Platforming·SideScrolling의 `Lvl_*`)와 해당 Map 전용 ExternalActors/ExternalObjects다.
+- `1c8f391`에서 Content Root 전체를 지운 것은 사용자 의도보다 넓었다. `909f6a3`에서 비맵 자산 62개(ThirdPerson 4, Combat 30, Platforming 10, SideScrolling 18)를 복구했다.
 - 시작 맵·Editor 시작 맵: `/Game/Drone/Maps/Lvl_DroneTraining`.
 - 전역 GameMode: `/Game/Drone/Prototype/Blueprints/BP_DronePrototypeGameMode`.
 - C++ `DroneCharacter`·기존 GameMode/Controller와 Variant Source는 별도 Source/Build.cs 감사 전까지 삭제하지 않았다.
 - Git 감지 기준 변경 규모: 599개 경로, 삭제 589개, 이름·위치 변경 2개, 새 경로 추가 2개.
-- 검증: 중앙 맵 3개와 BuiltData 로드, 이전 경로·템플릿 루트 부재, `DroneEditor Win64 Development` Build, Blueprint Compile 0/0/0, 전체 `Drone.` 15/15, `git lfs fsck`, `git diff --check` 통과.
-- Git: 기능 Commit `1c8f391`, main Merge Commit `2cc5d79`; 로컬 `main=origin/main`, 작업 트리 Clean.
-- 환경 맵 3팩: Battlefield·MilitaryCamp·MilitaryBase `.umap`은 현재 Drone 저장소에 없다. Battlefield는 별도 스테이징 변환 도중 중단됐고 세 팩의 실제 `/Game/Drone/ThirdParty/Environments` 이식·대표 Map 검증은 `AST-03A` Doing이다.
+- 환경 맵 중앙 사본: `/Game/Drone/Maps/Lvl_Battlefield`, `Lvl_MilitaryCamp`, `Lvl_MilitaryBase`. 공급사 내부 의존성 Root는 위험한 대량 경로 변경 없이 `/Game/Battlefield`, `/Game/FC_MilitaryCamp`, `/Game/MillitaryBase`를 유지한다.
+- 정확한 이식 폐쇄는 2,723개·18,211,844,112 bytes(16.96 GiB)다. 공급사 자산 수는 Battlefield 710, MilitaryCamp 593, MilitaryBase 1,414이며 누락 의존성 0, 허용 외 경로 0이다.
+- 호환 보강: Battlefield Manny/Quinn 정확 경로 2개, MilitaryCamp의 누락 Map 직접 참조 1개, MilitaryBase 공용 Gradient Texture 1개. MilitaryBase의 외부 RacingTrack 의존 TireTrack 데모 Actor 6개를 중앙 사본에서 제거했다.
+- 검증: `DroneEditor Win64 Development` Build, Blueprint Compile 0/0/0, 전체 `Drone.` 15/15, 환경 맵 실제 로드, `git lfs fsck`, `git diff --check` 통과.
+- Map Check: Battlefield 오류 0이며 공급 Blueprint 내부 선택적 NULL StaticMesh 메시지 14건, MilitaryCamp 0/0, MilitaryBase 0/0. Battlefield 건물은 다른 실제 Mesh가 정상 연결되어 있어 통째로 삭제하지 않았다.
+- Git: 복구 Commit `909f6a3`, 환경 이식 Commit `f8c8fb2`. 최종 원격·main 상태는 문서 상단의 저장소 상태를 따른다.
 
-따라서 현재 프로젝트 맵 정리는 완료지만 외부 환경 맵 이식 전체는 완료가 아니다. `프로젝트 맵 중앙화·템플릿 콘텐츠 정리 완료 / 환경 맵 3팩 미이식`이 현재 기준이다. 상세 규칙은 [`docs/DRONE_CONTENT_FOLDER_GUIDE.md`](docs/DRONE_CONTENT_FOLDER_GUIDE.md)를 따른다.
+따라서 환경 맵 3팩의 기술 이식은 완료다. 다만 세 맵의 조명·재질·스케일·충돌을 실제 Editor 화면에서 확인하고 어느 맵을 데모에 채택할지는 현재 미정이다. 상세 규칙은 [`docs/DRONE_CONTENT_FOLDER_GUIDE.md`](docs/DRONE_CONTENT_FOLDER_GUIDE.md)를 따른다.
 
 ## 2026-08-26 Dataflow·Chaos 물리 환경 후보
 

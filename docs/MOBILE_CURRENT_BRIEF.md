@@ -6,12 +6,12 @@
 
 ## 30초 요약
 
-- Unreal 저장소 `main`과 GitHub `origin/main`은 `2cc5d79`로 일치한다.
+- Unreal 저장소는 `main=origin/main=204e34b`다. 복구 `909f6a3`, 환경 이식 `f8c8fb2`가 병합됐다.
 - Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개와 Segment/Lap 원본 기록까지 구현됐다.
 - 현재 개발 완료 지점은 `TUT-03`, 다음 구현 카드는 `TUT-04 비교·결과 UI`다.
 - 이번 확인 PC의 제공 에셋 루트는 `C:\에셋`이다. FPV·Loop 선택 자산 12개와 프로젝트 Integration BP 1개의 파일·참조·LFS·자동 검증은 통과했다.
 - NavigationArrows 최소 자산 6개와 전용 테스트는 main에 병합됐다. 화면 Host는 아직 미구현이다.
-- 프로젝트 맵 3개는 `/Game/Drone/Maps`로 중앙화했고 미사용 ThirdPerson·Variant Template Content는 제거했다.
+- 프로젝트 사용 맵은 `/Game/Drone/Maps`로 중앙화했다. 기본 Template Map 4개만 제거했고 비맵 자산 62개는 복구했다. 환경 맵 3종의 기술 이식도 완료했다.
 - 사용자는 Gate나 기록 C++를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도와 Drone Loop를 확인하면 된다.
 - 확정된 학습 항목은 `정보처리산업기사`와 `C++ 코딩테스트` 두 가지뿐이다.
 - 정보처리산업기사 2026년 3회 필기 접수는 끝났다. 오늘 가장 먼저 Q-Net에서 자신의 접수·면제·응시 상태를 확인해야 한다.
@@ -22,17 +22,17 @@
 | 구분 | 현재 상태 |
 |---|---|
 | Unreal 저장소 | `C:\URproject\drone` |
-| Unreal 기준 Commit | `2cc5d79` |
-| Git 상태 | 깨끗한 `main`, 로컬·원격 `2cc5d79` 일치 |
+| Unreal 기준 Commit | `204e34b` |
+| Git 상태 | 깨끗한 `main`, 로컬·원격 일치. 환경 LFS 약 18GB Push 완료 |
 | Git LFS | `fsck` 정상 |
 | 최종 Editor Build | 성공 |
 | Tutorial 자동화 | 6/6 통과 |
 | 전체 `Drone.` 자동화 | 15/15 통과 |
 | Blueprint Compile | Errors 0, Warnings 0, Load Failures 0 |
 | Standalone | 실제 WBP HUD·Cyan Course·Current/Inactive Gate 표시 확인 |
-| 에셋 이식 | FPV 전용 자동화 1/1, 금지 의존성 0, LFS fsck 통과 |
+| 에셋 이식 | FPV 기준 유지. 환경 3종 누락 의존성 0·허용 외 경로 0, 중앙 Map 실제 로드, LFS fsck 통과 |
 
-현재 맵 중앙화·템플릿 정리 기준에서 Editor Build, 전체 Drone 15개와 Blueprint 전체 Compile을 다시 실행했다. 모든 자동화는 warning·error 없이 통과했다.
+환경 이식 기준에서 Editor Build, 전체 Drone 15개와 Blueprint 전체 Compile을 다시 실행했다. 자동화 15/15는 성공했고 기존 PIE NavMesh 경고 포함 성공 1개가 있다. Blueprint 자체 Compile은 0/0/0이다.
 
 ## 2. 코드가 어떻게 연결되는가
 
@@ -129,7 +129,7 @@ Lvl_DroneTraining
 - 배터리·통신거리·재밍
 - SaveGame·Multiplayer·최종 에셋 전면 적용
 
-남아 있는 C++ `Variant_Combat`에 AI와 StateTree 코드가 있어도 Drone Enemy AI가 구현됐다는 뜻은 아니다. 대응 Template Content는 제거했고 현재 전역 시작 Map은 `/Game/Drone/Maps/Lvl_DroneTraining`이다.
+남아 있는 C++ `Variant_Combat`와 복구된 Template Content에 AI·StateTree 예제가 있어도 Drone Enemy AI가 구현됐다는 뜻은 아니다. 현재 전역 시작 Map은 `/Game/Drone/Maps/Lvl_DroneTraining`이다.
 
 ## 4. 사용자가 지금 해야 하는 일
 
@@ -150,7 +150,7 @@ Lvl_DroneTraining
 ### PC 앞에서 할 일
 
 1. 다른 PC라면 `drone`과 `md` 저장소를 Pull한다.
-2. Unreal Commit이 `2cc5d79`인지, LFS Asset이 내려왔는지 확인한다.
+2. Unreal Commit이 환경 이식 기준인지, `git lfs pull` 뒤 세 환경 Map과 공급사 Root가 내려왔는지 확인한다.
 3. UE 5.8.1에서 `/Game/Drone/Maps/Lvl_DroneTraining`을 직접 연다.
 4. Gate 0→1→2→3을 정방향으로 완주한다.
 5. 미래 Gate를 먼저 통과하거나 현재 Gate를 역방향으로 통과해 진행되지 않는지 확인한다.

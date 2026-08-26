@@ -554,16 +554,27 @@ Inbox → Todo → Doing → Done
 - 같은 기준선의 `Lvl_DroneTraining` PIE에서 한글 Flight HUD·구간 기록 패널·현재 Gate·세분화 코스 선의 초기 렌더는 확인했다. Gate 0→3 한 Lap 뒤 구간 숫자 갱신과 NavigationArrows Host/Wrapper는 아직 확인·구현하지 않았다.
 - 맵 이식은 DronePack의 정리 `Map_Demo` 1개만 기술 검증·main 반영까지 완료했다. Battlefield·MilitaryCamp·MilitaryBase 환경 맵은 실제 Drone 저장소에 아직 없으며 `AST-03A`로 계속 분리한다.
 
-## 34. 2026-08-26 맵 중앙화와 템플릿 콘텐츠 정리
+## 34. 2026-08-26 맵 중앙화와 당시 템플릿 콘텐츠 정리
 
-- 위 33절은 `fb1d7ad` 시점의 역사 상태다. 현재 Unreal 기준선은 `main=origin/main=2cc5d79`, 작업 트리 Clean이다.
+- 위 33절은 `fb1d7ad` 시점의 역사 상태다. 이 절은 `2cc5d79` 시점의 역사 상태이며 35절에서 삭제 범위를 교정했다.
 - 실제 RabbitHole 프로젝트 `C:\project\Fractured\GoDownTheRabbitHole.uproject`를 확인했다. 프로젝트 소유 맵을 `Content/Maps`에 모으고 역할별 Blueprint 폴더와 공급사 폴더를 분리하는 방식을 참고했다.
 - Drone 프로젝트 소유 맵은 `/Game/Drone/Maps`로 중앙화했다: `Lvl_DroneTraining`, `Lvl_DronePrototype`, `Lvl_DronePackShowcase`.
 - 기존 공급사 정리 맵 `Map_Demo`는 `Lvl_DronePackShowcase`로 이름과 위치를 바꿨다. 공급사 Mesh·Material 등 의존 자산은 `/Game/Drone/ThirdParty/DronePack`에 유지한다.
-- 미사용 콘텐츠 루트 `/Game/ThirdPerson`, `/Game/Variant_Combat`, `/Game/Variant_Platforming`, `/Game/Variant_SideScrolling`과 대응 ExternalActors/ExternalObjects를 제거했다. 제거 전 프로젝트 맵 3개와 `/Game/Drone` 자산에서 해당 루트 의존성 0을 확인했다.
+- 당시 미사용으로 판단한 `/Game/ThirdPerson`, `/Game/Variant_Combat`, `/Game/Variant_Platforming`, `/Game/Variant_SideScrolling` 전체를 제거했다. 사용자가 뜻한 대상은 기본 Map이었으므로 이 범위는 35절에서 바로잡았다.
 - 시작 맵·Editor 시작 맵은 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode는 프로젝트 소유 `BP_DronePrototypeGameMode`다.
 - C++ `DroneCharacter`, 기존 GameMode/Controller, Variant Source는 별도 Source/Build.cs 감사 없이 지우지 않았다.
 - 중앙 맵과 BuiltData 로드, 이전 경로·템플릿 루트 부재, Build, Blueprint 0/0/0, 전체 `Drone.` 15/15, LFS, diff 검증을 통과했다.
 - 기능 Commit `1c8f391`을 Merge Commit `2cc5d79`로 main에 병합·Push했다. 삭제 내용은 Git 이력에서 복구할 수 있다.
 - Battlefield·MilitaryCamp·MilitaryBase 환경 맵은 아직 미이식이다. 현재 남은 수동 확인은 `Lvl_DronePackShowcase`의 시각 검토와 `Lvl_DroneTraining` 한 Lap 비행이다.
 - 상세 폴더 규칙과 현재 트리는 `docs/DRONE_CONTENT_FOLDER_GUIDE.md`를 따른다.
+
+## 35. 2026-08-26 삭제 범위 교정과 환경 맵 이식
+
+- Unreal 생성 기본 Map 4개만 삭제 대상으로 확정했다. ThirdPerson·Variant 비맵 자산 62개는 Commit `909f6a3`에서 복구했다.
+- 삭제 상태인 Map은 `Lvl_ThirdPerson`, `Lvl_Combat`, `Lvl_Platforming`, `Lvl_SideScrolling`과 각 Map 전용 ExternalActors/ExternalObjects다.
+- `C:\에셋` 원본 3팩은 수정하지 않고 별도 UE 5.8 스테이징에서 Map 10개와 3,334개·18.76 GiB를 감사했다.
+- 중앙 Map `/Game/Drone/Maps/Lvl_Battlefield`, `Lvl_MilitaryCamp`, `Lvl_MilitaryBase`와 정확한 의존성 2,723개·16.96 GiB를 Commit `f8c8fb2`로 이식했다.
+- 대형 공급사 패키지의 내부 경로는 일괄 재작성하지 않고 `/Game/Battlefield`, `/Game/FC_MilitaryCamp`, `/Game/MillitaryBase`를 유지했다. 프로젝트에서 선택한 Map 사본만 중앙 경로에 둔다.
+- 세 Map의 공급사 GameMode Override는 제거했다. 환경별 누락 Game 의존성 0, 허용 외 경로 0, World Load 성공을 확인했다.
+- Build, Blueprint 0/0/0, 전체 Drone 15/15, Map Check, LFS Pointer 2,723개와 fsck를 통과했다. Battlefield에는 공급 Blueprint의 선택적 NULL StaticMesh Map Check 메시지 14건이 남고 Camp/Base는 0/0이다.
+- 환경 맵의 기술 이식은 완료지만 실제 Editor 화면 시각 검토와 데모 주력 Map 선택은 아직 미정이다.

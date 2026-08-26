@@ -211,7 +211,7 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 | AST-00 | 제공 에셋 인수 감사 | ZIP 14개와 해제본의 상대 경로·크기 일치 및 팩별 호환성·이식 위험 기록 |
 | AST-01 | 제공 Drone 에셋 선별 적용 | UE 5.8 스테이징 검증 후 기능 코드 변경 없이 Integration BP에서 외형 교체 |
 
-현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`, `TUT-03`을 완료했다. TUT-03은 Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료와 World Game Time·Telemetry 위치 표본 기반 실제 거리·평균 속도 원본 기록을 포함한다. 2026-08-26 병합 main에서 Editor Build, 전체 `Drone.` 15/15, Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다. Unreal 저장소 로컬 `main`과 `origin/main`의 현재 기준선은 맵 중앙화·템플릿 정리를 포함한 `2cc5d79`이다.
+현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`, `TUT-03`을 완료했다. TUT-03은 Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료와 World Game Time·Telemetry 위치 표본 기반 실제 거리·평균 속도 원본 기록을 포함한다. 2026-08-26 병합 main에서 Editor Build, 전체 `Drone.` 15/15, Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다. Unreal 저장소 로컬 `main`과 `origin/main`의 현재 기준선은 환경 이식을 포함한 `204e34b`이다.
 
 다음 활성 카드는 `TUT-04`다. 이전 성공 평균·Best의 정확한 집계 규칙과 결과 UI는 현재 미구현이며, TUT-03의 성공 원본 History를 입력으로 사용한다.
 

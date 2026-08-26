@@ -199,7 +199,7 @@ Yaw     HDG 002° → 025°/045°
 
 ## 8. 현재 경계와 다음 작업
 
-`HUD-01` 데이터 공급 계층과 `HUD-02` C++ 기능·WBP 표시 계층, `TUT-01` Training Course, `TUT-02` Ordered Ring Gate와 `TUT-03` Segment/Lap 원본 기록을 완료했다. 현재 Unreal 기준은 `main=origin/main=2cc5d79`다. Lap Recorder는 이 문서의 10Hz Telemetry Event를 위치 표본 시계로 재사용한다. 다음 활성 카드는 `TUT-04` 이전 기록 비교·Best·결과 UI다. TUT-03의 구현·검증 기준은 [`DRONE_TRAINING_RECORDING_IMPLEMENTATION.md`](DRONE_TRAINING_RECORDING_IMPLEMENTATION.md)를 따른다.
+`HUD-01` 데이터 공급 계층과 `HUD-02` C++ 기능·WBP 표시 계층, `TUT-01` Training Course, `TUT-02` Ordered Ring Gate와 `TUT-03` Segment/Lap 원본 기록을 완료했다. 현재 Unreal 기준은 `main=origin/main=204e34b`다. Lap Recorder는 이 문서의 10Hz Telemetry Event를 위치 표본 시계로 재사용한다. 다음 활성 카드는 `TUT-04` 이전 기록 비교·Best·결과 UI다. TUT-03의 구현·검증 기준은 [`DRONE_TRAINING_RECORDING_IMPLEMENTATION.md`](DRONE_TRAINING_RECORDING_IMPLEMENTATION.md)를 따른다.
 
 아직 포함하지 않는 항목:
 

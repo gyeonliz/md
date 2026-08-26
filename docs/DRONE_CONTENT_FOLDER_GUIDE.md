@@ -1,7 +1,7 @@
 # Drone Content 폴더 정리 기준
 
 기준일: 2026-08-26  
-Drone 기준선: `main=origin/main=2cc5d79`  
+Drone 기준선: `main=origin/main=204e34b`
 Unreal Engine: 5.8.1
 
 ## 1. 레빗홀 프로젝트에서 확인한 기준
@@ -23,7 +23,10 @@ Content/Drone/
 │  ├─ Lvl_DroneTraining.umap
 │  ├─ Lvl_DronePrototype.umap
 │  ├─ Lvl_DronePackShowcase.umap
-│  └─ Lvl_DronePackShowcase_BuiltData.uasset
+│  ├─ Lvl_DronePackShowcase_BuiltData.uasset
+│  ├─ Lvl_Battlefield.umap
+│  ├─ Lvl_MilitaryCamp.umap
+│  └─ Lvl_MilitaryBase.umap
 ├─ Prototype/
 │  ├─ Blueprints/
 │  ├─ Input/
@@ -35,6 +38,11 @@ Content/Drone/
 └─ ThirdParty/
    ├─ DronePack/
    └─ NavigationArrows/
+
+Content/
+├─ Battlefield/       # Battlefield 맵의 공급사 의존성
+├─ FC_MilitaryCamp/   # MilitaryCamp 맵의 공급사 의존성
+└─ MillitaryBase/     # MilitaryBase 맵의 공급사 의존성(원본 철자 유지)
 ```
 
 Map의 현재 용도는 다음과 같다.
@@ -44,21 +52,26 @@ Map의 현재 용도는 다음과 같다.
 | `Lvl_DroneTraining` | Tutorial Vertical Slice와 현재 기본 실행 Map | PIE 초기 화면·자동화 확인, 한 Lap 수동 확인 대기 |
 | `Lvl_DronePrototype` | Drone Pawn·입력·Camera·Telemetry 기능 시험 | 자동화 확인 |
 | `Lvl_DronePackShowcase` | 공급사 DronePack 외형 6종 비교용 정리 Map | 기술 검증 완료, Editor 최종 시각 검토 대기 |
+| `Lvl_Battlefield` | 넓은 Battlefield 환경 후보 | 실제 로드·의존성 검증 완료, 공급 자산 Map Check 메시지 14건·시각 검토 대기 |
+| `Lvl_MilitaryCamp` | 군사 캠프 환경 후보 | 실제 로드·Map Check 0/0, 시각 검토 대기 |
+| `Lvl_MilitaryBase` | 군사 기지 환경 후보 | 실제 로드·Map Check 0/0, 시각 검토 대기 |
 
 `Lvl_DronePackShowcase`는 기존 공급사 정리본 `Map_Demo`를 프로젝트에서 사용하는 목적에 맞춰 이름과 위치를 바꾼 것이다. DronePack Mesh·Material 같은 의존 자산은 계속 `/Game/Drone/ThirdParty/DronePack`에 둔다.
 
-## 3. 이번에 제거한 영역
+환경 맵은 프로젝트가 선택한 중앙 사본만 `/Game/Drone/Maps`에 둔다. 공급사 내부 참조를 수천 개 일괄 재작성하는 위험을 피하기 위해 의존성은 공급사 경로를 유지했다. 이는 "프로젝트 사용 맵은 중앙화하되 공급사 자산은 원래 경계에 둔다"는 RabbitHole 참고 원칙과 맞는다.
 
-Asset Registry 감사에서 중앙 제작 Map 3개가 아래 Template Root를 참조하지 않는 것을 확인한 뒤 제거했다.
+## 3. 기본 템플릿 정리 범위와 교정 기록
+
+삭제 대상은 Unreal 프로젝트 생성 때 들어온 아래 기본 Map 4개와 그 Map 전용 ExternalActors/ExternalObjects다.
 
 ```text
-/Game/ThirdPerson
-/Game/Variant_Combat
-/Game/Variant_Platforming
-/Game/Variant_SideScrolling
+/Game/ThirdPerson/Lvl_ThirdPerson
+/Game/Variant_Combat/Lvl_Combat
+/Game/Variant_Platforming/Lvl_Platforming
+/Game/Variant_SideScrolling/Lvl_SideScrolling
 ```
 
-각 Template Map의 `__ExternalActors__`, `__ExternalObjects__`도 함께 제거했다. Commit `1c8f391`은 Git 감지 기준 총 599개 경로를 변경했고, 이 중 589개는 삭제, 2개는 이름·위치 변경, 2개는 새 경로 추가로 기록됐다. Git 이력에 남아 있으므로 필요하면 해당 Commit 이전 파일을 복구할 수 있다.
+`1c8f391`에서 위 네 Content Root 전체를 제거한 것은 사용자 의도보다 넓은 삭제였다. `909f6a3`에서 Blueprint·Material 등 비맵 자산 62개를 복구했고, 기본 Map 4개만 삭제 상태로 유지했다. 현재 Asset Registry 기준 복구 수는 ThirdPerson 4, Combat 30, Platforming 10, SideScrolling 18이다.
 
 다음 C++ 영역은 이번에 삭제하지 않았다.
 
@@ -71,7 +84,7 @@ Source/Drone/Variant_Platforming/
 Source/Drone/Variant_SideScrolling/
 ```
 
-콘텐츠가 없어 현재 Drone 게임 흐름에는 사용하지 않지만, C++ 삭제는 Build.cs와 클래스 의존성까지 별도로 감사해야 하므로 후속 정리 대상으로 분리했다. 이 코드가 남아 있다는 사실은 Enemy AI MVP가 구현됐다는 뜻이 아니다.
+대응 Content도 복구되어 참고할 수 있지만 현재 Drone Tutorial 실행 흐름이 직접 사용하는 영역은 아니다. C++ 삭제는 Build.cs와 클래스 의존성까지 별도로 감사해야 하므로 후속 정리 대상으로 분리했다. 이 코드와 Template Content가 남아 있다는 사실은 Enemy AI MVP가 구현됐다는 뜻이 아니다.
 
 ## 4. 기본 실행 설정
 
@@ -98,28 +111,32 @@ Content Browser 기본 선택 경로는 `/Game/Drone`이다. 예전 `ThirdPerson
 ### Blueprint와 자산
 
 - 기능 소유 Blueprint는 `Prototype`, `Tutorial`, 향후 `Mission`, `AI`, `UI` 같은 기능 폴더에 둔다.
-- 공급사 원본·선별 의존성은 `/Game/Drone/ThirdParty/<PackName>`에 둔다.
+- 새로 선별하는 소형 공급사 자산은 기본적으로 `/Game/Drone/ThirdParty/<PackName>`에 둔다.
 - 프로젝트가 공급사 자산을 조합하는 Wrapper는 `/Game/Drone/Integrations/<PackName>`에 둔다.
 - `ThirdParty` 자산을 직접 수정하기보다 프로젝트 소유 Wrapper 또는 Material Instance를 만든다.
+- 대형 환경 팩처럼 내부 패키지 경로가 넓게 얽힌 경우에는 검증된 정확한 의존성 폐쇄만 공급사 Root 그대로 보존하고, 중앙 Map만 프로젝트 소유 경로에 둔다.
 
 ### 새 환경 Map을 이식할 때
 
 1. 별도 Staging 프로젝트에서 원본 의존성과 누락 자산을 감사한다.
 2. 공급사 Pawn·Input·GameMode·HUD를 제거한다.
 3. 프로젝트에서 사용할 대표 Map 사본을 `Lvl_<EnvironmentName>`으로 정리한다.
-4. 대표 Map만 `/Game/Drone/Maps`에 두고 폐쇄 의존성은 `/Game/Drone/ThirdParty/Environments/<PackName>`에 둔다.
+4. 대표 Map만 `/Game/Drone/Maps`에 두고, 의존성 경로 변경 위험을 평가해 소형 팩은 `ThirdParty`, 대형 팩은 검증된 공급사 Root를 유지한다.
 5. Map load, Map Check, Blueprint Compile, 전체 `Drone.` 자동화, Git LFS를 확인한다.
 6. Editor에서 조명·재질·스케일·충돌을 눈으로 확인한 뒤 완료 처리한다.
 
-Battlefield·MilitaryCamp·MilitaryBase는 아직 실제 Drone 저장소에 이식되지 않았으므로 이 규칙을 적용한 것처럼 기록하지 않는다.
+Battlefield·MilitaryCamp·MilitaryBase는 이 절차로 실제 이식했다. 기술 검증은 통과했지만 Editor 화면에서 조명·재질·스케일·충돌을 직접 보는 수동 검토는 아직이므로 최종 채택 Map으로 확정하지 않는다.
 
 ## 6. 이번 검증 결과
 
 - `DroneEditor Win64 Development` Build 성공
-- 중앙 Maps 3개와 Showcase BuiltData 로드 성공
-- 삭제한 Template Root와 이전 Map 경로 잔존 0
+- 중앙 Maps 6개와 Showcase BuiltData 로드 성공
+- 기본 Template Map 4개와 이전 프로젝트 Map 경로 잔존 0
+- Template 비맵 자산 62개 복구 확인
+- 환경 의존성: Battlefield 710, MilitaryCamp 593, MilitaryBase 1,414개 공급사 자산; 누락 0, 허용 외 경로 0
 - Blueprint Compile `0 errors / 0 warnings / 0 failed loads`
-- 전체 `Drone.` 자동화 `15/15` 성공
-- 중앙 Map 4개 Git LFS 속성 확인
+- 전체 `Drone.` 자동화 `15/15` 성공(14 무경고, 기존 PIE NavMesh 경고 포함 성공 1)
+- 환경 Map Check: Battlefield 오류 0·공급 Blueprint 메시지 14, MilitaryCamp 0/0, MilitaryBase 0/0
+- 신규 환경 패키지 2,723개·16.96 GiB 전부 Git LFS 포인터 확인
 - `git lfs fsck`, `git diff --check` 통과
-- `main=origin/main=2cc5d79`, 작업 트리 Clean
+- 기능 커밋: 복구 `909f6a3`, 환경 이식 `f8c8fb2`; main 병합 `204e34b` Push 완료
