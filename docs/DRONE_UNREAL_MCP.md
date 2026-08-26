@@ -90,6 +90,6 @@ ModelContextProtocol.GenerateClientConfig Codex
 - `AutomationTestToolset.ListTests`의 `Drone.` 필터: 총 12개 반환
 - Codex 앱 번들 `codex.exe`는 WindowsApps 실행 권한 거부로 현재 PowerShell에서 `codex mcp list`를 직접 검증하지 못함
 
-위 12/12는 MCP 연결 당시의 검증 기록이다. 현재 Source 기준선 `2cc5d79`에서는 전체 `Drone.` 15/15와 Blueprint 0/0/0을 통과했다. Drone 루트에서 새 Codex 작업을 열 때 `unreal-mcp`가 네이티브 Tool 목록에 나타나는지와 Current Level 호출을 한 번 확인해 `UE-MCP-02`를 닫는다. 이 연결 작업은 `AST-01`의 실제 스피커 Loop 청감 확인을 대신하지 않으며, 다음 기능 카드는 `TUT-04 이전 기록 비교·Best·결과 UI`다.
+위 12/12는 MCP 연결 당시의 검증 기록이다. 현재 main `55b3ffe`에서는 전체 `Drone.` 16/16과 Blueprint 오류 0을 통과했다. Drone 루트에서 새 Codex 작업을 열 때 `unreal-mcp`가 네이티브 Tool 목록에 나타나는지와 Current Level 호출을 한 번 확인해 `UE-MCP-02`를 닫는다. 이 연결 작업은 실제 스피커 Loop 청감이나 TUT-04B 두 Lap 화면 확인을 대신하지 않는다.
 
 2026-08-26 09:17 KST에는 D 드라이브 프로젝트의 새 Editor PID 9884에서 MCP 서버 시작, 23 Toolset 등록과 `127.0.0.1:8000/mcp` HTTP 응답을 다시 확인했다. 현재 작업은 문서 루트에서 시작했으므로 이 재확인도 `UE-MCP-02`의 Codex 네이티브 Tool 노출 완료로 간주하지 않는다.

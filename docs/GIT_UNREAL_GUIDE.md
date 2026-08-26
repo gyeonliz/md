@@ -10,7 +10,7 @@
 - 다만 `UE_5.8` 폴더명이나 `.uproject`의 `EngineAssociation` 값만으로 패치 버전을 판정해서는 안 된다. 이번 확인 PC를 메인컴 또는 작업컴 중 어느 역할로 부를지는 이 문서에서 임의로 정하지 않으므로, 메인컴 설치 버전과 두 PC 일치 판정은 PC 역할을 확인한 뒤 닫는다.
 - 실제 Drone GitHub 저장소는 **`gyeonliz/drone`**으로 확정했다.
 - GitHub 저장소 공개 범위(Public/Private)는 **현재 미정**이다.
-- 이번 확인 PC의 Drone 경로는 `C:\URproject\drone`이며 로컬 `main=origin/main=204e34b`, 작업 트리 Clean이다. 프로젝트 사용 맵과 환경 중앙 사본은 `/Game/Drone/Maps`에 있고 Unreal 생성 기본 Map 4개만 제거했다. 현재 main 검증은 `Drone.` 15/15, Blueprint Compile 0/0/0, 환경 의존성 누락 0, LFS fsck 통과다. 다음 기능 카드는 TUT-04 이전 기록 비교·Best·결과 UI다. `f8c8fb2`는 환경 이식, `909f6a3`은 비맵 복구, `551e287`은 TUT-03, `91498b7`은 첫 Commit의 역사 기록이다. 실제 코드 구조와 사용자 확인 작업은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다. 다른 PC Pull/LFS/UE 실행 검증은 아직 남았다.
+- 이번 확인 PC의 Drone 경로는 `C:\URproject\drone`이다. 현재 main은 `55b3ffe`이며 남은 에셋 선별 이식과 TUT-04B를 병합·Push했다. 전체 `Drone.` 16/16, Blueprint 오류 0, 새 자산 외부·누락 참조 0, 신규 LFS 892개·4.9GB 업로드를 확인했다. 프로젝트 사용 맵과 환경 중앙 사본은 `/Game/Drone/Maps`에 있고 Unreal 생성 기본 Map 4개만 제거했다. 실제 코드 구조와 사용자 확인 작업은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다. 다른 PC Pull/LFS/UE 실행 검증은 아직 남았다.
 - 사용자는 현재 Drone 프로젝트에서 Android를 사용하지 않는다고 확정했다. 기준 Drone 프로젝트에서는 Android File Server Plugin과 네트워크 연결을 끄고 `SecurityToken`을 빈 할당으로 정리했다.
 - 아래 브랜치 구조는 현재 컨텍스트에 맞춘 권장 시작안이며, 최종 팀 규칙으로 확정된 것은 아니다.
 - 이 가이드는 명령줄 Git을 기준으로 한다. Unreal Editor 안의 Git 플러그인 제공 여부와 동작은 실제 UE 5.8 환경에서 확인하기 전까지 전제하지 않는다.

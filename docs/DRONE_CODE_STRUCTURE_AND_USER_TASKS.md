@@ -1,10 +1,10 @@
 # Drone 현재 코드 구조와 사용자 확인 작업
 
-기준일: 2026-08-26 (Asia/Seoul)
+기준일: 2026-08-27 (Asia/Seoul)
 
 이 문서는 현재 Unreal `drone` 저장소를 직접 확인한 결과를 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
 
-TUT-03 완료 기능 Commit은 `551e287`이다. 현재 기준은 `main=origin/main=204e34b`이며 기본 Template Map 정리 교정 `909f6a3`과 환경 맵 이식 `f8c8fb2`를 포함한다. 세 환경 Map은 후보 공간이며 현재 Tutorial 기본 실행 구조를 바꾸지 않는다.
+TUT-03 완료 기능 Commit은 `551e287`이다. 현재 main 기준은 `55b3ffe`이며, 남은 제공 에셋 선별 이식과 TUT-04B 이전 평균·Best 결과 기능 Commit `3fa4444`이 병합됐다. 환경 Map은 후보 공간이며 Tutorial 기본 실행 구조를 바꾸지 않는다.
 
 NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합됐다. 자산은 main에 있지만 프로젝트 소유 Widget Host는 아직 구현하지 않았으므로 화면에 나타나지 않는 것이 정상이다.
 
@@ -13,14 +13,14 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합�
 | 검증 항목 | 현재 확인 결과 |
 |---|---|
 | `DroneEditor Win64 Development` | Build 성공 |
-| `Drone.Tutorial` Automation | 6/6 통과 |
-| 전체 `Drone.` Automation | 15/15 통과 |
-| `CompileAllBlueprints` | Errors 0, Warnings 0, Load Failures 0 |
+| `Drone.Tutorial` Automation | 7/7 통과 |
+| 전체 `Drone.` Automation | 16/16 통과 |
+| `CompileAllBlueprints` | Errors 0, 기존 Battlefield Pose GUID와 MCP 고지 경고 유지 |
 | 현재 에셋 이식 재검증 | FPV 전용 1/1, Blueprint 0/0/0, 스테이징 선택 자산·현재 Integration 금지 의존성 0, 이식 13개 LFS와 fsck 통과 |
 | 기존 Standalone 시각 기록 | FPV 외형, 고정 추적 Camera, 실제 WBP HUD, Cyan 안내선, Current/Inactive Gate 표시 확인 |
-| 사용자 수동 확인 | 실제 조종으로 네 Gate 1 Lap을 완주하고 FPV Body·Rotor·Camera 배치, Drone Loop 단일 재생·종료 정지를 확인할 차례 |
+| 사용자 수동 확인 | Training 두 Lap 비교 HUD, OilRig Map Check·화면·성능, Ground Drone/MG·NPC·Raw Drone 외형을 확인할 차례 |
 
-TUT-03 Git 기준 `551e287`에서 Gate 순서 판정과 Segment/Lap 기록을 함께 재현할 수 있다. 전체 `Drone.` 14/14는 TUT-03 완료 때 실행한 같은 Commit의 기준선이며, 이번 에셋 재감사에서는 FPV 전용 1/1과 Blueprint Compile만 다시 실행했다. 수치 비교·Best와 결과 UI는 다음 카드인 TUT-04 범위이므로 현재 화면에 Lap 결과가 나타나지 않는 것이 정상이다.
+현재 main의 `UDroneTrainingLapRecorderComponent`는 Segment/Lap 원본 뒤 TUT-04B 비교 결과도 만든다. 첫 성공은 기준 기록, 이후 성공은 현재 시도를 제외한 이전 평균과 Best를 사용한다. HUD에 이전 완주 평균·Best·시간 Delta·속도 Delta가 표시되며 계산은 Blueprint에 중복하지 않는다. 실제 두 Lap 표시 확인 전까지 TUT-04의 수동 판정은 남아 있다.
 
 ## 1. 런타임 연결 구조
 
@@ -60,7 +60,8 @@ TUT-03 Git 기준 `551e287`에서 Gate 순서 판정과 Segment/Lap 기록을 �
 │        ├─ Idle → Recording → Completed
 │        ├─ Telemetry 10Hz 위치 표본으로 실제 이동 거리 누적
 │        ├─ Segment/Lap 시간·거리·평균 속도 기록
-│        └─ OnLapStarted / OnSegmentRecorded / OnLapCompleted
+│        ├─ 이전 평균·Best·Segment 비교 결과 생성
+│        └─ OnLapStarted / OnSegmentRecorded / OnLapCompleted / OnLapComparisonReady
 │
 └─ BP_DroneTrainingGate 4개
    └─ ADroneTrainingGate
@@ -472,7 +473,7 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
 - 최종 코스 배치·크기·난이도
 - 배터리·통신거리·재밍 같은 후보 시스템
 
-TUT-03의 원본 시간·거리·평균 속도 계산과 실행 중 성공 History는 구현됐다. 다만 이전 평균·Best 비교, 차이 계산, 화면 표시와 SaveGame은 아직 구현하지 않았으므로 TUT-04 이후 기능처럼 말하면 안 된다. `SegmentDistance`는 현재도 배치 메타데이터이며 실제 이동 거리 계산에 사용하지 않는다.
+TUT-03의 원본 시간·거리·평균 속도와 TUT-04B의 이전 평균·Best·Delta·HUD 표시는 구현됐다. `USaveGame` 영속화와 점수는 아직 구현하지 않았다. `SegmentDistance`는 현재도 배치 메타데이터이며 실제 이동 거리 계산에 사용하지 않는다.
 
 ## 6. 사용자가 지금 할 일과 반복하지 않아도 되는 일
 

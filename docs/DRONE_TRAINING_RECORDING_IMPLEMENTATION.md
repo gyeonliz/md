@@ -1,10 +1,10 @@
 # TUT-03 Training Lap·Segment 기록 구현 가이드
 
-기준일: 2026-08-25 (Asia/Seoul)
+기준일: 2026-08-27 (Asia/Seoul)
 
 Unreal 구현 기준: `551e287e8a5de7fa33f28d1911f8a7a957bd66fa` (`feat: record tutorial lap timing and distance`)
 
-이 문서는 TUT-03에서 실제 구현한 Lap·Segment 원본 기록 계층을 설명한다. 2026-08-26에는 이 원본을 기존 Flight HUD에 연결해 최근 구간과 완료 구간들의 평균을 한글로 표시했다. 이전 성공 Lap 평균·Best·SaveGame은 아직 만들지 않았으므로 구현된 기능처럼 포함하지 않는다.
+이 문서는 TUT-03에서 실제 구현한 Lap·Segment 원본 기록 계층을 설명한다. 2026-08-26에는 이 원본을 기존 Flight HUD에 연결했고, 2026-08-27에는 TUT-04B로 현재 시도를 제외한 이전 성공 평균·Best·Delta와 Segment 비교를 추가했다. `USaveGame` 영속화와 점수는 아직 만들지 않았다.
 
 ## 1. 왜 필요한가
 
@@ -56,11 +56,12 @@ Commit `551e287`은 C++ Source와 테스트만 변경했다. TUT-03 때문에 �
 |---|---|---|
 | `ADroneTrainingGate` | Pawn Overlap 수집, 진입·이탈 위치를 Sequence에 전달 | 시간·거리·평균 속도 계산 |
 | `UDroneTrainingGateSequenceComponent` | Gate 구성 검증, 현재 Gate, 순서·정방향·중복 판정, Reset | Lap 계산, History, 결과 UI |
-| `UDroneTrainingLapRecorderComponent` | 정상 Gate Event 구독, World Game Time과 3차원 위치 표본으로 Segment/Lap 원본 기록 생성 | 이전 평균, Best, 점수, UI, SaveGame |
+| `UDroneTrainingLapRecorderComponent` | 정상 Gate Event 구독, Segment/Lap 원본, 이전 평균·Best·Delta 비교 생성 | 점수, SaveGame |
 | `ADroneTrainingCourse` | Sequence와 Recorder를 함께 소유하고 런타임 연결 | 직접 기록 계산 |
 | `UDroneTelemetryComponent` | 기존 10Hz `OnTelemetryUpdated` Event 제공 | Segment 경계와 Lap 상태 결정 |
 | `FDroneTrainingSegmentRecord` | 완료된 한 구간의 원본 값 보관 | 비교·표시 문자열 생성 |
-| `FDroneTrainingLapRecord` | 완료된 한 Lap과 그 Segment 배열 보관 | 영구 저장·순위 계산 |
+| `FDroneTrainingLapRecord` | 완료된 한 Lap과 그 Segment 배열 보관 | 영구 저장 |
+| `FDroneTrainingLapComparison` | 현재 Lap, 이전 평균, Best, Delta와 Segment 비교 보관 | 영구 저장·점수 규칙 |
 
 핵심 원칙은 다음과 같다.
 
@@ -296,7 +297,7 @@ Event는 상태를 먼저 반영한 뒤 Broadcast한다. Blueprint가 Event 안�
 4. Course의 `OrderedGates`가 Gate 0, 1, 2, 3 순서인지 확인한다.
 5. PIE를 시작하고 Gate 0이 Current 상태인지 확인한다.
 
-현재 Flight HUD는 Training Course의 Recorder를 자동으로 찾아 최근 정상 구간의 평균 속도·이동 거리·통과 시간과 완료 구간들의 평균을 한글로 표시한다. 원본 검증이 필요하면 `LapRecorderComponent`의 세 Event와 `FDroneTrainingSegmentRecord`를 직접 확인할 수 있다. 이전 성공 Lap 평균·Best·`+/-` 비교는 아직 표시하지 않는다.
+현재 Flight HUD는 Training Course의 Recorder를 자동으로 찾아 최근 정상 구간 통계와 완료 구간 평균을 한글로 표시한다. TUT-04B 이후에는 이전 완주 평균, Best, 시간·속도 Delta도 표시한다. 원본 검증은 기존 세 Event와 `OnLapComparisonReady`, `FDroneTrainingLapComparison`을 확인한다.
 
 ### 정상 Lap
 

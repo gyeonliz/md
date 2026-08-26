@@ -11,7 +11,7 @@ TUT-01의 범위는 다음 두 가지뿐이다.
 
 TUT-01 자체 완료 범위에는 Gate, 통과 Trigger, 통과 순서, 정·역방향 판정, Segment/Lap 기록과 Timing을 포함하지 않는다. 이후 TUT-02에서 Gate·Trigger·순서·정방향 판정을, TUT-03에서 Segment/Lap 시간·실제 이동 거리·평균 속도 원본 기록을 각각 별도 책임으로 구현했다.
 
-TUT-01 자체 완료 기준선은 Unreal Commit `5a9a2fa`다. 현재 프로젝트 기준선 `2cc5d79`에는 TUT-02 Gate와 TUT-03 Lap Recorder, 자산 이식과 맵 중앙화가 추가됐으며 Editor Build, 전체 `Drone.` 15/15, 전체 Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다. Standalone에서는 TUT-02 기준 실제 BP Pawn·Controller·WBP HUD, 밝은 청록 안내선과 Current/Inactive Gate를 확인했다.
+TUT-01 자체 완료 기준선은 Unreal Commit `5a9a2fa`다. 현재 프로젝트 기준선 `55b3ffe`에는 TUT-02 Gate, TUT-03 Lap Recorder, TUT-04B 비교 결과, 자산 이식과 맵 중앙화가 추가됐으며 Editor Build, 전체 `Drone.` 16/16과 Blueprint 오류 0을 통과했다. Standalone에서는 TUT-02 기준 실제 BP Pawn·Controller·WBP HUD, 밝은 청록 안내선과 Current/Inactive Gate를 확인했다.
 
 ## 1. 왜 필요한가
 
@@ -327,6 +327,6 @@ TUT-02 Done
 TUT-03 Done
 → Segment/Lap 시간·실제 이동 거리·평균 속도 원본 기록
 
-TUT-04 Todo
-→ 이전 기록 비교·Best·결과 UI
+TUT-04B 기술 구현 완료·수동 확인 대기
+→ 첫 기준, 이전 평균·Best·시간/속도 Delta를 두 Lap 실제 HUD에서 확인
 ```

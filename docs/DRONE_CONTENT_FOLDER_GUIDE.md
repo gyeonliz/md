@@ -1,7 +1,7 @@
 # Drone Content 폴더 정리 기준
 
-기준일: 2026-08-26  
-Drone 기준선: `main=origin/main=204e34b`
+기준일: 2026-08-27
+Drone 기준선: `main=origin/main=55b3ffe`
 Unreal Engine: 5.8.1
 
 ## 1. 레빗홀 프로젝트에서 확인한 기준
@@ -26,7 +26,8 @@ Content/Drone/
 │  ├─ Lvl_DronePackShowcase_BuiltData.uasset
 │  ├─ Lvl_Battlefield.umap
 │  ├─ Lvl_MilitaryCamp.umap
-│  └─ Lvl_MilitaryBase.umap
+│  ├─ Lvl_MilitaryBase.umap
+│  └─ Lvl_OilRig.umap
 ├─ Prototype/
 │  ├─ Blueprints/
 │  ├─ Input/
@@ -36,8 +37,15 @@ Content/Drone/
 │  └─ Materials/
 ├─ Integrations/
 └─ ThirdParty/
+   ├─ ArmyVFX/
    ├─ DronePack/
-   └─ NavigationArrows/
+   ├─ GroundDroneKit/
+   ├─ InfantrySFX/
+   ├─ ModularInsurgents/
+   ├─ ModularSoldier/
+   ├─ NavigationArrows/
+   ├─ OilRig/
+   └─ RawDrones/
 
 Content/
 ├─ Battlefield/       # Battlefield 맵의 공급사 의존성
@@ -55,6 +63,7 @@ Map의 현재 용도는 다음과 같다.
 | `Lvl_Battlefield` | 넓은 Battlefield 환경 후보 | 실제 로드·의존성 검증 완료, 공급 자산 Map Check 메시지 14건·시각 검토 대기 |
 | `Lvl_MilitaryCamp` | 군사 캠프 환경 후보 | 실제 로드·Map Check 0/0, 시각 검토 대기 |
 | `Lvl_MilitaryBase` | 군사 기지 환경 후보 | 실제 로드·Map Check 0/0, 시각 검토 대기 |
+| `Lvl_OilRig` | 해상 시설 환경 후보 | 실제 로드·의존성 0/0 확인, 대형 Map 수동 Map Check·시각·성능 검토 대기 |
 
 `Lvl_DronePackShowcase`는 기존 공급사 정리본 `Map_Demo`를 프로젝트에서 사용하는 목적에 맞춰 이름과 위치를 바꾼 것이다. DronePack Mesh·Material 같은 의존 자산은 계속 `/Game/Drone/ThirdParty/DronePack`에 둔다.
 
@@ -125,18 +134,18 @@ Content Browser 기본 선택 경로는 `/Game/Drone`이다. 예전 `ThirdPerson
 5. Map load, Map Check, Blueprint Compile, 전체 `Drone.` 자동화, Git LFS를 확인한다.
 6. Editor에서 조명·재질·스케일·충돌을 눈으로 확인한 뒤 완료 처리한다.
 
-Battlefield·MilitaryCamp·MilitaryBase는 이 절차로 실제 이식했다. 기술 검증은 통과했지만 Editor 화면에서 조명·재질·스케일·충돌을 직접 보는 수동 검토는 아직이므로 최종 채택 Map으로 확정하지 않는다.
+Battlefield·MilitaryCamp·MilitaryBase와 OilRig은 이 절차로 실제 이식했다. 기술 검증은 통과했지만 Editor 화면에서 조명·재질·스케일·충돌을 직접 보는 수동 검토는 아직이므로 최종 채택 Map으로 확정하지 않는다. OilRig의 명령줄 Map Check는 맵 Construction이 장시간 끝나지 않아 별도 수동 확인으로 남겼다.
 
 ## 6. 이번 검증 결과
 
 - `DroneEditor Win64 Development` Build 성공
-- 중앙 Maps 6개와 Showcase BuiltData 로드 성공
+- 중앙 Maps 7개와 Showcase BuiltData 로드 성공
 - 기본 Template Map 4개와 이전 프로젝트 Map 경로 잔존 0
 - Template 비맵 자산 62개 복구 확인
 - 환경 의존성: Battlefield 710, MilitaryCamp 593, MilitaryBase 1,414개 공급사 자산; 누락 0, 허용 외 경로 0
-- Blueprint Compile `0 errors / 0 warnings / 0 failed loads`
-- 전체 `Drone.` 자동화 `15/15` 성공(14 무경고, 기존 PIE NavMesh 경고 포함 성공 1)
+- Blueprint Compile 오류 0. 기존 Battlefield Pose GUID와 MCP 고지 경고는 유지
+- 전체 `Drone.` 자동화 `16/16` 성공(기존 PIE NavMesh 경고 포함 성공 1)
 - 환경 Map Check: Battlefield 오류 0·공급 Blueprint 메시지 14, MilitaryCamp 0/0, MilitaryBase 0/0
 - 신규 환경 패키지 2,723개·16.96 GiB 전부 Git LFS 포인터 확인
 - `git lfs fsck`, `git diff --check` 통과
-- 기능 커밋: 복구 `909f6a3`, 환경 이식 `f8c8fb2`; main 병합 `204e34b` Push 완료
+- 현재 기능 커밋: 남은 선별 자산·TUT-04B `3fa4444`; main 병합 `55b3ffe` Push 완료
