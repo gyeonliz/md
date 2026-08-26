@@ -1,6 +1,6 @@
 # Drone 개발 진행 기록
 
-기준일: 2026-08-25 (Asia/Seoul)
+기준일: 2026-08-26 (Asia/Seoul)
 
 이 문서는 Drone 개발의 **진행 이력**을 시간순으로 남긴다. 가장 최신의 현재 상태는 [`../WORKBOARD.md`](../WORKBOARD.md), 확정 구현 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)를 따른다.
 
@@ -18,7 +18,7 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-25 20:05 KST
+마지막 갱신: 2026-08-26 12:57 KST
 
 | 구분 | 현재 상태 |
 |---|---|
@@ -26,12 +26,12 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 | Unreal 기준선 | 로컬 `main=origin/main=551e287`, `DroneEditor Win64 Development` Build 성공 |
 | 자동 검증 | Tutorial `6/6`, 전체 `Drone.` `14/14`, Blueprint Compile `0 errors / 0 warnings / 0 load failures` |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | `AST-01` FPV 최소 외형·Loop Spike. 자동 검증 완료, 실제 Loop 청감은 Pass·Fail 판정 없이 미확인 |
-| 차단 조건 | 기능 구현 차단 없음. 수동 근거가 없어 `AST-01` Done 판정만 보류. Android는 작업 범위에서 제외 |
-| 다음 행동 | 실제 스피커 Loop 청감과 Training Map 4-Gate 수동 비행 결과가 생기면 별도로 기록하고, 기능 작업은 `TUT-04`로 진행 |
-| 다음 기능 | `TUT-04` 이전 평균·Best 비교와 결과 UI. 기록 계산은 `TUT-03`에서 완료 |
+| 지금 작업 중 | 사용자 요청으로 모든 실행을 중단하고 `TUT-04A` Course/HUD 변경과 환경 팩 스테이징을 보존 |
+| 차단 조건 | 기술 차단으로 닫은 것이 아니라 귀가를 위한 의도적 정지. 환경 팩의 비호환 Demo Character/MRQ Preset 분리와 최종 검증이 남음 |
+| 다음 행동 | 스테이징 재감사 → 환경 팩별 변환/의존성 확인 → 실제 프로젝트 이식 → Course/HUD 최종 검증·화면 확인 |
+| 다음 기능 | `TUT-04A`를 먼저 검증하고, 이전 평균·Best `+/-` 비교는 `TUT-04B`로 이어서 구현 |
 | 이후 | Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming |
-| Git 처리 | Unreal `551e287`을 `codex/tutorial-lap-recording`과 `origin/main`에 Push 완료 |
+| Git 처리 | Drone `main=origin/main=551e287`; 기존 `DefaultEditor.ini`와 DronePack 154개가 미커밋. NavigationArrows `5a052c8` 원격 기능 Branch Push·main 미병합. 이번 변경은 사용자 Commit 대상이며 Push하지 않음 |
 
 ## 2026-08-21 — Camera·Mouse·Gamepad 기준선 갱신
 
@@ -548,7 +548,98 @@ HeadingValueText
 ### 현재 판정
 
 - 기술 이식·검증: 완료
-- Git: `codex/navigation-arrows-migration`에 미커밋, Push 전
+- Git: Commit `5a052c8`을 `origin/codex/navigation-arrows-migration`에 Push 완료, main 미병합
 - 실제 화면 연결: 미구현. 자산이 준비됐을 뿐 Training HUD 기능 완료가 아님
 - `AST-01`: 실제 스피커 Loop 확인 전까지 계속 Doing
 - `TUT-04`: 다음 기능 카드 유지
+
+## 2026-08-26 09:17 — 작업 PC·Git·Editor 상태 재동기화
+
+### 실제 확인
+
+- 현재 Unreal 작업 경로는 `D:\JGY\project\drone`, 문서 경로는 `D:\JGY\project\md`다.
+- Drone 로컬 `main`과 `origin/main`은 `551e287`로 일치하고 작업 트리는 깨끗하다.
+- NavigationArrows 최소 이식은 Commit `5a052c8bab2eb0dd8bc9ab16cfc7b3784e8e4cd7`로 `origin/codex/navigation-arrows-migration`에 Push됐다. 이 Commit의 부모는 `551e287`이며 main에는 아직 병합하지 않았다.
+- 문서 저장소는 최신화 직전 로컬 `main=origin/main=466609d`이고 작업 트리가 깨끗했다. 이번 최신화는 로컬 문서 변경으로 남기며 Commit·Push는 사용자가 수행한다.
+- 현재 PC의 제공 에셋 루트는 `D:\JGY\project\Unreal_260821`이다. ZIP 14개·공급사 폴더 14개와 `_Staging`을 확인했고 `C:\에셋`은 이 PC에 없다.
+- UE 5.8.1 Editor PID 9884가 D 드라이브 프로젝트로 실행 중이다. 로그에 MCP 서버 시작과 23 Toolset 등록이 있고 `127.0.0.1:8000/mcp`가 응답한다.
+
+### 판정과 다음 작업
+
+- `AST-02A` 최소 이식·검증·원격 기능 Branch 공유는 Done이다. main 병합과 실제 Navigation Host/Wrapper는 후속 카드다.
+- `UE-MCP-02`는 Drone 루트의 새 Codex 작업에서 네이티브 Tool 노출을 확인하기 전까지 Todo다.
+- `AST-01` 실제 스피커 Loop와 TUT-03 실제 Gate 0→3 한 Lap은 계속 수동 미확인이다.
+- 다음 기능 카드는 `TUT-04 이전 기록 비교·Best·결과 UI`다.
+
+## 2026-08-26 09:44 — Dataflow·Chaos 그물·맵 파괴 방향 추가
+
+### 확인
+
+- Epic UE 5.8 소개와 Release Notes에서 Dataflow와 Chaos Cloth의 Production-Ready 상태, Dataflow의 Chaos Destruction 비파괴 반복 제작 용도를 확인했다.
+- 공식 Cloth Node 문서에서 Max Distance 0 정점은 Kinematic이 되고 별도 `InKinematic` Selection도 사용할 수 있음을 확인했다.
+- Chaos Fields 문서에서 Anchor, External/Internal Strain, Force, Sleep/Disable Field가 Geometry Collection의 고정·파괴·정리에 사용됨을 확인했다.
+- 현재 UE 5.8.1 설치본에는 필요한 Dataflow/Chaos Cloth/Geometry Collection 플러그인이 있지만 `Drone.uproject`에는 아직 명시적 Cloth/Destruction Plugin을 추가하지 않았다.
+
+### 결정
+
+- 부분 고정 그물은 `Chaos Cloth + Dataflow`, 선택형 맵 파괴는 `Chaos Destruction + Geometry Collection + Dataflow`로 분리한다.
+- 그물 고정부는 Weight Map의 Max Distance 0 또는 Kinematic Selection으로 만들고 나머지 영역만 처지게 한다.
+- 포획·Crash·Damage·Mission Event는 물리 결과에 직접 종속시키지 않고 프로젝트 C++ Trigger/상태로 결정한다.
+- 맵 전체 파괴는 제외하고 얇은 벽·출입구·Jammer 설비부터 한 종류씩 검증한다.
+- 현재 기능 순서는 바꾸지 않는다. `TUT-04` 이후 별도 `PHY-DF-00` Sandbox에서 Plugin·Build·회귀를 먼저 검증한다.
+- 상세 계획: [`DRONE_CHAOS_DATAFLOW_PLAN.md`](DRONE_CHAOS_DATAFLOW_PLAN.md)
+
+### 현재 변경 경계
+
+- Unreal Plugin 활성화 0
+- Cloth/Geometry Collection 생산 자산 0
+- C++ 변경 0
+- 문서 계획만 추가, Commit·Push는 사용자 수행
+
+## 2026-08-26 09:48 — 별도 `droner` Editor와 대용량 Untracked 에셋 확인
+
+- 계획 검증 종료 시점에 기존 기준 `drone` Editor PID 9884가 종료되고 PID 10960이 `D:\JGY\project\droner\Drone.uproject`를 실행 중인 것을 확인했다.
+- Port 8000 MCP Listener도 PID 10960이 소유하므로 현재 MCP 대상은 기준 `drone`이 아니라 `droner`다.
+- `droner`는 같은 Git 원격과 `main=origin/main=551e287`을 사용한다.
+- `droner/Content/Asset`에는 공급사 14개 폴더와 `_Staging`, 총 10,928개·36,360,181,427 bytes가 Untracked로 존재한다.
+- 이 폴더는 전체 제공 소스 복사본이며 프로젝트 선별 이식 규칙을 만족하지 않는다. 일괄 Stage·Commit·Push 금지로 기록한다.
+- 기준 `drone`과 `droner`에는 Editor가 추가한 `Config/DefaultEditor.ini` 변경이 있다. 이 작업에서는 되돌리거나 Commit하지 않았다.
+- Dataflow/Chaos 구현을 시작할 때는 `droner` Editor를 닫고 기준 `D:\JGY\project\drone`을 연 뒤 별도 Branch에서 진행한다.
+
+## 2026-08-26 11:50 — AST-01C DronePack 드론 시각 자산·정리 맵 이식
+
+### 실제 변경
+
+- `D:\JGY\project\Unreal_260821\DronePack_Project`를 UE 5.8 전용 스테이징에서 감사했다.
+- 공급사 전체 기능 Blueprint는 Mannequin 누락, 구형 입력과 `ABP_Quinn_PostProcess` 중복 AnimGraph 오류가 있어 그대로 들여오지 않았다.
+- 원본 Demo Map의 Drone Blueprint 6개를 Static Mesh 표시 Actor로 바꾸고, 열화상 Mannequin 3개·도우미 Collision/Camera Proxy·삭제 Actor를 참조하던 Level Blueprint Event Graph를 제거했다.
+- 드론 `D_Mesh` 시각 자산과 정리 Map의 폐쇄 의존성만 `/Game/Drone/ThirdParty/DronePack`에 복사했다.
+- 최종 이식 수량은 `.uasset` 153개와 `.umap` 1개, 총 154개·82,465,487 bytes다. 기존 파일 덮어쓰기는 0개다.
+- 공급사 Pawn·Controller·GameMode·Input·HUD와 중복 FPV 기능 자산은 제외했다. 전역 시작 Map/GameMode와 프로젝트 C++ 공개 API는 변경하지 않았다.
+
+### 검증과 발견
+
+- 스테이징 Map 전이 Game 의존성은 161개이며 외부·누락 의존성 0이다.
+- 실제 프로젝트에서 154/154 Package를 UE 5.8로 Resave했다.
+- 정리 `Map_Demo` Map Check는 0 errors / 0 warnings다.
+- 전체 Blueprint Compile은 0 errors / 0 warnings / 0 failed loads다.
+- 처음 전체 자동화를 실행했을 때 Source보다 Editor DLL이 오래되어 12개만 탐색되는 것을 발견했다.
+- `-CompilerVersion=14.51.36256`을 하나의 문자열 인자로 전달해 `DroneEditor Win64 Development`를 다시 빌드했다. 첫 호출의 PowerShell 점 구분 오류는 명령 인자 오류였고 소스 컴파일 오류가 아니다.
+- 재빌드 DLL 기준 전체 `Drone.` 자동화는 14 succeeded / 0 warnings / 0 failed다. `TrainingLapRecorder`와 `TrainingRecordCalculation`을 포함하며 PIE Lifecycle 새 실행 3/3도 통과했다.
+- 이식 154개 모두 Git LFS filter 대상이고 `git lfs fsck`, `git diff --check`가 통과했다. 원본 `/Game/Drone_Pack`, ThirdPerson, Variant 문자열 잔존도 0이다.
+
+### 현재 판정과 다음 작업
+
+- `AST-01C` 기술 이식·자동 검증: 완료
+- `AST-01C` 수동 화면 검토: 미확인 — 드론 6종, 환경, 재질, 스케일, 조명과 카메라 구도를 Editor에서 확인해야 함
+- 현재 기준 `drone` Editor PID 22936 실행 중. 이미 열린 인스턴스를 프로세스 조회가 놓쳐 추가로 실행된 PID 2764는 `CloseMainWindow`로 정상 종료했고 기존 Editor는 보존함
+- Unreal Git: `main=origin/main=551e287`, 기존 `Config/DefaultEditor.ini` 변경과 새 DronePack 154개가 미커밋. 사용자가 Commit하며 Push하지 않음
+- 다음 자산 작업: 화면 검토 뒤 선택 Mesh를 프로젝트 소유 Integration BP에 연결
+- 다음 기능 작업: 기존 순서대로 `TUT-04` 이전 평균·Best 비교와 결과 UI
+
+## 2026-08-26 12:57 — 사용자 요청 중단 정리
+
+- `UnrealEditor`와 `UnrealEditor-Cmd`를 모두 종료했고 원본·스테이징·Git 변경을 삭제, 되돌림, Commit, Push하지 않았다.
+- Course/HUD는 한글 현재 비행값, 최근/평균 구간 통계, Gate 배열 자동 동기화, 200 cm 거리 샘플 곡선 표시까지 코드에 반영됐다. 마지막 폰트 보강 전 Build와 집중 자동화 8/8은 통과했지만 최종 전체 검증과 화면 확인은 남았다.
+- 환경 팩은 실제 Drone 저장소에 아직 복사하지 않았다. 스테이징 Battlefield 1,191개/Map 4만 새 경로로 변환됐고, 비호환 Demo Character 102개가 원본 경로에 남았다. MilitaryCamp 668개와 MilitaryBase 1,474개 원본은 보존됐다.
+- 재개 순서: 스테이징 재감사 → 세 팩 의존성 정리·변환 → 실제 프로젝트 이식 → Build·BP Compile·Map Check·전체 자동화 → Training Map 저장·한글 HUD/곡선 화면 확인.

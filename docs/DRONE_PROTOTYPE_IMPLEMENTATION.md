@@ -4,7 +4,7 @@
 
 ## 1. 현재 결과
 
-작업컴 기록 경로 `D:\JGY\project\drone`에 기존 Third Person 경로와 분리된 최소 Drone Prototype이 있다. 이번 확인 PC의 현재 저장소는 `C:\URproject\drone`이다. 구현을 시작한 2026-08-19 당시 `C:\project\Drone` 경로는 역사 기록일 뿐 현재 작업 경로가 아니다.
+현재 작업 경로 `D:\JGY\project\drone`에 기존 Third Person 경로와 분리된 최소 Drone Prototype이 있다. `C:\URproject\drone`은 2026-08-24 다른 PC에서 검증한 경로이며, 구현을 시작한 2026-08-19 당시 `C:\project\Drone`도 역사 기록일 뿐 현재 D 드라이브 작업 경로가 아니다.
 
 - `ADronePrototypePawn` C++ 클래스가 컴파일된다.
 - `ADronePrototypeGameMode`를 직접 선택하면 native 기본값으로 해당 Pawn을 Spawn한다.

@@ -2,7 +2,7 @@
 
 기준일: 2026-08-24 (Asia/Seoul)
 
-> 이 문서는 에셋 확보 전 수립한 기능 우선 계획이다. 현재 제공 에셋은 `C:\에셋`에 있으며 FPV 외형·Loop 최소 이식까지 완료했지만, 기능 우선 순서와 Greybox 기준은 그대로 유지한다.
+> 이 문서는 에셋 확보 전 수립한 기능 우선 계획이다. 현재 D 드라이브 작업 PC의 제공 에셋은 `D:\JGY\project\Unreal_260821`에 있으며 FPV 외형·Loop 최소 이식까지 완료했지만, 기능 우선 순서와 Greybox 기준은 그대로 유지한다.
 
 ## 1. 목적
 
@@ -31,8 +31,8 @@ Spawn
 확인된 현재 상태는 다음과 같다.
 
 - 작업컴 기본 작업 루트: `D:\JGY\project`
-- UE 5.8.1 프로젝트: 작업컴 기록 경로 `D:\JGY\project\drone`; 이번 확인 PC `C:\URproject\drone`의 로컬 `main`과 `origin/main`은 TUT-03 완료 Commit `551e287`
-- 문서 저장소: 작업컴 기록 경로 `D:\JGY\project\md`; 이번 확인 PC의 저장소 위치와 최신 동기화 상태는 [`STATUS.md`](../STATUS.md)를 따른다.
+- UE 5.8.1 프로젝트: 현재 작업 경로 `D:\JGY\project\drone`; 로컬 `main`과 `origin/main`은 TUT-03 완료 Commit `551e287`
+- 문서 저장소: 현재 작업 경로 `D:\JGY\project\md`; 최신화 직전 로컬 `main=origin/main=466609d`이며 이후 상태는 [`STATUS.md`](../STATUS.md)를 따른다.
 - 별도 `ADronePrototypePawn`과 `ADronePrototypeGameMode` C++ 구현 완료
 - 컴포넌트 기본값과 standalone Spawn/Possess 자동화 테스트 완료
 - 기존 Third Person 기본 맵과 전역 GameMode 유지

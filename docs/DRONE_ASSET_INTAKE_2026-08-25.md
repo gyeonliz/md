@@ -133,7 +133,7 @@
 
 ## 6. AST-01 최초 이식 시점의 정지선
 
-- 최초 이식 작업은 당시 `D:\JGY\project\Unreal_260821\_Staging\DroneAssetStage`의 UE 5.8 스테이징에서 수행했다. 현재 대응 스테이징 경로는 `C:\에셋\_Staging\DroneAssetStage`이며 선택 자산 대조 결과는 7절에 기록한다.
+- 최초 이식 작업은 당시 `D:\JGY\project\Unreal_260821\_Staging\DroneAssetStage`의 UE 5.8 스테이징에서 수행했다. 다른 PC에서는 `C:\에셋\_Staging\DroneAssetStage`를 대응 스테이징으로 재감사했으며 선택 자산 대조 결과는 7절에 기록한다. 현재 D 드라이브 PC 경로는 다시 원래 D 스테이징이다.
 - 공급사 Blueprint 전체 Compile은 `0 errors / 27 warnings / 0 load failures`였다. 경고는 구형 `MoveForward` 등 Input Axis와 누락 Mannequin Rig 참조이므로 외부 기능 Blueprint는 사용하지 않는다.
 - 실제 Drone 저장소에는 FPV Body·Rotor A~D·Material·Texture 4개와 44.1 kHz Cue/Wave, 합계 12개·21,753,071 bytes만 `/Game/Drone/ThirdParty`로 이식했다.
 - `/Game/Drone/Integrations/DronePackFPV/BP_DroneFPVIntegration`은 `ADronePrototypePawn` 자식이다. 기존 Sphere Collision Root·Movement·고정 추적 Camera·Input·Telemetry를 유지하고 본체 1, Rotor 4, Engine Loop Audio 1을 소유한다.
@@ -237,4 +237,44 @@ Blueprint Compile 프로세스의 전역 로그에는 활성 Unreal MCP 플러�
 
 다음 자산 카드는 프로젝트 소유 Host/Wrapper가 로컬 플레이어에게 Widget 한 개만 만들고 `UDroneTrainingGateSequenceComponent::GetCurrentGate()`의 결과를 `TargetComponent` 또는 `TargetWorldLocation`으로 전달하는 작업이다. Course 완료·Reset·UnPossess·EndPlay에서 숨김과 정리를 검증한다. `NavigationArrowExampleActor`는 사용하지 않는다.
 
-현재 Git 상태는 `codex/navigation-arrows-migration` Branch의 미커밋 작업이다. Commit·Push 전에는 원격 공유 완료로 판정하지 않는다.
+Commit `5a052c8bab2eb0dd8bc9ab16cfc7b3784e8e4cd7`을 `origin/codex/navigation-arrows-migration`에 Push해 최소 이식의 원격 공유까지 완료했다. 현재 `main=origin/main=551e287`에는 아직 병합하지 않았으므로 main 작업 트리에서는 이 6개가 보이지 않는 것이 정상이다. 실제 Training HUD Host/Wrapper도 아직 미구현이다.
+
+## 2026-08-26 09:17 — D 드라이브 작업 PC 재확인
+
+- 현재 제공 에셋 루트: `D:\JGY\project\Unreal_260821`
+- 현재 PC에 `C:\에셋`은 없으며, 앞 절의 C 드라이브 수치와 검증은 다른 PC에서 수행한 역사 기록이다.
+- D 루트에는 최상위 ZIP 14개, 대응 공급사 폴더 14개와 `_Staging`이 존재한다. 잘못 알려졌던 `D:\JGY\project\Unreal\_260821`은 존재하지 않는다.
+- Drone 프로젝트는 `D:\JGY\project\drone`, `main=origin/main=551e287`, 작업 트리 Clean이다.
+- FPV·Sound 12개와 Integration BP 1개는 main에 포함되어 있다. NavigationArrows 6개와 전용 테스트는 원격 기능 Branch Commit `5a052c8`에만 있고 main 미병합이다.
+- 다음 기능 우선순위는 `TUT-04`다. NavigationArrows Host/Wrapper·main 반영은 별도 후속 카드이며, 실제 Drone Loop 청감은 계속 미확인이다.
+
+## 2026-08-26 11:50 — AST-01C DronePack 드론·맵 선별 이식
+
+### 원본과 이식 범위
+
+- 원본 프로젝트: `D:\JGY\project\Unreal_260821\DronePack_Project`
+- UE 5.8 스테이징: `D:\JGY\project\Unreal_260821\_Staging\DroneAssetStage`
+- 대상 경로: `/Game/Drone/ThirdParty/DronePack`
+- 실제 이식: `.uasset` 153개와 `.umap` 1개, 총 154개·82,465,487 bytes
+- 포함: DronePack의 Drone `D_Mesh` 시각 자산 전부와 정리된 `Map_Demo`
+- 제외: 공급사 Pawn·Controller·GameMode·Input·HUD Blueprint, 열화상 Mannequin, 기존 프로젝트와 중복되는 FPV 기능 자산
+
+원본 Demo Map의 Drone Blueprint Actor 6개는 시각 Mesh Actor로 변환했다. 누락된 Mannequin을 요구하던 열화상 Actor 3개와 도우미 Collision·Camera Proxy를 제거했고, 삭제 Actor를 가리키던 Level Blueprint Event Graph도 제거했다. 장애물 배치에 필요한 `BP_Boxtemplate`은 컴파일 가능한 맵 구성요소로 유지했다. 따라서 이 맵은 공급사 조작 기능을 들여온 플레이 맵이 아니라 드론 6종과 환경을 비교하는 시각 검토 맵이다.
+
+### 검증 결과
+
+- 스테이징 Map 전이 의존성: 외부 Game 의존성 0, 누락 의존성 0
+- 실제 프로젝트 UE 5.8 Resave: 154/154 성공
+- `Map_Demo` Map Check: 0 errors / 0 warnings
+- 전체 Blueprint Compile: 0 errors / 0 warnings / 0 failed loads
+- `DroneEditor Win64 Development`: MSVC 14.51.36256 지정 빌드 성공
+- 재빌드 DLL 기준 전체 `Drone.` 자동화: 14 succeeded / 0 warnings / 0 failed
+- PIE Input Lifecycle: 새 PIE 3/3에서 Keyboard·Mouse·Gamepad·복합·반대 입력과 HUD/Possession 수명주기 통과
+- 원본 `/Game/Drone_Pack`, ThirdPerson, Variant 문자열 잔존 0
+- Git LFS 속성 154/154, `git lfs fsck`와 `git diff --check` 통과
+
+### 현재 경계와 다음 단계
+
+`Map_Demo`를 전역 시작 Map이나 Training Map으로 지정하지 않았다. 기존 ThirdPerson 기본 실행 경로와 프로젝트 소유 Prototype Pawn·입력·Camera·Telemetry도 바꾸지 않았다. 다음 확인은 Editor에서 맵을 열어 드론 6종, 환경 배치, 재질, 스케일, 조명과 카메라 구도를 눈으로 확인하는 것이다. 이후 선택한 외형만 프로젝트 소유 Integration BP에 연결한다. 공급사 기능 Blueprint를 다시 상속하거나 입력·GameMode를 가져오지 않는다.
+
+현재 Unreal Git은 `main=origin/main=551e287`이며 새 154개와 기존 `Config/DefaultEditor.ini` 변경이 미커밋이다. Commit은 사용자가 수행하고 Push는 별도 지시 전까지 하지 않는다.

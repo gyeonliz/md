@@ -1,6 +1,6 @@
 # 이동 중 읽는 Drone 현황·내 작업·학습 일정
 
-기준일: 2026-08-25 (Asia/Seoul)
+기준일: 2026-08-26 (Asia/Seoul)
 
 이 문서는 휴대폰으로 현재 상태와 다음 행동을 빠르게 확인하기 위한 요약본이다. 코드의 상세 설명은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md), 학습 기록 양식은 [`STUDY_PLANS.md`](STUDY_PLANS.md)를 따른다.
 
@@ -9,7 +9,8 @@
 - Unreal 저장소 `main`과 GitHub `origin/main`은 `551e287`로 일치한다.
 - Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개와 Segment/Lap 원본 기록까지 구현됐다.
 - 현재 개발 완료 지점은 `TUT-03`, 다음 구현 카드는 `TUT-04 비교·결과 UI`다.
-- 제공 에셋 루트는 `C:\에셋`이다. FPV·Loop 선택 자산 12개와 프로젝트 Integration BP 1개의 파일·참조·LFS·자동 검증은 통과했다.
+- 현재 D 드라이브 작업 PC의 제공 에셋 루트는 `D:\JGY\project\Unreal_260821`이다. FPV·Loop 선택 자산 12개와 프로젝트 Integration BP 1개의 파일·참조·LFS·자동 검증은 통과했다.
+- NavigationArrows 최소 자산 6개와 전용 테스트는 Commit `5a052c8`로 원격 기능 Branch에 Push됐지만 main 미병합·화면 Host 미구현이다.
 - 사용자는 Gate나 기록 C++를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도와 Drone Loop를 확인하면 된다.
 - 확정된 학습 항목은 `정보처리산업기사`와 `C++ 코딩테스트` 두 가지뿐이다.
 - 정보처리산업기사 2026년 3회 필기 접수는 끝났다. 오늘 가장 먼저 Q-Net에서 자신의 접수·면제·응시 상태를 확인해야 한다.
@@ -19,9 +20,9 @@
 
 | 구분 | 현재 상태 |
 |---|---|
-| Unreal 저장소 | `C:\URproject\drone` |
+| Unreal 저장소 | `D:\JGY\project\drone` |
 | Unreal 기준 Commit | `551e287e8a5de7fa33f28d1911f8a7a957bd66fa` |
-| Git 상태 | 깨끗한 `main`, 로컬·원격 일치 |
+| Git 상태 | 깨끗한 `main`, 로컬·원격 `551e287` 일치. NavigationArrows `5a052c8`은 원격 기능 Branch·main 미병합 |
 | Git LFS | `fsck` 정상 |
 | 최종 Editor Build | 성공 |
 | Tutorial 자동화 | 6/6 통과 |

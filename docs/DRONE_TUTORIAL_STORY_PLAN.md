@@ -179,7 +179,7 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 
 ## 6. 외부 Drone 에셋 적용
 
-- 현재 제공 에셋 해제본·스테이징 보관 루트는 `C:\에셋`으로 두고 Drone Git 저장소에 전체 복사하지 않는다. 최초 감사의 최상위 ZIP 14개는 현재 C 드라이브에 없으므로 과거 ZIP 대조 기록과 현재 해제본 감사를 구분한다.
+- 현재 D 드라이브 작업 PC의 제공 에셋 해제본·스테이징 보관 루트는 `D:\JGY\project\Unreal_260821`이며 Drone Git 저장소에 전체 복사하지 않는다. 다른 PC의 `C:\에셋` 재감사와 D 드라이브 ZIP 14개 감사는 PC별 기록으로 구분한다.
 - Loose `.uasset`은 UE 5.8 스테이징 프로젝트에서 먼저 원래 `/Game/<PackRoot>` 경로로 로드한다. Explorer에서 바로 `/Game/Drone` 아래로 옮기지 않는다.
 - 필요한 의존성만 고른 뒤 스테이징 Content Browser에서 `/Game/Drone/ThirdParty/<PackName>`으로 이동·재저장하고 Redirector를 정리한다.
 - 실제 사용 Blueprint는 `/Game/Drone/Integrations/<PackName>` 아래에 만들고 프로젝트 기능 Pawn에 연결한다.
@@ -243,4 +243,13 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 - 기존 Cyan Course 안내선과 Current/Inactive/Completed Gate Ring은 유지한다. NavigationArrow는 화면 밖 현재 목표를 보조하는 UI다.
 - 실제 화면 연결, PIE/Standalone 시각 확인과 수명주기 회귀 검증 전에는 “목표 안내 UI 완료”로 판정하지 않는다.
 
-자산 인수와 로드 검증은 완료했지만 현재 Branch가 Commit·Push 전이므로 `AST-02A`의 원격 공유 마감은 남아 있다. 이 작업은 `TUT-04`의 이전 평균·Best 결과 UI와 별개다.
+자산 인수와 로드 검증을 완료하고 Commit `5a052c8`을 `origin/codex/navigation-arrows-migration`에 Push했다. `AST-02A`의 최소 이식·원격 공유는 완료했지만 main 병합과 실제 Host/Wrapper 화면 연결은 후속 작업이다. 이 작업은 `TUT-04`의 이전 평균·Best 결과 UI와 별개다.
+
+## 10. Dataflow·Chaos 물리 환경 확장 (2026-08-26)
+
+- 일부가 고정된 그물·위장망은 Chaos Cloth Asset과 Dataflow Weight Map/Kinematic Selection으로 제작한다.
+- 그물 변형은 물리 표현이고 Drone 포획·감속·Crash 판정은 별도 프로젝트 Trigger/상태가 소유한다.
+- 선택형 벽·출입구·Jammer 설비는 Dataflow로 만든 Geometry Collection, Anchor/World Support, Damage Threshold와 Strain Field를 사용한다.
+- 맵 전체 파괴는 범위에서 제외하고 명시적으로 지정한 대상만 파괴 가능하게 한다.
+- 첫 Sandbox는 `TUT-04` 이후 또는 사용자가 우선순위를 명시적으로 변경했을 때 시작한다. 실제 그물 충돌은 Flight Collision, 파괴 Mission은 Damage/Crash와 Mission Shell 뒤에 연결한다.
+- Plugin 활성화·자산 생성은 아직 하지 않았다. 상세 카드는 [`DRONE_CHAOS_DATAFLOW_PLAN.md`](DRONE_CHAOS_DATAFLOW_PLAN.md)를 따른다.

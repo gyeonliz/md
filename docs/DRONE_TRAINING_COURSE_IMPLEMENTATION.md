@@ -1,8 +1,8 @@
 # TUT-01 Training Course 구현 가이드
 
-기준일: 2026-08-24 (Asia/Seoul)
+기준일: 2026-08-26 (Asia/Seoul)
 
-이 문서는 `C:\URproject\drone`의 실제 `ADroneTrainingCourse` 소스, 자동화 테스트, `BP_DroneTrainingCourse`, `Lvl_DroneTraining` 자산을 기준으로 한다.
+이 문서는 `D:\JGY\project\drone`의 실제 `ADroneTrainingCourse` 소스, 자동화 테스트, `BP_DroneTrainingCourse`, `Lvl_DroneTraining` 자산을 기준으로 한다. Editor에서 Gate를 설치하고 Spline 점을 추가하는 실제 절차는 [`DRONE_TRAINING_AUTHORING_GUIDE.md`](DRONE_TRAINING_AUTHORING_GUIDE.md)를 따른다.
 
 TUT-01의 범위는 다음 두 가지뿐이다.
 
@@ -40,7 +40,7 @@ Source/Drone/Tutorial/DroneTrainingCourse.cpp
 이 Actor가 담당하는 일은 다음과 같다.
 
 - `CourseSpline`에 비행 경로 점과 Tangent를 보관한다.
-- 열린 Spline의 점 사이마다 `USplineMeshComponent` 안내선 한 개를 만든다.
+- 열린 Spline 전체를 거리 기준으로 샘플링해 짧은 `USplineMeshComponent` 안내선을 이어 만든다.
 - Construction이 반복될 때 이전 안내선을 지운 뒤 다시 만들어 중복을 막는다.
 - Actor, Spline, 생성 안내선이 Collision, Overlap, Physics, Navigation에 관여하지 않게 한다.
 - 기본 Engine Cube와 `M_DroneTrainingGuide`를 사용하되 BP에서 표시용 Mesh와 Material을 바꿀 수 있게 한다.
@@ -92,6 +92,7 @@ TObjectPtr<USplineComponent> CourseSpline;
 - `CourseLineWidthCentimeters`: 기본 `32 cm`
 - `CourseLineThicknessCentimeters`: 기본 `10 cm`
 - `CourseLineVerticalOffsetCentimeters`: 기본 `0 cm`
+- `CourseLineSegmentLengthCentimeters`: 기본 `200 cm`
 - `CourseLineColor`: 기본 청록 계열 시험색
 
 최종 외형이 정해지면 BP에서 Mesh와 Material, 폭, 두께를 바꿀 수 있다. 이 값을 바꾸는 것과 Collision 판정 기능을 추가하는 것은 별개다.
@@ -103,6 +104,7 @@ void RebuildCourseLineSegments();
 void ApplyNonInterferenceRules();
 UMaterialInterface* CreateCourseLineMaterial();
 int32 GetCourseLineSegmentCount() const;
+int32 GetExpectedCourseLineSegmentCount() const;
 UMaterialInterface* GetCourseLineMaterial() const;
 static FName GetGeneratedSegmentTag();
 ```
@@ -111,6 +113,7 @@ static FName GetGeneratedSegmentTag();
 - `ApplyNonInterferenceRules()`는 BP나 Level 값이 역직렬화된 뒤에도 Course 소유 Primitive의 안전 설정을 복원한다.
 - `CreateCourseLineMaterial()`은 표시 Segment가 공유할 Dynamic Material을 만든다.
 - `GetCourseLineSegmentCount()`는 현재 생성된 표시 Segment 수를 센다.
+- `GetExpectedCourseLineSegmentCount()`는 전체 Spline 길이와 목표 Segment 길이로 예상 생성 수를 계산한다.
 - `GetCourseLineMaterial()`은 자동화와 BP가 실제 표시 Material을 확인할 수 있게 한다.
 - `GetGeneratedSegmentTag()`는 생성된 Segment를 구분하는 동일한 Tag 계약을 테스트와 후속 코드에 제공한다.
 
@@ -139,7 +142,7 @@ Can Ever Affect Nav     false
 (5000, 0,    300)
 ```
 
-점이 다섯 개이므로 기본 표시 Segment는 네 개다. 이 좌표는 최종 레벨 디자인이 아니라 맵을 열자마자 비행 경로를 확인하기 위한 S자형 Greybox다.
+native 기본값은 점 다섯 개지만 현재 저장된 `Lvl_DroneTraining` 인스턴스는 사용자가 추가한 점을 포함해 6개, 길이 약 `6491.96 cm`다. 기본 `200 cm` 거리 샘플링에서는 표시 Segment 33개가 생성된다. 이 좌표와 길이는 최종 레벨 디자인이 아니라 비행 경로를 확인하기 위한 Greybox다.
 
 ### 4.2 `OnConstruction`과 `BeginPlay`
 
@@ -149,19 +152,19 @@ Can Ever Affect Nav     false
 
 ### 4.3 Segment 중복 방지
 
-재구성을 시작하면 Actor가 소유한 `USplineMeshComponent` 중 `DroneTrainingCourse.GeneratedLineSegment` Tag가 붙은 것만 제거한다. 그 뒤 현재 Spline 점으로 새 Segment를 만든다.
+재구성을 시작하면 Actor가 소유한 `USplineMeshComponent` 중 `DroneTrainingCourse.GeneratedLineSegment` Tag가 붙은 것만 제거한다. 그 뒤 전체 Spline을 `CourseLineSegmentLengthCentimeters` 간격으로 나누어 새 Segment를 만든다.
 
 따라서 Construction Script가 여러 번 실행되어도 안내선 수는 계속 누적되지 않는다. 열린 Spline에서는 아래 관계가 유지된다.
 
 ```text
-표시 Segment 수 = Spline 점 수 - 1
+표시 Segment 수 = ceil(Spline 전체 길이 / 목표 Segment 길이)
 ```
 
 실수로 Spline 점을 지나치게 늘려 Editor가 멈추는 일을 줄이기 위해 한 Actor가 만드는 Segment 수는 최대 256개로 제한한다.
 
 ### 4.4 Spline을 Mesh로 표시
 
-각 Segment는 현재 점과 다음 점의 위치·Tangent를 받아 `SetStartAndEnd()`로 곡선을 따른다. Engine Cube의 실제 Bounds를 읽어 폭과 두께를 cm 값에 맞게 Scale하므로, Mesh 크기를 100 cm라고 코드에 고정하지 않는다.
+각 Segment는 시작·끝 거리에서 위치와 방향을 읽고, 구간 호 길이를 반영한 Tangent를 `SetStartAndEnd()`에 전달한다. Smooth Interpolation도 켜 긴 제어점 간격에서 빛나는 선이 각져 보이던 현상을 줄였다. Engine Cube의 실제 Bounds를 읽어 폭과 두께를 cm 값에 맞게 Scale하므로, Mesh 크기를 100 cm라고 코드에 고정하지 않는다.
 
 `M_DroneTrainingGuide`는 `Opaque + Unlit`이며 `Color × Intensity`를 Emissive Color에 연결한다. 특히 `Used with Spline Meshes` 사용 플래그를 저장해 런타임 Material 대체를 막는다. C++는 이 Material로 Dynamic Material Instance를 만들고 `Color` Parameter에 `CourseLineColor`를 적용한다.
 
@@ -208,7 +211,7 @@ Hidden In Game          false
 5. 배치된 Course Actor를 선택해 Level 전용 경로를 조정할 수 있다.
 6. 맵과 BP를 모두 저장한다.
 
-현재 경로는 코스 흐름을 시험하는 Greybox다. TUT-02의 실제 BP Gate 네 개는 별도 Actor로 배치됐으며, Course Spline을 수정할 때 Gate 배열 순서와 GateIndex가 자동으로 바뀐다고 가정하지 않는다. Lap UI는 아직 추가하지 않았다.
+현재 경로는 코스 흐름을 시험하는 Greybox다. TUT-02의 실제 BP Gate 네 개는 별도 Actor로 배치됐으며, `OrderedGates` 배열 순서가 GateIndex의 유일한 원본이다. Construction·BeginPlay와 `Synchronize Gate Definitions` 버튼이 `CourseId`와 `GateIndex`를 자동 동기화한다. 현재 HUD에는 최근 구간과 완료 구간 평균 통계가 한글로 연결됐고 이전 Lap 평균·Best 대비 표시는 후속 범위다.
 
 ## 6. Editor에서 테스트하는 방법
 
@@ -235,7 +238,7 @@ Drone.Tutorial.TrainingPIESmoke
 
 각 테스트의 역할은 다음과 같다.
 
-- `TrainingCourse`: native 기본값, 실제 World Spawn, N-1 Segment 생성, Construction 반복 시 중복 없음, 모든 Primitive의 Collision·Overlap·Physics·Nav 비간섭, Drone 크기 Sweep 통과를 검사한다.
+- `TrainingCourse`: native 기본값, 실제 World Spawn, 거리 샘플 Segment 생성, 긴 제어점 사이에서도 세분화됨, Construction 반복 시 중복 없음, 모든 Primitive의 Collision·Overlap·Physics·Nav 비간섭, Drone 크기 Sweep 통과를 검사한다.
 - `TrainingAssets`: 실제 BP 부모, 정확한 Map 경로, BP GameMode Override, PlayerStart/Pawn/Course 개수, `M_DroneTrainingGuide`의 Unlit/Opaque/SplineMesh 사용 플래그, 배치 Course의 생성 Segment와 비간섭 설정을 검사한다.
 - `TrainingPIESmoke`: 새 1인 PIE에서 실제 BP Controller·Pawn·WBP HUD·BP Course와 저장된 RecastNavMesh Actor 존재를 확인하고, 실제 PIE Drone을 안내선 가로 방향으로 Sweep한다.
 
@@ -249,14 +252,14 @@ TUT-01의 정상 기준은 다음과 같다.
 - 맵에는 `BP_DroneTrainingCourse` 한 개, `PlayerStart` 한 개, 직접 배치 Pawn 0개가 있다.
 - 기존 `BP_DronePrototypeGameMode`가 BP Pawn, BP Controller와 WBP Flight HUD를 생성한다.
 - Course Actor에는 편집 가능한 열린 `CourseSpline`이 있다.
-- 기본 다섯 점에서 안내선 Segment 네 개가 플레이 중 보인다.
+- 전체 Spline 길이를 기본 200 cm 단위로 나눈 안내선 Segment가 플레이 중 보인다.
 - Spline 점을 바꾸면 안내선이 새 경로를 따라 다시 만들어진다.
 - Construction을 반복해도 이전 Segment가 겹쳐 남지 않는다.
 - Drone이 안내선을 가로질러도 Blocking Hit와 Overlap이 생기지 않는다.
 - 안내선은 Physics를 사용하지 않고 NavMesh에 영향을 주지 않는다.
 - Course Actor는 Tick을 사용하지 않는다.
 
-Gate 통과 표시, 다음 Gate 선택과 역방향 거부는 TUT-02에서 별도 Actor·Component로 구현됐다. Lap 시작·완료, 구간 시간·실제 이동 거리·평균 속도 원본은 TUT-03의 별도 Recorder Component로 구현됐다. 둘 다 TUT-01 자체 정상 결과에는 포함하지 않으며, 다음 작업은 **TUT-04 이전 기록 비교·Best·결과 UI**다.
+Gate 통과 표시, 다음 Gate 선택과 역방향 거부는 TUT-02에서 별도 Actor·Component로 구현됐다. Lap 시작·완료, 구간 시간·실제 이동 거리·평균 속도 원본은 TUT-03의 별도 Recorder Component로 구현됐다. 2026-08-26에는 최근 구간과 완료 구간 평균을 기존 HUD에 연결했으며, 이전 성공 Lap 평균·Best와 `+/-` 비교는 TUT-04의 남은 범위다.
 
 ## 8. 문제가 생겼을 때 확인할 항목
 
@@ -267,7 +270,7 @@ Gate 통과 표시, 다음 Gate 선택과 역방향 거부는 TUT-02에서 별�
 - 폭과 두께가 1 cm 이상인지 확인한다.
 - Material이 완전 투명하거나 프로젝트 환경에서 사용할 수 없는 Editor 전용 자산인지 확인한다.
 - BP Compile 후 Actor를 움직이거나 Construction을 다시 실행해 Segment가 재생성되는지 확인한다.
-- `GetCourseLineSegmentCount()` 결과가 `Spline 점 수 - 1`인지 확인한다.
+- `GetCourseLineSegmentCount()` 결과가 `GetExpectedCourseLineSegmentCount()`와 같은지 확인한다.
 
 ### 안내선 색이 바뀌지 않음
 

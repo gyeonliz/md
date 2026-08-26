@@ -23,6 +23,7 @@
 - 핵심 요소: 드론 운용, 정찰, 침투, 탐지, 적 AI 반응, 임무, 귀환, 평가
 - 현재 v1 조작: 고정 추적 Camera, Actor-relative 이동, World Up 고도, Mouse X Drone Yaw, Mouse Y Camera Pitch, Gamepad Left Stick·Trigger·Right Stick
 - 현재 기능 우선 순서: TUT-04 이전 기록 비교·결과 UI → Flight 상태 → Operator↔Drone → NPC·Mission UI·Jamming → AI/MG → 에셋 통합
+- 후속 물리 환경: Dataflow/Chaos Sandbox → 부분 고정 그물 → 선택형 벽·Jammer 파괴. Flight Collision/Damage 기준 뒤 연결
 - J3C: 프로젝트 콘셉트에서 사용하는 가상의 외주 발주처 설정일 뿐이며, 실제 계약·협력·지원·공식 관계가 아니다.
 
 ### 현재 미정이며 구현 중에도 확정된 것처럼 다루지 않을 항목
@@ -45,6 +46,7 @@
 4. 실패한 테스트는 다음 기능으로 넘어가기 전에 원인을 기록한다.
 5. `.uasset`과 `.umap`은 병합이 어렵기 때문에 담당 파일을 분리하고 같은 에셋의 동시 수정을 피한다.
 6. 기능 구현과 콘텐츠 제작을 분리해, 코드가 임시 메시·맵에서도 검증 가능하게 만든다.
+7. Cloth·Destruction은 연출과 시뮬레이션을 담당하고 포획·Damage·Mission 판정은 프로젝트 C++ 상태가 담당한다.
 
 ### 기능 설명·구현 기록 형식
 

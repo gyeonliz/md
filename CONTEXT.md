@@ -512,5 +512,34 @@ Inbox → Todo → Doing → Done
 - `AST-02A NavigationArrows`는 원본 11개·1,364,087 bytes를 UE 5.8 전용 스테이징에서 감사한 뒤 기능 최소 폐쇄 집합 6개만 `/Game/Drone/ThirdParty/NavigationArrows`로 이동·재저장했다. UE 5.8 재저장 후 실제 프로젝트 크기는 1,098,730 bytes다.
 - 이식한 6개는 `NavigationArrow` Widget Blueprint 1개, Texture2D 2개, UserDefinedStruct 3개다. Demo Map·BuiltData·Example Actor·Example Mesh·미사용 `TransparentCircle`은 제외했다.
 - 실제 Drone 프로젝트에서 6개 로드, Generated Class, 의존성 폐쇄와 제외 목록을 검사했다. 외부 `/Game` 의존성 0, 로드 실패 0, 전용 자동화 1/1, 전체 `Drone.` 15/15, Blueprint Compile 0 errors·0 Blueprint warnings·0 load failures, LFS 속성과 `git lfs fsck`를 통과했다.
-- 현재 자산은 기능 Branch `codex/navigation-arrows-migration`의 작업 트리에 있으며 Commit·Push 전이다. 훈련 Map/HUD에는 아직 연결하지 않았다.
+- 자산과 검증 코드는 Commit `5a052c8bab2eb0dd8bc9ab16cfc7b3784e8e4cd7`로 `origin/codex/navigation-arrows-migration`에 Push했다. `main`에는 아직 병합하지 않았고 훈련 Map/HUD에도 연결하지 않았다.
 - 다음 자산 단계는 프로젝트 소유 Host/Wrapper가 현재 Gate 하나를 이 Widget의 `TargetComponent` 또는 `TargetWorldLocation`에 전달하는 것이다. 기존 Course 안내선과 Gate Ring을 교체하지 않으며, `TUT-04`는 별도의 다음 기능 카드로 유지한다.
+
+## 30. 2026-08-26 09:17 현재 작업 PC 동기화
+
+- 현재 실제 작업 경로는 Unreal `D:\JGY\project\drone`, 문서 `D:\JGY\project\md`다.
+- Drone은 로컬 `main=origin/main=551e287`, 작업 트리 Clean이다. NavigationArrows Commit `5a052c8`은 원격 기능 Branch에만 있고 main 미병합이다.
+- 문서는 최신화 직전 `main=origin/main=466609d`, 작업 트리 Clean이었다. 이 최신화 변경의 Commit·Push는 사용자가 직접 수행한다.
+- 현재 PC의 제공 에셋 루트는 `D:\JGY\project\Unreal_260821`이다. ZIP 14개·공급사 폴더 14개와 `_Staging`이 있으며 `C:\에셋`은 이 PC에 없다. C 드라이브 감사 결과는 다른 PC의 역사 기록으로 유지한다.
+- UE 5.8.1 Editor PID 9884가 D 드라이브 프로젝트로 실행 중이다. MCP 서버 시작·23 Toolset 등록 로그와 `127.0.0.1:8000/mcp` 응답을 확인했지만 현재 문서 루트 Codex 작업의 네이티브 Tool 노출은 확인하지 않았으므로 `UE-MCP-02`는 Todo다.
+- 다음 기능 카드는 `TUT-04 이전 기록 비교·Best·결과 UI`다. `AST-01` 청감과 TUT-03 실제 한 Lap 수동 확인은 계속 미확인이다.
+
+## 31. 2026-08-26 UE 5.8 Dataflow·Chaos 물리 환경 방향
+
+- 사용자는 일부 지점을 고정해 늘어뜨리는 그물 물리와 선택형 맵 파괴를 프로젝트에 포함하려고 한다.
+- 그물은 `Chaos Cloth + Dataflow`, 파괴물은 `Chaos Destruction + Geometry Collection + Dataflow`로 분리한다.
+- Cloth 변형과 파괴 연출은 물리 표현이며, 포획·Damage·Mission 성공/실패의 단일 기준은 프로젝트 C++ 상태가 소유한다.
+- 그물 고정부는 Max Distance 0 또는 Kinematic Selection, 동적 영역은 Weight Map으로 처짐 범위를 조정한다.
+- 맵 전체를 파괴 가능하게 하지 않고 벽·출입구·Jammer 설비 같은 명시적 대상만 Geometry Collection으로 만든다.
+- 현재 설치본에는 필요한 플러그인이 있지만 `Drone.uproject`에는 아직 명시적으로 활성화하지 않았다. Deprecated Cloth Editor는 사용하지 않는다.
+- 다음 기능 우선순위는 TUT-04로 유지하며, Dataflow/Chaos는 별도 Sandbox Branch와 Flight Collision/Damage 기준 뒤 구현한다.
+- 상세 설계와 검증 게이트는 `docs/DRONE_CHAOS_DATAFLOW_PLAN.md`를 따른다.
+
+## 32. 2026-08-26 09:48 별도 `droner` 복제본 발견
+
+- 기준 작업 루트는 계속 `D:\JGY\project\drone`이다.
+- 현재 열린 UE Editor PID 10960은 `D:\JGY\project\droner\Drone.uproject`를 사용하며 MCP Port 8000도 이 프로세스가 소유한다.
+- `droner`는 같은 원격과 `main=origin/main=551e287`을 사용하지만 `Content/Asset` 아래에 공급사 원본·스테이징 10,928개·36,360,181,427 bytes가 Untracked로 들어 있다.
+- `droner/Content/Asset` 전체를 Stage·Commit·Push하지 않는다. 기준 프로젝트로 필요한 에셋만 UE 5.8 스테이징·감사 후 `/Game/Drone/ThirdParty`로 선별 이식한다.
+- 기준 `drone`과 `droner` 모두 Editor가 만든 `Config/DefaultEditor.ini` 변경이 있다. 사용자 변경으로 보존하고 임의로 되돌리지 않는다.
+- C++·Plugin·Dataflow Asset 작업 전에는 `droner` Editor를 정상 종료하고 기준 `drone`을 명시적으로 연다.

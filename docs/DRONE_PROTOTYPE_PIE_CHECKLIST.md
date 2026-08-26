@@ -64,7 +64,7 @@ TUT-04     Next, 이전 기록 비교 · Best · 결과 UI
 
 ## 정식 3회 공통 체크리스트
 
-2026-08-21 PFN-06 검증 당시 작업컴 프로젝트는 `D:\JGY\project\drone\Drone.uproject`였다. 이번 확인 PC의 현재 저장소는 `C:\URproject\drone`이다. 확정된 고정 추적 Camera와 Gamepad 계약을 반영한 `Drone.Prototype.PIEInputLifecycle`가 당시 Automation Report에서 새 PIE 3회를 모두 통과했다. 각 실행은 아래 항목을 전부 만족해야 한 번의 Pass다.
+2026-08-21 PFN-06 검증 당시와 현재 D 드라이브 작업 PC의 프로젝트는 `D:\JGY\project\drone\Drone.uproject`다. `C:\URproject\drone`은 2026-08-24 다른 PC에서 확인한 경로다. 확정된 고정 추적 Camera와 Gamepad 계약을 반영한 `Drone.Prototype.PIEInputLifecycle`가 당시 Automation Report에서 새 PIE 3회를 모두 통과했다. 각 실행은 아래 항목을 전부 만족해야 한 번의 Pass다.
 
 - [x] `Lvl_DronePrototype`에서 새 PIE 시작
 - [x] BP Prototype Pawn 정확히 한 대 Spawn

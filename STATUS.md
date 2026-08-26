@@ -21,9 +21,11 @@
 | Git 사용자 이메일 | 전역 `jkw6483@gmail.com` 설정 확인 |
 | GitHub CLI | 설치되어 있지 않음 |
 | 기본 작업 루트 | `D:\JGY\project` |
-| Unreal 프로젝트 저장소 | 작업컴 기록 경로 `D:\JGY\project\drone`; 이번 확인 PC `C:\URproject\drone`의 로컬 `main`=`origin/main`=`551e287` |
-| 문서 작업 저장소 | 작업컴 기록 경로 `D:\JGY\project\md`; 이번 확인 PC에서는 이 스냅샷이 포함된 `gyeonliz/md`의 `origin/main`을 동기화 기준으로 사용 |
-| Commit·Push 처리 | TUT-03 Drone Commit `551e287`을 기능 Branch와 `origin/main`에 Push 완료. 문서 변경도 `gyeonliz/md`의 `origin/main`으로 관리 |
+| Unreal 프로젝트 저장소 | 기준 경로 `D:\JGY\project\drone`; 로컬 `main`=`origin/main`=`551e287`, 기존 `Config/DefaultEditor.ini` 변경과 새 `Content/Drone/ThirdParty/DronePack` 154개가 미커밋 |
+| 문서 작업 저장소 | 현재 작업 경로 `D:\JGY\project\md`; 최신화 직전 로컬 `main`=`origin/main`=`466609d`, 작업 트리 Clean |
+| Commit·Push 처리 | TUT-03 `551e287`은 `origin/main`에 Push 완료. NavigationArrows `5a052c8`은 `origin/codex/navigation-arrows-migration`에 Push됐지만 main 미병합. 이번 문서 최신화는 로컬 미커밋이며 사용자가 Commit·Push |
+| 실행 상태 | 기준 `D:\JGY\project\drone\Drone.uproject` Editor PID 22936 실행 중. 추가로 실행된 중복 인스턴스 PID 2764는 정상 창 닫기로 종료 |
+| 별도 `droner` 주의 | `main=origin/main=551e287`; `Config/DefaultEditor.ini` 변경과 `Content/Asset` 10,928개·36,360,181,427 bytes 전체가 Untracked. 공급사 원본·스테이징 복사본이므로 일괄 Stage·Commit 금지 |
 
 GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도했으나 Windows Installer가 종료 코드 1602로 취소되어 설치되지 않았다. GitHub 웹과 Git Credential Manager만으로도 기본 Push/Clone 작업은 가능하다.
 
@@ -37,7 +39,7 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 D:\JGY\project\drone\Drone.uproject
 ```
 
-이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않았고, 이번 확인 PC의 현재 로컬·원격 기준 Commit은 `551e287e8a5de7fa33f28d1911f8a7a957bd66fa`이다.
+이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않았고, 현재 D 드라이브 프로젝트의 로컬·원격 main 기준 Commit은 `551e287e8a5de7fa33f28d1911f8a7a957bd66fa`이다.
 
 확인 결과:
 
@@ -84,7 +86,7 @@ D:\JGY\project\drone\Drone.uproject
 
 ## 2026-08-25 제공 에셋 인수·이식 재검증
 
-현재 이 PC에서 확인한 제공 에셋 위치는 `C:\에셋`이다. 이전 `D:\JGY\project\Unreal_260821`과 `D:\JGY\project\Unreal\_260821`은 이 PC에 없다. 최초 D 드라이브 감사의 ZIP 14개 대조 결과는 역사 기록이며, 현재 C 드라이브에는 그 최상위 ZIP 14개가 없어 같은 검사를 다시 실행할 수 없다.
+이 절의 `C:\에셋` 결과는 다른 PC에서 2026-08-25에 수행한 재감사 기록이다. 현재 D 드라이브 작업 PC에는 `C:\에셋`이 없고 `D:\JGY\project\Unreal_260821`이 존재한다. D 경로에는 최상위 ZIP 14개·공급사 폴더 14개와 `_Staging`이 있으며 `D:\JGY\project\Unreal\_260821`은 존재하지 않는다. 아래 C 드라이브 수치는 PC 간 이력 비교용으로 보존한다.
 
 - 공급사 해제본 14개 기준선: 10,499개, 35,677,612,290 bytes
 - `_Staging`, 내부 FBX 해제본, 생성 캐시를 포함한 `C:\에셋` 현재 전체: 10,928개, 36,360,181,427 bytes
@@ -112,7 +114,7 @@ D:\JGY\project\drone\Drone.uproject
 - 실제 Editor MCP `initialize 200`, `initialized 202`, `tools/list 200`, 23개 Toolset 확인
 - MCP를 통해 Training Map·PIE·Selected Actor·Content Browser 상태를 실제 조회하고 `Drone.` 테스트 12개 탐색 확인
 
-현재 Unreal Editor PID가 `127.0.0.1:8000`을 소유한 상태로 실행 중이다. 이 Codex 작업은 문서 작업공간에서 시작되어 새 프로젝트 MCP 설정이 대화 중간에 Tool 목록으로 다시 주입되지는 않는다. Codex 앱 번들 CLI도 WindowsApps 실행 권한 거부로 셸의 `codex mcp list` 검증은 불가능했다. 이후에는 Editor를 먼저 실행하고 `D:\JGY\project\drone` 루트에서 Codex 작업을 열어 프로젝트 `.codex/config.toml`을 로드한 뒤 네이티브 Tool 노출을 한 번 확인한다. 세부 사용법과 보안 경계는 [`docs/DRONE_UNREAL_MCP.md`](docs/DRONE_UNREAL_MCP.md)에 기록했다.
+2026-08-26 09:17 KST에는 기준 `drone` Editor PID 9884의 MCP 응답을 확인했다. 이후 09:40 KST에 그 프로세스가 종료되고 별도 복제본 `D:\JGY\project\droner\Drone.uproject`의 Editor PID 10960이 `127.0.0.1:8000/mcp`를 소유했다. 현재 MCP는 `droner` Editor에 연결되므로 기준 프로젝트 변경 Tool로 사용하지 않는다. `D:\JGY\project\drone` 루트의 새 Codex 작업과 기준 Editor에서 네이티브 Tool 노출을 확인하는 `UE-MCP-02`는 계속 Todo다. 세부 사용법과 보안 경계는 [`docs/DRONE_UNREAL_MCP.md`](docs/DRONE_UNREAL_MCP.md)에 기록했다.
 
 ## 프로젝트 빌드와 실행 점검
 
@@ -246,7 +248,22 @@ PFN-06 Done
 - 제외: `Demo.umap`, `Demo_BuiltData`, `NavigationArrowExampleActor`, `ExampleMesh`, `TransparentCircle`
 - 의존성: 로드 실패 0, 외부 `/Game` 의존성 0, 원본 `/Game/NavigationArrows` 의존성 0
 - 검증: `DroneEditor Win64 Development` 성공, 전용 자동화 1/1, 전체 `Drone.` 15/15, Blueprint Compile 0 errors·0 Blueprint warnings·0 failed loads, Git LFS 속성 6/6과 `git lfs fsck` 통과
-- Git: `codex/navigation-arrows-migration` 작업 트리에 있으며 아직 Commit·Push하지 않음
+- Git: Commit `5a052c8bab2eb0dd8bc9ab16cfc7b3784e8e4cd7`을 `origin/codex/navigation-arrows-migration`에 Push 완료. `main`은 `551e287`로 유지되어 아직 이 6개 자산을 포함하지 않음
 - 적용 범위: 안전한 ThirdParty 인수까지만 완료. Training Map/HUD의 실제 화면 표시와 프로젝트 소유 Host/Wrapper는 다음 단계
 
-`AST-01`의 실제 스피커 Loop 단일 재생·종료 정지는 계속 미확인이므로 Doing이다. 다음 기능 카드는 계속 `TUT-04`이며 NavigationArrows 화면 연결과 섞어 완료 처리하지 않는다.
+`AST-02A`의 최소 이식·검증·원격 기능 Branch 공유는 완료했다. 실제 화면 Host/Wrapper와 main 반영은 미구현이다. `AST-01`의 실제 스피커 Loop 단일 재생·종료 정지는 계속 미확인이므로 Doing이다. 다음 기능 카드는 계속 `TUT-04`이며 NavigationArrows 화면 연결과 섞어 완료 처리하지 않는다.
+
+## 2026-08-26 Dataflow·Chaos 물리 환경 후보
+
+UE 5.8의 Dataflow·Chaos Cloth·Chaos Destruction을 부분 고정 그물과 선택형 맵 파괴의 후속 기술로 채택했다.
+
+- 현재 UE 5.8.1 설치본에서 `Dataflow`, `ChaosCloth`, `ChaosClothAsset`, `ChaosClothAssetEditorCore`, `ChaosClothAssetDataflowNodes`, `ChaosEditor`, `GeometryCollectionPlugin` 존재 확인
+- 현재 `Drone.uproject`에 위 Cloth/Destruction Plugin 명시적 활성화 0
+- Deprecated `ChaosClothAssetEditor`, `ChaosClothEditor` 사용 금지
+- 일부 고정 그물: Max Distance 0 또는 Kinematic Selection, 나머지 영역 Weight Map 시뮬레이션
+- 맵 파괴: Dataflow Geometry Collection, Anchor/World Support, Damage Threshold, Strain/Force와 Debris Sleep/Disable
+- Cloth 변형·파괴 연출과 포획·Damage·Mission 판정을 분리
+- 현재 생산 Cloth/Geometry Collection Asset 0, 관련 C++ 0
+- 다음 기능 우선순위는 `TUT-04`; 첫 물리 작업은 별도 `PHY-DF-00` Sandbox
+
+상세 설계는 [`docs/DRONE_CHAOS_DATAFLOW_PLAN.md`](docs/DRONE_CHAOS_DATAFLOW_PLAN.md)를 따른다.

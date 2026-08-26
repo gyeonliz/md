@@ -1,10 +1,12 @@
 # Drone 현재 코드 구조와 사용자 확인 작업
 
-기준일: 2026-08-25 (Asia/Seoul)
+기준일: 2026-08-26 (Asia/Seoul)
 
 이 문서는 현재 Unreal `drone` 저장소를 직접 확인한 결과를 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
 
 현재 TUT-03 완료 기준은 Unreal Commit `551e287` (`feat: record tutorial lap timing and distance`)이다. `codex/tutorial-lap-recording` Branch와 `main`을 모두 Push했으며 로컬 `main`과 `origin/main`이 이 Commit으로 일치한다.
+
+NavigationArrows 최소 이식 Commit `5a052c8`은 `origin/codex/navigation-arrows-migration`에만 있고 main에는 아직 병합하지 않았다. 따라서 아래 main 런타임 구조에는 NavigationArrows Widget Host가 없으며 화면에 나타나지 않는 것이 정상이다.
 
 ## 현재 검증 기준선
 

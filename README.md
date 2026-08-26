@@ -22,10 +22,11 @@
 16. [`docs/DRONE_MVP_GUIDE.md`](docs/DRONE_MVP_GUIDE.md): Flight MVP부터 데모까지의 개발 단위
 17. [`docs/WORK_MANAGEMENT.md`](docs/WORK_MANAGEMENT.md): Inbox → Todo → Doing → Done 운영
 18. [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md): 확정 조작, Tutorial 코스·기록 UI, Story·NPC·Jamming·에셋 적용 계획
-19. [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md): 최초 14팩 압축 감사, 현재 `C:\에셋` 재감사와 FPV·Loop 선별 이식 검증
+19. [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md): 최초 D 드라이브 14팩 압축 감사, 다른 PC의 C 드라이브 재감사와 FPV·Loop 선별 이식 검증
 20. [`docs/DRONE_UNREAL_MCP.md`](docs/DRONE_UNREAL_MCP.md): UE 5.8 공식 Unreal MCP·Codex 연결, 선택 Toolset과 검증 기준
-21. [`docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md`](docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md): 지원서·이력서용 Unreal 프로젝트 경험 기술 예시와 사실 확인 경계
-22. [`docs/STUDY_PLANS.md`](docs/STUDY_PLANS.md): 정보처리산업기사·C++ 코딩테스트 병행 계획
+21. [`docs/DRONE_CHAOS_DATAFLOW_PLAN.md`](docs/DRONE_CHAOS_DATAFLOW_PLAN.md): UE 5.8 Dataflow 기반 부분 고정 그물·선택형 맵 파괴 설계와 검증 순서
+22. [`docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md`](docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md): 지원서·이력서용 Unreal 프로젝트 경험 기술 예시와 사실 확인 경계
+23. [`docs/STUDY_PLANS.md`](docs/STUDY_PLANS.md): 정보처리산업기사·C++ 코딩테스트 병행 계획
 
 ## 구성
 
@@ -57,7 +58,7 @@ TUT-01~03을 완료했다. 별도 `Lvl_DroneTraining` Map의 실제 `BP_DroneTra
 
 TUT-03에서는 Course 소유 `UDroneTrainingLapRecorderComponent`를 Gate 판정과 분리했다. Gate 0 승인으로 Lap을 시작하고 이후 Gate마다 Segment를 확정하며, 마지막 Gate에서 Lap을 완료한다. World Game Time과 기존 Telemetry 10Hz의 3차원 World 위치 표본으로 실제 이동 거리와 평균 속도를 계산한다. 완료 원본은 현재 실행 중 보존하고 Blueprint가 `OnLapStarted`, `OnSegmentRecorded`, `OnLapCompleted`를 구독할 수 있다. 이전 평균·Best 비교와 결과 UI는 아직 TUT-04 범위다. 최종 검증은 Editor Build, Tutorial 6/6, 전체 `Drone.` 14/14, Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다.
 
-현재 제공 에셋 루트는 `C:\에셋`이다. 이 폴더의 14개 공급사 해제본 기준선은 10,499개·35,677,612,290 bytes이며, 스테이징·내부 FBX 해제본·생성 캐시까지 포함한 현재 전체는 10,928개·36,360,181,427 bytes다. 현재 폴더에는 최초 감사에 사용한 최상위 ZIP 14개가 없으므로 당시 `Missing 0 / Extra 0 / SizeMismatch 0` 결과는 역사 기록으로만 보존한다. UE 5.8 스테이징에서 선별한 `DronePack_Project` FPV 외형과 `Drone-Sounds` 44.1 kHz Loop 12개·21,753,071 bytes, 프로젝트 소유 Integration BP 1개가 실제 프로젝트에 들어 있으며 LFS·의존성·전용 자동화·Blueprint Compile 재검증을 통과했다. 실제 스피커의 Loop 단일 재생과 종료 정지는 수동 미확인이므로 `AST-01`은 Doing이다. 상세 결과는 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다.
+현재 D 드라이브 작업 PC의 제공 에셋 루트는 `D:\JGY\project\Unreal_260821`이며 최상위 ZIP 14개·공급사 폴더 14개와 `_Staging`이 있다. 다른 PC에서 확인한 `C:\에셋` 재감사 수치는 PC별 역사 기록으로 분리한다. UE 5.8 스테이징에서 선별한 `DronePack_Project` FPV 외형과 `Drone-Sounds` 44.1 kHz Loop 12개·21,753,071 bytes, 프로젝트 소유 Integration BP 1개가 `main`의 실제 프로젝트에 들어 있으며 LFS·의존성·전용 자동화·Blueprint Compile 재검증을 통과했다. 실제 스피커의 Loop 단일 재생과 종료 정지는 수동 미확인이므로 `AST-01`은 Doing이다. 상세 결과는 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다.
 
 2026-08-25 기준 Unreal 저장소 로컬 `main`과 `origin/main`은 TUT-03 완료 Commit `551e287e8a5de7fa33f28d1911f8a7a957bd66fa`로 일치한다. 소스 Branch `codex/tutorial-lap-recording`도 Push했다. `800a7ba`는 TUT-02, `5a9a2fa`는 TUT-01, `9f91bb6`은 WBP/BP 연결 보강, `410c940`은 native HUD, `91498b7`은 Unreal 저장소의 초기 기준선이다. 문서 저장소의 최신 동기화 상태는 [`STATUS.md`](STATUS.md)를 따른다.
 
@@ -81,4 +82,4 @@ PFN-06 Camera/Input 기준선 Done
 
 ## 2026-08-26 자산 작업 메모
 
-`NavigationArrows` 원본 11개를 UE 5.8에서 감사해 기능에 필요한 6개만 `/Game/Drone/ThirdParty/NavigationArrows`로 이식했다. 전용 자동화 1/1, 전체 `Drone.` 15/15, Blueprint Compile 0/0/0과 LFS 검증을 통과했다. 현재 `codex/navigation-arrows-migration` Branch의 미커밋 작업이며 Training Map/HUD에는 아직 연결하지 않았다. 상세 내용은 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다.
+`NavigationArrows` 원본 11개를 UE 5.8에서 감사해 기능에 필요한 6개만 `/Game/Drone/ThirdParty/NavigationArrows`로 이식했다. 전용 자동화 1/1, 전체 `Drone.` 15/15, Blueprint Compile 0/0/0과 LFS 검증을 통과했다. Commit `5a052c8`을 `origin/codex/navigation-arrows-migration`에 Push했지만 `main`에는 아직 병합하지 않았고 Training Map/HUD에도 연결하지 않았다. 상세 내용은 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다.

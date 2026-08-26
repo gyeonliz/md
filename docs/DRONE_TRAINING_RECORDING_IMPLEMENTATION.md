@@ -4,7 +4,7 @@
 
 Unreal 구현 기준: `551e287e8a5de7fa33f28d1911f8a7a957bd66fa` (`feat: record tutorial lap timing and distance`)
 
-이 문서는 TUT-03에서 실제 구현한 Lap·Segment 원본 기록 계층을 설명한다. 현재 구현된 계산과 Blueprint 연결 경계만 다루며, 아직 만들지 않은 결과 UI·이전 평균·Best·SaveGame을 구현된 기능처럼 포함하지 않는다.
+이 문서는 TUT-03에서 실제 구현한 Lap·Segment 원본 기록 계층을 설명한다. 2026-08-26에는 이 원본을 기존 Flight HUD에 연결해 최근 구간과 완료 구간들의 평균을 한글로 표시했다. 이전 성공 Lap 평균·Best·SaveGame은 아직 만들지 않았으므로 구현된 기능처럼 포함하지 않는다.
 
 ## 1. 왜 필요한가
 
@@ -296,7 +296,7 @@ Event는 상태를 먼저 반영한 뒤 Broadcast한다. Blueprint가 Event 안�
 4. Course의 `OrderedGates`가 Gate 0, 1, 2, 3 순서인지 확인한다.
 5. PIE를 시작하고 Gate 0이 Current 상태인지 확인한다.
 
-현재 TUT-03은 결과 UI를 만들지 않았으므로 화면에 Lap Time이나 Segment 결과가 표시되지 않는 것이 정상이다. 숫자를 수동으로 관찰하려면 `BP_DroneTrainingCourse`에서 `LapRecorderComponent`의 세 Event를 임시로 Bind하고 `Break DroneTrainingSegmentRecord` 또는 `Break DroneTrainingLapRecord` 뒤 `Print String`으로 확인할 수 있다. 이 임시 Debug Node는 TUT-04 UI가 아니며 제품 변경으로 Commit하지 않는다.
+현재 Flight HUD는 Training Course의 Recorder를 자동으로 찾아 최근 정상 구간의 평균 속도·이동 거리·통과 시간과 완료 구간들의 평균을 한글로 표시한다. 원본 검증이 필요하면 `LapRecorderComponent`의 세 Event와 `FDroneTrainingSegmentRecord`를 직접 확인할 수 있다. 이전 성공 Lap 평균·Best·`+/-` 비교는 아직 표시하지 않는다.
 
 ### 정상 Lap
 
