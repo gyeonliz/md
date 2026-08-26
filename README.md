@@ -78,3 +78,7 @@ PFN-06 Camera/Input 기준선 Done
 → Story/NPC/Mission/Jamming
 → AI/MG와 에셋 통합
 ```
+
+## 2026-08-26 자산 작업 메모
+
+`NavigationArrows` 원본 11개를 UE 5.8에서 감사해 기능에 필요한 6개만 `/Game/Drone/ThirdParty/NavigationArrows`로 이식했다. 전용 자동화 1/1, 전체 `Drone.` 15/15, Blueprint Compile 0/0/0과 LFS 검증을 통과했다. 현재 `codex/navigation-arrows-migration` Branch의 미커밋 작업이며 Training Map/HUD에는 아직 연결하지 않았다. 상세 내용은 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다.

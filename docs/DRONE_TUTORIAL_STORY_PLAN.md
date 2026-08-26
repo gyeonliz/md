@@ -229,3 +229,18 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 - 제공 에셋 적용 전후 Collision Root와 조작 테스트 결과가 동일해야 함
 
 네트워크, Android, 협동 플레이, 구매 에셋 세부 튜닝은 현재 범위에서 제외한다.
+
+## 9. AST-02A NavigationArrows 적용 경계 (2026-08-26)
+
+`NavigationArrows`는 AI Navigation이나 Gate 판정을 담당하지 않는다. 화면 안·밖의 World Target을 투영해 방향 화살표와 Text를 보여 주는 공급사 `UUserWidget`이다.
+
+- UE 5.8에서 검증한 최소 자산 6개만 `/Game/Drone/ThirdParty/NavigationArrows`에 둔다.
+- 공급사 `NavigationArrowExampleActor`, Demo Map, Example Mesh는 사용하지 않는다.
+- Gate 순서·현재 목표의 단일 기준은 계속 `UDroneTrainingGateSequenceComponent`다.
+- 프로젝트 소유 Host/Wrapper가 로컬 Player에게 Widget 한 개만 생성하고 현재 Gate의 Target만 전달한다.
+- Gate마다 Widget을 만들거나 공급사 Widget에서 Gate 목록을 검색하지 않는다.
+- 정상 통과·Reset·Reconfigure에서 Target만 교체하고, Course 완료·UnPossess·EndPlay에서는 숨기거나 제거한다.
+- 기존 Cyan Course 안내선과 Current/Inactive/Completed Gate Ring은 유지한다. NavigationArrow는 화면 밖 현재 목표를 보조하는 UI다.
+- 실제 화면 연결, PIE/Standalone 시각 확인과 수명주기 회귀 검증 전에는 “목표 안내 UI 완료”로 판정하지 않는다.
+
+자산 인수와 로드 검증은 완료했지만 현재 Branch가 Commit·Push 전이므로 `AST-02A`의 원격 공유 마감은 남아 있다. 이 작업은 `TUT-04`의 이전 평균·Best 결과 UI와 별개다.

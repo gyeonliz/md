@@ -1,6 +1,6 @@
 # 현재 작업 상태
 
-기준일: 2026-08-25 (Asia/Seoul)
+기준일: 2026-08-26 (Asia/Seoul)
 
 이 문서는 PC별로 명령으로 확인된 상태와 사용자가 아직 결정하지 않은 항목을 분리한다. 작업컴 기록과 이번 확인 PC의 결과를 같은 항목에서 섞지 않고 경로와 검증 시점을 함께 적는다.
 
@@ -234,3 +234,19 @@ PFN-06 Done
 ```
 
 최종 감도, Mouse Y 반전, 비행 물리, 멀티플레이와 세부 Mission 규칙은 현재 미정으로 유지한다.
+
+## 2026-08-26 NavigationArrows 최소 이식 상태
+
+사용자는 지원과정을 통해 구매·지급된 제공 에셋의 프로젝트 사용 권리를 확인했다. `C:\에셋`에 별도 라이선스·영수증 파일이 없다는 기존 기록은 로컬 증빙 보관 상태로 유지하며, 권리 미확정이나 법률 검토 완료로 바꾸어 해석하지 않는다. `PBR Sting`의 `isAiForbidden: true`는 해당 팩의 생성형 도구 업로드 제한으로만 유지한다.
+
+- 원본: `NavigationArrows` 11개·1,364,087 bytes, UE 5.2/5.3 저장본
+- 선택 이식: 6개·UE 5.8 재저장 후 1,098,730 bytes
+- 경로: `/Game/Drone/ThirdParty/NavigationArrows`
+- 구성: Widget Blueprint 1, Texture2D 2, UserDefinedStruct 3
+- 제외: `Demo.umap`, `Demo_BuiltData`, `NavigationArrowExampleActor`, `ExampleMesh`, `TransparentCircle`
+- 의존성: 로드 실패 0, 외부 `/Game` 의존성 0, 원본 `/Game/NavigationArrows` 의존성 0
+- 검증: `DroneEditor Win64 Development` 성공, 전용 자동화 1/1, 전체 `Drone.` 15/15, Blueprint Compile 0 errors·0 Blueprint warnings·0 failed loads, Git LFS 속성 6/6과 `git lfs fsck` 통과
+- Git: `codex/navigation-arrows-migration` 작업 트리에 있으며 아직 Commit·Push하지 않음
+- 적용 범위: 안전한 ThirdParty 인수까지만 완료. Training Map/HUD의 실제 화면 표시와 프로젝트 소유 Host/Wrapper는 다음 단계
+
+`AST-01`의 실제 스피커 Loop 단일 재생·종료 정지는 계속 미확인이므로 Doing이다. 다음 기능 카드는 계속 `TUT-04`이며 NavigationArrows 화면 연결과 섞어 완료 처리하지 않는다.

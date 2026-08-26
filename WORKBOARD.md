@@ -1,14 +1,14 @@
 # 현재 작업 보드
 
-기준일: 2026-08-25 (Asia/Seoul)
+기준일: 2026-08-26 (Asia/Seoul)
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-03 완료 Commit `551e287`이다. 소스 Branch `codex/tutorial-lap-recording`도 Push했다. 현재 기능 실행 순서는 `TUT-04 비교·결과 UI → Flight 상태 → Operator↔Drone → Story/NPC/Mission → AI/MG/Jamming → 에셋 적용`이다.
+Unreal 완료 기준선은 로컬 `main`과 `origin/main`이 일치하는 TUT-03 Commit `551e287`이다. 현재는 `codex/navigation-arrows-migration` Branch에서 `AST-02A` 파일과 검증 코드를 아직 Commit하지 않은 상태다. 기능 실행 순서는 `TUT-04 비교·결과 UI → Flight 상태 → Operator↔Drone → Story/NPC/Mission → AI/MG/Jamming`이며, 검증된 소형 에셋 이식은 기능 작업과 병행한다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-08-25 20:53 KST
+마지막 갱신: 2026-08-26 KST
 
 | 항목 | 상태 |
 |---|---|
@@ -59,6 +59,7 @@ Unreal 작업 기준은 로컬 `main`과 `origin/main`이 일치하는 TUT-03 �
 | ID | 태그 | 작업 | 현재 확인 | 남은 완료 조건 |
 |---|---|---|---|---|
 | AST-01 | Drone / Unreal | 제공 에셋 최소 외형 Spike | FPV 본체·로터 4·재질/Texture와 44.1 kHz Loop Cue/Wave를 `/Game/Drone/ThirdParty`로 선별 이식. Integration BP와 GameMode 연결. 이번 재검증에서 전용 자동화 1/1·의존성 감사·Blueprint 0/0/0·LFS fsck 통과. 전체 14/14는 TUT-03 당시 같은 Commit의 기준선이며 이번에 미재실행 | 실제 스피커 출력의 Loop 단일 재생·종료 정지는 미확인. 결과 확보 전까지 Doing 유지 |
+| AST-02A | Drone / Unreal / UI | NavigationArrows 최소 이식 | 원본 11개에서 기능 폐쇄 집합 6개만 UE 5.8 재저장 후 `/Game/Drone/ThirdParty/NavigationArrows`에 이식. 외부 Game 의존성 0, 전용 1/1, 전체 15/15, BP 0/0/0, LFS 속성·fsck 통과 | `codex/navigation-arrows-migration` Commit·Push. 이후 별도 카드에서 프로젝트 소유 Host/Wrapper로 현재 Gate 하나만 연결 |
 
 ## Done
 
@@ -116,3 +117,10 @@ Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 로컬 `main`과 
 Android 제외와 PFN-01~06, HUD-01, HUD-02, TUT-01~03, 최초 에셋 인수 감사 `AST-00`, 현재 `C:\에셋` 재검증 `AST-VERIFY-01`을 완료했다. `AST-01`은 선택 자산 12개와 Integration BP 이식 뒤 기존 전체 회귀와 Standalone 초기 렌더를 통과했고, 이번에는 FPV 1/1·Blueprint 0/0/0·의존성·LFS만 다시 검증했다. 실제 Loop 단일 재생·종료 정지는 수동 미확인이므로 Pass나 Fail로 간주하지 않고 Doing을 유지한다. 다음 기능 카드는 `TUT-04`이며 이전 평균·Best 비교와 기록 결과 UI는 아직 구현된 기능으로 보지 않는다. 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다.
 
 UE-MCP-01도 완료했다. 이후 Editor 내부 Actor·Asset·Blueprint·UMG·Automation 작업은 가능한 범위에서 공식 Unreal MCP를 우선 사용하되, Experimental 기능이므로 실제 Git diff·빌드·자동화 로그를 최종 판정 기준으로 유지한다.
+
+## 2026-08-26 현재 오버레이
+
+- 제공 에셋의 프로젝트 사용 권리는 사용자가 지원과정 구매·지급 근거로 확인했다. 로컬 증빙 파일 미발견은 별도 보관 상태로 기록한다.
+- `AST-02A`의 기술 이식과 검증은 완료했다. 현재 미완료는 Git Commit·Push와 실제 Training HUD 연결이다.
+- HUD 연결 전에도 자산은 안전하게 로드 가능한 상태지만, 화면에 보이는 구현으로 과장하지 않는다.
+- 바로 다음 마감은 `codex/navigation-arrows-migration` Commit·Push다. 다음 구현은 프로젝트 소유 Navigation Host/Wrapper 또는 기존 우선순위의 `TUT-04` 중 하나를 별도 카드로 시작한다.

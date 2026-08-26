@@ -188,3 +188,53 @@
 4. PIE/Standalone을 종료했을 때 소리가 즉시 멈추는지 확인한다.
 
 청감 결과가 없으므로 `AST-01`은 계속 Doing이다. 이번 재검증은 이식 파일과 구조가 정상이라는 판정이며 실제 청감 Pass를 뜻하지 않는다.
+
+## 2026-08-26 — AST-02A NavigationArrows 최소 이식
+
+### 권리와 증빙 상태
+
+- 사용자는 이 제공 에셋이 지원과정을 통해 구매·지급되었으며 프로젝트 사용에 문제가 없다고 확인했다. 프로젝트 사용 권리는 이번 이식의 차단 조건이 아니다.
+- `C:\에셋`에서 별도 `LICENSE`, `EULA`, 영수증 파일을 찾지 못한 기존 결과는 로컬 증빙 보관 상태다. 판매 페이지 조건 확인이나 법률 검토 완료를 의미하지 않는다.
+- `PBR Sting` Metadata의 `isAiForbidden: true`는 해당 팩을 생성형 도구에 올리지 않는 제한으로만 적용한다. NavigationArrows나 일반 Unreal 사용에 확대하지 않는다.
+
+### 원본 감사와 선택
+
+- 원본 `C:\에셋\NavigationArrows`: 11개·1,364,087 bytes
+- UE 5.8 전용 스테이징: `C:\에셋\_Staging\NavigationArrowsStage`
+- 선택한 최소 폐쇄 집합: 6개·원본 기준 1,072,269 bytes
+- UE 5.8 이동·재저장 후 실제 프로젝트 크기: 1,098,730 bytes
+
+```text
+/Game/Drone/ThirdParty/NavigationArrows
+├─ Blueprints/NavigationArrow          # Widget Blueprint
+├─ Icons/NewTransparentArrow           # Texture2D
+├─ Icons/TransparentArrow              # Texture2D
+└─ InfoStructs
+   ├─ ImageInfo                        # UserDefinedStruct
+   ├─ MovementInfo                     # UserDefinedStruct
+   └─ TextInfo                         # UserDefinedStruct
+```
+
+첫 이식에서 제외한 자산은 `Demo.umap`, `Demo_BuiltData`, `NavigationArrowExampleActor`, `ExampleMesh`, `TransparentCircle`이다. Demo와 Example은 기능 Widget의 런타임 폐쇄 집합이 아니며, `TransparentCircle`은 팩 내부 참조가 없다.
+
+### UE 5.8 검증
+
+- 원본 11개 Asset Registry 발견 11/11, 로드 실패 0
+- 원본 `NavigationArrow`와 `NavigationArrowExampleActor` Compile 성공
+- 이동 후 정확히 6개, 원본 `/Game/NavigationArrows` 의존성 0, 외부 `/Game` 의존성 0
+- 실제 Drone 프로젝트에서 Generated Class와 2개 Texture·3개 Struct 로드 성공
+- `DroneEditor Win64 Development` Build 성공
+- `Drone.Integration.NavigationArrowsAsset`: 1/1 Success
+- 전체 `Drone.` 자동화: 15/15 Success, warning·failure 0
+- Blueprint Compile: 0 errors, 0 Blueprint warnings, 0 failed loads
+- 6개 모두 Git LFS filter·diff·merge 적용, `git lfs fsck` 통과
+
+Blueprint Compile 프로세스의 전역 로그에는 활성 Unreal MCP 플러그인의 EULA 안내 경고가 한 번 있었지만 Blueprint 결과 집계는 0 errors·0 warnings·0 failed loads였다. 자산 오류로 계산하지 않는다.
+
+### 현재 경계와 다음 단계
+
+이번 단계는 외부 Widget과 그 의존성을 안전한 ThirdParty 경계에 넣은 것이다. `NavigationArrow`는 현재 Training Map/HUD에 생성되지 않으므로 아직 화면에 보이는 기능이 아니다. 기존 Course Spline과 Gate Ring을 교체하지 않는다.
+
+다음 자산 카드는 프로젝트 소유 Host/Wrapper가 로컬 플레이어에게 Widget 한 개만 만들고 `UDroneTrainingGateSequenceComponent::GetCurrentGate()`의 결과를 `TargetComponent` 또는 `TargetWorldLocation`으로 전달하는 작업이다. Course 완료·Reset·UnPossess·EndPlay에서 숨김과 정리를 검증한다. `NavigationArrowExampleActor`는 사용하지 않는다.
+
+현재 Git 상태는 `codex/navigation-arrows-migration` Branch의 미커밋 작업이다. Commit·Push 전에는 원격 공유 완료로 판정하지 않는다.

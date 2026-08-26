@@ -514,3 +514,41 @@ HeadingValueText
 - 전체 `Drone.` 14/14는 같은 현재 Commit에서 TUT-03 완료 시 통과한 전체 기준선이며 이번 재감사에서 전체 묶음을 다시 실행한 것으로 과장하지 않는다.
 - 기존 Standalone 초기 렌더는 통과 기록이 있지만 이번 재감사에서 새 시각 캡처와 실제 청감은 하지 않았다. Body·Rotor·Camera 배치와 Loop 단일 재생·여러 경계·종료 정지는 사람이 확인해야 한다.
 - 이식 파일·참조·구조는 Pass다. 실제 청감은 미확인이므로 `AST-01`은 Doing을 유지한다.
+
+## 2026-08-26 — AST-02A NavigationArrows 1차 이식
+
+### 사용자 확인과 범위
+
+- 사용자가 제공 에셋은 지원과정을 통해 구매·지급된 것이므로 프로젝트 사용에 문제가 없다고 확인했다.
+- 로컬 라이선스·영수증 파일 미발견은 증빙 보관 상태로 따로 기록하고 이식 차단으로 취급하지 않았다.
+- 원본 11개 전체를 넣지 않고, 화면 밖 목표 방향 표시 Widget의 최소 폐쇄 집합만 이식하기로 했다.
+
+### 실제 변경
+
+- 별도 `NavigationArrowsStage` UE 5.8 프로젝트에서 원본 경로 `/Game/NavigationArrows`를 유지해 11개를 먼저 로드했다.
+- Unreal 내부 이동으로 6개를 `/Game/Drone/ThirdParty/NavigationArrows`에 옮겨 참조를 갱신하고 재저장했다.
+- Widget Blueprint 1개, Texture2D 2개, UserDefinedStruct 3개만 실제 Drone 프로젝트에 복사했다.
+- Demo Map·BuiltData·Example Actor·Example Mesh·미사용 Circle Texture는 제외했다.
+- `DroneNavigationArrowsAssetTest.cpp`를 추가해 Generated Class, Target 변수 계약, Texture·Struct 로드와 제외 자산 부재를 검증했다.
+- 재현용 `tools/unreal/Audit-NavigationArrows.py`, `tools/unreal/Stage-NavigationArrows.py`를 문서 저장소에 추가했다.
+
+### 검증 결과
+
+- 원본·대상 Asset Registry 감사: 로드 실패 0, 외부 `/Game` 의존성 0
+- UE 5.8 스테이징 Target Blueprint Compile: 0/0/0
+- `DroneEditor Win64 Development`: 성공
+- 전용 자동화: 1/1 성공
+- 전체 `Drone.`: 15/15 성공, warning·failure 0
+- 실제 프로젝트 Blueprint Compile: 0 errors, 0 Blueprint warnings, 0 failed loads
+- 프로젝트 6개가 검증된 스테이징 6개와 SHA-256 일치
+- Git LFS 속성 6/6, `git lfs fsck` 정상
+
+첫 C++ 빌드는 `UUserDefinedStruct` 헤더 경로를 잘못 적어 실패했다. UE 5.8 실제 경로인 `StructUtils/UserDefinedStruct.h`로 수정한 뒤 빌드가 성공했다. 첫 전용 테스트는 Blueprint 변수의 GUID 접미사를 고려하지 않아 `TargetWorldLocation` 탐색이 실패했고, 접두사 기반 반사 검사로 수정한 뒤 1/1과 전체 15/15를 통과했다. 두 실패는 수정 전 검사 결함이며 최종 자산 결함으로 남지 않는다.
+
+### 현재 판정
+
+- 기술 이식·검증: 완료
+- Git: `codex/navigation-arrows-migration`에 미커밋, Push 전
+- 실제 화면 연결: 미구현. 자산이 준비됐을 뿐 Training HUD 기능 완료가 아님
+- `AST-01`: 실제 스피커 Loop 확인 전까지 계속 Doing
+- `TUT-04`: 다음 기능 카드 유지

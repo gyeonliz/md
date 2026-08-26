@@ -503,3 +503,14 @@ Inbox → Todo → Doing → Done
 - `C:\에셋\DronePack_Project\Config\DefaultEngine.ini`의 Android File Server에는 비어 있지 않은 토큰이 있으므로 Config를 이식하거나 Commit하지 않는다. 값은 기록하지 않으며 실제 Drone 프로젝트는 Plugin·네트워크 꺼짐, 빈 토큰을 유지한다.
 - 이번 재검증에서 `Drone.Integration.FPVAsset` 1/1, Blueprint Compile 0/0/0, LFS fsck를 통과했다. 전체 `Drone.` 14/14는 현재 Commit에서 TUT-03 완료 때 통과한 기준선이며 이번에는 미재실행이다.
 - 기존 Standalone 초기 렌더는 통과했지만 실제 스피커 Loop 단일 재생과 종료 정지는 여전히 사람이 확인하지 않았다. `AST-01`은 Doing으로 유지한다.
+
+## 29. 2026-08-26 자산 권리 확인과 NavigationArrows 1차 이식
+
+- 사용자는 제공 에셋이 지원과정을 통해 구매·지급된 것이며 현재 프로젝트에서 사용하는 데 문제가 없다고 확인했다. 이 사용자 확인으로 프로젝트 사용 권리는 이식 차단 조건이 아니다.
+- `C:\에셋`에서 별도 `LICENSE`, `EULA`, 영수증 파일을 찾지 못한 사실은 로컬 증빙 보관 상태다. 법률 검토 완료나 판매 페이지 조건 확인 완료를 뜻하지 않는다.
+- `PBR Sting`의 `isAiForbidden: true`는 해당 팩을 생성형 도구에 넣지 않는 별도 제한으로 유지한다. 다른 팩이나 일반 Unreal 사용에 임의로 확대 적용하지 않는다.
+- `AST-02A NavigationArrows`는 원본 11개·1,364,087 bytes를 UE 5.8 전용 스테이징에서 감사한 뒤 기능 최소 폐쇄 집합 6개만 `/Game/Drone/ThirdParty/NavigationArrows`로 이동·재저장했다. UE 5.8 재저장 후 실제 프로젝트 크기는 1,098,730 bytes다.
+- 이식한 6개는 `NavigationArrow` Widget Blueprint 1개, Texture2D 2개, UserDefinedStruct 3개다. Demo Map·BuiltData·Example Actor·Example Mesh·미사용 `TransparentCircle`은 제외했다.
+- 실제 Drone 프로젝트에서 6개 로드, Generated Class, 의존성 폐쇄와 제외 목록을 검사했다. 외부 `/Game` 의존성 0, 로드 실패 0, 전용 자동화 1/1, 전체 `Drone.` 15/15, Blueprint Compile 0 errors·0 Blueprint warnings·0 load failures, LFS 속성과 `git lfs fsck`를 통과했다.
+- 현재 자산은 기능 Branch `codex/navigation-arrows-migration`의 작업 트리에 있으며 Commit·Push 전이다. 훈련 Map/HUD에는 아직 연결하지 않았다.
+- 다음 자산 단계는 프로젝트 소유 Host/Wrapper가 현재 Gate 하나를 이 Widget의 `TargetComponent` 또는 `TargetWorldLocation`에 전달하는 것이다. 기존 Course 안내선과 Gate Ring을 교체하지 않으며, `TUT-04`는 별도의 다음 기능 카드로 유지한다.
