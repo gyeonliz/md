@@ -512,7 +512,7 @@ Inbox → Todo → Doing → Done
 - `AST-02A NavigationArrows`는 원본 11개·1,364,087 bytes를 UE 5.8 전용 스테이징에서 감사한 뒤 기능 최소 폐쇄 집합 6개만 `/Game/Drone/ThirdParty/NavigationArrows`로 이동·재저장했다. UE 5.8 재저장 후 실제 프로젝트 크기는 1,098,730 bytes다.
 - 이식한 6개는 `NavigationArrow` Widget Blueprint 1개, Texture2D 2개, UserDefinedStruct 3개다. Demo Map·BuiltData·Example Actor·Example Mesh·미사용 `TransparentCircle`은 제외했다.
 - 실제 Drone 프로젝트에서 6개 로드, Generated Class, 의존성 폐쇄와 제외 목록을 검사했다. 외부 `/Game` 의존성 0, 로드 실패 0, 전용 자동화 1/1, 전체 `Drone.` 15/15, Blueprint Compile 0 errors·0 Blueprint warnings·0 load failures, LFS 속성과 `git lfs fsck`를 통과했다.
-- 자산과 검증 코드는 Commit `5a052c8bab2eb0dd8bc9ab16cfc7b3784e8e4cd7`로 `origin/codex/navigation-arrows-migration`에 Push했다. `main`에는 아직 병합하지 않았고 훈련 Map/HUD에도 연결하지 않았다.
+- 자산과 검증 코드는 Commit `5a052c8bab2eb0dd8bc9ab16cfc7b3784e8e4cd7`로 기능 Branch에 Push한 뒤 Merge Commit `fb1d7ad2c23d6bf3b1c854ca7c1c0cddba2062ef`로 `origin/main`에도 반영했다. 훈련 Map/HUD의 실제 Host/Wrapper 화면 연결은 아직 하지 않았다.
 - 다음 자산 단계는 프로젝트 소유 Host/Wrapper가 현재 Gate 하나를 이 Widget의 `TargetComponent` 또는 `TargetWorldLocation`에 전달하는 것이다. 기존 Course 안내선과 Gate Ring을 교체하지 않으며, `TUT-04`는 별도의 다음 기능 카드로 유지한다.
 
 ## 30. 2026-08-26 09:17 현재 작업 PC 동기화
@@ -543,3 +543,11 @@ Inbox → Todo → Doing → Done
 - `droner/Content/Asset` 전체를 Stage·Commit·Push하지 않는다. 기준 프로젝트로 필요한 에셋만 UE 5.8 스테이징·감사 후 `/Game/Drone/ThirdParty`로 선별 이식한다.
 - 기준 `drone`과 `droner` 모두 Editor가 만든 `Config/DefaultEditor.ini` 변경이 있다. 사용자 변경으로 보존하고 임의로 되돌리지 않는다.
 - C++·Plugin·Dataflow Asset 작업 전에는 `droner` Editor를 정상 종료하고 기준 `drone`을 명시적으로 연다.
+
+## 33. 2026-08-26 13:11 중단 작업 재개와 NavigationArrows main 반영
+
+- 이번 확인 PC의 실제 경로는 Unreal `C:\URproject\drone`, 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6`다.
+- 기존 원격 `main`의 `5540c6b` 작업을 보존하고 NavigationArrows 기능 Commit `5a052c8`을 Merge Commit `fb1d7ad`로 병합해 `origin/main`에 Push했다.
+- 병합된 main에서 `DroneEditor Win64 Development` Build, NavigationArrows 1/1, 전체 `Drone.` 15/15, Blueprint Compile 0/0/0과 `git lfs fsck`를 다시 통과했다.
+- 로컬 `main=origin/main=fb1d7ad`이고 Drone 작업 트리는 Clean이다.
+- 이 완료는 자산 인수·공유 완료를 뜻한다. NavigationArrows를 실제 Training HUD에 표시하는 프로젝트 소유 Host/Wrapper와 PIE/Standalone 시각 검증은 아직 남아 있다.

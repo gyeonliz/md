@@ -237,16 +237,16 @@ Blueprint Compile 프로세스의 전역 로그에는 활성 Unreal MCP 플러�
 
 다음 자산 카드는 프로젝트 소유 Host/Wrapper가 로컬 플레이어에게 Widget 한 개만 만들고 `UDroneTrainingGateSequenceComponent::GetCurrentGate()`의 결과를 `TargetComponent` 또는 `TargetWorldLocation`으로 전달하는 작업이다. Course 완료·Reset·UnPossess·EndPlay에서 숨김과 정리를 검증한다. `NavigationArrowExampleActor`는 사용하지 않는다.
 
-Commit `5a052c8bab2eb0dd8bc9ab16cfc7b3784e8e4cd7`을 `origin/codex/navigation-arrows-migration`에 Push해 최소 이식의 원격 공유까지 완료했다. 현재 `main=origin/main=551e287`에는 아직 병합하지 않았으므로 main 작업 트리에서는 이 6개가 보이지 않는 것이 정상이다. 실제 Training HUD Host/Wrapper도 아직 미구현이다.
+Commit `5a052c8bab2eb0dd8bc9ab16cfc7b3784e8e4cd7`을 `origin/codex/navigation-arrows-migration`에 Push한 뒤 Merge Commit `fb1d7ad2c23d6bf3b1c854ca7c1c0cddba2062ef`로 `origin/main`에도 반영했다. 병합된 main에서 Build와 동일 검증 묶음을 다시 통과했다. 실제 Training HUD Host/Wrapper는 아직 미구현이다.
 
 ## 2026-08-26 09:17 — D 드라이브 작업 PC 재확인
 
 - 현재 제공 에셋 루트: `D:\JGY\project\Unreal_260821`
 - 현재 PC에 `C:\에셋`은 없으며, 앞 절의 C 드라이브 수치와 검증은 다른 PC에서 수행한 역사 기록이다.
 - D 루트에는 최상위 ZIP 14개, 대응 공급사 폴더 14개와 `_Staging`이 존재한다. 잘못 알려졌던 `D:\JGY\project\Unreal\_260821`은 존재하지 않는다.
-- Drone 프로젝트는 `D:\JGY\project\drone`, `main=origin/main=551e287`, 작업 트리 Clean이다.
-- FPV·Sound 12개와 Integration BP 1개는 main에 포함되어 있다. NavigationArrows 6개와 전용 테스트는 원격 기능 Branch Commit `5a052c8`에만 있고 main 미병합이다.
-- 다음 기능 우선순위는 `TUT-04`다. NavigationArrows Host/Wrapper·main 반영은 별도 후속 카드이며, 실제 Drone Loop 청감은 계속 미확인이다.
+- 이 시점의 D 드라이브 기록은 역사 상태다. 2026-08-26 13:11 KST 이번 확인 PC의 `C:\URproject\drone`은 `main=origin/main=fb1d7ad`, 작업 트리 Clean이다.
+- FPV·Sound와 기존 main 작업을 보존한 채 NavigationArrows 6개와 전용 테스트도 main에 포함했다.
+- 다음 기능 우선순위는 `TUT-04`다. NavigationArrows Host/Wrapper 화면 연결은 별도 후속 카드이며, 실제 Drone Loop 청감은 계속 미확인이다.
 
 ## 2026-08-26 11:50 — AST-01C DronePack 드론·맵 선별 이식
 

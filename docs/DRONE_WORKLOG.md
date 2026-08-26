@@ -22,16 +22,16 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | 3단계 Tutorial Vertical Slice — `TUT-03` 완료, `TUT-04` Todo |
-| Unreal 기준선 | 로컬 `main=origin/main=551e287`, `DroneEditor Win64 Development` Build 성공 |
-| 자동 검증 | Tutorial `6/6`, 전체 `Drone.` `14/14`, Blueprint Compile `0 errors / 0 warnings / 0 load failures` |
+| 전체 단계 | 3단계 Tutorial Vertical Slice — `TUT-03` 완료, `TUT-04A` 자동 검증 통과·수동 화면 확인 대기 |
+| Unreal 기준선 | 이번 확인 PC 로컬 `main=origin/main=fb1d7ad`, `DroneEditor Win64 Development` Build 성공 |
+| 자동 검증 | 전체 `Drone.` `15/15`, Blueprint Compile `0 errors / 0 warnings / 0 load failures`, LFS fsck 정상 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | 사용자 요청으로 모든 실행을 중단하고 `TUT-04A` Course/HUD 변경과 환경 팩 스테이징을 보존 |
-| 차단 조건 | 기술 차단으로 닫은 것이 아니라 귀가를 위한 의도적 정지. 환경 팩의 비호환 Demo Character/MRQ Preset 분리와 최종 검증이 남음 |
-| 다음 행동 | 스테이징 재감사 → 환경 팩별 변환/의존성 확인 → 실제 프로젝트 이식 → Course/HUD 최종 검증·화면 확인 |
-| 다음 기능 | `TUT-04A`를 먼저 검증하고, 이전 평균·Best `+/-` 비교는 `TUT-04B`로 이어서 구현 |
+| 지금 작업 중 | NavigationArrows main 병합·Push와 병합 기준 회귀 검증 완료. `TUT-04A` 실제 Training Map/HUD 화면 확인 대기 |
+| 차단 조건 | 기능 코드의 기술 차단은 없음. TUT-04A 완료 판정을 위한 수동 화면 확인과 별도 환경 팩의 비호환 Demo 자산 분리가 남음 |
+| 다음 행동 | `Lvl_DroneTraining`에서 한글 HUD·세분화 코스·GateIndex·한 Lap 기록을 확인하고 결과를 기록 |
+| 다음 기능 | TUT-04A 수동 확인 후 이전 평균·Best `+/-` 비교를 `TUT-04B`로 구현 |
 | 이후 | Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming |
-| Git 처리 | Drone `main=origin/main=551e287`; 기존 `DefaultEditor.ini`와 DronePack 154개가 미커밋. NavigationArrows `5a052c8` 원격 기능 Branch Push·main 미병합. 이번 변경은 사용자 Commit 대상이며 Push하지 않음 |
+| Git 처리 | 기존 main `5540c6b`를 보존하고 NavigationArrows `5a052c8`을 Merge Commit `fb1d7ad`로 `origin/main`에 Push 완료. Drone 작업 트리 Clean |
 
 ## 2026-08-21 — Camera·Mouse·Gamepad 기준선 갱신
 
@@ -548,7 +548,7 @@ HeadingValueText
 ### 현재 판정
 
 - 기술 이식·검증: 완료
-- Git: Commit `5a052c8`을 `origin/codex/navigation-arrows-migration`에 Push 완료, main 미병합
+- Git: Commit `5a052c8`을 `origin/codex/navigation-arrows-migration`에 Push 완료. 이후 `fb1d7ad`로 main 병합·Push 완료
 - 실제 화면 연결: 미구현. 자산이 준비됐을 뿐 Training HUD 기능 완료가 아님
 - `AST-01`: 실제 스피커 Loop 확인 전까지 계속 Doing
 - `TUT-04`: 다음 기능 카드 유지
@@ -566,7 +566,7 @@ HeadingValueText
 
 ### 판정과 다음 작업
 
-- `AST-02A` 최소 이식·검증·원격 기능 Branch 공유는 Done이다. main 병합과 실제 Navigation Host/Wrapper는 후속 카드다.
+- `AST-02A` 최소 이식·검증·main 공유는 Done이다. 실제 Navigation Host/Wrapper는 후속 카드다.
 - `UE-MCP-02`는 Drone 루트의 새 Codex 작업에서 네이티브 Tool 노출을 확인하기 전까지 Todo다.
 - `AST-01` 실제 스피커 Loop와 TUT-03 실제 Gate 0→3 한 Lap은 계속 수동 미확인이다.
 - 다음 기능 카드는 `TUT-04 이전 기록 비교·Best·결과 UI`다.
@@ -643,3 +643,15 @@ HeadingValueText
 - Course/HUD는 한글 현재 비행값, 최근/평균 구간 통계, Gate 배열 자동 동기화, 200 cm 거리 샘플 곡선 표시까지 코드에 반영됐다. 마지막 폰트 보강 전 Build와 집중 자동화 8/8은 통과했지만 최종 전체 검증과 화면 확인은 남았다.
 - 환경 팩은 실제 Drone 저장소에 아직 복사하지 않았다. 스테이징 Battlefield 1,191개/Map 4만 새 경로로 변환됐고, 비호환 Demo Character 102개가 원본 경로에 남았다. MilitaryCamp 668개와 MilitaryBase 1,474개 원본은 보존됐다.
 - 재개 순서: 스테이징 재감사 → 세 팩 의존성 정리·변환 → 실제 프로젝트 이식 → Build·BP Compile·Map Check·전체 자동화 → Training Map 저장·한글 HUD/곡선 화면 확인.
+
+## 2026-08-26 13:11 — 중단 작업 재개·NavigationArrows main 병합
+
+- `C:\URproject\drone`에서 기존 main `5540c6b`와 NavigationArrows 기능 Commit `5a052c8`의 분기를 확인했다.
+- 기존 main 작업을 유지한 채 `--no-ff` Merge Commit `fb1d7ad`를 만들고 `origin/main`에 Push했다.
+- 병합 main Build 성공.
+- `Drone.Integration.NavigationArrowsAsset` 1/1 Success.
+- 전체 `Drone.` 15/15 Success.
+- Blueprint Compile 0 errors, 0 Blueprint warnings, 0 failed loads.
+- NavigationArrows LFS 속성과 `git lfs fsck` 통과.
+- 최종 `main=origin/main=fb1d7ad`, Drone 작업 트리 Clean.
+- 실제 Training HUD Host/Wrapper와 PIE/Standalone 시각 확인은 구현하지 않았으므로 완료로 기록하지 않는다.

@@ -211,7 +211,7 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 | AST-00 | 제공 에셋 인수 감사 | ZIP 14개와 해제본의 상대 경로·크기 일치 및 팩별 호환성·이식 위험 기록 |
 | AST-01 | 제공 Drone 에셋 선별 적용 | UE 5.8 스테이징 검증 후 기능 코드 변경 없이 Integration BP에서 외형 교체 |
 
-현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`, `TUT-03`을 완료했다. TUT-03은 Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료와 World Game Time·Telemetry 위치 표본 기반 실제 거리·평균 속도 원본 기록을 포함한다. Editor Build, 실제 BP PIE Smoke를 포함한 Tutorial 6/6, 전체 `Drone.` 14/14, Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다. Unreal 저장소 로컬 `main`과 `origin/main`의 완료 기준선은 `551e287e8a5de7fa33f28d1911f8a7a957bd66fa`이다.
+현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`, `TUT-03`을 완료했다. TUT-03은 Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료와 World Game Time·Telemetry 위치 표본 기반 실제 거리·평균 속도 원본 기록을 포함한다. 2026-08-26 병합 main에서 Editor Build, 전체 `Drone.` 15/15, Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다. Unreal 저장소 로컬 `main`과 `origin/main`의 현재 기준선은 `fb1d7ad2c23d6bf3b1c854ca7c1c0cddba2062ef`이다.
 
 다음 활성 카드는 `TUT-04`다. 이전 성공 평균·Best의 정확한 집계 규칙과 결과 UI는 현재 미구현이며, TUT-03의 성공 원본 History를 입력으로 사용한다.
 
@@ -243,7 +243,7 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 - 기존 Cyan Course 안내선과 Current/Inactive/Completed Gate Ring은 유지한다. NavigationArrow는 화면 밖 현재 목표를 보조하는 UI다.
 - 실제 화면 연결, PIE/Standalone 시각 확인과 수명주기 회귀 검증 전에는 “목표 안내 UI 완료”로 판정하지 않는다.
 
-자산 인수와 로드 검증을 완료하고 Commit `5a052c8`을 `origin/codex/navigation-arrows-migration`에 Push했다. `AST-02A`의 최소 이식·원격 공유는 완료했지만 main 병합과 실제 Host/Wrapper 화면 연결은 후속 작업이다. 이 작업은 `TUT-04`의 이전 평균·Best 결과 UI와 별개다.
+자산 인수와 로드 검증을 완료하고 Commit `5a052c8`을 기능 Branch에 Push한 뒤 Merge Commit `fb1d7ad`로 `origin/main`에도 반영했다. `AST-02A`의 최소 이식·main 공유는 완료했지만 실제 Host/Wrapper 화면 연결은 후속 작업이다. 이 작업은 `TUT-04`의 이전 평균·Best 결과 UI와 별개다.
 
 ## 10. Dataflow·Chaos 물리 환경 확장 (2026-08-26)
 

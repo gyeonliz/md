@@ -20,11 +20,11 @@
 | Git 사용자 이름 | 전역 `gyeonliz` 설정 확인 |
 | Git 사용자 이메일 | 전역 `jkw6483@gmail.com` 설정 확인 |
 | GitHub CLI | 설치되어 있지 않음 |
-| 기본 작업 루트 | `D:\JGY\project` |
-| Unreal 프로젝트 저장소 | 기준 경로 `D:\JGY\project\drone`; 로컬 `main`=`origin/main`=`551e287`, 기존 `Config/DefaultEditor.ini` 변경과 새 `Content/Drone/ThirdParty/DronePack` 154개가 미커밋 |
-| 문서 작업 저장소 | 현재 작업 경로 `D:\JGY\project\md`; 최신화 직전 로컬 `main`=`origin/main`=`466609d`, 작업 트리 Clean |
-| Commit·Push 처리 | TUT-03 `551e287`은 `origin/main`에 Push 완료. NavigationArrows `5a052c8`은 `origin/codex/navigation-arrows-migration`에 Push됐지만 main 미병합. 이번 문서 최신화는 로컬 미커밋이며 사용자가 Commit·Push |
-| 실행 상태 | 기준 `D:\JGY\project\drone\Drone.uproject` Editor PID 22936 실행 중. 추가로 실행된 중복 인스턴스 PID 2764는 정상 창 닫기로 종료 |
+| 이번 확인 PC 작업 루트 | Unreal `C:\URproject\drone`; 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
+| Unreal 프로젝트 저장소 | 로컬 `main`=`origin/main`=`fb1d7ad`; 작업 트리 Clean |
+| 문서 작업 저장소 | 이 갱신 전 로컬 `main`=`origin/main`=`8017286`; 작업 트리 Clean |
+| Commit·Push 처리 | 기존 `main`의 `5540c6b`를 보존하고 NavigationArrows `5a052c8`을 Merge Commit `fb1d7ad`로 `origin/main`에 Push 완료 |
+| 실행 상태 | 2026-08-26 13:11 KST 확인 시 `UnrealEditor`와 `UnrealEditor-Cmd` 실행 0 |
 | 별도 `droner` 주의 | `main=origin/main=551e287`; `Config/DefaultEditor.ini` 변경과 `Content/Asset` 10,928개·36,360,181,427 bytes 전체가 Untracked. 공급사 원본·스테이징 복사본이므로 일괄 Stage·Commit 금지 |
 
 GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도했으나 Windows Installer가 종료 코드 1602로 취소되어 설치되지 않았다. GitHub 웹과 Git Credential Manager만으로도 기본 Push/Clone 작업은 가능하다.
@@ -39,7 +39,7 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 D:\JGY\project\drone\Drone.uproject
 ```
 
-이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않았고, 현재 D 드라이브 프로젝트의 로컬·원격 main 기준 Commit은 `551e287e8a5de7fa33f28d1911f8a7a957bd66fa`이다.
+이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 2026-08-26 이번 확인 PC의 기준 프로젝트는 `C:\URproject\drone`이고 로컬·원격 main은 `fb1d7ad2c23d6bf3b1c854ca7c1c0cddba2062ef`로 일치한다.
 
 확인 결과:
 
@@ -248,10 +248,10 @@ PFN-06 Done
 - 제외: `Demo.umap`, `Demo_BuiltData`, `NavigationArrowExampleActor`, `ExampleMesh`, `TransparentCircle`
 - 의존성: 로드 실패 0, 외부 `/Game` 의존성 0, 원본 `/Game/NavigationArrows` 의존성 0
 - 검증: `DroneEditor Win64 Development` 성공, 전용 자동화 1/1, 전체 `Drone.` 15/15, Blueprint Compile 0 errors·0 Blueprint warnings·0 failed loads, Git LFS 속성 6/6과 `git lfs fsck` 통과
-- Git: Commit `5a052c8bab2eb0dd8bc9ab16cfc7b3784e8e4cd7`을 `origin/codex/navigation-arrows-migration`에 Push 완료. `main`은 `551e287`로 유지되어 아직 이 6개 자산을 포함하지 않음
+- Git: Commit `5a052c8bab2eb0dd8bc9ab16cfc7b3784e8e4cd7`을 기능 Branch에 Push한 뒤 Merge Commit `fb1d7ad2c23d6bf3b1c854ca7c1c0cddba2062ef`로 `origin/main`에 반영 완료
 - 적용 범위: 안전한 ThirdParty 인수까지만 완료. Training Map/HUD의 실제 화면 표시와 프로젝트 소유 Host/Wrapper는 다음 단계
 
-`AST-02A`의 최소 이식·검증·원격 기능 Branch 공유는 완료했다. 실제 화면 Host/Wrapper와 main 반영은 미구현이다. `AST-01`의 실제 스피커 Loop 단일 재생·종료 정지는 계속 미확인이므로 Doing이다. 다음 기능 카드는 계속 `TUT-04`이며 NavigationArrows 화면 연결과 섞어 완료 처리하지 않는다.
+`AST-02A`의 최소 이식·검증·`main` 원격 공유는 완료했다. 실제 화면 Host/Wrapper는 아직 미구현이다. `AST-01`의 실제 스피커 Loop 단일 재생·종료 정지는 계속 미확인이므로 Doing이다. 다음 기능 카드는 계속 `TUT-04`이며 NavigationArrows 화면 연결과 섞어 완료 처리하지 않는다.
 
 ## 2026-08-26 Dataflow·Chaos 물리 환경 후보
 
