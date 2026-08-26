@@ -31,7 +31,7 @@ Spawn
 확인된 현재 상태는 다음과 같다.
 
 - 작업컴 기본 작업 루트: `D:\JGY\project`
-- UE 5.8.1 프로젝트: 이번 확인 PC 작업 경로 `C:\URproject\drone`; `main=origin/main=204e34b`
+- UE 5.8.1 프로젝트: 이번 확인 PC 작업 경로 `C:\URproject\drone`; `main=origin/main=55b3ffe`
 - 문서 저장소: 현재 작업 경로 `D:\JGY\project\md`; 최신화 직전 로컬 `main=origin/main=466609d`이며 이후 상태는 [`STATUS.md`](../STATUS.md)를 따른다.
 - 별도 `ADronePrototypePawn`과 `ADronePrototypeGameMode` C++ 구현 완료
 - 컴포넌트 기본값과 standalone Spawn/Possess 자동화 테스트 완료
@@ -43,7 +43,7 @@ Spawn
 
 `HUD-01` Telemetry Snapshot과 `HUD-02` C++ HUD 기능·실제 WBP 표시를 완료했다. 이어서 `TUT-01` Training Map과 비충돌 Spline도 완료했다. 별도 Map의 실제 `BP_DroneTrainingCourse`가 수정 가능한 Spline과 Runtime SplineMesh 안내선을 제공하며, 프로젝트 소유 불투명·Unlit·Emissive `M_DroneTrainingGuide`를 사용한다. Course Actor, Spline과 표시선은 Collision·Overlap·Physics·Navigation 영향을 모두 끈다. TUT-01 당시 전체 `Drone` 자동화 10/10, Tutorial 3/3, Blueprint Compile 오류·경고 0/0과 Standalone 안내선 표시를 확인했다.
 
-`TUT-02`에서는 실제 `BP_DroneTrainingGate` 4개, Course의 명시적 Gate 순서와 정방향 통과 판정을 구현했다. 이어진 `TUT-03`에서는 정상 Gate Event만 구독하는 Course 소유 Recorder를 추가해 Segment/Lap 시간, 실제 3차원 이동 거리와 평균 속도 원본을 기록한다. 환경 이식 기준에서도 전체 `Drone.` 자동화 15/15, Blueprint Compile Errors/Warnings/Load Failures 0/0/0을 통과했다.
+`TUT-02`에서는 실제 `BP_DroneTrainingGate` 4개, Course의 명시적 Gate 순서와 정방향 통과 판정을 구현했다. 이어진 `TUT-03`에서는 정상 Gate Event만 구독하는 Course 소유 Recorder를 추가해 Segment/Lap 시간, 실제 3차원 이동 거리와 평균 속도 원본을 기록한다. `TUT-04B`는 이전 성공 평균·Best·Delta 결과까지 추가했고 현재 main에서 전체 `Drone.` 자동화 16/16과 Blueprint 오류 0을 통과했다.
 
 현재 실행 카드는 `TUT-04 이전 기록 비교·Best·결과 UI`다. 비교 규칙과 표시 형식은 구현 전에 확정하며, 현재 C++·BP·Editor 책임과 사용자 수동 확인법은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
 

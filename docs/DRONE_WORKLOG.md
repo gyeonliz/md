@@ -1,6 +1,6 @@
 # Drone 개발 진행 기록
 
-기준일: 2026-08-26 (Asia/Seoul)
+기준일: 2026-08-27 (Asia/Seoul)
 
 이 문서는 Drone 개발의 **진행 이력**을 시간순으로 남긴다. 가장 최신의 현재 상태는 [`../WORKBOARD.md`](../WORKBOARD.md), 확정 구현 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)를 따른다.
 
@@ -18,20 +18,35 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-26 19:46 KST — 기본 Map 정리 범위 교정·환경 맵 3종 기술 이식
+마지막 갱신: 2026-08-27 — 남은 제공 에셋 선별 이식·OilRig 중앙 맵·TUT-04B 비교 결과 구현
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | 3단계 Tutorial Vertical Slice — `TUT-03` 완료, `TUT-04A` 자동 검증·PIE 초기 화면 통과, 한 Lap 확인 대기 |
-| Unreal 기준선 | `main=origin/main=204e34b`, `DroneEditor Win64 Development` Build 성공 |
-| 자동 검증 | 전체 `Drone.` `15/15`, Blueprint Compile `0 errors / 0 warnings / 0 load failures`, 환경 의존성 누락 0, LFS fsck 정상 |
+| 전체 단계 | 3단계 Tutorial Vertical Slice — `TUT-04B` 이전 평균·Best 계산과 HUD 구현, 실제 두 Lap 확인 대기 |
+| Unreal 기준선 | `main=origin/main=55b3ffe`, `DroneEditor Win64 Development` Build 성공 |
+| 자동 검증 | 전체 `Drone.` `16/16`, Blueprint Compile 오류 0, 새 자산 외부·누락 의존성 0 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | 환경 이식·LFS 원격 반영 완료. 기술 검증 뒤 환경 맵 시각 검토·`TUT-04A` 한 Lap 확인 대기 |
-| 차단 조건 | 기능 코드의 기술 차단은 없음. 자동 UI 제어로 지속 비행을 재현하지 못해 사람이 Gate 0→3 한 바퀴를 비행해야 함 |
-| 다음 행동 | 실제 한 Lap 뒤 방금 구간·완료 구간 속도/거리/시간 갱신을 확인하고 결과 기록 |
-| 다음 기능 | TUT-04A 한 Lap 수동 확인 후 이전 평균·Best `+/-` 비교를 `TUT-04B`로 구현 |
+| 지금 작업 중 | 892개 자산·맵 선별 이식, TUT-04B, LFS Push 완료. Editor 수동 확인 대기 |
+| 차단 조건 | 기능 코드의 기술 차단은 없음. OilRig 별도 Map Check가 장시간 완료되지 않아 Editor 수동 Map Check가 필요 |
+| 다음 행동 | OilRig 화면·Map Check와 Training 두 Lap 비교 HUD를 실제 Editor에서 확인 |
+| 다음 기능 | 수동 확인 뒤 NavigationArrows Host/Wrapper 또는 Flight 상태 카드 |
 | 이후 | Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming |
-| Git 처리 | 비맵 복구 `909f6a3`, 환경 이식 `f8c8fb2`, main 병합 `204e34b` Push 완료. LFS 2,785개·약 18GB 업로드 성공 |
+| Git 처리 | 기능 Commit `3fa4444`, main Merge `55b3ffe`. 신규 LFS 892개·4.9GB Push 완료 |
+
+## 2026-08-27 — 남은 에셋 선별 이식·OilRig·TUT-04B
+
+- `ArmyVFX`, `InfantrySFX`, `GC_DroneS`, `Modular Soldier`, `Modular Insurgents`, Non-Pilot Quad v4, PBR Sting과 OilRig을 별도 UE 5.8 스테이징에서 검사했다.
+- 실제 프로젝트에는 ThirdParty 891개와 중앙 `Lvl_OilRig` 1개만 이식했다.
+- Ground Drone의 구형 PhysX 차량 Blueprint는 제외했고, Soldier/Insurgent는 외형 후보로만 이식했다.
+- OilRig에서 FirstPerson 샘플 의존성을 끌어오던 `BP_Simple_Door` Actor 8개를 중앙 사본에서 제거했다.
+- 새 7개 Root 수량 일치, 대표 로드 성공, 외부·누락 `/Game` 참조 0, OilRig `default_game_mode=None`을 확인했다.
+- OilRig 별도 Map Check는 약 8분간 맵 Construction이 끝나지 않아 저장 없이 프로세스만 중단했다. Editor 시각·성능·Map Check는 미확인이다.
+- `FDroneTrainingLapComparison`, Segment 비교, 이전 평균·Best·Delta와 `OnLapComparisonReady`를 추가했다.
+- HUD에 이전 완주 평균, Best, 시간·속도 Delta 네 행을 추가했다.
+- Build 성공, Blueprint 오류 0, 전체 `Drone.` 16/16 성공했다.
+- 기능 Commit `3fa4444`을 `codex/remaining-asset-migration`에 Push하고 Merge Commit `55b3ffe`로 `origin/main`에 반영했다.
+- 신규 Unreal 패키지 892개는 모두 LFS Pointer로 커밋됐고 4.9GB 업로드 및 `git lfs fsck`를 통과했다.
+- 상세 범위와 수동 확인은 [`DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md)를 따른다.
 
 ## 2026-08-21 — Camera·Mouse·Gamepad 기준선 갱신
 

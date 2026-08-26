@@ -14,10 +14,10 @@ HUD-02     Done, WBP/BP 실제 연결 · 전체 자동화 7/7
 TUT-01     Done, Training Map · 비충돌 Cyan Spline
 TUT-02     Done, Gate · 명시적 순서 · 정방향 판정
 TUT-03     Done, Segment/Lap 시간 · 실제 이동 거리 · 평균 속도 원본 기록
-TUT-04     Next, 이전 기록 비교 · Best · 결과 UI
+TUT-04B    Implemented, 자동 검증 Pass · 실제 두 Lap 확인 대기
 ```
 
-현재 Source 기준은 `main=origin/main=204e34b`이다. 전체 `Drone.` 자동화 15/15, Blueprint Compile Errors/Warnings/Load Failures 0/0/0을 통과했다. 결과 UI는 아직 TUT-04 범위이므로 화면에 Lap 수치가 나타나지 않는 것이 정상이다. 현재 구조와 사용자 수동 확인 절차는 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
+현재 main 기준은 `55b3ffe`이며 전체 `Drone.` 자동화 16/16과 Blueprint 오류 0을 통과했다. TUT-04B 결과 HUD가 추가됐으므로 두 번 완주해 첫 기준과 이전 평균·Best·Delta 표시를 확인한다. 현재 구조와 사용자 수동 확인 절차는 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
 
 2026-08-19 사전 PIE 두 번에서 Prototype 입력 계열이 실제로 반응하는 것은 확인했다. 그러나 어느 실행도 한 번의 새 PIE 안에서 전체 체크리스트를 끝내지 못했으므로 Pass로 계산하지 않는다. 두 실행은 이미 종료된 역사적 부분 확인이며 현재 열린 PIE가 있다는 뜻이 아니다.
 

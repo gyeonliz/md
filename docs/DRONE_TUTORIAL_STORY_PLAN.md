@@ -1,6 +1,6 @@
 # Drone Tutorial·Story 구현 계획
 
-기준일: 2026-08-23 (Asia/Seoul)
+기준일: 2026-08-27 (Asia/Seoul)
 
 ## 1. 목표와 우선순위
 
@@ -82,7 +82,7 @@ Widget에서 매 프레임 Pawn을 검색하거나 Property Binding으로 계산
 - `TUT-01` 완료: Training Map, 수정 가능한 Spline, Runtime 안내선과 비충돌·비탐색 안전 설정
 - `TUT-02` 완료: Gate 목록, Gate Actor와 Trigger, 순서·정방향·중복 통과 판정과 시각 상태
 - `TUT-03` 완료: Segment/Lap World Game Time, 실제 3차원 이동 거리와 평균 속도 원본 기록
-- `TUT-04` 다음 활성 카드: 이전 성공 평균·Best 비교 규칙과 결과 UI
+- `TUT-04B` 기술 구현 완료: 이전 성공 평균·Best·Segment 비교와 HUD 결과 행. 실제 두 Lap 수동 확인 대기
 
 구매 에셋은 이 Vertical Slice의 선행 조건이 아니다. 현재는 Engine 기본 도형과 프로젝트 소유 Material로 기능을 검증하며, Android는 범위에서 제외한다.
 
@@ -119,13 +119,16 @@ TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경
 
 완료 원본은 첫 Vertical Slice에서 현재 실행 동안만 유지한다. `USaveGame` 영속화, 비교, Best와 표시 문자열은 이 카드에 포함하지 않는다.
 
-### TUT-04 — 이전 기록 비교와 결과 UI (미구현·다음 카드)
+### TUT-04 — 이전 기록 비교와 결과 UI (기술 구현 완료·수동 확인 대기)
 
 - 첫 성공 시도에는 `기준 기록 생성 중`을 표시한다.
 - 두 번째 시도부터 현재 결과를 **현재 시도를 제외한 이전 성공 기록 평균**과 비교한다.
 - Time Delta는 음수면 빠름, 양수면 느림으로 표시한다.
 - Speed Delta는 양수면 빠름, 음수면 느림으로 표시한다.
 - Best Lap과 Best Segment는 평균 기록과 별도로 보존한다.
+- `FDroneTrainingLapComparison`과 `FDroneTrainingSegmentComparison`을 Recorder가 생성하고 `OnLapComparisonReady`로 Blueprint에 전달한다.
+- HUD는 이전 완주 평균, Best, 시간 Delta, 속도 Delta를 표시하며 비교 계산을 다시 구현하지 않는다.
+- 현재 실행 중 History만 사용한다. `USaveGame`은 아직 미구현이다.
 
 표시 예시는 다음과 같다.
 
@@ -211,9 +214,9 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 | AST-00 | 제공 에셋 인수 감사 | ZIP 14개와 해제본의 상대 경로·크기 일치 및 팩별 호환성·이식 위험 기록 |
 | AST-01 | 제공 Drone 에셋 선별 적용 | UE 5.8 스테이징 검증 후 기능 코드 변경 없이 Integration BP에서 외형 교체 |
 
-현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`, `TUT-03`을 완료했다. TUT-03은 Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료와 World Game Time·Telemetry 위치 표본 기반 실제 거리·평균 속도 원본 기록을 포함한다. 2026-08-26 병합 main에서 Editor Build, 전체 `Drone.` 15/15, Blueprint Compile 0 errors·0 warnings·0 load failures를 통과했다. Unreal 저장소 로컬 `main`과 `origin/main`의 현재 기준선은 환경 이식을 포함한 `204e34b`이다.
+현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`, `TUT-03`과 `TUT-04B` 기술 구현을 완료했다. TUT-03은 Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료와 World Game Time·Telemetry 위치 표본 기반 실제 거리·평균 속도 원본 기록을 포함한다. `55b3ffe` main에서 Editor Build, 전체 `Drone.` 16/16, Blueprint 오류 0을 통과했다. 실제 두 Lap의 표시 판정은 남아 있다.
 
-다음 활성 카드는 `TUT-04`다. 이전 성공 평균·Best의 정확한 집계 규칙과 결과 UI는 현재 미구현이며, TUT-03의 성공 원본 History를 입력으로 사용한다.
+TUT-04B의 이전 성공 평균·Best 집계와 HUD 결과 행은 구현·자동 검증됐고 실제 두 Lap 수동 확인이 남았다. 수동 확인 뒤 다음 기능 카드는 Flight 상태 또는 NavigationArrows Host/Wrapper다.
 
 ## 8. 검증 게이트
 

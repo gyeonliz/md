@@ -1,6 +1,6 @@
 # Drone Unreal 프로젝트 읽기 전용 감사
 
-> 이 문서는 2026-08-19 Prototype 구현 전의 읽기 전용 스냅샷이다. 당시 감사 경로는 `C:\project\Drone`이었다. 현재 기준은 `C:\URproject\drone`, `main=origin/main=204e34b`이며 이후 구현은 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md), 현재 폴더 구조는 [`DRONE_CONTENT_FOLDER_GUIDE.md`](DRONE_CONTENT_FOLDER_GUIDE.md)를 따른다. 아래의 “현재” 표현은 모두 감사 당시 상태를 뜻한다.
+> 이 문서는 2026-08-19 Prototype 구현 전의 읽기 전용 스냅샷이다. 당시 감사 경로는 `C:\project\Drone`이었다. 현재 기준은 `C:\URproject\drone`, `main=origin/main=55b3ffe`이며 이후 구현은 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md), 현재 폴더 구조는 [`DRONE_CONTENT_FOLDER_GUIDE.md`](DRONE_CONTENT_FOLDER_GUIDE.md)를 따른다. 아래의 “현재” 표현은 모두 감사 당시 상태를 뜻한다.
 
 ## 1. 감사 범위와 안전 기준
 

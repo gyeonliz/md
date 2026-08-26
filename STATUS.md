@@ -1,6 +1,6 @@
 # 현재 작업 상태
 
-기준일: 2026-08-26 (Asia/Seoul)
+기준일: 2026-08-27 (Asia/Seoul)
 
 이 문서는 PC별로 명령으로 확인된 상태와 사용자가 아직 결정하지 않은 항목을 분리한다. 작업컴 기록과 이번 확인 PC의 결과를 같은 항목에서 섞지 않고 경로와 검증 시점을 함께 적는다.
 
@@ -21,10 +21,10 @@
 | Git 사용자 이메일 | 전역 `jkw6483@gmail.com` 설정 확인 |
 | GitHub CLI | 설치되어 있지 않음 |
 | 이번 확인 PC 작업 루트 | Unreal `C:\URproject\drone`; 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
-| Unreal 프로젝트 저장소 | 로컬 `main`=`origin/main`=`204e34b`; 작업 트리 Clean |
-| 문서 작업 저장소 | 이 갱신 전 로컬 `main`=`origin/main`=`58f2a08`; 이 문서 갱신도 Commit·Push 후 로컬·원격 일치 상태로 마감 |
-| Commit·Push 처리 | 비맵 복구 `909f6a3`, 환경 이식 `f8c8fb2`를 Merge Commit `204e34b`로 `origin/main`에 Push 완료. LFS 2,785개·약 18GB 업로드 성공 |
-| 실행 상태 | 2026-08-26 19:46 KST 확인 시 `UnrealEditor`와 `UnrealEditor-Cmd` 실행 0 |
+| Unreal 프로젝트 저장소 | `main`=`origin/main`=`55b3ffe`; 선별 자산·TUT-04B 기능 Commit `3fa4444`을 Merge하고 Push 완료 |
+| 문서 작업 저장소 | 이 갱신을 기능 Branch와 `main`에 Commit·Push하고 로컬·원격 일치 상태로 마감 |
+| Commit·Push 처리 | 기존 환경 LFS 2,785개·약 18GB에 이어 이번 자산 892개·4.9GB를 LFS Push 완료. 최종 Merge Commit `55b3ffe` |
+| 실행 상태 | 2026-08-27 06:55 KST 확인 시 `UnrealEditor`와 `UnrealEditor-Cmd` 실행 0 |
 | 별도 `droner` 주의 | `main=origin/main=551e287`; `Config/DefaultEditor.ini` 변경과 `Content/Asset` 10,928개·36,360,181,427 bytes 전체가 Untracked. 공급사 원본·스테이징 복사본이므로 일괄 Stage·Commit 금지 |
 
 GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도했으나 Windows Installer가 종료 코드 1602로 취소되어 설치되지 않았다. GitHub 웹과 Git Credential Manager만으로도 기본 Push/Clone 작업은 가능하다.
@@ -39,7 +39,7 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 D:\JGY\project\drone\Drone.uproject
 ```
 
-이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 2026-08-26 이번 확인 PC의 기준 프로젝트는 `C:\URproject\drone`이고 로컬·원격 main은 `204e34b`로 일치한다.
+이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 이번 확인 PC의 기준 프로젝트는 `C:\URproject\drone`이고 로컬·원격 main은 `55b3ffe`로 일치한다.
 
 확인 결과:
 
@@ -50,7 +50,7 @@ D:\JGY\project\drone\Drone.uproject
 - 시작 시 Git 저장소가 아니었음
 - 작업 시작 시 Content에는 `.uasset` 749개와 `.umap` 4개가 있었음
 
-초기에는 Third Person 기본 맵과 전역 기본 GameMode를 유지한 채 Git 준비, Android 제외 설정, 별도 Drone Prototype Source를 적용했다. 이후 시작 맵을 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode를 프로젝트 소유 `BP_DronePrototypeGameMode`로 바꿨다. 현재 `204e34b`에서는 Unreal 생성 기본 Map 4개만 제거하고 Template 비맵 자산은 복구한 상태다.
+초기에는 Third Person 기본 맵과 전역 기본 GameMode를 유지한 채 Git 준비, Android 제외 설정, 별도 Drone Prototype Source를 적용했다. 이후 시작 맵을 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode를 프로젝트 소유 `BP_DronePrototypeGameMode`로 바꿨다. 현재 `55b3ffe`에서는 Unreal 생성 기본 Map 4개만 제거하고 Template 비맵 자산은 복구한 상태다.
 
 - `main` Branch의 로컬 Git 저장소 초기화
 - 프로젝트 로컬 Git LFS 초기화
@@ -78,7 +78,9 @@ D:\JGY\project\drone\Drone.uproject
 
 첫 Commit은 863개 파일이며 `Content`는 761개로 `.uasset` 756개와 `.umap` 5개다. 가장 큰 파일은 약 21.0 MB이고 100 MB를 넘는 파일은 없다. 새 Prototype `.uasset`과 `.umap`을 포함한 Unreal Asset에는 Git LFS의 filter·diff·merge 속성이 적용된다. WBP·BP Controller·TUT-01 Asset에 이어 TUT-02의 신규 `BP_DroneTrainingGate`와 갱신한 `Lvl_DroneTraining` 두 Asset도 Git LFS로 Push했다.
 
-현재 구현된 Drone 기능 기준선은 Prototype Pawn/GameMode, Move·Altitude·Yaw·Camera 입력, Telemetry Snapshot, 실제 Flight HUD, TUT-01 Training Map·비충돌 Spline, TUT-02 Ordered Ring Gate와 TUT-03 Segment/Lap 원본 기록까지다. `ADroneTrainingGate`는 비충돌 Ring Visual과 별도 Pawn Overlap Trigger를 분리하고, `UDroneTrainingGateSequenceComponent`는 순서·정방향·중복 통과를 판정한다. Course 소유 `UDroneTrainingLapRecorderComponent`는 정상 Gate Event와 기존 Telemetry 10Hz 위치 표본으로 World Game Time, 실제 3차원 이동 거리와 평균 속도를 기록한다. 이전 평균·Best 비교와 결과 UI는 아직 TUT-04 범위다. Take Off, Landing, Crash/실패, Mission, Enemy AI, MG 점유·공격, Evaluation도 아직 구현된 것으로 판정하지 않는다. 이전 기준 Commit `fb891fb`의 잘못된 `//test` 주석은 이력 재작성 없이 `2c38ebf`에서 제거했다.
+현재 main에는 Prototype Pawn/GameMode, 입력, Telemetry, Flight HUD, TUT-01 Course, TUT-02 Ordered Ring Gate, TUT-03 Segment/Lap 원본과 TUT-04B 이전 평균·Best·Delta 결과가 있다. `UDroneTrainingLapRecorderComponent`는 현재 완료 Lap을 History에 넣기 전에 비교해 자기 자신이 이전 평균에 섞이지 않게 한다. 결과는 `OnLapComparisonReady`와 HUD 네 행으로 노출된다. 자동 검증은 16/16이지만 실제 두 Lap 화면은 미확인이다. Take Off, Landing, Crash/실패, Mission, Enemy AI, MG 점유·공격, Evaluation은 아직 구현된 것으로 판정하지 않는다.
+
+2026-08-27에는 `C:\에셋`에서 ArmyVFX·InfantrySFX·Ground Drone/MG 외형·Modular Soldier/Insurgent 외형·Quad v4·PBR Sting과 OilRig을 선별 이식했다. ThirdParty 891개와 중앙 `Lvl_OilRig` 1개이며 새 Root 수량 일치, 대표 로드, 외부·누락 참조 0을 확인했다. OilRig 명령줄 Map Check는 장시간 완료되지 않아 Editor 수동 확인이 남았다. 상세 내용은 [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md)를 따른다.
 
 사용자는 이 프로젝트에서 Android를 사용하지 않는다고 확정했다. 이에 따라 `Config/DefaultEngine.ini`의 Android File Server Plugin과 네트워크 연결을 끄고 `SecurityToken` 할당을 비웠다. 검사 결과 활성 Plugin 0, 네트워크 허용 0, 비어 있지 않은 토큰 0이다. 기존 토큰 값은 이 문서나 로그에 기록하지 않았다. 향후 Android File Server를 다시 켤 경우 빈 토큰은 인증 없는 상태가 될 수 있으므로 보안 설정을 새로 검토해야 한다.
 
@@ -204,9 +206,9 @@ C:\Users\jkw11\Documents\Codex\2026-08-12\c-project-factoryenvironmentcollect\wo
 ## 다음 단계
 
 1. 사용자가 실제 Training Map에서 Gate 0→3 한 Lap과 Drone Loop 단일 재생·종료 정지를 수동 확인
-2. `TUT-04` 이전 평균·Best 비교 규칙을 확정하고 결과 UI와 Tutorial 회귀 구현
+2. `TUT-04B` 첫 기준·이전 평균·Best·Delta를 두 번 완주해 실제 HUD에서 확인
 3. 그 다음 Flight 상태, Operator↔Drone, NPC·Mission UI, Jamming Story 순으로 진행
-4. 병행 과제로 다른 PC에서 `551e287` Pull, LFS/UE 5.8.1 실행과 문서 Pull 확인
+4. 병행 과제로 다른 PC에서 `55b3ffe` Pull, LFS/UE 5.8.1 실행과 문서 Pull 확인
 5. 정보처리산업기사는 Q-Net 개인 접수·수험일·필기면제 상태를 확인해 Track A/B/C를 선택하고, 코딩테스트는 주간 반복으로 병행
 
 Camera·Mouse·Gamepad 역할은 v1 조작으로 확정했다. Keyboard·Mouse 체감은 현재 시험값으로 통과했으며 실제 Gamepad 체감, 최종 물리와 최종 감도 조정은 이후 별도 카드로 남긴다. 구매 소스와 최종 Mesh는 선행 조건이 아니며 상세 계획은 [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)를 따른다. 이동 중 볼 통합 요약과 날짜별 학습안은 [`docs/MOBILE_CURRENT_BRIEF.md`](docs/MOBILE_CURRENT_BRIEF.md)를 따른다.
@@ -251,7 +253,7 @@ PFN-06 Done
 - Git: Commit `5a052c8bab2eb0dd8bc9ab16cfc7b3784e8e4cd7`을 기능 Branch에 Push한 뒤 Merge Commit `fb1d7ad2c23d6bf3b1c854ca7c1c0cddba2062ef`로 `origin/main`에 반영 완료
 - 적용 범위: 안전한 ThirdParty 인수까지만 완료. Training Map/HUD의 실제 화면 표시와 프로젝트 소유 Host/Wrapper는 다음 단계
 
-`AST-02A`의 최소 이식·검증·`main` 원격 공유는 완료했다. 실제 화면 Host/Wrapper는 아직 미구현이다. `AST-01`의 실제 스피커 Loop 단일 재생·종료 정지는 계속 미확인이므로 Doing이다. 다음 기능 카드는 계속 `TUT-04`이며 NavigationArrows 화면 연결과 섞어 완료 처리하지 않는다.
+`AST-02A`의 최소 이식·검증·`main` 원격 공유는 완료했다. 실제 화면 Host/Wrapper는 아직 미구현이다. `AST-01`의 실제 스피커 Loop 단일 재생·종료 정지는 계속 미확인이므로 Doing이다. `TUT-04B` 기술 구현은 완료됐고 실제 두 Lap 표시 확인 뒤 Flight 상태 또는 NavigationArrows 화면 연결을 별도 카드로 진행한다.
 
 ## 2026-08-26 TUT-04A PIE 초기 화면 확인
 

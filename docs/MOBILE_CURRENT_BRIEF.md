@@ -1,17 +1,17 @@
 # 이동 중 읽는 Drone 현황·내 작업·학습 일정
 
-기준일: 2026-08-26 (Asia/Seoul)
+기준일: 2026-08-27 (Asia/Seoul)
 
 이 문서는 휴대폰으로 현재 상태와 다음 행동을 빠르게 확인하기 위한 요약본이다. 코드의 상세 설명은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md), 학습 기록 양식은 [`STUDY_PLANS.md`](STUDY_PLANS.md)를 따른다.
 
 ## 30초 요약
 
-- Unreal 저장소는 `main=origin/main=204e34b`다. 복구 `909f6a3`, 환경 이식 `f8c8fb2`가 병합됐다.
-- Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개와 Segment/Lap 원본 기록까지 구현됐다.
-- 현재 개발 완료 지점은 `TUT-03`, 다음 구현 카드는 `TUT-04 비교·결과 UI`다.
+- Unreal 저장소는 `main=origin/main=55b3ffe`다. 남은 자산·TUT-04B 기능 Commit `3fa4444`이 병합됐다.
+- Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개, Segment/Lap 원본과 이전 평균·Best·Delta 결과까지 구현됐다.
+- 현재 개발 완료 지점은 `TUT-04B` 기술 구현이며, 실제 두 Lap HUD 확인 뒤 Flight 상태로 진행한다.
 - 이번 확인 PC의 제공 에셋 루트는 `C:\에셋`이다. FPV·Loop 선택 자산 12개와 프로젝트 Integration BP 1개의 파일·참조·LFS·자동 검증은 통과했다.
 - NavigationArrows 최소 자산 6개와 전용 테스트는 main에 병합됐다. 화면 Host는 아직 미구현이다.
-- 프로젝트 사용 맵은 `/Game/Drone/Maps`로 중앙화했다. 기본 Template Map 4개만 제거했고 비맵 자산 62개는 복구했다. 환경 맵 3종의 기술 이식도 완료했다.
+- 프로젝트 사용 맵은 `/Game/Drone/Maps`로 중앙화했다. 환경 맵 3종에 `Lvl_OilRig`을 추가했고, 남은 제공 자산 891개를 후보 라이브러리로 선별 이식했다.
 - 사용자는 Gate나 기록 C++를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도와 Drone Loop를 확인하면 된다.
 - 확정된 학습 항목은 `정보처리산업기사`와 `C++ 코딩테스트` 두 가지뿐이다.
 - 정보처리산업기사 2026년 3회 필기 접수는 끝났다. 오늘 가장 먼저 Q-Net에서 자신의 접수·면제·응시 상태를 확인해야 한다.
@@ -22,17 +22,17 @@
 | 구분 | 현재 상태 |
 |---|---|
 | Unreal 저장소 | `C:\URproject\drone` |
-| Unreal 기준 Commit | `204e34b` |
-| Git 상태 | 깨끗한 `main`, 로컬·원격 일치. 환경 LFS 약 18GB Push 완료 |
+| Unreal 기준 Commit | `55b3ffe` |
+| Git 상태 | 깨끗한 `main`, 로컬·원격 일치. 이번 신규 LFS 892개·4.9GB Push 완료 |
 | Git LFS | `fsck` 정상 |
 | 최종 Editor Build | 성공 |
-| Tutorial 자동화 | 6/6 통과 |
-| 전체 `Drone.` 자동화 | 15/15 통과 |
-| Blueprint Compile | Errors 0, Warnings 0, Load Failures 0 |
+| Tutorial 자동화 | 7/7 통과 |
+| 전체 `Drone.` 자동화 | 16/16 통과 |
+| Blueprint Compile | Errors 0, 기존 Battlefield Pose GUID·MCP 고지 경고 유지 |
 | Standalone | 실제 WBP HUD·Cyan Course·Current/Inactive Gate 표시 확인 |
-| 에셋 이식 | FPV 기준 유지. 환경 3종 누락 의존성 0·허용 외 경로 0, 중앙 Map 실제 로드, LFS fsck 통과 |
+| 에셋 이식 | 환경 3종+OilRig와 후보 라이브러리 891개. 새 Root 수량 일치·대표 로드·외부/누락 0, LFS fsck 통과 |
 
-환경 이식 기준에서 Editor Build, 전체 Drone 15개와 Blueprint 전체 Compile을 다시 실행했다. 자동화 15/15는 성공했고 기존 PIE NavMesh 경고 포함 성공 1개가 있다. Blueprint 자체 Compile은 0/0/0이다.
+현재 main에서 Editor Build, 전체 Drone 16개와 Blueprint 전체 Compile을 다시 실행했다. 자동화 16/16은 성공했고 기존 PIE NavMesh 경고 포함 성공 1개가 있다. Blueprint 오류는 0이다.
 
 ## 2. 코드가 어떻게 연결되는가
 
@@ -57,7 +57,8 @@ Lvl_DroneTraining
 │  │  └─ 순서·정방향·중복 통과·색 상태 판정
 │  └─ UDroneTrainingLapRecorderComponent
 │     ├─ Gate 0 시작 → Gate별 Segment → 마지막 Gate Lap 완료
-│     └─ World Time·Telemetry 위치로 실제 거리·평균속도 기록
+│     ├─ World Time·Telemetry 위치로 실제 거리·평균속도 기록
+│     └─ 이전 성공 평균·Best·시간/속도 Delta 비교
 │
 └─ ADroneTrainingGate × 4
    ├─ Pawn Overlap Box Trigger
@@ -84,7 +85,7 @@ Lvl_DroneTraining
 - Gate Actor의 로컬 `+X`가 유일한 정방향이다.
 - `OrderedGates` 배열 위치가 통과 순서의 단일 기준이며 `GateIndex`는 `0, 1, 2, 3`이다.
 - BP Event Graph에 Gate 판정 로직을 다시 만들 필요가 없다.
-- TUT-04 UI는 Recorder의 `OnLapStarted`, `OnSegmentRecorded`, `OnLapCompleted`와 Getter를 사용하며 계산을 BP에 중복 작성하지 않는다.
+- TUT-04B UI는 Recorder의 `OnLapComparisonReady`와 Getter를 사용하며 계산을 BP에 중복 작성하지 않는다.
 
 ### 현재 UI 상태
 
@@ -93,12 +94,13 @@ Lvl_DroneTraining
 - 실제 Blueprint Widget `WBP_DroneFlightHUD`
 - Speed, Altitude, Vertical Speed, Heading 표시
 - Gate Ring의 `Inactive`, `Current`, `Completed` 색 전환
+- 최근/완료 Segment 통계와 이전 완주 평균·Best·시간/속도 Delta 표시
 
 아직 없음:
 
 - 다음 Gate 번호·화살표
 - Wrong Order·Wrong Direction 메시지
-- Lap/Segment 실시간 표시·이전 평균·Best 표시
+- 현재 Lap/Segment 실시간 타이머와 구간별 결과 표
 - 완주 팝업·결과·평가 화면
 
 ## 3. 구현된 것과 아직 남은 것
@@ -117,12 +119,12 @@ Lvl_DroneTraining
 - Gate 0 시작, Gate별 Segment와 마지막 Gate Lap 완료 원본 기록
 - World Game Time·Telemetry 10Hz 3차원 위치 기반 실제 이동 거리·평균 속도
 - Reset 시 부분 기록 폐기, 성공 History 유지, Course 재구성 시 History 초기화
-- 후속 결과 UI가 구독할 Blueprint Event와 Getter
+- 현재 기록을 제외한 이전 성공 평균·Best·시간/속도 Delta와 Segment 비교
+- 결과 UI가 구독할 `OnLapComparisonReady`와 Getter
 
 ### 미구현
 
-- 이전 성공 평균·Best 비교 계산
-- Gate 진행·실패·Segment/Lap 결과 UI
+- 다음 Gate·잘못된 순서/방향 안내와 완주 팝업·구간별 결과 표
 - 명시적인 Take Off·Landing·Crash 상태와 최종 비행 물리
 - Mission·귀환·평가
 - Drone Enemy AI·MG Turret 점유·공격
@@ -150,15 +152,16 @@ Lvl_DroneTraining
 ### PC 앞에서 할 일
 
 1. 다른 PC라면 `drone`과 `md` 저장소를 Pull한다.
-2. Unreal Commit이 환경 이식 기준인지, `git lfs pull` 뒤 세 환경 Map과 공급사 Root가 내려왔는지 확인한다.
+2. Unreal Commit이 `55b3ffe`인지, `git lfs pull` 뒤 네 환경 Map과 신규 ThirdParty Root가 내려왔는지 확인한다.
 3. UE 5.8.1에서 `/Game/Drone/Maps/Lvl_DroneTraining`을 직접 연다.
 4. Gate 0→1→2→3을 정방향으로 완주한다.
 5. 미래 Gate를 먼저 통과하거나 현재 Gate를 역방향으로 통과해 진행되지 않는지 확인한다.
 6. 마지막 Gate 뒤 네 Gate가 모두 Completed 색인지 확인한다.
-7. 현재 화면에 Lap 결과 UI가 없는 것이 정상임을 확인한다. 계산 원본을 포함한 현재 전체 자동화는 15/15다.
-8. Gate 크기·높이·간격·색 대비와 Keyboard/Gamepad 조종 체감을 메모한다.
-9. FPV Body와 Rotor 4개의 크기·방향·Camera 가림이 정상인지 확인한다.
-10. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가고 종료 후 즉시 멈추는지 기록한다.
+7. 두 번 완주해 첫 시도 `기준 기록 생성`, 두 번째 시도 이전 평균·Best·Delta 부호를 확인한다.
+8. `Lvl_OilRig`을 열어 Map Check와 재질·조명·스케일·충돌·성능을 기록한다.
+9. Ground Drone/MG·Soldier/Insurgent·Quad v4/Sting 후보의 외형과 스케일을 확인한다.
+10. Gate 크기·높이·간격·색 대비와 Keyboard/Gamepad 조종 체감을 메모한다.
+11. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가고 종료 후 즉시 멈추는지 기록한다.
 
 다시 만들 필요가 없는 것:
 
@@ -174,14 +177,14 @@ Lvl_DroneTraining
 
 ```text
 TUT-03 Segment/Lap 기록 Done
-→ TUT-04 비교·결과 UI
+→ TUT-04B 비교·결과 UI 기술 구현 Done · 수동 확인 대기
 → Take Off·Landing·Crash
 → Operator↔Drone
 → Story/NPC/Mission
 → Enemy AI·MG·Jamming
 ```
 
-TUT-03은 기존 Gate 판정과 분리된 Recorder가 정상 `OnGateAccepted`와 Telemetry Event를 구독하도록 완료했다. TUT-04도 이 원본 Event/Getter를 사용하고 Timing·거리 계산을 Widget에 중복 작성하지 않는다.
+TUT-03은 기존 Gate 판정과 분리된 Recorder가 정상 `OnGateAccepted`와 Telemetry Event를 구독하도록 완료했다. TUT-04B도 이 원본을 사용해 비교 결과를 C++에서 만들고 Widget은 표시만 한다.
 
 ## 5. 정보처리산업기사 공식 일정
 

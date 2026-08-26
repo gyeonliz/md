@@ -1,30 +1,30 @@
 # 현재 작업 보드
 
-기준일: 2026-08-26 (Asia/Seoul)
+기준일: 2026-08-27 (Asia/Seoul)
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 현재 기준선은 로컬 `main=origin/main=204e34b`다. 복구 `909f6a3`과 환경 이식 `f8c8fb2`가 포함된다. 기본 Template Map 4개만 제거하고 비맵 자산 62개는 복구했다. 환경 맵 3종과 검증된 정확한 의존성 2,723개·16.96 GiB를 이식했다. 기능 실행 순서는 `TUT-04 비교·결과 UI → Flight 상태 → Operator↔Drone → Story/NPC/Mission → AI/MG/Jamming`이다.
+Unreal 현재 기준선은 `main=origin/main=55b3ffe`다. 기능 Commit `3fa4444`에서 남은 제공 에셋 891개와 `Lvl_OilRig`, `TUT-04B` 이전 평균·Best 결과 기능을 추가하고 main에 병합·Push했다. 기능 실행 순서는 `TUT-04 수동 확인 → Flight 상태 → Operator↔Drone → Story/NPC/Mission → AI/MG/Jamming`이다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-08-26 19:46 KST — 기본 Map 정리 교정·환경 맵 3종 기술 이식 완료
+마지막 갱신: 2026-08-27 — 남은 에셋 선별 이식·OilRig·TUT-04B 기술 검증
 
 | 항목 | 상태 |
 |---|---|
-| 현재 단계 | 3단계 Tutorial Vertical Slice — `TUT-04A` 자동 검증과 PIE 초기 화면 통과, 한 Lap 구간 값 갱신 확인 대기 |
-| 진행 정도 | 한글 현재 속도·고도·수직속도·방향과 구간 기록 패널, 현재 Gate와 세분화 코스 선을 실제 PIE에서 확인했다. 최근·평균 구간 값은 코드·자동화 검증을 통과했지만 실제 Gate 0→3 비행 후 숫자 갱신은 아직 확인하지 않았다 |
-| 지금 작업 중 | 환경 맵 3종 기술 이식·대용량 LFS 원격 반영 완료. 다음은 사람이 환경 맵을 실제 화면에서 검토하고 Training 한 Lap을 확인하는 단계 |
-| 완료 근거 | 복구 `909f6a3`, 환경 이식 `f8c8fb2`. Build 성공, 전체 `Drone.` 15/15, Blueprint 0/0/0, 중앙 환경 맵 실제 로드, 의존성 누락 0·허용 외 0, LFS fsck 통과 |
-| 수동 미확인 | Gate 0→3 한 Lap 후 숫자 갱신, DronePack 화면·Loop 청감, 환경 맵 3종 조명·재질·스케일·충돌 화면 확인과 최종 채택 Map 결정 |
-| 현재 차단 | 기능 코드의 기술 차단은 없다. 자동 UI 제어는 지속 키 입력이 짧아 한 Lap을 재현하지 못했다. TUT-04A 완료 판정에는 사람이 실제 한 바퀴를 비행한 화면 결과가 남아 있다 |
-| 다음 행동 | `Lvl_DroneTraining`에서 Gate 0→3을 실제로 한 바퀴 비행해 방금 구간·완료 구간 속도/거리/시간 갱신을 확인한다. 통과 후 `TUT-04B` 이전 성공 Lap 평균·Best 비교로 진행한다 |
-| 다음 기능 | TUT-04A 한 Lap 수동 확인 후 이전 성공 Lap 평균·Best 대비 `+/-` 비교를 `TUT-04B`로 구현 |
-| 에셋 인수 | 이번 확인 PC의 제공 에셋 루트는 `C:\에셋`. NavigationArrows 6개는 main 반영 완료. D 드라이브 환경 팩 스테이징은 별도 PC의 중단 기록으로 보존 |
-| 맵 이식 | 중앙 폴더에 기존 프로젝트 Map과 `Lvl_Battlefield`, `Lvl_MilitaryCamp`, `Lvl_MilitaryBase`를 배치했다. 대형 공급사 의존성 Root는 참조 안정성을 위해 보존했다. AST-03A 기술 이식은 완료, Editor 시각 검토는 대기 |
-| Editor/MCP | 2026-08-26 19:46 KST 현재 `UnrealEditor`와 `UnrealEditor-Cmd` 실행 0. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
+| 현재 단계 | 3단계 Tutorial Vertical Slice — `TUT-04B` 계산·HUD 자동 검증 완료, 실제 두 Lap 비교 확인 대기 |
+| 진행 정도 | 첫 기록 기준 생성, 이전 성공 평균, Best, 시간·속도 Delta와 Segment 비교가 구현됐다. 전체 자동화 16/16을 통과했지만 실제 두 번 완주 화면은 아직 미확인 |
+| 지금 작업 중 | 남은 제공 에셋 891개와 `Lvl_OilRig` 기술 이식, TUT-04B, Git LFS Push 완료. Editor 수동 확인 단계 |
+| 완료 근거 | Build 성공, 새 자산 수량 일치·대표 로드 성공·외부/누락 0, Blueprint 오류 0, 전체 `Drone.` 16/16 |
+| 수동 미확인 | Training 두 Lap 비교 HUD, OilRig Map Check·재질·조명·스케일·충돌·성능, Ground Drone/MG·NPC·Raw Drone 외형 채택 |
+| 현재 차단 | 기능 코드 차단 없음. OilRig 명령줄 Map Check가 약 8분 동안 맵 Construction에서 끝나지 않아 Editor 수동 확인 필요 |
+| 다음 행동 | 다른 PC Pull/LFS를 확인하고 `Lvl_OilRig` Map Check와 `Lvl_DroneTraining` 두 Lap을 실제 Editor에서 확인 |
+| 다음 기능 | NavigationArrows Host/Wrapper 또는 Flight Take Off/Landing/Crash 카드 |
+| 에셋 인수 | `C:\에셋` 원본은 보존. ArmyVFX·InfantrySFX·Ground Drone·NPC 외형·Raw Drone을 정확한 의존성 묶음으로 이식 |
+| 맵 이식 | 기존 환경 3종에 `Lvl_OilRig`을 추가. Vendor FirstPerson Sample 의존성을 끌어오던 Door Actor 8개는 중앙 사본에서 제거 |
+| Editor/MCP | 모든 검사 프로세스 종료 확인. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
-| Git 처리 | `main=origin/main=204e34b`. 신규 2,723개가 모두 3줄 LFS Pointer이고 LFS 2,785개·약 18GB 원격 업로드와 병합 후 `git lfs fsck` 통과 |
+| Git 처리 | 자산·기능 Commit `3fa4444`, main Merge `55b3ffe`. 신규 LFS 892개·4.9GB Push 완료 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
 | 학습 다음 행동 | Q-Net 상태를 확인해 Track A/B/C를 고르고 첫 학습 블록 실행 |
 
@@ -54,7 +54,7 @@ Unreal 현재 기준선은 로컬 `main=origin/main=204e34b`다. 복구 `909f6a3
 |---|---|---|---|
 | GIT-10 | Git / Unreal | 다른 PC Clone과 실행 | LFS 포함 Clone 후 UE 5.8.1에서 열림 |
 | SYNC-04 | Codex Sync | 두 PC 간 실제 수동 인계 시험 | Git 흐름과 문맥 패키지 흐름을 각각 완료 |
-| TUT-04 | Drone / Tutorial / UI | 이전 기록 비교와 결과 UI | 성공 Lap 원본을 기준으로 이전 평균·Best 규칙을 확정하고 Blueprint 결과 UI와 회귀 검증 완료 |
+| TUT-04 | Drone / Tutorial / UI | 비교 결과 수동 판정 | 두 번 완주해 첫 기준 생성과 두 번째 이전 평균·Best·부호를 실제 HUD에서 확인 |
 | UE-MCP-02 | Drone / Unreal / Codex Sync | Codex 네이티브 MCP Tool 노출 확인 | Unreal Editor 실행 후 `D:\JGY\project\drone` 루트의 새 Codex 작업에서 `unreal-mcp` Tool을 찾고 Current Level을 한 번 조회 |
 | STUDY-EXAM-01 | 정보처리산업기사 | Q-Net 개인 상태 확인 | 3회 접수·수험일·응시 여부·필기 합격/면제 상태를 확인하고 Track A/B/C 기록 |
 | STUDY-EXAM-02 | 정보처리산업기사 | 선택 Track 첫 학습 | 필기 60문항 진단 또는 실기 기초 1블록과 오답 기록 완료 |
@@ -67,6 +67,8 @@ Unreal 현재 기준선은 로컬 `main=origin/main=204e34b`다. 복구 `909f6a3
 | AST-01 | Drone / Unreal | 제공 에셋 최소 외형 Spike | FPV 본체·로터 4·재질/Texture와 44.1 kHz Loop Cue/Wave를 `/Game/Drone/ThirdParty`로 선별 이식. Integration BP와 GameMode 연결. 이번 재검증에서 전용 자동화 1/1·의존성 감사·Blueprint 0/0/0·LFS fsck 통과. 전체 14/14는 TUT-03 당시 같은 Commit의 기준선이며 이번에 미재실행 | 실제 스피커 출력의 Loop 단일 재생·종료 정지는 미확인. 결과 확보 전까지 Doing 유지 |
 | AST-01C | Drone / Unreal / Asset | DronePack 드론 시각 라이브러리·데모 맵 | 드론 Mesh·Material·Texture와 정리 Map 154개를 `/Game/Drone/ThirdParty/DronePack`에 선별 이식. Build·전체 14/14·BP 0/0/0·Map Check 0/0·의존성·LFS 검증 통과 | Editor에서 드론 6종·맵 화면을 확인하고 재질·스케일·조명 이상 유무를 기록 |
 | TUT-04A | Drone / Tutorial / UI | 한글 비행·구간 통계 HUD와 Course Authoring 보강 | 병합 main Build·전체 15/15·BP 0/0/0 통과. PIE에서 한글 HUD 두 패널·현재 Gate·세분화 코스 선 초기 렌더 확인 | Gate 0→3 실제 한 Lap 뒤 최근·완료 구간 숫자 갱신 확인 |
+| TUT-04B | Drone / Tutorial / UI | 이전 평균·Best·Delta 결과 | 현재 시도 제외 평균, 첫 기준, Best와 Segment 비교, Blueprint Event, HUD 네 행 구현. Build·16/16 통과 | 실제 두 Lap에서 표시 값과 부호 확인 |
+| AST-05 | Drone / Unreal / Asset | 남은 제공 에셋 선별 라이브러리 | ThirdParty 891개와 `Lvl_OilRig` 1개. 수량·대표 로드·외부/누락 0 | Editor 시각·성능·Map Check와 실제 채택 후보 결정 |
 
 ## Done
 
@@ -122,9 +124,9 @@ Unreal 현재 기준선은 로컬 `main=origin/main=204e34b`다. 복구 `909f6a3
 
 ## 이번 인계의 정지선
 
-Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 로컬 `main`과 `origin/main`은 Merge Commit `204e34b`로 일치한다. `909f6a3`은 비맵 복구, `f8c8fb2`는 환경 이식, `2cc5d79`는 그 직전 맵 중앙화 기준선, `551e287`은 TUT-03 기준선이다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
+Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 로컬 `main`과 `origin/main`은 Merge Commit `55b3ffe`로 일치한다. `3fa4444`는 남은 선별 자산·TUT-04B, `204e34b`는 환경 이식까지의 이전 main, `551e287`은 TUT-03 기준선이다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
 
-Android 제외와 PFN-01~06, HUD-01, HUD-02, TUT-01~03, 최초 에셋 인수 감사 `AST-00`, 다른 PC의 `C:\에셋` 재검증 `AST-VERIFY-01`, NavigationArrows 최소 이식·원격 공유 `AST-02A`를 완료했다. `AST-01`은 선택 자산 12개와 Integration BP 이식 뒤 기존 전체 회귀와 Standalone 초기 렌더를 통과했고, 이번에는 FPV 1/1·Blueprint 0/0/0·의존성·LFS만 다시 검증했다. 실제 Loop 단일 재생·종료 정지는 수동 미확인이므로 Pass나 Fail로 간주하지 않고 Doing을 유지한다. 다음 기능 카드는 `TUT-04`이며 이전 평균·Best 비교와 기록 결과 UI는 아직 구현된 기능으로 보지 않는다. 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다.
+Android 제외와 PFN-01~06, HUD-01, HUD-02, TUT-01~03, 최초 에셋 인수 감사 `AST-00`, 다른 PC의 `C:\에셋` 재검증 `AST-VERIFY-01`, NavigationArrows 최소 이식·원격 공유 `AST-02A`를 완료했다. `AST-01`의 실제 Loop 청감은 여전히 수동 미확인이다. 현재 main에는 TUT-04B 이전 평균·Best 비교와 기록 결과 HUD까지 구현됐으며 실제 두 Lap 표시 판정이 남았다. 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다.
 
 UE-MCP-01도 완료했다. 이후 Editor 내부 Actor·Asset·Blueprint·UMG·Automation 작업은 가능한 범위에서 공식 Unreal MCP를 우선 사용하되, Experimental 기능이므로 실제 Git diff·빌드·자동화 로그를 최종 판정 기준으로 유지한다.
 
