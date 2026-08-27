@@ -18,20 +18,36 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-27 — 남은 제공 에셋 선별 이식·OilRig 중앙 맵·TUT-04B 비교 결과 구현
+마지막 갱신: 2026-08-27 — NPC·Smart Object C++ 기반과 실행 가이드 준비
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | 3단계 Tutorial Vertical Slice — `TUT-04B` 이전 평균·Best 계산과 HUD 구현, 실제 두 Lap 확인 대기 |
-| Unreal 기준선 | `main=origin/main=55b3ffe`, `DroneEditor Win64 Development` Build 성공 |
-| 자동 검증 | 전체 `Drone.` `16/16`, Blueprint Compile 오류 0, 새 자산 외부·누락 의존성 0 |
+| 전체 단계 | Tutorial 수동 확인 대기 + 적/아군 NPC Smart Object 선행 기반 준비 |
+| Unreal 기준선 | `main=origin/main=c3e6d38`; AI 기능 `489ced5`, 사용자 Battlefield Map `4f14d2f` 보존 |
+| 자동 검증 | Game/Editor Build, 전용 1/1, 전체 `Drone.` 17/17, Blueprint 0/0/0, LFS fsck 성공 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | 892개 자산·맵 선별 이식, TUT-04B, LFS Push 완료. Editor 수동 확인 대기 |
+| 지금 작업 중 | `AI-SO-00` 완료. 다음 `AI-SO-01` Editor 자산 생성 준비 |
 | 차단 조건 | 기능 코드의 기술 차단은 없음. OilRig 별도 Map Check가 장시간 완료되지 않아 Editor 수동 Map Check가 필요 |
-| 다음 행동 | OilRig 화면·Map Check와 Training 두 Lap 비교 HUD를 실제 Editor에서 확인 |
-| 다음 기능 | 수동 확인 뒤 NavigationArrows Host/Wrapper 또는 Flight 상태 카드 |
-| 이후 | Flight 상태 → Operator↔Drone → Story/NPC/Mission/Jamming |
-| Git 처리 | 기능 Commit `3fa4444`, main Merge `55b3ffe`. 신규 LFS 892개·4.9GB Push 완료 |
+| 다음 행동 | 회귀 통과 뒤 `AI-SO-01` Definition/Station BP부터 Editor에서 한 종류씩 생성 |
+| 다음 기능 | `AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01` |
+| 이후 | Drone 감지 → Rifle → Shotgun → MG → Cover/Search/Return |
+| Git 처리 | 기능 `489ced5`, main Merge `c3e6d38` Push 완료; 기존 사용자 `4f14d2f` Map 변경 보존 |
+
+## 2026-08-27 — NPC·Smart Object 기반 준비
+
+- `SmartObjects`와 `GameplayInteractions` Plugin 및 모듈 의존성을 추가했다.
+- NPC 역할을 `Neutral/Friendly/Hostile`, 무기를 `Unarmed/Rifle/Shotgun`으로 구분하고 Hostile의 MG 사용 가능 여부를 Profile로 분리했다.
+- EnemyPatrol, FriendlyBasePatrol, Ambient, Guard, Cover, MGTurret Activity와 DroneDetected/DroneLost Native Gameplay Tag를 추가했다.
+- 프로젝트 소유 `ADroneNPCCharacter`, `ADroneNPCAIController`, `ADroneNPCSpawnPoint`, `ADroneSmartObjectStation`과 예약 Component를 추가했다.
+- Hostile은 EnemyPatrol/Guard, Friendly는 FriendlyBasePatrol/Ambient만 기본 검색한다. Required Activity가 비어 있으면 검색을 거부해 잘못된 점유를 막는다.
+- Drone Prototype을 Sight 감지 대상으로 등록했다. Hostile이 드론을 감지하면 순찰 Claim을 해제하고 StateTree Event를 보내며 Friendly는 전투 전환하지 않는다.
+- `UsesRifle()`과 `UsesShotgun()` 분기는 준비했지만 실제 Trace·Damage·Animation·FX·SFX는 구현하지 않았다.
+- Game/Editor Build와 `Drone.AI.SmartObjectFoundationDefaults` 1/1, 전체 `Drone.` 17/17을 통과했다. 전체 자동화에는 기존 PIE RecastNavMesh 경고 1개가 있으나 실패는 0이다.
+- `CompileAllBlueprints`는 Blueprint errors 0, Blueprint warnings 0, failed load 0이다. 기존 Battlefield Pose GUID와 MCP EULA 고지 Summary 경고는 새 AI 코드와 무관하게 유지된다.
+- `git diff --check`, `git lfs fsck`, Unreal 프로세스 종료를 확인했다.
+- Definition·Blueprint·StateTree·NavMesh·Rifle/Shotgun·MG의 Editor 작성 순서를 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md)에 정리했다.
+- 사용자 Battlefield Map Commit `4f14d2f`을 기반으로 Branch를 만들었으며 해당 Map 변경은 수정하거나 되돌리지 않았다.
+- 기능 Commit `489ced5`를 `codex/smart-object-npc-foundation`에 Push하고 Merge Commit `c3e6d38`로 `origin/main`에 반영했다.
 
 ## 2026-08-27 — 남은 에셋 선별 이식·OilRig·TUT-04B
 

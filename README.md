@@ -20,14 +20,15 @@
 14. [`docs/DRONE_TRAINING_RECORDING_IMPLEMENTATION.md`](docs/DRONE_TRAINING_RECORDING_IMPLEMENTATION.md): TUT-03 구간·랩 기록 구조, Blueprint 연결점과 검증 절차
 15. [`docs/DRONE_PREASSET_FUNCTION_PLAN.md`](docs/DRONE_PREASSET_FUNCTION_PLAN.md): 구매 소스 없이 Greybox 기능을 먼저 완성하는 실행 계획
 16. [`docs/DRONE_MVP_GUIDE.md`](docs/DRONE_MVP_GUIDE.md): Flight MVP부터 데모까지의 개발 단위
-17. [`docs/WORK_MANAGEMENT.md`](docs/WORK_MANAGEMENT.md): Inbox → Todo → Doing → Done 운영
-18. [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md): 확정 조작, Tutorial 코스·기록 UI, Story·NPC·Jamming·에셋 적용 계획
-19. [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md): 최초 D 드라이브 14팩 압축 감사, 다른 PC의 C 드라이브 재감사와 FPV·Loop 선별 이식 검증
-20. [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md): 남은 제공 자산 891개·OilRig 중앙 맵·TUT-04B 이식 및 검증
-21. [`docs/DRONE_UNREAL_MCP.md`](docs/DRONE_UNREAL_MCP.md): UE 5.8 공식 Unreal MCP·Codex 연결, 선택 Toolset과 검증 기준
-22. [`docs/DRONE_CHAOS_DATAFLOW_PLAN.md`](docs/DRONE_CHAOS_DATAFLOW_PLAN.md): UE 5.8 Dataflow 기반 부분 고정 그물·선택형 맵 파괴 설계와 검증 순서
-23. [`docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md`](docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md): 지원서·이력서용 Unreal 프로젝트 경험 기술 예시와 사실 확인 경계
-24. [`docs/STUDY_PLANS.md`](docs/STUDY_PLANS.md): 정보처리산업기사·C++ 코딩테스트 병행 계획
+17. [`docs/DRONE_SMART_OBJECT_NPC_GUIDE.md`](docs/DRONE_SMART_OBJECT_NPC_GUIDE.md): 적 순찰·드론 감지·Rifle/Shotgun·MG와 기지 아군 Smart Object 이동 준비·사용 절차
+18. [`docs/WORK_MANAGEMENT.md`](docs/WORK_MANAGEMENT.md): Inbox → Todo → Doing → Done 운영
+19. [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md): 확정 조작, Tutorial 코스·기록 UI, Story·NPC·Jamming·에셋 적용 계획
+20. [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md): 최초 D 드라이브 14팩 압축 감사, 다른 PC의 C 드라이브 재감사와 FPV·Loop 선별 이식 검증
+21. [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md): 남은 제공 자산 891개·OilRig 중앙 맵·TUT-04B 이식 및 검증
+22. [`docs/DRONE_UNREAL_MCP.md`](docs/DRONE_UNREAL_MCP.md): UE 5.8 공식 Unreal MCP·Codex 연결, 선택 Toolset과 검증 기준
+23. [`docs/DRONE_CHAOS_DATAFLOW_PLAN.md`](docs/DRONE_CHAOS_DATAFLOW_PLAN.md): UE 5.8 Dataflow 기반 부분 고정 그물·선택형 맵 파괴 설계와 검증 순서
+24. [`docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md`](docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md): 지원서·이력서용 Unreal 프로젝트 경험 기술 예시와 사실 확인 경계
+25. [`docs/STUDY_PLANS.md`](docs/STUDY_PLANS.md): 정보처리산업기사·C++ 코딩테스트 병행 계획
 
 ## 구성
 
@@ -57,11 +58,13 @@ tools/unreal/              Prototype·Tutorial 자산 생성·재검증용 안�
 
 TUT-01~03을 완료했다. 별도 `Lvl_DroneTraining` Map의 실제 `BP_DroneTrainingCourse`가 편집 가능한 Spline과 Runtime 표시용 SplineMesh를 소유한다. `ADroneTrainingGate`는 비충돌 Ring Visual과 별도 Pawn Overlap Trigger를 분리하고, `UDroneTrainingGateSequenceComponent`가 Course의 명시적 Gate 배열을 기준으로 현재 순서·정방향·중복 통과를 판정한다. 실제 `BP_DroneTrainingGate` 네 개를 Map에 연결했으며 기존 Prototype BP GameMode·FPV Integration Pawn·PlayerController·WBP를 그대로 재사용한다.
 
-TUT-03에서는 Course 소유 `UDroneTrainingLapRecorderComponent`를 Gate 판정과 분리했다. Gate 0 승인으로 Lap을 시작하고 이후 Gate마다 Segment를 확정하며, 마지막 Gate에서 Lap을 완료한다. TUT-04B는 현재 기록을 제외한 이전 성공 평균, Best, 시간·속도 Delta와 Segment 비교를 계산하고 Flight HUD에 표시한다. 최종 검증은 Editor Build, 전체 `Drone.` 16/16과 Blueprint 오류 0을 통과했으며 실제 두 Lap 화면 확인은 남아 있다.
+TUT-03에서는 Course 소유 `UDroneTrainingLapRecorderComponent`를 Gate 판정과 분리했다. Gate 0 승인으로 Lap을 시작하고 이후 Gate마다 Segment를 확정하며, 마지막 Gate에서 Lap을 완료한다. TUT-04B는 현재 기록을 제외한 이전 성공 평균, Best, 시간·속도 Delta와 Segment 비교를 계산하고 Flight HUD에 표시한다. 최신 전체 검증은 Game/Editor Build, 전체 `Drone.` 17/17과 Blueprint 0/0/0을 통과했으며 실제 두 Lap 화면 확인은 남아 있다.
 
 이번 확인 PC의 제공 에셋 루트는 `C:\에셋`이다. 초기 FPV 외형·Loop와 Integration BP에 이어 ArmyVFX·InfantrySFX·Ground Drone/MG·NPC 외형·Raw Drone 후보와 OilRig을 선별 이식했다. 원본 제공 폴더는 수정하지 않았고 실제 프로젝트의 새 자산 외부·누락 참조는 0이다. 실제 스피커의 Loop 단일 재생과 종료 정지는 수동 미확인이므로 `AST-01`은 Doing이다. 상세 결과는 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)와 [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md)를 따른다.
 
-2026-08-27 현재 Unreal 저장소 로컬 `main`과 `origin/main`은 Merge Commit `55b3ffe`로 일치한다. 남은 제공 자산·TUT-04B Commit은 `3fa4444`이며 신규 Unreal 패키지 892개·4.9GB를 Git LFS로 Push했다. Battlefield·MilitaryCamp·MilitaryBase에 OilRig 중앙 사본을 추가했고, ArmyVFX·InfantrySFX·Ground Drone/MG·NPC 외형·Raw Drone 후보를 선별 이식했다. 이 자산들은 후보 라이브러리이며 실제 AI·MG 기능 또는 최종 드론 채택을 뜻하지 않는다.
+NPC·AI 다음 작업을 위해 Smart Objects와 Gameplay Interactions 모듈, Faction·Rifle·Shotgun Profile, Activity Tag, NPC Character/Controller/Spawn Point, Slot 예약 Component와 드론 Sight 감지 기반을 준비했다. 기능 Commit `489ced5`를 Merge Commit `c3e6d38`로 main에 반영·Push했고 Game/Editor Build, 전체 `Drone.` 17/17, Blueprint 0/0/0과 LFS 검사를 통과했다. 이 기반은 적 순찰·드론 감지 이벤트·MG 한 명 예약과 기지 아군의 FriendlyBasePatrol/Ambient 검색 범위를 분리한다. 실제 Smart Object Definition·Blueprint·StateTree·사격은 아직 미구현이며 [`docs/DRONE_SMART_OBJECT_NPC_GUIDE.md`](docs/DRONE_SMART_OBJECT_NPC_GUIDE.md)의 카드 순서로 진행한다.
+
+2026-08-27 현재 Unreal 저장소 로컬 `main`과 `origin/main`은 NPC Smart Object 기반 Merge Commit `c3e6d38`로 일치한다. 기존 남은 제공 자산·TUT-04B Commit은 `3fa4444`, Merge는 `55b3ffe`이며 신규 Unreal 패키지 892개·4.9GB를 Git LFS로 Push했다. 그 뒤 사용자 Battlefield Map Commit `4f14d2f`도 그대로 보존했다. 이식 자산은 후보 라이브러리이며 실제 외형 채택이나 완성된 AI·MG 기능을 뜻하지 않는다.
 
 외부 제공 소스는 전체 팩을 흡수하지 않고 검증된 대표 자산과 정확한 의존성만 ThirdParty 경계로 선별 이식했다. 기능 구현은 계속 프로젝트 C++와 Greybox 기준을 유지하며 외부 Pawn·GameMode·Input은 사용하지 않는다. 현재 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)가 우선하고 PFN 카드 번호와 교체 경계는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](docs/DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 

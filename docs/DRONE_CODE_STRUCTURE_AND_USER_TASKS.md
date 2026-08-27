@@ -4,7 +4,7 @@
 
 이 문서는 현재 Unreal `drone` 저장소를 직접 확인한 결과를 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
 
-TUT-03 완료 기능 Commit은 `551e287`이다. 현재 main 기준은 `55b3ffe`이며, 남은 제공 에셋 선별 이식과 TUT-04B 이전 평균·Best 결과 기능 Commit `3fa4444`이 병합됐다. 환경 Map은 후보 공간이며 Tutorial 기본 실행 구조를 바꾸지 않는다.
+TUT-03 완료 기능 Commit은 `551e287`이다. 현재 main은 NPC Smart Object 기반 Merge `c3e6d38`이며 기능 Commit은 `489ced5`다. 기존 자산·TUT-04B Merge `55b3ffe`와 사용자 Battlefield Map 갱신 `4f14d2f`도 보존한다. 환경 Map은 후보 공간이며 Tutorial 기본 실행 구조를 바꾸지 않는다.
 
 NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합됐다. 자산은 main에 있지만 프로젝트 소유 Widget Host는 아직 구현하지 않았으므로 화면에 나타나지 않는 것이 정상이다.
 
@@ -14,8 +14,8 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합�
 |---|---|
 | `DroneEditor Win64 Development` | Build 성공 |
 | `Drone.Tutorial` Automation | 7/7 통과 |
-| 전체 `Drone.` Automation | 16/16 통과 |
-| `CompileAllBlueprints` | Errors 0, 기존 Battlefield Pose GUID와 MCP 고지 경고 유지 |
+| 전체 `Drone.` Automation | 17/17 통과. 기존 PIE RecastNavMesh 경고 포함 성공 1개 |
+| `CompileAllBlueprints` | Blueprint Errors 0, Blueprint warnings 0, failed load 0. 별도 Summary에 기존 Battlefield Pose GUID와 MCP 고지 경고 유지 |
 | 현재 에셋 이식 재검증 | FPV 전용 1/1, Blueprint 0/0/0, 스테이징 선택 자산·현재 Integration 금지 의존성 0, 이식 13개 LFS와 fsck 통과 |
 | 기존 Standalone 시각 기록 | FPV 외형, 고정 추적 Camera, 실제 WBP HUD, Cyan 안내선, Current/Inactive Gate 표시 확인 |
 | 사용자 수동 확인 | Training 두 Lap 비교 HUD, OilRig Map Check·화면·성능, Ground Drone/MG·NPC·Raw Drone 외형을 확인할 차례 |
@@ -118,12 +118,51 @@ BP_DronePrototypePlayerController
 
 Prototype Pawn이 Input Mapping Context를 로컬 Player에 한 번 적용하고, UnPossess 또는 EndPlay에서 자신이 적용한 Context를 제거한다. PlayerController는 HUD를 한 개만 만들고 Pawn이 바뀌면 Widget을 다시 만들지 않고 Telemetry Source만 교체한다.
 
+### NPC·Smart Object 준비 구조
+
+```text
+ADroneNPCSpawnPoint 또는 맵 직접 배치
+└─ ADroneNPCCharacter
+   ├─ UDroneNPCProfileComponent
+   │  ├─ Faction: Neutral / Friendly / Hostile
+   │  ├─ Weapon: Unarmed / Rifle / Shotgun
+   │  └─ Hostile의 MG 사용 가능 여부
+   └─ USmartObjectUserComponent
+      └─ ADroneNPCAIController
+         ├─ UStateTreeAIComponent
+         ├─ UAIPerceptionComponent + Sight
+         └─ UDroneSmartObjectReservationComponent
+            └─ Activity Tag로 가장 가까운 빈 Slot Claim·Release
+
+ADroneSmartObjectStation
+└─ USmartObjectComponent
+   └─ Smart Object Definition Asset
+      ├─ EnemyPatrol / Guard
+      ├─ FriendlyBasePatrol / Ambient
+      ├─ Cover
+      └─ MGTurret 1-Slot
+```
+
+Hostile은 EnemyPatrol/Guard를 기본 검색하고 Friendly는 FriendlyBasePatrol/Ambient만 검색한다. Hostile이 `ADronePrototypePawn`을 보면 현재 순찰 Claim을 해제하고 StateTree에 `DroneDetected` 이벤트를 보낸다. `Rifle`과 `Shotgun` Profile 및 분기 Getter는 준비됐지만 실제 발사·Damage·Animation은 아직 없다.
+
+실제 Definition·Blueprint·StateTree 작성 순서와 정상 결과는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md)를 따른다.
+
 ## 2. 디렉터리와 클래스 책임
 
 ### 현재 Drone 기능 소스
 
 ```text
 Source/Drone/
+├─ AI/
+│  ├─ DroneAITypes.h
+│  ├─ DroneAITags.h/.cpp
+│  ├─ DroneNPCProfileComponent.h/.cpp
+│  ├─ DroneNPCCharacter.h/.cpp
+│  ├─ DroneNPCAIController.h/.cpp
+│  ├─ DroneNPCSpawnPoint.h/.cpp
+│  ├─ DroneSmartObjectStation.h/.cpp
+│  ├─ DroneSmartObjectReservationComponent.h/.cpp
+│  └─ Tests/DroneSmartObjectFoundationTest.cpp
 ├─ Prototype/
 │  ├─ DronePrototypeGameMode.h/.cpp
 │  ├─ DronePrototypePawn.h/.cpp
@@ -177,6 +216,12 @@ Source/Drone/
 | `EDroneTrainingGatePassResult` | 통과 성공 또는 거부 이유 표현 | 사용자 메시지 표시 |
 | `EDroneTrainingGateVisualState` | `Inactive`, `Current`, `Completed` 상태 표현 | Lap 상태 표현 |
 | `EDroneTrainingLapRecordState` | `Idle`, `Recording`, `Completed` 기록 상태 표현 | Gate 시각 상태 표현 |
+| `FDroneNPCProfile` | NPC의 Friendly/Hostile 역할, Rifle/Shotgun 장비 종류와 MG 사용 가능 여부 | 최종 진영 설정, 무기 수치·피해·Animation |
+| `ADroneNPCCharacter` | 프로젝트 소유 NPC Character, Profile과 Smart Object User Component 소유 | 외형·Animation 확정, 행동 의사결정 |
+| `ADroneNPCAIController` | StateTree·Sight·예약 Component 소유, Hostile 드론 감지 Event와 무기 분기 제공 | 실제 순찰 Task, Rifle/Shotgun/MG 발사 구현 |
+| `UDroneSmartObjectReservationComponent` | Activity Tag와 User Tag로 가장 가까운 빈 Slot 검색·Claim·Release | NavMesh 이동, Animation, StateTree 상태 선택 |
+| `ADroneSmartObjectStation` | Definition이 연결될 프로젝트 소유 Host와 방향 Preview | Definition Slot·Interaction StateTree 생성 |
+| `ADroneNPCSpawnPoint` | NPC Class·Profile·수·간격에 따른 명시적 Spawn | NPC의 순찰 위치와 행동 선택 |
 
 ### 중앙 Map Asset
 
@@ -425,7 +470,7 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
 
 ## 5. 현재 구현과 미구현
 
-### 현재 `main`에 구현된 것
+### 기존 main과 현재 AI 기능 Branch에 구현된 것
 
 - 별도 Prototype Drone Pawn과 Enhanced Input
 - 전후·좌우·상승·하강·Yaw·Camera Pitch 조작
@@ -456,11 +501,15 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
 - `OnLapStarted`, `OnSegmentRecorded`, `OnLapCompleted` Blueprint Event
 - Gate Trigger·Ring·Course 안내선의 Collision·Navigation 안전 규칙
 - 순수 계산, native World, 실제 Asset, 실제 PIE를 포함한 Tutorial 자동화 6개
+- Smart Objects·Gameplay Interactions 모듈 연결
+- NPC Friendly/Hostile, Unarmed/Rifle/Shotgun, MG 허용 Profile
+- 적 순찰·아군 기지 순찰·생활·경계·엄폐·MG Activity Tag
+- NPC Character·AI Controller·Spawn Point·Smart Object Station C++ 기반
+- Activity Tag 기반 가장 가까운 빈 Smart Object Slot Claim·Release
+- Drone Prototype의 Sight 감지 대상 등록과 Hostile용 Detected/Lost StateTree Event
 
 ### 아직 구현하지 않은 것
 
-- 이전 성공 기록 평균과 현재 기록의 Time·Speed Delta
-- Best Lap과 Best Segment 비교
 - 통과 품질·점수·평가
 - Gate 진행 HUD, 다음 Gate 화살표, Wrong Order·Wrong Direction 메시지
 - Course HUD, Gate 결과 Toast, Lap 결과 화면
@@ -472,6 +521,11 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
 - 최종 Gate Mesh·VFX·SFX·Animation
 - 최종 코스 배치·크기·난이도
 - 배터리·통신거리·재밍 같은 후보 시스템
+- Smart Object Definition·Station Blueprint와 Hostile/Friendly StateTree Asset
+- 실제 적 순찰과 아군 기지 생활 이동의 PIE 동작
+- Rifle 단일 Trace, Shotgun Pellet/Spread, Damage·재장전·Animation·FX·SFX
+- MG 이동·한 명 점유·조준·사격과 사망/중단 뒤 재점유
+- Cover·Search·Return 실제 행동
 
 TUT-03의 원본 시간·거리·평균 속도와 TUT-04B의 이전 평균·Best·Delta·HUD 표시는 구현됐다. `USaveGame` 영속화와 점수는 아직 구현하지 않았다. `SegmentDistance`는 현재도 배치 메타데이터이며 실제 이동 거리 계산에 사용하지 않는다.
 
@@ -479,7 +533,7 @@ TUT-03의 원본 시간·거리·평균 속도와 TUT-04B의 이전 평균·Best
 
 ### 지금 사용자가 할 일
 
-1. 다른 PC에서는 Unreal 저장소 `main`을 Pull하고 Commit이 `551e287`인지 확인한다.
+1. 다른 PC에서는 Unreal 저장소 `main`을 Pull하고 원격 최신 Commit과 일치하는지 확인한다.
 2. UE 5.8.1에서 `/Game/Drone/Maps/Lvl_DroneTraining`을 연다.
 3. World Outliner에서 Course와 Gate 네 개의 배치가 의도한 비행 경로처럼 보이는지 확인한다.
 4. Course의 `OrderedGates` 순서와 실제 공간 배치 순서가 자연스러운지 확인한다.
@@ -494,6 +548,9 @@ TUT-03의 원본 시간·거리·평균 속도와 TUT-04B의 이전 평균·Best
 13. 조종 감각상 너무 작음, 너무 큼, 간격 과도, 방향 이해 어려움이 있으면 수치와 체감만 기록한다.
 14. FPV Body와 Rotor 4개의 크기·방향·위치가 자연스럽고 Camera를 가리지 않는지 확인한다.
 15. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가며 PIE/Standalone 종료 즉시 멈추는지 확인한다.
+16. AI 기능이 병합된 뒤 Editor를 재시작하고 Smart Objects와 Gameplay Interactions Plugin 활성 상태를 확인한다.
+17. [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md)의 `AI-SO-01`부터 Definition과 Station BP를 한 종류씩 만든다.
+18. 적 Rifle 1명, 적 Shotgun 1명, 아군 2명으로 전용 Greybox 맵에서 NavMesh·예약·이동을 먼저 검증한다.
 
 사용자가 지금 판단해야 하는 것은 플레이할 때의 가독성·조종 난이도, 실제 비행에서 기록값이 자연스럽게 증가하는지, FPV 외형·Camera·소리가 실제 환경에서 자연스러운지다. 정확한 공식과 파일·참조 구조는 자동 검증했지만, Gate 배치와 사람이 체감하는 시간·거리·속도·청감은 직접 확인이 필요하다.
 

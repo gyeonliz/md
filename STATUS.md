@@ -21,10 +21,10 @@
 | Git 사용자 이메일 | 전역 `jkw6483@gmail.com` 설정 확인 |
 | GitHub CLI | 설치되어 있지 않음 |
 | 이번 확인 PC 작업 루트 | Unreal `C:\URproject\drone`; 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
-| Unreal 프로젝트 저장소 | `main`=`origin/main`=`55b3ffe`; 선별 자산·TUT-04B 기능 Commit `3fa4444`을 Merge하고 Push 완료 |
+| Unreal 프로젝트 저장소 | `main`=`origin/main`=`c3e6d38`; AI 기반 `489ced5` 병합·Push, 기존 사용자 Battlefield Map `4f14d2f` 보존 |
 | 문서 작업 저장소 | 이 갱신을 기능 Branch와 `main`에 Commit·Push하고 로컬·원격 일치 상태로 마감 |
-| Commit·Push 처리 | 기존 환경 LFS 2,785개·약 18GB에 이어 이번 자산 892개·4.9GB를 LFS Push 완료. 최종 Merge Commit `55b3ffe` |
-| 실행 상태 | 2026-08-27 06:55 KST 확인 시 `UnrealEditor`와 `UnrealEditor-Cmd` 실행 0 |
+| Commit·Push 처리 | 기존 자산 LFS Push 뒤 AI 기반 기능 `489ced5`를 Merge Commit `c3e6d38`로 `origin/main`에 Push 완료 |
+| 실행 상태 | Game/Editor Build 성공, 전체 `Drone.` 17/17, Blueprint 0/0/0, LFS fsck 성공. `UnrealEditor`·`UnrealEditor-Cmd` 실행 0 확인 |
 | 별도 `droner` 주의 | `main=origin/main=551e287`; `Config/DefaultEditor.ini` 변경과 `Content/Asset` 10,928개·36,360,181,427 bytes 전체가 Untracked. 공급사 원본·스테이징 복사본이므로 일괄 Stage·Commit 금지 |
 
 GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도했으나 Windows Installer가 종료 코드 1602로 취소되어 설치되지 않았다. GitHub 웹과 Git Credential Manager만으로도 기본 Push/Clone 작업은 가능하다.
@@ -39,14 +39,14 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 D:\JGY\project\drone\Drone.uproject
 ```
 
-이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 이번 확인 PC의 기준 프로젝트는 `C:\URproject\drone`이고 로컬·원격 main은 `55b3ffe`로 일치한다.
+이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 이번 확인 PC의 기준 프로젝트는 `C:\URproject\drone`이고 `main=origin/main=c3e6d38`이다.
 
 확인 결과:
 
 - 실행 로그 기준 UE 5.8.1 (`Release-5.8`, Changelist 56057345)
 - Runtime 모듈 이름은 `Drone`
 - 초기 기존 내용은 UE Third Person C++ 템플릿과 Variant 예제 중심
-- `StateTree`, `GameplayStateTree` Plugin이 활성화되어 있음
+- `StateTree`, `GameplayStateTree`, `SmartObjects`, `GameplayInteractions` Plugin이 활성화되어 있음. UE 5.8.1의 `GameplayInteractions`는 Experimental 표기이므로 엔진 갱신 때 재검증
 - 시작 시 Git 저장소가 아니었음
 - 작업 시작 시 Content에는 `.uasset` 749개와 `.umap` 4개가 있었음
 
@@ -78,7 +78,7 @@ D:\JGY\project\drone\Drone.uproject
 
 첫 Commit은 863개 파일이며 `Content`는 761개로 `.uasset` 756개와 `.umap` 5개다. 가장 큰 파일은 약 21.0 MB이고 100 MB를 넘는 파일은 없다. 새 Prototype `.uasset`과 `.umap`을 포함한 Unreal Asset에는 Git LFS의 filter·diff·merge 속성이 적용된다. WBP·BP Controller·TUT-01 Asset에 이어 TUT-02의 신규 `BP_DroneTrainingGate`와 갱신한 `Lvl_DroneTraining` 두 Asset도 Git LFS로 Push했다.
 
-현재 main에는 Prototype Pawn/GameMode, 입력, Telemetry, Flight HUD, TUT-01 Course, TUT-02 Ordered Ring Gate, TUT-03 Segment/Lap 원본과 TUT-04B 이전 평균·Best·Delta 결과가 있다. `UDroneTrainingLapRecorderComponent`는 현재 완료 Lap을 History에 넣기 전에 비교해 자기 자신이 이전 평균에 섞이지 않게 한다. 결과는 `OnLapComparisonReady`와 HUD 네 행으로 노출된다. 자동 검증은 16/16이지만 실제 두 Lap 화면은 미확인이다. Take Off, Landing, Crash/실패, Mission, Enemy AI, MG 점유·공격, Evaluation은 아직 구현된 것으로 판정하지 않는다.
+현재 main에는 Prototype Pawn/GameMode, 입력, Telemetry, Flight HUD, TUT-01 Course, TUT-02 Ordered Ring Gate, TUT-03 Segment/Lap 원본과 TUT-04B 이전 평균·Best·Delta 결과가 있다. NPC Faction·Rifle/Shotgun Profile, Smart Object Activity Tag, Character·Controller·Spawn Point·Station·예약 Component와 Drone Sight 대상 등록 기반도 `c3e6d38`에 병합됐다. Game/Editor Build, 전체 `Drone.` 17/17, Blueprint 0/0/0을 통과했다. 실제 Definition·Blueprint·StateTree, 순찰, 아군 이동, Rifle/Shotgun 발사, MG 점유·공격은 아직 구현된 것으로 판정하지 않는다.
 
 2026-08-27에는 `C:\에셋`에서 ArmyVFX·InfantrySFX·Ground Drone/MG 외형·Modular Soldier/Insurgent 외형·Quad v4·PBR Sting과 OilRig을 선별 이식했다. ThirdParty 891개와 중앙 `Lvl_OilRig` 1개이며 새 Root 수량 일치, 대표 로드, 외부·누락 참조 0을 확인했다. OilRig 명령줄 Map Check는 장시간 완료되지 않아 Editor 수동 확인이 남았다. 상세 내용은 [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md)를 따른다.
 
@@ -294,6 +294,6 @@ UE 5.8의 Dataflow·Chaos Cloth·Chaos Destruction을 부분 고정 그물과 �
 - 맵 파괴: Dataflow Geometry Collection, Anchor/World Support, Damage Threshold, Strain/Force와 Debris Sleep/Disable
 - Cloth 변형·파괴 연출과 포획·Damage·Mission 판정을 분리
 - 현재 생산 Cloth/Geometry Collection Asset 0, 관련 C++ 0
-- 다음 기능 우선순위는 `TUT-04`; 첫 물리 작업은 별도 `PHY-DF-00` Sandbox
+- `TUT-04` 수동 확인은 유지한다. 현재 사용자 지시에 따른 다음 구현 우선순위는 `AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01`; 첫 물리 작업은 별도 `PHY-DF-00` Sandbox
 
 상세 설계는 [`docs/DRONE_CHAOS_DATAFLOW_PLAN.md`](docs/DRONE_CHAOS_DATAFLOW_PLAN.md)를 따른다.

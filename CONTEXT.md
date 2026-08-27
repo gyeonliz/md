@@ -578,3 +578,14 @@ Inbox → Todo → Doing → Done
 - 세 Map의 공급사 GameMode Override는 제거했다. 환경별 누락 Game 의존성 0, 허용 외 경로 0, World Load 성공을 확인했다.
 - Build, Blueprint 0/0/0, 전체 Drone 15/15, Map Check, LFS Pointer 2,723개와 fsck를 통과했다. Battlefield에는 공급 Blueprint의 선택적 NULL StaticMesh Map Check 메시지 14건이 남고 Camp/Base는 0/0이다.
 - 환경 맵의 기술 이식은 완료지만 실제 Editor 화면 시각 검토와 데모 주력 Map 선택은 아직 미정이다.
+
+## 36. 2026-08-27 NPC·Smart Object 방향 추가
+
+- 적 NPC는 순찰하다가 Drone을 발견하면 대응한다.
+- 개인 화기 사격은 Rifle과 Shotgun 두 종류까지 구분해 준비한다. 최종 수치·입력·피해·Animation은 현재 미정이다.
+- MG Turret은 Smart Object Slot 예약으로 한 명만 점유하도록 한다.
+- 기지의 아군 NPC도 Smart Object를 이용해 Friendly Base Patrol 또는 Ambient 지점을 돌아다니는 방향으로 준비한다.
+- Friendly/Hostile은 기술적인 역할 구분이며 국가·군·세계관 설정을 확정하지 않는다.
+- Smart Object는 NPC Spawn이 아니라 이동 대상·생활 지점·MG 점유를 관리한다. NPC 직접 배치와 반복 Spawn은 별도 Character/Spawn Point가 담당한다.
+- `c3e6d38` main의 C++ 기반은 Profile·Tag·Character·Controller·Spawn·Reservation·Drone Sight까지다. 실제 Smart Object Definition·Blueprint·StateTree·Rifle/Shotgun 사격·MG Animation은 아직 구현 완료로 표현하지 않는다.
+- 상세 구현·Editor 사용 순서는 `docs/DRONE_SMART_OBJECT_NPC_GUIDE.md`를 기준으로 한다.
