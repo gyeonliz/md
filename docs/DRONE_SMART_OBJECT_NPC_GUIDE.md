@@ -4,7 +4,7 @@
 
 이 문서는 적군 순찰과 드론 발견 대응, 소총·샷건 분기, 기지 아군 NPC의 생활·순찰 이동, 한 명만 사용하는 MG Turret을 같은 기반 위에 구성하기 위한 실전 가이드다.
 
-현재 단계는 **C++ 기반과 역할 계약을 준비한 상태**다. Smart Object Definition, NPC Blueprint, StateTree, 무기 사격·피해·Animation 자산은 아직 완성된 기능이 아니다. 아래 순서대로 작은 동작 단위로 만들고 PIE에서 확인한 뒤 다음 카드로 넘어간다.
+현재 단계는 **C++ 기반과 Smart Object Definition·Station Blueprint 6쌍을 준비한 상태**다. NPC Blueprint, StateTree, 실제 순찰·아군 이동, 무기 사격·피해·Animation은 아직 완성된 기능이 아니다. 아래 순서대로 작은 동작 단위로 만들고 PIE에서 확인한 뒤 다음 카드로 넘어간다.
 
 ## 1. 이번 구조로 만들 동작
 
@@ -163,7 +163,7 @@ Hostile Controller가 `ADronePrototypePawn`을 처음 감지하면 현재 Smart 
 
 외형 후보만 이식된 상태이므로 특정 외형을 적·아군으로 확정하지 않는다. Animation Blueprint와 무기 손 위치도 아직 검증 전이다.
 
-## 5. Editor에서 Smart Object 지점 만들기
+## 5. 생성된 Smart Object 지점 확인·사용하기
 
 ### 왜 필요한가
 
@@ -175,27 +175,50 @@ Hostile Controller가 `ADronePrototypePawn`을 처음 감지하면 현재 Smart 
 - Editor Asset: Smart Object Definition
 - Runtime 예약: `UDroneSmartObjectReservationComponent`
 
-### Editor 절차
+### 현재 생성 결과
+
+`AI-SO-01`에서 다음 12개 Asset을 실제로 생성했다.
+
+| 역할 | Definition | Station Blueprint |
+|---|---|---|
+| 적 순찰 | `SO_Def_EnemyPatrol` | `BP_SO_EnemyPatrol` |
+| 기지 아군 순찰 | `SO_Def_FriendlyBasePatrol` | `BP_SO_FriendlyBasePatrol` |
+| 생활·대기 | `SO_Def_Ambient` | `BP_SO_Ambient` |
+| 경계 | `SO_Def_Guard` | `BP_SO_Guard` |
+| 엄폐 | `SO_Def_Cover` | `BP_SO_Cover` |
+| MG | `SO_Def_MGTurret` | `BP_SO_MGTurret` |
+
+- Definition 경로: `/Game/Drone/AI/SmartObjects/Definitions`
+- Blueprint 경로: `/Game/Drone/AI/SmartObjects/Blueprints`
+- 각 Definition은 정확히 Slot 1개와 해당 Activity Tag 1개를 가진다.
+- 각 Slot에는 `Gameplay Interaction Smart Object Behavior Definition`이 1개 들어 있다.
+- Interaction StateTree는 의도적으로 비어 있다. `AI-PATROL-01`·`AI-FRIEND-01`에서 행동을 만든 뒤 연결한다.
+- 여섯 Blueprint는 모두 `ADroneSmartObjectStation` 자식이며, 대응 Definition과 `Activity`가 연결됐다.
+- `BP_SO_MGTurret`에만 Ground Drone Kit의 `MG_Turret_SK` 후보 Mesh를 연결했다.
+
+따라서 현재 Asset은 검색·Claim 계약을 검사할 수 있지만, 맵에 배치하는 것만으로 NPC가 이동·대기하지는 않는다. 실제 이동 실행은 후속 StateTree Task가 담당한다.
+
+### Editor 확인·배치 절차
 
 1. `Drone.uproject`의 Plugin 변경을 반영하도록 Editor를 완전히 종료하고 다시 연다.
 2. Plugins에서 `Smart Objects`와 `Gameplay Interactions`가 켜졌는지 확인한다.
-3. Content Browser의 `/Game/Drone/AI/SmartObjects/Definitions`에서 Smart Object Definition을 하나 만든다.
-4. 첫 MVP는 Definition마다 Slot을 1개만 둔다.
-5. Slot의 Activity Tags에 표의 정확한 Tag 하나를 넣는다.
-6. NPC가 실제로 지점을 사용하는 단계에서는 Slot Behavior에 Gameplay Interaction Definition을 연결한다.
-7. `/Game/Drone/AI/SmartObjects/Blueprints`에서 `ADroneSmartObjectStation` 자식 Blueprint를 만든다.
-8. Class Defaults의 `Activity`를 Definition의 Activity Tag와 같은 역할로 맞춘다.
-9. Smart Object Component의 Definition에 방금 만든 Asset을 연결한다.
-10. 화살표가 NPC가 바라볼 방향이 되도록 맵에서 회전한다.
-11. MG Blueprint만 Visual Mesh에 MG Turret 후보를 연결한다. 일반 순찰 지점은 Mesh 없이 사용한다.
+3. Content Browser에서 위 Definition과 Station Blueprint 6쌍이 보이는지 확인한다.
+4. Definition 하나를 열어 Slot 1개, 정확한 Activity Tag와 Gameplay Interaction Behavior가 있는지 확인한다.
+5. Station Blueprint의 Class Defaults에서 `Activity`와 Smart Object Definition이 같은 역할인지 확인한다.
+6. 시험 맵에 필요한 Station Blueprint를 끌어 놓는다.
+7. 화살표가 NPC가 바라볼 방향이 되도록 맵에서 회전한다.
+8. `P` 키로 NavMesh가 NPC 위치부터 각 Slot까지 이어지는지 확인한다.
+9. MG Blueprint만 Turret Mesh가 보이고 일반 순찰·생활 지점은 Mesh 없이 화살표 Preview만 보이는지 확인한다.
+10. StateTree 구현 뒤 Slot Behavior의 비어 있는 StateTree를 해당 Interaction StateTree로 연결한다.
 
 `Activity` enum은 사람이 Blueprint 역할을 확인하기 위한 값이고, 실제 검색 기준은 Definition Slot의 Activity Tag다. 둘이 다르면 검색 결과가 잘못되므로 반드시 같이 맞춘다.
 
-### 정상 결과
+### 현재 단계의 정상 결과
 
 - Smart Object 디버그 화면에서 Slot이 보인다.
-- 첫 NPC가 Claim한 Slot은 두 번째 NPC가 동시에 Claim하지 못한다.
-- NPC가 행동을 끝내거나 중단하면 Slot이 다시 사용 가능해진다.
+- Definition과 Blueprint의 역할·Tag·참조가 일치한다.
+- `BP_SO_MGTurret`만 후보 Mesh를 가진다.
+- 실제 Claim·이동·해제는 `AI-PATROL-01` 이후 PIE에서 판정한다.
 
 ### 문제 확인
 
@@ -356,7 +379,7 @@ Hostile + CanUseMGTurret
 | 카드 | 작업 | 완료 조건 |
 |---|---|---|
 | `AI-SO-00` | Plugin·Tag·Profile·Reservation·Station C++ 기반 | Build와 기반 자동화 통과 |
-| `AI-SO-01` | Smart Object Definition 6종과 Station BP 생성 | Activity 일치, 각 Slot 디버그 표시 |
+| `AI-SO-01` | Smart Object Definition 6종과 Station BP 생성 | **Done** — 6쌍 생성, Slot·Activity·Definition·MG Mesh 자동 검증 통과 |
 | `AI-NPC-01` | 적 Rifle·Shotgun·아군 BP와 시험 맵 배치 | 세 Profile과 Possess 확인 |
 | `AI-PATROL-01` | 적 순찰 StateTree | 3개 지점을 반복 이동하고 예약 해제 |
 | `AI-FRIEND-01` | 아군 BaseRoutine StateTree | 아군 2명이 생활 지점을 겹치지 않고 순환 |
@@ -369,7 +392,17 @@ Hostile + CanUseMGTurret
 | `AI-COVER-01` | 비점유 병사 엄폐 | MG 실패 병사가 Cover 지점 사용 |
 | `AI-VIS-01` | 외형·Animation 연결 | T Pose·손 위치·Root Motion 문제 없음 |
 
-`AI-SO-00` 이후 가장 먼저 `AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01`을 완료한다. 사격은 이동·예약과 드론 감지가 안정된 뒤 Rifle부터 붙이고 Shotgun을 같은 계약의 두 번째 구현으로 추가한다.
+`AI-SO-00 → AI-SO-01`은 완료했다. 다음은 `AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01` 순서다. 사격은 이동·예약과 드론 감지가 안정된 뒤 Rifle부터 붙이고 Shotgun을 같은 계약의 두 번째 구현으로 추가한다.
+
+### Asset 재검증 명령
+
+다른 PC에서 Pull한 뒤 Asset의 저장된 연결을 다시 확인할 때 문서 저장소 루트에서 실행한다.
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneSmartObjectSetup.ps1 -Mode Validate -ProjectPath C:\URproject\drone\Drone.uproject
+```
+
+`VALIDATION_OK`가 출력되면 6쌍의 형식·부모 Class·Slot Tag·Definition·MG Mesh 연결이 일치한다. `Create` 모드는 정확한 12개 Asset을 재구성하는 유지보수용이며 일반 작업에서는 실행할 필요가 없다.
 
 ## 12. 첫 PIE 검증 체크리스트
 

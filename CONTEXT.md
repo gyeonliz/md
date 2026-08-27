@@ -470,6 +470,7 @@ Inbox → Todo → Doing → Done
 - Standalone 싱글플레이만 현재 검증 범위로 두며 네트워크·Android는 제외한다. 제공 에셋은 검증된 FPV 외형·Loop 최소 이식만 허용하고 전면 교체는 제외한다.
 - C++ 변경과 전체 빌드 전에는 열려 있는 Unreal Editor를 저장하고 종료한다.
 - Drone 작업을 진행할 때 `WORKBOARD.md`에 현재 단계·진행 정도·지금 작업·완료 근거·다음 작업을 갱신하고, 실제 변경과 검증 이력은 `docs/DRONE_WORKLOG.md`에 같은 작업에서 추가한다.
+- Codex가 새로 만드는 Git 기능 Commit과 Merge Commit 메시지는 사용자가 GitHub Desktop에서 읽기 쉽도록 한글로 작성한다. 기존 영문 Commit 이력은 바꾸지 않는다.
 
 ## 26. 2026-08-21 Tutorial·Story 방향 확정
 
@@ -587,5 +588,6 @@ Inbox → Todo → Doing → Done
 - 기지의 아군 NPC도 Smart Object를 이용해 Friendly Base Patrol 또는 Ambient 지점을 돌아다니는 방향으로 준비한다.
 - Friendly/Hostile은 기술적인 역할 구분이며 국가·군·세계관 설정을 확정하지 않는다.
 - Smart Object는 NPC Spawn이 아니라 이동 대상·생활 지점·MG 점유를 관리한다. NPC 직접 배치와 반복 Spawn은 별도 Character/Spawn Point가 담당한다.
-- `c3e6d38` main의 C++ 기반은 Profile·Tag·Character·Controller·Spawn·Reservation·Drone Sight까지다. 실제 Smart Object Definition·Blueprint·StateTree·Rifle/Shotgun 사격·MG Animation은 아직 구현 완료로 표현하지 않는다.
+- `c3e6d38` main의 C++ 기반은 Profile·Tag·Character·Controller·Spawn·Reservation·Drone Sight까지다. 그 위 `AI-SO-01` 작업에서 Smart Object Definition 6종과 대응 Station Blueprint 6종을 실제 구성하고 Slot·Activity·Definition·MG Mesh 연결을 검증했다.
+- 각 Definition의 Gameplay Interaction Behavior에 연결할 StateTree는 현재 비어 있다. 실제 NPC Blueprint·순찰·아군 이동·Rifle/Shotgun 사격·MG Animation은 아직 구현 완료로 표현하지 않는다.
 - 상세 구현·Editor 사용 순서는 `docs/DRONE_SMART_OBJECT_NPC_GUIDE.md`를 기준으로 한다.
