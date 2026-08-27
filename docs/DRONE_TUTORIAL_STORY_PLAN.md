@@ -214,9 +214,11 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 | AST-00 | 제공 에셋 인수 감사 | ZIP 14개와 해제본의 상대 경로·크기 일치 및 팩별 호환성·이식 위험 기록 |
 | AST-01 | 제공 Drone 에셋 선별 적용 | UE 5.8 스테이징 검증 후 기능 코드 변경 없이 Integration BP에서 외형 교체 |
 
-현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`, `TUT-03`과 `TUT-04B` 기술 구현을 완료했다. TUT-03은 Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료와 World Game Time·Telemetry 위치 표본 기반 실제 거리·평균 속도 원본 기록을 포함한다. `55b3ffe` main에서 Editor Build, 전체 `Drone.` 16/16, Blueprint 오류 0을 통과했다. 실제 두 Lap의 표시 판정은 남아 있다.
+현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`, `TUT-03`과 `TUT-04B` 기술 구현을 완료했다. TUT-03은 Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료와 World Game Time·Telemetry 위치 표본 기반 실제 거리·평균 속도 원본 기록을 포함한다. 최신 `c3e6d38` main에서 Game/Editor Build, 전체 `Drone.` 17/17, Blueprint 0/0/0을 통과했다. 실제 두 Lap의 표시 판정은 남아 있다.
 
 TUT-04B의 이전 성공 평균·Best 집계와 HUD 결과 행은 구현·자동 검증됐고 실제 두 Lap 수동 확인이 남았다. 수동 확인 뒤 다음 기능 카드는 Flight 상태 또는 NavigationArrows Host/Wrapper다.
+
+사용자의 2026-08-27 우선순위 변경에 따라 Story/NPC/MG 단계의 선행 준비로 NPC·Smart Object C++ 기반을 병행한다. 적 EnemyPatrol/Guard, 아군 FriendlyBasePatrol/Ambient, Rifle/Shotgun Profile, 드론 감지 Event와 MG 1-Slot 예약 계약을 먼저 고정한다. 실제 구현 순서는 `AI-SO-01 Definition → AI-NPC-01 BP 배치 → 적 순찰 → 아군 기지 이동 → 드론 감지 → Rifle → Shotgun → MG`이며, 상세 절차는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md)를 따른다. 이는 Mission·최종 전투 규칙이 확정됐다는 뜻이 아니다.
 
 ## 8. 검증 게이트
 

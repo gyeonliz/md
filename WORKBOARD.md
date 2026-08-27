@@ -4,27 +4,27 @@
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 현재 기준선은 `main=origin/main=55b3ffe`다. 기능 Commit `3fa4444`에서 남은 제공 에셋 891개와 `Lvl_OilRig`, `TUT-04B` 이전 평균·Best 결과 기능을 추가하고 main에 병합·Push했다. 기능 실행 순서는 `TUT-04 수동 확인 → Flight 상태 → Operator↔Drone → Story/NPC/Mission → AI/MG/Jamming`이다.
+Unreal 현재 기준선은 `main=origin/main=c3e6d38`이다. 기존 Merge `55b3ffe`와 사용자의 `4f14d2f` Battlefield Map 갱신을 보존하고, 적 순찰·드론 감지·Rifle/Shotgun·MG와 기지 아군 Smart Object 이동의 C++ 기반 `489ced5`를 병합·Push했다. 이 준비 작업은 AI가 완성됐다는 뜻이 아니며, 실제 Definition·Blueprint·StateTree·사격 구현은 별도 카드로 닫는다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-08-27 — 남은 에셋 선별 이식·OilRig·TUT-04B 기술 검증
+마지막 갱신: 2026-08-27 — Smart Object NPC 기반과 사용 가이드 준비
 
 | 항목 | 상태 |
 |---|---|
-| 현재 단계 | 3단계 Tutorial Vertical Slice — `TUT-04B` 계산·HUD 자동 검증 완료, 실제 두 Lap 비교 확인 대기 |
-| 진행 정도 | 첫 기록 기준 생성, 이전 성공 평균, Best, 시간·속도 Delta와 Segment 비교가 구현됐다. 전체 자동화 16/16을 통과했지만 실제 두 번 완주 화면은 아직 미확인 |
-| 지금 작업 중 | 남은 제공 에셋 891개와 `Lvl_OilRig` 기술 이식, TUT-04B, Git LFS Push 완료. Editor 수동 확인 단계 |
-| 완료 근거 | Build 성공, 새 자산 수량 일치·대표 로드 성공·외부/누락 0, Blueprint 오류 0, 전체 `Drone.` 16/16 |
+| 현재 단계 | 3단계 Tutorial Vertical Slice 수동 확인 대기 + NPC/Smart Object 선행 기반 준비 |
+| 진행 정도 | 기존 TUT-04B는 실제 두 Lap 확인 대기. `AI-SO-00` Profile·Tag·NPC·Controller·Spawn·Reservation·드론 Sight 기반 완료 |
+| 지금 작업 중 | `AI-SO-00` 코드·문서·Git 공유 완료. 다음은 Editor 자산 카드 `AI-SO-01` |
+| 완료 근거 | Game/Editor Build 성공, 전체 `Drone.` 17/17, Blueprint 0/0/0, LFS fsck와 두 저장소 diff 검사 통과 |
 | 수동 미확인 | Training 두 Lap 비교 HUD, OilRig Map Check·재질·조명·스케일·충돌·성능, Ground Drone/MG·NPC·Raw Drone 외형 채택 |
 | 현재 차단 | 기능 코드 차단 없음. OilRig 명령줄 Map Check가 약 8분 동안 맵 Construction에서 끝나지 않아 Editor 수동 확인 필요 |
-| 다음 행동 | 다른 PC Pull/LFS를 확인하고 `Lvl_OilRig` Map Check와 `Lvl_DroneTraining` 두 Lap을 실제 Editor에서 확인 |
-| 다음 기능 | NavigationArrows Host/Wrapper 또는 Flight Take Off/Landing/Crash 카드 |
+| 다음 행동 | 전체 회귀 뒤 AI 기반을 Push하고, Editor에서 `AI-SO-01` Definition/Station BP를 한 종류씩 생성 |
+| 다음 기능 | `AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01`; 이동·예약이 안정된 뒤 Rifle·Shotgun 사격 |
 | 에셋 인수 | `C:\에셋` 원본은 보존. ArmyVFX·InfantrySFX·Ground Drone·NPC 외형·Raw Drone을 정확한 의존성 묶음으로 이식 |
 | 맵 이식 | 기존 환경 3종에 `Lvl_OilRig`을 추가. Vendor FirstPerson Sample 의존성을 끌어오던 Door Actor 8개는 중앙 사본에서 제거 |
 | Editor/MCP | 모든 검사 프로세스 종료 확인. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
-| Git 처리 | 자산·기능 Commit `3fa4444`, main Merge `55b3ffe`. 신규 LFS 892개·4.9GB Push 완료 |
+| Git 처리 | AI 기능 `489ced5`, main Merge `c3e6d38` Push 완료. 기존 사용자 `4f14d2f` Map 변경 보존 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
 | 학습 다음 행동 | Q-Net 상태를 확인해 Track A/B/C를 고르고 첫 학습 블록 실행 |
 
@@ -59,6 +59,16 @@ Unreal 현재 기준선은 `main=origin/main=55b3ffe`다. 기능 Commit `3fa4444
 | STUDY-EXAM-01 | 정보처리산업기사 | Q-Net 개인 상태 확인 | 3회 접수·수험일·응시 여부·필기 합격/면제 상태를 확인하고 Track A/B/C 기록 |
 | STUDY-EXAM-02 | 정보처리산업기사 | 선택 Track 첫 학습 | 필기 60문항 진단 또는 실기 기초 1블록과 오답 기록 완료 |
 | STUDY-CT-01 | Coding Test | C++ 기본 진단 시작 | 첫 문제 직접 풀이·실패 이유·재풀이 날짜 기록 |
+| AI-SO-01 | Drone / AI / Smart Object | Definition 6종과 Station Blueprint 생성 | Activity Tag와 Slot을 일치시키고 Smart Object 디버그에 표시 |
+| AI-NPC-01 | Drone / AI | Hostile Rifle·Hostile Shotgun·Friendly Base Blueprint와 Greybox 배치 | 세 Profile, Possess, NavMesh 연결 확인 |
+| AI-PATROL-01 | Drone / AI | Hostile 순찰 StateTree | 적이 EnemyPatrol 지점을 예약·이동·대기·해제하며 반복 |
+| AI-FRIEND-01 | Drone / AI | Friendly BaseRoutine StateTree | 아군 2명이 FriendlyBasePatrol/Ambient를 겹치지 않고 순환 |
+| AI-PER-01 | Drone / AI | 드론 Sight와 StateTree Event PIE 검증 | Hostile만 감지 시 순찰 중단, 실종 시 Search 전환 |
+| AI-WPN-01 | Drone / AI / Combat | Rifle·Shotgun 공용 무기 계약 | 같은 AI 호출 경로에서 무기 Profile별 구현 분기 |
+| AI-WPN-02 | Drone / AI / Combat | Rifle Greybox 사격 | 단일 Trace, 시야·사거리·Cooldown 검증 |
+| AI-WPN-03 | Drone / AI / Combat | Shotgun Greybox 사격 | 다중 Pellet·Spread와 단일 Trigger 판정 검증 |
+| AI-MG-01 | Drone / AI / Smart Object | MG Claim·Move | 여러 적 중 한 명만 1-Slot MG에 이동 |
+| AI-MG-02 | Drone / AI / Combat | MG Occupy·Aim·Fire·Release | 중단·사망 뒤 Slot 해제와 다음 AI 재점유 확인 |
 
 ## Doing
 
@@ -116,6 +126,7 @@ Unreal 현재 기준선은 `main=origin/main=55b3ffe`다. 기능 Commit `3fa4444
 | AST-03A | Drone / Unreal / Asset | `C:\에셋` 세 환경 팩 3,334개·18.76 GiB와 Map 10개를 스테이징 감사했다. 대표 중앙 Map 3개와 정확한 폐쇄 2,723개·16.96 GiB 이식, GameMode Override 제거, 누락 직접 참조·호환 경로 보강, Build·BP 0/0/0·전체 15/15·실제 Map Load·LFS 검증 통과. Battlefield 공급 BP Map Check 메시지 14건과 세 맵 Editor 시각 검토는 별도 수동 항목 |
 | UE-MCP-01 | Drone / Unreal / Codex Sync | UE 5.8 공식 `ModelContextProtocol`과 Editor·Automation·UMG·StateTree·AI Toolset을 Editor Target으로 연결. Codex 프로젝트 설정·자동 시작 기본값 추가, Editor/Game Build, 전체 Drone 12/12, HTTP MCP 초기화·23 Toolset·Training Map 상태 조회·12개 테스트 탐색 통과. 새 Codex 작업의 네이티브 노출 확인은 UE-MCP-02로 분리 |
 | STUDY-PLAN-01 | 정보처리산업기사 / Coding Test | Q-Net 공식 2026 일정·시험 구성을 확인하고 접수 상태별 Track A/B/C, C++ 주간 병행안과 이동용 통합 문서를 작성 |
+| AI-SO-00 | Drone / AI / Smart Object | Plugin·Module·Profile·Native Tag·Character·Controller·Spawn Point·Station·Reservation·Drone Sight 기반. Game/Editor Build, 전용 1/1, 전체 17/17, Blueprint 0/0/0, LFS 검증 후 `489ced5`를 `c3e6d38`로 main 병합·Push |
 | SYNC-01 | Codex Sync | 목표·완료·진행·결정·미정·다음 작업 형식 정의 |
 | SYNC-02 | Codex Sync | `handoff.md` + `manifest.json` Export/Import 구현 |
 | SYNC-03 | Codex Sync | 인증·토큰·원시 세션 제외 기준과 검사 구현 |
@@ -124,7 +135,7 @@ Unreal 현재 기준선은 `main=origin/main=55b3ffe`다. 기능 Commit `3fa4444
 
 ## 이번 인계의 정지선
 
-Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 로컬 `main`과 `origin/main`은 Merge Commit `55b3ffe`로 일치한다. `3fa4444`는 남은 선별 자산·TUT-04B, `204e34b`는 환경 이식까지의 이전 main, `551e287`은 TUT-03 기준선이다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
+Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 `main=origin/main=c3e6d38`이다. AI 기반 기능 Commit은 `489ced5`이며 기존 자산·TUT-04B Merge `55b3ffe`와 사용자 Battlefield Map 갱신 `4f14d2f`을 보존한다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
 
 Android 제외와 PFN-01~06, HUD-01, HUD-02, TUT-01~03, 최초 에셋 인수 감사 `AST-00`, 다른 PC의 `C:\에셋` 재검증 `AST-VERIFY-01`, NavigationArrows 최소 이식·원격 공유 `AST-02A`를 완료했다. `AST-01`의 실제 Loop 청감은 여전히 수동 미확인이다. 현재 main에는 TUT-04B 이전 평균·Best 비교와 기록 결과 HUD까지 구현됐으며 실제 두 Lap 표시 판정이 남았다. 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다.
 
@@ -136,4 +147,4 @@ UE-MCP-01도 완료했다. 이후 Editor 내부 Actor·Asset·Blueprint·UMG·Au
 - `AST-02A`의 기술 이식·검증·기능 Branch와 `main` Push는 완료했다. 실제 Training HUD 연결은 아직 하지 않았다.
 - HUD 연결 전에도 자산은 안전하게 로드 가능한 상태지만, 화면에 보이는 구현으로 과장하지 않는다.
 - 프로젝트 소유 맵은 `/Game/Drone/Maps` 한 곳에서 관리한다. 공급사 원본 맵을 추가할 때도 검토용 사본만 이 폴더에 두고 의존 자산은 각 ThirdParty 폴더에 유지한다.
-- 바로 다음 기능은 기존 우선순위의 `TUT-04`다. 프로젝트 소유 Navigation Host/Wrapper 화면 연결은 별도 후속 카드로 시작한다.
+- TUT-04 실제 두 Lap 확인은 그대로 남긴다. 사용자 요청으로 NPC/Smart Object 기반을 먼저 준비했고, 다음 구현은 `AI-SO-01`부터 한 카드씩 Editor에서 검증한다.

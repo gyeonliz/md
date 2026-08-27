@@ -6,13 +6,14 @@
 
 ## 30초 요약
 
-- Unreal 저장소는 `main=origin/main=55b3ffe`다. 남은 자산·TUT-04B 기능 Commit `3fa4444`이 병합됐다.
+- Unreal 기준선은 `main=origin/main=c3e6d38`이다. AI 기반 기능 `489ced5`와 기존 사용자 Battlefield Map `4f14d2f`이 모두 반영됐다.
 - Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개, Segment/Lap 원본과 이전 평균·Best·Delta 결과까지 구현됐다.
 - 현재 개발 완료 지점은 `TUT-04B` 기술 구현이며, 실제 두 Lap HUD 확인 뒤 Flight 상태로 진행한다.
 - 이번 확인 PC의 제공 에셋 루트는 `C:\에셋`이다. FPV·Loop 선택 자산 12개와 프로젝트 Integration BP 1개의 파일·참조·LFS·자동 검증은 통과했다.
 - NavigationArrows 최소 자산 6개와 전용 테스트는 main에 병합됐다. 화면 Host는 아직 미구현이다.
 - 프로젝트 사용 맵은 `/Game/Drone/Maps`로 중앙화했다. 환경 맵 3종에 `Lvl_OilRig`을 추가했고, 남은 제공 자산 891개를 후보 라이브러리로 선별 이식했다.
 - 사용자는 Gate나 기록 C++를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도와 Drone Loop를 확인하면 된다.
+- 적 순찰·드론 감지·Rifle/Shotgun·MG와 기지 아군 Smart Object 이동을 위한 C++ 기반과 상세 가이드를 준비했다. 실제 Definition·BP·StateTree·사격은 다음 카드다.
 - 확정된 학습 항목은 `정보처리산업기사`와 `C++ 코딩테스트` 두 가지뿐이다.
 - 정보처리산업기사 2026년 3회 필기 접수는 끝났다. 오늘 가장 먼저 Q-Net에서 자신의 접수·면제·응시 상태를 확인해야 한다.
 - 코딩테스트는 공통 시험일이 없으므로 자격시험 일정에 맞춰 주간 반복 학습으로 운영한다.
@@ -22,17 +23,18 @@
 | 구분 | 현재 상태 |
 |---|---|
 | Unreal 저장소 | `C:\URproject\drone` |
-| Unreal 기준 Commit | `55b3ffe` |
-| Git 상태 | 깨끗한 `main`, 로컬·원격 일치. 이번 신규 LFS 892개·4.9GB Push 완료 |
+| Unreal 기준 Commit | `c3e6d38` |
+| Git 상태 | 깨끗한 `main`, 로컬·원격 일치. AI 기반 Merge·Push 완료 |
 | Git LFS | `fsck` 정상 |
 | 최종 Editor Build | 성공 |
 | Tutorial 자동화 | 7/7 통과 |
-| 전체 `Drone.` 자동화 | 16/16 통과 |
+| 전체 `Drone.` 자동화 | 17/17 통과. 기존 PIE RecastNavMesh 경고 포함 성공 1개 |
 | Blueprint Compile | Errors 0, 기존 Battlefield Pose GUID·MCP 고지 경고 유지 |
 | Standalone | 실제 WBP HUD·Cyan Course·Current/Inactive Gate 표시 확인 |
 | 에셋 이식 | 환경 3종+OilRig와 후보 라이브러리 891개. 새 Root 수량 일치·대표 로드·외부/누락 0, LFS fsck 통과 |
+| NPC/Smart Object 기반 | Game/Editor Build, 전용 1/1, 전체 17/17, Blueprint 0/0/0, LFS 통과. main Push 완료 |
 
-현재 main에서 Editor Build, 전체 Drone 16개와 Blueprint 전체 Compile을 다시 실행했다. 자동화 16/16은 성공했고 기존 PIE NavMesh 경고 포함 성공 1개가 있다. Blueprint 오류는 0이다.
+현재 main에서 Game/Editor Build, 전체 Drone 17개와 Blueprint 전체 Compile을 실행했다. 자동화 17/17은 성공했고 기존 PIE NavMesh 경고 포함 성공 1개가 있다. Blueprint 오류·Blueprint 경고·로드 실패는 0이다.
 
 ## 2. 코드가 어떻게 연결되는가
 
@@ -63,6 +65,15 @@ Lvl_DroneTraining
 └─ ADroneTrainingGate × 4
    ├─ Pawn Overlap Box Trigger
    └─ 비충돌 Ring Visual 16조각
+
+ADroneNPCSpawnPoint 또는 직접 배치
+└─ ADroneNPCCharacter + NPC Profile
+   └─ ADroneNPCAIController
+      ├─ StateTree
+      ├─ Sight: Drone Prototype 감지
+      └─ Smart Object Reservation
+         ├─ Hostile: EnemyPatrol / Guard / 선택적 MG
+         └─ Friendly: FriendlyBasePatrol / Ambient
 ```
 
 ### 클래스별 한 줄 책임
@@ -121,13 +132,20 @@ Lvl_DroneTraining
 - Reset 시 부분 기록 폐기, 성공 History 유지, Course 재구성 시 History 초기화
 - 현재 기록을 제외한 이전 성공 평균·Best·시간/속도 Delta와 Segment 비교
 - 결과 UI가 구독할 `OnLapComparisonReady`와 Getter
+- Friendly/Hostile, Unarmed/Rifle/Shotgun, MG 사용 가능 NPC Profile
+- Smart Object Activity Tag와 Slot Claim·Release 기반
+- NPC Character·Controller·Spawn Point·Station C++ 기반
+- Drone Sight 감지 대상 등록과 Hostile Detected/Lost StateTree Event
 
 ### 미구현
 
 - 다음 Gate·잘못된 순서/방향 안내와 완주 팝업·구간별 결과 표
 - 명시적인 Take Off·Landing·Crash 상태와 최종 비행 물리
 - Mission·귀환·평가
-- Drone Enemy AI·MG Turret 점유·공격
+- 실제 Smart Object Definition·Station BP·Hostile/Friendly StateTree
+- 실제 Enemy Patrol과 Friendly BaseRoutine 이동
+- Rifle·Shotgun 발사·피해·Animation·FX·SFX
+- MG Turret 점유·조준·공격과 중단 뒤 재점유
 - 배터리·통신거리·재밍
 - SaveGame·Multiplayer·최종 에셋 전면 적용
 
@@ -152,7 +170,7 @@ Lvl_DroneTraining
 ### PC 앞에서 할 일
 
 1. 다른 PC라면 `drone`과 `md` 저장소를 Pull한다.
-2. Unreal Commit이 `55b3ffe`인지, `git lfs pull` 뒤 네 환경 Map과 신규 ThirdParty Root가 내려왔는지 확인한다.
+2. Unreal Commit이 `origin/main`과 일치하는지, `git lfs pull` 뒤 네 환경 Map과 신규 ThirdParty Root가 내려왔는지 확인한다.
 3. UE 5.8.1에서 `/Game/Drone/Maps/Lvl_DroneTraining`을 직접 연다.
 4. Gate 0→1→2→3을 정방향으로 완주한다.
 5. 미래 Gate를 먼저 통과하거나 현재 Gate를 역방향으로 통과해 진행되지 않는지 확인한다.
@@ -162,6 +180,8 @@ Lvl_DroneTraining
 9. Ground Drone/MG·Soldier/Insurgent·Quad v4/Sting 후보의 외형과 스케일을 확인한다.
 10. Gate 크기·높이·간격·색 대비와 Keyboard/Gamepad 조종 체감을 메모한다.
 11. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가고 종료 후 즉시 멈추는지 기록한다.
+12. AI 기반 Merge 뒤 Editor를 재시작해 Smart Objects와 Gameplay Interactions Plugin을 확인한다.
+13. [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md)의 `AI-SO-01`부터 Definition/Station BP를 만든다.
 
 다시 만들 필요가 없는 것:
 
@@ -178,10 +198,13 @@ Lvl_DroneTraining
 ```text
 TUT-03 Segment/Lap 기록 Done
 → TUT-04B 비교·결과 UI 기술 구현 Done · 수동 확인 대기
-→ Take Off·Landing·Crash
-→ Operator↔Drone
-→ Story/NPC/Mission
-→ Enemy AI·MG·Jamming
+→ AI-SO-00 C++ 기반 Done
+→ AI-SO-01 Definition/Station BP
+→ AI-NPC-01 적 Rifle·Shotgun·아군 BP
+→ AI-PATROL-01 적 순찰
+→ AI-FRIEND-01 기지 아군 이동
+→ AI-PER-01 드론 감지
+→ Rifle → Shotgun → MG
 ```
 
 TUT-03은 기존 Gate 판정과 분리된 Recorder가 정상 `OnGateAccepted`와 Telemetry Event를 구독하도록 완료했다. TUT-04B도 이 원본을 사용해 비교 결과를 C++에서 만들고 Widget은 표시만 한다.
