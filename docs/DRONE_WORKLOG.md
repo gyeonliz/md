@@ -18,20 +18,20 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-27 — AI-SO-01 Definition·Station Asset 6쌍 구성·검증
+마지막 갱신: 2026-08-27 — AI-NPC-01 역할 Blueprint·Greybox 맵·NavMesh 검증
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | Tutorial 수동 확인 대기 + 적/아군 NPC Smart Object 선행 기반 준비 |
-| Unreal 기준선 | `main=origin/main=c3e6d38`; AI 기능 `489ced5`, 사용자 Battlefield Map `4f14d2f` 보존 |
-| 자동 검증 | Game/Editor Build, AI Asset 전용 1/1, 전체 `Drone.` 18/18, Blueprint 0/0/0, LFS fsck 성공 |
+| 전체 단계 | Tutorial 수동 확인 대기 + 적/아군 NPC Greybox 기반 완료 |
+| Unreal 기준선 | `main=origin/main=eeb4354`; AI-NPC-01 기능 `362edaa`, 사용자 Battlefield Map `4f14d2f` 보존 |
+| 자동 검증 | Game/Editor Build, NPC 전용 2/2, 전체 `Drone.` 20/20, Blueprint 0/0/0, LFS fsck 성공 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | `AI-SO-01` Definition/Station BP 6쌍 구성·검증 완료. 다음 `AI-NPC-01` 준비 |
+| 지금 작업 중 | `AI-NPC-01` 역할 BP·전용 맵·NavMesh 검증 완료. 다음 `AI-PATROL-01` 준비 |
 | 차단 조건 | 기능 코드의 기술 차단은 없음. OilRig 별도 Map Check가 장시간 완료되지 않아 Editor 수동 Map Check가 필요 |
-| 다음 행동 | `AI-NPC-01` Hostile Rifle·Hostile Shotgun·Friendly Base Blueprint와 Greybox 배치 구성 |
-| 다음 기능 | `AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01` |
+| 다음 행동 | `AI-PATROL-01` Hostile 순찰 StateTree와 예약·이동·해제 Task 구성 |
+| 다음 기능 | `AI-PATROL-01 → AI-FRIEND-01 → AI-PER-01` |
 | 이후 | Drone 감지 → Rifle → Shotgun → MG → Cover/Search/Return |
-| Git 처리 | 기능 `489ced5`, main Merge `c3e6d38` Push 완료; 기존 사용자 `4f14d2f` Map 변경 보존 |
+| Git 처리 | AI-NPC-01 기능 `362edaa`, main Merge `eeb4354` Push 완료; AI-SO-01 Merge `89ca2bc`와 사용자 `4f14d2f` Map 변경 보존 |
 
 ## 2026-08-27 — NPC·Smart Object 기반 준비
 
@@ -60,6 +60,20 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 - Game/Editor Build, 전용 AI Asset 1/1, 전체 `Drone.` 18/18, Blueprint 0 errors·0 warnings·0 load failures, LFS fsck를 통과했다. 전체 자동화의 경고 포함 성공 1개는 기존 PIE RecastNavMesh 경고다.
 - Interaction StateTree는 후속 `AI-PATROL-01`·`AI-FRIEND-01`에서 연결하므로 현재 의도적으로 비어 있다. 실제 순찰·아군 이동·사격을 완료로 표현하지 않는다.
 - 문서 저장소의 `tools/unreal/Setup-DroneSmartObjectStations.py`와 `Invoke-DroneSmartObjectSetup.ps1`로 정확한 12개 Asset을 재구성하거나 읽기 전용 검증할 수 있게 했다.
+
+## 2026-08-27 — AI-NPC-01 역할 Blueprint·Greybox 맵 구성
+
+- `/Game/Drone/AI/Blueprints`에 `BP_NPC_Hostile_Rifle`, `BP_NPC_Hostile_Shotgun`, `BP_NPC_Friendly_Base`, `BP_NPCSpawnPoint`를 생성했다.
+- 역할별 Profile은 Hostile/Rifle/MG 가능, Hostile/Shotgun/MG 불가, Friendly/Unarmed/MG 불가로 분리했다.
+- `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`에 Rifle 1명, Shotgun 1명, Friendly 2명과 EnemyPatrol 3·Guard 1·MGTurret 1·FriendlyBasePatrol 3·Ambient 2 Station을 배치했다.
+- 시각용 바닥과 별도로 `ADroneNPCNavigationFloor`를 추가해 NavMesh에 실제 충돌 지오메트리를 제공했다. Recast는 현재 MVP 검증을 위해 Dynamic·Force Rebuild On Load로 설정했으며, 넓은 맵에서는 성능 범위를 다시 결정한다.
+- StateTree Asset이 비어 있을 때 자동 시작하지 않고, 실행 중인 StateTree에만 감지 Event를 보내도록 Controller의 현재 단계 오류를 막았다.
+- `Drone.AI.NPCGreyboxAssets`와 `Drone.AI.NPCGreyboxPIE` 2/2에서 Profile, Controller Possess, 역할 Tag, NPC·Station 수, Navigation Floor, Dynamic Recast, NPC 시작점 NavMesh 투영을 검증했다.
+- Game/Editor Build, 전체 `Drone.` 20/20을 통과했다. 19개 정상 성공, 기존 PIE RecastNavMesh 경고 포함 성공 1개, 실패 0개다.
+- Blueprint 전체 Compile은 errors 0·warnings 0·failed load 0이며, 새 패키지 5개는 LFS Pointer와 `git lfs fsck`를 통과했다.
+- Manny Simple·`ABP_Unarmed`은 임시 Greybox다. 최종 Soldier/Insurgent 외형, 실제 StateTree·순찰·아군 이동·Rifle/Shotgun 사격은 아직 미구현이다.
+- 기능 Commit `362edaa`를 `codex/npc-greybox-setup`에 Push하고 Merge Commit `eeb4354`로 `origin/main`에 반영했다.
+- 문서 저장소의 `tools/unreal/Setup-DroneNPCGreybox.py`와 `Invoke-DroneNPCGreyboxSetup.ps1`로 자산 생성·유지보수와 읽기 전용 검증을 반복할 수 있게 했다.
 
 ## 2026-08-27 — 남은 에셋 선별 이식·OilRig·TUT-04B
 

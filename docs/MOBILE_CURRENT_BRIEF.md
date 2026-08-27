@@ -6,14 +6,14 @@
 
 ## 30초 요약
 
-- Unreal 기준선은 `main=origin/main=c3e6d38`이다. AI 기반 기능 `489ced5`와 기존 사용자 Battlefield Map `4f14d2f`이 모두 반영됐다.
+- Unreal 기준선은 `main=origin/main=eeb4354`이다. AI-NPC-01 기능 `362edaa`와 기존 사용자 Battlefield Map `4f14d2f`이 모두 반영됐다.
 - Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개, Segment/Lap 원본과 이전 평균·Best·Delta 결과까지 구현됐다.
 - 현재 개발 완료 지점은 `TUT-04B` 기술 구현이며, 실제 두 Lap HUD 확인 뒤 Flight 상태로 진행한다.
 - 이번 확인 PC의 제공 에셋 루트는 `C:\에셋`이다. FPV·Loop 선택 자산 12개와 프로젝트 Integration BP 1개의 파일·참조·LFS·자동 검증은 통과했다.
 - NavigationArrows 최소 자산 6개와 전용 테스트는 main에 병합됐다. 화면 Host는 아직 미구현이다.
 - 프로젝트 사용 맵은 `/Game/Drone/Maps`로 중앙화했다. 환경 맵 3종에 `Lvl_OilRig`을 추가했고, 남은 제공 자산 891개를 후보 라이브러리로 선별 이식했다.
 - 사용자는 Gate나 기록 C++를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도와 Drone Loop를 확인하면 된다.
-- 적 순찰·드론 감지·Rifle/Shotgun·MG와 기지 아군 Smart Object 이동을 위한 C++ 기반에 이어 Definition·Station BP 6쌍을 구성했다. StateTree·실제 이동·사격은 후속 카드다.
+- 적 순찰·드론 감지·Rifle/Shotgun·MG와 기지 아군 Smart Object 이동을 위한 C++ 기반, Definition·Station BP 6쌍, 역할별 NPC BP와 전용 Greybox 맵까지 구성했다. StateTree·실제 이동·사격은 후속 카드다.
 - 확정된 학습 항목은 `정보처리산업기사`와 `C++ 코딩테스트` 두 가지뿐이다.
 - 정보처리산업기사 2026년 3회 필기 접수는 끝났다. 오늘 가장 먼저 Q-Net에서 자신의 접수·면제·응시 상태를 확인해야 한다.
 - 코딩테스트는 공통 시험일이 없으므로 자격시험 일정에 맞춰 주간 반복 학습으로 운영한다.
@@ -23,18 +23,18 @@
 | 구분 | 현재 상태 |
 |---|---|
 | Unreal 저장소 | `C:\URproject\drone` |
-| Unreal 기준 Commit | `c3e6d38` |
-| Git 상태 | 깨끗한 `main`, 로컬·원격 일치. AI 기반 Merge·Push 완료 |
+| Unreal 기준 Commit | `eeb4354` |
+| Git 상태 | 깨끗한 `main`, 로컬·원격 일치. AI-NPC-01 Merge·Push 완료 |
 | Git LFS | `fsck` 정상 |
 | 최종 Editor Build | 성공 |
 | Tutorial 자동화 | 7/7 통과 |
-| 전체 `Drone.` 자동화 | 18/18 통과. 17개 정상 성공, 기존 PIE RecastNavMesh 경고 포함 성공 1개 |
+| 전체 `Drone.` 자동화 | 20/20 통과. 19개 정상 성공, 기존 PIE RecastNavMesh 경고 포함 성공 1개 |
 | Blueprint Compile | Errors 0, 기존 Battlefield Pose GUID·MCP 고지 경고 유지 |
 | Standalone | 실제 WBP HUD·Cyan Course·Current/Inactive Gate 표시 확인 |
 | 에셋 이식 | 환경 3종+OilRig와 후보 라이브러리 891개. 새 Root 수량 일치·대표 로드·외부/누락 0, LFS fsck 통과 |
-| NPC/Smart Object | C++ 기반과 Definition/Station BP 6쌍 구성. Game/Editor Build, AI Asset 1/1, 전체 18/18, Blueprint 0/0/0, LFS 통과 |
+| NPC/Smart Object | C++ 기반, Definition/Station BP 6쌍, 역할 BP 3종·Spawn Point·Greybox 맵 구성. NPC 전용 2/2, 전체 20/20, Blueprint 0/0/0, LFS 통과 |
 
-현재 작업 기준에서 Game/Editor Build, 전체 Drone 18개와 Blueprint 전체 Compile을 실행했다. 자동화는 17개 정상 성공, 기존 PIE NavMesh 경고 포함 성공 1개이며 실패는 0이다. Blueprint 오류·Blueprint 경고·로드 실패는 0이다.
+현재 작업 기준에서 Game/Editor Build, 전체 Drone 20개와 Blueprint 전체 Compile을 실행했다. 자동화는 19개 정상 성공, 기존 PIE NavMesh 경고 포함 성공 1개이며 실패는 0이다. Blueprint 오류·Blueprint 경고·로드 실패는 0이다.
 
 ## 2. 코드가 어떻게 연결되는가
 
@@ -69,11 +69,16 @@ Lvl_DroneTraining
 ADroneNPCSpawnPoint 또는 직접 배치
 └─ ADroneNPCCharacter + NPC Profile
    └─ ADroneNPCAIController
-      ├─ StateTree
+      ├─ StateTree Component: Asset 연결 전 자동 시작 안 함
       ├─ Sight: Drone Prototype 감지
       └─ Smart Object Reservation
          ├─ Hostile: EnemyPatrol / Guard / 선택적 MG
          └─ Friendly: FriendlyBasePatrol / Ambient
+
+Lvl_NPCSmartObjectGreybox
+├─ Hostile Rifle 1 + Hostile Shotgun 1 + Friendly 2
+├─ Smart Object Station 10개
+└─ ADroneNPCNavigationFloor + NavMeshBoundsVolume
 ```
 
 ### 클래스별 한 줄 책임
@@ -88,6 +93,7 @@ ADroneNPCSpawnPoint 또는 직접 배치
 | `ADroneTrainingGate` | Ring과 Overlap Trigger를 소유하고 진입·이탈 위치를 전달 |
 | `UDroneTrainingGateSequenceComponent` | 현재 Gate와 정상 통과 여부를 판정하고 `OnGateAccepted`를 발생 |
 | `UDroneTrainingLapRecorderComponent` | 정상 승인·Telemetry Event를 구독해 Segment/Lap 원본 기록 생성 |
+| `ADroneNPCNavigationFloor` | Greybox NavMesh에 사용할 BlockAll·Navigation Relevant 바닥 제공 |
 
 ### C++와 Blueprint의 경계
 
@@ -136,13 +142,17 @@ ADroneNPCSpawnPoint 또는 직접 배치
 - Smart Object Activity Tag와 Slot Claim·Release 기반
 - NPC Character·Controller·Spawn Point·Station C++ 기반
 - Drone Sight 감지 대상 등록과 Hostile Detected/Lost StateTree Event
+- Smart Object Definition·Station Blueprint 6쌍
+- Hostile Rifle·Hostile Shotgun·Friendly Base Blueprint와 Spawn Point BP
+- `Lvl_NPCSmartObjectGreybox`의 NPC 4명·Station 10개·Navigation Floor
+- 역할 Profile·Possess·Activity Tag·시작 위치 NavMesh 투영 자동 검증
 
 ### 미구현
 
 - 다음 Gate·잘못된 순서/방향 안내와 완주 팝업·구간별 결과 표
 - 명시적인 Take Off·Landing·Crash 상태와 최종 비행 물리
 - Mission·귀환·평가
-- 실제 Smart Object Definition·Station BP·Hostile/Friendly StateTree
+- Hostile/Friendly StateTree와 실제 이동 Task
 - 실제 Enemy Patrol과 Friendly BaseRoutine 이동
 - Rifle·Shotgun 발사·피해·Animation·FX·SFX
 - MG Turret 점유·조준·공격과 중단 뒤 재점유
@@ -181,7 +191,9 @@ ADroneNPCSpawnPoint 또는 직접 배치
 10. Gate 크기·높이·간격·색 대비와 Keyboard/Gamepad 조종 체감을 메모한다.
 11. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가고 종료 후 즉시 멈추는지 기록한다.
 12. AI 기반 Merge 뒤 Editor를 재시작해 Smart Objects와 Gameplay Interactions Plugin을 확인한다.
-13. 생성된 Smart Object Definition/Station BP 6쌍을 Content Browser에서 확인하고, 다음 `AI-NPC-01`용 전용 Greybox 맵 배치 위치를 정한다.
+13. `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`을 열어 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 10개의 위치·방향을 확인한다.
+14. `P` 키로 네 NPC 시작점과 Station 사이의 녹색 NavMesh 연결을 확인한다.
+15. 다음 `AI-PATROL-01`에 사용할 EnemyPatrol 3개 지점의 순찰 동선이 이해하기 쉬운지 검토한다.
 
 다시 만들 필요가 없는 것:
 
@@ -200,7 +212,7 @@ TUT-03 Segment/Lap 기록 Done
 → TUT-04B 비교·결과 UI 기술 구현 Done · 수동 확인 대기
 → AI-SO-00 C++ 기반 Done
 → AI-SO-01 Definition/Station BP Done
-→ AI-NPC-01 적 Rifle·Shotgun·아군 BP
+→ AI-NPC-01 적 Rifle·Shotgun·아군 BP와 Greybox Done
 → AI-PATROL-01 적 순찰
 → AI-FRIEND-01 기지 아군 이동
 → AI-PER-01 드론 감지

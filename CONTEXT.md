@@ -588,6 +588,6 @@ Inbox → Todo → Doing → Done
 - 기지의 아군 NPC도 Smart Object를 이용해 Friendly Base Patrol 또는 Ambient 지점을 돌아다니는 방향으로 준비한다.
 - Friendly/Hostile은 기술적인 역할 구분이며 국가·군·세계관 설정을 확정하지 않는다.
 - Smart Object는 NPC Spawn이 아니라 이동 대상·생활 지점·MG 점유를 관리한다. NPC 직접 배치와 반복 Spawn은 별도 Character/Spawn Point가 담당한다.
-- `c3e6d38` main의 C++ 기반은 Profile·Tag·Character·Controller·Spawn·Reservation·Drone Sight까지다. 그 위 `AI-SO-01` 작업에서 Smart Object Definition 6종과 대응 Station Blueprint 6종을 실제 구성하고 Slot·Activity·Definition·MG Mesh 연결을 검증했다.
-- 각 Definition의 Gameplay Interaction Behavior에 연결할 StateTree는 현재 비어 있다. 실제 NPC Blueprint·순찰·아군 이동·Rifle/Shotgun 사격·MG Animation은 아직 구현 완료로 표현하지 않는다.
+- `eeb4354` main은 C++ 기반, Smart Object Definition·Station Blueprint 6쌍, `BP_NPC_Hostile_Rifle`, `BP_NPC_Hostile_Shotgun`, `BP_NPC_Friendly_Base`, `BP_NPCSpawnPoint`, `Lvl_NPCSmartObjectGreybox`을 포함한다. 맵에는 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 10개, 전용 Navigation Floor·NavMesh 영역이 배치되어 있고 Profile·Possess·Activity Tag·NavMesh 투영 자동화를 통과했다.
+- NPC의 Manny/Unarmed 외형은 `AI-VIS-01` 전 임시 Greybox이다. 각 Definition의 Gameplay Interaction Behavior에 연결할 StateTree는 현재 비어 있고, 실제 순찰·아군 이동·Rifle/Shotgun 사격·MG Animation은 아직 구현 완료로 표현하지 않는다.
 - 상세 구현·Editor 사용 순서는 `docs/DRONE_SMART_OBJECT_NPC_GUIDE.md`를 기준으로 한다.
