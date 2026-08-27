@@ -4,7 +4,7 @@
 
 이 문서는 적군 순찰과 드론 발견 대응, 소총·샷건 분기, 기지 아군 NPC의 생활·순찰 이동, 한 명만 사용하는 MG Turret을 같은 기반 위에 구성하기 위한 실전 가이드다.
 
-현재 단계는 **C++ 기반과 Smart Object Definition·Station Blueprint 6쌍을 준비한 상태**다. NPC Blueprint, StateTree, 실제 순찰·아군 이동, 무기 사격·피해·Animation은 아직 완성된 기능이 아니다. 아래 순서대로 작은 동작 단위로 만들고 PIE에서 확인한 뒤 다음 카드로 넘어간다.
+현재 단계는 **C++ 기반, Smart Object Definition·Station Blueprint 6쌍, 역할별 NPC Blueprint, 전용 Greybox 맵을 준비한 상태**다. NPC 4명의 Profile·Possess·Activity Tag·NavMesh 투영까지 자동 검증했다. StateTree, 실제 순찰·아군 이동, 무기 사격·피해·Animation은 아직 완성된 기능이 아니다. 아래 순서대로 작은 동작 단위로 만들고 PIE에서 확인한 뒤 다음 카드로 넘어간다.
 
 ## 1. 이번 구조로 만들 동작
 
@@ -256,6 +256,19 @@ C++ Character에는 공통 수명주기만 두고 외형, Animation Blueprint, �
 
 Spawn Point의 `Spawn On Begin Play` 기본값은 꺼져 있다. 실수로 PIE마다 NPC가 중복 생성되는 것을 막기 위한 값이다. 자동 생성을 사용할 때 NPC Class, Profile, Count, Spacing을 설정하고 그때만 켠다.
 
+### 현재 생성 결과
+
+| Asset | 설정 | Greybox 배치 |
+|---|---|---:|
+| `BP_NPC_Hostile_Rifle` | Hostile / Rifle / MG 사용 가능 | 1명 |
+| `BP_NPC_Hostile_Shotgun` | Hostile / Shotgun / MG 사용 불가 | 1명 |
+| `BP_NPC_Friendly_Base` | Friendly / Unarmed / MG 사용 불가 | 2명 |
+| `BP_NPCSpawnPoint` | `ADroneNPCSpawnPoint` Blueprint 자식 | 필요할 때 사용 |
+
+경로는 `/Game/Drone/AI/Blueprints`다. 현재 Mesh와 Animation은 Manny Simple·`ABP_Unarmed` 임시 Greybox이므로 최종 외형이 아니다. Soldier/Insurgent 후보 중 실제 역할별 외형 선택은 `AI-VIS-01`에서 자산을 직접 확인한 뒤 결정한다.
+
+StateTree Asset이 비어 있는 동안 Controller의 자동 StateTree 시작은 꺼져 있다. StateTree Event도 StateTree가 실행 중일 때만 전달하므로, 현재 단계에서 빈 Asset 때문에 PIE 오류가 반복되지 않는다.
+
 ### 정상 결과
 
 - 배치 또는 Spawn된 Character가 `ADroneNPCAIController`에 Possess된다.
@@ -281,6 +294,18 @@ Spawn Point의 `Spawn On Begin Play` 기본값은 꺼져 있다. 실수로 PIE�
 7. 드론의 비행 경로가 적 Sight 범위에 들어오면서도 시작 즉시 보이지 않게 지형이나 벽으로 가린다.
 
 처음부터 여러 맵에 퍼뜨리지 않는다. 전용 Greybox 시험 맵 한 곳에서 점유·이동·감지를 통과한 뒤 Battlefield 또는 Military Base 후보 맵에 적용한다.
+
+### 현재 Greybox 맵
+
+전용 맵은 `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`다.
+
+- Hostile Rifle 1명, Hostile Shotgun 1명, Friendly Base 2명
+- EnemyPatrol 3개, Guard 1개, MGTurret 1개
+- FriendlyBasePatrol 3개, Ambient 2개
+- PlayerStart, NavMeshBoundsVolume, 조명·Sky, 시각용 바닥
+- NavMesh에 실제로 기여하는 `ADroneNPCNavigationFloor`
+
+`ADroneNPCNavigationFloor`는 `BlockAll` 충돌과 Navigation Relevant 설정을 가진 전용 C++ 바닥이다. 시각용 Plane만으로는 NavMesh가 생기지 않는 경우를 피한다. 현재 MVP 맵은 Recast Runtime Generation을 `Dynamic`, `Force Rebuild On Load`를 활성화해 자동 검증한다. 넓은 최종 맵에 적용할 때는 성능 범위를 다시 측정하고 프로젝트 전역 설정 유지 여부를 결정한다.
 
 ## 8. StateTree 구성 순서
 
@@ -380,7 +405,7 @@ Hostile + CanUseMGTurret
 |---|---|---|
 | `AI-SO-00` | Plugin·Tag·Profile·Reservation·Station C++ 기반 | Build와 기반 자동화 통과 |
 | `AI-SO-01` | Smart Object Definition 6종과 Station BP 생성 | **Done** — 6쌍 생성, Slot·Activity·Definition·MG Mesh 자동 검증 통과 |
-| `AI-NPC-01` | 적 Rifle·Shotgun·아군 BP와 시험 맵 배치 | 세 Profile과 Possess 확인 |
+| `AI-NPC-01` | 적 Rifle·Shotgun·아군 BP와 시험 맵 배치 | **Done** — 4명 Profile·Possess·Activity Tag·NavMesh 투영 검증 |
 | `AI-PATROL-01` | 적 순찰 StateTree | 3개 지점을 반복 이동하고 예약 해제 |
 | `AI-FRIEND-01` | 아군 BaseRoutine StateTree | 아군 2명이 생활 지점을 겹치지 않고 순환 |
 | `AI-PER-01` | 드론 Sight·Event PIE 검증 | 감지 시 순찰 중단, 놓치면 Search 전환 |
@@ -392,7 +417,7 @@ Hostile + CanUseMGTurret
 | `AI-COVER-01` | 비점유 병사 엄폐 | MG 실패 병사가 Cover 지점 사용 |
 | `AI-VIS-01` | 외형·Animation 연결 | T Pose·손 위치·Root Motion 문제 없음 |
 
-`AI-SO-00 → AI-SO-01`은 완료했다. 다음은 `AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01` 순서다. 사격은 이동·예약과 드론 감지가 안정된 뒤 Rifle부터 붙이고 Shotgun을 같은 계약의 두 번째 구현으로 추가한다.
+`AI-SO-00 → AI-SO-01 → AI-NPC-01`은 완료했다. 다음은 `AI-PATROL-01 → AI-FRIEND-01 → AI-PER-01` 순서다. 사격은 이동·예약과 드론 감지가 안정된 뒤 Rifle부터 붙이고 Shotgun을 같은 계약의 두 번째 구현으로 추가한다.
 
 ### Asset 재검증 명령
 
@@ -404,11 +429,19 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 
 `VALIDATION_OK`가 출력되면 6쌍의 형식·부모 Class·Slot Tag·Definition·MG Mesh 연결이 일치한다. `Create` 모드는 정확한 12개 Asset을 재구성하는 유지보수용이며 일반 작업에서는 실행할 필요가 없다.
 
+NPC 역할 Blueprint와 Greybox 맵까지 다시 확인할 때는 다음 명령을 사용한다.
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneNPCGreyboxSetup.ps1 -Mode Validate -ProjectPath C:\URproject\drone\Drone.uproject
+```
+
+이 검증은 역할 Profile, AI Controller Possess, 역할 Tag, NPC 4명과 Station 10개 배치, Navigation Floor, Recast 설정, NPC 시작 위치의 NavMesh 투영을 확인한다. `BuildNavigation` 모드는 생성 자산을 수리하거나 Navigation을 다시 저장해야 할 때만 사용한다.
+
 ## 12. 첫 PIE 검증 체크리스트
 
-- [ ] Editor 재시작 뒤 Smart Objects와 Gameplay Interactions Plugin 활성 확인
-- [ ] NavMesh 녹색 영역이 NPC와 모든 Slot을 연결
-- [ ] Hostile Rifle 1명, Hostile Shotgun 1명, Friendly 2명 Possess
+- [x] Smart Objects와 Gameplay Interactions Plugin 활성 상태를 프로젝트 설정과 자동화로 확인
+- [x] NPC 4명 시작 위치가 NavMesh에 투영되는지 자동화로 확인
+- [x] Hostile Rifle 1명, Hostile Shotgun 1명, Friendly 2명 Possess 확인
 - [ ] 적이 EnemyPatrol/Guard만 사용
 - [ ] 아군이 FriendlyBasePatrol/Ambient만 사용
 - [ ] 같은 1-Slot 지점을 두 NPC가 동시에 사용하지 않음
@@ -432,17 +465,20 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 - Drone Prototype의 AI Sight 감지 대상 등록
 - Hostile 감지/실종 StateTree Event 전달 기반
 - Friendly와 Hostile의 기본 Smart Object 검색 범위 분리
-- C++ Build와 기반 자동화
+- Smart Object Definition·Station Blueprint 6쌍
+- 역할별 NPC Blueprint 3종과 Spawn Point Blueprint
+- `Lvl_NPCSmartObjectGreybox`의 NPC 4명·Station 10개·Navigation Floor
+- Profile·Possess·Activity Tag·NavMesh 투영 자동화
+- Game/Editor Build, NPC 전용 2/2, 전체 `Drone.` 20/20, Blueprint 0/0/0, LFS 검증
 
 ### 아직 구현·수동 검증 필요
 
-- Smart Object Definition과 Station Blueprint 자산
 - 실제 Hostile/Friendly StateTree 자산과 이동 Task
-- NPC 외형·Skeleton·Animation Blueprint 연결
+- 최종 NPC 외형·Skeleton·Animation Blueprint 선택과 연결
 - Rifle·Shotgun 발사·피해·Animation·FX·SFX
 - MG 승하차·조준·사격 Animation과 Turret 제어
 - Cover·Search·Return 실제 행동
-- 전용 Greybox 맵에서 4 NPC 동시 PIE 검증
+- 전용 Greybox 맵에서 실제 순찰·아군 이동·드론 감지 동작 확인
 - 최종 맵에 NPC와 Smart Object 배치
 
 UE 5.8.1에서 `Gameplay Interactions`는 Experimental 표기가 있는 Plugin이다. 프로젝트에 제한적으로 사용하되 엔진 업데이트 때 API 변경 가능성을 확인하고, 핵심 역할·예약 규칙은 프로젝트 C++와 테스트에 남긴다.

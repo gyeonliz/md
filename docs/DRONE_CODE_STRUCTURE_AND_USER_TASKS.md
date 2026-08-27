@@ -4,7 +4,7 @@
 
 이 문서는 현재 Unreal `drone` 저장소를 직접 확인한 결과를 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
 
-TUT-03 완료 기능 Commit은 `551e287`이다. 공유 main의 NPC Smart Object C++ 기반은 Merge `c3e6d38`이며, 현재 작업 기준에는 Definition·Station BP 6쌍도 구성돼 있다. 기존 자산·TUT-04B Merge `55b3ffe`와 사용자 Battlefield Map 갱신 `4f14d2f`도 보존한다. 환경 Map은 후보 공간이며 Tutorial 기본 실행 구조를 바꾸지 않는다.
+TUT-03 완료 기능 Commit은 `551e287`이다. 공유 main은 AI-NPC-01 Merge `eeb4354`이며, NPC Smart Object C++ 기반, Definition·Station BP 6쌍, 역할별 NPC BP와 전용 Greybox 맵까지 구성돼 있다. 기존 자산·TUT-04B Merge `55b3ffe`와 사용자 Battlefield Map 갱신 `4f14d2f`도 보존한다. 환경 Map은 후보 공간이며 Tutorial 기본 실행 구조를 바꾸지 않는다.
 
 NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합됐다. 자산은 main에 있지만 프로젝트 소유 Widget Host는 아직 구현하지 않았으므로 화면에 나타나지 않는 것이 정상이다.
 
@@ -14,7 +14,7 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합�
 |---|---|
 | `DroneEditor Win64 Development` | Build 성공 |
 | `Drone.Tutorial` Automation | 7/7 통과 |
-| 전체 `Drone.` Automation | 18/18 통과. 17개 정상 성공, 기존 PIE RecastNavMesh 경고 포함 성공 1개 |
+| 전체 `Drone.` Automation | 20/20 통과. 19개 정상 성공, 기존 PIE RecastNavMesh 경고 포함 성공 1개 |
 | `CompileAllBlueprints` | Blueprint Errors 0, Blueprint warnings 0, failed load 0. 별도 Summary에 기존 Battlefield Pose GUID와 MCP 고지 경고 유지 |
 | 현재 에셋 이식 재검증 | FPV 전용 1/1, Blueprint 0/0/0, 스테이징 선택 자산·현재 Integration 금지 의존성 0, 이식 13개 LFS와 fsck 통과 |
 | 기존 Standalone 시각 기록 | FPV 외형, 고정 추적 Camera, 실제 WBP HUD, Cyan 안내선, Current/Inactive Gate 표시 확인 |
@@ -143,9 +143,9 @@ ADroneSmartObjectStation
       └─ MGTurret 1-Slot
 ```
 
-Hostile은 EnemyPatrol/Guard를 기본 검색하고 Friendly는 FriendlyBasePatrol/Ambient만 검색한다. Hostile이 `ADronePrototypePawn`을 보면 현재 순찰 Claim을 해제하고 StateTree에 `DroneDetected` 이벤트를 보낸다. `Rifle`과 `Shotgun` Profile 및 분기 Getter는 준비됐지만 실제 발사·Damage·Animation은 아직 없다.
+Hostile은 EnemyPatrol/Guard를 기본 검색하고 Friendly는 FriendlyBasePatrol/Ambient만 검색한다. Hostile이 `ADronePrototypePawn`을 감지하면 현재 예약을 해제하고, StateTree가 실제로 실행 중일 때만 `DroneDetected` 이벤트를 보낼 기반이 있다. 현재 StateTree Asset은 비어 있고 자동 시작도 꺼져 있다. `Rifle`과 `Shotgun` Profile 및 분기 Getter는 준비됐지만 실제 발사·Damage·Animation은 아직 없다.
 
-Definition·Station Blueprint 6쌍은 생성됐다. StateTree 작성과 실제 이동·점유 검증 순서는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md)를 따른다.
+Definition·Station Blueprint 6쌍과 역할별 NPC Blueprint 3종, Spawn Point BP, 전용 Greybox 맵은 생성됐다. Profile·Possess·역할 Tag·NPC 시작 위치의 NavMesh 투영은 자동 검증했다. StateTree 작성과 실제 이동·점유 검증 순서는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md)를 따른다.
 
 ## 2. 디렉터리와 클래스 책임
 
@@ -160,9 +160,12 @@ Source/Drone/
 │  ├─ DroneNPCCharacter.h/.cpp
 │  ├─ DroneNPCAIController.h/.cpp
 │  ├─ DroneNPCSpawnPoint.h/.cpp
+│  ├─ DroneNPCNavigationFloor.h/.cpp
 │  ├─ DroneSmartObjectStation.h/.cpp
 │  ├─ DroneSmartObjectReservationComponent.h/.cpp
-│  └─ Tests/DroneSmartObjectFoundationTest.cpp
+│  └─ Tests/
+│     ├─ DroneSmartObjectFoundationTest.cpp
+│     └─ DroneNPCGreyboxAssetTest.cpp
 ├─ Prototype/
 │  ├─ DronePrototypeGameMode.h/.cpp
 │  ├─ DronePrototypePawn.h/.cpp
@@ -222,6 +225,7 @@ Source/Drone/
 | `UDroneSmartObjectReservationComponent` | Activity Tag와 User Tag로 가장 가까운 빈 Slot 검색·Claim·Release | NavMesh 이동, Animation, StateTree 상태 선택 |
 | `ADroneSmartObjectStation` | Definition이 연결될 프로젝트 소유 Host와 방향 Preview, Authoring Tool용 Definition·Mesh 연결 함수 | Interaction StateTree와 NPC 행동 실행 |
 | `ADroneNPCSpawnPoint` | NPC Class·Profile·수·간격에 따른 명시적 Spawn | NPC의 순찰 위치와 행동 선택 |
+| `ADroneNPCNavigationFloor` | Greybox에서 BlockAll 충돌과 Navigation Relevant 바닥을 제공 | 최종 환경 Mesh·대규모 맵 NavMesh 성능 정책 |
 
 ### Smart Object Asset
 
@@ -245,12 +249,28 @@ Content/Drone/AI/SmartObjects/
 
 각 Definition은 Slot 1개·해당 Activity Tag·Gameplay Interaction Behavior 1개를 가진다. StateTree는 아직 비어 있고 MG Blueprint에만 `MG_Turret_SK` 후보 Mesh가 연결돼 있다.
 
+### NPC 역할·Greybox Asset
+
+```text
+Content/Drone/AI/Blueprints/
+├─ BP_NPC_Hostile_Rifle.uasset
+├─ BP_NPC_Hostile_Shotgun.uasset
+├─ BP_NPC_Friendly_Base.uasset
+└─ BP_NPCSpawnPoint.uasset
+
+Content/Drone/Maps/
+└─ Lvl_NPCSmartObjectGreybox.umap
+```
+
+맵에는 Rifle 1명, Shotgun 1명, Friendly 2명과 Smart Object Station 10개가 있다. Manny Simple·`ABP_Unarmed`은 기능 배치 확인용 임시 외형이다. Soldier/Insurgent 후보 중 최종 선택은 아직 미정이다.
+
 ### 중앙 Map Asset
 
 ```text
 Content/Drone/Maps/
 ├─ Lvl_DroneTraining.umap
 ├─ Lvl_DronePrototype.umap
+├─ Lvl_NPCSmartObjectGreybox.umap
 ├─ Lvl_DronePackShowcase.umap
 └─ Lvl_DronePackShowcase_BuiltData.uasset
 ```
@@ -543,7 +563,7 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
 - 최종 Gate Mesh·VFX·SFX·Animation
 - 최종 코스 배치·크기·난이도
 - 배터리·통신거리·재밍 같은 후보 시스템
-- Smart Object Definition·Station Blueprint와 Hostile/Friendly StateTree Asset
+- Hostile/Friendly StateTree Asset과 실제 이동 Task
 - 실제 적 순찰과 아군 기지 생활 이동의 PIE 동작
 - Rifle 단일 Trace, Shotgun Pellet/Spread, Damage·재장전·Animation·FX·SFX
 - MG 이동·한 명 점유·조준·사격과 사망/중단 뒤 재점유
@@ -572,7 +592,9 @@ TUT-03의 원본 시간·거리·평균 속도와 TUT-04B의 이전 평균·Best
 15. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가며 PIE/Standalone 종료 즉시 멈추는지 확인한다.
 16. AI 기능이 병합된 뒤 Editor를 재시작하고 Smart Objects와 Gameplay Interactions Plugin 활성 상태를 확인한다.
 17. Content Browser에서 생성된 Definition·Station BP 6쌍과 MG Mesh 연결을 확인한다.
-18. `AI-NPC-01`에서 적 Rifle 1명, 적 Shotgun 1명, 아군 2명용 Blueprint를 만들고 전용 Greybox 맵에서 Profile·Possess·NavMesh를 먼저 검증한다.
+18. `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`을 열고 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 10개의 위치·방향이 알아보기 쉬운지 확인한다.
+19. Editor에서 `P` 키를 눌러 네 NPC 시작점과 Station 사이에 녹색 NavMesh가 이어지는지 눈으로 확인한다.
+20. Manny/Unarmed 외형은 임시임을 전제로, 다음 `AI-PATROL-01`에서 먼저 확인하고 싶은 적 순찰 동선을 3개 EnemyPatrol 지점 기준으로 검토한다.
 
 사용자가 지금 판단해야 하는 것은 플레이할 때의 가독성·조종 난이도, 실제 비행에서 기록값이 자연스럽게 증가하는지, FPV 외형·Camera·소리가 실제 환경에서 자연스러운지다. 정확한 공식과 파일·참조 구조는 자동 검증했지만, Gate 배치와 사람이 체감하는 시간·거리·속도·청감은 직접 확인이 필요하다.
 
@@ -595,6 +617,8 @@ TUT-03의 원본 시간·거리·평균 속도와 TUT-04B의 이전 평균·Best
 - Greybox 확인 전에 추가 에셋 구매나 전체 외형 교체를 진행할 필요 없음
 - TUT-03 확인 중 비교·Best·결과 UI·Mission UI까지 함께 구현할 필요 없음
 - 현재 작업과 무관하게 전역 Default Map을 바꿀 필요 없음
+- 역할별 NPC Blueprint와 Greybox 맵을 다시 만들 필요 없음
+- StateTree가 아직 없으므로 NPC가 순찰하거나 사격하지 않는 현상을 오류로 오해할 필요 없음
 
 코드나 BP·Map Asset을 실제로 수정했다면 그때 Build, Tutorial 테스트, 전체 회귀, Blueprint Compile을 다시 실행한다.
 
