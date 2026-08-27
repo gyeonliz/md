@@ -13,7 +13,7 @@
 - NavigationArrows 최소 자산 6개와 전용 테스트는 main에 병합됐다. 화면 Host는 아직 미구현이다.
 - 프로젝트 사용 맵은 `/Game/Drone/Maps`로 중앙화했다. 환경 맵 3종에 `Lvl_OilRig`을 추가했고, 남은 제공 자산 891개를 후보 라이브러리로 선별 이식했다.
 - 사용자는 Gate나 기록 C++를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도와 Drone Loop를 확인하면 된다.
-- 적 순찰·드론 감지·Rifle/Shotgun·MG와 기지 아군 Smart Object 이동을 위한 C++ 기반과 상세 가이드를 준비했다. 실제 Definition·BP·StateTree·사격은 다음 카드다.
+- 적 순찰·드론 감지·Rifle/Shotgun·MG와 기지 아군 Smart Object 이동을 위한 C++ 기반에 이어 Definition·Station BP 6쌍을 구성했다. StateTree·실제 이동·사격은 후속 카드다.
 - 확정된 학습 항목은 `정보처리산업기사`와 `C++ 코딩테스트` 두 가지뿐이다.
 - 정보처리산업기사 2026년 3회 필기 접수는 끝났다. 오늘 가장 먼저 Q-Net에서 자신의 접수·면제·응시 상태를 확인해야 한다.
 - 코딩테스트는 공통 시험일이 없으므로 자격시험 일정에 맞춰 주간 반복 학습으로 운영한다.
@@ -28,13 +28,13 @@
 | Git LFS | `fsck` 정상 |
 | 최종 Editor Build | 성공 |
 | Tutorial 자동화 | 7/7 통과 |
-| 전체 `Drone.` 자동화 | 17/17 통과. 기존 PIE RecastNavMesh 경고 포함 성공 1개 |
+| 전체 `Drone.` 자동화 | 18/18 통과. 17개 정상 성공, 기존 PIE RecastNavMesh 경고 포함 성공 1개 |
 | Blueprint Compile | Errors 0, 기존 Battlefield Pose GUID·MCP 고지 경고 유지 |
 | Standalone | 실제 WBP HUD·Cyan Course·Current/Inactive Gate 표시 확인 |
 | 에셋 이식 | 환경 3종+OilRig와 후보 라이브러리 891개. 새 Root 수량 일치·대표 로드·외부/누락 0, LFS fsck 통과 |
-| NPC/Smart Object 기반 | Game/Editor Build, 전용 1/1, 전체 17/17, Blueprint 0/0/0, LFS 통과. main Push 완료 |
+| NPC/Smart Object | C++ 기반과 Definition/Station BP 6쌍 구성. Game/Editor Build, AI Asset 1/1, 전체 18/18, Blueprint 0/0/0, LFS 통과 |
 
-현재 main에서 Game/Editor Build, 전체 Drone 17개와 Blueprint 전체 Compile을 실행했다. 자동화 17/17은 성공했고 기존 PIE NavMesh 경고 포함 성공 1개가 있다. Blueprint 오류·Blueprint 경고·로드 실패는 0이다.
+현재 작업 기준에서 Game/Editor Build, 전체 Drone 18개와 Blueprint 전체 Compile을 실행했다. 자동화는 17개 정상 성공, 기존 PIE NavMesh 경고 포함 성공 1개이며 실패는 0이다. Blueprint 오류·Blueprint 경고·로드 실패는 0이다.
 
 ## 2. 코드가 어떻게 연결되는가
 
@@ -181,7 +181,7 @@ ADroneNPCSpawnPoint 또는 직접 배치
 10. Gate 크기·높이·간격·색 대비와 Keyboard/Gamepad 조종 체감을 메모한다.
 11. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가고 종료 후 즉시 멈추는지 기록한다.
 12. AI 기반 Merge 뒤 Editor를 재시작해 Smart Objects와 Gameplay Interactions Plugin을 확인한다.
-13. [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md)의 `AI-SO-01`부터 Definition/Station BP를 만든다.
+13. 생성된 Smart Object Definition/Station BP 6쌍을 Content Browser에서 확인하고, 다음 `AI-NPC-01`용 전용 Greybox 맵 배치 위치를 정한다.
 
 다시 만들 필요가 없는 것:
 
@@ -199,7 +199,7 @@ ADroneNPCSpawnPoint 또는 직접 배치
 TUT-03 Segment/Lap 기록 Done
 → TUT-04B 비교·결과 UI 기술 구현 Done · 수동 확인 대기
 → AI-SO-00 C++ 기반 Done
-→ AI-SO-01 Definition/Station BP
+→ AI-SO-01 Definition/Station BP Done
 → AI-NPC-01 적 Rifle·Shotgun·아군 BP
 → AI-PATROL-01 적 순찰
 → AI-FRIEND-01 기지 아군 이동

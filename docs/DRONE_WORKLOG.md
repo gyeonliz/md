@@ -18,18 +18,18 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-27 — NPC·Smart Object C++ 기반과 실행 가이드 준비
+마지막 갱신: 2026-08-27 — AI-SO-01 Definition·Station Asset 6쌍 구성·검증
 
 | 구분 | 현재 상태 |
 |---|---|
 | 전체 단계 | Tutorial 수동 확인 대기 + 적/아군 NPC Smart Object 선행 기반 준비 |
 | Unreal 기준선 | `main=origin/main=c3e6d38`; AI 기능 `489ced5`, 사용자 Battlefield Map `4f14d2f` 보존 |
-| 자동 검증 | Game/Editor Build, 전용 1/1, 전체 `Drone.` 17/17, Blueprint 0/0/0, LFS fsck 성공 |
+| 자동 검증 | Game/Editor Build, AI Asset 전용 1/1, 전체 `Drone.` 18/18, Blueprint 0/0/0, LFS fsck 성공 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | `AI-SO-00` 완료. 다음 `AI-SO-01` Editor 자산 생성 준비 |
+| 지금 작업 중 | `AI-SO-01` Definition/Station BP 6쌍 구성·검증 완료. 다음 `AI-NPC-01` 준비 |
 | 차단 조건 | 기능 코드의 기술 차단은 없음. OilRig 별도 Map Check가 장시간 완료되지 않아 Editor 수동 Map Check가 필요 |
-| 다음 행동 | 회귀 통과 뒤 `AI-SO-01` Definition/Station BP부터 Editor에서 한 종류씩 생성 |
-| 다음 기능 | `AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01` |
+| 다음 행동 | `AI-NPC-01` Hostile Rifle·Hostile Shotgun·Friendly Base Blueprint와 Greybox 배치 구성 |
+| 다음 기능 | `AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01` |
 | 이후 | Drone 감지 → Rifle → Shotgun → MG → Cover/Search/Return |
 | Git 처리 | 기능 `489ced5`, main Merge `c3e6d38` Push 완료; 기존 사용자 `4f14d2f` Map 변경 보존 |
 
@@ -48,6 +48,18 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 - Definition·Blueprint·StateTree·NavMesh·Rifle/Shotgun·MG의 Editor 작성 순서를 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md)에 정리했다.
 - 사용자 Battlefield Map Commit `4f14d2f`을 기반으로 Branch를 만들었으며 해당 Map 변경은 수정하거나 되돌리지 않았다.
 - 기능 Commit `489ced5`를 `codex/smart-object-npc-foundation`에 Push하고 Merge Commit `c3e6d38`로 `origin/main`에 반영했다.
+
+## 2026-08-27 — AI-SO-01 Definition·Station Asset 구성
+
+- `/Game/Drone/AI/SmartObjects/Definitions`에 EnemyPatrol, FriendlyBasePatrol, Ambient, Guard, Cover, MGTurret Definition 6종을 생성했다.
+- `/Game/Drone/AI/SmartObjects/Blueprints`에 대응하는 `ADroneSmartObjectStation` 자식 Blueprint 6종을 생성했다.
+- 각 Definition은 Slot 1개, 정확한 Native Activity Tag와 Gameplay Interaction Behavior 1개를 가진다.
+- 각 Blueprint의 Activity와 Definition을 대응시켰고 `BP_SO_MGTurret`에만 Ground Drone Kit의 `MG_Turret_SK` 후보 Mesh를 연결했다.
+- Engine Smart Object Component의 Definition 설정을 자동화가 안전하게 수행하도록 `ADroneSmartObjectStation`에 프로젝트 소유 Definition·Mesh 접근 함수를 추가했다.
+- `Drone.AI.SmartObjectStationAssets` 자동화를 추가해 Definition 유효성, Slot·Tag·Behavior, Blueprint 부모·Activity·Definition·MG Mesh를 재로딩 후 검사한다.
+- Game/Editor Build, 전용 AI Asset 1/1, 전체 `Drone.` 18/18, Blueprint 0 errors·0 warnings·0 load failures, LFS fsck를 통과했다. 전체 자동화의 경고 포함 성공 1개는 기존 PIE RecastNavMesh 경고다.
+- Interaction StateTree는 후속 `AI-PATROL-01`·`AI-FRIEND-01`에서 연결하므로 현재 의도적으로 비어 있다. 실제 순찰·아군 이동·사격을 완료로 표현하지 않는다.
+- 문서 저장소의 `tools/unreal/Setup-DroneSmartObjectStations.py`와 `Invoke-DroneSmartObjectSetup.ps1`로 정확한 12개 Asset을 재구성하거나 읽기 전용 검증할 수 있게 했다.
 
 ## 2026-08-27 — 남은 에셋 선별 이식·OilRig·TUT-04B
 
