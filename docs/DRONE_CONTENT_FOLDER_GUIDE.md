@@ -1,7 +1,7 @@
 # Drone Content 폴더 정리 기준
 
-기준일: 2026-08-27
-Drone 기준선: `main=origin/main=eeb4354`
+기준일: 2026-08-28
+Drone 기준선: `main=origin/main=095dda7`
 Unreal Engine: 5.8.1
 
 ## 1. 레빗홀 프로젝트에서 확인한 기준
@@ -36,6 +36,13 @@ Content/Drone/
 ├─ Tutorial/
 │  ├─ Blueprints/
 │  └─ Materials/
+├─ AI/
+│  ├─ Blueprints/
+│  ├─ SmartObjects/
+│  │  ├─ Blueprints/
+│  │  └─ Definitions/
+│  └─ StateTrees/
+│     └─ ST_NPC_HostilePatrol.uasset
 ├─ Integrations/
 └─ ThirdParty/
    ├─ ArmyVFX/
@@ -60,7 +67,7 @@ Map의 현재 용도는 다음과 같다.
 |---|---|---|
 | `Lvl_DroneTraining` | Tutorial Vertical Slice와 현재 기본 실행 Map | PIE 초기 화면·자동화 확인, 한 Lap 수동 확인 대기 |
 | `Lvl_DronePrototype` | Drone Pawn·입력·Camera·Telemetry 기능 시험 | 자동화 확인 |
-| `Lvl_NPCSmartObjectGreybox` | 적·아군 NPC와 Smart Object·NavMesh 기능 시험 | 역할 BP·NPC 4명·Station 10개·NavMesh 투영 자동 검증 완료, 실제 이동은 미구현 |
+| `Lvl_NPCSmartObjectGreybox` | 적·아군 NPC와 Smart Object·NavMesh 기능 시험 | Hostile 2명 EnemyPatrol 반복 이동 검증 완료, Friendly 2명 이동은 미구현 |
 | `Lvl_DronePackShowcase` | 공급사 DronePack 외형 6종 비교용 정리 Map | 기술 검증 완료, Editor 최종 시각 검토 대기 |
 | `Lvl_Battlefield` | 넓은 Battlefield 환경 후보 | 실제 로드·의존성 검증 완료, 공급 자산 Map Check 메시지 14건·시각 검토 대기 |
 | `Lvl_MilitaryCamp` | 군사 캠프 환경 후보 | 실제 로드·Map Check 0/0, 시각 검토 대기 |
@@ -146,8 +153,8 @@ Battlefield·MilitaryCamp·MilitaryBase와 OilRig은 이 절차로 실제 이식
 - Template 비맵 자산 62개 복구 확인
 - 환경 의존성: Battlefield 710, MilitaryCamp 593, MilitaryBase 1,414개 공급사 자산; 누락 0, 허용 외 경로 0
 - Blueprint Compile 오류 0. 기존 Battlefield Pose GUID와 MCP 고지 경고는 유지
-- AI-NPC-01 반영 뒤 전체 `Drone.` 자동화 `20/20` 성공(기존 PIE NavMesh 경고 포함 성공 1)
+- AI-PATROL-01 반영 뒤 AI `6/6` 경고·오류 0, 전체 `Drone.` 자동화 `22/22` 성공(기존 PIE NavMesh 경고 포함 성공 1)
 - 환경 Map Check: Battlefield 오류 0·공급 Blueprint 메시지 14, MilitaryCamp 0/0, MilitaryBase 0/0
 - 신규 환경 패키지 2,723개·16.96 GiB 전부 Git LFS 포인터 확인
 - `git lfs fsck`, `git diff --check` 통과
-- 현재 기능 커밋: AI-NPC-01 `362edaa`; main 병합 `eeb4354` Push 완료
+- 현재 기능 커밋: AI-PATROL-01 `a721fe4`; main 병합 `095dda7` Push 완료

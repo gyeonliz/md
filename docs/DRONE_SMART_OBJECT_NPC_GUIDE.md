@@ -1,10 +1,10 @@
 # Drone Smart Object NPC 준비·사용 가이드
 
-기준일: 2026-08-27 (Asia/Seoul)
+기준일: 2026-08-28 (Asia/Seoul)
 
 이 문서는 적군 순찰과 드론 발견 대응, 소총·샷건 분기, 기지 아군 NPC의 생활·순찰 이동, 한 명만 사용하는 MG Turret을 같은 기반 위에 구성하기 위한 실전 가이드다.
 
-현재 단계는 **C++ 기반, Smart Object Definition·Station Blueprint 6쌍, 역할별 NPC Blueprint, 전용 Greybox 맵을 준비한 상태**다. NPC 4명의 Profile·Possess·Activity Tag·NavMesh 투영까지 자동 검증했다. StateTree, 실제 순찰·아군 이동, 무기 사격·피해·Animation은 아직 완성된 기능이 아니다. 아래 순서대로 작은 동작 단위로 만들고 PIE에서 확인한 뒤 다음 카드로 넘어간다.
+현재 단계는 **C++·Smart Object 기반과 Hostile 최소 순찰 StateTree를 완료한 상태**다. `ST_NPC_HostilePatrol`의 Native Task가 EnemyPatrol Slot Claim → NavMesh 이동 → 1초 대기 → Release → 다른 지점 재선택을 반복한다. Greybox의 Hostile 2명은 이 순환을 자동 검증했고 Friendly 2명은 아직 정지한다. 감지 후 Search, 아군 이동, 무기 사격·피해·Animation은 아직 완성된 기능이 아니다. 아래 순서대로 작은 동작 단위로 만들고 PIE에서 확인한 뒤 다음 카드로 넘어간다.
 
 ## 1. 이번 구조로 만들 동작
 
@@ -192,7 +192,7 @@ Hostile Controller가 `ADronePrototypePawn`을 처음 감지하면 현재 Smart 
 - Blueprint 경로: `/Game/Drone/AI/SmartObjects/Blueprints`
 - 각 Definition은 정확히 Slot 1개와 해당 Activity Tag 1개를 가진다.
 - 각 Slot에는 `Gameplay Interaction Smart Object Behavior Definition`이 1개 들어 있다.
-- Interaction StateTree는 의도적으로 비어 있다. `AI-PATROL-01`·`AI-FRIEND-01`에서 행동을 만든 뒤 연결한다.
+- Definition의 Gameplay Interaction StateTree는 아직 의도적으로 비어 있다. `AI-PATROL-01`의 이동은 Controller가 실행하는 `ST_NPC_HostilePatrol`과 Reservation Component가 담당하며, Slot 자체 Interaction은 아군 생활 Animation·MG 점유 카드에서 필요할 때 별도로 연결한다.
 - 여섯 Blueprint는 모두 `ADroneSmartObjectStation` 자식이며, 대응 Definition과 `Activity`가 연결됐다.
 - `BP_SO_MGTurret`에만 Ground Drone Kit의 `MG_Turret_SK` 후보 Mesh를 연결했다.
 
@@ -218,7 +218,7 @@ Hostile Controller가 `ADronePrototypePawn`을 처음 감지하면 현재 Smart 
 - Smart Object 디버그 화면에서 Slot이 보인다.
 - Definition과 Blueprint의 역할·Tag·참조가 일치한다.
 - `BP_SO_MGTurret`만 후보 Mesh를 가진다.
-- 실제 Claim·이동·해제는 `AI-PATROL-01` 이후 PIE에서 판정한다.
+- Hostile EnemyPatrol Claim·이동·해제는 `AI-PATROL-01` PIE로 판정했다. Friendly·MG·Cover Activity는 각 후속 카드에서 따로 판정한다.
 
 ### 문제 확인
 
@@ -267,7 +267,7 @@ Spawn Point의 `Spawn On Begin Play` 기본값은 꺼져 있다. 실수로 PIE�
 
 경로는 `/Game/Drone/AI/Blueprints`다. 현재 Mesh와 Animation은 Manny Simple·`ABP_Unarmed` 임시 Greybox이므로 최종 외형이 아니다. Soldier/Insurgent 후보 중 실제 역할별 외형 선택은 `AI-VIS-01`에서 자산을 직접 확인한 뒤 결정한다.
 
-StateTree Asset이 비어 있는 동안 Controller의 자동 StateTree 시작은 꺼져 있다. StateTree Event도 StateTree가 실행 중일 때만 전달하므로, 현재 단계에서 빈 Asset 때문에 PIE 오류가 반복되지 않는다.
+Controller의 StateTree 자동 시작은 꺼져 있고 역할에 맞는 Asset을 명시적으로 연결한다. Hostile은 World BeginPlay에서 Smart Object Runtime이 준비된 뒤 `ST_NPC_HostilePatrol`을 시작한다. Friendly는 `AI-FRIEND-01` 전까지 StateTree를 시작하지 않는다.
 
 ### 정상 결과
 
@@ -309,9 +309,29 @@ StateTree Asset이 비어 있는 동안 Controller의 자동 StateTree 시작은
 
 ## 8. StateTree 구성 순서
 
-### 적 StateTree `ST_NPC_Hostile`
+### 현재 적 순찰 StateTree `ST_NPC_HostilePatrol`
 
-첫 버전의 상태는 다음 정도로 제한한다.
+`AI-PATROL-01`에서 실제로 저장한 첫 버전은 다음 네 상태만 가진다.
+
+```text
+HostilePatrol
+├─ ClaimEnemyPatrolSlot
+├─ MoveToPatrolSlot
+├─ WaitAtPatrolSlot
+└─ ReleasePatrolSlot
+    └─ ClaimEnemyPatrolSlot로 반복
+```
+
+- Claim 실패 시 0.5초 간격으로 다시 찾는다.
+- 직전에 완료한 지점 반경 250 cm를 우선 피하되 다른 빈 지점이 없으면 일반 검색으로 돌아간다.
+- Move는 Pathfinding과 NavMesh Projection을 사용하며 기본 수용 반경은 80 cm다.
+- 도착 후 기본 1초 대기하고 방문 횟수·서로 다른 방문 위치를 Controller에 기록한 뒤 Slot을 해제한다.
+- Hostile만 Tree를 실행하고 EnemyPatrol Activity만 Claim한다.
+- 드론이 감지되면 이동을 멈추고 예약을 해제한 뒤 Claim 단계에서 대기한다. 이 안전 중단은 Search·공격 구현 완료를 뜻하지 않는다.
+
+### 후속 확장 적 StateTree
+
+감지·무기·MG 카드까지 진행하면 아래 구조로 확장한다. 현재 구현된 상태처럼 읽으면 안 된다.
 
 ```text
 Root
@@ -406,7 +426,7 @@ Hostile + CanUseMGTurret
 | `AI-SO-00` | Plugin·Tag·Profile·Reservation·Station C++ 기반 | Build와 기반 자동화 통과 |
 | `AI-SO-01` | Smart Object Definition 6종과 Station BP 생성 | **Done** — 6쌍 생성, Slot·Activity·Definition·MG Mesh 자동 검증 통과 |
 | `AI-NPC-01` | 적 Rifle·Shotgun·아군 BP와 시험 맵 배치 | **Done** — 4명 Profile·Possess·Activity Tag·NavMesh 투영 검증 |
-| `AI-PATROL-01` | 적 순찰 StateTree | 3개 지점을 반복 이동하고 예약 해제 |
+| `AI-PATROL-01` | 적 순찰 StateTree | **Done** — Hostile 2명이 EnemyPatrol Claim·이동·대기·해제, 각 2회 이상·서로 다른 2지점 이상 방문 자동 검증 |
 | `AI-FRIEND-01` | 아군 BaseRoutine StateTree | 아군 2명이 생활 지점을 겹치지 않고 순환 |
 | `AI-PER-01` | 드론 Sight·Event PIE 검증 | 감지 시 순찰 중단, 놓치면 Search 전환 |
 | `AI-WPN-01` | 공용 Weapon 계약 | Rifle·Shotgun이 같은 AI 호출 경로 사용 |
@@ -417,7 +437,7 @@ Hostile + CanUseMGTurret
 | `AI-COVER-01` | 비점유 병사 엄폐 | MG 실패 병사가 Cover 지점 사용 |
 | `AI-VIS-01` | 외형·Animation 연결 | T Pose·손 위치·Root Motion 문제 없음 |
 
-`AI-SO-00 → AI-SO-01 → AI-NPC-01`은 완료했다. 다음은 `AI-PATROL-01 → AI-FRIEND-01 → AI-PER-01` 순서다. 사격은 이동·예약과 드론 감지가 안정된 뒤 Rifle부터 붙이고 Shotgun을 같은 계약의 두 번째 구현으로 추가한다.
+`AI-SO-00 → AI-SO-01 → AI-NPC-01 → AI-PATROL-01`은 완료했다. 다음은 `AI-FRIEND-01 → AI-PER-01` 순서다. 사격은 아군 이동·예약과 드론 감지가 안정된 뒤 Rifle부터 붙이고 Shotgun을 같은 계약의 두 번째 구현으로 추가한다.
 
 ### Asset 재검증 명령
 
@@ -437,15 +457,23 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 
 이 검증은 역할 Profile, AI Controller Possess, 역할 Tag, NPC 4명과 Station 10개 배치, Navigation Floor, Recast 설정, NPC 시작 위치의 NavMesh 투영을 확인한다. `BuildNavigation` 모드는 생성 자산을 수리하거나 Navigation을 다시 저장해야 할 때만 사용한다.
 
+Hostile 순찰 StateTree의 Schema·상태 순서·Native Task·컴파일 상태는 다음 읽기 전용 명령으로 확인한다.
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneHostilePatrolStateTreeSetup.ps1 -Mode Validate -ProjectPath C:\URproject\drone\Drone.uproject
+```
+
+`Create`는 Asset이 없을 때만 새로 만들며 기존 StateTree는 덮어쓰지 않는다. 일반 Pull·검증에서는 `Validate`만 사용한다.
+
 ## 12. 첫 PIE 검증 체크리스트
 
 - [x] Smart Objects와 Gameplay Interactions Plugin 활성 상태를 프로젝트 설정과 자동화로 확인
 - [x] NPC 4명 시작 위치가 NavMesh에 투영되는지 자동화로 확인
 - [x] Hostile Rifle 1명, Hostile Shotgun 1명, Friendly 2명 Possess 확인
-- [ ] 적이 EnemyPatrol/Guard만 사용
+- [x] 적 순찰 Tree가 EnemyPatrol만 사용
 - [ ] 아군이 FriendlyBasePatrol/Ambient만 사용
 - [ ] 같은 1-Slot 지점을 두 NPC가 동시에 사용하지 않음
-- [ ] 드론이 보이지 않을 때 적 순찰 유지
+- [x] 드론이 보이지 않을 때 Hostile 2명이 각각 2회 이상 순찰하고 서로 다른 2개 이상 지점 방문
 - [ ] 드론이 Sight에 들어오면 Hostile만 순찰 예약 해제
 - [ ] Friendly는 드론을 봐도 전투 상태로 바뀌지 않음
 - [ ] MG 사용 가능 적만 MG를 검색
@@ -469,16 +497,20 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 - 역할별 NPC Blueprint 3종과 Spawn Point Blueprint
 - `Lvl_NPCSmartObjectGreybox`의 NPC 4명·Station 10개·Navigation Floor
 - Profile·Possess·Activity Tag·NavMesh 투영 자동화
-- Game/Editor Build, NPC 전용 2/2, 전체 `Drone.` 20/20, Blueprint 0/0/0, LFS 검증
+- Hostile `ST_NPC_HostilePatrol`과 Claim·Move·Wait·Release Native Task
+- 직전 지점 우선 회피, 이동 실패·감지·UnPossess 시 예약 해제
+- Hostile 2명의 반복 순찰과 Friendly 정지 상태 PIE 자동화
+- Game/Editor Build, AI 6/6 경고·오류 0, 전체 `Drone.` 22/22, Blueprint 0/0/0, LFS 검증
 
 ### 아직 구현·수동 검증 필요
 
-- 실제 Hostile/Friendly StateTree 자산과 이동 Task
+- Friendly BaseRoutine StateTree와 실제 아군 이동 Task
+- 감지 후 Search·Return 전환과 순찰 복귀
 - 최종 NPC 외형·Skeleton·Animation Blueprint 선택과 연결
 - Rifle·Shotgun 발사·피해·Animation·FX·SFX
 - MG 승하차·조준·사격 Animation과 Turret 제어
 - Cover·Search·Return 실제 행동
-- 전용 Greybox 맵에서 실제 순찰·아군 이동·드론 감지 동작 확인
+- 전용 Greybox 맵에서 Hostile 순찰의 수동 시각 확인과 아군 이동·드론 감지 동작 확인
 - 최종 맵에 NPC와 Smart Object 배치
 
 UE 5.8.1에서 `Gameplay Interactions`는 Experimental 표기가 있는 Plugin이다. 프로젝트에 제한적으로 사용하되 엔진 업데이트 때 API 변경 가능성을 확인하고, 핵심 역할·예약 규칙은 프로젝트 C++와 테스트에 남긴다.

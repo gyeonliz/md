@@ -1,6 +1,6 @@
 # Drone 개발 진행 기록
 
-기준일: 2026-08-27 (Asia/Seoul)
+기준일: 2026-08-28 (Asia/Seoul)
 
 이 문서는 Drone 개발의 **진행 이력**을 시간순으로 남긴다. 가장 최신의 현재 상태는 [`../WORKBOARD.md`](../WORKBOARD.md), 확정 구현 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)를 따른다.
 
@@ -18,20 +18,35 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-27 — AI-NPC-01 역할 Blueprint·Greybox 맵·NavMesh 검증
+마지막 갱신: 2026-08-28 — AI-PATROL-01 Hostile Smart Object 순찰 구현·검증
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | Tutorial 수동 확인 대기 + 적/아군 NPC Greybox 기반 완료 |
-| Unreal 기준선 | `main=origin/main=eeb4354`; AI-NPC-01 기능 `362edaa`, 사용자 Battlefield Map `4f14d2f` 보존 |
-| 자동 검증 | Game/Editor Build, NPC 전용 2/2, 전체 `Drone.` 20/20, Blueprint 0/0/0, LFS fsck 성공 |
+| 전체 단계 | Tutorial 수동 확인 대기 + Hostile 순찰 MVP 완료 |
+| Unreal 기준선 | `main=origin/main=095dda7`; AI-PATROL-01 기능 `a721fe4`, 사용자 Battlefield Map `4f14d2f` 보존 |
+| 자동 검증 | Game/Editor Build, AI 6/6 경고·오류 0, 전체 `Drone.` 22/22, Blueprint 0/0/0, LFS fsck 성공 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | `AI-NPC-01` 역할 BP·전용 맵·NavMesh 검증 완료. 다음 `AI-PATROL-01` 준비 |
+| 지금 작업 중 | `AI-PATROL-01` Hostile Claim·Move·Wait·Release 반복 완료. 다음 `AI-FRIEND-01` 준비 |
 | 차단 조건 | 기능 코드의 기술 차단은 없음. OilRig 별도 Map Check가 장시간 완료되지 않아 Editor 수동 Map Check가 필요 |
-| 다음 행동 | `AI-PATROL-01` Hostile 순찰 StateTree와 예약·이동·해제 Task 구성 |
-| 다음 기능 | `AI-PATROL-01 → AI-FRIEND-01 → AI-PER-01` |
+| 다음 행동 | `AI-FRIEND-01` FriendlyBasePatrol/Ambient BaseRoutine 구성 |
+| 다음 기능 | `AI-FRIEND-01 → AI-PER-01` |
 | 이후 | Drone 감지 → Rifle → Shotgun → MG → Cover/Search/Return |
-| Git 처리 | AI-NPC-01 기능 `362edaa`, main Merge `eeb4354` Push 완료; AI-SO-01 Merge `89ca2bc`와 사용자 `4f14d2f` Map 변경 보존 |
+| Git 처리 | AI-PATROL-01 기능 `a721fe4`, main Merge `095dda7` Push 완료; AI-NPC-01 Merge `eeb4354`와 사용자 `4f14d2f` Map 변경 보존 |
+
+## 2026-08-28 — AI-PATROL-01 Hostile Smart Object 순찰
+
+- `/Game/Drone/AI/StateTrees/ST_NPC_HostilePatrol`을 생성하고 AI Component Schema, 네 상태와 Native Task 형식을 저장 자산으로 검증했다.
+- `ClaimEnemyPatrolSlot → MoveToPatrolSlot → WaitAtPatrolSlot → ReleasePatrolSlot`을 반복한다. 기본 재검색 간격은 0.5초, 이동 수용 반경은 80 cm, 대기는 1초다.
+- `UDroneSmartObjectReservationComponent`에 직전 완료 지점 반경 250 cm를 우선 피하는 검색을 추가했다. 대안이 없으면 일반 검색으로 돌아가 한 지점 맵에서도 교착되지 않는다.
+- Hostile Controller는 World BeginPlay 이후 Tree를 시작한다. 이 순서로 Smart Object Runtime 초기화 전 첫 조회 경고를 제거했다. Runtime Spawn은 Controller BeginPlay가 끝난 뒤 Possess되면 즉시 시작한다.
+- Hostile 2명은 EnemyPatrol만 Claim하며 완료 횟수와 서로 다른 방문 위치를 기록한다. Friendly는 `AI-FRIEND-01` 전까지 Tree를 시작하지 않는다.
+- 드론 감지, 이동 실패, UnPossess에서는 이동·예약을 해제한다. 현재 감지는 순찰을 안전 중단할 뿐 Search·Return·Rifle/Shotgun·MG로 전환하지 않는다.
+- `Lvl_NPCSmartObjectGreybox`의 PlayerStart를 초기 Sight 반경 밖으로 옮겨 순찰 검증 시작 즉시 감지되지 않게 했다. 플레이어가 기지에 접근하면 기존 Sight 기반은 계속 동작한다.
+- StateTree와 Greybox는 각각 새 Editor 프로세스 `Validate`를 통과했다. AI 자동화 6/6은 경고·오류 0이다.
+- 전체 `Drone.` 자동화 22/22는 실패 0이며 기존 `PIEInputLifecycle`의 RecastNavMesh 경고 포함 성공 1개만 남는다.
+- Game/Editor Build 성공, Blueprint Compile `0 errors / 0 warnings / 0 load failures`, 새 StateTree와 갱신 맵 LFS Pointer 및 `git lfs fsck`를 통과했다. 전역 Blueprint Commandlet Summary의 기존 Battlefield Pose GUID·MCP 고지 경고 29건은 Blueprint 결과 집계와 분리한다.
+- 문서 저장소에 `Setup-DroneHostilePatrolStateTree.py`와 `Invoke-DroneHostilePatrolStateTreeSetup.ps1`을 추가했다. 기존 Asset을 덮어쓰지 않고 Create 또는 읽기 전용 Validate를 수행한다.
+- Unreal 기능 Commit `a721fe4`를 기능 Branch에 Push하고 Merge Commit `095dda7`로 `origin/main`에 반영했다.
 
 ## 2026-08-27 — NPC·Smart Object 기반 준비
 

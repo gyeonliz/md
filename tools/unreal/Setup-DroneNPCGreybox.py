@@ -256,7 +256,9 @@ def create_map(
 
     cube = unreal.load_asset("/Engine/BasicShapes/Cube.Cube")
     require(isinstance(cube, unreal.StaticMesh), "Engine Cube is unavailable")
-    spawn_actor(actors, unreal.PlayerStart, "PlayerStart_NPCGreybox", (-2600.0, 0.0, 180.0), 0.0)
+    # 순찰 카드에서는 시작 Drone이 Hostile Sight 4,000 cm 안에 즉시 들어오지 않게 한다.
+    # 플레이어가 기지 쪽으로 접근하면 기존 Perception 경계가 그대로 작동한다.
+    spawn_actor(actors, unreal.PlayerStart, "PlayerStart_NPCGreybox", (-3000.0, 2400.0, 180.0), 0.0)
     # Engine Cube는 기본 100 cm 크기이므로 X/Y 배율 64/52가 각각
     # -3200~3200, -2600~2600을 덮는다. 시각 메시와 내비게이션용
     # Blocking Volume을 분리해 명령행 PIE에서도 충돌 수집이 일관되게 한다.
@@ -358,6 +360,10 @@ def build_navigation() -> None:
     require(world is not None, "NPC Greybox World is unavailable")
 
     by_label = {actor.get_actor_label(): actor for actor in actors.get_all_level_actors()}
+    player_start = by_label.get("PlayerStart_NPCGreybox")
+    require(isinstance(player_start, unreal.PlayerStart), "NPC Greybox PlayerStart is unavailable")
+    player_start.set_actor_location(unreal.Vector(-3000.0, 2400.0, 180.0), False, False)
+
     ground = by_label.get("Greybox_Ground")
     require(isinstance(ground, unreal.StaticMeshActor), "NPC Greybox visual Ground is unavailable")
     ground.set_actor_scale3d(unreal.Vector(64.0, 52.0, 1.0))
