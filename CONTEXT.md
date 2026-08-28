@@ -602,3 +602,13 @@ Inbox → Todo → Doing → Done
 - 드론 감지 시 현재 이동과 예약은 안전하게 중단하지만 Search·Return·Rifle/Shotgun·MG 행동은 아직 구현하지 않았다.
 - Game/Editor Build, AI 6/6 경고·오류 0, 전체 `Drone.` 22/22, Blueprint 0/0/0과 LFS 검증을 통과했다. 전체 자동화의 경고 포함 성공 1개는 기존 `PIEInputLifecycle` RecastNavMesh 경고다.
 - 다음 기능 순서는 `AI-FRIEND-01 → AI-PER-01 → AI-WPN-01/02/03 → AI-MG-01/02`이며, 확정하지 않은 전투 수치·Animation·최종 외형을 임의로 정하지 않는다.
+
+## 38. 2026-08-28 팀원 환경 변경과 AI-FRIEND-01 기준선
+
+- Unreal `main=origin/main=2fcfb04`이며 AI-FRIEND-01 기능 Commit은 `b5b733f`, Merge는 `2fcfb04`다.
+- 팀원 환경 맵·재질 변경은 중앙에 반영됐다. Battlefield의 추가 프로젝트 의존성은 `M_Enemy`, `M_Start`, `M_Target` 세 Material로 확인했고 Camp/Base를 포함한 중앙 맵 3종은 누락 의존성 없이 로드·검증됐다.
+- `.vsconfig`는 UE 권장 14.50 구성으로 복원하고 `Drone.cpp`의 `//test`를 제거했다. 바이너리 맵·Fab 자산·시험 맵은 역할 결정 전이므로 임의 삭제하지 않는다.
+- `/Game/Drone/AI/StateTrees/ST_NPC_FriendlyBaseRoutine`을 구현했다. Friendly 2명은 FriendlyBasePatrol과 Ambient를 번갈아 Claim·NavMesh 이동·대기·Release한다.
+- Smart Object 1-Slot 배타 Claim과 직전 지점 회피를 사용하며 각 Friendly가 두 종류와 서로 다른 2개 이상 지점을 방문하는 PIE 자동화를 통과했다.
+- Game/Editor Build, AI 7/7 경고·오류 0, 전체 `Drone.` 23/23, Blueprint 0/0/0, LFS 검증을 통과했다. 기존 `PIEInputLifecycle` RecastNavMesh 경고 포함 성공 1개는 유지된다.
+- 다음 기능 순서는 `AI-PER-01 → AI-WPN-01/02/03 → AI-MG-01/02`다. Search·Return·사격·Damage·Animation·MG 점유는 아직 구현되지 않았다.

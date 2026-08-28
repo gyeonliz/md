@@ -22,24 +22,24 @@
 | GitHub CLI | 설치되어 있지 않음 |
 | 현재 기본 작업 루트 | Unreal `D:\JGY\project\drone`; 문서 `D:\JGY\project\md` |
 | 다른 PC 검증 기록 | Unreal `C:\URproject\drone`; 당시 문서 Clone `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
-| Unreal 프로젝트 저장소 | `main`=`origin/main`=`095dda7`; AI-PATROL-01 기능 `a721fe4` 및 Merge `095dda7` Push, 기존 사용자 Battlefield Map `4f14d2f` 보존 |
-| 문서 작업 저장소 | 최신화 직전 `main=origin/main=602c863`. 이번 협업 Git 문서 변경은 사용자가 직접 Commit할 예정 |
-| Commit·Push 처리 | AI-PATROL-01 기능 `a721fe4`를 Merge Commit `095dda7`로 `origin/main`에 Push 완료. StateTree와 갱신 맵 LFS Object Push 완료 |
-| 실행 상태 | Game/Editor Build 성공, AI 6/6 경고·오류 0, 전체 `Drone.` 22/22(21 정상+기존 PIE Recast 경고 포함 성공 1), Blueprint 0/0/0, LFS fsck 성공. `UnrealEditor`·`UnrealEditor-Cmd` 실행 0 확인 |
+| Unreal 프로젝트 저장소 | `main`=`origin/main`=`2fcfb04`; 팀원 변경 정리 Merge `888414f`, AI-FRIEND-01 기능 `b5b733f` 및 Merge `2fcfb04` Push 완료 |
+| 문서 작업 저장소 | 작업 시작 기준 `main=origin/main=5baff3e`; 이번 구현·검증 기록은 현재 문서 Feature Commit으로 반영 예정 |
+| Commit·Push 처리 | 팀 정리 기능 `f8c8568`·Merge `888414f`, 아군 루틴 기능 `b5b733f`·Merge `2fcfb04`를 한국어 Commit 메시지로 `origin/main`에 Push 완료. 새 StateTree LFS Object Push 완료 |
+| 실행 상태 | Game/Editor Build 성공, AI 7/7 경고·오류 0, 전체 `Drone.` 23/23(22 무경고+기존 PIE Recast 경고 포함 성공 1), Blueprint 0/0/0, 환경 맵 검증과 LFS fsck 성공 |
 | 별도 `droner` 주의 | `main=origin/main=551e287`; `Config/DefaultEditor.ini` 변경과 `Content/Asset` 10,928개·36,360,181,427 bytes 전체가 Untracked. 공급사 원본·스테이징 복사본이므로 일괄 Stage·Commit 금지 |
-| 팀원 Fork | `Yook34/drone` main=`0ff4fb1`; 중앙 `gyeonliz/drone` main=`095dda7`보다 4 Commit 앞섬. 중앙에만 있는 Commit은 0개 |
+| 팀원 변경 | 환경 맵·재질 변경은 중앙 `main`에 반영된 상태. Battlefield의 새 프로젝트 머티리얼 3개와 Camp/Base 의존성을 검증했고 개인 `.vsconfig` 변경·`//test`를 별도 정리. 팀원 PC Remote 실측만 남음 |
 
 GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도했으나 Windows Installer가 종료 코드 1602로 취소되어 설치되지 않았다. GitHub 웹과 Git Credential Manager만으로도 기본 Push/Clone 작업은 가능하다.
 
 전역 Git 작성자 정보는 `gyeonliz <jkw6483@gmail.com>`으로 설정되어 있다. Unreal 프로젝트는 `https://github.com/gyeonliz/drone.git`, 문서 저장소는 `https://github.com/gyeonliz/md.git`를 `origin`으로 사용하며 둘 다 첫 Commit과 Push를 완료했다. 기준선 확인 시 각 로컬 `main`과 `origin/main`이 일치했다. Git 작성자 이름·이메일과 GitHub Desktop 로그인 계정은 Commit 작성자·인증 정보이며 Push 목적지는 아니다. Push 목적지는 선택한 로컬 저장소의 Remote URL과 선택 Branch가 결정한다. 작업컴 기본 PowerShell 정책은 `.ps1` 직접 실행을 차단하므로 컨텍스트 도구 검증에는 영구 설정 변경 없이 실행 1회에만 `-ExecutionPolicy Bypass`를 적용했다.
 
-## 2026-08-28 팀원 Fork 원격 감사
+## 2026-08-28 팀원 변경 인수·정리 결과
 
-- 중앙 저장소 `https://github.com/gyeonliz/drone.git`의 `main`은 `095dda7`, 팀원 Fork `https://github.com/Yook34/drone.git`의 `main`은 `0ff4fb1`이다.
-- 두 저장소의 Merge Base는 `095dda7`이고 차이는 중앙 전용 0 Commit, 팀원 Fork 전용 4 Commit이다. 따라서 팀원 Push가 유실된 것이 아니라 Fork의 `main`에 도착한 상태다.
+- 원격 감사 당시 팀원 변경은 Fork에만 있었지만, 현재 중앙 저장소 `main=2fcfb04`에는 환경 맵·재질 변경이 반영돼 있다.
+- 중앙 맵 `Lvl_Battlefield`, `Lvl_MilitaryCamp`, `Lvl_MilitaryBase`를 실제 로드했다. 누락 의존성은 0이고 Battlefield의 추가 프로젝트 의존성은 `M_Enemy`, `M_Start`, `M_Target` 세 Material뿐이다.
 - 팀원 Fork는 GitHub에서 `gyeonliz/drone`에서 Fork된 저장소로 표시된다. 팀원 PC가 이 Fork를 Clone했다면 `origin=Yook34/drone`이 되는 것이 기본이며 GitHub Desktop의 **Push origin**도 그 Remote로 전송한다.
-- Fork의 순 변경은 `Lvl_Battlefield.umap`, `M_Enemy`, `M_Start`, `M_Target` 후보 자산과 `.vsconfig`, `Drone.uproject`, `Source/Drone/Drone.cpp` 변경이다.
-- `.vsconfig`에는 MSVC 구성 변경, `Drone.uproject`에는 PC별 Engine Association GUID, `Drone.cpp`에는 `//test`가 있어 전체 Merge 또는 `main` 직접 Push는 보류한다. Battlefield Map·재질 3개도 팀원의 의도 확인 전에는 중앙에 반영하지 않는다.
+- 중앙 변경에는 세 환경 맵 갱신, 시험 맵과 Fab 머티리얼 자산이 포함돼 있다. 시험 맵은 역할·이름 결정 전이라 삭제하지 않고 보존한다.
+- `.vsconfig`는 UE 선호 14.50 구성으로 되돌리고 `Drone.cpp`의 `//test`를 제거했다. 기능과 무관한 개인 변경 정리는 `f8c8568`과 Merge `888414f`에 분리했다.
 - 팀원이 중앙 저장소 Collaborator라면 중앙을 `origin`, 기존 Fork를 `fork`로 둘 수 있다. 권한이 없다면 Fork를 `origin`, 중앙을 `upstream`으로 유지하고 Feature Branch를 Pull Request로 중앙 `main`에 반영하는 흐름이 정상이다.
 - `git lfs push`는 LFS Object만 올리고 Git Commit이나 Branch Reference는 올리지 않는다. Commit을 GitHub 이력에 보이게 하려면 정상 `git push` 또는 GitHub Desktop의 **Push origin**이 별도로 성공해야 한다.
 - 정확한 확인·변경·선별 인수 명령은 [`docs/GIT_UNREAL_GUIDE.md`](docs/GIT_UNREAL_GUIDE.md)의 팀 원격 절차를 따른다.
@@ -52,7 +52,7 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 D:\JGY\project\drone\Drone.uproject
 ```
 
-이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 현재 기본 프로젝트는 `D:\JGY\project\drone`이고 `main=origin/main=095dda7`이다. `C:\URproject\drone`은 같은 기준선을 검증한 다른 PC Clone 기록이다.
+이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 공유 기준선은 `main=origin/main=2fcfb04`이며 이번 구현·검증은 `C:\URproject\drone`에서 수행했다. `D:\JGY\project\drone`은 다음 작업 시작 전에 Pull로 맞춰야 한다.
 
 확인 결과:
 
@@ -63,7 +63,7 @@ D:\JGY\project\drone\Drone.uproject
 - 시작 시 Git 저장소가 아니었음
 - 작업 시작 시 Content에는 `.uasset` 749개와 `.umap` 4개가 있었음
 
-초기에는 Third Person 기본 맵과 전역 기본 GameMode를 유지한 채 Git 준비, Android 제외 설정, 별도 Drone Prototype Source를 적용했다. 이후 시작 맵을 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode를 프로젝트 소유 `BP_DronePrototypeGameMode`로 바꿨다. 기존 자산·TUT-04B 병합 기준선 `55b3ffe`에서 Unreal 생성 기본 Map 4개만 제거하고 Template 비맵 자산은 복구했으며, 최신 공유 기준선은 문서 상단의 `095dda7`이다.
+초기에는 Third Person 기본 맵과 전역 기본 GameMode를 유지한 채 Git 준비, Android 제외 설정, 별도 Drone Prototype Source를 적용했다. 이후 시작 맵을 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode를 프로젝트 소유 `BP_DronePrototypeGameMode`로 바꿨다. 기존 자산·TUT-04B 병합 기준선 `55b3ffe`에서 Unreal 생성 기본 Map 4개만 제거하고 Template 비맵 자산은 복구했으며, 최신 공유 기준선은 문서 상단의 `2fcfb04`다.
 
 - `main` Branch의 로컬 Git 저장소 초기화
 - 프로젝트 로컬 Git LFS 초기화
@@ -91,7 +91,7 @@ D:\JGY\project\drone\Drone.uproject
 
 첫 Commit은 863개 파일이며 `Content`는 761개로 `.uasset` 756개와 `.umap` 5개다. 가장 큰 파일은 약 21.0 MB이고 100 MB를 넘는 파일은 없다. 새 Prototype `.uasset`과 `.umap`을 포함한 Unreal Asset에는 Git LFS의 filter·diff·merge 속성이 적용된다. WBP·BP Controller·TUT-01 Asset에 이어 TUT-02의 신규 `BP_DroneTrainingGate`와 갱신한 `Lvl_DroneTraining` 두 Asset도 Git LFS로 Push했다.
 
-현재 공유 main에는 Prototype Pawn/GameMode, 입력, Telemetry, Flight HUD, TUT-01 Course, TUT-02 Ordered Ring Gate, TUT-03 Segment/Lap 원본과 TUT-04B 이전 평균·Best·Delta 결과가 있다. NPC Faction·Rifle/Shotgun Profile, Smart Object Activity Tag, Character·Controller·Spawn Point·Station·예약 Component와 Drone Sight 기반, Definition·Station BP 6쌍도 병합됐다. AI-NPC-01에서 역할 Blueprint와 `Lvl_NPCSmartObjectGreybox`을 추가했고, AI-PATROL-01에서 `ST_NPC_HostilePatrol`과 Native Claim·Move·Wait·Release Task를 구현했다. 맵의 Hostile 2명은 EnemyPatrol 지점을 예약·이동·대기·해제하며 서로 다른 지점을 반복하고 Friendly 2명은 아직 정지한다. Game/Editor Build, AI 6/6, 전체 `Drone.` 22/22, Blueprint 0/0/0을 통과했다. Friendly 이동, 감지 후 Search, Rifle/Shotgun 발사, MG 점유·공격은 아직 미구현이다.
+현재 공유 main에는 Prototype Pawn/GameMode, 입력, Telemetry, Flight HUD, Tutorial 기록·비교 결과와 NPC Smart Object 기반이 있다. Hostile 2명은 `ST_NPC_HostilePatrol`로 EnemyPatrol을 반복하고, Friendly 2명은 `ST_NPC_FriendlyBaseRoutine`으로 FriendlyBasePatrol과 Ambient를 번갈아 예약·이동·대기·해제한다. 양쪽 모두 직전 지점 회피와 1-Slot 배타 Claim을 사용한다. Game/Editor Build, AI 7/7, 전체 `Drone.` 23/23, Blueprint 0/0/0을 통과했다. 감지 후 Search, Rifle/Shotgun 발사, MG 점유·공격, 생활 Animation은 아직 미구현이다.
 
 2026-08-27에는 `C:\에셋`에서 ArmyVFX·InfantrySFX·Ground Drone/MG 외형·Modular Soldier/Insurgent 외형·Quad v4·PBR Sting과 OilRig을 선별 이식했다. ThirdParty 891개와 중앙 `Lvl_OilRig` 1개이며 새 Root 수량 일치, 대표 로드, 외부·누락 참조 0을 확인했다. OilRig 명령줄 Map Check는 장시간 완료되지 않아 Editor 수동 확인이 남았다. 상세 내용은 [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md)를 따른다.
 
@@ -220,8 +220,8 @@ C:\Users\jkw11\Documents\Codex\2026-08-12\c-project-factoryenvironmentcollect\wo
 
 1. 사용자가 실제 Training Map에서 Gate 0→3 한 Lap과 Drone Loop 단일 재생·종료 정지를 수동 확인
 2. `TUT-04B` 첫 기준·이전 평균·Best·Delta를 두 번 완주해 실제 HUD에서 확인
-3. 기능 다음 카드는 `AI-FRIEND-01`, 이후 `AI-PER-01 → AI-WPN → AI-MG` 순으로 진행
-4. 병행으로 팀원 Fork의 Battlefield Map·재질 채택 여부를 확인해 깨끗한 Feature Branch로 선별 인수하고 팀원 Remote 규칙을 통일
+3. 기능 다음 카드는 `AI-PER-01`, 이후 `AI-WPN → AI-MG` 순으로 진행
+4. 병행으로 팀원 PC의 실제 Remote URL·Push 대상 규칙을 확인
 5. 다른 PC에서 최신 `origin/main` Pull, LFS/UE 5.8.1 실행과 문서 Pull 확인
 6. 정보처리산업기사는 Q-Net 개인 접수·수험일·필기면제 상태를 확인해 Track A/B/C를 선택하고, 코딩테스트는 주간 반복으로 병행
 
@@ -246,7 +246,7 @@ PFN-06 Done
 → TUT-03 Segment/Lap 기록 Done
 → TUT-04 비교·결과 UI 기술 구현 완료, 두 Lap 수동 확인 대기
 → AI-PATROL-01 Hostile 순찰 Done
-→ AI-FRIEND-01 BaseRoutine
+→ AI-FRIEND-01 BaseRoutine Done
 → AI-PER-01 감지·Search
 → AI-WPN Rifle·Shotgun
 → AI-MG 점유·공격
@@ -310,6 +310,6 @@ UE 5.8의 Dataflow·Chaos Cloth·Chaos Destruction을 부분 고정 그물과 �
 - 맵 파괴: Dataflow Geometry Collection, Anchor/World Support, Damage Threshold, Strain/Force와 Debris Sleep/Disable
 - Cloth 변형·파괴 연출과 포획·Damage·Mission 판정을 분리
 - 현재 생산 Cloth/Geometry Collection Asset 0, 관련 C++ 0
-- `TUT-04` 수동 확인은 유지한다. `AI-PATROL-01`까지 완료했고 다음 구현 우선순위는 `AI-FRIEND-01 → AI-PER-01 → AI-WPN → AI-MG`; 첫 물리 작업은 별도 `PHY-DF-00` Sandbox
+- `TUT-04` 수동 확인은 유지한다. `AI-FRIEND-01`까지 완료했고 다음 구현 우선순위는 `AI-PER-01 → AI-WPN → AI-MG`; 첫 물리 작업은 별도 `PHY-DF-00` Sandbox
 
 상세 설계는 [`docs/DRONE_CHAOS_DATAFLOW_PLAN.md`](docs/DRONE_CHAOS_DATAFLOW_PLAN.md)를 따른다.

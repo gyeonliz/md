@@ -4,28 +4,28 @@
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 공유 기준선은 `main=origin/main=095dda7`이다. Smart Object Definition·Station Blueprint 6쌍, NPC 역할 Blueprint 3종, Spawn Point Blueprint, 전용 Greybox 맵과 Hostile 최소 순찰 StateTree를 생성·검증했다. 적 순찰만 완료됐으며 아군 이동·Search·Rifle/Shotgun·MG는 별도 카드로 닫는다.
+Unreal 공유 기준선은 `main=origin/main=2fcfb04`다. 팀원 환경 맵·재질 변경을 보존하면서 개인 설정과 시험 주석을 정리했고, Hostile 순찰에 이어 Friendly 기지 활동 StateTree까지 생성·검증했다. Search·Rifle/Shotgun·MG는 아직 별도 카드다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-08-28 — 팀원 Fork 원격 감사와 협업 Git 절차 최신화
+마지막 갱신: 2026-08-28 — 팀원 환경 변경 검증·정리와 AI-FRIEND-01 완료
 
 | 항목 | 상태 |
 |---|---|
-| 현재 단계 | 3단계 Tutorial Vertical Slice 수동 확인 대기 + Hostile 순찰 MVP 완료 |
-| 진행 정도 | 기존 TUT-04B는 실제 두 Lap 확인 대기. `AI-SO-00`, `AI-SO-01`, `AI-NPC-01`, `AI-PATROL-01` 기술 구현 완료 |
-| 지금 작업 중 | 기능 다음 카드 `AI-FRIEND-01` 아군 BaseRoutine 준비. 병행으로 `GIT-TEAM-01` 팀원 Fork 변경 선별 인수 대기 |
-| 완료 근거 | Game/Editor Build 성공, AI 6/6 경고·오류 0, 전체 `Drone.` 22/22(21 정상+기존 PIE Recast 경고 포함 성공 1), Blueprint 0/0/0, LFS fsck 통과 |
+| 현재 단계 | 3단계 Tutorial Vertical Slice 수동 확인 대기 + Hostile/Friendly 기본 이동 MVP 완료 |
+| 진행 정도 | 기존 TUT-04B는 실제 두 Lap 확인 대기. `AI-SO-00`, `AI-SO-01`, `AI-NPC-01`, `AI-PATROL-01`, `AI-FRIEND-01` 기술 구현 완료 |
+| 지금 작업 중 | 기능 다음 카드 `AI-PER-01` 드론 감지·Search 전환 준비. 병행으로 팀원 PC Remote 규칙 확인 대기 |
+| 완료 근거 | Game/Editor Build 성공, AI 7/7 경고·오류 0, 전체 `Drone.` 23/23(22 무경고+기존 PIE Recast 경고 포함 성공 1), Blueprint 0/0/0, 환경 맵 검증과 LFS fsck 통과 |
 | 수동 미확인 | Training 두 Lap 비교 HUD, OilRig Map Check·재질·조명·스케일·충돌·성능, Ground Drone/MG·NPC·Raw Drone 외형 채택 |
 | 현재 차단 | 기능 코드 차단 없음. OilRig 명령줄 Map Check가 약 8분 동안 맵 Construction에서 끝나지 않아 Editor 수동 확인 필요 |
-| 다음 행동 | `AI-FRIEND-01`에서 Friendly 2명이 FriendlyBasePatrol/Ambient Slot을 겹치지 않고 순환하는 최소 StateTree 구성 |
-| 다음 기능 | `AI-FRIEND-01 → AI-PER-01`; 아군 이동과 감지·Search가 안정된 뒤 Rifle·Shotgun 사격 |
+| 다음 행동 | `AI-PER-01`에서 Hostile만 드론 감지 시 순찰을 중단하고 실종 시 Search로 전환하는 PIE 검증 구성 |
+| 다음 기능 | `AI-PER-01 → AI-WPN-01`; 감지·Search가 안정된 뒤 Rifle·Shotgun 공용 계약과 Greybox 사격 |
 | 에셋 인수 | `C:\에셋` 원본은 보존. ArmyVFX·InfantrySFX·Ground Drone·NPC 외형·Raw Drone을 정확한 의존성 묶음으로 이식 |
 | 맵 이식 | 기존 환경 3종에 `Lvl_OilRig`을 추가. Vendor FirstPerson Sample 의존성을 끌어오던 Door Actor 8개는 중앙 사본에서 제거 |
 | Editor/MCP | 모든 검사 프로세스 종료 확인. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
-| Git 처리 | AI-PATROL-01 기능 `a721fe4`, main Merge `095dda7` Push 완료. AI-NPC-01 Merge `eeb4354`와 기존 사용자 `4f14d2f` Map 변경 보존 |
-| 협업 Git | 중앙 `gyeonliz/drone` main은 `095dda7`, 팀원 Fork `Yook34/drone` main은 `0ff4fb1`로 중앙보다 4 Commit 앞섬. 팀원 PC의 Push Remote가 Fork를 가리키는 것으로 판단되며 실제 `origin`/`pushurl` 확인이 필요. 의도 자산만 새 Branch로 선별 인수해야 함 |
+| Git 처리 | 팀 변경 정리 기능 `f8c8568`·Merge `888414f`, AI-FRIEND-01 기능 `b5b733f`·Merge `2fcfb04`를 한국어 메시지로 Push 완료 |
+| 협업 Git | 팀원 환경 맵·재질은 중앙 `main`에 들어온 상태다. Battlefield의 새 `M_Enemy`·`M_Start`·`M_Target` 의존성과 세 중앙 맵 로드를 검증했고, `.vsconfig` 14.50 복원과 `//test` 제거를 별도 정리했다. 팀원 PC의 실제 Remote 구성 확인은 남음 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
 | 학습 다음 행동 | Q-Net 상태를 확인해 Track A/B/C를 고르고 첫 학습 블록 실행 |
 
@@ -54,14 +54,13 @@ Unreal 공유 기준선은 `main=origin/main=095dda7`이다. Smart Object Defini
 | ID | 태그 | 작업 | 완료 조건 |
 |---|---|---|---|
 | GIT-10 | Git / Unreal | 다른 PC Clone과 실행 | LFS 포함 Clone 후 UE 5.8.1에서 열림 |
-| GIT-TEAM-01 | Git / Unreal / 협업 | `Yook34/drone` Fork 변경 선별 인수와 원격 규칙 통일 | Battlefield Map·재질 3개의 채택 여부를 확인하고, PC별 `.vsconfig`·`Drone.uproject` GUID·`//test`를 제외한 깨끗한 Feature Branch/PR로 반영한 뒤 팀원 PC의 `origin`/`upstream` 또는 `origin`/`fork` 구성을 검증 |
+| GIT-TEAM-01 | Git / Unreal / 협업 | 팀원 PC 원격 규칙 확인 | 환경 맵·재질 중앙 반영과 개인 설정 정리는 완료. 팀원 PC에서 `origin`/`upstream` 또는 `origin`/`fork`, `pushurl`을 실제 확인 |
 | SYNC-04 | Codex Sync | 두 PC 간 실제 수동 인계 시험 | Git 흐름과 문맥 패키지 흐름을 각각 완료 |
 | TUT-04 | Drone / Tutorial / UI | 비교 결과 수동 판정 | 두 번 완주해 첫 기준 생성과 두 번째 이전 평균·Best·부호를 실제 HUD에서 확인 |
 | UE-MCP-02 | Drone / Unreal / Codex Sync | Codex 네이티브 MCP Tool 노출 확인 | Unreal Editor 실행 후 `D:\JGY\project\drone` 루트의 새 Codex 작업에서 `unreal-mcp` Tool을 찾고 Current Level을 한 번 조회 |
 | STUDY-EXAM-01 | 정보처리산업기사 | Q-Net 개인 상태 확인 | 3회 접수·수험일·응시 여부·필기 합격/면제 상태를 확인하고 Track A/B/C 기록 |
 | STUDY-EXAM-02 | 정보처리산업기사 | 선택 Track 첫 학습 | 필기 60문항 진단 또는 실기 기초 1블록과 오답 기록 완료 |
 | STUDY-CT-01 | Coding Test | C++ 기본 진단 시작 | 첫 문제 직접 풀이·실패 이유·재풀이 날짜 기록 |
-| AI-FRIEND-01 | Drone / AI | Friendly BaseRoutine StateTree | 아군 2명이 FriendlyBasePatrol/Ambient를 겹치지 않고 순환 |
 | AI-PER-01 | Drone / AI | 드론 Sight와 StateTree Event PIE 검증 | Hostile만 감지 시 순찰 중단, 실종 시 Search 전환 |
 | AI-WPN-01 | Drone / AI / Combat | Rifle·Shotgun 공용 무기 계약 | 같은 AI 호출 경로에서 무기 Profile별 구현 분기 |
 | AI-WPN-02 | Drone / AI / Combat | Rifle Greybox 사격 | 단일 Trace, 시야·사거리·Cooldown 검증 |
@@ -129,6 +128,7 @@ Unreal 공유 기준선은 `main=origin/main=095dda7`이다. Smart Object Defini
 | AI-SO-01 | Drone / AI / Smart Object | Definition 6종과 Station Blueprint 6종을 실제 생성. 각 Definition Slot 1개·Activity Tag·Gameplay Interaction Behavior, 각 BP의 Activity·Definition과 MG 전용 Mesh를 전용 자동화 및 전체 18/18, Blueprint 0/0/0, LFS fsck로 검증. Interaction StateTree는 후속 카드까지 의도적으로 비움 |
 | AI-NPC-01 | Drone / AI | `BP_NPC_Hostile_Rifle`, `BP_NPC_Hostile_Shotgun`, `BP_NPC_Friendly_Base`, `BP_NPCSpawnPoint`와 `Lvl_NPCSmartObjectGreybox` 생성. Rifle 1·Shotgun 1·Friendly 2명, Station 10개, 전용 Navigation Floor·Dynamic Recast를 구성하고 4명 Possess·역할 Tag·NavMesh 투영을 NPC 전용 2/2·전체 20/20·Blueprint 0/0/0으로 검증. Manny/Unarmed은 AI-VIS-01 전 임시 Greybox이며 StateTree·이동·사격은 미구현 |
 | AI-PATROL-01 | Drone / AI / Smart Object | `/Game/Drone/AI/StateTrees/ST_NPC_HostilePatrol`과 Native Claim·Move·Wait·Release Task를 구현했다. Hostile 2명이 EnemyPatrol Slot을 예약하고 NavMesh 이동·1초 대기·해제·다른 지점 재선택을 반복한다. Friendly 2명은 정지 상태를 유지한다. AI 6/6 경고·오류 0, 전체 22/22, Blueprint 0/0/0, Game/Editor Build와 LFS 검증 뒤 기능 `a721fe4`를 `095dda7`로 main 병합·Push. 드론 감지는 순찰을 안전 중단하지만 Search·사격 전환은 미구현 |
+| AI-FRIEND-01 | Drone / AI / Smart Object | `/Game/Drone/AI/StateTrees/ST_NPC_FriendlyBaseRoutine`과 Friendly Claim·공용 Move/Wait·Friendly Release Task를 구현했다. Friendly 2명이 `FriendlyBasePatrol`과 `Ambient`를 번갈아 Claim하고 서로 다른 지점 2개 이상을 방문한다. Smart Object 1-Slot Claim으로 동시 점유를 막는다. AI 7/7, 전체 23/23, Blueprint 0/0/0, Game/Editor Build와 LFS 검증 뒤 기능 `b5b733f`를 `2fcfb04`로 main 병합·Push. 생활 Animation과 드론 전투 반응은 미구현 |
 | SYNC-01 | Codex Sync | 목표·완료·진행·결정·미정·다음 작업 형식 정의 |
 | SYNC-02 | Codex Sync | `handoff.md` + `manifest.json` Export/Import 구현 |
 | SYNC-03 | Codex Sync | 인증·토큰·원시 세션 제외 기준과 검사 구현 |
@@ -137,7 +137,7 @@ Unreal 공유 기준선은 `main=origin/main=095dda7`이다. Smart Object Defini
 
 ## 이번 인계의 정지선
 
-Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 `main=origin/main=095dda7`이다. AI-PATROL-01 기능 Commit은 `a721fe4`, Merge는 `095dda7`이며 AI-NPC-01 Merge `eeb4354`, AI-SO-01 Merge `89ca2bc`, 기존 자산·TUT-04B Merge `55b3ffe`와 사용자 Battlefield Map 갱신 `4f14d2f`을 보존한다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
+Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 `main=origin/main=2fcfb04`다. 팀원 환경 변경 `852e6e6`, 정리 Merge `888414f`, AI-FRIEND-01 기능 `b5b733f`와 Merge `2fcfb04`를 보존한다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
 
 Android 제외와 PFN-01~06, HUD-01, HUD-02, TUT-01~03, 최초 에셋 인수 감사 `AST-00`, 다른 PC의 `C:\에셋` 재검증 `AST-VERIFY-01`, NavigationArrows 최소 이식·원격 공유 `AST-02A`를 완료했다. `AST-01`의 실제 Loop 청감은 여전히 수동 미확인이다. 현재 main에는 TUT-04B 이전 평균·Best 비교와 기록 결과 HUD까지 구현됐으며 실제 두 Lap 표시 판정이 남았다. 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다.
 
@@ -149,4 +149,4 @@ UE-MCP-01도 완료했다. 이후 Editor 내부 Actor·Asset·Blueprint·UMG·Au
 - `AST-02A`의 기술 이식·검증·기능 Branch와 `main` Push는 완료했다. 실제 Training HUD 연결은 아직 하지 않았다.
 - HUD 연결 전에도 자산은 안전하게 로드 가능한 상태지만, 화면에 보이는 구현으로 과장하지 않는다.
 - 프로젝트 소유 맵은 `/Game/Drone/Maps` 한 곳에서 관리한다. 공급사 원본 맵을 추가할 때도 검토용 사본만 이 폴더에 두고 의존 자산은 각 ThirdParty 폴더에 유지한다.
-- TUT-04 실제 두 Lap 확인은 그대로 남긴다. 이 오버레이 당시 다음 구현이던 `AI-PATROL-01`은 2026-08-28 완료했고 현재 다음은 `AI-FRIEND-01`이다.
+- TUT-04 실제 두 Lap 확인은 그대로 남긴다. `AI-PATROL-01`과 `AI-FRIEND-01`은 2026-08-28 완료했고 현재 다음 기능은 `AI-PER-01`이다.

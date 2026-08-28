@@ -6,14 +6,14 @@
 
 ## 30초 요약
 
-- Unreal 기준선은 `main=origin/main=095dda7`이다. AI-PATROL-01 기능 `a721fe4`와 기존 사용자 Battlefield Map `4f14d2f`이 모두 반영됐다.
+- Unreal 기준선은 `main=origin/main=2fcfb04`다. 팀원 환경 변경 정리 `888414f`와 AI-FRIEND-01 기능 `b5b733f`가 모두 반영됐다.
 - Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개, Segment/Lap 원본과 이전 평균·Best·Delta 결과까지 구현됐다.
 - 현재 개발 완료 지점은 `TUT-04B` 기술 구현이며, 실제 두 Lap HUD 확인 뒤 Flight 상태로 진행한다.
 - 이번 확인 PC의 제공 에셋 루트는 `C:\에셋`이다. FPV·Loop 선택 자산 12개와 프로젝트 Integration BP 1개의 파일·참조·LFS·자동 검증은 통과했다.
 - NavigationArrows 최소 자산 6개와 전용 테스트는 main에 병합됐다. 화면 Host는 아직 미구현이다.
 - 프로젝트 사용 맵은 `/Game/Drone/Maps`로 중앙화했다. 환경 맵 3종에 `Lvl_OilRig`을 추가했고, 남은 제공 자산 891개를 후보 라이브러리로 선별 이식했다.
 - 사용자는 Gate나 기록 C++를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도와 Drone Loop를 확인하면 된다.
-- 적 순찰·드론 감지·Rifle/Shotgun·MG와 기지 아군 Smart Object 이동을 위한 기반에 Hostile 순찰 StateTree를 추가했다. Hostile 2명은 EnemyPatrol Claim·이동·대기·해제를 반복한다. Friendly 이동·Search·사격은 후속 카드다.
+- Hostile/Friendly Smart Object 기본 이동 StateTree를 추가했다. Hostile 2명은 EnemyPatrol, Friendly 2명은 FriendlyBasePatrol/Ambient의 Claim·이동·대기·해제를 반복한다. Search·Rifle/Shotgun·MG는 후속 카드다.
 - 확정된 학습 항목은 `정보처리산업기사`와 `C++ 코딩테스트` 두 가지뿐이다.
 - 정보처리산업기사 2026년 3회 필기 접수는 끝났다. 오늘 가장 먼저 Q-Net에서 자신의 접수·면제·응시 상태를 확인해야 한다.
 - 코딩테스트는 공통 시험일이 없으므로 자격시험 일정에 맞춰 주간 반복 학습으로 운영한다.
@@ -23,19 +23,19 @@
 | 구분 | 현재 상태 |
 |---|---|
 | Unreal 저장소 | `C:\URproject\drone` |
-| Unreal 기준 Commit | `095dda7` |
+| Unreal 기준 Commit | `2fcfb04` |
 | Git 상태 | 깨끗한 `main`, 로컬·원격 일치. AI-PATROL-01 Merge·Push 완료 |
 | Git LFS | `fsck` 정상 |
-| 최종 Editor Build | 성공 |
+| 최종 Game/Editor Build | 성공 |
 | Tutorial 자동화 | 7/7 통과 |
 | AI 자동화 | 6/6 통과, 경고·오류 0 |
-| 전체 `Drone.` 자동화 | 22/22 통과. 21개 정상 성공, 기존 PIE RecastNavMesh 경고 포함 성공 1개 |
+| 전체 `Drone.` 자동화 | 23/23 통과. 22개 무경고 성공, 기존 PIE RecastNavMesh 경고 포함 성공 1개 |
 | Blueprint Compile | Errors 0, 기존 Battlefield Pose GUID·MCP 고지 경고 유지 |
 | Standalone | 실제 WBP HUD·Cyan Course·Current/Inactive Gate 표시 확인 |
 | 에셋 이식 | 환경 3종+OilRig와 후보 라이브러리 891개. 새 Root 수량 일치·대표 로드·외부/누락 0, LFS fsck 통과 |
-| NPC/Smart Object | 기반·Definition/Station BP 6쌍·역할 BP·Greybox·Hostile 순찰 StateTree 구성. AI 6/6, 전체 22/22, Blueprint 0/0/0, LFS 통과 |
+| NPC/Smart Object | 기반·Definition/Station BP 6쌍·역할 BP·Greybox·Hostile/Friendly StateTree 구성. AI 7/7, 전체 23/23, Blueprint 0/0/0, LFS 통과 |
 
-현재 작업 기준에서 Game/Editor Build, AI 6개, 전체 Drone 22개와 Blueprint 전체 Compile을 실행했다. AI는 경고·오류 없이 통과했고 전체 자동화는 21개 정상 성공, 기존 PIE NavMesh 경고 포함 성공 1개이며 실패는 0이다. Blueprint 오류·Blueprint 경고·로드 실패는 0이다.
+현재 작업 기준에서 Game/Editor Build, AI 7개, 전체 Drone 23개와 Blueprint 전체 Compile을 실행했다. AI는 경고·오류 없이 통과했고 전체 자동화는 22개 무경고 성공, 기존 PIE NavMesh 경고 포함 성공 1개이며 실패는 0이다. Blueprint 오류·Blueprint 경고·로드 실패는 0이다.
 
 ## 2. 코드가 어떻게 연결되는가
 
@@ -72,7 +72,7 @@ ADroneNPCSpawnPoint 또는 직접 배치
    └─ ADroneNPCAIController
       ├─ StateTree Component
       │  ├─ Hostile: ST_NPC_HostilePatrol 실행
-      │  └─ Friendly: AI-FRIEND-01 전 미실행
+      │  └─ Friendly: ST_NPC_FriendlyBaseRoutine 실행
       ├─ Sight: Drone Prototype 감지
       └─ Smart Object Reservation
          ├─ Hostile: EnemyPatrol / Guard / 선택적 MG
@@ -82,7 +82,8 @@ Lvl_NPCSmartObjectGreybox
 ├─ Hostile Rifle 1 + Hostile Shotgun 1 + Friendly 2
 ├─ Smart Object Station 10개
 ├─ ADroneNPCNavigationFloor + NavMeshBoundsVolume
-└─ Hostile: Claim → Move → Wait → Release 반복
+├─ Hostile: EnemyPatrol Claim → Move → Wait → Release 반복
+└─ Friendly: BasePatrol/Ambient Claim → Move → Wait → Release 반복
 ```
 
 ### 클래스별 한 줄 책임
@@ -152,6 +153,8 @@ Lvl_NPCSmartObjectGreybox
 - 역할 Profile·Possess·Activity Tag·시작 위치 NavMesh 투영 자동 검증
 - `ST_NPC_HostilePatrol`과 Native Claim·Move·Wait·Release Task
 - Hostile 2명의 반복 순찰, 각 2회 이상 완료·서로 다른 2지점 이상 방문 자동 검증
+- `ST_NPC_FriendlyBaseRoutine`과 Base Patrol/Ambient 교대·Fallback·방문 기록
+- Friendly 2명의 반복 이동, 각 두 Activity·서로 다른 2지점 이상 방문 자동 검증
 - 직전 지점 우선 회피와 감지·실패·UnPossess 시 예약 해제
 
 ### 미구현
@@ -159,7 +162,6 @@ Lvl_NPCSmartObjectGreybox
 - 다음 Gate·잘못된 순서/방향 안내와 완주 팝업·구간별 결과 표
 - 명시적인 Take Off·Landing·Crash 상태와 최종 비행 물리
 - Mission·귀환·평가
-- Friendly StateTree와 실제 BaseRoutine 이동
 - 감지 후 Search·Return과 순찰 복귀
 - Rifle·Shotgun 발사·피해·Animation·FX·SFX
 - MG Turret 점유·조준·공격과 중단 뒤 재점유
@@ -201,7 +203,7 @@ Lvl_NPCSmartObjectGreybox
 13. `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`을 열어 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 10개의 위치·방향을 확인한다.
 14. `P` 키로 네 NPC 시작점과 Station 사이의 녹색 NavMesh 연결을 확인한다.
 15. PIE에서 Hostile 2명이 EnemyPatrol 3개 사이를 반복 이동하고 같은 자리에만 머물지 않는지 확인한다.
-16. Friendly 2명은 아직 정지하는 것이 정상이며, 다음 `AI-FRIEND-01`에 사용할 FriendlyBasePatrol/Ambient 동선을 검토한다.
+16. Friendly 2명이 FriendlyBasePatrol/Ambient 사이를 이동하고 같은 1-Slot에 동시에 머물지 않는지 눈으로 확인한다.
 
 다시 만들 필요가 없는 것:
 
@@ -222,7 +224,7 @@ TUT-03 Segment/Lap 기록 Done
 → AI-SO-01 Definition/Station BP Done
 → AI-NPC-01 적 Rifle·Shotgun·아군 BP와 Greybox Done
 → AI-PATROL-01 적 순찰 Done
-→ AI-FRIEND-01 기지 아군 이동
+→ AI-FRIEND-01 기지 아군 이동 Done
 → AI-PER-01 드론 감지
 → Rifle → Shotgun → MG
 ```
