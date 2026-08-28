@@ -13,6 +13,9 @@ ENVIRONMENTS = {
         "compatibility": {
             "/Game/Characters/Heroes/Mannequin/Meshes/SKM_Manny",
             "/Game/Characters/Heroes/Mannequin/Meshes/SKM_Quinn",
+            "/Game/Material/M_Enemy",
+            "/Game/Material/M_Start",
+            "/Game/Material/M_Target",
         },
         "expected_vendor_assets": 710,
     },

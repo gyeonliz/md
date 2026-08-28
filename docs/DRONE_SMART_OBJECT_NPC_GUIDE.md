@@ -4,7 +4,7 @@
 
 이 문서는 적군 순찰과 드론 발견 대응, 소총·샷건 분기, 기지 아군 NPC의 생활·순찰 이동, 한 명만 사용하는 MG Turret을 같은 기반 위에 구성하기 위한 실전 가이드다.
 
-현재 단계는 **C++·Smart Object 기반과 Hostile 최소 순찰 StateTree를 완료한 상태**다. `ST_NPC_HostilePatrol`의 Native Task가 EnemyPatrol Slot Claim → NavMesh 이동 → 1초 대기 → Release → 다른 지점 재선택을 반복한다. Greybox의 Hostile 2명은 이 순환을 자동 검증했고 Friendly 2명은 아직 정지한다. 감지 후 Search, 아군 이동, 무기 사격·피해·Animation은 아직 완성된 기능이 아니다. 아래 순서대로 작은 동작 단위로 만들고 PIE에서 확인한 뒤 다음 카드로 넘어간다.
+현재 단계는 **C++·Smart Object 기반과 Hostile/Friendly 기본 이동 StateTree를 완료한 상태**다. `ST_NPC_HostilePatrol`은 EnemyPatrol, `ST_NPC_FriendlyBaseRoutine`은 FriendlyBasePatrol/Ambient Slot의 Claim → NavMesh 이동 → 1초 대기 → Release를 반복한다. Greybox의 Hostile 2명과 Friendly 2명 모두 역할별 순환을 자동 검증했다. 감지 후 Search, 무기 사격·피해, 생활·전투 Animation은 아직 완성된 기능이 아니다. 아래 순서대로 작은 동작 단위로 만들고 PIE에서 확인한 뒤 다음 카드로 넘어간다.
 
 ## 1. 이번 구조로 만들 동작
 
@@ -147,8 +147,8 @@ Hostile Controller가 `ADronePrototypePawn`을 처음 감지하면 현재 Smart 
 │     ├─ BP_SO_Cover
 │     └─ BP_SO_MGTurret
 ├─ StateTrees/
-│  ├─ ST_NPC_Hostile
-│  ├─ ST_NPC_Friendly
+│  ├─ ST_NPC_HostilePatrol
+│  ├─ ST_NPC_FriendlyBaseRoutine
 │  └─ ST_Interaction_MGTurret
 └─ Weapons/
    ├─ Rifle/
@@ -192,11 +192,11 @@ Hostile Controller가 `ADronePrototypePawn`을 처음 감지하면 현재 Smart 
 - Blueprint 경로: `/Game/Drone/AI/SmartObjects/Blueprints`
 - 각 Definition은 정확히 Slot 1개와 해당 Activity Tag 1개를 가진다.
 - 각 Slot에는 `Gameplay Interaction Smart Object Behavior Definition`이 1개 들어 있다.
-- Definition의 Gameplay Interaction StateTree는 아직 의도적으로 비어 있다. `AI-PATROL-01`의 이동은 Controller가 실행하는 `ST_NPC_HostilePatrol`과 Reservation Component가 담당하며, Slot 자체 Interaction은 아군 생활 Animation·MG 점유 카드에서 필요할 때 별도로 연결한다.
+- Definition의 Gameplay Interaction StateTree는 아직 의도적으로 비어 있다. 기본 이동은 Controller가 실행하는 역할별 StateTree와 Reservation Component가 담당하며, Slot 자체 Interaction은 생활 Animation·MG 점유 카드에서 필요할 때 별도로 연결한다.
 - 여섯 Blueprint는 모두 `ADroneSmartObjectStation` 자식이며, 대응 Definition과 `Activity`가 연결됐다.
 - `BP_SO_MGTurret`에만 Ground Drone Kit의 `MG_Turret_SK` 후보 Mesh를 연결했다.
 
-따라서 현재 Asset은 검색·Claim 계약을 검사할 수 있지만, 맵에 배치하는 것만으로 NPC가 이동·대기하지는 않는다. 실제 이동 실행은 후속 StateTree Task가 담당한다.
+Station만 맵에 배치한다고 NPC가 자동 생성되지는 않는다. 역할 Profile을 가진 NPC와 NavMesh가 함께 있으면 현재 Controller StateTree가 검색·Claim·이동·대기·해제를 실행한다.
 
 ### Editor 확인·배치 절차
 
@@ -218,7 +218,7 @@ Hostile Controller가 `ADronePrototypePawn`을 처음 감지하면 현재 Smart 
 - Smart Object 디버그 화면에서 Slot이 보인다.
 - Definition과 Blueprint의 역할·Tag·참조가 일치한다.
 - `BP_SO_MGTurret`만 후보 Mesh를 가진다.
-- Hostile EnemyPatrol Claim·이동·해제는 `AI-PATROL-01` PIE로 판정했다. Friendly·MG·Cover Activity는 각 후속 카드에서 따로 판정한다.
+- Hostile EnemyPatrol은 `AI-PATROL-01`, FriendlyBasePatrol/Ambient는 `AI-FRIEND-01` PIE로 Claim·이동·해제를 판정했다. MG·Cover Activity는 각 후속 카드에서 따로 판정한다.
 
 ### 문제 확인
 
@@ -267,7 +267,7 @@ Spawn Point의 `Spawn On Begin Play` 기본값은 꺼져 있다. 실수로 PIE�
 
 경로는 `/Game/Drone/AI/Blueprints`다. 현재 Mesh와 Animation은 Manny Simple·`ABP_Unarmed` 임시 Greybox이므로 최종 외형이 아니다. Soldier/Insurgent 후보 중 실제 역할별 외형 선택은 `AI-VIS-01`에서 자산을 직접 확인한 뒤 결정한다.
 
-Controller의 StateTree 자동 시작은 꺼져 있고 역할에 맞는 Asset을 명시적으로 연결한다. Hostile은 World BeginPlay에서 Smart Object Runtime이 준비된 뒤 `ST_NPC_HostilePatrol`을 시작한다. Friendly는 `AI-FRIEND-01` 전까지 StateTree를 시작하지 않는다.
+Controller의 엔진 자동 시작은 꺼져 있고 C++가 Profile에 맞는 Asset을 명시적으로 선택한다. Smart Object Runtime이 준비된 World BeginPlay 뒤 Hostile은 `ST_NPC_HostilePatrol`, Friendly는 `ST_NPC_FriendlyBaseRoutine`을 시작한다.
 
 ### 정상 결과
 
@@ -359,19 +359,18 @@ Root
 - `Drone.AI.Event.DroneLost`가 오면 Search로 이동하고, 정해진 시간 또는 탐색 완료 뒤 ReturnToPatrol로 간다.
 - 상태가 성공·실패·중단되는 모든 경로에서 예약을 해제한다.
 
-### 아군 StateTree `ST_NPC_Friendly`
+### 현재 아군 StateTree `ST_NPC_FriendlyBaseRoutine`
 
 ```text
-Root
-└─ BaseRoutine
-   ├─ FindAndClaimFriendlyActivity
-   ├─ MoveToSlot
-   ├─ WaitOrAmbient
-   ├─ ReleaseSlot
-   └─ Repeat
+FriendlyBaseRoutine
+├─ ClaimFriendlyActivitySlot
+├─ MoveToFriendlyActivitySlot
+├─ WaitAtFriendlyActivitySlot
+└─ ReleaseFriendlyActivitySlot
+    └─ ClaimFriendlyActivitySlot로 반복
 ```
 
-Friendly는 전투 분기를 넣지 않는다. 처음에는 이동과 대기만 확인하고, 대화·작업·경례 같은 행동은 Animation 자산을 확인한 뒤 Activity와 Interaction을 추가한다.
+Friendly는 `FriendlyBasePatrol`과 `Ambient`를 번갈아 먼저 시도하며, 선호 종류의 빈 Slot이 없으면 다른 아군 활동을 시도한다. 직전 완료 지점 반경 250 cm를 우선 피하고, Smart Object의 원자적 1-Slot Claim으로 다른 NPC가 이미 잡은 지점을 제외한다. 이동과 대기 Task는 Hostile과 공유하지만 Claim·완료 기록·Release Task는 역할별로 분리했다. Friendly에는 전투 분기를 넣지 않았으며 대화·작업·경례 같은 행동은 Animation 자산을 확인한 뒤 추가한다.
 
 ## 9. 소총과 샷건 구현 경계
 
@@ -427,7 +426,7 @@ Hostile + CanUseMGTurret
 | `AI-SO-01` | Smart Object Definition 6종과 Station BP 생성 | **Done** — 6쌍 생성, Slot·Activity·Definition·MG Mesh 자동 검증 통과 |
 | `AI-NPC-01` | 적 Rifle·Shotgun·아군 BP와 시험 맵 배치 | **Done** — 4명 Profile·Possess·Activity Tag·NavMesh 투영 검증 |
 | `AI-PATROL-01` | 적 순찰 StateTree | **Done** — Hostile 2명이 EnemyPatrol Claim·이동·대기·해제, 각 2회 이상·서로 다른 2지점 이상 방문 자동 검증 |
-| `AI-FRIEND-01` | 아군 BaseRoutine StateTree | 아군 2명이 생활 지점을 겹치지 않고 순환 |
+| `AI-FRIEND-01` | 아군 BaseRoutine StateTree | **Done** — 아군 2명이 FriendlyBasePatrol/Ambient를 배타 Claim하고, 각각 두 종류·서로 다른 2지점 이상 방문 |
 | `AI-PER-01` | 드론 Sight·Event PIE 검증 | 감지 시 순찰 중단, 놓치면 Search 전환 |
 | `AI-WPN-01` | 공용 Weapon 계약 | Rifle·Shotgun이 같은 AI 호출 경로 사용 |
 | `AI-WPN-02` | Rifle Greybox 발사 | 단일 Trace, 사거리·시야·Cooldown 검증 |
@@ -437,7 +436,7 @@ Hostile + CanUseMGTurret
 | `AI-COVER-01` | 비점유 병사 엄폐 | MG 실패 병사가 Cover 지점 사용 |
 | `AI-VIS-01` | 외형·Animation 연결 | T Pose·손 위치·Root Motion 문제 없음 |
 
-`AI-SO-00 → AI-SO-01 → AI-NPC-01 → AI-PATROL-01`은 완료했다. 다음은 `AI-FRIEND-01 → AI-PER-01` 순서다. 사격은 아군 이동·예약과 드론 감지가 안정된 뒤 Rifle부터 붙이고 Shotgun을 같은 계약의 두 번째 구현으로 추가한다.
+`AI-SO-00 → AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01`은 완료했다. 다음은 `AI-PER-01`이다. 사격은 드론 감지·Search가 안정된 뒤 Rifle부터 붙이고 Shotgun을 같은 계약의 두 번째 구현으로 추가한다.
 
 ### Asset 재검증 명령
 
@@ -465,14 +464,22 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 
 `Create`는 Asset이 없을 때만 새로 만들며 기존 StateTree는 덮어쓰지 않는다. 일반 Pull·검증에서는 `Validate`만 사용한다.
 
+Friendly 기지 루틴 StateTree도 같은 방식으로 읽기 전용 검증한다.
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneFriendlyBaseRoutineStateTreeSetup.ps1 -Mode Validate -ProjectPath C:\URproject\drone\Drone.uproject
+```
+
+이 검증은 `FriendlyBaseRoutine`의 Claim·Move·Wait·Release 상태 순서, Native Task 종류와 컴파일 준비 상태를 확인한다. `Create`는 Asset이 없을 때만 사용하며 기존 Asset을 덮어쓰지 않는다.
+
 ## 12. 첫 PIE 검증 체크리스트
 
 - [x] Smart Objects와 Gameplay Interactions Plugin 활성 상태를 프로젝트 설정과 자동화로 확인
 - [x] NPC 4명 시작 위치가 NavMesh에 투영되는지 자동화로 확인
 - [x] Hostile Rifle 1명, Hostile Shotgun 1명, Friendly 2명 Possess 확인
 - [x] 적 순찰 Tree가 EnemyPatrol만 사용
-- [ ] 아군이 FriendlyBasePatrol/Ambient만 사용
-- [ ] 같은 1-Slot 지점을 두 NPC가 동시에 사용하지 않음
+- [x] 아군이 FriendlyBasePatrol/Ambient만 사용하고 두 종류를 모두 방문
+- [x] 같은 1-Slot은 Smart Object 배타 Claim 경로로 예약
 - [x] 드론이 보이지 않을 때 Hostile 2명이 각각 2회 이상 순찰하고 서로 다른 2개 이상 지점 방문
 - [ ] 드론이 Sight에 들어오면 Hostile만 순찰 예약 해제
 - [ ] Friendly는 드론을 봐도 전투 상태로 바뀌지 않음
@@ -499,18 +506,18 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 - Profile·Possess·Activity Tag·NavMesh 투영 자동화
 - Hostile `ST_NPC_HostilePatrol`과 Claim·Move·Wait·Release Native Task
 - 직전 지점 우선 회피, 이동 실패·감지·UnPossess 시 예약 해제
-- Hostile 2명의 반복 순찰과 Friendly 정지 상태 PIE 자동화
-- Game/Editor Build, AI 6/6 경고·오류 0, 전체 `Drone.` 22/22, Blueprint 0/0/0, LFS 검증
+- Hostile 2명의 반복 순찰과 Friendly 2명의 Base Patrol/Ambient 반복 이동 PIE 자동화
+- Friendly `ST_NPC_FriendlyBaseRoutine`과 역할별 Claim·Release Native Task
+- Game/Editor Build, AI 7/7 경고·오류 0, 전체 `Drone.` 23/23, Blueprint 0/0/0, LFS 검증
 
 ### 아직 구현·수동 검증 필요
 
-- Friendly BaseRoutine StateTree와 실제 아군 이동 Task
 - 감지 후 Search·Return 전환과 순찰 복귀
 - 최종 NPC 외형·Skeleton·Animation Blueprint 선택과 연결
 - Rifle·Shotgun 발사·피해·Animation·FX·SFX
 - MG 승하차·조준·사격 Animation과 Turret 제어
 - Cover·Search·Return 실제 행동
-- 전용 Greybox 맵에서 Hostile 순찰의 수동 시각 확인과 아군 이동·드론 감지 동작 확인
+- 전용 Greybox 맵에서 Hostile/Friendly 이동의 수동 시각 확인과 드론 감지 동작 확인
 - 최종 맵에 NPC와 Smart Object 배치
 
 UE 5.8.1에서 `Gameplay Interactions`는 Experimental 표기가 있는 Plugin이다. 프로젝트에 제한적으로 사용하되 엔진 업데이트 때 API 변경 가능성을 확인하고, 핵심 역할·예약 규칙은 프로젝트 C++와 테스트에 남긴다.

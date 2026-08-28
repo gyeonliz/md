@@ -10,7 +10,7 @@
 - 다만 `UE_5.8` 폴더명이나 `.uproject`의 `EngineAssociation` 값만으로 패치 버전을 판정해서는 안 된다. 이번 확인 PC를 메인컴 또는 작업컴 중 어느 역할로 부를지는 이 문서에서 임의로 정하지 않으므로, 메인컴 설치 버전과 두 PC 일치 판정은 PC 역할을 확인한 뒤 닫는다.
 - 실제 Drone GitHub 저장소는 **`gyeonliz/drone`**으로 확정했다.
 - GitHub 저장소 공개 범위(Public/Private)는 **현재 미정**이다.
-- 기본 Drone 작업 경로는 `D:\JGY\project\drone`이고 문서 경로는 `D:\JGY\project\md`다. 다른 PC의 검증 Clone `C:\URproject\drone`도 별도 기록으로 보존한다. 현재 중앙 main은 `095dda7`이며 AI-PATROL-01까지 병합·Push했다. Game/Editor Build, AI 6/6, 전체 `Drone.` 22/22, Blueprint 0/0/0, LFS fsck를 통과했다. 프로젝트 사용 맵과 환경 중앙 사본은 `/Game/Drone/Maps`에 있고 Unreal 생성 기본 Map 4개만 제거했다. 실제 코드 구조와 사용자 확인 작업은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다. 다른 PC Pull/LFS/UE 실행 검증은 아직 남았다.
+- 기본 Drone 작업 경로는 `D:\JGY\project\drone`이고 문서 경로는 `D:\JGY\project\md`다. 다른 PC의 검증 Clone `C:\URproject\drone`도 별도 기록으로 보존한다. 현재 중앙 main은 `2fcfb04`이며 AI-FRIEND-01까지 병합·Push했다. Game/Editor Build, AI 7/7, 전체 `Drone.` 23/23, Blueprint 0/0/0, 환경 맵 검증과 LFS fsck를 통과했다. 프로젝트 사용 맵과 환경 중앙 사본은 `/Game/Drone/Maps`에 있고 Unreal 생성 기본 Map 4개만 제거했다. 실제 코드 구조와 사용자 확인 작업은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다. 다른 PC Pull/LFS/UE 실행 검증은 아직 남았다.
 - 사용자는 현재 Drone 프로젝트에서 Android를 사용하지 않는다고 확정했다. 기준 Drone 프로젝트에서는 Android File Server Plugin과 네트워크 연결을 끄고 `SecurityToken`을 빈 할당으로 정리했다.
 - 아래 브랜치 구조는 현재 컨텍스트에 맞춘 권장 시작안이며, 최종 팀 규칙으로 확정된 것은 아니다.
 - 이 가이드는 명령줄 Git을 기준으로 한다. Unreal Editor 안의 Git 플러그인 제공 여부와 동작은 실제 UE 5.8 환경에서 확인하기 전까지 전제하지 않는다.
@@ -339,7 +339,7 @@ git config --get branch.main.pushRemote
 
 `remote.pushDefault`나 `branch.main.pushRemote`가 출력되면 `origin`과 다른 Push 대상이 지정될 수 있으므로 함께 기록한다. Unreal Editor를 저장·종료하고 작업 트리가 깨끗한 상태에서만 Remote 이름이나 Branch 구조를 바꾼다.
 
-2026-08-28 실제 원격 감사 결과는 다음과 같다.
+2026-08-28 팀원 변경 인수 전 원격 감사 결과는 다음과 같다.
 
 | 역할 | 저장소 | main |
 |---|---|---|
@@ -347,6 +347,8 @@ git config --get branch.main.pushRemote
 | 팀원 Fork | `https://github.com/Yook34/drone.git` | `0ff4fb1` |
 
 `Yook34/drone`은 `gyeonliz/drone`의 Fork이며 Merge Base는 `095dda7`이다. 중앙 전용 Commit은 0개, Fork 전용 Commit은 4개다. 따라서 팀원 PC가 Fork를 Clone해 `origin=Yook34/drone`인 경우 팀원 GitHub에 Push된 것은 정상 동작이다.
+
+이후 팀원 환경 변경은 중앙에 반영됐고 현재 중앙 `main`은 `2fcfb04`다. 위 표는 Push가 사라진 것처럼 보였던 원인을 설명하는 당시 감사 기록이며 최신 기준선으로 사용하지 않는다.
 
 #### 방식 A — Fork + Pull Request
 
@@ -378,7 +380,7 @@ git fetch --all --prune
 git remote -v
 ```
 
-현재 팀원 로컬 `main`에는 Fork 전용 4 Commit이 있으므로 그 상태에서 중앙 `main`으로 바로 Push하지 않는다. 작업 트리가 깨끗하고 현재 Branch가 `main`인 것을 확인한 뒤 기존 Branch 이름을 보존하고 중앙 기준의 새 `main`을 만든다.
+감사 당시 팀원 로컬 `main`에는 Fork 전용 4 Commit이 있었다. 현재는 먼저 `git fetch --all --prune`과 `git branch -vv`로 실제 상태를 다시 확인하고, 기존 작업 Branch를 보존한 뒤 중앙 최신 `main`에서 새 Feature Branch를 만든다. 아래 이름 변경 예시는 감사 당시 Fork `main`을 보존할 때만 사용한다.
 
 ```powershell
 git status --short

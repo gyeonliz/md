@@ -1,7 +1,7 @@
 # Drone Content 폴더 정리 기준
 
 기준일: 2026-08-28
-Drone 기준선: `main=origin/main=095dda7`
+Drone 기준선: `main=origin/main=2fcfb04`
 Unreal Engine: 5.8.1
 
 ## 1. 레빗홀 프로젝트에서 확인한 기준
@@ -153,8 +153,8 @@ Battlefield·MilitaryCamp·MilitaryBase와 OilRig은 이 절차로 실제 이식
 - Template 비맵 자산 62개 복구 확인
 - 환경 의존성: Battlefield 710, MilitaryCamp 593, MilitaryBase 1,414개 공급사 자산; 누락 0, 허용 외 경로 0
 - Blueprint Compile 오류 0. 기존 Battlefield Pose GUID와 MCP 고지 경고는 유지
-- AI-PATROL-01 반영 뒤 AI `6/6` 경고·오류 0, 전체 `Drone.` 자동화 `22/22` 성공(기존 PIE NavMesh 경고 포함 성공 1)
+- AI-FRIEND-01 반영 뒤 AI `7/7` 경고·오류 0, 전체 `Drone.` 자동화 `23/23` 성공(기존 PIE NavMesh 경고 포함 성공 1)
 - 환경 Map Check: Battlefield 오류 0·공급 Blueprint 메시지 14, MilitaryCamp 0/0, MilitaryBase 0/0
 - 신규 환경 패키지 2,723개·16.96 GiB 전부 Git LFS 포인터 확인
 - `git lfs fsck`, `git diff --check` 통과
-- 현재 기능 커밋: AI-PATROL-01 `a721fe4`; main 병합 `095dda7` Push 완료
+- 현재 기능 커밋: AI-FRIEND-01 `b5b733f`; main 병합 `2fcfb04` Push 완료

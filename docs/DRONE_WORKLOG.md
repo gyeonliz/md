@@ -18,21 +18,35 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-28 — 팀원 Fork 원격 감사와 협업 Git 절차 최신화
+마지막 갱신: 2026-08-28 — 팀원 환경 변경 검증·정리와 AI-FRIEND-01 완료
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | Tutorial 수동 확인 대기 + Hostile 순찰 MVP 완료 |
-| Unreal 기준선 | `main=origin/main=095dda7`; AI-PATROL-01 기능 `a721fe4`, 사용자 Battlefield Map `4f14d2f` 보존 |
-| 자동 검증 | Game/Editor Build, AI 6/6 경고·오류 0, 전체 `Drone.` 22/22, Blueprint 0/0/0, LFS fsck 성공 |
+| 전체 단계 | Tutorial 수동 확인 대기 + Hostile/Friendly 기본 이동 MVP 완료 |
+| Unreal 기준선 | `main=origin/main=2fcfb04`; 팀 변경 정리 `888414f`, AI-FRIEND-01 기능 `b5b733f` 보존 |
+| 자동 검증 | Game/Editor Build, AI 7/7 경고·오류 0, 전체 `Drone.` 23/23, Blueprint 0/0/0, 환경 맵 검증과 LFS fsck 성공 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | `AI-PATROL-01` Hostile Claim·Move·Wait·Release 반복 완료. 다음 `AI-FRIEND-01` 준비 |
+| 지금 작업 중 | `AI-FRIEND-01` Friendly Claim·Move·Wait·Release 반복 완료. 다음 `AI-PER-01` 준비 |
 | 차단 조건 | 기능 코드의 기술 차단은 없음. OilRig 별도 Map Check가 장시간 완료되지 않아 Editor 수동 Map Check가 필요 |
-| 다음 행동 | `AI-FRIEND-01` FriendlyBasePatrol/Ambient BaseRoutine 구성 |
-| 다음 기능 | `AI-FRIEND-01 → AI-PER-01` |
+| 다음 행동 | `AI-PER-01` Hostile 감지·실종·Search StateTree 전환 구성 |
+| 다음 기능 | `AI-PER-01 → AI-WPN-01` |
 | 이후 | Drone 감지 → Rifle → Shotgun → MG → Cover/Search/Return |
-| Git 처리 | AI-PATROL-01 기능 `a721fe4`, main Merge `095dda7` Push 완료; AI-NPC-01 Merge `eeb4354`와 사용자 `4f14d2f` Map 변경 보존 |
-| 협업 Git | 중앙 `gyeonliz/drone`=`095dda7`; 팀원 Fork `Yook34/drone`=`0ff4fb1`, Fork 전용 4 Commit. 전체 Merge 금지, 의도 자산 선별 인수 대기 |
+| Git 처리 | 팀 정리 `f8c8568`→`888414f`, AI-FRIEND-01 `b5b733f`→`2fcfb04`를 한국어 메시지로 기능 Branch와 main에 Push |
+| 협업 Git | 환경 맵·재질 중앙 반영 및 검증 완료. 개인 `.vsconfig`·시험 주석 정리 완료. 팀원 PC Remote 실측만 남음 |
+
+## 2026-08-28 — 팀원 환경 변경 검증·정리와 AI-FRIEND-01
+
+- 중앙 `main`을 팀원 변경 `852e6e6`까지 Fast-forward하고 LFS Object 78개를 내려받아 `git lfs fsck`를 통과했다.
+- 중앙 환경 맵 3종을 새 Editor 프로세스에서 실제 로드했다. Camp 추가 외부 의존성 0, Base는 기존 `T_Linear_Grad`, Battlefield는 기존 Manny/Quinn과 새 `M_Enemy`, `M_Start`, `M_Target`만 참조하며 누락은 0이다.
+- 읽기 전용 `Audit-DroneEnvironmentDependencies.py`를 추가하고 엄격한 환경 검증 허용 목록에는 확인된 세 Material만 명시했다. 수정한 검증은 세 맵 모두 성공했다.
+- 팀원 변경의 `.vsconfig`를 UE 권장 14.50 구성으로 복원하고 `Drone.cpp`의 `//test`를 제거했다. 바이너리 환경 맵·Fab 자산·시험 맵은 삭제하지 않았다. 기능 `f8c8568`, Merge `888414f`로 중앙에 Push했다.
+- `/Game/Drone/AI/StateTrees/ST_NPC_FriendlyBaseRoutine`을 생성했다. 상태는 Friendly Claim → 공용 Move → 공용 Wait → Friendly Release 네 단계다.
+- Friendly Controller는 Base Patrol과 Ambient를 번갈아 먼저 시도하고, 빈 선호 Slot이 없으면 다른 아군 활동으로 대체한다. 직전 지점 반경 250 cm를 우선 피하며 Smart Object의 배타 Claim을 사용한다.
+- Greybox Friendly 2명 각각이 2회 이상 완료하고 서로 다른 2지점 이상과 두 Activity 종류를 모두 방문하도록 `Drone.AI.NPCBaseRoutinesPIE`에서 검증했다. Hostile 2명의 기존 순찰도 같은 PIE에서 회귀 확인했다.
+- Game/Editor Build 성공, AI 7/7 경고·오류 0, 전체 `Drone.` 23/23 성공이다. 22개는 무경고, 기존 `PIEInputLifecycle` 한 개만 예상 RecastNavMesh 경고를 포함한다.
+- Blueprint Compile은 `0 errors / 0 warnings / 0 failed loads`다. 전역 Summary의 기존 Battlefield Pose GUID와 MCP 고지 경고 29건은 Blueprint 결과와 분리한다.
+- 새 StateTree는 Git LFS 대상이며 LFS fsck를 통과했다. 기능 `b5b733f`, Merge `2fcfb04`를 한국어 메시지로 `origin/main`에 Push했다.
+- 다음 기능 카드는 `AI-PER-01`이다. 현재 드론 감지는 예약을 안전 해제하지만 Search·Return·Rifle/Shotgun·MG 전환은 아직 구현하지 않았다.
 
 ## 2026-08-28 — 팀원 Fork 원격 감사와 문서 최신화
 
@@ -44,6 +58,7 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 - 현재 Fork `main`을 중앙 `main`에 바로 Push하거나 전체 Merge하지 않는다. 중앙 `095dda7`에서 새 Feature Branch를 만들고 채택이 확인된 Battlefield Map·재질만 선별 복원한 뒤 Build·Blueprint·Automation·LFS를 재검증한다.
 - `git lfs push`는 대용량 Object 전송이며 Commit·Branch Push가 아니다. 일반 `git push`가 성공해야 GitHub Desktop의 Pull/Commit 이력에 새 Git Commit이 나타난다.
 - 구체 명령과 두 Remote 운영 방식은 [`GIT_UNREAL_GUIDE.md`](GIT_UNREAL_GUIDE.md)에 추가했다.
+- 위 항목은 원격 감사 당시 판단 기록이다. 이후 팀원 변경은 중앙에 반영됐고, 현재 판정은 바로 위 `팀원 환경 변경 검증·정리와 AI-FRIEND-01` 절을 우선한다.
 
 ## 2026-08-28 — AI-PATROL-01 Hostile Smart Object 순찰
 
