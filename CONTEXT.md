@@ -591,3 +591,14 @@ Inbox → Todo → Doing → Done
 - `eeb4354` main은 C++ 기반, Smart Object Definition·Station Blueprint 6쌍, `BP_NPC_Hostile_Rifle`, `BP_NPC_Hostile_Shotgun`, `BP_NPC_Friendly_Base`, `BP_NPCSpawnPoint`, `Lvl_NPCSmartObjectGreybox`을 포함한다. 맵에는 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 10개, 전용 Navigation Floor·NavMesh 영역이 배치되어 있고 Profile·Possess·Activity Tag·NavMesh 투영 자동화를 통과했다.
 - NPC의 Manny/Unarmed 외형은 `AI-VIS-01` 전 임시 Greybox이다. 각 Definition의 Gameplay Interaction Behavior에 연결할 StateTree는 현재 비어 있고, 실제 순찰·아군 이동·Rifle/Shotgun 사격·MG Animation은 아직 구현 완료로 표현하지 않는다.
 - 상세 구현·Editor 사용 순서는 `docs/DRONE_SMART_OBJECT_NPC_GUIDE.md`를 기준으로 한다.
+
+## 37. 2026-08-28 AI-PATROL-01 Hostile 순찰 기준선
+
+- Unreal `main=origin/main=095dda7`이며 기능 Commit은 `a721fe4`다.
+- `/Game/Drone/AI/StateTrees/ST_NPC_HostilePatrol`과 프로젝트 Native StateTree Task 4종을 구현했다.
+- Hostile 2명은 EnemyPatrol Slot Claim → NavMesh 이동 → 1초 대기 → Release를 반복하고 직전 완료 지점을 우선 피한다.
+- Hostile마다 2회 이상 완료하고 서로 다른 2개 이상 지점을 방문하는 PIE 자동화를 통과했다.
+- Friendly 2명은 아직 StateTree를 시작하지 않는다. FriendlyBasePatrol/Ambient 이동은 `AI-FRIEND-01` 범위다.
+- 드론 감지 시 현재 이동과 예약은 안전하게 중단하지만 Search·Return·Rifle/Shotgun·MG 행동은 아직 구현하지 않았다.
+- Game/Editor Build, AI 6/6 경고·오류 0, 전체 `Drone.` 22/22, Blueprint 0/0/0과 LFS 검증을 통과했다. 전체 자동화의 경고 포함 성공 1개는 기존 `PIEInputLifecycle` RecastNavMesh 경고다.
+- 다음 기능 순서는 `AI-FRIEND-01 → AI-PER-01 → AI-WPN-01/02/03 → AI-MG-01/02`이며, 확정하지 않은 전투 수치·Animation·최종 외형을 임의로 정하지 않는다.
