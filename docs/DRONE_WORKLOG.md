@@ -18,7 +18,7 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-28 — AI-PATROL-01 Hostile Smart Object 순찰 구현·검증
+마지막 갱신: 2026-08-28 — 팀원 Fork 원격 감사와 협업 Git 절차 최신화
 
 | 구분 | 현재 상태 |
 |---|---|
@@ -32,6 +32,18 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 | 다음 기능 | `AI-FRIEND-01 → AI-PER-01` |
 | 이후 | Drone 감지 → Rifle → Shotgun → MG → Cover/Search/Return |
 | Git 처리 | AI-PATROL-01 기능 `a721fe4`, main Merge `095dda7` Push 완료; AI-NPC-01 Merge `eeb4354`와 사용자 `4f14d2f` Map 변경 보존 |
+| 협업 Git | 중앙 `gyeonliz/drone`=`095dda7`; 팀원 Fork `Yook34/drone`=`0ff4fb1`, Fork 전용 4 Commit. 전체 Merge 금지, 의도 자산 선별 인수 대기 |
+
+## 2026-08-28 — 팀원 Fork 원격 감사와 문서 최신화
+
+- 문서 저장소를 먼저 `main=origin/main=602c863`까지 Fast-forward한 뒤 최신 Unreal 기준선 `095dda7`과 현재 작업 순서를 대조했다. 이 항목의 문서 변경은 사용자가 직접 Commit할 예정이며 자동 Commit·Push하지 않았다.
+- 중앙 `gyeonliz/drone`의 `main=095dda7`, 팀원 Fork `Yook34/drone`의 `main=0ff4fb1`을 원격에서 확인했다. Merge Base는 `095dda7`, 좌우 차이는 중앙 0 / Fork 4 Commit이다.
+- 팀원 Fork 순 변경에는 `Lvl_Battlefield.umap`, `M_Enemy`, `M_Start`, `M_Target`과 함께 `.vsconfig`, PC별 `Drone.uproject` Engine Association GUID, `Drone.cpp`의 `//test`가 섞여 있다.
+- 팀원 PC에서 Fork를 Clone해 `origin=Yook34/drone`인 상태라면 GitHub Desktop과 `git push origin`이 팀원 저장소로 전송되는 것이 정상이다. Git 작성자 설정이나 로그인 계정이 Remote URL을 자동으로 중앙 저장소로 바꾸지는 않는다.
+- 중앙 직접 협업은 `origin=gyeonliz/drone`, 보존할 Fork는 `fork=Yook34/drone`으로 구성한다. 중앙 쓰기 권한이 없다면 `origin=Yook34/drone`, `upstream=gyeonliz/drone`으로 두고 Pull Request를 사용한다.
+- 현재 Fork `main`을 중앙 `main`에 바로 Push하거나 전체 Merge하지 않는다. 중앙 `095dda7`에서 새 Feature Branch를 만들고 채택이 확인된 Battlefield Map·재질만 선별 복원한 뒤 Build·Blueprint·Automation·LFS를 재검증한다.
+- `git lfs push`는 대용량 Object 전송이며 Commit·Branch Push가 아니다. 일반 `git push`가 성공해야 GitHub Desktop의 Pull/Commit 이력에 새 Git Commit이 나타난다.
+- 구체 명령과 두 Remote 운영 방식은 [`GIT_UNREAL_GUIDE.md`](GIT_UNREAL_GUIDE.md)에 추가했다.
 
 ## 2026-08-28 — AI-PATROL-01 Hostile Smart Object 순찰
 

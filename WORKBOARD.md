@@ -8,13 +8,13 @@ Unreal 공유 기준선은 `main=origin/main=095dda7`이다. Smart Object Defini
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-08-28 — AI-PATROL-01 Hostile Smart Object 순찰 구현·검증
+마지막 갱신: 2026-08-28 — 팀원 Fork 원격 감사와 협업 Git 절차 최신화
 
 | 항목 | 상태 |
 |---|---|
 | 현재 단계 | 3단계 Tutorial Vertical Slice 수동 확인 대기 + Hostile 순찰 MVP 완료 |
 | 진행 정도 | 기존 TUT-04B는 실제 두 Lap 확인 대기. `AI-SO-00`, `AI-SO-01`, `AI-NPC-01`, `AI-PATROL-01` 기술 구현 완료 |
-| 지금 작업 중 | `AI-PATROL-01` 완료. 다음 카드 `AI-FRIEND-01` 아군 BaseRoutine 준비 |
+| 지금 작업 중 | 기능 다음 카드 `AI-FRIEND-01` 아군 BaseRoutine 준비. 병행으로 `GIT-TEAM-01` 팀원 Fork 변경 선별 인수 대기 |
 | 완료 근거 | Game/Editor Build 성공, AI 6/6 경고·오류 0, 전체 `Drone.` 22/22(21 정상+기존 PIE Recast 경고 포함 성공 1), Blueprint 0/0/0, LFS fsck 통과 |
 | 수동 미확인 | Training 두 Lap 비교 HUD, OilRig Map Check·재질·조명·스케일·충돌·성능, Ground Drone/MG·NPC·Raw Drone 외형 채택 |
 | 현재 차단 | 기능 코드 차단 없음. OilRig 명령줄 Map Check가 약 8분 동안 맵 Construction에서 끝나지 않아 Editor 수동 확인 필요 |
@@ -25,6 +25,7 @@ Unreal 공유 기준선은 `main=origin/main=095dda7`이다. Smart Object Defini
 | Editor/MCP | 모든 검사 프로세스 종료 확인. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
 | Git 처리 | AI-PATROL-01 기능 `a721fe4`, main Merge `095dda7` Push 완료. AI-NPC-01 Merge `eeb4354`와 기존 사용자 `4f14d2f` Map 변경 보존 |
+| 협업 Git | 중앙 `gyeonliz/drone` main은 `095dda7`, 팀원 Fork `Yook34/drone` main은 `0ff4fb1`로 중앙보다 4 Commit 앞섬. 팀원 PC의 Push Remote가 Fork를 가리키는 것으로 판단되며 실제 `origin`/`pushurl` 확인이 필요. 의도 자산만 새 Branch로 선별 인수해야 함 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
 | 학습 다음 행동 | Q-Net 상태를 확인해 Track A/B/C를 고르고 첫 학습 블록 실행 |
 
@@ -53,6 +54,7 @@ Unreal 공유 기준선은 `main=origin/main=095dda7`이다. Smart Object Defini
 | ID | 태그 | 작업 | 완료 조건 |
 |---|---|---|---|
 | GIT-10 | Git / Unreal | 다른 PC Clone과 실행 | LFS 포함 Clone 후 UE 5.8.1에서 열림 |
+| GIT-TEAM-01 | Git / Unreal / 협업 | `Yook34/drone` Fork 변경 선별 인수와 원격 규칙 통일 | Battlefield Map·재질 3개의 채택 여부를 확인하고, PC별 `.vsconfig`·`Drone.uproject` GUID·`//test`를 제외한 깨끗한 Feature Branch/PR로 반영한 뒤 팀원 PC의 `origin`/`upstream` 또는 `origin`/`fork` 구성을 검증 |
 | SYNC-04 | Codex Sync | 두 PC 간 실제 수동 인계 시험 | Git 흐름과 문맥 패키지 흐름을 각각 완료 |
 | TUT-04 | Drone / Tutorial / UI | 비교 결과 수동 판정 | 두 번 완주해 첫 기준 생성과 두 번째 이전 평균·Best·부호를 실제 HUD에서 확인 |
 | UE-MCP-02 | Drone / Unreal / Codex Sync | Codex 네이티브 MCP Tool 노출 확인 | Unreal Editor 실행 후 `D:\JGY\project\drone` 루트의 새 Codex 작업에서 `unreal-mcp` Tool을 찾고 Current Level을 한 번 조회 |

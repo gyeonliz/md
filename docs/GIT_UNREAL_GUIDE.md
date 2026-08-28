@@ -10,7 +10,7 @@
 - 다만 `UE_5.8` 폴더명이나 `.uproject`의 `EngineAssociation` 값만으로 패치 버전을 판정해서는 안 된다. 이번 확인 PC를 메인컴 또는 작업컴 중 어느 역할로 부를지는 이 문서에서 임의로 정하지 않으므로, 메인컴 설치 버전과 두 PC 일치 판정은 PC 역할을 확인한 뒤 닫는다.
 - 실제 Drone GitHub 저장소는 **`gyeonliz/drone`**으로 확정했다.
 - GitHub 저장소 공개 범위(Public/Private)는 **현재 미정**이다.
-- 이번 확인 PC의 Drone 경로는 `C:\URproject\drone`이다. 현재 main은 `55b3ffe`이며 남은 에셋 선별 이식과 TUT-04B를 병합·Push했다. 전체 `Drone.` 16/16, Blueprint 오류 0, 새 자산 외부·누락 참조 0, 신규 LFS 892개·4.9GB 업로드를 확인했다. 프로젝트 사용 맵과 환경 중앙 사본은 `/Game/Drone/Maps`에 있고 Unreal 생성 기본 Map 4개만 제거했다. 실제 코드 구조와 사용자 확인 작업은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다. 다른 PC Pull/LFS/UE 실행 검증은 아직 남았다.
+- 기본 Drone 작업 경로는 `D:\JGY\project\drone`이고 문서 경로는 `D:\JGY\project\md`다. 다른 PC의 검증 Clone `C:\URproject\drone`도 별도 기록으로 보존한다. 현재 중앙 main은 `095dda7`이며 AI-PATROL-01까지 병합·Push했다. Game/Editor Build, AI 6/6, 전체 `Drone.` 22/22, Blueprint 0/0/0, LFS fsck를 통과했다. 프로젝트 사용 맵과 환경 중앙 사본은 `/Game/Drone/Maps`에 있고 Unreal 생성 기본 Map 4개만 제거했다. 실제 코드 구조와 사용자 확인 작업은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다. 다른 PC Pull/LFS/UE 실행 검증은 아직 남았다.
 - 사용자는 현재 Drone 프로젝트에서 Android를 사용하지 않는다고 확정했다. 기준 Drone 프로젝트에서는 Android File Server Plugin과 네트워크 연결을 끄고 `SecurityToken`을 빈 할당으로 정리했다.
 - 아래 브랜치 구조는 현재 컨텍스트에 맞춘 권장 시작안이며, 최종 팀 규칙으로 확정된 것은 아니다.
 - 이 가이드는 명령줄 Git을 기준으로 한다. Unreal Editor 안의 Git 플러그인 제공 여부와 동작은 실제 UE 5.8 환경에서 확인하기 전까지 전제하지 않는다.
@@ -130,7 +130,7 @@ GitHub 이메일 공개를 원하지 않으면 GitHub가 제공하는 `noreply` 
 | 작업컴 `Build.version` | 5.8.1 확인 완료 |
 | 이번 확인 PC `Build.version` | 5.8.1, Changelist 56057345 확인 완료 |
 | 메인컴 설치 버전 | 아직 확인 필요 |
-| 실제 프로젝트 `EngineAssociation` | `C:\URproject\drone\Drone.uproject`에서 `5.8` 확인 |
+| 실제 프로젝트 `EngineAssociation` | `D:\JGY\project\drone\Drone.uproject`와 다른 PC `C:\URproject\drone\Drone.uproject`에서 `5.8` 확인 |
 
 작업컴과 이번 확인 PC의 엔진 패치 버전, 이번 확인 PC의 실제 프로젝트 `EngineAssociation`은 확인했다. 이번 확인 PC의 메인컴/작업컴 역할과 나머지 PC 설치 버전을 확인해 두 PC 일치 여부를 닫기 전에는 프로젝트 연결 버전을 임의로 바꾸거나 버전 변경으로 생성된 `.uproject` 수정사항을 커밋하지 않는다.
 
@@ -297,7 +297,7 @@ git log --oneline -n 3
 
 ## 8. 첫 Push
 
-GitHub에서 생성한 **빈 저장소**의 HTTPS 또는 SSH URL을 사용한다.
+이 절차는 저장소 최초 생성자가 GitHub에 만든 **빈 중앙 저장소**를 처음 연결할 때만 사용한다. 팀원이 `YOUR_ACCOUNT`에 자기 계정을 넣으면 자기 저장소 또는 Fork가 `origin`이 되며 이후 Push도 그곳으로 간다. 이미 팀 저장소가 있으면 새 저장소를 만들지 말고 아래의 팀 Remote 절차를 사용한다.
 
 ```powershell
 $RemoteUrl = "https://github.com/YOUR_ACCOUNT/YOUR_REPOSITORY.git"
@@ -323,6 +323,112 @@ GitHub 웹에서도 다음을 확인한다.
 
 GitHub의 Git LFS 저장공간·대역폭·파일 크기 제한은 요금제와 정책에 따라 달라질 수 있다. 대형 원본 영상, 렌더 결과물, 마켓플레이스 원본까지 무조건 넣기 전에 현재 계정의 LFS 사용량과 라이선스를 확인한다.
 
+### 8.1 팀 저장소와 Fork의 Remote 규칙
+
+GitHub Desktop의 **Push origin**과 명령줄의 `git push origin`은 로그인한 계정 이름이 아니라 현재 로컬 저장소에 설정된 `origin`의 Push URL로 보낸다. `user.name`·`user.email`은 Commit 작성자 정보이고 Remote 목적지가 아니다. 먼저 팀원 PC의 실제 Unreal 프로젝트 폴더에서 다음을 확인한다.
+
+```powershell
+git status --short
+git remote -v
+git remote get-url origin
+git remote get-url --push origin
+git branch -vv
+git config --get remote.pushDefault
+git config --get branch.main.pushRemote
+```
+
+`remote.pushDefault`나 `branch.main.pushRemote`가 출력되면 `origin`과 다른 Push 대상이 지정될 수 있으므로 함께 기록한다. Unreal Editor를 저장·종료하고 작업 트리가 깨끗한 상태에서만 Remote 이름이나 Branch 구조를 바꾼다.
+
+2026-08-28 실제 원격 감사 결과는 다음과 같다.
+
+| 역할 | 저장소 | main |
+|---|---|---|
+| 중앙 | `https://github.com/gyeonliz/drone.git` | `095dda7` |
+| 팀원 Fork | `https://github.com/Yook34/drone.git` | `0ff4fb1` |
+
+`Yook34/drone`은 `gyeonliz/drone`의 Fork이며 Merge Base는 `095dda7`이다. 중앙 전용 Commit은 0개, Fork 전용 Commit은 4개다. 따라서 팀원 PC가 Fork를 Clone해 `origin=Yook34/drone`인 경우 팀원 GitHub에 Push된 것은 정상 동작이다.
+
+#### 방식 A — Fork + Pull Request
+
+팀원이 중앙 저장소에 직접 쓰기 권한이 없거나 리뷰 후 반영하려면 이 방식을 사용한다. 팀원 Fork는 `origin`, 중앙 저장소는 `upstream`으로 둔다.
+
+```powershell
+git remote -v
+git remote add upstream https://github.com/gyeonliz/drone.git
+git fetch --all --prune
+git remote -v
+```
+
+이미 `upstream`이 있으면 새로 추가하지 말고 `git remote set-url upstream https://github.com/gyeonliz/drone.git`로 교정한다. 작업 Branch는 중앙 최신 main에서 만들고 팀원 Fork에 Push한 뒤, GitHub에서 `Yook34/drone:feature/...`를 `gyeonliz/drone:main`으로 보내는 Pull Request를 연다.
+
+```powershell
+git switch -c feature/yook34-battlefield-assets upstream/main
+# 의도한 파일만 작업·검증·Commit
+git push -u origin feature/yook34-battlefield-assets
+```
+
+#### 방식 B — 중앙을 origin으로 직접 협업
+
+팀원 GitHub 계정이 `gyeonliz/drone` Collaborator로 초대되고 초대를 수락한 경우에만 사용한다. 기존 Fork를 잃지 않도록 먼저 이름을 `fork`로 보존한다.
+
+```powershell
+git remote rename origin fork
+git remote add origin https://github.com/gyeonliz/drone.git
+git fetch --all --prune
+git remote -v
+```
+
+현재 팀원 로컬 `main`에는 Fork 전용 4 Commit이 있으므로 그 상태에서 중앙 `main`으로 바로 Push하지 않는다. 작업 트리가 깨끗하고 현재 Branch가 `main`인 것을 확인한 뒤 기존 Branch 이름을 보존하고 중앙 기준의 새 `main`을 만든다.
+
+```powershell
+git status --short
+git branch --show-current
+git branch -m main yook34-import-20260828
+git switch -c main --track origin/main
+git switch -c feature/yook34-battlefield-assets
+```
+
+이름을 바꾼 `yook34-import-20260828` Branch에 기존 4 Commit이 남으므로 이력은 삭제되지 않는다. 기능 Branch 검증 후 중앙에 Branch만 Push하고 Pull Request로 병합한다.
+
+```powershell
+git push -u origin feature/yook34-battlefield-assets
+```
+
+중앙 직접 Push가 403 또는 권한 오류로 거절되면 Remote 문제가 아니라 Collaborator 권한 문제다. 저장소 소유자가 팀원 계정을 초대하거나 방식 A를 사용한다.
+
+### 8.2 현재 팀원 Fork 변경 선별 인수
+
+팀원 Fork의 순 변경에는 다음 항목이 함께 섞여 있다.
+
+- 후보 기능 자산: `Content/Drone/Maps/Lvl_Battlefield.umap`, `Content/Material/M_Enemy.uasset`, `M_Start.uasset`, `M_Target.uasset`
+- 인수 제외 기본값: PC별 `.vsconfig`, GUID 형태로 바뀐 `Drone.uproject`의 `EngineAssociation`, `Source/Drone/Drone.cpp`의 `//test`
+
+후보 자산도 의도 확인 전에는 중앙에 반영하지 않는다. 방식 A라면 `upstream/main`, 방식 B라면 `origin/main`에서 만든 깨끗한 Feature Branch에서만 다음 네 파일을 임시 복원해 확인한다. 아래 예시는 방식 A 기준이다.
+
+```powershell
+git switch feature/yook34-battlefield-assets
+git restore --source=origin/main -- `
+  Content/Drone/Maps/Lvl_Battlefield.umap `
+  Content/Material/M_Enemy.uasset `
+  Content/Material/M_Start.uasset `
+  Content/Material/M_Target.uasset
+git status --short
+git lfs status
+```
+
+방식 B에서는 Source Remote만 `fork/main`으로 바꾼다. 프로젝트 규칙상 새 생산 자산은 `/Game/Drone` 아래에 있어야 하므로 `/Game/Material`의 세 Material을 그대로 Commit하지 않는다. Unreal Editor의 Content Browser에서 `/Game/Drone/Materials/Battlefield`로 옮겨 Map 참조를 갱신하고 Redirector를 정리한 뒤, 이전 `/Game/Material` 경로가 남지 않았는지 확인한다.
+
+검증 범위는 Battlefield Map Load·Map Check, Blueprint Compile, 관련 Automation, `git lfs fsck`, `git diff --check`다. 그 뒤에도 `.vsconfig`, `Drone.uproject`, `Drone.cpp`가 Stage되지 않았는지 확인하고 필요한 파일만 Commit한다.
+
+```powershell
+git status --short
+git diff --check
+git lfs fsck
+git diff --cached --name-status
+```
+
+`git lfs push`만 실행해서는 Git Commit과 Branch Reference가 이동하지 않는다. 정상 `git push`가 실행될 때 LFS pre-push Hook이 해당 Commit이 참조하는 LFS Object를 함께 업로드한다.
+
 ### Push가 `non-fast-forward`로 거절될 때
 
 원격 저장소에 이미 커밋이 있다는 뜻이다. 절대로 바로 Force Push하지 않는다.
@@ -336,7 +442,9 @@ git log --oneline --graph --decorate --all -n 20
 
 ## 9. 기본 브랜치 구성
 
-현재 권장 시작안은 다음과 같다.
+아래 `develop` 구조는 일반 권장 시작안이며 현재 Drone 원격의 실제 Branch 구조가 아니다. 2026-08-28 기준 실제 협업 흐름은 `main`에서 기능 Branch를 만들고 검증 후 `main`으로 Pull Request/Merge하는 방식이다. 팀 합의 전에는 `develop`을 새 공유 기준선으로 만들지 않는다.
+
+일반 권장 시작안은 다음과 같다.
 
 ```text
 main
@@ -716,10 +824,12 @@ git lfs status
 GitHub가 참조된 LFS 객체 누락을 보고하고, 해당 PC가 모든 원본 객체를 보유한 것이 확실할 때만 다음을 검토한다.
 
 ```powershell
+git remote get-url --push origin
+git branch -vv
 git lfs push --all origin
 ```
 
-`--all`은 많은 과거 객체를 업로드할 수 있으므로 저장공간·대역폭과 대상 원격을 먼저 확인한다.
+`--all`은 많은 과거 객체를 업로드할 수 있으므로 저장공간·대역폭과 대상 원격을 먼저 확인한다. 이 명령은 LFS Object만 전송하며 Git Commit·Branch는 Push하지 않는다.
 
 ## 17. 안전한 복구와 Commit 되돌리기
 
@@ -899,6 +1009,7 @@ git switch -c recovery/found-commit $CommitSha
 
 ### 협업
 
+- [ ] 중앙/Fork Remote 역할과 실제 Push URL 확인
 - [ ] `main` / `develop` / `feature/*` 규칙 합의
 - [ ] Asset 담당 선언 방식 합의
 - [ ] Level 동시 작업 방지 방식 합의
@@ -912,6 +1023,8 @@ git switch -c recovery/found-commit $CommitSha
 - [GitHub Docs: Git LFS 설치](https://docs.github.com/en/repositories/working-with-files/managing-large-files/installing-git-large-file-storage)
 - [GitHub Docs: Git LFS 설정](https://docs.github.com/en/repositories/working-with-files/managing-large-files/configuring-git-large-file-storage)
 - [GitHub Docs: Git LFS 개요](https://docs.github.com/en/repositories/working-with-files/managing-large-files/about-git-large-file-storage)
+- [GitHub Docs: GitHub Desktop에서 Push](https://docs.github.com/en/desktop/making-changes-in-a-branch/pushing-changes-to-github-from-github-desktop)
+- [GitHub Docs: Remote 저장소 관리](https://docs.github.com/en/get-started/git-basics/managing-remote-repositories)
 - [GitHub 공식 Unreal `.gitignore` 템플릿](https://github.com/github/gitignore/blob/main/UnrealEngine.gitignore)
 - [Epic UE 5.8: Source Control](https://dev.epicgames.com/documentation/en-us/unreal-engine/source-control-in-unreal-engine)
 - [Epic UE 5.8: One File Per Actor](https://dev.epicgames.com/documentation/en-us/unreal-engine/one-file-per-actor-in-unreal-engine)
