@@ -1,6 +1,6 @@
 # Drone 개발 진행 기록
 
-기준일: 2026-08-28 (Asia/Seoul)
+기준일: 2026-09-02 (Asia/Seoul)
 
 이 문서는 Drone 개발의 **진행 이력**을 시간순으로 남긴다. 가장 최신의 현재 상태는 [`../WORKBOARD.md`](../WORKBOARD.md), 확정 구현 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)를 따른다.
 
@@ -18,21 +18,44 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-08-28 — 팀원 환경 변경 검증·정리와 AI-FRIEND-01 완료
+마지막 갱신: 2026-09-02 — AI-PER-01 수동 Pass와 AI-WPN-01 공용 Weapon 계약 완료
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | Tutorial 수동 확인 대기 + Hostile/Friendly 기본 이동 MVP 완료 |
-| Unreal 기준선 | `main=origin/main=2fcfb04`; 팀 변경 정리 `888414f`, AI-FRIEND-01 기능 `b5b733f` 보존 |
-| 자동 검증 | Game/Editor Build, AI 7/7 경고·오류 0, 전체 `Drone.` 23/23, Blueprint 0/0/0, 환경 맵 검증과 LFS fsck 성공 |
+| 전체 단계 | Tutorial 두 Lap 수동 확인 대기 + NPC 기본 이동·Perception/Search·공용 Weapon 계약 완료 |
+| Unreal 기준선 | 공유 `origin/main=2fcfb04`; 로컬 `main` AI-PER-01·AI-WPN-01 미커밋 |
+| 자동 검증 | Game/Editor Build, StateTree Validate, AI 9/9 경고·오류 0, 전체 `Drone.` 25/25, 직전 Blueprint 0/0/0와 이번 NPC BP 로드 검증, LFS fsck 성공 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | `AI-FRIEND-01` Friendly Claim·Move·Wait·Release 반복 완료. 다음 `AI-PER-01` 준비 |
+| 지금 작업 중 | `AI-WPN-01` 공용 Weapon 계약 구현·자동 검증·문서 반영 완료. 사용자 Commit 대기 |
 | 차단 조건 | 기능 코드의 기술 차단은 없음. OilRig 별도 Map Check가 장시간 완료되지 않아 Editor 수동 Map Check가 필요 |
-| 다음 행동 | `AI-PER-01` Hostile 감지·실종·Search StateTree 전환 구성 |
-| 다음 기능 | `AI-PER-01 → AI-WPN-01` |
-| 이후 | Drone 감지 → Rifle → Shotgun → MG → Cover/Search/Return |
-| Git 처리 | 팀 정리 `f8c8568`→`888414f`, AI-FRIEND-01 `b5b733f`→`2fcfb04`를 한국어 메시지로 기능 Branch와 main에 Push |
+| 다음 행동 | `AI-WPN-02`에서 공용 계약 뒤에 Rifle 단일 Trace·사거리·시야·Cooldown Greybox 구현 |
+| 다음 기능 | `AI-WPN-02 → AI-WPN-03` |
+| 이후 | Rifle → Shotgun → MG → Cover/통합 |
+| Git 처리 | AI-PER-01·AI-WPN-01 코드·StateTree·문서 변경은 Stage·Commit·Push하지 않음 |
 | 협업 Git | 환경 맵·재질 중앙 반영 및 검증 완료. 개인 `.vsconfig`·시험 주석 정리 완료. 팀원 PC Remote 실측만 남음 |
+
+## 2026-09-02 — AI-PER-01 Hostile 감지·Search·순찰 복귀
+
+- `ADroneNPCAIController`에 `Patrol`, `DroneDetected`, `Search` 관측 상태와 마지막 감지 위치, 감지·실종·Search 진입·완료 카운터를 추가했다. Hostile은 감지 즉시 이동을 멈추고 Smart Object Claim을 해제하며 Friendly는 같은 자극을 무시한다.
+- `FDroneStateTreeDetectedTask`와 `FDroneStateTreeSearchTask`를 추가했다. 실종 뒤 마지막 위치로 이동을 요청하고 NavMesh 밖이면 제자리에서 3초 Search를 유지한 뒤 기본 순찰 Activity와 Claim 흐름으로 복귀한다.
+- 저장된 `/Game/Drone/AI/StateTrees/ST_NPC_HostilePatrol`에 `DroneDetected`, `SearchLastKnownLocation` 상태와 `DroneDetected`/`DroneLost` Event 전환, Search 성공·실패의 Claim 복귀를 추가했다. Upgrade는 기존 정확한 4-State 자산만 수정하고 알 수 없는 확장 자산은 덮어쓰지 않는다.
+- 문서 저장소에 `Setup-DroneHostilePerceptionStateTree.py`와 `Invoke-DroneHostilePerceptionStateTreeSetup.ps1`을 추가했다. Upgrade와 Validate 모두 성공했고 저장 자산의 Task·Event 연결을 검사한다.
+- 새 `Drone.AI.NPCPerceptionSearchPIE`는 Hostile 2명 감지·예약 해제, Friendly 2명 무반응, Hostile 실종·Search 진입, Search 완료·순찰 작업 재개와 Friendly 루틴 지속을 검증한다. 실제 Sight의 재감지와 수동 Lost 자극이 경합하지 않도록 Lost 뒤 시험 Pawn만 LoseSight 범위 밖으로 격리한다.
+- 최종 `DroneEditor Win64 Development`와 `Drone Win64 Development` Build가 성공했다. AI `8/8`은 모두 무경고·무오류, 전체 `Drone.`은 `24/24`로 23개 무경고와 기존 `PIEInputLifecycle` RecastNavMesh 경고 포함 성공 1개다.
+- `CompileAllBlueprints`는 `0 errors / 0 warnings / 0 failed loads`다. 전역 Summary의 기존 Battlefield Pose GUID와 MCP EULA 고지 29건은 Blueprint 결과 집계와 분리한다. `git lfs fsck`도 통과했다.
+- 사용자가 Editor 화면에서 Hostile 정지→Search→순찰 복귀와 Friendly 지속을 직접 확인해 수동 Pass 처리했다.
+- 공유 기준은 계속 `origin/main=2fcfb04`다. Unreal·문서는 로컬 `main` 위 미커밋 변경이며 자동 Commit·Push하지 않았다.
+- 다음 활성 카드는 `AI-WPN-01` 공용 Weapon 계약으로 이어서 완료했다.
+
+## 2026-09-02 — AI-WPN-01 공용 Weapon 계약
+
+- `UDroneNPCWeaponComponent`를 추가해 Rifle·Shotgun 공통 `ConfigureWeapon`, `CanFire`, `StartFire`, `StopFire`, `Reload` 호출과 Target Actor·Aim Point 상태를 한 곳에서 관리한다.
+- `ADroneNPCCharacter`가 Weapon Component를 소유하고, Controller는 Possess 때 NPC Profile의 Weapon Type을 구성한다. Hostile Controller는 `DetectedDrone`에서 Target과 Aim Point를 한 번만 만들어 Rifle·Shotgun 분기 없이 같은 경로로 전달한다.
+- 감지 실종과 UnPossess에서는 발사 상태를 정리한다. Unarmed와 잘못된 Target은 거부하며 Rifle/Shotgun별 Trace·Damage·탄약·Cooldown·Pellet·Spread는 후속 카드 범위로 남겼다.
+- `Drone.AI.WeaponContract` 자동화 테스트를 추가하고 NPC Greybox PIE를 확장해 Rifle·Shotgun의 같은 Target/Aim Point 경로, Friendly 비발사, Lost 시 발사 정리를 검증했다.
+- 최종 `DroneEditor Win64 Development`와 `Drone Win64 Development` Build가 성공했다. AI `9/9`은 모두 무경고·무오류, 전체 `Drone.`은 `25/25`로 24개 무경고와 기존 `PIEInputLifecycle` RecastNavMesh 경고 포함 성공 1개다.
+- 이번 카드는 Blueprint 자산을 수정하지 않아 전체 Blueprint Compile을 반복하지 않았다. 직전 `0 errors / 0 warnings / 0 failed loads`와 이번 자동화의 NPC Blueprint 로드 성공을 기준으로 유지한다.
+- 공유 기준선은 `origin/main=2fcfb04`이며 Unreal·문서 로컬 `main`의 변경은 Stage·Commit·Push하지 않았다. 다음 활성 카드는 `AI-WPN-02` Rifle Greybox Trace다.
 
 ## 2026-08-28 — 팀원 환경 변경 검증·정리와 AI-FRIEND-01
 

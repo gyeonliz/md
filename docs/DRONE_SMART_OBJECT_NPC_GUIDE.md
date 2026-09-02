@@ -1,10 +1,10 @@
 # Drone Smart Object NPC 준비·사용 가이드
 
-기준일: 2026-08-28 (Asia/Seoul)
+기준일: 2026-09-02 (Asia/Seoul)
 
 이 문서는 적군 순찰과 드론 발견 대응, 소총·샷건 분기, 기지 아군 NPC의 생활·순찰 이동, 한 명만 사용하는 MG Turret을 같은 기반 위에 구성하기 위한 실전 가이드다.
 
-현재 단계는 **C++·Smart Object 기반과 Hostile/Friendly 기본 이동 StateTree를 완료한 상태**다. `ST_NPC_HostilePatrol`은 EnemyPatrol, `ST_NPC_FriendlyBaseRoutine`은 FriendlyBasePatrol/Ambient Slot의 Claim → NavMesh 이동 → 1초 대기 → Release를 반복한다. Greybox의 Hostile 2명과 Friendly 2명 모두 역할별 순환을 자동 검증했다. 감지 후 Search, 무기 사격·피해, 생활·전투 Animation은 아직 완성된 기능이 아니다. 아래 순서대로 작은 동작 단위로 만들고 PIE에서 확인한 뒤 다음 카드로 넘어간다.
+현재 단계는 **C++·Smart Object 기반, Hostile/Friendly 기본 이동, Hostile Perception/Search와 공용 Weapon 호출 계약을 완료한 상태**다. `ST_NPC_HostilePatrol`은 EnemyPatrol 중 감지 Event를 받으면 즉시 Claim을 해제하고, 실종 Event 뒤 마지막 감지 위치를 3초 Search한 다음 순찰로 복귀한다. `ST_NPC_FriendlyBaseRoutine`은 이 Event와 무관하게 FriendlyBasePatrol/Ambient Slot의 Claim → NavMesh 이동 → 1초 대기 → Release를 반복한다. Rifle·Shotgun은 같은 Weapon Component의 Target·Aim Point 경로를 사용한다. 실제 Trace·피해, MG, 생활·전투 Animation은 아직 완성된 기능이 아니다.
 
 ## 1. 이번 구조로 만들 동작
 
@@ -77,7 +77,7 @@ Smart Object는 NPC를 생성하는 장치가 아니다.
 - Weapon Type: `Unarmed`, `Rifle`, `Shotgun`
 - `bCanUseMGTurret`: 적 NPC가 드론 발견 뒤 MG 후보를 검색할 수 있는지
 
-소총·샷건 분기는 준비됐지만 실제 발사 로직은 아직 없다. Controller의 `UsesRifle()`과 `UsesShotgun()`을 StateTree 전환 조건이나 Blueprint 조건으로 사용할 수 있다.
+`UDroneNPCWeaponComponent`가 Rifle·Shotgun 공통 `CanFire/StartFire/StopFire/Reload`와 Target Actor·Aim Point를 관리한다. Controller의 `UsesRifle()`과 `UsesShotgun()`은 호환용 분류 API로 남기되, AI 발사 호출 경로에서는 무기별 분기를 만들지 않는다. 실제 Trace·피해·탄약·Cooldown·Pellet은 아직 없다.
 
 ### Smart Object Activity
 
@@ -427,8 +427,8 @@ Hostile + CanUseMGTurret
 | `AI-NPC-01` | 적 Rifle·Shotgun·아군 BP와 시험 맵 배치 | **Done** — 4명 Profile·Possess·Activity Tag·NavMesh 투영 검증 |
 | `AI-PATROL-01` | 적 순찰 StateTree | **Done** — Hostile 2명이 EnemyPatrol Claim·이동·대기·해제, 각 2회 이상·서로 다른 2지점 이상 방문 자동 검증 |
 | `AI-FRIEND-01` | 아군 BaseRoutine StateTree | **Done** — 아군 2명이 FriendlyBasePatrol/Ambient를 배타 Claim하고, 각각 두 종류·서로 다른 2지점 이상 방문 |
-| `AI-PER-01` | 드론 Sight·Event PIE 검증 | 감지 시 순찰 중단, 놓치면 Search 전환 |
-| `AI-WPN-01` | 공용 Weapon 계약 | Rifle·Shotgun이 같은 AI 호출 경로 사용 |
+| `AI-PER-01` | 드론 Sight·Event PIE 검증 | **Done** — Hostile만 감지 시 Claim·이동 중단, 실종 뒤 3초 Search와 순찰 복귀, Friendly 루틴 지속 자동 검증 및 사용자 수동 화면 Pass |
+| `AI-WPN-01` | 공용 Weapon 계약 | **Done** — Weapon Component의 공용 호출, 단일 Target·Aim Point 경로, Lost·UnPossess 정리와 Unarmed 거부 자동 검증 |
 | `AI-WPN-02` | Rifle Greybox 발사 | 단일 Trace, 사거리·시야·Cooldown 검증 |
 | `AI-WPN-03` | Shotgun Greybox 발사 | Pellet·Spread 분리, 단일 발사 판정 검증 |
 | `AI-MG-01` | MG Claim·Move | 두 AI 중 한 명만 MG에 도착 |
@@ -436,14 +436,14 @@ Hostile + CanUseMGTurret
 | `AI-COVER-01` | 비점유 병사 엄폐 | MG 실패 병사가 Cover 지점 사용 |
 | `AI-VIS-01` | 외형·Animation 연결 | T Pose·손 위치·Root Motion 문제 없음 |
 
-`AI-SO-00 → AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01`은 완료했다. 다음은 `AI-PER-01`이다. 사격은 드론 감지·Search가 안정된 뒤 Rifle부터 붙이고 Shotgun을 같은 계약의 두 번째 구현으로 추가한다.
+`AI-SO-00 → AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01 → AI-PER-01 → AI-WPN-01`은 완료했다. 다음은 `AI-WPN-02`로, 공용 계약 뒤에 Rifle 단일 Trace·사거리·시야·Cooldown을 붙인다. Shotgun은 `AI-WPN-03`에서 같은 Trigger 계약의 두 번째 구현으로 추가한다.
 
 ### Asset 재검증 명령
 
 다른 PC에서 Pull한 뒤 Asset의 저장된 연결을 다시 확인할 때 문서 저장소 루트에서 실행한다.
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneSmartObjectSetup.ps1 -Mode Validate -ProjectPath C:\URproject\drone\Drone.uproject
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneSmartObjectSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
 ```
 
 `VALIDATION_OK`가 출력되면 6쌍의 형식·부모 Class·Slot Tag·Definition·MG Mesh 연결이 일치한다. `Create` 모드는 정확한 12개 Asset을 재구성하는 유지보수용이며 일반 작업에서는 실행할 필요가 없다.
@@ -451,7 +451,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 NPC 역할 Blueprint와 Greybox 맵까지 다시 확인할 때는 다음 명령을 사용한다.
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneNPCGreyboxSetup.ps1 -Mode Validate -ProjectPath C:\URproject\drone\Drone.uproject
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneNPCGreyboxSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
 ```
 
 이 검증은 역할 Profile, AI Controller Possess, 역할 Tag, NPC 4명과 Station 10개 배치, Navigation Floor, Recast 설정, NPC 시작 위치의 NavMesh 투영을 확인한다. `BuildNavigation` 모드는 생성 자산을 수리하거나 Navigation을 다시 저장해야 할 때만 사용한다.
@@ -459,7 +459,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 Hostile 순찰 StateTree의 Schema·상태 순서·Native Task·컴파일 상태는 다음 읽기 전용 명령으로 확인한다.
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneHostilePatrolStateTreeSetup.ps1 -Mode Validate -ProjectPath C:\URproject\drone\Drone.uproject
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneHostilePatrolStateTreeSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
 ```
 
 `Create`는 Asset이 없을 때만 새로 만들며 기존 StateTree는 덮어쓰지 않는다. 일반 Pull·검증에서는 `Validate`만 사용한다.
@@ -467,10 +467,16 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 Friendly 기지 루틴 StateTree도 같은 방식으로 읽기 전용 검증한다.
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneFriendlyBaseRoutineStateTreeSetup.ps1 -Mode Validate -ProjectPath C:\URproject\drone\Drone.uproject
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneFriendlyBaseRoutineStateTreeSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
 ```
 
 이 검증은 `FriendlyBaseRoutine`의 Claim·Move·Wait·Release 상태 순서, Native Task 종류와 컴파일 준비 상태를 확인한다. `Create`는 Asset이 없을 때만 사용하며 기존 Asset을 덮어쓰지 않는다.
+
+Hostile 감지·Search 전환까지 포함한 최종 StateTree는 다음 명령으로 확인한다.
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneHostilePerceptionStateTreeSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
+```
 
 ## 12. 첫 PIE 검증 체크리스트
 
@@ -481,11 +487,12 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 - [x] 아군이 FriendlyBasePatrol/Ambient만 사용하고 두 종류를 모두 방문
 - [x] 같은 1-Slot은 Smart Object 배타 Claim 경로로 예약
 - [x] 드론이 보이지 않을 때 Hostile 2명이 각각 2회 이상 순찰하고 서로 다른 2개 이상 지점 방문
-- [ ] 드론이 Sight에 들어오면 Hostile만 순찰 예약 해제
-- [ ] Friendly는 드론을 봐도 전투 상태로 바뀌지 않음
+- [x] 드론이 Sight Event에 들어오면 Hostile만 순찰 예약 해제
+- [x] Friendly는 같은 드론 감지 자극에도 전투 상태로 바뀌지 않고 BaseRoutine 지속
 - [ ] MG 사용 가능 적만 MG를 검색
-- [ ] Rifle과 Shotgun 상태 분기가 Profile과 일치
-- [ ] 드론을 놓치면 Search를 거쳐 순찰 복귀
+- [x] 드론을 놓치면 마지막 감지 위치 Search를 거쳐 순찰 Claim 재개
+- [x] Rifle과 Shotgun이 공용 Weapon 호출과 같은 Target·Aim Point 경로를 사용
+- [x] 감지 실종과 UnPossess에서 발사 상태 정리, Friendly·Unarmed 비발사
 - [ ] PIE 종료 뒤 남은 Claim이나 중복 Spawn 없음
 
 ## 13. 현재 완료와 미완료 판정
@@ -508,16 +515,18 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 - 직전 지점 우선 회피, 이동 실패·감지·UnPossess 시 예약 해제
 - Hostile 2명의 반복 순찰과 Friendly 2명의 Base Patrol/Ambient 반복 이동 PIE 자동화
 - Friendly `ST_NPC_FriendlyBaseRoutine`과 역할별 Claim·Release Native Task
-- Game/Editor Build, AI 7/7 경고·오류 0, 전체 `Drone.` 23/23, Blueprint 0/0/0, LFS 검증
+- Hostile `DroneDetected`·`SearchLastKnownLocation` State와 감지·실종 Event 전환, Search 성공·실패의 순찰 복귀
+- Hostile만 반응하고 Friendly 루틴은 지속되는 `Drone.AI.NPCPerceptionSearchPIE`
+- `UDroneNPCWeaponComponent` 공용 호출과 Controller의 단일 Target Actor·Aim Point 전달 계약
+- Rifle·Shotgun 동일 경로, Friendly 비발사, Lost 정리를 검증하는 `Drone.AI.WeaponContract`와 NPC Greybox PIE
+- Game/Editor Build, AI 9/9 경고·오류 0, 전체 `Drone.` 25/25, 직전 Blueprint 0/0/0와 이번 NPC BP 로드 검증, LFS 검증
 
 ### 아직 구현·수동 검증 필요
 
-- 감지 후 Search·Return 전환과 순찰 복귀
 - 최종 NPC 외형·Skeleton·Animation Blueprint 선택과 연결
 - Rifle·Shotgun 발사·피해·Animation·FX·SFX
 - MG 승하차·조준·사격 Animation과 Turret 제어
-- Cover·Search·Return 실제 행동
-- 전용 Greybox 맵에서 Hostile/Friendly 이동의 수동 시각 확인과 드론 감지 동작 확인
+- Cover와 전투 종료 뒤 통합 Return 실제 행동
 - 최종 맵에 NPC와 Smart Object 배치
 
 UE 5.8.1에서 `Gameplay Interactions`는 Experimental 표기가 있는 Plugin이다. 프로젝트에 제한적으로 사용하되 엔진 업데이트 때 API 변경 가능성을 확인하고, 핵심 역할·예약 규칙은 프로젝트 C++와 테스트에 남긴다.

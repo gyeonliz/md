@@ -1,19 +1,19 @@
 # 이동 중 읽는 Drone 현황·내 작업·학습 일정
 
-기준일: 2026-08-28 (Asia/Seoul)
+기준일: 2026-09-02 (Asia/Seoul)
 
 이 문서는 휴대폰으로 현재 상태와 다음 행동을 빠르게 확인하기 위한 요약본이다. 코드의 상세 설명은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md), 학습 기록 양식은 [`STUDY_PLANS.md`](STUDY_PLANS.md)를 따른다.
 
 ## 30초 요약
 
-- Unreal 기준선은 `main=origin/main=2fcfb04`다. 팀원 환경 변경 정리 `888414f`와 AI-FRIEND-01 기능 `b5b733f`가 모두 반영됐다.
+- Unreal 공유 기준선은 `origin/main=2fcfb04`다. 로컬 `main`에는 AI-PER-01·AI-WPN-01 변경이 미커밋 상태로 있다.
 - Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개, Segment/Lap 원본과 이전 평균·Best·Delta 결과까지 구현됐다.
 - 현재 개발 완료 지점은 `TUT-04B` 기술 구현이며, 실제 두 Lap HUD 확인 뒤 Flight 상태로 진행한다.
-- 이번 확인 PC의 제공 에셋 루트는 `C:\에셋`이다. FPV·Loop 선택 자산 12개와 프로젝트 Integration BP 1개의 파일·참조·LFS·자동 검증은 통과했다.
+- 현재 D 드라이브 작업 PC의 제공 에셋 루트는 `D:\JGY\project\Unreal_260821`이다. FPV·Loop 선택 자산과 프로젝트 Integration BP의 파일·참조·LFS·자동 검증은 통과했다.
 - NavigationArrows 최소 자산 6개와 전용 테스트는 main에 병합됐다. 화면 Host는 아직 미구현이다.
 - 프로젝트 사용 맵은 `/Game/Drone/Maps`로 중앙화했다. 환경 맵 3종에 `Lvl_OilRig`을 추가했고, 남은 제공 자산 891개를 후보 라이브러리로 선별 이식했다.
 - 사용자는 Gate나 기록 C++를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도와 Drone Loop를 확인하면 된다.
-- Hostile/Friendly Smart Object 기본 이동 StateTree를 추가했다. Hostile 2명은 EnemyPatrol, Friendly 2명은 FriendlyBasePatrol/Ambient의 Claim·이동·대기·해제를 반복한다. Search·Rifle/Shotgun·MG는 후속 카드다.
+- Hostile/Friendly Smart Object 기본 이동, Hostile 감지·3초 Search·순찰 복귀와 사용자 수동 화면 확인까지 완료했다. Rifle·Shotgun 공용 Weapon 호출 계약도 완료했으며 다음은 Rifle Greybox Trace다.
 - 확정된 학습 항목은 `정보처리산업기사`와 `C++ 코딩테스트` 두 가지뿐이다.
 - 정보처리산업기사 2026년 3회 필기 접수는 끝났다. 오늘 가장 먼저 Q-Net에서 자신의 접수·면제·응시 상태를 확인해야 한다.
 - 코딩테스트는 공통 시험일이 없으므로 자격시험 일정에 맞춰 주간 반복 학습으로 운영한다.
@@ -22,20 +22,20 @@
 
 | 구분 | 현재 상태 |
 |---|---|
-| Unreal 저장소 | `C:\URproject\drone` |
+| Unreal 저장소 | `D:\JGY\project\drone` |
 | Unreal 기준 Commit | `2fcfb04` |
-| Git 상태 | 깨끗한 `main`, 로컬·원격 일치. AI-PATROL-01 Merge·Push 완료 |
+| Git 상태 | 공유 `origin/main=2fcfb04`; 로컬 `main`의 AI-PER-01·AI-WPN-01과 문서 변경 미커밋 |
 | Git LFS | `fsck` 정상 |
 | 최종 Game/Editor Build | 성공 |
 | Tutorial 자동화 | 7/7 통과 |
-| AI 자동화 | 6/6 통과, 경고·오류 0 |
-| 전체 `Drone.` 자동화 | 23/23 통과. 22개 무경고 성공, 기존 PIE RecastNavMesh 경고 포함 성공 1개 |
-| Blueprint Compile | Errors 0, 기존 Battlefield Pose GUID·MCP 고지 경고 유지 |
+| AI 자동화 | 9/9 통과, 경고·오류 0 |
+| 전체 `Drone.` 자동화 | 25/25 통과. 24개 무경고 성공, 기존 PIE RecastNavMesh 경고 포함 성공 1개 |
+| Blueprint Compile | 직전 0/0/0. AI-WPN-01은 BP 자산 미수정이며 NPC BP 자동 로드 성공 |
 | Standalone | 실제 WBP HUD·Cyan Course·Current/Inactive Gate 표시 확인 |
 | 에셋 이식 | 환경 3종+OilRig와 후보 라이브러리 891개. 새 Root 수량 일치·대표 로드·외부/누락 0, LFS fsck 통과 |
-| NPC/Smart Object | 기반·Definition/Station BP 6쌍·역할 BP·Greybox·Hostile/Friendly StateTree 구성. AI 7/7, 전체 23/23, Blueprint 0/0/0, LFS 통과 |
+| NPC/Smart Object | 기반·Definition/Station BP 6쌍·역할 BP·Greybox·Hostile/Friendly StateTree·Perception/Search·공용 Weapon 계약 구성. AI 9/9, 전체 25/25 통과 |
 
-현재 작업 기준에서 Game/Editor Build, AI 7개, 전체 Drone 23개와 Blueprint 전체 Compile을 실행했다. AI는 경고·오류 없이 통과했고 전체 자동화는 22개 무경고 성공, 기존 PIE NavMesh 경고 포함 성공 1개이며 실패는 0이다. Blueprint 오류·Blueprint 경고·로드 실패는 0이다.
+현재 작업 기준에서 Game/Editor Build, AI 9개와 전체 Drone 25개를 실행했다. AI는 경고·오류 없이 통과했고 전체 자동화는 24개 무경고 성공, 기존 PIE NavMesh 경고 포함 성공 1개이며 실패는 0이다. 직전 Blueprint 전체 Compile은 오류·경고·로드 실패 0이며, BP 자산을 수정하지 않은 AI-WPN-01에서는 NPC BP 로드 자동화로 회귀 확인했다.
 
 ## 2. 코드가 어떻게 연결되는가
 
@@ -225,8 +225,10 @@ TUT-03 Segment/Lap 기록 Done
 → AI-NPC-01 적 Rifle·Shotgun·아군 BP와 Greybox Done
 → AI-PATROL-01 적 순찰 Done
 → AI-FRIEND-01 기지 아군 이동 Done
-→ AI-PER-01 드론 감지
-→ Rifle → Shotgun → MG
+→ AI-PER-01 드론 감지·Search 자동/수동 Done
+→ AI-WPN-01 공용 Weapon 계약 Done
+→ AI-WPN-02 Rifle Greybox Trace
+→ AI-WPN-03 Shotgun → MG
 ```
 
 TUT-03은 기존 Gate 판정과 분리된 Recorder가 정상 `OnGateAccepted`와 Telemetry Event를 구독하도록 완료했다. TUT-04B도 이 원본을 사용해 비교 결과를 C++에서 만들고 Widget은 표시만 한다.

@@ -1,6 +1,6 @@
 # 작업컴 Codex/GPT 기준 컨텍스트
 
-기준일: 2026-08-24 (Asia/Seoul)
+기준일: 2026-09-02 (Asia/Seoul)
 
 이 문서는 메인컴 ChatGPT/Codex에서 진행하던 작업을 작업컴에서 이어가기 위한 기준 컨텍스트다. 추측해서 내용을 추가하지 않고, 사용자가 실제 진행 상황을 알려준 경우에만 상태를 갱신한다.
 
@@ -612,3 +612,13 @@ Inbox → Todo → Doing → Done
 - Smart Object 1-Slot 배타 Claim과 직전 지점 회피를 사용하며 각 Friendly가 두 종류와 서로 다른 2개 이상 지점을 방문하는 PIE 자동화를 통과했다.
 - Game/Editor Build, AI 7/7 경고·오류 0, 전체 `Drone.` 23/23, Blueprint 0/0/0, LFS 검증을 통과했다. 기존 `PIEInputLifecycle` RecastNavMesh 경고 포함 성공 1개는 유지된다.
 - 다음 기능 순서는 `AI-PER-01 → AI-WPN-01/02/03 → AI-MG-01/02`다. Search·Return·사격·Damage·Animation·MG 점유는 아직 구현되지 않았다.
+
+## 39. 2026-09-02 AI-PER-01 수동 Pass와 AI-WPN-01 기준선
+
+- AI-PER-01은 Hostile 감지 시 이동·Claim 중단, 실종 뒤 마지막 위치 3초 Search와 순찰 복귀, Friendly 루틴 지속을 자동 검증했고 사용자가 Editor 화면에서도 정상 동작을 확인했다.
+- `UDroneNPCWeaponComponent`의 공용 `CanFire/StartFire/StopFire/Reload`와 Target Actor·Aim Point 계약을 추가했다. Rifle·Shotgun은 Controller에서 무기별 분기 없이 같은 감지 Target 경로를 사용한다.
+- 감지 실종과 UnPossess에서는 발사를 정리하고 Friendly·Unarmed·잘못된 Target은 발사하지 않는다.
+- 실제 Rifle Line Trace·Damage·탄약·Cooldown과 Shotgun Pellet·Spread는 아직 구현하지 않는다. 다음 순서는 `AI-WPN-02 → AI-WPN-03 → AI-MG-01/02`다.
+- Game/Editor Build, AI 9/9 경고·오류 0, 전체 `Drone.` 25/25를 통과했다. 전체 중 24개는 무경고이며 기존 `PIEInputLifecycle` RecastNavMesh 경고 포함 성공 1개만 유지된다.
+- 직전 Blueprint 전체 Compile은 0/0/0이다. AI-WPN-01은 Blueprint 자산을 수정하지 않았고 NPC Blueprint 자동 로드를 통과했다.
+- 공유 기준은 `origin/main=2fcfb04`다. Unreal과 문서의 로컬 `main` 변경은 사용자가 직접 처리하도록 Commit·Push하지 않는다.

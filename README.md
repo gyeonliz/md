@@ -52,19 +52,19 @@ tools/unreal/              Prototype·Tutorial 자산 생성·재검증용 안�
 
 ## 현재 진행 지점
 
-작업컴 기본 작업 루트는 `D:\JGY\project`이고, 현재 PC의 Unreal 저장소는 `C:\URproject\drone`이다. 별도 `ADronePrototypePawn`과 GameMode, 5개 Input Action, Keyboard·Mouse·Gamepad 15개 Mapping, BP Pawn/GameMode와 Greybox Map을 연결했다. Camera는 Drone 뒤 고정 추적, Mouse X는 Drone Yaw, Mouse Y는 Camera Pitch로 동작한다.
+작업컴 기본 작업 루트는 `D:\JGY\project`이고, 현재 PC의 Unreal 저장소는 `D:\JGY\project\drone`이다. 별도 `ADronePrototypePawn`과 GameMode, 5개 Input Action, Keyboard·Mouse·Gamepad 15개 Mapping, BP Pawn/GameMode와 Greybox Map을 연결했다. Camera는 Drone 뒤 고정 추적, Mouse X는 Drone Yaw, Mouse Y는 Camera Pitch로 동작한다.
 
 확정 조작을 반영한 PFN-06은 자동화와 Standalone 수동 조작을 통과해 Done이다. HUD-01 공용 Telemetry Component는 기본 10Hz Snapshot Event를 제공한다. HUD-02는 C++가 계산·생성·Possession·Delegate 수명주기를 맡고 실제 `WBP_DroneFlightHUD`가 화면 외형을 맡도록 연결했다.
 
 TUT-01~03을 완료했다. 별도 `Lvl_DroneTraining` Map의 실제 `BP_DroneTrainingCourse`가 편집 가능한 Spline과 Runtime 표시용 SplineMesh를 소유한다. `ADroneTrainingGate`는 비충돌 Ring Visual과 별도 Pawn Overlap Trigger를 분리하고, `UDroneTrainingGateSequenceComponent`가 Course의 명시적 Gate 배열을 기준으로 현재 순서·정방향·중복 통과를 판정한다. 실제 `BP_DroneTrainingGate` 네 개를 Map에 연결했으며 기존 Prototype BP GameMode·FPV Integration Pawn·PlayerController·WBP를 그대로 재사용한다.
 
-TUT-03에서는 Course 소유 `UDroneTrainingLapRecorderComponent`를 Gate 판정과 분리했다. Gate 0 승인으로 Lap을 시작하고 이후 Gate마다 Segment를 확정하며, 마지막 Gate에서 Lap을 완료한다. TUT-04B는 현재 기록을 제외한 이전 성공 평균, Best, 시간·속도 Delta와 Segment 비교를 계산하고 Flight HUD에 표시한다. 최신 전체 검증은 Game/Editor Build, 전체 `Drone.` 23/23과 Blueprint 0/0/0을 통과했으며 실제 두 Lap 화면 확인은 남아 있다.
+TUT-03에서는 Course 소유 `UDroneTrainingLapRecorderComponent`를 Gate 판정과 분리했다. Gate 0 승인으로 Lap을 시작하고 이후 Gate마다 Segment를 확정하며, 마지막 Gate에서 Lap을 완료한다. TUT-04B는 현재 기록을 제외한 이전 성공 평균, Best, 시간·속도 Delta와 Segment 비교를 계산하고 Flight HUD에 표시한다. 최신 전체 검증은 Game/Editor Build와 전체 `Drone.` 25/25를 통과했다. 직전 Blueprint Compile은 0/0/0이며 실제 두 Lap 화면 확인은 남아 있다.
 
-이번 확인 PC의 제공 에셋 루트는 `C:\에셋`이다. 초기 FPV 외형·Loop와 Integration BP에 이어 ArmyVFX·InfantrySFX·Ground Drone/MG·NPC 외형·Raw Drone 후보와 OilRig을 선별 이식했다. 원본 제공 폴더는 수정하지 않았고 실제 프로젝트의 새 자산 외부·누락 참조는 0이다. 실제 스피커의 Loop 단일 재생과 종료 정지는 수동 미확인이므로 `AST-01`은 Doing이다. 상세 결과는 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)와 [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md)를 따른다.
+현재 D 드라이브 작업 PC의 제공 에셋 루트는 `D:\JGY\project\Unreal_260821`이다. 초기 FPV 외형·Loop와 Integration BP에 이어 ArmyVFX·InfantrySFX·Ground Drone/MG·NPC 외형·Raw Drone 후보와 OilRig을 선별 이식했다. 원본 제공 폴더는 수정하지 않았고 실제 프로젝트의 새 자산 외부·누락 참조는 0이다. 실제 스피커의 Loop 단일 재생과 종료 정지는 수동 미확인이므로 `AST-01`은 Doing이다. 상세 결과는 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)와 [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md)를 따른다.
 
-NPC·AI를 위해 Smart Objects와 Gameplay Interactions 모듈, Faction·Rifle·Shotgun Profile, Activity Tag, NPC Character/Controller/Spawn Point, Slot 예약 Component와 드론 Sight 감지 기반을 준비했다. Smart Object Definition·Station Blueprint 6쌍, 역할 Blueprint 3종, Spawn Point BP와 `Lvl_NPCSmartObjectGreybox`에 이어 `ST_NPC_HostilePatrol`, `ST_NPC_FriendlyBaseRoutine`을 구현했다. Hostile 2명은 EnemyPatrol, Friendly 2명은 FriendlyBasePatrol/Ambient의 배타 Claim·이동·대기·Release를 반복한다. AI 7/7 경고·오류 0과 전체 `Drone.` 23/23을 통과했다. Manny/Unarmed 외형은 임시 Greybox이며 Search·Rifle/Shotgun 사격은 아직 미구현이고, 다음은 `AI-PER-01`이다.
+NPC·AI를 위해 Smart Objects와 Gameplay Interactions 모듈, Faction·Rifle·Shotgun Profile, Activity Tag, NPC Character/Controller/Spawn Point, Slot 예약 Component와 드론 Sight를 구성했다. Smart Object Definition·Station Blueprint 6쌍, 역할 Blueprint 3종, Spawn Point BP, `Lvl_NPCSmartObjectGreybox`, Hostile/Friendly StateTree를 구현했다. Hostile은 감지 시 순찰을 중단하고 실종 뒤 마지막 위치를 3초 Search한 다음 복귀하며 사용자 수동 화면 확인도 통과했다. Rifle·Shotgun은 `UDroneNPCWeaponComponent`의 공용 Target·Aim Point 호출 계약을 사용한다. AI 9/9와 전체 `Drone.` 25/25를 통과했으며 실제 Trace·Damage·Shotgun Pellet·MG는 미구현이다. 다음은 `AI-WPN-02` Rifle Greybox Trace다.
 
-2026-08-28 현재 Unreal 저장소 로컬 `main`과 `origin/main`은 AI-FRIEND-01 Merge Commit `2fcfb04`로 일치한다. 기능 Commit은 `b5b733f`, 팀원 변경 정리 Merge는 `888414f`다. 중앙에 반영된 환경 맵·재질과 기존 자산·Tutorial 이력을 보존했다. 이식 자산은 후보 라이브러리이며 Search·사격·MG까지 완성됐다는 뜻은 아니다.
+2026-09-02 현재 Unreal 공유 기준은 `origin/main=2fcfb04`다. AI-PER-01·AI-WPN-01은 로컬 `main`의 미커밋 변경이며 문서 변경도 사용자가 직접 Commit하기 전 상태다. 중앙에 반영된 환경 맵·재질과 기존 자산·Tutorial 이력을 보존했고 실제 사격·MG까지 완성됐다는 뜻은 아니다.
 
 외부 제공 소스는 전체 팩을 흡수하지 않고 검증된 대표 자산과 정확한 의존성만 ThirdParty 경계로 선별 이식했다. 기능 구현은 계속 프로젝트 C++와 Greybox 기준을 유지하며 외부 Pawn·GameMode·Input은 사용하지 않는다. 현재 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md)가 우선하고 PFN 카드 번호와 교체 경계는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](docs/DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 
