@@ -22,10 +22,10 @@
 | GitHub CLI | 설치되어 있지 않음 |
 | 현재 기본 작업 루트 | Unreal `D:\JGY\project\drone`; 문서 `D:\JGY\project\md` |
 | 다른 PC 검증 기록 | Unreal `C:\URproject\drone`; 당시 문서 Clone `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
-| Unreal 프로젝트 저장소 | 공유 기준 `origin/main=2fcfb04`; 현재 로컬 `main`에 AI-PER-01·AI-WPN-01 변경이 미커밋 상태 |
-| 문서 작업 저장소 | `main=origin/main=ae2d0c5`; AI-PER-01·AI-WPN-01 실행 기록과 기준선 갱신은 로컬 미커밋 상태 |
-| Commit·Push 처리 | 이번 AI-PER-01·AI-WPN-01 코드·StateTree·문서 변경은 Stage·Commit·Push하지 않았다. 사용자가 검토 후 직접 처리 |
-| 실행 상태 | Game/Editor Build 성공, AI 9/9 경고·오류 0, 전체 `Drone.` 25/25(24 무경고+기존 PIE Recast 경고 포함 성공 1), 직전 Blueprint 0/0/0와 이번 NPC BP 로드 검증, StateTree Validate와 LFS fsck 성공 |
+| Unreal 프로젝트 저장소 | `main=origin/main=0d92a5f`, 작업 트리 Clean |
+| 문서 작업 저장소 | 본 갱신 전 `main=origin/main=08c4b61`; Rifle·Shotgun 완료 기록을 한글 커밋으로 Push |
+| Commit·Push 처리 | Rifle·Shotgun 코드와 테스트는 `0d92a5f`로 Unreal 원격에 Push 완료. 문서도 같은 기준으로 갱신·Push |
+| 실행 상태 | Game/Editor Build 성공, AI 11/11·전체 `Drone.` 27/27, Blueprint 0 errors·0 warnings·0 failed loads, LFS fsck 성공. Rifle 빈 시험 World 경고 1건과 공급사/MCP 전역 경고 29건은 별도 |
 | 별도 `droner` 주의 | `main=origin/main=551e287`; `Config/DefaultEditor.ini` 변경과 `Content/Asset` 10,928개·36,360,181,427 bytes 전체가 Untracked. 공급사 원본·스테이징 복사본이므로 일괄 Stage·Commit 금지 |
 | 팀원 변경 | 환경 맵·재질 변경은 중앙 `main`에 반영된 상태. Battlefield의 새 프로젝트 머티리얼 3개와 Camp/Base 의존성을 검증했고 개인 `.vsconfig` 변경·`//test`를 별도 정리. 팀원 PC Remote 실측만 남음 |
 
@@ -51,6 +51,14 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 - `DroneEditor Win64 Development`와 `Drone Win64 Development` Build가 성공했다. 이번 카드는 Blueprint 자산을 수정하지 않아 전체 Compile을 반복하지 않았고, 직전 0/0/0 기준선과 자동화의 NPC Blueprint 로드 성공을 유지 근거로 삼는다.
 - 현재 다음 활성 카드는 `AI-WPN-02` Rifle 단일 Trace·사거리·시야·Cooldown Greybox다.
 
+## 2026-09-02 AI-WPN-02/03 Rifle·Shotgun Greybox 구현·검증 결과
+
+- Rifle은 4,000cm 사거리와 0.25초 Cooldown의 단일 Visibility Trace, Shotgun은 1,600cm·0.9초·8 Pellet·6도 반각의 결정적 Spread를 사용한다. 모두 밸런스 확정값이 아닌 Greybox 시험값이다.
+- 전용 자동화가 Rifle의 개방 표적·장애물·사거리·Cooldown과 Shotgun의 단일 Trigger 다중 Pellet·Spread·장애물·사거리·Cooldown을 검증한다.
+- Game 타깃이 Editor 전용 테스트 헤더를 포함하던 경계를 수정해 Rifle/Shotgun 자동화는 Editor에서만 컴파일되고 런타임 무기 코드는 Game에 포함된다.
+- `Drone Win64 Development`, `DroneEditor Win64 Development`, AI 11/11, 전체 27/27, Blueprint 0/0/0, `git lfs fsck`가 통과했다. Rifle 빈 시험 World의 RecastNavMesh 경고 1건과 공급사/MCP 전역 경고 29건은 기능 실패가 아니다.
+- 한글 Commit `0d92a5f`를 `origin/main`에 Push했다. 실제 Damage·탄약·Animation·FX·SFX는 미구현이며 다음 카드는 `AI-MG-01`이다.
+
 ## 2026-08-28 팀원 변경 인수·정리 결과
 
 - 원격 감사 당시 팀원 변경은 Fork에만 있었지만, 현재 중앙 저장소 `main=2fcfb04`에는 환경 맵·재질 변경이 반영돼 있다.
@@ -70,7 +78,7 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 D:\JGY\project\drone\Drone.uproject
 ```
 
-이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 공유 기준선은 `origin/main=2fcfb04`이며 이번 AI-PER-01·AI-WPN-01 구현·검증은 기본 작업 위치 `D:\JGY\project\drone`의 로컬 `main`에서 수행해 미커밋 상태로 유지했다.
+이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 현재 공유 기준선은 `origin/main=0d92a5f`다.
 
 확인 결과:
 
@@ -81,7 +89,7 @@ D:\JGY\project\drone\Drone.uproject
 - 시작 시 Git 저장소가 아니었음
 - 작업 시작 시 Content에는 `.uasset` 749개와 `.umap` 4개가 있었음
 
-초기에는 Third Person 기본 맵과 전역 기본 GameMode를 유지한 채 Git 준비, Android 제외 설정, 별도 Drone Prototype Source를 적용했다. 이후 시작 맵을 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode를 프로젝트 소유 `BP_DronePrototypeGameMode`로 바꿨다. 기존 자산·TUT-04B 병합 기준선 `55b3ffe`에서 Unreal 생성 기본 Map 4개만 제거하고 Template 비맵 자산은 복구했으며, 최신 공유 기준선은 문서 상단의 `2fcfb04`다.
+초기에는 Third Person 기본 맵과 전역 기본 GameMode를 유지한 채 Git 준비, Android 제외 설정, 별도 Drone Prototype Source를 적용했다. 이후 시작 맵을 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode를 프로젝트 소유 `BP_DronePrototypeGameMode`로 바꿨다. 기존 자산·TUT-04B 병합 기준선 `55b3ffe`에서 Unreal 생성 기본 Map 4개만 제거하고 Template 비맵 자산은 복구했으며, 최신 공유 기준선은 문서 상단의 `0d92a5f`다.
 
 - `main` Branch의 로컬 Git 저장소 초기화
 - 프로젝트 로컬 Git LFS 초기화
@@ -109,7 +117,7 @@ D:\JGY\project\drone\Drone.uproject
 
 첫 Commit은 863개 파일이며 `Content`는 761개로 `.uasset` 756개와 `.umap` 5개다. 가장 큰 파일은 약 21.0 MB이고 100 MB를 넘는 파일은 없다. 새 Prototype `.uasset`과 `.umap`을 포함한 Unreal Asset에는 Git LFS의 filter·diff·merge 속성이 적용된다. WBP·BP Controller·TUT-01 Asset에 이어 TUT-02의 신규 `BP_DroneTrainingGate`와 갱신한 `Lvl_DroneTraining` 두 Asset도 Git LFS로 Push했다.
 
-현재 공유 main에는 Prototype Pawn/GameMode, 입력, Telemetry, Flight HUD, Tutorial 기록·비교 결과와 NPC Smart Object 기반이 있다. 로컬 미커밋 변경에서는 Hostile 2명이 감지 즉시 Claim·이동을 중단하고 실종 뒤 마지막 위치 Search를 거쳐 EnemyPatrol로 복귀하며, Rifle·Shotgun이 공용 Weapon Component의 Target·Aim Point 호출 계약을 사용한다. Friendly 2명은 감지 Event와 무관하게 FriendlyBasePatrol/Ambient를 계속 반복한다. Game/Editor Build, AI 9/9, 전체 `Drone.` 25/25를 통과했다. 실제 Rifle/Shotgun Trace·Damage와 MG 점유·공격, 생활 Animation은 아직 미구현이다.
+현재 공유 main에는 Prototype Pawn/GameMode, 입력, Telemetry, Flight HUD, Tutorial 기록·비교 결과와 NPC Smart Object 기반이 있다. Hostile 2명은 감지 즉시 Claim·이동을 중단하고 Rifle 또는 Shotgun Greybox Trace를 시작하며, 실종 뒤 마지막 위치 Search를 거쳐 EnemyPatrol로 복귀한다. Friendly 2명은 감지 Event와 무관하게 FriendlyBasePatrol/Ambient를 계속 반복한다. Game/Editor Build, AI 11/11, 전체 `Drone.` 27/27을 통과했다. 실제 Damage·탄약과 MG 점유·공격, 생활/전투 Animation·FX·SFX는 아직 미구현이다.
 
 2026-08-27에는 `C:\에셋`에서 ArmyVFX·InfantrySFX·Ground Drone/MG 외형·Modular Soldier/Insurgent 외형·Quad v4·PBR Sting과 OilRig을 선별 이식했다. ThirdParty 891개와 중앙 `Lvl_OilRig` 1개이며 새 Root 수량 일치, 대표 로드, 외부·누락 참조 0을 확인했다. OilRig 명령줄 Map Check는 장시간 완료되지 않아 Editor 수동 확인이 남았다. 상세 내용은 [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md)를 따른다.
 
@@ -238,7 +246,7 @@ C:\Users\jkw11\Documents\Codex\2026-08-12\c-project-factoryenvironmentcollect\wo
 
 1. 사용자가 실제 Training Map에서 Gate 0→3 한 Lap과 Drone Loop 단일 재생·종료 정지를 수동 확인
 2. `TUT-04B` 첫 기준·이전 평균·Best·Delta를 두 번 완주해 실제 HUD에서 확인
-3. 기능 다음 카드는 `AI-WPN-02`, 이후 `AI-WPN-03 → AI-MG` 순으로 진행
+3. 기능 다음 카드는 `AI-MG-01`, 이후 `AI-MG-02 → AI-COVER-01` 순으로 진행
 4. 병행으로 팀원 PC의 실제 Remote URL·Push 대상 규칙을 확인
 5. 다른 PC에서 최신 `origin/main` Pull, LFS/UE 5.8.1 실행과 문서 Pull 확인
 6. 정보처리산업기사는 Q-Net 개인 접수·수험일·필기면제 상태를 확인해 Track A/B/C를 선택하고, 코딩테스트는 주간 반복으로 병행
@@ -267,7 +275,9 @@ PFN-06 Done
 → AI-FRIEND-01 BaseRoutine Done
 → AI-PER-01 감지·Search 자동·수동 검증 Done
 → AI-WPN-01 공용 Weapon 계약 Done
-→ AI-WPN-02 Rifle Greybox Trace
+→ AI-WPN-02 Rifle Greybox Trace Done
+→ AI-WPN-03 Shotgun Pellet/Spread Done
+→ AI-MG-01 MG 1-Slot Claim·Move
 → AI-MG 점유·공격
 → Take Off·Landing·Crash, Operator↔Drone, Mission UI·Jamming은 활성화 조건에 맞춰 후속 통합
 ```
@@ -329,6 +339,6 @@ UE 5.8의 Dataflow·Chaos Cloth·Chaos Destruction을 부분 고정 그물과 �
 - 맵 파괴: Dataflow Geometry Collection, Anchor/World Support, Damage Threshold, Strain/Force와 Debris Sleep/Disable
 - Cloth 변형·파괴 연출과 포획·Damage·Mission 판정을 분리
 - 현재 생산 Cloth/Geometry Collection Asset 0, 관련 C++ 0
-- `TUT-04` 실제 두 Lap 확인은 유지한다. AI-PER-01 수동 확인과 AI-WPN-01은 완료했고 다음 구현 우선순위는 `AI-WPN-02 → AI-WPN-03 → AI-MG`; 첫 물리 작업은 별도 `PHY-DF-00` Sandbox
+- `TUT-04` 실제 두 Lap 확인은 유지한다. AI-PER-01부터 AI-WPN-03까지 완료했고 다음 구현 우선순위는 `AI-MG-01 → AI-MG-02 → AI-COVER-01`; 첫 물리 작업은 별도 `PHY-DF-00` Sandbox
 
 상세 설계는 [`docs/DRONE_CHAOS_DATAFLOW_PLAN.md`](docs/DRONE_CHAOS_DATAFLOW_PLAN.md)를 따른다.

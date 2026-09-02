@@ -4,7 +4,7 @@
 
 이 문서는 적군 순찰과 드론 발견 대응, 소총·샷건 분기, 기지 아군 NPC의 생활·순찰 이동, 한 명만 사용하는 MG Turret을 같은 기반 위에 구성하기 위한 실전 가이드다.
 
-현재 단계는 **C++·Smart Object 기반, Hostile/Friendly 기본 이동, Hostile Perception/Search와 공용 Weapon 호출 계약을 완료한 상태**다. `ST_NPC_HostilePatrol`은 EnemyPatrol 중 감지 Event를 받으면 즉시 Claim을 해제하고, 실종 Event 뒤 마지막 감지 위치를 3초 Search한 다음 순찰로 복귀한다. `ST_NPC_FriendlyBaseRoutine`은 이 Event와 무관하게 FriendlyBasePatrol/Ambient Slot의 Claim → NavMesh 이동 → 1초 대기 → Release를 반복한다. Rifle·Shotgun은 같은 Weapon Component의 Target·Aim Point 경로를 사용한다. 실제 Trace·피해, MG, 생활·전투 Animation은 아직 완성된 기능이 아니다.
+현재 단계는 **C++·Smart Object 기반, Hostile/Friendly 기본 이동, Hostile Perception/Search와 Rifle·Shotgun Greybox Trace를 완료한 상태**다. `ST_NPC_HostilePatrol`은 EnemyPatrol 중 감지 Event를 받으면 즉시 Claim을 해제하고, 감지 중 개인 무기로 발사하며, 실종 Event 뒤 마지막 감지 위치를 3초 Search한 다음 순찰로 복귀한다. `ST_NPC_FriendlyBaseRoutine`은 이 Event와 무관하게 FriendlyBasePatrol/Ambient Slot의 Claim → NavMesh 이동 → 1초 대기 → Release를 반복한다. 실제 Damage·탄약·MG·생활/전투 Animation·FX·SFX는 아직 완성된 기능이 아니다.
 
 ## 1. 이번 구조로 만들 동작
 
@@ -77,7 +77,7 @@ Smart Object는 NPC를 생성하는 장치가 아니다.
 - Weapon Type: `Unarmed`, `Rifle`, `Shotgun`
 - `bCanUseMGTurret`: 적 NPC가 드론 발견 뒤 MG 후보를 검색할 수 있는지
 
-`UDroneNPCWeaponComponent`가 Rifle·Shotgun 공통 `CanFire/StartFire/StopFire/Reload`와 Target Actor·Aim Point를 관리한다. Controller의 `UsesRifle()`과 `UsesShotgun()`은 호환용 분류 API로 남기되, AI 발사 호출 경로에서는 무기별 분기를 만들지 않는다. 실제 Trace·피해·탄약·Cooldown·Pellet은 아직 없다.
+`UDroneNPCWeaponComponent`가 Rifle·Shotgun 공통 `CanFire/StartFire/StopFire/Reload`와 Target Actor·Aim Point를 관리한다. Controller의 `UsesRifle()`과 `UsesShotgun()`은 분류 API로 남기되, AI 발사 요청은 같은 경로를 사용한다. Rifle은 4,000cm·0.25초 단일 Visibility Trace, Shotgun은 1,600cm·0.9초·8 Pellet·6도 반각의 결정적 Spread를 Greybox 기본값으로 사용한다. 이 수치는 시험값이며 실제 Damage·탄약·최종 밸런스는 아직 없다.
 
 ### Smart Object Activity
 
@@ -429,14 +429,14 @@ Hostile + CanUseMGTurret
 | `AI-FRIEND-01` | 아군 BaseRoutine StateTree | **Done** — 아군 2명이 FriendlyBasePatrol/Ambient를 배타 Claim하고, 각각 두 종류·서로 다른 2지점 이상 방문 |
 | `AI-PER-01` | 드론 Sight·Event PIE 검증 | **Done** — Hostile만 감지 시 Claim·이동 중단, 실종 뒤 3초 Search와 순찰 복귀, Friendly 루틴 지속 자동 검증 및 사용자 수동 화면 Pass |
 | `AI-WPN-01` | 공용 Weapon 계약 | **Done** — Weapon Component의 공용 호출, 단일 Target·Aim Point 경로, Lost·UnPossess 정리와 Unarmed 거부 자동 검증 |
-| `AI-WPN-02` | Rifle Greybox 발사 | 단일 Trace, 사거리·시야·Cooldown 검증 |
-| `AI-WPN-03` | Shotgun Greybox 발사 | Pellet·Spread 분리, 단일 발사 판정 검증 |
+| `AI-WPN-02` | Rifle Greybox 발사 | **Done** — 단일 Visibility Trace, 장애물·사거리·Cooldown과 공용 계약 회귀 검증 |
+| `AI-WPN-03` | Shotgun Greybox 발사 | **Done** — 한 Trigger의 다중 Pellet, 결정적 Spread, 장애물·사거리·Cooldown 검증 |
 | `AI-MG-01` | MG Claim·Move | 두 AI 중 한 명만 MG에 도착 |
 | `AI-MG-02` | MG Occupy·Aim·Fire·Release | 사망·중단 뒤 다음 AI가 재점유 |
 | `AI-COVER-01` | 비점유 병사 엄폐 | MG 실패 병사가 Cover 지점 사용 |
 | `AI-VIS-01` | 외형·Animation 연결 | T Pose·손 위치·Root Motion 문제 없음 |
 
-`AI-SO-00 → AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01 → AI-PER-01 → AI-WPN-01`은 완료했다. 다음은 `AI-WPN-02`로, 공용 계약 뒤에 Rifle 단일 Trace·사거리·시야·Cooldown을 붙인다. Shotgun은 `AI-WPN-03`에서 같은 Trigger 계약의 두 번째 구현으로 추가한다.
+`AI-SO-00 → AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01 → AI-PER-01 → AI-WPN-01 → AI-WPN-02 → AI-WPN-03`은 완료했다. 다음은 `AI-MG-01`로, MG 사용 가능 Hostile 여러 명 중 한 명만 MGTurret 1-Slot을 Claim하고 이동하도록 만든다.
 
 ### Asset 재검증 명령
 
@@ -518,13 +518,14 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 - Hostile `DroneDetected`·`SearchLastKnownLocation` State와 감지·실종 Event 전환, Search 성공·실패의 순찰 복귀
 - Hostile만 반응하고 Friendly 루틴은 지속되는 `Drone.AI.NPCPerceptionSearchPIE`
 - `UDroneNPCWeaponComponent` 공용 호출과 Controller의 단일 Target Actor·Aim Point 전달 계약
+- Rifle 단일 Trace와 Shotgun 다중 Pellet·Spread, 장애물·사거리·Cooldown Greybox
 - Rifle·Shotgun 동일 경로, Friendly 비발사, Lost 정리를 검증하는 `Drone.AI.WeaponContract`와 NPC Greybox PIE
-- Game/Editor Build, AI 9/9 경고·오류 0, 전체 `Drone.` 25/25, 직전 Blueprint 0/0/0와 이번 NPC BP 로드 검증, LFS 검증
+- Game/Editor Build, AI 11/11, 전체 `Drone.` 27/27, Blueprint 0/0/0와 LFS 검증
 
 ### 아직 구현·수동 검증 필요
 
 - 최종 NPC 외형·Skeleton·Animation Blueprint 선택과 연결
-- Rifle·Shotgun 발사·피해·Animation·FX·SFX
+- Rifle·Shotgun Damage·탄약·재장전 상태·Animation·FX·SFX
 - MG 승하차·조준·사격 Animation과 Turret 제어
 - Cover와 전투 종료 뒤 통합 Return 실제 행동
 - 최종 맵에 NPC와 Smart Object 배치

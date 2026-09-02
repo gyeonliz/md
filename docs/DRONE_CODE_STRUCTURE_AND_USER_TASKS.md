@@ -1,10 +1,10 @@
 # Drone 현재 코드 구조와 사용자 확인 작업
 
-기준일: 2026-08-28 (Asia/Seoul)
+기준일: 2026-09-02 (Asia/Seoul)
 
 이 문서는 현재 Unreal `drone` 저장소를 직접 확인한 결과를 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
 
-TUT-03 완료 기능 Commit은 `551e287`이다. 공유 main은 AI-FRIEND-01 Merge `2fcfb04`이며, NPC Smart Object 기반, Definition·Station BP 6쌍, 역할별 NPC BP, 전용 Greybox 맵과 Hostile/Friendly 기본 이동 StateTree까지 구성돼 있다. 팀원 환경 맵·재질 변경과 정리 Merge `888414f`도 보존한다. 환경 Map은 후보 공간이며 Tutorial 기본 실행 구조를 바꾸지 않는다.
+TUT-03 완료 기능 Commit은 `551e287`이다. 현재 공유 main은 `0d92a5f`이며, NPC Smart Object 기반, Definition·Station BP 6쌍, 역할별 NPC BP, Hostile/Friendly StateTree, Perception/Search와 Rifle·Shotgun Greybox Trace까지 구성돼 있다. 팀원 환경 맵·재질 변경과 정리 Merge `888414f`도 보존한다. 환경 Map은 후보 공간이며 Tutorial 기본 실행 구조를 바꾸지 않는다.
 
 NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합됐다. 자산은 main에 있지만 프로젝트 소유 Widget Host는 아직 구현하지 않았으므로 화면에 나타나지 않는 것이 정상이다.
 
@@ -14,8 +14,8 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합�
 |---|---|
 | `DroneEditor Win64 Development` | Build 성공 |
 | `Drone.Tutorial` Automation | 7/7 통과 |
-| `Drone.AI` Automation | 7/7 통과, 경고·오류 0 |
-| 전체 `Drone.` Automation | 23/23 통과. 22개 무경고 성공, 기존 PIE RecastNavMesh 경고 포함 성공 1개 |
+| `Drone.AI` Automation | 11/11 통과. Rifle 빈 시험 World의 예상 RecastNavMesh 경고 1건 |
+| 전체 `Drone.` Automation | 27/27 통과, 실패 0 |
 | `CompileAllBlueprints` | Blueprint Errors 0, Blueprint warnings 0, failed load 0. 별도 Summary에 기존 Battlefield Pose GUID와 MCP 고지 경고 유지 |
 | 현재 에셋 이식 재검증 | FPV 전용 1/1, Blueprint 0/0/0, 스테이징 선택 자산·현재 Integration 금지 의존성 0, 이식 13개 LFS와 fsck 통과 |
 | 기존 Standalone 시각 기록 | FPV 외형, 고정 추적 Camera, 실제 WBP HUD, Cyan 안내선, Current/Inactive Gate 표시 확인 |
@@ -146,7 +146,7 @@ ADroneSmartObjectStation
       └─ MGTurret 1-Slot
 ```
 
-Hostile은 `ST_NPC_HostilePatrol`에서 EnemyPatrol만 검색하고 Friendly는 `ST_NPC_FriendlyBaseRoutine`에서 FriendlyBasePatrol/Ambient를 번갈아 검색한다. 두 Tree 모두 Smart Object Runtime 초기화 뒤 Claim·NavMesh 이동·대기·해제를 반복하며 1-Slot 배타 예약과 직전 지점 회피를 사용한다. `ADronePrototypePawn` 감지 시 Hostile 이동과 예약을 안전하게 중단하지만 Search·공격 상태로 전환하지는 않는다. `Rifle`과 `Shotgun` Profile 및 분기 Getter는 준비됐지만 실제 발사·Damage·Animation은 아직 없다.
+Hostile은 `ST_NPC_HostilePatrol`에서 EnemyPatrol을 검색하고 Friendly는 `ST_NPC_FriendlyBaseRoutine`에서 FriendlyBasePatrol/Ambient를 번갈아 검색한다. 두 Tree 모두 Smart Object Runtime 초기화 뒤 Claim·NavMesh 이동·대기·해제를 반복하며 1-Slot 배타 예약과 직전 지점 회피를 사용한다. `ADronePrototypePawn` 감지 시 Hostile은 이동·예약을 중단하고 개인 Rifle 또는 Shotgun Greybox Trace를 시작한다. 실종 뒤 마지막 위치를 3초 Search하고 순찰로 복귀하며 Friendly 루틴은 계속된다. 실제 Damage·탄약·Animation·FX·SFX는 아직 없다.
 
 Definition·Station Blueprint 6쌍과 역할별 NPC Blueprint 3종, Spawn Point BP, 전용 Greybox 맵, Hostile/Friendly StateTree가 생성됐다. Profile·Possess·역할 Tag·NavMesh 투영에 더해 Hostile 2명과 Friendly 2명이 각각 2회 이상 완료하고 서로 다른 2지점 이상을 방문하도록 자동 검증했다. Friendly는 Base Patrol과 Ambient를 모두 방문한다. 후속 감지·점유 순서는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md)를 따른다.
 
@@ -165,12 +165,17 @@ Source/Drone/
 │  ├─ DroneNPCSpawnPoint.h/.cpp
 │  ├─ DroneNPCNavigationFloor.h/.cpp
 │  ├─ DroneNPCPatrolStateTreeTasks.h/.cpp
+│  ├─ DroneNPCPerceptionStateTreeTasks.h/.cpp
 │  ├─ DroneAIStateTreeAuthoringLibrary.h/.cpp
 │  ├─ DroneSmartObjectStation.h/.cpp
 │  ├─ DroneSmartObjectReservationComponent.h/.cpp
+│  ├─ Weapons/DroneNPCWeaponComponent.h/.cpp
 │  └─ Tests/
 │     ├─ DroneSmartObjectFoundationTest.cpp
-│     └─ DroneNPCGreyboxAssetTest.cpp
+│     ├─ DroneNPCGreyboxAssetTest.cpp
+│     ├─ DroneNPCWeaponContractTest.cpp
+│     ├─ DroneNPCRifleTraceTest.cpp
+│     └─ DroneNPCShotgunTraceTest.cpp
 ├─ Prototype/
 │  ├─ DronePrototypeGameMode.h/.cpp
 │  ├─ DronePrototypePawn.h/.cpp
@@ -226,8 +231,9 @@ Source/Drone/
 | `EDroneTrainingLapRecordState` | `Idle`, `Recording`, `Completed` 기록 상태 표현 | Gate 시각 상태 표현 |
 | `FDroneNPCProfile` | NPC의 Friendly/Hostile 역할, Rifle/Shotgun 장비 종류와 MG 사용 가능 여부 | 최종 진영 설정, 무기 수치·피해·Animation |
 | `ADroneNPCCharacter` | 프로젝트 소유 NPC Character, Profile과 Smart Object User Component 소유 | 외형·Animation 확정, 행동 의사결정 |
-| `ADroneNPCAIController` | StateTree·Sight·예약 Component 소유, 역할별 Tree 시작, Hostile/Friendly 다음 Slot Claim과 방문 기록, 드론 감지 안전 중단·무기 분기 제공 | Search, Rifle/Shotgun/MG 발사 구현 |
-| `FDroneStateTree*PatrolSlotTask` | Hostile/Friendly Claim, 공용 NavMesh Move·Wait, 역할별 Release 실행 | Search·사격·Animation |
+| `ADroneNPCAIController` | StateTree·Sight·예약 Component 소유, 역할별 Tree 시작, Hostile/Friendly Slot Claim과 방문 기록, 드론 감지·Search·개인 무기 공용 호출 | MG/Cover 전환, Damage·Animation |
+| `FDroneStateTree*PatrolSlotTask` | Hostile/Friendly Claim, 공용 NavMesh Move·Wait, 역할별 Release 실행 | MG·Cover·Animation |
+| `UDroneNPCWeaponComponent` | Rifle 단일 Trace와 Shotgun 다중 Pellet·Spread, 사거리·Cooldown·Target/Aim Point·Timer 정리 | Damage·탄약·재장전 상태·Animation·FX·SFX |
 | `UDroneSmartObjectReservationComponent` | Activity/User Tag로 빈 Slot 검색·Claim·Release, 직전 위치 반경 회피 검색 | Animation, StateTree 상태 선택 |
 | `UDroneAIStateTreeAuthoringLibrary` | Editor에서 Hostile 순찰·Friendly 기지 루틴 StateTree 생성 및 Schema/상태/Task 검증 | 런타임 의사결정, 기존 Asset 덮어쓰기 |
 | `ADroneSmartObjectStation` | Definition이 연결될 프로젝트 소유 Host와 방향 Preview, Authoring Tool용 Definition·Mesh 연결 함수 | Interaction StateTree와 NPC 행동 실행 |
@@ -579,8 +585,8 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
 - 최종 Gate Mesh·VFX·SFX·Animation
 - 최종 코스 배치·크기·난이도
 - 배터리·통신거리·재밍 같은 후보 시스템
-- 감지 후 Search·Return과 순찰 복귀의 PIE 동작
-- Rifle 단일 Trace, Shotgun Pellet/Spread, Damage·재장전·Animation·FX·SFX
+- MG를 사용하지 않는 전투원의 Cover와 통합 Return
+- Rifle·Shotgun Damage·탄약·재장전 상태·Animation·FX·SFX
 - MG 이동·한 명 점유·조준·사격과 사망/중단 뒤 재점유
 - Cover·Search·Return 실제 행동
 

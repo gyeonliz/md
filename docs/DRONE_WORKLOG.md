@@ -18,21 +18,31 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-09-02 — Rifle Trace 구현 착수 및 MilitaryBase 강/도로 구조 확인
+마지막 갱신: 2026-09-02 — Rifle·Shotgun Greybox 사격 완료 및 원격 공유
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | Tutorial 두 Lap 수동 확인 대기 + NPC 기본 이동·Perception/Search·공용 Weapon 계약 완료 |
-| Unreal 기준선 | 공유 `origin/main=c7f116f`; 로컬 `main` Rifle Trace 코드·테스트 미커밋 |
-| 자동 검증 | Game/Editor Build, StateTree Validate, AI 9/9 경고·오류 0, 전체 `Drone.` 25/25, 직전 Blueprint 0/0/0와 이번 NPC BP 로드 검증, LFS fsck 성공 |
+| 전체 단계 | Tutorial 두 Lap 수동 확인 대기 + NPC 기본 이동·Perception/Search·Rifle/Shotgun Greybox 사격 완료 |
+| Unreal 기준선 | 공유 `main=origin/main=0d92a5f`, 작업 트리 Clean |
+| 자동 검증 | Game/Editor Build, AI 11/11·전체 `Drone.` 27/27, Blueprint 0 errors·0 warnings·0 failed loads, LFS fsck 성공. 전역 Summary의 기존 공급사/MCP 경고 29건은 별도 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | `AI-WPN-02` Rifle 단일 Trace·사거리·Cooldown 구현 및 자동화 결과 정리 |
+| 지금 작업 중 | 다음 카드 `AI-MG-01` MG 1-Slot Claim·Move 준비 |
 | 차단 조건 | 기능 코드의 기술 차단은 없음. OilRig 별도 Map Check가 장시간 완료되지 않아 Editor 수동 Map Check가 필요 |
-| 다음 행동 | `AI-WPN-02`에서 공용 계약 뒤에 Rifle 단일 Trace·사거리·시야·Cooldown Greybox 구현 |
-| 다음 기능 | `AI-WPN-02 → AI-WPN-03` |
-| 이후 | Rifle → Shotgun → MG → Cover/통합 |
-| Git 처리 | AI-PER-01·AI-WPN-01과 Unity 빌드 수정은 `431d1fe`까지 Push 완료. NPC Details 수정과 본 기록은 Stage·Commit·Push하지 않음 |
+| 다음 행동 | MG 사용 가능 Hostile만 MGTurret Activity 1-Slot을 Claim하고 이동하도록 StateTree Task·자동화 추가 |
+| 다음 기능 | `AI-MG-01 → AI-MG-02` |
+| 이후 | MG Claim/Move → Occupy/Aim/Fire/Release → Cover/통합 |
+| Git 처리 | Rifle·Shotgun과 Game 빌드용 테스트 경계 수정은 `0d92a5f`로 Unreal `origin/main`에 Push 완료. 본 문서도 별도 한글 커밋으로 Push |
 | 협업 Git | 환경 맵·재질 중앙 반영 및 검증 완료. 개인 `.vsconfig`·시험 주석 정리 완료. 팀원 PC Remote 실측만 남음 |
+
+## 2026-09-02 — AI-WPN-02 Rifle 확정·AI-WPN-03 Shotgun Greybox 사격
+
+- 최신 `98f67d0`에 들어온 Rifle Visibility 단일 Trace, 4,000cm 사거리, 0.25초 Cooldown과 `Drone.AI.RifleTrace`를 Editor에서 빌드했다. 전용 테스트는 개방 표적 명중, 장애물 차단, 사거리 밖 거부와 즉시 재발사 Cooldown을 통과했다.
+- 첫 전체 회귀에서는 수동 Sight Broadcast가 실제 Sight 반경을 적용하지 않아 기존 공용 Weapon 경로 테스트가 Rifle 사거리에서 실패했다. Rifle/Shotgun 전용 테스트가 사거리를 검증하도록 두고, 공용 경로 테스트에서는 시험용 사거리를 넓혀 Target/Aim Point 계약만 분리 검증했다. 수정 뒤 Rifle 기준 전체 26/26이 통과했다.
+- `AI-WPN-03`으로 Shotgun 1,600cm 사거리, 0.9초 Cooldown, 8 Pellet, 6도 원뿔 반각 Greybox를 같은 `UDroneNPCWeaponComponent`에 추가했다. 첫 Pellet은 중심, 나머지는 원뿔 가장자리에 균등 배치해 실행마다 같은 Spread를 재현한다.
+- `Drone.AI.ShotgunTrace`는 한 Trigger가 설정된 Pellet 수만큼 Trace를 만드는지, 0도 Spread 전탄 명중, 장애물 전탄 차단, 사거리 밖 거부, 즉시 재발사 Cooldown, Spread Endpoint 분리와 Rifle 코드 분리를 검증했다.
+- Game 빌드에서 Rifle/Shotgun 자동화가 Editor 전용 `AutomationEditorCommon` 헤더를 포함하던 기존 경계 오류를 발견했다. 두 테스트를 `WITH_DEV_AUTOMATION_TESTS && WITH_EDITOR`로 제한해 런타임 코드와 Editor 테스트를 분리했고 `Drone Win64 Development`와 `DroneEditor Win64 Development`가 모두 성공했다.
+- 최종 AI 11/11과 전체 `Drone.` 27/27이 성공했다. Rifle 테스트의 빈 World에서 RecastNavMesh가 없다는 예상 경고 1건만 있으며 실패는 0이다. `CompileAllBlueprints`는 0 errors / 0 Blueprint warnings / 0 failed loads이고 전역 Summary의 기존 Battlefield Pose GUID 28건과 MCP EULA 1건은 별도 경고다. `git lfs fsck`와 `git diff --check`도 통과했다.
+- Unreal 한글 Commit `0d92a5f` (`기능: 샷건 펠릿 사격과 무기 테스트 보강`)을 `origin/main`에 Push했다. 실제 Damage·탄약·Animation·FX·SFX는 미구현이며 다음 활성 카드는 `AI-MG-01`이다.
 
 ## 2026-09-02 — Rifle Trace 착수·MilitaryBase 강/도로 구조 확인
 
