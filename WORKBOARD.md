@@ -4,18 +4,18 @@
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 공유 기준선은 `origin/main=2fcfb04`다. 현재 로컬 `main` 작업 트리에서 `AI-PER-01`과 `AI-WPN-01`을 구현·검증했으며 아직 Commit·Push하지 않았다. 실제 Rifle Trace, Shotgun Pellet과 MG는 후속 카드다.
+Unreal 공유 기준선은 `origin/main=431d1fe`다. `AI-PER-01`·`AI-WPN-01`과 Generate 이후 Unity 빌드 수정까지 Push됐으며, 현재 로컬에는 NPC Details 선택 크래시 회피용 표시 메타데이터 변경 3개만 미커밋 상태다. 실제 Rifle Trace, Shotgun Pellet과 MG는 후속 카드다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-09-02 — AI-PER-01 수동 Pass와 AI-WPN-01 공용 Weapon 계약 완료
+마지막 갱신: 2026-09-02 — Friendly/Hostile NPC 선택 시 PropertyEditor 스택 오버플로 수정·화면 재검증
 
 | 항목 | 상태 |
 |---|---|
 | 현재 단계 | 3단계 Tutorial Vertical Slice 수동 확인 대기 + NPC 이동·Perception/Search·Weapon 호출 계약 완료 |
 | 진행 정도 | 기존 TUT-04B는 실제 두 Lap 확인 대기. `AI-SO-00`부터 `AI-PER-01`, `AI-WPN-01`까지 완료 |
-| 지금 작업 중 | `AI-WPN-01` 공용 Weapon Component와 Target/Aim Point 호출 계약 완료. 다음 기능은 `AI-WPN-02` Rifle Greybox Trace |
-| 완료 근거 | Game/Editor Build 성공, StateTree Validate, AI 9/9 경고·오류 0, 전체 `Drone.` 25/25(24 무경고+기존 PIE Recast 경고 포함 성공 1), 직전 Blueprint 0/0/0 및 이번 NPC BP 로드 검증, LFS fsck 통과 |
+| 지금 작업 중 | NPC 선택 크래시 수정 완료·Commit 대기. 다음 기능은 `AI-WPN-02` Rifle Greybox Trace |
+| 완료 근거 | 기존 Game/Editor Build·AI 9/9·전체 25/25 기준에 더해, Details 표시 메타데이터 단순화 후 DroneEditor 재빌드 성공. 사용자 Friendly 선택 Pass, MCP Hostile Rifle 선택 뒤 12초 이상 Editor 생존 확인 |
 | 수동 미확인 | Training 두 Lap 비교 HUD, OilRig Map Check·재질·조명·스케일·충돌·성능, Ground Drone/MG·NPC·Raw Drone 외형 채택 |
 | 현재 차단 | 기능 코드 차단 없음. OilRig 명령줄 Map Check가 약 8분 동안 맵 Construction에서 끝나지 않아 Editor 수동 확인 필요 |
 | 다음 행동 | `AI-WPN-02`에서 공용 계약 뒤에 Rifle 단일 Trace·사거리·시야·Cooldown을 Greybox 값으로 구현 |
@@ -24,7 +24,7 @@ Unreal 공유 기준선은 `origin/main=2fcfb04`다. 현재 로컬 `main` 작업
 | 맵 이식 | 기존 환경 3종에 `Lvl_OilRig`을 추가. Vendor FirstPerson Sample 의존성을 끌어오던 Door Actor 8개는 중앙 사본에서 제거 |
 | Editor/MCP | 모든 검사 프로세스 종료 확인. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
-| Git 처리 | Unreal 공유 기준은 `origin/main=2fcfb04`, 문서는 `main=origin/main=ae2d0c5`. 양쪽 로컬 `main`의 AI-PER-01·AI-WPN-01 변경은 Stage·Commit·Push하지 않음 |
+| Git 처리 | 사용자의 Push 뒤 Unreal `main=origin/main=431d1fe`, 문서 `main=origin/main=356d942`. NPC Details 크래시 수정 3개 Header와 본 기록은 로컬 미커밋 변경 |
 | 협업 Git | 팀원 환경 맵·재질은 중앙 `main`에 들어온 상태다. Battlefield의 새 `M_Enemy`·`M_Start`·`M_Target` 의존성과 세 중앙 맵 로드를 검증했고, `.vsconfig` 14.50 복원과 `//test` 제거를 별도 정리했다. 팀원 PC의 실제 Remote 구성 확인은 남음 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
 | 학습 다음 행동 | Q-Net 상태를 확인해 Track A/B/C를 고르고 첫 학습 블록 실행 |
@@ -127,8 +127,9 @@ Unreal 공유 기준선은 `origin/main=2fcfb04`다. 현재 로컬 `main` 작업
 | AI-NPC-01 | Drone / AI | `BP_NPC_Hostile_Rifle`, `BP_NPC_Hostile_Shotgun`, `BP_NPC_Friendly_Base`, `BP_NPCSpawnPoint`와 `Lvl_NPCSmartObjectGreybox` 생성. Rifle 1·Shotgun 1·Friendly 2명, Station 10개, 전용 Navigation Floor·Dynamic Recast를 구성하고 4명 Possess·역할 Tag·NavMesh 투영을 NPC 전용 2/2·전체 20/20·Blueprint 0/0/0으로 검증. Manny/Unarmed은 AI-VIS-01 전 임시 Greybox이며 StateTree·이동·사격은 미구현 |
 | AI-PATROL-01 | Drone / AI / Smart Object | `/Game/Drone/AI/StateTrees/ST_NPC_HostilePatrol`과 Native Claim·Move·Wait·Release Task를 구현했다. Hostile 2명이 EnemyPatrol Slot을 예약하고 NavMesh 이동·1초 대기·해제·다른 지점 재선택을 반복한다. Friendly 2명은 정지 상태를 유지한다. AI 6/6 경고·오류 0, 전체 22/22, Blueprint 0/0/0, Game/Editor Build와 LFS 검증 뒤 기능 `a721fe4`를 `095dda7`로 main 병합·Push. 드론 감지는 순찰을 안전 중단하지만 Search·사격 전환은 미구현 |
 | AI-FRIEND-01 | Drone / AI / Smart Object | `/Game/Drone/AI/StateTrees/ST_NPC_FriendlyBaseRoutine`과 Friendly Claim·공용 Move/Wait·Friendly Release Task를 구현했다. Friendly 2명이 `FriendlyBasePatrol`과 `Ambient`를 번갈아 Claim하고 서로 다른 지점 2개 이상을 방문한다. Smart Object 1-Slot Claim으로 동시 점유를 막는다. AI 7/7, 전체 23/23, Blueprint 0/0/0, Game/Editor Build와 LFS 검증 뒤 기능 `b5b733f`를 `2fcfb04`로 main 병합·Push. 생활 Animation과 드론 전투 반응은 미구현 |
-| AI-PER-01 | Drone / AI / StateTree | Hostile만 Sight Event에 반응해 이동·Claim을 중단하고 마지막 위치를 3초 Search한 뒤 순찰로 복귀한다. Friendly는 루틴을 지속한다. AI 8/8·전체 24/24 자동화와 2026-09-02 사용자 수동 화면 확인에서 정상 동작 Pass. 로컬 미커밋 |
-| AI-WPN-01 | Drone / AI / Combat | `UDroneNPCWeaponComponent`의 공용 `CanFire/StartFire/StopFire/Reload`, 단일 Target Actor·Aim Point 계약을 구현했다. Controller는 Rifle/Shotgun 분기 없이 `DetectedDrone`을 같은 경로로 전달하고 실종·UnPossess 때 발사를 정리한다. 실제 Trace·Damage·탄약은 후속 카드다. Game/Editor Build, AI 9/9, 전체 25/25 통과. 로컬 미커밋 |
+| AI-PER-01 | Drone / AI / StateTree | Hostile만 Sight Event에 반응해 이동·Claim을 중단하고 마지막 위치를 3초 Search한 뒤 순찰로 복귀한다. Friendly는 루틴을 지속한다. AI 8/8·전체 24/24 자동화와 2026-09-02 사용자 수동 화면 확인에서 정상 동작 Pass. `2054d6f`에 포함돼 Push 완료 |
+| AI-WPN-01 | Drone / AI / Combat | `UDroneNPCWeaponComponent`의 공용 `CanFire/StartFire/StopFire/Reload`, 단일 Target Actor·Aim Point 계약을 구현했다. Controller는 Rifle/Shotgun 분기 없이 `DetectedDrone`을 같은 경로로 전달하고 실종·UnPossess 때 발사를 정리한다. 실제 Trace·Damage·탄약은 후속 카드다. Game/Editor Build, AI 9/9, 전체 25/25 통과. `2054d6f`에 포함돼 Push 완료 |
+| AI-EDITOR-01 | Drone / AI / Unreal Editor | Friendly와 Hostile NPC Actor를 선택하면 `UnrealEditor_PropertyEditor`에서 `EXCEPTION_STACK_OVERFLOW`가 발생하던 문제를 공통 NPC Details 메타데이터 단순화로 해소. 런타임 API·기능은 유지하고 Profile 자동 인라인 표시와 다단계 Category만 제거했다. Editor Build, 사용자 Friendly 선택, MCP Hostile Rifle 선택 생존 검증 통과. 로컬 미커밋 |
 | SYNC-01 | Codex Sync | 목표·완료·진행·결정·미정·다음 작업 형식 정의 |
 | SYNC-02 | Codex Sync | `handoff.md` + `manifest.json` Export/Import 구현 |
 | SYNC-03 | Codex Sync | 인증·토큰·원시 세션 제외 기준과 검사 구현 |
@@ -137,7 +138,7 @@ Unreal 공유 기준선은 `origin/main=2fcfb04`다. 현재 로컬 `main` 작업
 
 ## 이번 인계의 정지선
 
-Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 공유 기준은 `origin/main=2fcfb04`다. 팀원 환경 변경과 AI-FRIEND-01까지의 원격 이력을 보존한다. AI-PER-01·AI-WPN-01은 로컬 `main`의 미커밋 작업이므로 Commit 전까지 공유 기준선으로 부르지 않는다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
+Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 공유 기준은 `origin/main=431d1fe`다. AI-PER-01·AI-WPN-01은 `2054d6f`, Generate 이후 Unity 빌드 수정은 `431d1fe`로 공유됐다. NPC Details 크래시 수정은 로컬 미커밋이므로 Commit 전까지 공유 기준선에 포함하지 않는다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
 
 Android 제외와 PFN-01~06, HUD-01, HUD-02, TUT-01~03, 최초 에셋 인수 감사 `AST-00`, 다른 PC의 `C:\에셋` 재검증 `AST-VERIFY-01`, NavigationArrows 최소 이식·원격 공유 `AST-02A`를 완료했다. `AST-01`의 실제 Loop 청감은 여전히 수동 미확인이다. 현재 main에는 TUT-04B 이전 평균·Best 비교와 기록 결과 HUD까지 구현됐으며 실제 두 Lap 표시 판정이 남았다. 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다.
 
@@ -149,4 +150,4 @@ UE-MCP-01도 완료했다. 이후 Editor 내부 Actor·Asset·Blueprint·UMG·Au
 - `AST-02A`의 기술 이식·검증·기능 Branch와 `main` Push는 완료했다. 실제 Training HUD 연결은 아직 하지 않았다.
 - HUD 연결 전에도 자산은 안전하게 로드 가능한 상태지만, 화면에 보이는 구현으로 과장하지 않는다.
 - 프로젝트 소유 맵은 `/Game/Drone/Maps` 한 곳에서 관리한다. 공급사 원본 맵을 추가할 때도 검토용 사본만 이 폴더에 두고 의존 자산은 각 ThirdParty 폴더에 유지한다.
-- TUT-04 실제 두 Lap 확인은 그대로 남긴다. `AI-PER-01`은 2026-09-02 사용자 수동 확인까지 Pass했고 `AI-WPN-01` 공용 계약도 완료했다. 현재 다음 기능은 `AI-WPN-02`다.
+- TUT-04 실제 두 Lap 확인은 그대로 남긴다. `AI-PER-01`과 `AI-WPN-01`은 Push 완료했고 NPC Details 선택 크래시도 로컬에서 수정·재검증했다. 현재 다음 기능은 `AI-WPN-02`다.

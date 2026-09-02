@@ -18,21 +18,30 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-09-02 — AI-PER-01 수동 Pass와 AI-WPN-01 공용 Weapon 계약 완료
+마지막 갱신: 2026-09-02 — Friendly/Hostile NPC Details 선택 크래시 수정·재검증
 
 | 구분 | 현재 상태 |
 |---|---|
 | 전체 단계 | Tutorial 두 Lap 수동 확인 대기 + NPC 기본 이동·Perception/Search·공용 Weapon 계약 완료 |
-| Unreal 기준선 | 공유 `origin/main=2fcfb04`; 로컬 `main` AI-PER-01·AI-WPN-01 미커밋 |
+| Unreal 기준선 | 공유 `origin/main=431d1fe`; 로컬 `main` NPC Details 선택 크래시 수정 3개 Header 미커밋 |
 | 자동 검증 | Game/Editor Build, StateTree Validate, AI 9/9 경고·오류 0, 전체 `Drone.` 25/25, 직전 Blueprint 0/0/0와 이번 NPC BP 로드 검증, LFS fsck 성공 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | `AI-WPN-01` 공용 Weapon 계약 구현·자동 검증·문서 반영 완료. 사용자 Commit 대기 |
+| 지금 작업 중 | NPC Details 선택 크래시 수정·화면 재검증 완료. 사용자 Commit 대기 |
 | 차단 조건 | 기능 코드의 기술 차단은 없음. OilRig 별도 Map Check가 장시간 완료되지 않아 Editor 수동 Map Check가 필요 |
 | 다음 행동 | `AI-WPN-02`에서 공용 계약 뒤에 Rifle 단일 Trace·사거리·시야·Cooldown Greybox 구현 |
 | 다음 기능 | `AI-WPN-02 → AI-WPN-03` |
 | 이후 | Rifle → Shotgun → MG → Cover/통합 |
-| Git 처리 | AI-PER-01·AI-WPN-01 코드·StateTree·문서 변경은 Stage·Commit·Push하지 않음 |
+| Git 처리 | AI-PER-01·AI-WPN-01과 Unity 빌드 수정은 `431d1fe`까지 Push 완료. NPC Details 수정과 본 기록은 Stage·Commit·Push하지 않음 |
 | 협업 Git | 환경 맵·재질 중앙 반영 및 검증 완료. 개인 `.vsconfig`·시험 주석 정리 완료. 팀원 PC Remote 실측만 남음 |
+
+## 2026-09-02 — Friendly/Hostile NPC 선택 PropertyEditor 크래시 수정
+
+- `Lvl_NPCSmartObjectGreybox`에서 Friendly 또는 Hostile NPC Actor를 선택하면 `UnrealEditor_PropertyEditor` 호출이 반복된 뒤 `EXCEPTION_STACK_OVERFLOW`로 Editor가 종료되는 현상을 사용자와 자동 선택으로 동일 재현했다. 맵 로드와 무선택 상태는 정상이므로 플레이 로직이 아니라 Details 패널 생성 경로로 범위를 좁혔다.
+- Friendly도 동일하게 재현돼 적 전용 Weapon이나 Hostile StateTree가 아니라 `ADroneNPCCharacter` 공통 Details 표시 경로 문제로 판정했다.
+- 공통 컴포넌트와 Weapon 진단값의 다단계 `Category`를 단일 카테고리로 바꾸고, `FDroneNPCProfile`의 `ShowOnlyInnerProperties` 자동 인라인 표시를 제거했다. 값·저장 구조·런타임 공개 API와 AI 동작은 변경하지 않았다.
+- `DroneEditor Win64 Development`가 MSVC 14.51.36256으로 성공했다. 사용자가 Friendly 선택 후 크래시가 없음을 확인했고, MCP로 `BP_NPC_Hostile_Rifle_C_0`을 정확히 선택한 뒤 12초 이상 Editor가 정상 생존했다.
+- 엔진 내부의 어느 단일 메타데이터가 직접 원인인지는 추가 격리하지 않았다. 현재 확정 범위는 공통 NPC Details 메타데이터 조합에서 재현됐고 표시 단순화 후 해소됐다는 것이다.
+- Unreal 변경은 `DroneNPCCharacter.h`, `DroneNPCProfileComponent.h`, `DroneNPCWeaponComponent.h` 3개이며 로컬 미커밋이다. 다음 기능 카드는 그대로 `AI-WPN-02` Rifle Greybox Trace다.
 
 ## 2026-09-02 — AI-PER-01 Hostile 감지·Search·순찰 복귀
 
@@ -56,6 +65,14 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 - 최종 `DroneEditor Win64 Development`와 `Drone Win64 Development` Build가 성공했다. AI `9/9`은 모두 무경고·무오류, 전체 `Drone.`은 `25/25`로 24개 무경고와 기존 `PIEInputLifecycle` RecastNavMesh 경고 포함 성공 1개다.
 - 이번 카드는 Blueprint 자산을 수정하지 않아 전체 Blueprint Compile을 반복하지 않았다. 직전 `0 errors / 0 warnings / 0 failed loads`와 이번 자동화의 NPC Blueprint 로드 성공을 기준으로 유지한다.
 - 공유 기준선은 `origin/main=2fcfb04`이며 Unreal·문서 로컬 `main`의 변경은 Stage·Commit·Push하지 않았다. 다음 활성 카드는 `AI-WPN-02` Rifle Greybox Trace다.
+
+## 2026-09-02 — Generate 이후 DroneEditor Unity 빌드 수정
+
+- 사용자가 AI-PER-01·AI-WPN-01과 문서를 Push해 Unreal `main=origin/main=2054d6f`, 문서 `main=origin/main=356d942`가 됐다.
+- 생성 폴더를 정리하고 프로젝트 파일을 다시 만든 뒤 Editor 자동 컴파일에서 `DroneNPCPatrolStateTreeTasks.cpp`와 `DroneNPCPerceptionStateTreeTasks.cpp`의 익명 Namespace 헬퍼 `GetDroneController`가 Unity Translation Unit 안에서 중복 정의되는 오류를 확인했다.
+- Perception 파일의 헬퍼를 `GetPerceptionDroneController`로 고유화했다. 런타임 API나 동작은 바꾸지 않았다.
+- Generate가 `.vsconfig`의 세부 MSVC Component를 UE 5.8 권장 14.50으로 갱신했다. 실제 Build는 설치된 MSVC 14.51.36256을 사용했고 비선호 버전 주의 메시지만 남긴 채 `DroneEditor Win64 Development`가 성공했다.
+- 이 수정과 `.vsconfig` 자동 갱신, 본 기록은 새 로컬 미커밋 변경이다.
 
 ## 2026-08-28 — 팀원 환경 변경 검증·정리와 AI-FRIEND-01
 
