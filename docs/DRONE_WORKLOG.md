@@ -18,21 +18,29 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-09-02 — Friendly/Hostile NPC Details 선택 크래시 수정·재검증
+마지막 갱신: 2026-09-02 — Rifle Trace 구현 착수 및 MilitaryBase 강/도로 구조 확인
 
 | 구분 | 현재 상태 |
 |---|---|
 | 전체 단계 | Tutorial 두 Lap 수동 확인 대기 + NPC 기본 이동·Perception/Search·공용 Weapon 계약 완료 |
-| Unreal 기준선 | 공유 `origin/main=431d1fe`; 로컬 `main` NPC Details 선택 크래시 수정 3개 Header 미커밋 |
+| Unreal 기준선 | 공유 `origin/main=c7f116f`; 로컬 `main` Rifle Trace 코드·테스트 미커밋 |
 | 자동 검증 | Game/Editor Build, StateTree Validate, AI 9/9 경고·오류 0, 전체 `Drone.` 25/25, 직전 Blueprint 0/0/0와 이번 NPC BP 로드 검증, LFS fsck 성공 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | NPC Details 선택 크래시 수정·화면 재검증 완료. 사용자 Commit 대기 |
+| 지금 작업 중 | `AI-WPN-02` Rifle 단일 Trace·사거리·Cooldown 구현 및 자동화 결과 정리 |
 | 차단 조건 | 기능 코드의 기술 차단은 없음. OilRig 별도 Map Check가 장시간 완료되지 않아 Editor 수동 Map Check가 필요 |
 | 다음 행동 | `AI-WPN-02`에서 공용 계약 뒤에 Rifle 단일 Trace·사거리·시야·Cooldown Greybox 구현 |
 | 다음 기능 | `AI-WPN-02 → AI-WPN-03` |
 | 이후 | Rifle → Shotgun → MG → Cover/통합 |
 | Git 처리 | AI-PER-01·AI-WPN-01과 Unity 빌드 수정은 `431d1fe`까지 Push 완료. NPC Details 수정과 본 기록은 Stage·Commit·Push하지 않음 |
 | 협업 Git | 환경 맵·재질 중앙 반영 및 검증 완료. 개인 `.vsconfig`·시험 주석 정리 완료. 팀원 PC Remote 실측만 남음 |
+
+## 2026-09-02 — Rifle Trace 착수·MilitaryBase 강/도로 구조 확인
+
+- Unreal `origin/main=c7f116f`까지 사용자가 저장·Push했고 두 저장소 모두 작업 트리가 깨끗한 상태에서 재개했다.
+- `AI-WPN-02` 코드에 Rifle Visibility 단일 Trace, 4,000cm 시험 사거리, 0.25초 Cooldown, 장애물 차단·디버그 선·상태 정리를 추가하고 `Drone.AI.RifleTrace` 자동화 테스트를 작성했다. Editor 빌드는 성공했으나 전용 테스트 결과 로그는 다음 확인 대상이다.
+- `Lvl_MilitaryBase`의 강은 WaterBody가 아니라 `Landscape` 내부 `SM_RiverBank` SplineMesh 166개와 물 재질 슬롯으로 구성된다. 강 반사광은 별도 `MI_DecalCaustic_Inst` 9개 및 Wetness Decal 계열이며, Sphere Reflection Capture 9개도 별도로 존재한다.
+- 도로는 별도 Road Actor가 아니라 Landscape 높이/재질 레이어 방식으로 보이며 `rockyPath`, `forrestPath`, `brownMud` Target Layer를 Paint/Layer Debug로 확인하는 절차를 정리했다. 맵 삭제·저장은 수행하지 않았다.
+- 다음 확인: Rifle 전용 자동화 결과 판정 후 장애물·사거리·Cooldown이 모두 통과하면 `AI-WPN-02`를 완료하고, 실패 시 코드만 수정한다.
 
 ## 2026-09-02 — Friendly/Hostile NPC 선택 PropertyEditor 크래시 수정
 

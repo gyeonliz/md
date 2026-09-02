@@ -8,23 +8,23 @@ Unreal 공유 기준선은 `origin/main=431d1fe`다. `AI-PER-01`·`AI-WPN-01`과
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-09-02 — Friendly/Hostile NPC 선택 시 PropertyEditor 스택 오버플로 수정·화면 재검증
+마지막 갱신: 2026-09-02 — Rifle Trace 구현 착수 및 MilitaryBase 강/도로 구조 확인
 
 | 항목 | 상태 |
 |---|---|
 | 현재 단계 | 3단계 Tutorial Vertical Slice 수동 확인 대기 + NPC 이동·Perception/Search·Weapon 호출 계약 완료 |
 | 진행 정도 | 기존 TUT-04B는 실제 두 Lap 확인 대기. `AI-SO-00`부터 `AI-PER-01`, `AI-WPN-01`까지 완료 |
-| 지금 작업 중 | NPC 선택 크래시 수정 완료·Commit 대기. 다음 기능은 `AI-WPN-02` Rifle Greybox Trace |
+| 지금 작업 중 | `AI-WPN-02` Rifle 단일 Trace·사거리·Cooldown 구현 및 자동화 검증 |
 | 완료 근거 | 기존 Game/Editor Build·AI 9/9·전체 25/25 기준에 더해, Details 표시 메타데이터 단순화 후 DroneEditor 재빌드 성공. 사용자 Friendly 선택 Pass, MCP Hostile Rifle 선택 뒤 12초 이상 Editor 생존 확인 |
 | 수동 미확인 | Training 두 Lap 비교 HUD, OilRig Map Check·재질·조명·스케일·충돌·성능, Ground Drone/MG·NPC·Raw Drone 외형 채택 |
 | 현재 차단 | 기능 코드 차단 없음. OilRig 명령줄 Map Check가 약 8분 동안 맵 Construction에서 끝나지 않아 Editor 수동 확인 필요 |
-| 다음 행동 | `AI-WPN-02`에서 공용 계약 뒤에 Rifle 단일 Trace·사거리·시야·Cooldown을 Greybox 값으로 구현 |
+| 다음 행동 | `Drone.AI.RifleTrace` 결과 확인 후 장애물·사거리·Cooldown 통과 시 `AI-WPN-02` 완료 처리 |
 | 다음 기능 | `AI-WPN-02 → AI-WPN-03`; Rifle을 먼저 검증한 뒤 Shotgun Pellet·Spread를 같은 Trigger 계약에 연결 |
 | 에셋 인수 | `C:\에셋` 원본은 보존. ArmyVFX·InfantrySFX·Ground Drone·NPC 외형·Raw Drone을 정확한 의존성 묶음으로 이식 |
 | 맵 이식 | 기존 환경 3종에 `Lvl_OilRig`을 추가. Vendor FirstPerson Sample 의존성을 끌어오던 Door Actor 8개는 중앙 사본에서 제거 |
 | Editor/MCP | 모든 검사 프로세스 종료 확인. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
-| Git 처리 | 사용자의 Push 뒤 Unreal `main=origin/main=431d1fe`, 문서 `main=origin/main=356d942`. NPC Details 크래시 수정 3개 Header와 본 기록은 로컬 미커밋 변경 |
+| Git 처리 | Unreal `main=origin/main=c7f116f`, 문서 `main=origin/main=f4ebe1d`. 추가 Rifle 코드·테스트와 본 기록은 로컬 미커밋 |
 | 협업 Git | 팀원 환경 맵·재질은 중앙 `main`에 들어온 상태다. Battlefield의 새 `M_Enemy`·`M_Start`·`M_Target` 의존성과 세 중앙 맵 로드를 검증했고, `.vsconfig` 14.50 복원과 `//test` 제거를 별도 정리했다. 팀원 PC의 실제 Remote 구성 확인은 남음 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
 | 학습 다음 행동 | Q-Net 상태를 확인해 Track A/B/C를 고르고 첫 학습 블록 실행 |
