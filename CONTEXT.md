@@ -1,6 +1,6 @@
 # 작업컴 Codex/GPT 기준 컨텍스트
 
-기준일: 2026-09-02 (Asia/Seoul)
+기준일: 2026-09-03 (Asia/Seoul)
 
 이 문서는 메인컴 ChatGPT/Codex에서 진행하던 작업을 작업컴에서 이어가기 위한 기준 컨텍스트다. 추측해서 내용을 추가하지 않고, 사용자가 실제 진행 상황을 알려준 경우에만 상태를 갱신한다.
 
@@ -108,6 +108,28 @@ J3C는 실제 계약된 발주처가 아니다. 프로젝트 콘셉트상의 가
 
 ## 5. 드론 프로젝트 핵심 방향
 
+2026-09-03 확정 Front-end 흐름:
+
+```text
+게임 실행
+→ 시작 트레일러
+→ 로비
+→ 미션 레벨 선택 + 측면 미션 설명
+→ 하단 시작
+→ 미션 트레일러
+→ 미션 맵 진입
+→ Drone 선택
+→ Mission 시작 + 측면 목표 UI
+→ 성공/실패 결과
+```
+
+- 사람 Player Character 조작은 취소한다.
+- 로비에서 NPC에게 걸어가 대화해 Mission을 받지 않는다.
+- Operator↔Drone 실시간 전환을 만들지 않는다.
+- 적 NPC와 Smart Object 전투는 Mission Map 내부 요소로 유지한다.
+- 세계관·UI 참고 Figma는 읽기 전용이며 Unreal 구현 사실의 근거로 사용하지 않는다.
+- 상세 실행 기준은 [`docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)다.
+
 - 드론 운용
 - 정찰
 - 침투
@@ -117,7 +139,7 @@ J3C는 실제 계약된 발주처가 아니다. 프로젝트 콘셉트상의 가
 - 귀환
 - 평가
 
-예상 게임 루프:
+Mission 내부 게임 루프:
 
 Briefing → Recon → Detect → Information acquisition → Enemy response → Mission → Egress → Evaluation
 
@@ -425,7 +447,7 @@ Inbox → Todo → Doing → Done
 
 ### 1순위: Tutorial Vertical Slice와 기능 우선 Greybox
 
-`TUT-04 비교·결과 UI → Flight 상태 → Operator↔Drone → NPC·Mission UI Story Shell → AI/MG/Jamming → 에셋 적용` 순서로 진행한다. TUT-03에서 Lap 시작·완료, Segment/Lap Timing, 10Hz 위치 표본 기반 이동 거리와 평균 속도 원본까지 구현했다. 이전 성공 평균·Best 비교와 화면 표시는 아직 구현하지 않았으며 TUT-04 범위다. 상세 기준은 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다.
+TUT-04 비교·결과 UI는 기술 구현됐고 실제 두 Lap 확인이 남았다. 2026-09-03 이후 신규 기능은 `FLOW-01 상태·Mission/Drone 데이터 → 시작 트레일러·로비 → 미션 선택/설명 → 미션 트레일러·맵 → Drone 선택 → Mission/목표 UI → AI/MG/Jamming` 순서로 진행한다. 사람 Operator와 NPC 대화 수령 흐름은 만들지 않는다. 상세 기준은 `docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`를 따른다.
 
 ### 병행: PC 간 공유 검증
 
@@ -460,7 +482,7 @@ Inbox → Todo → Doing → Done
 
 ## 25. 현재 작업 기준
 
-- 실제 Git·코드·설정·실행 로그를 최우선 근거로 삼고, 상태는 `WORKBOARD.md`, 현재 실행 순서는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다. 기존 Preasset 계획은 카드 번호와 에셋 교체 경계 참고용으로 유지한다.
+- 실제 Git·코드·설정·실행 로그를 최우선 근거로 삼고, 상태는 `WORKBOARD.md`, Front-end/Mission 실행 순서는 `docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`, Tutorial·조작 기준은 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다. 기존 Preasset 계획은 카드 번호와 에셋 교체 경계 참고용으로 유지한다.
 - 새 생산 코드는 `Source/Drone`, 새 자산은 `/Game/Drone` 아래에 둔다.
 - ThirdPerson·Combat·Platforming·SideScrolling은 참고용 Legacy로 동결한다. 신규 상속·참조를 만들지 않고 Vertical Slice 전에는 삭제하지 않는다.
 - Prototype IMC의 등록·제거 책임은 Pawn 한 곳에만 둔다. PlayerController나 Level Blueprint에 중복 등록하지 않는다.
@@ -477,7 +499,7 @@ Inbox → Todo → Doing → Done
 - Tutorial은 비충돌 Spline 안내선과 순서형 원형 Gate를 따라 비행하는 훈련 모드다.
 - 상시 HUD에는 속도·고도·수직 속도·Heading을 표시한다.
 - Gate마다 Segment Time과 실제 이동 거리 기준 평균 속도를 계산하고 이전 성공 기록 평균·Best 대비 ± 차이를 표시한다.
-- Story는 Operator Character, NPC 대화, Mission 안내 UI, Operator↔Drone 화면/Possess 전환을 포함한다.
+- 당시 Story는 Operator Character, NPC 대화와 Operator↔Drone 전환을 포함하도록 계획했으나 2026-09-03 기획 변경으로 이 항목은 폐기됐다. 현재는 로비 미션 선택과 맵 내 Drone 선택 흐름을 사용한다.
 - Jamming은 신호 경고 → HUD Noise → 조작/통신 저하의 재현 가능한 단계형 규칙으로 만든다.
 - 제공 Drone 에셋은 기능 부모로 상속하지 않고 `/Game/Drone` 아래 Integration Blueprint에서 Visual만 교체한다.
 

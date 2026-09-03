@@ -363,4 +363,4 @@ PFN-06 Done
 → TUT-04 이전 기록 비교·Best·결과 UI
 ```
 
-이후 순서는 `TUT-04 결과 UI → Flight 상태 → Operator↔Drone → Story NPC·Mission·Jamming → Enemy AI/MG → 에셋 통합`이다.
+이후 순서는 `TUT-04 수동 확인 병행 → FLOW-01 상태·Mission/Drone 데이터 → 시작 트레일러·로비·미션 선택 → 미션 트레일러·Map·Drone 선택·목표 UI → Flight 실패·Jamming → Enemy AI/MG·에셋 통합`이다. 사람 Operator와 NPC 대화 수령 흐름은 2026-09-03 폐기됐다.

@@ -18,23 +18,59 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-09-03 — 전투 비주얼 자산 호환성 감사와 Blueprint 이벤트 경계 완료
+마지막 갱신: 2026-09-03 — 프로젝트 통합 기획·개발 현황서 작성
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | Tutorial 두 Lap 수동 확인 대기 + 전투 Greybox 확장 |
-| Unreal 기준선 | 공유 `main=origin/main=249d6cd`; AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01·AI-VIS-01A 로컬 미커밋 |
-| 자동 검증 | 공유 기준선은 전체 27/27·Blueprint 0/0/0·LFS 성공. 최신 로컬은 Editor Build, 무기 집중 테스트 3/3과 비주얼 자산 감사 통과 |
+| 전체 단계 | Front-end Mission Flow 기준 확정 + Tutorial/Smart Object 수동 확인 대기 |
+| Unreal 기준선 | 공유 `main=origin/main=6a18210`; Smart Object C++·테스트 7개와 `SO_Def_FriendlyBasePatrol` 1개 로컬 수정 |
+| 자동 검증 | DroneEditor Build 성공. Slot Yaw 직접 판정을 포함한 SmartObjectFoundationDefaults·NPCPerceptionSearchPIE 2/2 성공, 경고·오류 0. Definition/BP 6쌍 Validate 성공 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | 다음 후보 `AI-VIS-01B` 실제 Mesh·Animation·FX·SFX 연결 |
-| 차단 조건 | Shotgun Weapon Mesh 후보가 확인되지 않았다. Soldier/Insurgent는 Manny와 Skeleton이 달라 최종 외형에 Retarget 검증 필요 |
-| 다음 행동 | Manny Rifle Animation/AR4로 임시 Rifle 표현을 연결하고 MG Muzzle 기준을 Editor에서 확인. Shotgun Mesh는 후보 확보 뒤 진행 |
-| 다음 기능 | `AI-VIS-01B` |
-| 이후 | 전투 Animation·FX·SFX와 최종 Mission 실패 화면 |
-| Git 처리 | 마지막 Push는 `249d6cd`. 이후 Unreal 코드와 문서는 사용자 요청대로 로컬 미커밋 유지 |
+| 지금 작업 중 | `FLOW-00` 새 화면 흐름과 개발 순서 문서화 완료. Unreal 신규 Flow 코드는 미착수 |
+| 차단 조건 | FLOW 구현 차단 없음. 기존 `AI-SO-TUNE-01` Unreal 로컬 변경을 새 기능과 섞지 않도록 먼저 검토 필요 |
+| 다음 행동 | Smart Object 방향을 화면 확인하고 사용자 Commit 범위를 정리한 뒤 `FLOW-01` 상태·Mission/Drone 데이터 계약 시작 |
+| 다음 기능 | `FLOW-01 → FLOW-06` 한 Mission·한 Drone Front-end Vertical Slice |
+| 이후 | 결과/재시도, Flight 실패 연결, AI/MG·Jamming과 실제 비주얼 통합 |
+| Git 처리 | Unreal 8개와 문서·도구 로컬 변경을 유지. Commit·Push는 사용자가 수행 |
 | 협업 Git | 환경 맵·재질 중앙 반영 및 검증 완료. 개인 `.vsconfig`·시험 주석 정리 완료. 팀원 PC Remote 실측만 남음 |
 
+## 2026-09-03 — 프로젝트 통합 기획·개발 현황서
+
+- 새 [`DRONE_PROJECT_PLANNING_BRIEF.md`](DRONE_PROJECT_PLANNING_BRIEF.md)에 세계관·플레이어 역할, 확정 Front-end 흐름, Tutorial/Story Mission, 한글 UI 수치, 구현/미구현, 폐기/보존, 기술 구조, Map 활용, FLOW-01~08 로드맵, 검증, 역할 분리와 보류 결정을 한 문서로 정리했다.
+- 진행상황은 실제 `main=origin/main=6a18210`, Unreal 로컬 Smart Object 변경 8개와 기존 빌드·자동화·수동 미확인 기록을 기준으로 작성했다.
+- Figma는 세계관·UI 방향 참고로만 구분하고 사람 Operator 조작이 구현된 것으로 표현하지 않았다.
+- 이번 작업은 Markdown만 변경했고 Unreal Build·PIE·Asset 변경은 수행하지 않았다.
+
+## 2026-09-03 — 사람 Operator 폐기와 Front-end Mission Flow 확정
+
+- 사용자가 사람 Player Character 구상을 취소하고 새 흐름을 `게임 실행 → 시작 트레일러 → 로비 → 미션 레벨 선택 → 측면 미션 설명 → 하단 시작 → 미션 트레일러 → Map 진입 → Drone 선택 → Mission 시작 → 측면 목표 UI`로 확정했다.
+- 기존 Operator↔Drone Possess/Camera 전환과 로비 NPC 대화 Mission 수령 카드는 폐기했다. 아직 해당 생산 코드를 만들지 않았으므로 제거할 Unreal 구현은 없다.
+- 기존 Drone 조작·Telemetry·Tutorial 기록과 적 NPC·Smart Object·Rifle/Shotgun·MG·Cover·체력 기능은 Mission Map 내부 기능으로 재사용한다. 아군 NPC 생활 루틴은 보존하지만 Front-end 선행조건에서는 제외했다.
+- 새 최우선 계획 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)에 영속 Flow 상태, Mission/Drone Data Asset, 화면별 책임, Content 경계, `FLOW-00~08` 카드와 3회 반복 검증을 기록했다.
+- 첫 Vertical Slice는 기존 `Lvl_DroneTraining`을 한 개 Tutorial Mission으로 등록하고 한 개 Drone만 허용해 흐름을 검증한다. MilitaryCamp·MilitaryBase·Battlefield 연결은 이 골격 뒤에 진행한다.
+- Figma `Project:Droner`는 세계관과 UI 분위기 참고용으로 읽었고 수정하지 않았다. 최종 제목 통일은 보류했다.
+- 이번 작업은 MD 기준선만 변경했다. Unreal Source·Asset·Build·PIE 결과는 추가하지 않았으며 새 Flow가 구현됐다고 표시하지 않는다.
+
+## 2026-09-03 — AI-SO-TUNE-01 Smart Object 배치·방향 조정 보강
+
+- 실제 수정 위치를 맵 Actor, Station Blueprint, Smart Object Definition, StateTree, C++ Station/Reservation/Controller/Task로 나눠 `DRONE_SMART_OBJECT_NPC_GUIDE.md` 상단에 빠른 표와 Editor 배치 절차를 추가했다.
+- `SlotFacingPreview`를 `SmartObjectComponent` 아래에 부착해 Blueprint에서 Slot Offset을 조정할 때 Cyan 화살표도 같은 Transform을 따르게 했다.
+- `ADroneNPCAIController::AlignPawnToReservedSlot()`을 추가해 예약 Slot의 Yaw를 Pawn과 Control Rotation에 적용했다. 순찰·아군 활동 공용 이동, Cover, MG 도착 경로에서 호출한다. Pitch/Roll은 지면 Character 기울어짐 방지를 위해 적용하지 않는다.
+- Smart Object Foundation 기본 계약에 Preview의 Attach Parent 검증을 추가했다.
+- Smart Object Setup Wrapper는 하드코딩된 C 드라이브 경로 대신 문서 저장소와 같은 상위 폴더의 `drone/Drone.uproject`를 자동 계산한다.
+- 첫 Build 시 Unreal Editor가 `D:\JGY\project\drone\Drone.uproject`로 실행 중임을 확인해 저장되지 않은 작업 보호를 위해 강제 종료하지 않았다. 사용자 종료 뒤 `DroneEditor Win64 Development` Build가 성공했다.
+- `NPCPerceptionSearchPIE`에 Pawn Yaw와 예약 Slot Yaw의 1도 이내 비교를 추가했다. MG 점유와 Cover 점유 경로를 직접 판정하며 `SmartObjectFoundationDefaults`의 Preview Parent 계약과 함께 2/2 성공, 경고·오류 0이다.
+- 자동 계산 Wrapper로 Definition/BP 6쌍을 `Validate`해 모두 역할·Tag·Definition·MG Mesh 계약과 일치했다. 이제 Editor 화면에서 Cyan 화살표와 실제 NPC 도착 방향만 확인하면 `AI-SO-TUNE-01`을 Done으로 옮길 수 있다.
+- 최종 Git 확인에서 `SO_Def_FriendlyBasePatrol`이 5,493 bytes에서 5,750 bytes로 바뀐 LFS 객체를 확인했다. 사용자 Editor 종료 저장인지 Headless 재직렬화인지 확정할 수 없어 변경을 삭제하지 않고 보존했다. 변경된 Definition 상태로 후속 NPC PIE가 통과했으며 Commit 전 Slot 설정을 Editor에서 확인한다.
+
 ## 2026-09-03 — AI-MG-02 Occupy·Aim·Fire·Release 핵심
+
+### 2026-09-03 공유 기준선 재확인
+
+- 사용자가 전투 Greybox와 표현 이벤트 변경을 Commit·Push해 Unreal `main=origin/main=6a18210`, 문서 `main=origin/main=2c99f00`이며 두 작업 트리가 Clean임을 확인했다.
+- `6a18210`에는 AI-MG-02, HP-01, AI-COVER-01, AI-COMBAT-END-01, AI-AMMO-01, AI-VIS-01A에 해당하는 코드·StateTree·Greybox Map 변경이 포함된다.
+- 각 기능의 단계별 Editor Build와 집중 테스트 결과는 유지한다. 이 대형 Commit 이후 전체 `Drone.` 회귀·Blueprint 전체 Compile·LFS 검증은 새로 실행하지 않았으므로 완료 근거를 과장하지 않는다.
+- 다음 구현 후보는 `AI-VIS-01B`: Manny Rifle 임시 표현과 MG FX/SFX 연결이다. Shotgun Mesh와 최종 Soldier/Insurgent 외형은 후보·Retarget 확인 전까지 미정이다.
 
 ### AI-VIS-01A 자산 호환성 감사·Blueprint 표현 이벤트
 
@@ -43,7 +79,7 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 - Modular Soldier/Insurgent는 Manny와 Skeleton이 직접 일치하지 않고 이식된 두 Root의 Animation Asset은 각각 0개다. 따라서 최종 진영 외형과 Retarget 결과를 확인하기 전에는 역할 Blueprint에 강제 적용하지 않았다.
 - `UDroneNPCWeaponComponent`에 Blueprint용 `OnWeaponFired(WeaponType, TraceStart, AimPoint)`와 `OnReloadCompleted(WeaponType, CurrentAmmo, Capacity)`를 추가했다. Rifle은 Trace당 1회, Shotgun은 Volley당 1회이며 실패/거절 요청은 방송하지 않는다.
 - `DroneEditor Win64 Development`와 WeaponContract·RifleTrace·ShotgunTrace 3/3이 통과했다. 전체 자동화·Blueprint Compile·LFS는 반복하지 않았다.
-- 현재 Unreal 변경은 `git status --porcelain -uall` 기준 30개 파일, 문서 저장소는 12개 파일이며 모두 로컬 미커밋이다.
+- `6a18210` Push 전 당시 Unreal 변경은 `git status --porcelain -uall` 기준 30개 파일, 문서 저장소는 12개 파일이며 모두 로컬 미커밋이었다.
 
 ### AI-AMMO-01 Rifle·Shotgun 탄창·재장전
 

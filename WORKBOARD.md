@@ -4,27 +4,30 @@
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 공유 기준선은 `origin/main=249d6cd`다. MG 1-Slot Claim·Move까지 Push됐고, AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01·AI-VIS-01A는 로컬 미커밋 상태다. 실제 Mesh·Animation·FX·SFX 연결은 후속 작업이다.
+Unreal 공유 기준선은 `origin/main=6a18210`다. MG 점유·사격·사망 교대, NPC/Drone 체력, Cover, Drone 파괴 교전 종료, 탄창·재장전과 AI-VIS-01A 표현 이벤트까지 Push됐다. 실제 Mesh·Animation·FX·SFX 연결은 후속 작업이다.
+
+2026-09-03 게임 흐름은 `실행 → 시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → 맵 → Drone 선택 → Mission 시작/측면 목표 UI`로 변경됐다. 사람 Operator 조작·NPC 대화 수령·Operator↔Drone 전환은 폐기하며 [`docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 최우선 실행 기준으로 사용한다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-09-03 — 전투 비주얼 자산 호환성 감사와 Blueprint 이벤트 경계 완료
+마지막 갱신: 2026-09-03 — Front-end Mission Flow와 전체 기획·개발 현황 통합 문서화
 
 | 항목 | 상태 |
 |---|---|
-| 현재 단계 | 3단계 Tutorial Vertical Slice 수동 확인 대기 + 전투 Greybox 확장 |
-| 진행 정도 | 전투 Greybox와 `AI-VIS-01A` 자산 감사·BP 발사/재장전 이벤트까지 완료. Unreal 변경 30개 파일 로컬 미커밋 |
-| 지금 작업 중 | 다음 후보 `AI-VIS-01B` — Manny 기반 Rifle 임시 표현과 MG FX/SFX 연결, Shotgun 외형은 후보 확보 뒤 진행 |
-| 완료 근거 | Editor Development Build 성공. WeaponContract·RifleTrace·ShotgunTrace 3/3 통과. 비주얼 감사에서 후보 로드·Skeleton·Animation/Weapon Mesh 수량 확인 |
+| 현재 단계 | Front-end·Mission 진입 흐름 재기획 완료 + Tutorial/Smart Object 기존 수동 확인 대기 |
+| 진행 정도 | 전투 Greybox와 `AI-VIS-01A`까지 Push. `AI-SO-TUNE-01` 로컬 구현·자동 검증 뒤, 사람 Operator 없는 새 화면 흐름과 FLOW-00~08 카드를 문서화 |
+| 지금 작업 중 | `FLOW-00` 문서 기준선 완료. 신규 Unreal 구현은 아직 시작하지 않았으며 다음 활성 카드는 `FLOW-01` |
+| 완료 근거 | 새 사용자 흐름, 폐기 범위, 재사용 기능, 상태·데이터·UI 책임과 반복 검증 조건을 계획/보드/상태/컨텍스트에 반영하고 `DRONE_PROJECT_PLANNING_BRIEF.md`로 통합. 이번 변경은 문서만 수정했으므로 새 Build·PIE 근거는 없음 |
 | 수동 미확인 | Training 두 Lap 비교 HUD, OilRig Map Check·재질·조명·스케일·충돌·성능, Ground Drone/MG·NPC·Raw Drone 외형 채택 |
-| 현재 차단 | 지급/프로젝트 자산에서 이름으로 식별되는 Shotgun Weapon Mesh가 0개다. Soldier/Insurgent는 Manny와 Skeleton이 달라 최종 외형 적용 전 Retarget 검증이 필요 |
-| 다음 행동 | 기존 Manny Rifle Animation 38개와 AR4 Rifle 후보를 임시 Rifle 표현에 연결하고, MG 후보의 Muzzle 기준을 Editor에서 확인 |
-| 다음 기능 | `AI-VIS-01B`; `OnWeaponFired`·`OnReloadCompleted`에 Animation·FX·SFX를 연결. Shotgun 실제 Mesh와 최종 진영 외형은 미정 유지 |
+| 현재 차단 | FLOW 설계 차단 없음. Unreal 작업 트리에 `AI-SO-TUNE-01` 8개 변경이 남아 있어 새 기능 변경과 Commit 범위를 섞지 않도록 먼저 검토 필요 |
+| 다음 행동 | 기존 Smart Object 방향 변경을 Editor에서 수동 확인하고 사용자가 Commit 범위를 정리한 뒤 `FLOW-01` 상태·Mission/Drone 데이터 계약 착수 |
+| 다음 기능 | `FLOW-01 → FLOW-02~06`으로 한 Mission·한 Drone Front-end Vertical Slice. `AI-VIS-01B`는 Mission 흐름 뒤 실제 전투 표현 단계로 이동 |
 | 에셋 인수 | `C:\에셋` 원본은 보존. ArmyVFX·InfantrySFX·Ground Drone·NPC 외형·Raw Drone을 정확한 의존성 묶음으로 이식 |
 | 맵 이식 | 기존 환경 3종에 `Lvl_OilRig`을 추가. Vendor FirstPerson Sample 의존성을 끌어오던 Door Actor 8개는 중앙 사본에서 제거 |
-| Editor/MCP | 모든 검사 프로세스 종료 확인. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
+| Editor/MCP | Build·Headless 검증 뒤 모든 Unreal Editor 프로세스 종료. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
-| Git 처리 | 마지막 Push는 Unreal `249d6cd`. 이후 Unreal 코드와 문서는 사용자 요청대로 로컬 미커밋 유지 |
+| Git 처리 | Unreal `main=origin/main=6a18210` 위 Smart Object C++·테스트 7개와 `SO_Def_FriendlyBasePatrol` 1개, 문서 `main=origin/main=2c99f00` 위 기존 로컬 변경과 새 Front-end Flow 문서 변경이 미커밋. Commit·Push는 사용자가 수행 |
+| UI/기획 참고 | Figma `Project:Droner`는 세계관·청록/녹색 HUD·경고 아이콘 참고용으로만 읽음. Figma는 수정하지 않았고 게임 제목 통일은 보류 |
 | 협업 Git | 팀원 환경 맵·재질은 중앙 `main`에 들어온 상태다. Battlefield의 새 `M_Enemy`·`M_Start`·`M_Target` 의존성과 세 중앙 맵 로드를 검증했고, `.vsconfig` 14.50 복원과 `//test` 제거를 별도 정리했다. 팀원 PC의 실제 Remote 구성 확인은 남음 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
 | 학습 다음 행동 | Q-Net 상태를 확인해 Track A/B/C를 고르고 첫 학습 블록 실행 |
@@ -38,22 +41,35 @@ Unreal 공유 기준선은 `origin/main=249d6cd`다. MG 1-Slot Claim·Move까지
 | PF-01 | Portfolio | 데모 기능별 기록 시작 | 첫 재현 가능한 Drone 기능 완료 |
 | DR-FUTURE-01 | Drone | 배터리·통신·재밍·멀티 후보 평가 | Flight MVP 이후 |
 | PFN-P2 | Drone | Flight MVP 카드 PFN-07~14 활성화 | Tutorial Vertical Slice 통과 |
-| PFN-P3 | Drone | Mission Shell 카드 PFN-15~21 활성화 | PFN-14 통과 |
+| PFN-P3 | Drone | Mission Runtime 카드 PFN-15~21 활성화 | FLOW-06과 PFN-14 통과 |
 | PFN-P4 | Drone / Unreal | Enemy AI·Turret 카드 PFN-22~32 활성화 | PFN-21 통과 |
 | PFN-P5 | Drone / Unreal | 통합 Greybox 카드 PFN-33~38 활성화 | PFN-32 통과 |
-| CTRL-02 | Drone / Story | Operator↔Drone Possess·Camera 전환 | Tutorial Vertical Slice 통과 |
-| STY-01 | Drone / Story | NPC 대화·Mission UI Story Shell | CTRL-02 통과 |
+| FLOW-02 | Drone / Front-end | 시작 트레일러 → 로비 | FLOW-01 통과 |
+| FLOW-03 | Drone / Front-end / UI | 미션 선택·측면 설명·하단 시작 | FLOW-02 통과 |
+| FLOW-04 | Drone / Front-end / Mission | 미션 트레일러 → 선택 Map 로드 | FLOW-03 통과 |
+| FLOW-05 | Drone / Mission / UI | Map 진입 뒤 Drone 선택·Spawn/Possess | FLOW-04 통과 |
+| FLOW-06 | Drone / Mission / UI | Mission 시작과 측면 목표 UI | FLOW-05 통과 |
+| FLOW-07 | Drone / Mission / UI | 성공·실패 결과, 재도전·로비 복귀 | FLOW-06 통과 |
+| FLOW-08 | Drone / Front-end / Test | 전체 흐름 새 실행 3회 반복 | FLOW-07 통과 |
 | PFN-P6 | Drone / Unreal | 에셋 교체 준비 카드 PFN-39~43 활성화 | PFN-38 완료 + 최신 PFN-37 결과 3회 Pass |
 | ASSET-GATE-01 | Drone / Unreal | 구매 소스 후보 비교와 구매 결정 | Greybox Vertical Slice 3회 Pass와 차단 결함 0건 |
 | PHY-DF-00 | Drone / Physics / Unreal | Dataflow·Chaos Physics Sandbox | TUT-04 완료 또는 사용자 우선순위 변경 후 별도 Branch에서 Plugin·Build·회귀 검증 |
 | PHY-NET-01 | Drone / Physics | 일부 고정 그물 Cloth Spike | PHY-DF-00 + Flight Collision 기준 완료 |
 | PHY-DST-01 | Drone / Physics / Mission | 선택형 Geometry Collection 파괴 Spike | PHY-DF-00 + Damage/Crash Event 기준 완료 |
 
+## 폐기된 계획
+
+| ID | 기존 계획 | 처리 |
+|---|---|---|
+| CTRL-02 | 사람 Operator↔Drone Possess·Camera 전환 | 2026-09-03 기획 변경으로 폐기. Drone 선택 확정 뒤 단일 Drone Pawn을 Spawn/Possess |
+| STY-01 | 로비에서 Operator가 NPC와 대화해 Mission 수령 | 2026-09-03 기획 변경으로 폐기. 로비 미션 목록·측면 설명·하단 시작 버튼으로 대체 |
+
 ## Todo
 
 | ID | 태그 | 작업 | 완료 조건 |
 |---|---|---|---|
 | GIT-10 | Git / Unreal | 다른 PC Clone과 실행 | LFS 포함 Clone 후 UE 5.8.1에서 열림 |
+| FLOW-01 | Drone / Front-end / Data | Flow 상태와 Mission/Drone Data Asset 계약 | 한 Mission·한 Drone을 ID로 선택·검증하고 잘못된 ID와 중복 전환을 안전하게 거부 |
 | GIT-TEAM-01 | Git / Unreal / 협업 | 팀원 PC 원격 규칙 확인 | 환경 맵·재질 중앙 반영과 개인 설정 정리는 완료. 팀원 PC에서 `origin`/`upstream` 또는 `origin`/`fork`, `pushurl`을 실제 확인 |
 | SYNC-04 | Codex Sync | 두 PC 간 실제 수동 인계 시험 | Git 흐름과 문맥 패키지 흐름을 각각 완료 |
 | TUT-04 | Drone / Tutorial / UI | 비교 결과 수동 판정 | 두 번 완주해 첫 기준 생성과 두 번째 이전 평균·Best·부호를 실제 HUD에서 확인 |
@@ -72,12 +88,15 @@ Unreal 공유 기준선은 `origin/main=249d6cd`다. MG 1-Slot Claim·Move까지
 | TUT-04A | Drone / Tutorial / UI | 한글 비행·구간 통계 HUD와 Course Authoring 보강 | 병합 main Build·전체 15/15·BP 0/0/0 통과. PIE에서 한글 HUD 두 패널·현재 Gate·세분화 코스 선 초기 렌더 확인 | Gate 0→3 실제 한 Lap 뒤 최근·완료 구간 숫자 갱신 확인 |
 | TUT-04B | Drone / Tutorial / UI | 이전 평균·Best·Delta 결과 | 현재 시도 제외 평균, 첫 기준, Best와 Segment 비교, Blueprint Event, HUD 네 행 구현. Build·16/16 통과 | 실제 두 Lap에서 표시 값과 부호 확인 |
 | AST-05 | Drone / Unreal / Asset | 남은 제공 에셋 선별 라이브러리 | ThirdParty 891개와 `Lvl_OilRig` 1개. 수량·대표 로드·외부/누락 0 | Editor 시각·성능·Map Check와 실제 채택 후보 결정 |
+| AI-SO-TUNE-01 | Drone / AI / Smart Object | 배치·Offset·Definition·검색·StateTree 조정 가이드와 Slot 도착 방향 적용 | `SlotFacingPreview`를 SmartObjectComponent에 부착하고 Controller가 예약 Slot Yaw를 Pawn·ControlRotation에 적용. DroneEditor Build, Slot Yaw 판정 포함 자동화 2/2, Definition/BP 6쌍 Validate 통과. `SO_Def_FriendlyBasePatrol` 재직렬화/사용자 저장 가능 변경은 보존 | `Lvl_NPCSmartObjectGreybox`에서 Cyan 화살표와 순찰·Cover·MG 도착 방향의 화면 일치 확인. Definition 변경은 Commit 전 Editor에서 의도한 Slot 설정인지 확인 |
 
 ## Done
 
 | ID | 태그 | 검증 결과 |
 |---|---|---|
 | WM-01 | 전체 관리 | 이 파일에 Inbox/Todo/Doing/Done과 일곱 분류 태그 사용 가능 |
+| FLOW-00 | Drone / Front-end / Planning | 새 실행 흐름, 사람 Operator 폐기, Mission/Drone 데이터·UI 책임과 FLOW-01~08 검증 순서를 문서 기준선으로 확정 |
+| PLAN-01 | Drone / Planning | 세계관·화면 흐름·Tutorial/Story·UI·구현 현황·기술 구조·로드맵·검증·보류 결정을 통합 기획서로 정리 |
 | ENV-01 | Unreal | 작업컴 UE 5.8.1 설치 확인 |
 | GIT-01 | Git | Git 2.53.0.windows.3 실행 확인 |
 | GIT-02-CHECK | Git | 초기 점검 당시 전역 Git 이름과 이메일이 없었던 상태를 확인 |
@@ -129,12 +148,12 @@ Unreal 공유 기준선은 `origin/main=249d6cd`다. MG 1-Slot Claim·Move까지
 | AI-WPN-02 | Drone / AI / Combat | Rifle Visibility 단일 Trace, 4,000cm Greybox 사거리, 0.25초 Cooldown과 반복 Timer를 구현했다. 장애물·사거리·Cooldown 전용 테스트와 기존 공용 Target/Aim Point 계약 회귀를 통과하고 Game용 테스트의 Editor 의존성도 차단했다. `0d92a5f` 기준 공유 완료 |
 | AI-WPN-03 | Drone / AI / Combat | Shotgun 1,600cm·0.9초·8 Pellet·6도 반각 Greybox를 구현했다. 한 Trigger의 다중 Trace, 결정적 Spread, 장애물·사거리·Cooldown과 Rifle 코드 분리를 자동 검증했다. Game/Editor Build, AI 11/11·전체 27/27, Blueprint 0/0/0, LFS fsck 뒤 `0d92a5f`로 Push 완료 |
 | AI-MG-01 | Drone / AI / Smart Object | Hostile 감지 StateTree에 MG 1-Slot Claim·NavMesh 이동·도착 뒤 예약 유지 상태를 추가했다. MG 사용 가능 Rifle Hostile 정확히 1명과 예약 1개, Shotgun 개인 무기 Fallback, Friendly 비무장을 PIE로 검증했다. Game/Editor Build, AI 11/11·전체 27/27, Blueprint 0/0/0, LFS fsck 뒤 `249d6cd`로 Push 완료 |
-| AI-MG-02 | Drone / AI / Smart Object | MG Claim을 Occupied로 바꾸고 Aim Pivot·6,000cm/0.15초 Trace·발당 8 Damage를 연결했다. 사수 사망·DroneLost·중단 시 Slot을 Free로 만들고 감지 중인 다른 MG 가능 Hostile이 재점유한다. Editor Build와 관련 PIE 1/1 통과, 로컬 미커밋 |
-| HP-01 | Drone / Combat / UI | NPC·Drone 공통 `UDroneHealthComponent` 기본 100/100, 0 이하 사망 1회, 추가 Damage 무시를 구현했다. Rifle 10·Shotgun 적중 Pellet당 8·MG 8 피해와 NPC/Drone 정지 규칙, 우측 상단 Drone 체력 HUD를 연결했다. 관련 AI PIE·HUD 테스트 각 1/1 통과, 로컬 미커밋 |
-| AI-COVER-01 | Drone / AI / Smart Object | MG Claim 실패 뒤 Cover 1-Slot을 Claim해 이동·Occupied 전환 후 개인 무기 사격한다. Greybox Map에 Cover Station 2개를 추가했고, MG 사망 뒤 Cover 병사가 Slot을 해제하고 MG를 재점유한다. Editor Build·StateTree/Map 갱신 검증·관련 PIE 1/1 통과, 로컬 미커밋 |
-| AI-COMBAT-END-01 | Drone / AI / Mission | Drone 체력 0에서 Blueprint `OnDroneDestroyed`를 한 번 보내고 Perception Source를 해제한다. 감지 중인 살아 있는 Hostile의 개인 무기·MG·Cover·이동·마지막 위치를 정리해 Search 없이 Patrol로 복귀시킨다. 사망 Hostile·Friendly 무반응과 중복 Damage Event 방지를 확장 PIE 1/1로 검증, 로컬 미커밋 |
-| AI-AMMO-01 | Drone / AI / Combat | Rifle 30발·Shotgun 8발 Greybox 탄창, Trace/Volley당 한 발 소모, 빈 탄창 발사 정지·거부, 명시적 즉시 Reload와 AI 자동 요청 경계를 구현했다. 예비 탄약·시간·Animation은 미정. Editor Build와 WeaponContract·Rifle·Shotgun·NPC 교전 집중 테스트 통과, 로컬 미커밋 |
-| AI-VIS-01A | Drone / AI / Assets | 읽기 전용 감사에서 Manny Rifle Animation 38개·FPS Weapon Mesh 70개·이름으로 식별되는 Shotgun Mesh 0개를 확인했다. Soldier/Insurgent는 Manny와 Skeleton이 다르고 각 이식 Root Animation은 0개다. Weapon Component에 BP `OnWeaponFired`·`OnReloadCompleted`를 추가하고 Build·무기 집중 테스트 3/3 통과, 로컬 미커밋 |
+| AI-MG-02 | Drone / AI / Smart Object | MG Claim을 Occupied로 바꾸고 Aim Pivot·6,000cm/0.15초 Trace·발당 8 Damage를 연결했다. 사수 사망·DroneLost·중단 시 Slot을 Free로 만들고 감지 중인 다른 MG 가능 Hostile이 재점유한다. Editor Build와 관련 PIE 1/1 통과, `6a18210` Push 포함 |
+| HP-01 | Drone / Combat / UI | NPC·Drone 공통 `UDroneHealthComponent` 기본 100/100, 0 이하 사망 1회, 추가 Damage 무시를 구현했다. Rifle 10·Shotgun 적중 Pellet당 8·MG 8 피해와 NPC/Drone 정지 규칙, 우측 상단 Drone 체력 HUD를 연결했다. 관련 AI PIE·HUD 테스트 각 1/1 통과, `6a18210` Push 포함 |
+| AI-COVER-01 | Drone / AI / Smart Object | MG Claim 실패 뒤 Cover 1-Slot을 Claim해 이동·Occupied 전환 후 개인 무기 사격한다. Greybox Map에 Cover Station 2개를 추가했고, MG 사망 뒤 Cover 병사가 Slot을 해제하고 MG를 재점유한다. Editor Build·StateTree/Map 갱신 검증·관련 PIE 1/1 통과, `6a18210` Push 포함 |
+| AI-COMBAT-END-01 | Drone / AI / Mission | Drone 체력 0에서 Blueprint `OnDroneDestroyed`를 한 번 보내고 Perception Source를 해제한다. 감지 중인 살아 있는 Hostile의 개인 무기·MG·Cover·이동·마지막 위치를 정리해 Search 없이 Patrol로 복귀시킨다. 사망 Hostile·Friendly 무반응과 중복 Damage Event 방지를 확장 PIE 1/1로 검증, `6a18210` Push 포함 |
+| AI-AMMO-01 | Drone / AI / Combat | Rifle 30발·Shotgun 8발 Greybox 탄창, Trace/Volley당 한 발 소모, 빈 탄창 발사 정지·거부, 명시적 즉시 Reload와 AI 자동 요청 경계를 구현했다. 예비 탄약·시간·Animation은 미정. Editor Build와 WeaponContract·Rifle·Shotgun·NPC 교전 집중 테스트 통과, `6a18210` Push 포함 |
+| AI-VIS-01A | Drone / AI / Assets | 읽기 전용 감사에서 Manny Rifle Animation 38개·FPS Weapon Mesh 70개·이름으로 식별되는 Shotgun Mesh 0개를 확인했다. Soldier/Insurgent는 Manny와 Skeleton이 다르고 각 이식 Root Animation은 0개다. Weapon Component에 BP `OnWeaponFired`·`OnReloadCompleted`를 추가하고 Build·무기 집중 테스트 3/3 통과, `6a18210` Push 포함 |
 | AI-EDITOR-01 | Drone / AI / Unreal Editor | Friendly와 Hostile NPC Actor를 선택하면 `UnrealEditor_PropertyEditor`에서 `EXCEPTION_STACK_OVERFLOW`가 발생하던 문제를 공통 NPC Details 메타데이터 단순화로 해소. 런타임 API·기능은 유지하고 Profile 자동 인라인 표시와 다단계 Category만 제거했다. Editor Build, 사용자 Friendly 선택, MCP Hostile Rifle 선택 생존 검증 통과 후 원격 공유 완료 |
 | SYNC-01 | Codex Sync | 목표·완료·진행·결정·미정·다음 작업 형식 정의 |
 | SYNC-02 | Codex Sync | `handoff.md` + `manifest.json` Export/Import 구현 |
@@ -144,9 +163,9 @@ Unreal 공유 기준선은 `origin/main=249d6cd`다. MG 1-Slot Claim·Move까지
 
 ## 이번 인계의 정지선
 
-Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 공유 기준은 `origin/main=249d6cd`다. AI-PER-01·AI-WPN-01, NPC Details 수정, Rifle·Shotgun Greybox 사격과 MG Claim·Move가 원격에 포함됐다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
+Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 공유 기준은 `origin/main=6a18210`다. AI-PER-01부터 AI-VIS-01A까지의 전투 Greybox와 표현 이벤트가 원격에 포함됐다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
 
-Android 제외와 PFN-01~06, HUD-01, HUD-02, TUT-01~03, 최초 에셋 인수 감사 `AST-00`, 다른 PC의 `C:\에셋` 재검증 `AST-VERIFY-01`, NavigationArrows 최소 이식·원격 공유 `AST-02A`를 완료했다. `AST-01`의 실제 Loop 청감은 여전히 수동 미확인이다. 현재 main에는 TUT-04B 이전 평균·Best 비교와 기록 결과 HUD까지 구현됐으며 실제 두 Lap 표시 판정이 남았다. 이후 상세 순서와 Tutorial/Story 범위는 `docs/DRONE_TUTORIAL_STORY_PLAN.md`가 우선한다.
+Android 제외와 PFN-01~06, HUD-01, HUD-02, TUT-01~03, 최초 에셋 인수 감사 `AST-00`, 다른 PC의 `C:\에셋` 재검증 `AST-VERIFY-01`, NavigationArrows 최소 이식·원격 공유 `AST-02A`를 완료했다. `AST-01`의 실제 Loop 청감은 여전히 수동 미확인이다. 현재 main에는 TUT-04B 이전 평균·Best 비교와 기록 결과 HUD까지 구현됐으며 실제 두 Lap 표시 판정이 남았다. 이후 상세 순서는 `docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`, Tutorial·조작 기준은 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다.
 
 UE-MCP-01도 완료했다. 이후 Editor 내부 Actor·Asset·Blueprint·UMG·Automation 작업은 가능한 범위에서 공식 Unreal MCP를 우선 사용하되, Experimental 기능이므로 실제 Git diff·빌드·자동화 로그를 최종 판정 기준으로 유지한다.
 
@@ -156,4 +175,4 @@ UE-MCP-01도 완료했다. 이후 Editor 내부 Actor·Asset·Blueprint·UMG·Au
 - `AST-02A`의 기술 이식·검증·기능 Branch와 `main` Push는 완료했다. 실제 Training HUD 연결은 아직 하지 않았다.
 - HUD 연결 전에도 자산은 안전하게 로드 가능한 상태지만, 화면에 보이는 구현으로 과장하지 않는다.
 - 프로젝트 소유 맵은 `/Game/Drone/Maps` 한 곳에서 관리한다. 공급사 원본 맵을 추가할 때도 검토용 사본만 이 폴더에 두고 의존 자산은 각 ThirdParty 폴더에 유지한다.
-- TUT-04 실제 두 Lap 확인은 그대로 남긴다. `AI-PER-01`부터 `AI-MG-01`까지 Push 완료했고 현재 다음 기능은 `AI-MG-02`다.
+- TUT-04 실제 두 Lap 확인은 그대로 남긴다. `AI-PER-01`부터 `AI-VIS-01A`까지 Push 완료했고 현재 신규 기능은 `FLOW-01`이다. `AI-VIS-01B`는 Mission 흐름 뒤로 이동했다.

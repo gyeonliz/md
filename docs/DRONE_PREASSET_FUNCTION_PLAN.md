@@ -1,6 +1,6 @@
 # 구매 소스 확보 전 Drone 기능 우선 개발 계획
 
-기준일: 2026-08-24 (Asia/Seoul)
+기준일: 2026-09-03 (Asia/Seoul)
 
 > 이 문서는 에셋 확보 전 수립한 기능 우선 계획이다. 현재 D 드라이브 작업 PC의 제공 에셋은 `D:\JGY\project\Unreal_260821`에 있으며 FPV 외형·Loop 최소 이식까지 완료했지만, 기능 우선 순서와 Greybox 기준은 그대로 유지한다.
 
@@ -24,7 +24,7 @@ Spawn
 
 구매 소스가 예상보다 늦어져도 이 사이클까지는 Placeholder만으로 완성할 수 있게 한다.
 
-사용자가 Tutorial과 Story 구성을 확정한 뒤의 최신 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)가 우선한다. 이 문서는 기존 PFN 카드, Placeholder 원칙과 에셋 교체 경계를 보존하는 참고 기준이다.
+사용자가 Tutorial과 Mission 구성을 확정한 뒤의 최신 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)가 우선하며, 실행→트레일러→로비→미션 선택→브리핑→맵→Drone 선택→Mission 시작의 상세 구조는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 따른다. 이 문서는 기존 PFN 카드, Placeholder 원칙과 에셋 교체 경계를 보존하는 참고 기준이다.
 
 ## 2. 현재 출발점
 
@@ -143,16 +143,16 @@ P1. 입력·BP·Greybox 시험장
   ↓
 P2. Telemetry HUD + Tutorial Vertical Slice (TUT-01~03 완료, TUT-04 비교·결과 UI 진행 예정)
   ↓
-P3. Flight 상태 + Operator ↔ Drone
+P3. Flight 상태 + Front-end Flow
   ↓
-P4. NPC·Mission UI Story Shell
+P4. 로비·미션 선택·브리핑·Drone 선택·목표 UI
   ↓
 P5. Enemy AI + MG + Jamming
   ↓
 P6. 통합 Greybox + 에셋 교체 준비
 ```
 
-기존 PFN 번호는 유지하지만 실제 활성화 순서는 Tutorial에서 조작·Telemetry·기록 UI를 먼저 검증한 뒤 Story의 Operator·NPC·Mission·Jamming으로 확장한다.
+기존 PFN 번호는 역사·의존성 추적을 위해 유지한다. 실제 활성화 순서는 Tutorial에서 조작·Telemetry·기록 UI를 검증한 뒤 Front-end Flow와 Mission/Drone 데이터 계약을 만들고, 사람 Operator나 NPC 대화 없이 Mission·Jamming·전투로 확장한다.
 
 경진대회 마감일과 팀원별 주간 투입 시간이 현재 문서에 확정되어 있지 않으므로 주차별 완료일은 임의로 만들지 않는다. 우선 모든 작업을 1~3시간 카드로 운영하고, 일정이 정해지면 이 의존 순서를 유지한 채 주차 계획으로 배치한다.
 
@@ -206,7 +206,9 @@ P6. 통합 Greybox + 에셋 교체 준비
 
 현재 `UFloatingPawnMovement`와 수치는 기능 시험용이다. 이 단계의 통과가 최종 물리 확정을 뜻하지 않는다.
 
-## 9. P3 — 최소 Mission Shell
+## 9. P3 — Front-end와 최소 Mission Shell
+
+PFN-15~21의 Mission Runtime 앞에 `FLOW-01~06`을 둔다. 로비에서 선택한 Mission과 Map 안에서 선택한 Drone을 확정한 뒤에만 기존 Mission 상태를 시작한다. 사람 Operator·NPC 대화·Character↔Drone 전환은 범위에서 제외한다.
 
 | ID | 작업 | 예상 크기 | 의존성 | 완료 조건 |
 |---|---|---:|---|---|
@@ -374,11 +376,13 @@ PFN-01~05 Done
 → TUT-01 Training Course/Spline Done
 → TUT-02 Gate·순서·정방향 Done
 → TUT-03 Segment/Lap 원본 기록 Done
-→ TUT-04 결과 UI
-→ Take Off·Landing·Crash
-→ Operator↔Drone와 NPC·Mission UI
+→ TUT-04 결과 UI 기술 구현 Done · 실제 두 Lap 수동 확인 대기
+→ FLOW-01 Flow 상태·Mission/Drone 데이터 계약
+→ 시작 트레일러·로비·미션 선택·측면 설명·하단 시작
+→ 미션 트레일러·맵 진입·Drone 선택·Mission 목표 UI
+→ Take Off·Landing·Crash를 Mission 실패/귀환에 연결
 → Enemy AI·MG·Jamming
 → 통합 Greybox·에셋 교체 준비
 ```
 
-현재는 TUT-03 Segment/Lap 원본 기록까지 통과했으므로 TUT-04 이전 기록 비교·Best·결과 UI부터 Tutorial Vertical Slice를 이어간다. 비교 규칙과 화면 표시를 검증한 뒤 Take Off와 Landing 상태 구현으로 넘어간다. 외부 구매 에셋은 이 순서의 선행 조건이 아니며 Android는 현재 범위에서 제외한다.
+현재는 TUT-04 비교·결과 UI 기술 구현까지 완료했고 실제 두 Lap 화면 확인이 남았다. 새 신규 기능은 `FLOW-01`이며 한 Mission·한 Drone Greybox 데이터로 전체 진입 흐름을 먼저 세운다. 외부 구매 에셋과 완성 트레일러 영상은 선행 조건이 아니고 정적 대체 화면으로 상태 전환을 검증할 수 있다. Android는 현재 범위에서 제외한다.

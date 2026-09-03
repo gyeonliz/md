@@ -4,7 +4,58 @@
 
 이 문서는 적군 순찰과 드론 발견 대응, 소총·샷건 분기, 기지 아군 NPC의 생활·순찰 이동, 한 명만 사용하는 MG Turret을 같은 기반 위에 구성하기 위한 실전 가이드다.
 
-현재 단계는 **MG·체력·사망 교대·Cover·Drone 파괴 교전 종료와 Rifle/Shotgun 탄창까지 로컬 구현한 상태**다. `ST_NPC_HostilePatrol`은 MGTurret을 먼저 시도하고 실패한 Hostile은 Cover 1-Slot으로 이동해 개인 무기로 대응한다. 사수가 사망하면 Cover 병사가 자기 Slot을 놓고 빈 MG를 재Claim할 수 있다. Cover도 없으면 제자리 개인 무기로 대응하며, 실종 Event 뒤에는 모든 Slot을 정리하고 3초 Search 후 순찰로 복귀한다. Drone이 파괴되면 Search 없이 즉시 전투 자원을 정리하고 Patrol로 돌아간다. 예비 탄약·재장전 시간·생활/전투 Animation·FX·SFX와 최종 사망 연출은 아직 완성된 기능이 아니다.
+현재 공유 기준선 `6a18210`에는 **MG·체력·사망 교대·Cover·Drone 파괴 교전 종료와 Rifle/Shotgun 탄창**까지 반영돼 있다. `ST_NPC_HostilePatrol`은 MGTurret을 먼저 시도하고 실패한 Hostile은 Cover 1-Slot으로 이동해 개인 무기로 대응한다. 사수가 사망하면 Cover 병사가 자기 Slot을 놓고 빈 MG를 재Claim할 수 있다. Cover도 없으면 제자리 개인 무기로 대응하며, 실종 Event 뒤에는 모든 Slot을 정리하고 3초 Search 후 순찰로 복귀한다. Drone이 파괴되면 Search 없이 즉시 전투 자원을 정리하고 Patrol로 돌아간다. 예비 탄약·재장전 시간·생활/전투 Animation·FX·SFX와 최종 사망 연출은 아직 완성된 기능이 아니다.
+
+## 바로 찾는 수정 위치
+
+Smart Object는 하나의 파일만 고치는 기능이 아니다. **장소**, **검색·예약 규칙**, **행동 순서**, **맵 배치**를 분리해 수정한다.
+
+| 바꾸려는 내용 | 수정 위치 | 조정 방법 |
+|---|---|---|
+| 지점의 월드 위치·방향 | `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox` 또는 적용할 실제 맵 | 배치된 `BP_SO_*` Actor를 이동·회전한다. Cyan 화살표 `+X`가 NPC 도착 방향이다 |
+| Mesh와 NPC 대기 위치 사이 Offset | `/Game/Drone/AI/SmartObjects/Blueprints/BP_SO_*` | Blueprint Viewport에서 상속된 `SmartObjectComponent`의 상대 Location·Rotation을 조정한다. `SlotFacingPreview`가 같이 움직인다 |
+| Slot 수·Activity Tag·Behavior | `/Game/Drone/AI/SmartObjects/Definitions/SO_Def_*` | Definition Editor의 Slots에서 수정한다. 현재 프로젝트 계약은 역할별 Slot 1개·Activity Tag 1개다 |
+| 역할·Definition·MG Mesh 연결 | `/Game/Drone/AI/SmartObjects/Blueprints/BP_SO_*` | Class Defaults의 `Activity`, Smart Object Definition, MG Mesh를 맞춘다 |
+| MG 사거리·발사 간격·피해·총구 Offset | `BP_SO_MGTurret` Class Defaults | `Drone > AI > MG`의 Range, Cooldown, Damage, Muzzle Offset을 조정한다 |
+| AI의 Smart Object 검색 범위 | `Source/Drone/AI/DroneSmartObjectReservationComponent.h` | `SearchRadius`, `SearchHalfHeight` 기본값을 수정한다. 역할별 차이가 필요하면 Controller Blueprint 분리를 먼저 한다 |
+| 순찰 재선택 회피 거리 | `Source/Drone/AI/DroneNPCAIController.h` | `PatrolRepeatAvoidanceRadius`를 조정한다 |
+| 도착 허용 반경·대기·재시도 시간 | `/Game/Drone/AI/StateTrees/ST_NPC_HostilePatrol`, `ST_NPC_FriendlyBaseRoutine` | 해당 Native Task 노드의 `AcceptanceRadius`, `WaitDuration`, `RetryInterval`을 조정한다 |
+| MG/Cover 우선순위와 실패 분기 | `/Game/Drone/AI/StateTrees/ST_NPC_HostilePatrol` | State와 Transition을 조정한다. Native Task Struct 이름·순서는 검증 도구 계약과 같이 갱신한다 |
+| 검색·Claim·Occupied·Release 코드 | `DroneSmartObjectReservationComponent.*`, `DroneNPCAIController.*` | 예약 Handle은 Component 한 곳에서만 소유한다. Blueprint에 별도 Claim 로직을 중복하지 않는다 |
+| Station 구조·MG Trace | `DroneSmartObjectStation.*` | Station Component 구조와 MG Pivot·Trace·Damage 공용 규칙을 수정한다 |
+| Definition/BP 생성·정합성 검사 | `md/tools/unreal/Setup-DroneSmartObjectStations.py` | 새 역할을 추가할 때 `SPECS`와 Tag Enum을 함께 갱신한다 |
+
+### 에디터에서 지점 하나 조정하는 순서
+
+1. 적용할 맵을 열고 World Outliner에서 `Station_*` 또는 배치한 `BP_SO_*`를 선택한다.
+2. `W/E`로 Actor 전체 위치와 Yaw를 조정한다. Cyan 화살표가 NPC가 도착해 바라볼 방향이다.
+3. 외형은 그대로 두고 NPC가 서는 위치만 옮겨야 하면 대응 `BP_SO_*`를 열고 `SmartObjectComponent` 상대 Transform을 조정한다.
+4. `SlotFacingPreview`는 `SmartObjectComponent`의 자식이므로 실제 Slot Offset과 함께 움직이는지 Viewport에서 확인한다.
+5. MG는 `MGTurretAimPivot`이 회전축, `StationMesh`가 외형, `SmartObjectComponent`가 병사가 서는 위치다. 세 Component의 역할을 섞지 않는다.
+6. `P` 키로 NPC 시작 위치부터 Slot까지 녹색 NavMesh가 끊기지 않는지 확인한다.
+7. PIE에서 NPC가 Slot에 도착한 뒤 Cyan 화살표 방향으로 회전하는지 확인한다. 이번 보완부터 순찰·아군 활동·Cover·MG 모두 예약 Slot Yaw를 적용한다.
+8. 이동 실패 시 Actor를 지면 위로 조금 올리는 방식으로 숨기지 말고 NavMesh 경계, 장애물 Collision, Acceptance Radius를 순서대로 확인한다.
+
+### 여러 지점 배치와 복제
+
+1. Content Browser의 대응 `BP_SO_*`를 맵으로 끌어 놓는다.
+2. 같은 역할은 `Alt+Drag`로 복제하고 Actor Label을 `Station_역할_번호` 형식으로 정리한다.
+3. Patrol은 최소 2개, 권장은 3개 이상 배치한다. 한 개뿐이면 재선택 회피 뒤 같은 지점을 다시 사용한다.
+4. MG와 Cover는 Slot 1개가 동시 사용자 1명을 뜻한다. 두 명을 받으려면 Station Actor를 두 개 배치하는 방식을 우선 사용한다.
+5. 같은 Blueprint의 모든 배치에 공통 Offset이 필요하면 Blueprint의 `SmartObjectComponent`를 수정한다. 특정 한 곳만 다른 구조라면 Definition을 변형하기보다 프로젝트 소유 Child Blueprint를 만든다.
+6. 배치 후 `Validate`를 실행하고, 행동 변경까지 했다면 관련 PIE 자동화와 화면 확인을 함께 수행한다.
+
+### Definition 수정 시 주의
+
+- `Activity` Enum은 사람용 표시이고 실제 검색 기준은 Definition Slot의 Activity Tag다. 둘을 반드시 같은 역할로 맞춘다.
+- `Invoke-DroneSmartObjectSetup.ps1 -Mode Validate`는 읽기 중심 정합성 검사다.
+- `-Mode Create`는 관리 대상 6개 Definition의 Slot 배열과 Blueprint 기본 연결을 다시 기록한다. 수동 Slot Offset·다중 Slot·Behavior를 넣은 뒤에는 의도적으로 재생성할 때만 사용한다.
+- 현재 실행 Wrapper는 문서 저장소와 같은 상위 폴더의 `drone/Drone.uproject`를 기본 경로로 자동 계산한다. 다른 복제본을 검사할 때만 `-ProjectPath`를 명시한다.
+
+```powershell
+cd D:\JGY\project\md
+powershell -ExecutionPolicy Bypass -File .\tools\unreal\Invoke-DroneSmartObjectSetup.ps1 -Mode Validate
+```
 
 ## 1. 이번 구조로 만들 동작
 
@@ -486,7 +537,7 @@ Editor 테스트:
 | `AI-VIS-01A` | 자산 호환성 감사·BP 표현 Event | **Done** — Manny Rifle Animation 38개, Weapon Mesh 70개, 이름 기반 Shotgun Mesh 0개와 서로 다른 NPC Skeleton을 기록. 발사/Reload Event 및 집중 테스트 3/3 통과 |
 | `AI-VIS-01B` | 외형·Animation·FX·SFX 연결 | Manny 임시 Rifle과 MG 표현부터 연결해 T Pose·손 위치·Muzzle 기준 확인. Shotgun 실제 Mesh와 최종 역할 외형은 미정 |
 
-`AI-SO-00 → AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01 → AI-PER-01 → AI-WPN-01 → AI-WPN-02 → AI-WPN-03 → AI-MG-01 → AI-MG-02 → HP-01 → AI-COVER-01 → AI-COMBAT-END-01 → AI-AMMO-01 → AI-VIS-01A`는 코드·에셋과 해당 집중 자동화 기준 완료했다. 다음 후보는 `AI-VIS-01B`다.
+`AI-SO-00 → AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01 → AI-PER-01 → AI-WPN-01 → AI-WPN-02 → AI-WPN-03 → AI-MG-01 → AI-MG-02 → HP-01 → AI-COVER-01 → AI-COMBAT-END-01 → AI-AMMO-01 → AI-VIS-01A`는 코드·에셋과 해당 집중 자동화 기준 완료했다. AI 하위 기능의 다음 후보는 `AI-VIS-01B`지만, 프로젝트 전체 신규 기능 우선순위는 2026-09-03 확정한 `FLOW-01~06` Front-end Mission 흐름이다.
 
 ### Asset 재검증 명령
 

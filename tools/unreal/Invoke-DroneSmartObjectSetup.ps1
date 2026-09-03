@@ -3,7 +3,7 @@ param(
     [ValidateSet('Create', 'Validate')]
     [string]$Mode = 'Validate',
 
-    [string]$ProjectPath = 'C:\URproject\drone\Drone.uproject',
+    [string]$ProjectPath = '',
 
     [string]$EngineRoot = 'C:\Program Files\Epic Games\UE_5.8'
 )
@@ -12,6 +12,10 @@ $ErrorActionPreference = 'Stop'
 $editorPath = Join-Path $EngineRoot 'Engine\Binaries\Win64\UnrealEditor-Cmd.exe'
 $pythonPath = Join-Path $PSScriptRoot 'Setup-DroneSmartObjectStations.py'
 $workspaceRoot = Split-Path (Split-Path $PSScriptRoot -Parent) -Parent
+if ([string]::IsNullOrWhiteSpace($ProjectPath)) {
+    $projectRoot = Join-Path (Split-Path $workspaceRoot -Parent) 'drone'
+    $ProjectPath = Join-Path $projectRoot 'Drone.uproject'
+}
 $runRoot = Join-Path $workspaceRoot ('.tmp-tests\smart-object-setup\' + [guid]::NewGuid().ToString('N'))
 $userDir = Join-Path $runRoot 'User'
 $logPath = Join-Path $runRoot 'Setup.log'

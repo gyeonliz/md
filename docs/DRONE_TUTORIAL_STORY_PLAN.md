@@ -1,13 +1,15 @@
-# Drone Tutorial·Story 구현 계획
+# Drone Tutorial·Mission 구현 계획
 
-기준일: 2026-08-27 (Asia/Seoul)
+기준일: 2026-09-03 (Asia/Seoul)
 
 ## 1. 목표와 우선순위
 
 현재 Drone Prototype을 다음 두 플레이 모드의 공통 기반으로 확장한다.
 
 1. **Tutorial**: 표시용 비충돌 경로와 순서형 Ring Gate를 따라 비행하고, 속도·고도·Lap/구간 기록을 비교하는 훈련 모드
-2. **Story**: Operator Character가 NPC와 상호작용하고 Mission 안내를 받은 뒤 Drone 조작으로 전환해 정찰·재밍·전투 방해 요소를 해결하는 모드
+2. **Mission**: 로비에서 임무를 선택하고 브리핑 트레일러 뒤 미션 맵으로 진입해 Drone을 선택한 다음 정찰·재밍·전투 방해 요소를 해결하는 모드
+
+2026-09-03 기획 변경으로 사람 Operator 직접 조작, NPC에게 걸어가 대화해 임무를 받는 흐름, Operator↔Drone 실시간 전환은 폐기했다. 새 프런트엔드·미션 진입 구조의 상세 기준은 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)가 우선한다.
 
 구현 순서는 아래와 같이 고정한다.
 
@@ -16,8 +18,9 @@
 → Telemetry·공용 HUD 기반
 → Tutorial 코스·Gate·Timing Vertical Slice
 → Take Off·Landing·Crash Flight 상태
-→ Operator ↔ Drone 전환
-→ NPC 대화·Mission UI Story Shell
+→ 시작 트레일러·로비·미션 선택
+→ 미션 트레일러·맵 진입·Drone 선택
+→ Mission Director·목표 UI
 → Enemy AI·MG·Jamming Mission
 → 통합 Greybox와 외부 Drone 에셋 적용
 ```
@@ -39,28 +42,28 @@ Tutorial을 먼저 완성해 조작감, 카메라, HUD, 비행 기록 계산을 
 | Gamepad | `RT/LT` | 상승·하강 |
 | Gamepad | Right Stick X | Drone Yaw |
 | Gamepad | Right Stick Y | Camera Pitch |
-| 공통 | `Tab` / Gamepad `Y` | Story의 Operator ↔ Drone 전환 후보 |
-| 공통 | `F` / Gamepad `A` | NPC·오브젝트 상호작용 후보 |
+| UI | `Enter` / Gamepad `A` | 선택·시작·Drone 확정 후보 |
+| UI | `Esc` / Gamepad `B` | 뒤로·닫기 후보. 실제 게임 종료·Pause 경계는 별도 결정 |
 
 현재 Camera Pitch 범위는 `-70°~20°`, Keyboard/Gamepad Yaw Rate는 `90°/s`, Mouse 감도는 `1.0°/input`의 시험값이다. Mouse Y 반전과 최종 감도는 수동 체감 검증 뒤 조정한다.
 
 입력 소유권은 다음과 같이 고정한다.
 
 - Drone 전용 IMC는 Drone Pawn이 Possess 수명주기에 맞춰 한 번만 등록·제거한다.
-- Operator 전용 IMC는 Operator Pawn이 소유한다.
-- 화면 전환, Pause, 공용 UI 입력만 프로젝트 소유 PlayerController의 Common IMC가 담당한다.
+- 사람 Operator 전용 IMC는 만들지 않는다.
+- 로비·Mission 선택·Drone 선택·Pause 같은 UI 입력은 프로젝트 소유 Front-end/PlayerController 계층 한 곳에서만 담당한다.
 - 같은 IMC를 PlayerController, Pawn, Level Blueprint에서 중복 등록하지 않는다.
 
 ## 3. 공용 런타임 구조
 
-### Control과 화면 전환
+### Front-end와 Drone 진입
 
-- Story 전용 프로젝트 소유 PlayerController가 Operator와 지정 Drone 참조를 관리한다.
-- `Tab` 또는 Gamepad `Y` 입력 시 `SetViewTargetWithBlend(0.35s)`와 Possess 전환을 수행한다.
-- Drone 모드 진입 시 Operator는 위치를 유지하고 이동 입력을 받지 않는다.
-- Operator 복귀 시 Drone Movement 입력과 속도를 정리하고 현재 위치에서 Hover 상태를 유지한다.
-- `Character`, `TransitionToDrone`, `Drone`, `TransitionToCharacter`, `Dialogue` 상태에서 중복 전환을 차단한다.
-- HUD는 PlayerController 수명에 연결해 Pawn이 바뀌어도 다시 생성하지 않고 데이터 공급자만 교체한다.
+- GameInstance 수명의 프로젝트 소유 Flow 계층이 `OpeningTrailer`, `LobbyMissionSelect`, `MissionTrailer`, `LoadingMissionMap`, `DroneSelect`, `InMission`, `MissionResult` 상태를 관리한다.
+- 로비에서 선택한 Mission ID와 Mission Map 진입 뒤 선택한 Drone ID를 맵 전환 사이에 보존한다.
+- Mission Map 진입 직후에는 Drone 선택 UI를 먼저 열고, 확정 전 플레이어 Drone Pawn을 생성·Possess하지 않는다.
+- Drone 확정 뒤 해당 Integration Pawn을 정확히 한 대 Spawn/Possess하고 Mission Director를 시작한다.
+- HUD는 PlayerController 수명에 연결해 한 개만 유지하며, 선택된 Drone의 Telemetry·Health와 Mission 목표 Snapshot을 구독한다.
+- Trailer·Lobby·Mission Map 전환을 Level Blueprint의 임시 Boolean이나 Widget 직접 OpenLevel 호출로 분산하지 않는다.
 
 ### Telemetry
 
@@ -153,22 +156,24 @@ TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경
 
 기록은 현재 실행 동안만 유지한다. TUT-04 비교·표시 계산을 검증한 뒤에만 `USaveGame`으로 Course별 Attempt Count, 평균, Best 기록을 영속화한다.
 
-## 5. Story Mode
+## 5. Mission Mode
 
-### Operator와 NPC
+### 프런트엔드 진입
 
-- Legacy ThirdPerson/Variant를 상속하지 않는 `ACharacter` 기반 Operator를 `/Game/Drone` 전용으로 만든다.
-- `IDroneInteractable` Interface로 NPC·콘솔·목표물을 동일한 상호작용 입력에 연결한다.
-- NPC 대화는 Speaker, Text, Portrait 후보, 다음 Line, Mission Event를 가진 Data Asset으로 구성한다.
-- 첫 버전은 선택지 없는 순차 대화이며 실제 분기 요구가 생길 때 Choice를 추가한다.
-- Dialogue 중 Character/Drone 이동 입력과 전환 입력을 잠근다.
+- 게임 실행 뒤 세계관 시작 트레일러를 거쳐 로비로 이동한다.
+- 로비의 미션 목록에서 항목을 선택하면 측면 패널에 미션 이름·설명·지역·난이도 후보를 표시한다.
+- 하단 시작 버튼은 유효한 Mission ID가 선택됐을 때만 미션 트레일러/브리핑으로 진행한다.
+- 브리핑 종료 뒤 Mission Definition에 지정된 Map을 열고 Drone 선택 UI를 먼저 표시한다.
+- 허용 Drone을 확정한 뒤에만 Pawn Spawn/Possess, Flight HUD 연결과 Mission 시작을 수행한다.
+- 사람 Player Character, Operator 이동, NPC 대화와 Character↔Drone 전환은 이 흐름에 포함하지 않는다.
 
 ### Mission
 
 - Mission Definition은 Data Asset, 실행 상태는 Map의 Mission Director가 소유한다.
-- 공통 상태는 `Briefing`, `Deploy`, `Recon`, `Objective`, `Egress`, `Evaluation`, `Failed`로 시작한다.
-- Mission UI는 현재 목표, 거리, 상호작용 Prompt, Drone/Operator 전환 가능 여부를 표시한다.
-- Crash, 목표 획득, 귀환, NPC 대화 완료를 중복 없이 Mission Event로 연결한다.
+- 공통 상태는 `WaitingForDroneSelection`, `Deploy`, `Recon`, `Objective`, `Egress`, `Evaluation`, `Failed`로 시작한다.
+- Mission UI는 화면 측면에 현재 목표, 진행값과 선택적 목표 거리를 표시한다.
+- Crash, 목표 획득, 귀환과 적 대응 결과를 중복 없이 Mission Event로 연결한다.
+- 적 NPC·Smart Object·MG·Cover는 Mission Map 내부의 전투 요소이며 로비 진입이나 Drone 선택을 담당하지 않는다.
 
 ### Jamming
 
@@ -206,19 +211,23 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 | TUT-04 | 비교와 결과 UI | 이전 평균·Best 대비 ± 결과 표시 |
 | TUT-05 | Tutorial 회귀 테스트 | 정상 Lap, 역순, 재통과, Restart를 자동/수동 검증 |
 | FLT-01 | Take Off·Landing·Crash | 비행 상태와 Mission 실패 Event 연결 가능 |
-| CTRL-02 | Operator·Drone 전환 | Blend, Possess, IMC 정리, Drone Hover 복귀 확인 |
-| STY-01 | NPC 상호작용·대화 | 이동 잠금과 순차 대화 완료 Event 확인 |
-| STY-02 | Mission Director·UI | Briefing부터 Evaluation까지 상태 전환 |
+| FLOW-01 | Flow 상태·Mission/Drone 데이터 계약 | Mission ID·Drone ID 검증과 맵 전환 상태를 한 곳에서 관리 |
+| FLOW-02 | 시작 트레일러·로비 | 트레일러 종료 뒤 미션 선택 Widget 한 개 표시 |
+| FLOW-03 | 미션 선택·측면 설명·시작 | 항목 선택과 설명 패널·하단 시작 버튼이 같은 Mission Definition을 사용 |
+| FLOW-04 | 미션 트레일러·맵 로드 | 선택한 브리핑 뒤 지정 Mission Map 진입 |
+| FLOW-05 | 맵 내 Drone 선택 | 확정 전 Pawn 0대, 확정 뒤 허용 Drone 1대 Spawn/Possess |
+| FLOW-06 | Mission Director·목표 UI | Drone 확정 뒤에만 Mission 시작, 측면 목표 Event 갱신 |
+| FLOW-07 | Mission 결과 | 성공·실패 뒤 재도전·로비 복귀 |
 | STY-03 | Jamming Mission | 세 단계 효과와 회피/해제 목표 재현 |
 | STY-04 | AI·MG 통합 | Drone 탐지와 대응을 Mission 흐름에서 재현 |
 | AST-00 | 제공 에셋 인수 감사 | ZIP 14개와 해제본의 상대 경로·크기 일치 및 팩별 호환성·이식 위험 기록 |
 | AST-01 | 제공 Drone 에셋 선별 적용 | UE 5.8 스테이징 검증 후 기능 코드 변경 없이 Integration BP에서 외형 교체 |
 
-현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`, `TUT-03`과 `TUT-04B` 기술 구현을 완료했다. TUT-03은 Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료와 World Game Time·Telemetry 위치 표본 기반 실제 거리·평균 속도 원본 기록을 포함한다. 최신 `c3e6d38` main에서 Game/Editor Build, 전체 `Drone.` 17/17, Blueprint 0/0/0을 통과했다. 실제 두 Lap의 표시 판정은 남아 있다.
+현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`, `TUT-03`과 `TUT-04B` 기술 구현을 완료했다. TUT-03은 Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료와 World Game Time·Telemetry 위치 표본 기반 실제 거리·평균 속도 원본 기록을 포함한다. 최신 공유 기준선은 `6a18210`이며 이후 Smart Object 방향 보강이 로컬에 있다. 실제 두 Lap의 표시 판정은 남아 있다.
 
-TUT-04B의 이전 성공 평균·Best 집계와 HUD 결과 행은 구현·자동 검증됐고 실제 두 Lap 수동 확인이 남았다. 수동 확인 뒤 다음 기능 카드는 Flight 상태 또는 NavigationArrows Host/Wrapper다.
+TUT-04B의 이전 성공 평균·Best 집계와 HUD 결과 행은 구현·자동 검증됐고 실제 두 Lap 수동 확인이 남았다. 새 우선순위에 따라 다음 신규 기능은 `FLOW-01` Flow 상태·Mission/Drone 데이터 계약이다. Flight 상태와 NavigationArrows Host/Wrapper는 Mission Vertical Slice에서 필요한 시점에 연결한다.
 
-사용자의 2026-08-27 우선순위 변경에 따라 Story/NPC/MG 단계의 선행 준비로 NPC·Smart Object C++ 기반을 병행한다. 적 EnemyPatrol/Guard, 아군 FriendlyBasePatrol/Ambient, Rifle/Shotgun Profile, 드론 감지 Event와 MG 1-Slot 예약 계약을 먼저 고정한다. 실제 구현 순서는 `AI-SO-01 Definition → AI-NPC-01 BP 배치 → 적 순찰 → 아군 기지 이동 → 드론 감지 → Rifle → Shotgun → MG`이며, 상세 절차는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md)를 따른다. 이는 Mission·최종 전투 규칙이 확정됐다는 뜻이 아니다.
+2026-08-27부터 구현한 NPC·Smart Object·Rifle/Shotgun·MG·Cover 기반은 폐기하지 않고 Mission Map 내부 전투에 재사용한다. 다만 아군 NPC 대화와 사람 Operator는 더 이상 Front-end나 Mission 시작의 선행조건이 아니다. 상세 AI 절차는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md), 최신 화면 흐름은 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 따른다.
 
 ## 8. 검증 게이트
 
@@ -229,8 +238,9 @@ TUT-04B의 이전 성공 평균·Best 집계와 HUD 결과 행은 구현·자동
 - 각 입력 Mapping은 한 경로에서만 등록
 - TUT-03 시간·거리·평균 속도와 TUT-04 Delta·첫 시도 예외는 각 카드에서 순수 C++ 자동화로 검증
 - Gate는 정상 순서, 역순, 중복 Overlap, 잘못된 Pawn을 자동화 검증
-- Operator↔Drone 전환을 새 PIE 3회 반복해 Pawn, Camera, IMC, HUD 중복 없음 확인
-- Story Mission은 성공·Crash 실패·Jamming 해제 경로를 각각 반복
+- 시작 트레일러→로비→미션 선택→미션 트레일러→맵→Drone 선택→Mission 시작을 새 실행 3회 반복
+- Drone 확정 전 Pawn 0대, 확정 후 Pawn·Camera·IMC·HUD·목표 패널 각각 1개 확인
+- Mission은 성공·Crash 실패·Jamming 해제 경로를 각각 반복
 - 제공 에셋 적용 전후 Collision Root와 조작 테스트 결과가 동일해야 함
 
 네트워크, Android, 협동 플레이, 구매 에셋 세부 튜닝은 현재 범위에서 제외한다.

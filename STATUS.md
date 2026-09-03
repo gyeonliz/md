@@ -20,18 +20,28 @@
 | Git 사용자 이름 | 전역 `gyeonliz` 설정 확인 |
 | Git 사용자 이메일 | 전역 `jkw6483@gmail.com` 설정 확인 |
 | GitHub CLI | 설치되어 있지 않음 |
-| 현재 실행 세션 작업 루트 | Unreal `C:\URproject\drone`; 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
-| 다른 PC의 이전 기준 경로 | Unreal `D:\JGY\project\drone`; 문서 `D:\JGY\project\md` |
-| Unreal 프로젝트 저장소 | `main=origin/main=249d6cd`; AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01·AI-VIS-01A 포함 30개 파일 로컬 수정·미커밋 |
-| 문서 작업 저장소 | `main=origin/main=747bc02`; 문서 6개와 유지보수 도구 6개 로컬 수정·미커밋 |
-| Commit·Push 처리 | 마지막 원격은 MG Claim·Move `249d6cd`. 사용자 요청에 따라 이후 코드·에셋·문서는 로컬에만 유지하고 자동 Commit·Push하지 않음 |
-| 실행 상태 | 공유 기준선은 Game/Editor Build·AI 11/11·전체 27/27·Blueprint 0/0/0·LFS 성공. 최신 로컬은 Editor Build, WeaponContract·RifleTrace·ShotgunTrace 3/3과 NPC 비주얼 자산 감사 통과 |
+| 현재 확인 작업 루트 | Unreal `D:\JGY\project\drone`; 문서 `D:\JGY\project\md` |
+| 다른 PC의 기록 경로 | Unreal `C:\URproject\drone`; 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
+| Unreal 프로젝트 저장소 | `main=origin/main=6a18210`; Smart Object 배치 방향 보강 C++·테스트 7개와 `SO_Def_FriendlyBasePatrol` 1개 로컬 수정·미커밋 |
+| 문서 작업 저장소 | `main=origin/main=2c99f00` 위 기존 Smart Object 문서·도구 변경과 Front-end Mission Flow 최신화가 로컬 수정·미커밋 |
+| Commit·Push 처리 | 사용자가 최신 전투 Greybox 묶음을 `6a18210`으로 Commit·Push. Smart Object 로컬 보강과 이번 문서 최신화는 Commit·Push하지 않음 |
+| 실행 상태 | Smart Object 보강 뒤 DroneEditor Build 성공, Slot Yaw 판정 포함 자동화 2/2 경고·오류 0, Definition/BP 6쌍 Validate 성공. 전체 `Drone.` 회귀·Blueprint 전체 Compile·LFS는 이번 변경 뒤 미재실행 |
 | 별도 `droner` 주의 | `main=origin/main=551e287`; `Config/DefaultEditor.ini` 변경과 `Content/Asset` 10,928개·36,360,181,427 bytes 전체가 Untracked. 공급사 원본·스테이징 복사본이므로 일괄 Stage·Commit 금지 |
 | 팀원 변경 | 환경 맵·재질 변경은 중앙 `main`에 반영된 상태. Battlefield의 새 프로젝트 머티리얼 3개와 Camp/Base 의존성을 검증했고 개인 `.vsconfig` 변경·`//test`를 별도 정리. 팀원 PC Remote 실측만 남음 |
 
 GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도했으나 Windows Installer가 종료 코드 1602로 취소되어 설치되지 않았다. GitHub 웹과 Git Credential Manager만으로도 기본 Push/Clone 작업은 가능하다.
 
 전역 Git 작성자 정보는 `gyeonliz <jkw6483@gmail.com>`으로 설정되어 있다. Unreal 프로젝트는 `https://github.com/gyeonliz/drone.git`, 문서 저장소는 `https://github.com/gyeonliz/md.git`를 `origin`으로 사용하며 둘 다 첫 Commit과 Push를 완료했다. 기준선 확인 시 각 로컬 `main`과 `origin/main`이 일치했다. Git 작성자 이름·이메일과 GitHub Desktop 로그인 계정은 Commit 작성자·인증 정보이며 Push 목적지는 아니다. Push 목적지는 선택한 로컬 저장소의 Remote URL과 선택 Branch가 결정한다. 작업컴 기본 PowerShell 정책은 `.ps1` 직접 실행을 차단하므로 컨텍스트 도구 검증에는 영구 설정 변경 없이 실행 1회에만 `-ExecutionPolicy Bypass`를 적용했다.
+
+## 2026-09-03 Front-end·Mission 진입 기획 변경
+
+- 확정 흐름은 `게임 실행 → 시작 트레일러 → 로비 → 미션 레벨 선택 → 측면 미션 설명 → 하단 시작 → 미션 트레일러 → 맵 진입 → Drone 선택 → Mission 시작 → 측면 목표 UI`다.
+- 사람 Player Character 직접 조작, 로비 NPC 대화로 Mission 수령, Operator↔Drone 실시간 Possess 전환은 폐기했다. 관련 생산 코드는 새로 만들지 않는다.
+- 기존 Drone 조작·Telemetry·Training, 적 NPC·Smart Object·Rifle/Shotgun·MG·Cover·체력 코드는 폐기하지 않고 Mission Map 내부 기능으로 재사용한다.
+- 새 선행 순서는 `FLOW-01 상태/데이터 계약 → 시작 트레일러/로비 → 미션 선택/설명 → 미션 트레일러/Map → Drone 선택 → Mission 시작/목표 UI → 결과/반복 검증`이다.
+- Figma `Project:Droner`는 세계관과 UI 분위기 참고용으로 읽기만 했고 수정하지 않았다. `Project:Droner`와 `DRONE LINE` 중 최종 제목 통일은 보류 상태다.
+- 이번 변경은 문서 기준선만 갱신했다. Unreal Source·Asset·Build·PIE에는 새 Flow 구현 결과가 없으므로 구현 완료로 표현하지 않는다.
+- 상세 설계와 검증 조건은 [`docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 따른다.
 
 ## 2026-09-02 AI-PER-01 구현·검증 결과
 
@@ -126,13 +136,13 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 
 ## PC별 Drone 프로젝트 기준
 
-현재 실행 세션에서 확인한 프로젝트 경로는 다음과 같다.
+현재 작업 기준으로 확인한 프로젝트 경로는 다음과 같다.
 
 ```text
-C:\URproject\drone\Drone.uproject
+D:\JGY\project\drone\Drone.uproject
 ```
 
-다른 PC에서 사용한 `D:\JGY\project\drone`도 같은 저장소의 이전 작업 경로로 기록한다. 이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 현재 공유 기준선은 `origin/main=249d6cd`다.
+다른 PC에서 사용한 `C:\URproject\drone`도 같은 저장소의 검증 경로로 기록한다. 이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 현재 공유 기준선은 `origin/main=6a18210`다.
 
 확인 결과:
 
@@ -143,7 +153,7 @@ C:\URproject\drone\Drone.uproject
 - 시작 시 Git 저장소가 아니었음
 - 작업 시작 시 Content에는 `.uasset` 749개와 `.umap` 4개가 있었음
 
-초기에는 Third Person 기본 맵과 전역 기본 GameMode를 유지한 채 Git 준비, Android 제외 설정, 별도 Drone Prototype Source를 적용했다. 이후 시작 맵을 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode를 프로젝트 소유 `BP_DronePrototypeGameMode`로 바꿨다. 기존 자산·TUT-04B 병합 기준선 `55b3ffe`에서 Unreal 생성 기본 Map 4개만 제거하고 Template 비맵 자산은 복구했으며, 최신 공유 기준선은 문서 상단의 `249d6cd`다.
+초기에는 Third Person 기본 맵과 전역 기본 GameMode를 유지한 채 Git 준비, Android 제외 설정, 별도 Drone Prototype Source를 적용했다. 이후 시작 맵을 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode를 프로젝트 소유 `BP_DronePrototypeGameMode`로 바꿨다. 기존 자산·TUT-04B 병합 기준선 `55b3ffe`에서 Unreal 생성 기본 Map 4개만 제거하고 Template 비맵 자산은 복구했으며, 최신 공유 기준선은 문서 상단의 `6a18210`이다.
 
 - `main` Branch의 로컬 Git 저장소 초기화
 - 프로젝트 로컬 Git LFS 초기화
@@ -171,7 +181,7 @@ C:\URproject\drone\Drone.uproject
 
 첫 Commit은 863개 파일이며 `Content`는 761개로 `.uasset` 756개와 `.umap` 5개다. 가장 큰 파일은 약 21.0 MB이고 100 MB를 넘는 파일은 없다. 새 Prototype `.uasset`과 `.umap`을 포함한 Unreal Asset에는 Git LFS의 filter·diff·merge 속성이 적용된다. WBP·BP Controller·TUT-01 Asset에 이어 TUT-02의 신규 `BP_DroneTrainingGate`와 갱신한 `Lvl_DroneTraining` 두 Asset도 Git LFS로 Push했다.
 
-현재 공유 main에는 Prototype Pawn/GameMode, 입력, Telemetry, Flight HUD, Tutorial 기록·비교 결과와 NPC Smart Object 기반, MG Claim·Move까지 있다. 로컬 미커밋 작업에는 MG Occupied·조준·Trace·사망 교대, NPC/Drone 체력 100, Rifle/Shotgun/MG Damage, Drone 체력 HUD, Drone 파괴 교전 종료, Rifle/Shotgun 탄창·즉시 Reload와 BP 발사/Reload 표현 Event가 추가됐다. 예비 탄약·재장전 시간, 실제 생활/전투 Animation·FX·SFX와 최종 사망/Respawn 연출은 아직 미구현이다.
+현재 공유 main에는 Prototype Pawn/GameMode, 입력, Telemetry, Flight HUD, Tutorial 기록·비교 결과, NPC Smart Object, MG Occupied·조준·Trace·사망 교대, NPC/Drone 체력 100, Rifle/Shotgun/MG Damage, Drone 체력 HUD, Drone 파괴 교전 종료, Rifle/Shotgun 탄창·즉시 Reload와 BP 발사/Reload 표현 Event가 포함됐다. 예비 탄약·재장전 시간, 실제 생활/전투 Animation·FX·SFX와 최종 사망/Respawn 연출은 아직 미구현이다.
 
 2026-08-27에는 `C:\에셋`에서 ArmyVFX·InfantrySFX·Ground Drone/MG 외형·Modular Soldier/Insurgent 외형·Quad v4·PBR Sting과 OilRig을 선별 이식했다. ThirdParty 891개와 중앙 `Lvl_OilRig` 1개이며 새 Root 수량 일치, 대표 로드, 외부·누락 참조 0을 확인했다. OilRig 명령줄 Map Check는 장시간 완료되지 않아 Editor 수동 확인이 남았다. 상세 내용은 [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md)를 따른다.
 
@@ -300,7 +310,7 @@ C:\Users\jkw11\Documents\Codex\2026-08-12\c-project-factoryenvironmentcollect\wo
 
 1. 사용자가 실제 Training Map에서 Gate 0→3 한 Lap과 Drone Loop 단일 재생·종료 정지를 수동 확인
 2. `TUT-04B` 첫 기준·이전 평균·Best·Delta를 두 번 완주해 실제 HUD에서 확인
-3. 기능 다음 후보는 `AI-VIS-01B`; Manny Rifle 임시 표현과 MG FX/SFX를 먼저 연결하고 Shotgun 실제 Mesh·최종 진영 외형은 미정 유지
+3. 신규 기능은 `FLOW-01`; Flow 상태와 Mission/Drone 데이터 계약을 먼저 만들고 한 Mission·한 Drone으로 Front-end Vertical Slice 시작
 4. 병행으로 팀원 PC의 실제 Remote URL·Push 대상 규칙을 확인
 5. 다른 PC에서 최신 `origin/main` Pull, LFS/UE 5.8.1 실행과 문서 Pull 확인
 6. 정보처리산업기사는 Q-Net 개인 접수·수험일·필기면제 상태를 확인해 Track A/B/C를 선택하고, 코딩테스트는 주간 반복으로 병행
@@ -337,8 +347,11 @@ PFN-06 Done
 → AI-COMBAT-END-01 드론 파괴 시 교전 종료·실패 Event Done
 → AI-AMMO-01 Rifle·Shotgun 탄창·재장전 Greybox Done
 → AI-VIS-01A 자산 호환성 감사·BP 발사/재장전 Event Done
-→ AI-VIS-01B NPC·무기·MG 실제 외형과 Animation·FX·SFX Next
-→ Take Off·Landing·Crash, Operator↔Drone, Mission UI·Jamming은 활성화 조건에 맞춰 후속 통합
+→ FLOW-00 사람 Operator 폐기·Front-end Mission Flow 문서 기준선 Done
+→ FLOW-01 상태·Mission/Drone 데이터 계약 Next
+→ FLOW-02~06 시작 트레일러·로비·미션 선택·브리핑·Map·Drone 선택·측면 목표 UI
+→ Take Off·Landing·Crash와 Mission UI·Jamming 통합
+→ AI-VIS-01B NPC·무기·MG 실제 외형과 Animation·FX·SFX
 ```
 
 최종 감도, Mouse Y 반전, 비행 물리, 멀티플레이와 세부 Mission 규칙은 현재 미정으로 유지한다.
@@ -398,6 +411,6 @@ UE 5.8의 Dataflow·Chaos Cloth·Chaos Destruction을 부분 고정 그물과 �
 - 맵 파괴: Dataflow Geometry Collection, Anchor/World Support, Damage Threshold, Strain/Force와 Debris Sleep/Disable
 - Cloth 변형·파괴 연출과 포획·Damage·Mission 판정을 분리
 - 현재 생산 Cloth/Geometry Collection Asset 0, 관련 C++ 0
-- `TUT-04` 실제 두 Lap 확인은 유지한다. AI-PER-01부터 AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01·AI-VIS-01A까지 완료했고 다음 구현 후보는 `AI-VIS-01B`; 첫 물리 작업은 별도 `PHY-DF-00` Sandbox
+- `TUT-04` 실제 두 Lap 확인은 유지한다. 전투 Greybox와 AI-VIS-01A까지 완료했지만 새 기획 우선순위는 `FLOW-01~06` Front-end Mission Vertical Slice다. `AI-VIS-01B`와 첫 물리 작업 `PHY-DF-00` Sandbox는 그 뒤 후보로 둔다.
 
 상세 설계는 [`docs/DRONE_CHAOS_DATAFLOW_PLAN.md`](docs/DRONE_CHAOS_DATAFLOW_PLAN.md)를 따른다.

@@ -4,7 +4,7 @@
 
 이 문서는 현재 Unreal `drone` 저장소를 직접 확인한 결과를 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
 
-TUT-03 완료 기능 Commit은 `551e287`이다. 현재 공유 main은 `249d6cd`이며 MG 1-Slot Claim·Move까지 구성돼 있다. 로컬 미커밋 작업에는 AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01, AI-AMMO-01과 AI-VIS-01A Blueprint 발사/재장전 이벤트까지 추가됐다. 팀원 환경 맵·재질 변경과 정리 Merge `888414f`도 보존한다. 환경 Map은 후보 공간이며 Tutorial 기본 실행 구조를 바꾸지 않는다.
+TUT-03 완료 기능 Commit은 `551e287`이다. 현재 공유 main은 `6a18210`이며 MG 점유·조준·사격·사망 뒤 재점유, 공통 체력, Cover 대응, Drone 파괴 시 교전 종료, 탄창·즉시 재장전과 AI-VIS-01A Blueprint 발사/재장전 이벤트까지 포함한다. 팀원 환경 맵·재질 변경과 정리 Merge `888414f`도 보존한다. 환경 Map은 후보 공간이며 Tutorial 기본 실행 구조를 바꾸지 않는다.
 
 NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합됐다. 자산은 main에 있지만 프로젝트 소유 Widget Host는 아직 구현하지 않았으므로 화면에 나타나지 않는 것이 정상이다.
 
@@ -16,13 +16,19 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합�
 | `Drone.Tutorial` Automation | 7/7 통과 |
 | `Drone.AI` Automation | 11/11 통과. Rifle 빈 시험 World의 예상 RecastNavMesh 경고 1건 |
 | 전체 `Drone.` Automation | 27/27 통과, 실패 0 |
-| 전투 로컬 집중 검증 | AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01 관련 집중 테스트 통과. 최신 AI-VIS-01A Editor Build와 WeaponContract·RifleTrace·ShotgunTrace 3/3 통과. 전체 묶음은 사용량 절약을 위해 반복하지 않음 |
+| 전투 집중 검증 | AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01 관련 집중 테스트 통과. AI-VIS-01A Editor Build와 WeaponContract·RifleTrace·ShotgunTrace 3/3 통과. 이 변경을 포함한 `6a18210` 뒤 전체 묶음은 아직 반복하지 않음 |
 | `CompileAllBlueprints` | Blueprint Errors 0, Blueprint warnings 0, failed load 0. 별도 Summary에 기존 Battlefield Pose GUID와 MCP 고지 경고 유지 |
 | 현재 에셋 이식 재검증 | FPV 전용 1/1, Blueprint 0/0/0, 스테이징 선택 자산·현재 Integration 금지 의존성 0, 이식 13개 LFS와 fsck 통과 |
 | 기존 Standalone 시각 기록 | FPV 외형, 고정 추적 Camera, 실제 WBP HUD, Cyan 안내선, Current/Inactive Gate 표시 확인 |
 | 사용자 수동 확인 | Training 두 Lap 비교 HUD, OilRig Map Check·화면·성능, Ground Drone/MG·NPC·Raw Drone 외형을 확인할 차례 |
 
 현재 main의 `UDroneTrainingLapRecorderComponent`는 Segment/Lap 원본 뒤 TUT-04B 비교 결과도 만든다. 첫 성공은 기준 기록, 이후 성공은 현재 시도를 제외한 이전 평균과 Best를 사용한다. HUD에 이전 완주 평균·Best·시간 Delta·속도 Delta가 표시되며 계산은 Blueprint에 중복하지 않는다. 실제 두 Lap 표시 확인 전까지 TUT-04의 수동 판정은 남아 있다.
+
+## 확정됐지만 아직 구현하지 않은 Front-end 경계
+
+2026-09-03 사용자 결정으로 사람 Operator Character와 NPC 대화 기반 Mission 수령, Operator↔Drone 전환은 폐기됐다. 새 실행 흐름은 `시작 트레일러 → 로비 → 미션 선택/측면 설명 → 미션 트레일러 → Map → Drone 선택 → Mission 시작/측면 목표 UI`다.
+
+현재 Source/Asset에는 이 Front-end Flow, Mission/Drone Definition, 로비 Widget, Trailer 전환과 Drone 선택 UI가 아직 없다. 기존 `ADronePrototypeGameMode`가 바로 Pawn을 Spawn/Possess하는 구조는 Training 검증용으로 유지하고, 새 Mission Flow에서 확정 전 Spawn을 막는 별도 진입 계층을 추가할 예정이다. 상세 책임과 작업 순서는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 따른다.
 
 ## 1. 런타임 연결 구조
 
