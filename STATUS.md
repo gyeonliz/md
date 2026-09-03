@@ -1,6 +1,6 @@
 # 현재 작업 상태
 
-기준일: 2026-09-03 (Asia/Seoul)
+기준일: 2026-09-04 (Asia/Seoul)
 
 이 문서는 PC별로 명령으로 확인된 상태와 사용자가 아직 결정하지 않은 항목을 분리한다. 현재 C 드라이브 실행 세션과 다른 PC의 검증 기록을 같은 항목에서 섞지 않고 경로와 검증 시점을 함께 적는다.
 
@@ -22,10 +22,10 @@
 | GitHub CLI | 설치되어 있지 않음 |
 | 현재 실행 세션 작업 루트 | Unreal `C:\URproject\drone`; 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
 | 다른 PC의 이전 기준 경로 | Unreal `D:\JGY\project\drone`; 문서 `D:\JGY\project\md` |
-| Unreal 프로젝트 저장소 | `main=origin/main=2d6a459`; FLOW-01~03·NPC Visual 기반 Source/Test, Data Asset, Front-end BP/Map 등 26개 경로 로컬 수정·미커밋 |
+| Unreal 프로젝트 저장소 | `main=origin/main=2d6a459`; FLOW-01~03·NPC Visual 기반과 AI Projectile Source/Test, Data Asset, Front-end BP/Map이 로컬 수정·미커밋 |
 | 문서 작업 저장소 | `main=origin/main=14c4ae6`; 상태 문서와 FLOW Data/Front-end 작성·검증 도구 4개 로컬 미커밋 |
 | Commit·Push 처리 | 사용자 측 최신 공유 기준은 Unreal `2d6a459`, 문서 `14c4ae6`. 이번 FLOW-01~03과 Visual 기반은 Commit·Push하지 않음 |
-| 실행 상태 | FLOW-03 뒤 Drone Game/Editor Build와 최종 `Drone.Flow` 3/3 성공. Data/Front-end Asset 새 프로세스 Validate, Root Widget 1개·중복 전환 0·Drone Pawn 0·Mission Definition 기반 설명 일치를 확인. NPC Visual 기반은 WeaponContract 1/1과 역할 BP/Map Validate 성공. 전체 회귀·Blueprint 전체 Compile은 반복하지 않음 |
+| 실행 상태 | FLOW-03 검증 기준 유지. AI Projectile·원뿔 내 무작위 분산과 무장 NPC 전용 Rifle AnimBP를 보강했다. 최신 DroneEditor Build, `NPCGreyboxAssets`·`WeaponContract`·`NPCPerceptionSearchPIE` 3/3 및 저장 Animation Asset 읽기 검증 성공. 전체 회귀·Blueprint 전체 Compile은 반복하지 않음 |
 | 별도 `droner` 주의 | `main=origin/main=551e287`; `Config/DefaultEditor.ini` 변경과 `Content/Asset` 10,928개·36,360,181,427 bytes 전체가 Untracked. 공급사 원본·스테이징 복사본이므로 일괄 Stage·Commit 금지 |
 | 팀원 변경 | 환경 맵·재질 변경은 중앙 `main`에 반영된 상태. Battlefield의 새 프로젝트 머티리얼 3개와 Camp/Base 의존성을 검증했고 개인 `.vsconfig` 변경·`//test`를 별도 정리. 팀원 PC Remote 실측만 남음 |
 
@@ -70,6 +70,24 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 - 실제 Mission 영상 재생과 `OpenLevel`은 FLOW-04 범위이므로 아직 실행하지 않는다. 최종 로비 Designer도 미정이며 WBP에는 같은 이름 Widget과 Blueprint 표현 Event만 사용할 수 있게 경계를 유지한다.
 - 최종 Drone Game/Editor Build와 `Drone.Flow` 3/3이 통과했다. PIE에서 잘못된 Mission 거부, 저장 Definition과 표시 이름·설명 일치, 중복 Mission 확정 거부, Root 생성 1회를 확인했다.
 - 다음 활성 카드는 `FLOW-04` 정적 Mission Briefing 종료→선택 Map 로드다.
+
+## 2026-09-03 AI-BALLISTIC-01 회피 가능한 탄속 구현 결과
+
+- `ADroneNPCProjectile`을 추가해 복잡한 물리 Simulation이나 Actor Tick 없이 `ProjectileMovementComponent` Sweep 충돌로 이동한다. 첫 충돌에서 제거되고 현재 지정 Target에 맞았을 때만 기존 Damage 계약을 적용한다.
+- Gameplay 기본 탄속은 Rifle `4,500 cm/s`, Shotgun `3,500 cm/s`, MG `5,500 cm/s`다. Rifle 40m 약 0.89초, Shotgun 16m 약 0.46초, MG 60m 약 1.09초의 최대 사거리 비행 시간이며 모두 최종 밸런스 확정값이 아니다.
+- Rifle은 한 발에 Projectile 1개, Shotgun은 현재 8 Pellet에 8개를 Spawn한다. 사거리/탄속으로 계산한 수명 뒤 자동 제거하고 발사자와 MG 사용자를 이동 충돌에서 제외해 자기 피격을 막는다.
+- Engine 기본 Sphere를 구매 에셋 전 Greybox Visual로 사용한다. 최종 Tracer/Niagara/Impact FX는 BP 파생 Projectile에서 교체하며 BP에서 Damage나 탄약 감소를 중복 구현하지 않는다.
+- 이전 Rifle·Shotgun·MG Visibility Trace는 `bUseProjectileBallistics=false` 비교·회귀 경계로 유지했다. 기존 `RifleTrace`와 `ShotgunTrace` 테스트는 이 모드를 명시적으로 선택한다.
+- `DroneEditor Win64 Development` Build와 `Drone.AI.ProjectileBallistics`, `RifleTrace`, `ShotgunTrace`, `WeaponContract`, `NPCPerceptionSearchPIE` 총 5/5가 성공했다. Commit·Push는 하지 않았다.
+
+## 2026-09-04 AI-ACCURACY-01 원뿔 내 무작위 사격 분산
+
+- Rifle·Shotgun·MG가 목표 중심을 축으로 하는 설정 반각의 원뿔 내부에서 탄환마다 무작위 방향을 선택한다. 기존 Shotgun의 중앙 1발+테두리 균등 배치는 제거했다.
+- Greybox 기본 반각은 Rifle `2.5도`, Shotgun `6도`, MG `3.5도`이며 최종 명중률 확정값이 아니다. `0도`로 설정하면 정확히 조준점으로 발사한다.
+- Rifle/Shotgun 역할 Blueprint에서는 `NPCWeaponComponent`의 `Rifle Spread Half Angle Degrees`와 `Shotgun Spread Half Angle Degrees`, MG Blueprint에서는 `MG Turret Spread Half Angle Degrees`를 조정한다. 런타임 BP는 `Configure Accuracy Greybox`와 `Configure MG Turret Accuracy Greybox`를 사용할 수 있다.
+- 처음에는 `MM_Rifle_Fire`를 `ABP_Unarmed` 위에서 0.25초마다 재시작해 무장 자세가 없고 연사 중 떨리는 문제가 있었다. 이를 프로젝트 소유 `/Game/Drone/AI/Animation/ABP_NPC_Rifle_Greybox`와 `BS_NPC_Rifle_Locomotion`으로 교체했다. Hostile Rifle·Shotgun은 Rifle ADS Idle과 8방향 Walk/Jog·Rifle Jump를 사용하고 Friendly만 기존 `ABP_Unarmed`를 유지한다.
+- 0.533초인 가산 발사 Sequence는 기본 `2.4x`로 약 0.222초 재생해 Rifle 기본 Cooldown 0.25초 전에 끝난다. Fire/Reload 자산, Play Rate와 `Use Greybox Weapon Animations`는 역할 BP에서 교체·해제할 수 있다. 새 Fab 다운로드는 현재 필수가 아니다.
+- `DroneEditor Win64 Development` Build와 `NPCGreyboxAssets`·`WeaponContract`·`NPCPerceptionSearchPIE` 3/3, 별도 새 Editor 프로세스에서 저장된 Rifle Idle·27개 Rifle BlendSpace Sample·Hostile/Friendly AnimBP 분리 검증이 성공했다. 실제 화면의 손 위치·총기 정렬과 반복 동작은 육안 재확인이 남았고 Commit·Push하지 않았다.
 
 ## 2026-09-02 AI-PER-01 구현·검증 결과
 

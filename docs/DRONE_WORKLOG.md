@@ -1,6 +1,6 @@
 # Drone 개발 진행 기록
 
-기준일: 2026-09-03 (Asia/Seoul)
+기준일: 2026-09-04 (Asia/Seoul)
 
 이 문서는 Drone 개발의 **진행 이력**을 시간순으로 남긴다. 가장 최신의 현재 상태는 [`../WORKBOARD.md`](../WORKBOARD.md), 확정 구현 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)를 따른다.
 
@@ -18,21 +18,44 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-09-03 — FLOW-03 미션 선택·설명·시작 완료
+마지막 갱신: 2026-09-04 — AI-ANIM-TEMP-01 무장 자세·연사 떨림 구조 수정
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | FLOW-01~03 데이터·시작 화면·로비 미션 선택 로컬 완료, Tutorial/Smart Object 수동 확인 대기 |
+| 전체 단계 | FLOW-01~03 로컬 완료, AI 회피형 Projectile·무작위 사격 원뿔·무장 NPC Rifle AnimBP 보강 완료, Tutorial/Smart Object 수동 확인 대기 |
 | Unreal 기준선 | 공유 `main=origin/main=2d6a459`; FLOW-01~03과 NPC Visual 기반 26개 경로 로컬 수정 |
-| 자동 검증 | FLOW-03 뒤 Drone Game/Editor Build와 최종 `Drone.Flow` 3/3 성공. Data/Front-end Asset 새 프로세스 Validate, NPC Visual WeaponContract 1/1과 역할 BP/Map Validate 성공 |
+| 자동 검증 | FLOW-03 검증 유지. 무장 AnimBP 보강 뒤 Editor Build, `NPCGreyboxAssets`·`WeaponContract`·`NPCPerceptionSearchPIE` 3/3과 저장 Asset 읽기 검증 성공 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
 | 지금 작업 중 | `FLOW-03` 데이터 기반 로비 UI·집중 PIE 완료. 다음 활성 카드는 `FLOW-04` |
 | 차단 조건 | FLOW-04 코드 차단 없음. 실제 Mission 영상 형식은 미정이므로 정적 대체 Briefing으로 진행 |
 | 다음 행동 | MissionTrailer 종료 → LoadingMissionMap → 선택 Definition의 Training Map 로드와 Mission 선택 보존 연결 |
 | 다음 기능 | `FLOW-04 → FLOW-06` 한 Mission·한 Drone Front-end Vertical Slice |
 | 이후 | 결과/재시도, Flight 실패 연결, AI/MG·Jamming과 실제 비주얼 통합 |
-| Git 처리 | Unreal 26개 경로와 문서·도구 로컬 변경을 유지. Codex는 Commit·Push하지 않음 |
+| Git 처리 | FLOW·NPC Visual·Projectile과 문서·도구 로컬 변경을 유지. Codex는 Commit·Push하지 않음 |
 | 협업 Git | 환경 맵·재질 중앙 반영 및 검증 완료. 개인 `.vsconfig`·시험 주석 정리 완료. 팀원 PC Remote 실측만 남음 |
+
+## 2026-09-04 — AI-ACCURACY-01 사격 분산·AI-ANIM-TEMP-01 무장 자세 수정
+
+- 기존 Rifle·MG는 목표 중심으로 정확히 발사했고 Shotgun은 중앙 1발과 원뿔 테두리의 결정적 배치였다. 사용자 의도에 맞춰 세 무기 모두 탄환마다 원뿔 내부의 무작위 방향을 고르도록 통일했다.
+- 기본 반각은 Rifle `2.5도`, Shotgun `6도`, MG `3.5도`다. 역할 BP Component Details에서 직접 바꾸거나 `ConfigureAccuracyGreybox`, `ConfigureMGTurretAccuracyGreybox` BP Node로 바꿀 수 있으며 0도는 정확 사격이다.
+- Projectile과 보존된 즉시 Trace 경로가 같은 분산 규칙을 사용한다. MG Pivot은 표적 중심을 계속 바라보고 탄환 방향만 흔들려 외형 조준과 명중률을 분리했다.
+- Rifle 회귀 테스트는 장애물·Damage 계약을 안정적으로 확인하기 위해 0도를 명시한다. 별도 검증은 무작위 Rifle/Shotgun 방향이 설정 원뿔을 벗어나지 않는지 확인한다.
+- 첫 임시 연결은 `MM_Rifle_Fire`, `MM_Rifle_Reload`를 `ABP_Unarmed`의 `DefaultSlot`에서 재생했지만, 화면에서 무장 자세가 없고 0.533초 발사 동작을 0.25초마다 재시작해 떨리는 문제가 확인됐다.
+- `/Game/Drone/AI/Animation/ABP_NPC_Rifle_Greybox`와 `BS_NPC_Rifle_Locomotion`을 프로젝트 소유 Asset으로 만들었다. Hostile Rifle·Shotgun은 Rifle ADS Idle, 8방향 Walk/Jog와 Rifle Jump를 사용하고 Friendly만 기존 Unarmed를 유지한다.
+- 발사 가산 Sequence 기본 Play Rate를 `2.4x`로 설정해 약 0.222초 안에 끝낸다. 역할 BP에서 Fire/Reload Asset·Play Rate를 바꾸거나 임시 재생을 끌 수 있다.
+- `DroneEditor Win64 Development` Build 성공. `NPCGreyboxAssets`, `WeaponContract`, `NPCPerceptionSearchPIE` 3/3과 새 Editor 프로세스의 저장된 Rifle Idle·27개 Rifle BlendSpace Sample·Hostile/Friendly AnimBP 분리 검증이 성공했다. 손 위치·총기 정렬과 반복 동작은 화면 육안 재확인이 남았고 전체 자동화·Blueprint 전체 Compile은 반복하지 않았으며 Commit·Push하지 않았다.
+
+## 2026-09-03 — AI-BALLISTIC-01 회피 가능한 Projectile
+
+- 기존 개인 무기와 MG는 발사 즉시 맞는 Visibility Trace였다. 드론이 발사 뒤에도 이동으로 회피할 수 있도록 `ADroneNPCProjectile` 공용 탄환을 추가했다.
+- 기본 탄속은 Rifle `4,500 cm/s`, Shotgun `3,500 cm/s`, MG `5,500 cm/s`다. 최종 난이도 값이 아니며 `ConfigureProjectileBallisticsGreybox`와 `ConfigureMGTurretProjectileGreybox` 또는 BP Class Defaults에서 조정한다.
+- Projectile은 Actor Tick·Chaos 물리 Simulation 없이 `ProjectileMovementComponent`의 Sweep 충돌을 사용한다. 지정 사거리 비행 시간에 0.25초 여유를 더한 뒤 자동 제거되어 누적되지 않는다.
+- Rifle은 탄환 1개, Shotgun은 기존 결정적 Spread 방향마다 탄환을 한 개씩 Spawn한다. 발사자와 MG 사용자는 이동 충돌에서 제외하고, 현재 지정한 Target에 맞았을 때만 기존 Damage를 적용한다.
+- Engine 기본 Sphere는 구매 에셋 전 이동 확인용이다. 최종 Mesh/Tracer/Niagara/Sound는 BP 파생 Projectile과 기존 `OnWeaponFired`에서 표현만 연결한다.
+- 즉시 Rifle/Shotgun Trace 코드는 삭제하지 않고 `bUseProjectileBallistics=false` 선택 경계로 보존했다. 회귀 테스트는 이 모드를 명시적으로 사용한다.
+- 첫 빌드 실패 표시는 소스 오류가 아니라 UnrealBuildTool의 AppData Trace 로그 교체 권한 거부였다. 권한 해소 후 `DroneEditor Win64 Development` Build가 성공했다.
+- 추가 충돌 결과 검사에서 Component Delegate의 생성자 연결이 시험 인스턴스에 적용되지 않는 문제를 발견했다. CDO 복제에 의존하지 않는 Actor `NotifyHit` 경계로 교체하고 Rifle/Shotgun Target impact가 무기 적중 카운터까지 돌아오는 것을 재검증했다.
+- `Drone.AI.ProjectileBallistics`, `RifleTrace`, `ShotgunTrace`, `WeaponContract`, `NPCPerceptionSearchPIE` 5/5가 성공했다. 전체 `Drone.`·Blueprint 전체 Compile·LFS는 반복하지 않았고 Commit·Push도 하지 않았다.
 
 ## 2026-09-03 — FLOW-03 미션 선택·설명·시작 완료
 

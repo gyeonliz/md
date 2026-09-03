@@ -1,6 +1,6 @@
 # 현재 작업 보드
 
-기준일: 2026-09-03 (Asia/Seoul)
+기준일: 2026-09-04 (Asia/Seoul)
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
@@ -10,15 +10,15 @@ Unreal 공유 기준선은 `origin/main=2d6a459`다. 전투 Greybox·AI-VIS-01A�
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-09-03 — FLOW-03 미션 선택·설명·시작 완료
+마지막 갱신: 2026-09-04 — AI-ANIM-TEMP-01 무장 자세·연사 떨림 구조 수정
 
 | 항목 | 상태 |
 |---|---|
 | 현재 단계 | FLOW-01~03 데이터·시작 화면·로비 미션 선택 완료, FLOW-04 브리핑→Map 준비 |
-| 진행 정도 | GameInstance Flow/Catalog, 실제 Mission·Drone Data Asset, 전용 Front-end BP/WBP/Map, 정적 Opening→Lobby와 Training Mission 목록·측면 설명·하단 시작 완료. NPC Visual/Muzzle 기반도 후속 표현용으로 준비 |
+| 진행 정도 | GameInstance Flow/Catalog, 실제 Mission·Drone Data Asset, 전용 Front-end BP/WBP/Map, 정적 Opening→Lobby와 Training Mission 목록·측면 설명·하단 시작 완료. Rifle·Shotgun·MG는 이동 Projectile과 BP 조정형 무작위 사격 원뿔을 기본 사용. Hostile Rifle·Shotgun은 프로젝트 소유 Rifle AnimBP 사용 |
 | 지금 작업 중 | `FLOW-03` 데이터 기반 로비 UI·집중 PIE 완료. 다음 활성 카드는 `FLOW-04` |
-| 완료 근거 | Game/Editor Build와 최종 `Drone.Flow` 3/3 통과. Mission 이름·설명은 저장 Definition과 일치, 잘못된 ID·중복 확정 0, Root Widget 생성 1회 확인 |
-| 수동 미확인 | Training 두 Lap 비교 HUD, OilRig Map Check·재질·조명·스케일·충돌·성능, Ground Drone/MG·NPC·Raw Drone 외형 채택 |
+| 완료 근거 | 기존 FLOW 검증 유지. Editor Build, `NPCGreyboxAssets`·`WeaponContract`·`NPCPerceptionSearchPIE` 3/3, 저장된 Rifle Idle·27개 Rifle BlendSpace Sample·역할별 AnimBP 분리 읽기 검증 성공 |
+| 수동 미확인 | 수정된 Manny 연사 반복 동작, 임시 발사·Reload 손 위치/총기 정렬, Training 두 Lap 비교 HUD, OilRig Map Check·재질·조명·스케일·충돌·성능, Ground Drone/MG·NPC·Raw Drone 외형 채택 |
 | 현재 차단 | FLOW-04 코드 차단 없음. 실제 Mission Trailer Asset 형식은 미정이므로 정적 Briefing 대체 화면 뒤 `MissionMap` Soft Reference를 여는 경로로 먼저 검증 가능 |
 | 다음 행동 | `FLOW-04`에서 MissionTrailer 대체 패널 종료 → `LoadingMissionMap` → 선택 Definition의 Training Map 로드와 GameInstance 선택 보존 연결 |
 | 다음 기능 | `FLOW-04 → FLOW-06` 한 Mission·한 Drone Front-end Vertical Slice. `AI-VIS-01B`는 Mission 흐름 뒤 실제 전투 표현 단계로 유지 |
@@ -147,8 +147,11 @@ Unreal 공유 기준선은 `origin/main=2d6a459`다. 전투 Greybox·AI-VIS-01A�
 | AI-WPN-01 | Drone / AI / Combat | `UDroneNPCWeaponComponent`의 공용 `CanFire/StartFire/StopFire/Reload`, 단일 Target Actor·Aim Point 계약을 구현했다. Controller는 Rifle/Shotgun 분기 없이 `DetectedDrone`을 같은 경로로 전달하고 실종·UnPossess 때 발사를 정리한다. 실제 Trace·Damage·탄약은 후속 카드다. Game/Editor Build, AI 9/9, 전체 25/25 통과. `2054d6f`에 포함돼 Push 완료 |
 | AI-WPN-02 | Drone / AI / Combat | Rifle Visibility 단일 Trace, 4,000cm Greybox 사거리, 0.25초 Cooldown과 반복 Timer를 구현했다. 장애물·사거리·Cooldown 전용 테스트와 기존 공용 Target/Aim Point 계약 회귀를 통과하고 Game용 테스트의 Editor 의존성도 차단했다. `0d92a5f` 기준 공유 완료 |
 | AI-WPN-03 | Drone / AI / Combat | Shotgun 1,600cm·0.9초·8 Pellet·6도 반각 Greybox를 구현했다. 한 Trigger의 다중 Trace, 결정적 Spread, 장애물·사거리·Cooldown과 Rifle 코드 분리를 자동 검증했다. Game/Editor Build, AI 11/11·전체 27/27, Blueprint 0/0/0, LFS fsck 뒤 `0d92a5f`로 Push 완료 |
+| AI-BALLISTIC-01 | Drone / AI / Combat | `ADroneNPCProjectile` 공용 Sweep 탄환을 추가하고 Rifle 4,500·Shotgun 3,500·MG 5,500 cm/s를 Gameplay 기본값으로 연결했다. 사거리 기반 자동 제거, 지정 표적 충돌 Damage, Engine Sphere Greybox와 BP 교체 경계를 제공한다. 기존 Trace는 선택형 회귀 경계로 유지. Editor Build와 집중 테스트 5/5 통과, 로컬 미커밋 |
+| AI-ACCURACY-01 | Drone / AI / Combat | Rifle 2.5도·Shotgun 6도·MG 3.5도 반각의 BP 조정형 사격 원뿔을 추가하고 모든 탄환을 원뿔 내부 무작위 방향으로 발사한다. 0도 정확 사격과 기존 Trace 선택 경계를 유지. Editor Build·사격 3/3·MG 통합 PIE 1/1 통과, 로컬 미커밋 |
+| AI-ANIM-TEMP-01 | Drone / AI / Animation | `ABP_NPC_Rifle_Greybox`와 `BS_NPC_Rifle_Locomotion`을 추가해 Hostile Rifle·Shotgun에 Rifle ADS Idle·8방향 Walk/Jog·Jump를 적용했다. Friendly는 Unarmed 유지. 0.533초 가산 Fire를 2.4x로 재생해 0.25초 연사 재시작 떨림 구조를 제거했다. Build·자동화 3/3·저장 Asset 읽기 검증 통과, 최종 육안 확인은 남음, 로컬 미커밋 |
 | AI-MG-01 | Drone / AI / Smart Object | Hostile 감지 StateTree에 MG 1-Slot Claim·NavMesh 이동·도착 뒤 예약 유지 상태를 추가했다. MG 사용 가능 Rifle Hostile 정확히 1명과 예약 1개, Shotgun 개인 무기 Fallback, Friendly 비무장을 PIE로 검증했다. Game/Editor Build, AI 11/11·전체 27/27, Blueprint 0/0/0, LFS fsck 뒤 `249d6cd`로 Push 완료 |
-| AI-MG-02 | Drone / AI / Smart Object | MG Claim을 Occupied로 바꾸고 Aim Pivot·6,000cm/0.15초 Trace·발당 8 Damage를 연결했다. 사수 사망·DroneLost·중단 시 Slot을 Free로 만들고 감지 중인 다른 MG 가능 Hostile이 재점유한다. Editor Build와 관련 PIE 1/1 통과, `6a18210` Push 포함 |
+| AI-MG-02 | Drone / AI / Smart Object | MG Claim을 Occupied로 바꾸고 Aim Pivot·6,000cm/0.15초 공격·발당 8 Damage를 연결했다. 현재 공격 판정은 AI-BALLISTIC-01의 5,500cm/s Projectile을 기본 사용한다. 사수 사망·DroneLost·중단 시 Slot을 Free로 만들고 감지 중인 다른 MG 가능 Hostile이 재점유한다. `6a18210` 기준 기능 위 로컬 보강 |
 | HP-01 | Drone / Combat / UI | NPC·Drone 공통 `UDroneHealthComponent` 기본 100/100, 0 이하 사망 1회, 추가 Damage 무시를 구현했다. Rifle 10·Shotgun 적중 Pellet당 8·MG 8 피해와 NPC/Drone 정지 규칙, 우측 상단 Drone 체력 HUD를 연결했다. 관련 AI PIE·HUD 테스트 각 1/1 통과, `6a18210` Push 포함 |
 | AI-COVER-01 | Drone / AI / Smart Object | MG Claim 실패 뒤 Cover 1-Slot을 Claim해 이동·Occupied 전환 후 개인 무기 사격한다. Greybox Map에 Cover Station 2개를 추가했고, MG 사망 뒤 Cover 병사가 Slot을 해제하고 MG를 재점유한다. Editor Build·StateTree/Map 갱신 검증·관련 PIE 1/1 통과, `6a18210` Push 포함 |
 | AI-COMBAT-END-01 | Drone / AI / Mission | Drone 체력 0에서 Blueprint `OnDroneDestroyed`를 한 번 보내고 Perception Source를 해제한다. 감지 중인 살아 있는 Hostile의 개인 무기·MG·Cover·이동·마지막 위치를 정리해 Search 없이 Patrol로 복귀시킨다. 사망 Hostile·Friendly 무반응과 중복 Damage Event 방지를 확장 PIE 1/1로 검증, `6a18210` Push 포함 |
