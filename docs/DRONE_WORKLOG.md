@@ -18,21 +18,50 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-09-03 — 프로젝트 통합 기획·개발 현황서 작성
+마지막 갱신: 2026-09-03 — FLOW-03 미션 선택·설명·시작 완료
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | Front-end Mission Flow 기준 확정 + Tutorial/Smart Object 수동 확인 대기 |
-| Unreal 기준선 | 공유 `main=origin/main=6a18210`; Smart Object C++·테스트 7개와 `SO_Def_FriendlyBasePatrol` 1개 로컬 수정 |
-| 자동 검증 | DroneEditor Build 성공. Slot Yaw 직접 판정을 포함한 SmartObjectFoundationDefaults·NPCPerceptionSearchPIE 2/2 성공, 경고·오류 0. Definition/BP 6쌍 Validate 성공 |
+| 전체 단계 | FLOW-01~03 데이터·시작 화면·로비 미션 선택 로컬 완료, Tutorial/Smart Object 수동 확인 대기 |
+| Unreal 기준선 | 공유 `main=origin/main=2d6a459`; FLOW-01~03과 NPC Visual 기반 26개 경로 로컬 수정 |
+| 자동 검증 | FLOW-03 뒤 Drone Game/Editor Build와 최종 `Drone.Flow` 3/3 성공. Data/Front-end Asset 새 프로세스 Validate, NPC Visual WeaponContract 1/1과 역할 BP/Map Validate 성공 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | `FLOW-00` 새 화면 흐름과 개발 순서 문서화 완료. Unreal 신규 Flow 코드는 미착수 |
-| 차단 조건 | FLOW 구현 차단 없음. 기존 `AI-SO-TUNE-01` Unreal 로컬 변경을 새 기능과 섞지 않도록 먼저 검토 필요 |
-| 다음 행동 | Smart Object 방향을 화면 확인하고 사용자 Commit 범위를 정리한 뒤 `FLOW-01` 상태·Mission/Drone 데이터 계약 시작 |
-| 다음 기능 | `FLOW-01 → FLOW-06` 한 Mission·한 Drone Front-end Vertical Slice |
+| 지금 작업 중 | `FLOW-03` 데이터 기반 로비 UI·집중 PIE 완료. 다음 활성 카드는 `FLOW-04` |
+| 차단 조건 | FLOW-04 코드 차단 없음. 실제 Mission 영상 형식은 미정이므로 정적 대체 Briefing으로 진행 |
+| 다음 행동 | MissionTrailer 종료 → LoadingMissionMap → 선택 Definition의 Training Map 로드와 Mission 선택 보존 연결 |
+| 다음 기능 | `FLOW-04 → FLOW-06` 한 Mission·한 Drone Front-end Vertical Slice |
 | 이후 | 결과/재시도, Flight 실패 연결, AI/MG·Jamming과 실제 비주얼 통합 |
-| Git 처리 | Unreal 8개와 문서·도구 로컬 변경을 유지. Commit·Push는 사용자가 수행 |
+| Git 처리 | Unreal 26개 경로와 문서·도구 로컬 변경을 유지. Codex는 Commit·Push하지 않음 |
 | 협업 Git | 환경 맵·재질 중앙 반영 및 검증 완료. 개인 `.vsconfig`·시험 주석 정리 완료. 팀원 PC Remote 실측만 남음 |
+
+## 2026-09-03 — FLOW-03 미션 선택·설명·시작 완료
+
+- Flow Subsystem이 등록 Mission ID를 이름순으로 반환하도록 해 로비가 `TMap` 내부 순서나 별도 문자열 목록을 소유하지 않게 했다.
+- 현재 한 개의 Training Mission을 `MissionSelectButton`으로 표시하고, 선택 뒤 이름·설명·지역·난이도는 `DA_Mission_Tutorial_Training`에서 읽는다.
+- 하단 `StartMissionButton`은 유효한 선택이 있을 때만 활성화되고 `ConfirmSelectedMission()`으로 `MissionTrailer` 상태까지만 전환한다. 실제 영상·Map 이동은 FLOW-04로 남겼다.
+- WBP가 최종 Designer를 만들 때 사용할 이름 계약은 `MissionSelectButton`, `MissionSelectButtonText`, `MissionNameText`, `MissionDescriptionText`, `MissionMetaText`, `StartMissionButton`이다. Blueprint는 선택/확정 판정을 중복 구현하지 않는다.
+- 최종 Drone Game/Editor Build와 `Drone.Flow` 3/3이 성공했다. PIE에서 잘못된 Mission ID 거부, Definition과 표시 이름·설명 일치, 중복 확정 거부, 같은 Root Widget 1회 생성을 확인했다.
+- 새 Asset을 추가하지 않아 Unreal 변경 경로 수는 26개로 유지한다. Commit·Push하지 않았고 다음 카드는 `FLOW-04`다.
+
+## 2026-09-03 — FLOW-02 시작 화면→로비 완료
+
+- `UDroneGameFlowSubsystem::EnsureDefaultCatalog()`을 추가해 첫 Vertical Slice Drone을 먼저, Mission을 다음에 GameInstance 수명 Catalog로 등록한다. 같은 Asset의 반복 호출은 중복 항목을 만들지 않는다.
+- 새 `ADroneFrontEndGameMode`는 `DefaultPawnClass=None`, 새 `ADroneFrontEndPlayerController`는 Root Widget 한 개와 UI 입력 수명만 소유한다.
+- 새 `UDroneFrontEndRootWidget`은 정적 Opening 대체 화면과 Lobby 패널을 같은 인스턴스에서 전환한다. 실제 영상이 생기면 `FinishOpeningTrailer()`를 Media/Sequencer 종료 Callback에서 호출하고, `ReceiveFrontEndStateDisplayed`에는 Blueprint 표현만 붙인다.
+- 실제 `/Game/Drone/FrontEnd/UI/WBP_DroneFrontEndRoot`, BP Controller/GameMode와 `/Game/Drone/Maps/Lvl_DroneFrontEnd`를 만들었다. WBP Designer는 최종 외형 미정이므로 비어 있고 현재는 C++ fallback Layout을 사용한다.
+- `GameDefaultMap`을 `Lvl_DroneFrontEnd`로 바꿨지만 `EditorStartupMap`은 기존 Training Map을 유지했다. Front-end Map에서는 Drone 선택 전 Drone Pawn을 Spawn하지 않는다.
+- 최초 Front-end Asset Create는 자산 저장까지 성공했으나 Python 검증에서 Generated Class API 이름을 잘못 사용해 종료 코드 3이 났다. `MathLibrary.class_is_child_of`로 검증만 수정한 뒤 새 프로세스 Validate가 성공했으며 생성 Asset은 덮어쓰지 않았다.
+- 첫 PIE에서는 UIOnly Focus 대상이 Focusable이 아니어서 실패했다. Root Widget을 Focusable로 만든 뒤 `Drone.Flow.FrontEndPIE` 1/1이 성공했다.
+- 최종 확인은 `Drone Win64 Development`, `DroneEditor Win64 Development`, Front-end Asset Validate와 `Drone.Flow` 3/3이다. Root 생성 1회, Opening→Lobby 단일 전환, 두 번째 전환 거부, Mission/Drone Catalog 각 1개, 선택 전 Drone 0대를 확인했다.
+- 모든 변경은 로컬 미커밋이며 Commit·Push하지 않았다. 다음 카드는 `FLOW-03`이다.
+
+## 2026-09-03 — FLOW-01 상태·Mission/Drone 데이터 계약 완료
+
+- `UDroneGameFlowSubsystem`에 실행부터 결과까지 8개 상태, Mission/Drone 선택 Snapshot, 잘못된 순서와 중복 요청 거부 규칙을 구현했다.
+- `UDroneDefinition`, `UDroneMissionDefinition` Primary Data Asset과 실제 `DA_Drone_Scout_Greybox`, `DA_Mission_Tutorial_Training`을 만들었다. 이는 첫 Greybox 값이며 최종 Drone 종류나 게임 규칙 확정이 아니다.
+- `DroneEditor Win64 Development`, 저장 Asset 새 프로세스 Validate와 `Drone.Flow.Contract` 1/1이 통과했다.
+- 후속 전투 표현을 위해 NPC Character에 `WeaponVisualComponent`, `WeaponMuzzleComponent`, BP 발사/재장전 표현 Event를 준비했다. 실제 Rifle/Shotgun Mesh·Animation·FX·SFX는 연결하지 않았다.
+- 모든 변경은 로컬 미커밋으로 유지했다.
 
 ## 2026-09-03 — 프로젝트 통합 기획·개발 현황서
 

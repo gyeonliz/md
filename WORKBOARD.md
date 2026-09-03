@@ -4,29 +4,29 @@
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 공유 기준선은 `origin/main=6a18210`다. MG 점유·사격·사망 교대, NPC/Drone 체력, Cover, Drone 파괴 교전 종료, 탄창·재장전과 AI-VIS-01A 표현 이벤트까지 Push됐다. 실제 Mesh·Animation·FX·SFX 연결은 후속 작업이다.
+Unreal 공유 기준선은 `origin/main=2d6a459`다. 전투 Greybox·AI-VIS-01A와 Smart Object 방향 보강까지 Push됐다. 실제 Mesh·Animation·FX·SFX 연결은 후속 작업이다.
 
 2026-09-03 게임 흐름은 `실행 → 시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → 맵 → Drone 선택 → Mission 시작/측면 목표 UI`로 변경됐다. 사람 Operator 조작·NPC 대화 수령·Operator↔Drone 전환은 폐기하며 [`docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 최우선 실행 기준으로 사용한다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-09-03 — Front-end Mission Flow와 전체 기획·개발 현황 통합 문서화
+마지막 갱신: 2026-09-03 — FLOW-03 미션 선택·설명·시작 완료
 
 | 항목 | 상태 |
 |---|---|
-| 현재 단계 | Front-end·Mission 진입 흐름 재기획 완료 + Tutorial/Smart Object 기존 수동 확인 대기 |
-| 진행 정도 | 전투 Greybox와 `AI-VIS-01A`까지 Push. `AI-SO-TUNE-01` 로컬 구현·자동 검증 뒤, 사람 Operator 없는 새 화면 흐름과 FLOW-00~08 카드를 문서화 |
-| 지금 작업 중 | `FLOW-00` 문서 기준선 완료. 신규 Unreal 구현은 아직 시작하지 않았으며 다음 활성 카드는 `FLOW-01` |
-| 완료 근거 | 새 사용자 흐름, 폐기 범위, 재사용 기능, 상태·데이터·UI 책임과 반복 검증 조건을 계획/보드/상태/컨텍스트에 반영하고 `DRONE_PROJECT_PLANNING_BRIEF.md`로 통합. 이번 변경은 문서만 수정했으므로 새 Build·PIE 근거는 없음 |
+| 현재 단계 | FLOW-01~03 데이터·시작 화면·로비 미션 선택 완료, FLOW-04 브리핑→Map 준비 |
+| 진행 정도 | GameInstance Flow/Catalog, 실제 Mission·Drone Data Asset, 전용 Front-end BP/WBP/Map, 정적 Opening→Lobby와 Training Mission 목록·측면 설명·하단 시작 완료. NPC Visual/Muzzle 기반도 후속 표현용으로 준비 |
+| 지금 작업 중 | `FLOW-03` 데이터 기반 로비 UI·집중 PIE 완료. 다음 활성 카드는 `FLOW-04` |
+| 완료 근거 | Game/Editor Build와 최종 `Drone.Flow` 3/3 통과. Mission 이름·설명은 저장 Definition과 일치, 잘못된 ID·중복 확정 0, Root Widget 생성 1회 확인 |
 | 수동 미확인 | Training 두 Lap 비교 HUD, OilRig Map Check·재질·조명·스케일·충돌·성능, Ground Drone/MG·NPC·Raw Drone 외형 채택 |
-| 현재 차단 | FLOW 설계 차단 없음. Unreal 작업 트리에 `AI-SO-TUNE-01` 8개 변경이 남아 있어 새 기능 변경과 Commit 범위를 섞지 않도록 먼저 검토 필요 |
-| 다음 행동 | 기존 Smart Object 방향 변경을 Editor에서 수동 확인하고 사용자가 Commit 범위를 정리한 뒤 `FLOW-01` 상태·Mission/Drone 데이터 계약 착수 |
-| 다음 기능 | `FLOW-01 → FLOW-02~06`으로 한 Mission·한 Drone Front-end Vertical Slice. `AI-VIS-01B`는 Mission 흐름 뒤 실제 전투 표현 단계로 이동 |
+| 현재 차단 | FLOW-04 코드 차단 없음. 실제 Mission Trailer Asset 형식은 미정이므로 정적 Briefing 대체 화면 뒤 `MissionMap` Soft Reference를 여는 경로로 먼저 검증 가능 |
+| 다음 행동 | `FLOW-04`에서 MissionTrailer 대체 패널 종료 → `LoadingMissionMap` → 선택 Definition의 Training Map 로드와 GameInstance 선택 보존 연결 |
+| 다음 기능 | `FLOW-04 → FLOW-06` 한 Mission·한 Drone Front-end Vertical Slice. `AI-VIS-01B`는 Mission 흐름 뒤 실제 전투 표현 단계로 유지 |
 | 에셋 인수 | `C:\에셋` 원본은 보존. ArmyVFX·InfantrySFX·Ground Drone·NPC 외형·Raw Drone을 정확한 의존성 묶음으로 이식 |
 | 맵 이식 | 기존 환경 3종에 `Lvl_OilRig`을 추가. Vendor FirstPerson Sample 의존성을 끌어오던 Door Actor 8개는 중앙 사본에서 제거 |
 | Editor/MCP | Build·Headless 검증 뒤 모든 Unreal Editor 프로세스 종료. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
-| Git 처리 | Unreal `main=origin/main=6a18210` 위 Smart Object C++·테스트 7개와 `SO_Def_FriendlyBasePatrol` 1개, 문서 `main=origin/main=2c99f00` 위 기존 로컬 변경과 새 Front-end Flow 문서 변경이 미커밋. Commit·Push는 사용자가 수행 |
+| Git 처리 | Unreal `main=origin/main=2d6a459` 위 FLOW-01~03·NPC Visual 기반 26개 경로, 문서 `main=origin/main=14c4ae6` 위 상태 문서와 Flow 작성/검증 도구 4개가 로컬 미커밋. Codex는 Commit·Push하지 않음 |
 | UI/기획 참고 | Figma `Project:Droner`는 세계관·청록/녹색 HUD·경고 아이콘 참고용으로만 읽음. Figma는 수정하지 않았고 게임 제목 통일은 보류 |
 | 협업 Git | 팀원 환경 맵·재질은 중앙 `main`에 들어온 상태다. Battlefield의 새 `M_Enemy`·`M_Start`·`M_Target` 의존성과 세 중앙 맵 로드를 검증했고, `.vsconfig` 14.50 복원과 `//test` 제거를 별도 정리했다. 팀원 PC의 실제 Remote 구성 확인은 남음 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
@@ -44,9 +44,6 @@ Unreal 공유 기준선은 `origin/main=6a18210`다. MG 점유·사격·사망 �
 | PFN-P3 | Drone | Mission Runtime 카드 PFN-15~21 활성화 | FLOW-06과 PFN-14 통과 |
 | PFN-P4 | Drone / Unreal | Enemy AI·Turret 카드 PFN-22~32 활성화 | PFN-21 통과 |
 | PFN-P5 | Drone / Unreal | 통합 Greybox 카드 PFN-33~38 활성화 | PFN-32 통과 |
-| FLOW-02 | Drone / Front-end | 시작 트레일러 → 로비 | FLOW-01 통과 |
-| FLOW-03 | Drone / Front-end / UI | 미션 선택·측면 설명·하단 시작 | FLOW-02 통과 |
-| FLOW-04 | Drone / Front-end / Mission | 미션 트레일러 → 선택 Map 로드 | FLOW-03 통과 |
 | FLOW-05 | Drone / Mission / UI | Map 진입 뒤 Drone 선택·Spawn/Possess | FLOW-04 통과 |
 | FLOW-06 | Drone / Mission / UI | Mission 시작과 측면 목표 UI | FLOW-05 통과 |
 | FLOW-07 | Drone / Mission / UI | 성공·실패 결과, 재도전·로비 복귀 | FLOW-06 통과 |
@@ -69,7 +66,7 @@ Unreal 공유 기준선은 `origin/main=6a18210`다. MG 점유·사격·사망 �
 | ID | 태그 | 작업 | 완료 조건 |
 |---|---|---|---|
 | GIT-10 | Git / Unreal | 다른 PC Clone과 실행 | LFS 포함 Clone 후 UE 5.8.1에서 열림 |
-| FLOW-01 | Drone / Front-end / Data | Flow 상태와 Mission/Drone Data Asset 계약 | 한 Mission·한 Drone을 ID로 선택·검증하고 잘못된 ID와 중복 전환을 안전하게 거부 |
+| FLOW-04 | Drone / Front-end / Mission | 미션 트레일러 → 선택 Map 로드 | 정적 Briefing 종료 뒤 선택 Definition의 Training Map으로 이동하고 GameInstance의 Mission 선택이 유지됨 |
 | GIT-TEAM-01 | Git / Unreal / 협업 | 팀원 PC 원격 규칙 확인 | 환경 맵·재질 중앙 반영과 개인 설정 정리는 완료. 팀원 PC에서 `origin`/`upstream` 또는 `origin`/`fork`, `pushurl`을 실제 확인 |
 | SYNC-04 | Codex Sync | 두 PC 간 실제 수동 인계 시험 | Git 흐름과 문맥 패키지 흐름을 각각 완료 |
 | TUT-04 | Drone / Tutorial / UI | 비교 결과 수동 판정 | 두 번 완주해 첫 기준 생성과 두 번째 이전 평균·Best·부호를 실제 HUD에서 확인 |
@@ -88,7 +85,7 @@ Unreal 공유 기준선은 `origin/main=6a18210`다. MG 점유·사격·사망 �
 | TUT-04A | Drone / Tutorial / UI | 한글 비행·구간 통계 HUD와 Course Authoring 보강 | 병합 main Build·전체 15/15·BP 0/0/0 통과. PIE에서 한글 HUD 두 패널·현재 Gate·세분화 코스 선 초기 렌더 확인 | Gate 0→3 실제 한 Lap 뒤 최근·완료 구간 숫자 갱신 확인 |
 | TUT-04B | Drone / Tutorial / UI | 이전 평균·Best·Delta 결과 | 현재 시도 제외 평균, 첫 기준, Best와 Segment 비교, Blueprint Event, HUD 네 행 구현. Build·16/16 통과 | 실제 두 Lap에서 표시 값과 부호 확인 |
 | AST-05 | Drone / Unreal / Asset | 남은 제공 에셋 선별 라이브러리 | ThirdParty 891개와 `Lvl_OilRig` 1개. 수량·대표 로드·외부/누락 0 | Editor 시각·성능·Map Check와 실제 채택 후보 결정 |
-| AI-SO-TUNE-01 | Drone / AI / Smart Object | 배치·Offset·Definition·검색·StateTree 조정 가이드와 Slot 도착 방향 적용 | `SlotFacingPreview`를 SmartObjectComponent에 부착하고 Controller가 예약 Slot Yaw를 Pawn·ControlRotation에 적용. DroneEditor Build, Slot Yaw 판정 포함 자동화 2/2, Definition/BP 6쌍 Validate 통과. `SO_Def_FriendlyBasePatrol` 재직렬화/사용자 저장 가능 변경은 보존 | `Lvl_NPCSmartObjectGreybox`에서 Cyan 화살표와 순찰·Cover·MG 도착 방향의 화면 일치 확인. Definition 변경은 Commit 전 Editor에서 의도한 Slot 설정인지 확인 |
+| AI-SO-TUNE-01 | Drone / AI / Smart Object | 배치·Offset·Definition·검색·StateTree 조정 가이드와 Slot 도착 방향 적용 | 공유 `2d6a459`에 방향 보강과 Definition이 Push됨. DroneEditor Build, Slot Yaw 판정 포함 자동화 2/2, Definition/BP 6쌍 Validate 통과 | `Lvl_NPCSmartObjectGreybox`에서 Cyan 화살표와 순찰·Cover·MG 도착 방향의 화면 일치만 확인 |
 
 ## Done
 
@@ -96,6 +93,9 @@ Unreal 공유 기준선은 `origin/main=6a18210`다. MG 점유·사격·사망 �
 |---|---|---|
 | WM-01 | 전체 관리 | 이 파일에 Inbox/Todo/Doing/Done과 일곱 분류 태그 사용 가능 |
 | FLOW-00 | Drone / Front-end / Planning | 새 실행 흐름, 사람 Operator 폐기, Mission/Drone 데이터·UI 책임과 FLOW-01~08 검증 순서를 문서 기준선으로 확정 |
+| FLOW-01 | Drone / Front-end / Data | `UDroneGameFlowSubsystem`, 8개 상태, Mission/Drone Primary Data Asset, ID/Catalog/중복 요청 검증을 구현했다. 실제 `DA_Mission_Tutorial_Training`과 `DA_Drone_Scout_Greybox`를 생성해 새 프로세스 Validate 및 `Drone.Flow.Contract` 1/1 통과. 로컬 미커밋 |
+| FLOW-02 | Drone / Front-end / UI | `Lvl_DroneFrontEnd`, 전용 BP GameMode/Controller, `WBP_DroneFrontEndRoot`와 C++ 정적 대체 Layout을 구현했다. 새 실행 Opening→계속→Lobby, Root 1개, 중복 전환 0, 선택 전 Drone 0대를 PIE에서 확인. 로컬 미커밋 |
+| FLOW-03 | Drone / Front-end / UI | 등록 Mission ID 목록을 이름순으로 공급하고 첫 Training Mission 버튼·이름·설명·지역/난이도·하단 시작을 같은 Definition에 연결했다. 시작은 `MissionTrailer`까지만 전환하며 잘못된 ID·중복 확정을 거부한다. 최종 Flow 3/3 통과, 로컬 미커밋 |
 | PLAN-01 | Drone / Planning | 세계관·화면 흐름·Tutorial/Story·UI·구현 현황·기술 구조·로드맵·검증·보류 결정을 통합 기획서로 정리 |
 | ENV-01 | Unreal | 작업컴 UE 5.8.1 설치 확인 |
 | GIT-01 | Git | Git 2.53.0.windows.3 실행 확인 |
@@ -163,7 +163,7 @@ Unreal 공유 기준선은 `origin/main=6a18210`다. MG 점유·사격·사망 �
 
 ## 이번 인계의 정지선
 
-Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 공유 기준은 `origin/main=6a18210`다. AI-PER-01부터 AI-VIS-01A까지의 전투 Greybox와 표현 이벤트가 원격에 포함됐다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
+Unreal 프로젝트의 초기 Commit은 `91498b7`이고 현재 공유 기준은 `origin/main=2d6a459`다. AI-PER-01부터 AI-VIS-01A와 Smart Object 방향 보강이 원격에 포함됐다. 다른 PC Clone·LFS·UE 5.8.1 실행과 문서 Clone/Pull을 확인하기 전까지 PC 간 전체 공유 흐름은 완료로 닫지 않는다.
 
 Android 제외와 PFN-01~06, HUD-01, HUD-02, TUT-01~03, 최초 에셋 인수 감사 `AST-00`, 다른 PC의 `C:\에셋` 재검증 `AST-VERIFY-01`, NavigationArrows 최소 이식·원격 공유 `AST-02A`를 완료했다. `AST-01`의 실제 Loop 청감은 여전히 수동 미확인이다. 현재 main에는 TUT-04B 이전 평균·Best 비교와 기록 결과 HUD까지 구현됐으며 실제 두 Lap 표시 판정이 남았다. 이후 상세 순서는 `docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`, Tutorial·조작 기준은 `docs/DRONE_TUTORIAL_STORY_PLAN.md`를 따른다.
 
@@ -175,4 +175,4 @@ UE-MCP-01도 완료했다. 이후 Editor 내부 Actor·Asset·Blueprint·UMG·Au
 - `AST-02A`의 기술 이식·검증·기능 Branch와 `main` Push는 완료했다. 실제 Training HUD 연결은 아직 하지 않았다.
 - HUD 연결 전에도 자산은 안전하게 로드 가능한 상태지만, 화면에 보이는 구현으로 과장하지 않는다.
 - 프로젝트 소유 맵은 `/Game/Drone/Maps` 한 곳에서 관리한다. 공급사 원본 맵을 추가할 때도 검토용 사본만 이 폴더에 두고 의존 자산은 각 ThirdParty 폴더에 유지한다.
-- TUT-04 실제 두 Lap 확인은 그대로 남긴다. `AI-PER-01`부터 `AI-VIS-01A`까지 Push 완료했고 현재 신규 기능은 `FLOW-01`이다. `AI-VIS-01B`는 Mission 흐름 뒤로 이동했다.
+- TUT-04 실제 두 Lap 확인은 그대로 남긴다. `FLOW-01~03`은 로컬 완료됐고 현재 신규 기능은 `FLOW-04`다. `AI-VIS-01B`는 Mission 흐름 뒤로 이동했다.

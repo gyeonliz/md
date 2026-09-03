@@ -4,7 +4,7 @@
 
 이 문서는 적군 순찰과 드론 발견 대응, 소총·샷건 분기, 기지 아군 NPC의 생활·순찰 이동, 한 명만 사용하는 MG Turret을 같은 기반 위에 구성하기 위한 실전 가이드다.
 
-현재 공유 기준선 `6a18210`에는 **MG·체력·사망 교대·Cover·Drone 파괴 교전 종료와 Rifle/Shotgun 탄창**까지 반영돼 있다. `ST_NPC_HostilePatrol`은 MGTurret을 먼저 시도하고 실패한 Hostile은 Cover 1-Slot으로 이동해 개인 무기로 대응한다. 사수가 사망하면 Cover 병사가 자기 Slot을 놓고 빈 MG를 재Claim할 수 있다. Cover도 없으면 제자리 개인 무기로 대응하며, 실종 Event 뒤에는 모든 Slot을 정리하고 3초 Search 후 순찰로 복귀한다. Drone이 파괴되면 Search 없이 즉시 전투 자원을 정리하고 Patrol로 돌아간다. 예비 탄약·재장전 시간·생활/전투 Animation·FX·SFX와 최종 사망 연출은 아직 완성된 기능이 아니다.
+현재 공유 기준선 `2d6a459`에는 **MG·체력·사망 교대·Cover·Drone 파괴 교전 종료·Rifle/Shotgun 탄창과 Smart Object 도착 방향 보강**까지 반영돼 있다. `ST_NPC_HostilePatrol`은 MGTurret을 먼저 시도하고 실패한 Hostile은 Cover 1-Slot으로 이동해 개인 무기로 대응한다. 사수가 사망하면 Cover 병사가 자기 Slot을 놓고 빈 MG를 재Claim할 수 있다. Cover도 없으면 제자리 개인 무기로 대응하며, 실종 Event 뒤에는 모든 Slot을 정리하고 3초 Search 후 순찰로 복귀한다. Drone이 파괴되면 Search 없이 즉시 전투 자원을 정리하고 Patrol로 돌아간다. 예비 탄약·재장전 시간·생활/전투 Animation·FX·SFX와 최종 사망 연출은 아직 완성된 기능이 아니다.
 
 ## 바로 찾는 수정 위치
 
@@ -537,7 +537,7 @@ Editor 테스트:
 | `AI-VIS-01A` | 자산 호환성 감사·BP 표현 Event | **Done** — Manny Rifle Animation 38개, Weapon Mesh 70개, 이름 기반 Shotgun Mesh 0개와 서로 다른 NPC Skeleton을 기록. 발사/Reload Event 및 집중 테스트 3/3 통과 |
 | `AI-VIS-01B` | 외형·Animation·FX·SFX 연결 | Manny 임시 Rifle과 MG 표현부터 연결해 T Pose·손 위치·Muzzle 기준 확인. Shotgun 실제 Mesh와 최종 역할 외형은 미정 |
 
-`AI-SO-00 → AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01 → AI-PER-01 → AI-WPN-01 → AI-WPN-02 → AI-WPN-03 → AI-MG-01 → AI-MG-02 → HP-01 → AI-COVER-01 → AI-COMBAT-END-01 → AI-AMMO-01 → AI-VIS-01A`는 코드·에셋과 해당 집중 자동화 기준 완료했다. AI 하위 기능의 다음 후보는 `AI-VIS-01B`지만, 프로젝트 전체 신규 기능 우선순위는 2026-09-03 확정한 `FLOW-01~06` Front-end Mission 흐름이다.
+`AI-SO-00 → AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01 → AI-PER-01 → AI-WPN-01 → AI-WPN-02 → AI-WPN-03 → AI-MG-01 → AI-MG-02 → HP-01 → AI-COVER-01 → AI-COMBAT-END-01 → AI-AMMO-01 → AI-VIS-01A`는 코드·에셋과 해당 집중 자동화 기준 완료했다. AI 하위 기능의 다음 후보는 `AI-VIS-01B`지만, 프로젝트 전체 신규 기능 우선순위는 FLOW-01~03 완료 뒤 `FLOW-04~06` Front-end Mission 흐름이다.
 
 ### Asset 재검증 명령
 

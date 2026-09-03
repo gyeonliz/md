@@ -4,7 +4,7 @@
 
 이 문서는 현재 Unreal `drone` 저장소를 직접 확인한 결과를 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
 
-TUT-03 완료 기능 Commit은 `551e287`이다. 현재 공유 main은 `6a18210`이며 MG 점유·조준·사격·사망 뒤 재점유, 공통 체력, Cover 대응, Drone 파괴 시 교전 종료, 탄창·즉시 재장전과 AI-VIS-01A Blueprint 발사/재장전 이벤트까지 포함한다. 팀원 환경 맵·재질 변경과 정리 Merge `888414f`도 보존한다. 환경 Map은 후보 공간이며 Tutorial 기본 실행 구조를 바꾸지 않는다.
+TUT-03 완료 기능 Commit은 `551e287`이다. 현재 공유 main은 `2d6a459`이며 MG 점유·조준·사격·사망 뒤 재점유, 공통 체력, Cover 대응, Drone 파괴 시 교전 종료, 탄창·AI-VIS-01A 표현 Event와 Smart Object 방향 보강까지 포함한다. FLOW-01~03과 NPC Weapon Visual 기반은 이 위의 로컬 미커밋이다. 팀원 환경 맵·재질 변경과 정리 Merge `888414f`도 보존한다.
 
 NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합됐다. 자산은 main에 있지만 프로젝트 소유 Widget Host는 아직 구현하지 않았으므로 화면에 나타나지 않는 것이 정상이다.
 
@@ -17,6 +17,7 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합�
 | `Drone.AI` Automation | 11/11 통과. Rifle 빈 시험 World의 예상 RecastNavMesh 경고 1건 |
 | 전체 `Drone.` Automation | 27/27 통과, 실패 0 |
 | 전투 집중 검증 | AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01 관련 집중 테스트 통과. AI-VIS-01A Editor Build와 WeaponContract·RifleTrace·ShotgunTrace 3/3 통과. 이 변경을 포함한 `6a18210` 뒤 전체 묶음은 아직 반복하지 않음 |
+| Front-end Flow | FLOW-01~03 Game/Editor Build, Data/Front-end Asset 새 프로세스 Validate, 최종 `Drone.Flow` 3/3 통과. Root Widget 1개·중복 전환 0·선택 전 Drone 0대·Definition 기반 Mission 설명 일치 확인 |
 | `CompileAllBlueprints` | Blueprint Errors 0, Blueprint warnings 0, failed load 0. 별도 Summary에 기존 Battlefield Pose GUID와 MCP 고지 경고 유지 |
 | 현재 에셋 이식 재검증 | FPV 전용 1/1, Blueprint 0/0/0, 스테이징 선택 자산·현재 Integration 금지 의존성 0, 이식 13개 LFS와 fsck 통과 |
 | 기존 Standalone 시각 기록 | FPV 외형, 고정 추적 Camera, 실제 WBP HUD, Cyan 안내선, Current/Inactive Gate 표시 확인 |
@@ -24,13 +25,32 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합�
 
 현재 main의 `UDroneTrainingLapRecorderComponent`는 Segment/Lap 원본 뒤 TUT-04B 비교 결과도 만든다. 첫 성공은 기준 기록, 이후 성공은 현재 시도를 제외한 이전 평균과 Best를 사용한다. HUD에 이전 완주 평균·Best·시간 Delta·속도 Delta가 표시되며 계산은 Blueprint에 중복하지 않는다. 실제 두 Lap 표시 확인 전까지 TUT-04의 수동 판정은 남아 있다.
 
-## 확정됐지만 아직 구현하지 않은 Front-end 경계
+## 구현된 Front-end 경계
 
 2026-09-03 사용자 결정으로 사람 Operator Character와 NPC 대화 기반 Mission 수령, Operator↔Drone 전환은 폐기됐다. 새 실행 흐름은 `시작 트레일러 → 로비 → 미션 선택/측면 설명 → 미션 트레일러 → Map → Drone 선택 → Mission 시작/측면 목표 UI`다.
 
-현재 Source/Asset에는 이 Front-end Flow, Mission/Drone Definition, 로비 Widget, Trailer 전환과 Drone 선택 UI가 아직 없다. 기존 `ADronePrototypeGameMode`가 바로 Pawn을 Spawn/Possess하는 구조는 Training 검증용으로 유지하고, 새 Mission Flow에서 확정 전 Spawn을 막는 별도 진입 계층을 추가할 예정이다. 상세 책임과 작업 순서는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 따른다.
+현재 Source/Asset에는 FLOW-01 상태·Mission/Drone Definition, FLOW-02 정적 Opening→Lobby, FLOW-03 Training Mission 선택·설명·시작까지 있다. `Lvl_DroneFrontEnd`의 전용 GameMode는 Pawn을 만들지 않고 전용 Controller가 `WBP_DroneFrontEndRoot` 하나만 소유한다. 실제 영상, Map 이동과 Drone Spawn은 아직 없다. 기존 `ADronePrototypeGameMode`의 즉시 Spawn/Possess는 Training 단독 검증용으로 유지한다. 상세 책임과 작업 순서는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 따른다.
 
 ## 1. 런타임 연결 구조
+
+### Front-end Map 흐름
+
+```text
+/Game/Drone/Maps/Lvl_DroneFrontEnd
+└─ BP_DroneFrontEndGameMode (Default Pawn 없음)
+   └─ BP_DroneFrontEndPlayerController
+      ├─ GameInstance의 UDroneGameFlowSubsystem
+      │  ├─ Mission/Drone Catalog 각 1개
+      │  └─ Boot → OpeningTrailer → LobbyMissionSelect
+      └─ WBP_DroneFrontEndRoot 한 개
+         ├─ OpeningPanel + ContinueButton
+         └─ LobbyPanel
+            ├─ Training Mission 선택 버튼
+            ├─ Definition 기반 이름·설명·지역/난이도
+            └─ 하단 시작 → MissionTrailer
+```
+
+`WBP_DroneFrontEndRoot`는 현재 Designer가 비어 있어 C++ 정적 대체 Layout을 쓴다. 사용자가 UI를 꾸밀 때 `OpeningPanel`, `LobbyPanel`, `ContinueButton` 이름을 지키면 C++ 수명·전환 로직을 다시 만들 필요가 없다. 실제 Trailer 종료는 `FinishOpeningTrailer`, Blueprint Animation/표현은 `ReceiveFrontEndStateDisplayed`를 사용한다.
 
 ### Training Map 전체 흐름
 
@@ -198,6 +218,7 @@ Source/Drone/
 │  └─ Tests/DroneTelemetryTest.cpp
 ├─ UI/
 │  ├─ DroneFlightHUDWidget.h/.cpp
+│  ├─ DroneFrontEndRootWidget.h/.cpp
 │  └─ Tests/
 │     ├─ DroneFlightHUDBlueprintAssetTest.cpp
 │     └─ DroneFlightHUDTest.cpp
@@ -222,6 +243,11 @@ Source/Drone/
 | 클래스·구조체 | 담당 책임 | 담당하지 않는 책임 |
 |---|---|---|
 | `ADronePrototypeGameMode` | Prototype Pawn과 PlayerController의 native 기본 Class 제공 | Mission·Lap·점수 규칙 |
+| `UDroneGameFlowSubsystem` | GameInstance 수명의 8개 상태, Mission/Drone Catalog·선택, 잘못된 순서·중복 요청 거부 | Widget 외형, OpenLevel, Pawn Spawn |
+| `UDroneMissionDefinition` / `UDroneDefinition` | 로비 Text·Map·허용 Drone과 실제 Pawn Class의 데이터 원본 | 화면 생성, Mission 실행 판정 |
+| `ADroneFrontEndGameMode` | Drone 선택 전 Pawn을 만들지 않는 Front-end 실행 경계 | Training/Mission Gameplay |
+| `ADroneFrontEndPlayerController` | WBP Root 한 개 생성·정리, Flow 연결, UI 입력 | Flow 상태 중복 소유, 미션 목록 하드코딩 |
+| `UDroneFrontEndRootWidget` | Opening/Lobby 전환, Mission 선택·Definition 표시·확정, WBP 표현 Event와 native fallback | 실제 영상 재생, Map 로드, Drone Spawn |
 | `ADronePrototypePawn` | Enhanced Input Binding, 이동, 고도 이동, Actor Yaw, Camera Pitch, Component 소유 | HUD 생성, Gate 순서 판정, 최종 비행 물리 |
 | `UDroneTelemetryComponent` | 0.1초 기본 Timer와 즉시 갱신으로 Telemetry Snapshot 계산·Broadcast, Lap Recorder의 위치 표본 주기 제공 | 화면 배치, Lap 계산, 지형 AGL 계산 |
 | `ADronePrototypePlayerController` | 로컬 HUD 한 개의 생성·재사용·정리, Possess Pawn의 Telemetry·Health 연결 | Telemetry·체력 계산, HUD Designer 외형 |
@@ -604,6 +630,9 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
 - Greybox Map의 Cover Station 2개와 MG 사망 뒤 Cover→MG 교대
 - Drone 파괴 Event 1회, Perception Source 해제, 살아 있는 적의 개인 무기·MG·Cover 정리와 Search 없는 Patrol 복귀
 - Rifle 30발·Shotgun 8발 탄창, 발사당 1발 소모, 빈 탄창 정지·거부와 명시적 즉시 Reload
+- GameInstance 수명의 FLOW-01 상태·Mission/Drone Catalog와 Training 데이터 2개
+- `Lvl_DroneFrontEnd`의 전용 BP GameMode/Controller와 `WBP_DroneFrontEndRoot` 한 개
+- 정적 Opening `계속` → 같은 Root의 Lobby 전환, 중복 전환 거부, 선택 전 Drone 0대
 
 ### 아직 구현하지 않은 것
 
@@ -630,36 +659,39 @@ TUT-03의 원본 시간·거리·평균 속도와 TUT-04B의 이전 평균·Best
 ### 지금 사용자가 할 일
 
 1. 다른 PC에서는 Unreal 저장소 `main`을 Pull하고 원격 최신 Commit과 일치하는지 확인한다.
-2. UE 5.8.1에서 `/Game/Drone/Maps/Lvl_DroneTraining`을 연다.
-3. World Outliner에서 Course와 Gate 네 개의 배치가 의도한 비행 경로처럼 보이는지 확인한다.
-4. Course의 `OrderedGates` 순서와 실제 공간 배치 순서가 자연스러운지 확인한다.
-5. Gate의 크기, 간격, 높이, 색 대비가 직접 조종할 때 읽기 쉬운지 확인한다.
-6. PIE에서 Gate 0부터 3까지 정방향으로 한 번 완주한다.
-7. Gate 0 통과 뒤 Recorder가 `Recording`, Gate 3 통과 뒤 `Completed`가 되는지 확인한다.
-8. 완료 기록이 1개이고 Segment가 `0→1`, `1→2`, `2→3` 세 개인지 확인한다.
-9. Lap과 각 Segment의 시간이 0보다 크고, 이동 거리가 실제 비행 경로만큼 누적되며, 평균 속도가 유한한 양수인지 확인한다.
-10. 같은 PIE에서 `ResetSequence()`를 실행해 Gate 0이 Current, Recorder가 `Idle`, `IsRecordingReady=true`가 되는지 확인한다.
-11. Reset 뒤에도 방금 완료한 성공 Lap 1개가 유지되고, 진행 중 값과 미완료 Segment만 초기화되는지 확인한다.
-12. 한 번은 미래 Gate를 먼저 통과하고, 한 번은 현재 Gate를 역방향으로 통과해 Gate 진행과 기록이 바뀌지 않는지 확인한다.
-13. 조종 감각상 너무 작음, 너무 큼, 간격 과도, 방향 이해 어려움이 있으면 수치와 체감만 기록한다.
-14. FPV Body와 Rotor 4개의 크기·방향·위치가 자연스럽고 Camera를 가리지 않는지 확인한다.
-15. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가며 PIE/Standalone 종료 즉시 멈추는지 확인한다.
-16. AI 기능이 병합된 뒤 Editor를 재시작하고 Smart Objects와 Gameplay Interactions Plugin 활성 상태를 확인한다.
-17. Content Browser에서 생성된 Definition·Station BP 6쌍과 MG Mesh 연결을 확인한다.
-18. `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`을 열고 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 12개(기존 10 + Cover 2)의 위치·방향이 알아보기 쉬운지 확인한다.
-19. Editor에서 `P` 키를 눌러 네 NPC 시작점과 Station 사이에 녹색 NavMesh가 이어지는지 눈으로 확인한다.
-20. Manny/Unarmed 외형은 임시임을 전제로 PIE에서 Hostile 2명이 EnemyPatrol 3개 사이를 반복하는지, 서로 겹치거나 제자리만 다시 고르지 않는지 눈으로 확인한다.
-21. Friendly 2명이 FriendlyBasePatrol 3개와 Ambient 2개 사이를 이동하고 같은 지점에 동시에 머물지 않는지 눈으로 확인한다.
-22. 드론 감지 뒤 Rifle Hostile이 MG로 이동·점유하고 조준 방향을 갱신하며, Shotgun Hostile은 개인 무기 대응을 유지하는지 확인한다.
-23. 드론 피격 때 우측 상단 내구도가 100에서 내려가고 0에서 `파괴됨`과 함께 입력·이동이 정지하는지 확인한다.
-24. MG 사수에게 `Apply Damage` 100을 주면 사수가 멈추고 Slot이 Free가 되는지 확인한다.
-25. 다른 Hostile이 Cover로 이동·점유해 개인 무기를 사용하고, MG 사망 뒤 빈 MG를 이어서 점유하는지 확인한다.
+2. 현재 PC에서는 UE 5.8.1에서 `/Game/Drone/Maps/Lvl_DroneFrontEnd`를 열고 PIE를 시작한다.
+3. 정적 Opening의 `계속` 버튼이 새 Widget을 만들지 않고 `작전 로비`로 바뀌는지 확인한다. Training Mission을 누르면 이름·설명·지역·난이도가 나오고 하단 시작으로 화면이 종료되는지 본다. 실제 영상·Map 이동이 없는 것은 정상이다.
+4. 이어 `/Game/Drone/Maps/Lvl_DroneTraining`을 열고 World Outliner에서 Course와 Gate 네 개의 배치가 의도한 비행 경로처럼 보이는지 확인한다.
+5. Course의 `OrderedGates` 순서와 실제 공간 배치 순서가 자연스러운지 확인한다.
+6. Gate의 크기, 간격, 높이, 색 대비가 직접 조종할 때 읽기 쉬운지 확인한다.
+7. PIE에서 Gate 0부터 3까지 정방향으로 한 번 완주한다.
+8. Gate 0 통과 뒤 Recorder가 `Recording`, Gate 3 통과 뒤 `Completed`가 되는지 확인한다.
+9. 완료 기록이 1개이고 Segment가 `0→1`, `1→2`, `2→3` 세 개인지 확인한다.
+10. Lap과 각 Segment의 시간이 0보다 크고, 이동 거리가 실제 비행 경로만큼 누적되며, 평균 속도가 유한한 양수인지 확인한다.
+11. 같은 PIE에서 `ResetSequence()`를 실행해 Gate 0이 Current, Recorder가 `Idle`, `IsRecordingReady=true`가 되는지 확인한다.
+12. Reset 뒤에도 방금 완료한 성공 Lap 1개가 유지되고, 진행 중 값과 미완료 Segment만 초기화되는지 확인한다.
+13. 한 번은 미래 Gate를 먼저 통과하고, 한 번은 현재 Gate를 역방향으로 통과해 Gate 진행과 기록이 바뀌지 않는지 확인한다.
+14. 조종 감각상 너무 작음, 너무 큼, 간격 과도, 방향 이해 어려움이 있으면 수치와 체감만 기록한다.
+15. FPV Body와 Rotor 4개의 크기·방향·위치가 자연스럽고 Camera를 가리지 않는지 확인한다.
+16. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가며 PIE/Standalone 종료 즉시 멈추는지 확인한다.
+17. AI 기능이 병합된 뒤 Editor를 재시작하고 Smart Objects와 Gameplay Interactions Plugin 활성 상태를 확인한다.
+18. Content Browser에서 생성된 Definition·Station BP 6쌍과 MG Mesh 연결을 확인한다.
+19. `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`을 열고 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 12개(기존 10 + Cover 2)의 위치·방향이 알아보기 쉬운지 확인한다.
+20. Editor에서 `P` 키를 눌러 네 NPC 시작점과 Station 사이에 녹색 NavMesh가 이어지는지 눈으로 확인한다.
+21. Manny/Unarmed 외형은 임시임을 전제로 PIE에서 Hostile 2명이 EnemyPatrol 3개 사이를 반복하는지, 서로 겹치거나 제자리만 다시 고르지 않는지 눈으로 확인한다.
+22. Friendly 2명이 FriendlyBasePatrol 3개와 Ambient 2개 사이를 이동하고 같은 지점에 동시에 머물지 않는지 눈으로 확인한다.
+23. 드론 감지 뒤 Rifle Hostile이 MG로 이동·점유하고 조준 방향을 갱신하며, Shotgun Hostile은 개인 무기 대응을 유지하는지 확인한다.
+24. 드론 피격 때 우측 상단 내구도가 100에서 내려가고 0에서 `파괴됨`과 함께 입력·이동이 정지하는지 확인한다.
+25. MG 사수에게 `Apply Damage` 100을 주면 사수가 멈추고 Slot이 Free가 되는지 확인한다.
+26. 다른 Hostile이 Cover로 이동·점유해 개인 무기를 사용하고, MG 사망 뒤 빈 MG를 이어서 점유하는지 확인한다.
 
 사용자가 지금 판단해야 하는 것은 플레이할 때의 가독성·조종 난이도, 실제 비행에서 기록값이 자연스럽게 증가하는지, FPV 외형·Camera·소리가 실제 환경에서 자연스러운지다. 정확한 공식과 파일·참조 구조는 자동 검증했지만, Gate 배치와 사람이 체감하는 시간·거리·속도·청감은 직접 확인이 필요하다.
 
 ### 반복하지 않아도 되는 일
 
 - `ADroneTrainingGate`와 Sequence Component를 다시 만들 필요 없음
+- FLOW 상태·Mission/Drone Data Asset, Front-end GameMode/Controller/WBP/Map을 다시 만들 필요 없음
+- WBP Event Graph에서 `Create Widget`, Flow 전환, Mission/Drone Catalog 등록을 중복 구현할 필요 없음
 - `BP_DroneTrainingGate`를 새로 생성할 필요 없음
 - Training Map에 Gate 네 개를 다시 배치할 필요 없음
 - Course의 Ordered Array를 처음부터 다시 연결할 필요 없음
@@ -896,4 +928,4 @@ Gate는 정상 완료되지만 기록이 만들어지지 않으면 다음을 확
 5. 중간에 `ResetSequence`, Course Reconfigure 또는 Pawn 파괴가 발생하지 않았는지
 6. 4 Gate 완료 기록의 Segment 수가 `Gate 수 - 1`, 즉 3인지
 
-수동 확인에서 문제가 없으면 TUT-03 사용자 확인 결과를 기록한다. 다음 카드는 현재 실행에 보존된 성공 기록을 이용해 이전 평균·Best·현재 대비 차이를 계산하고 Course HUD·Gate Toast·Lap 결과를 표시하는 `TUT-04 비교·결과 UI`다.
+수동 확인 결과는 TUT-04와 Front-end 화면 기록에 남긴다. 현재 신규 구현 카드는 `FLOW-04`이며, 정적 Mission Briefing 종료 뒤 선택한 `UDroneMissionDefinition::MissionMap`을 열고 GameInstance 선택을 보존한다.

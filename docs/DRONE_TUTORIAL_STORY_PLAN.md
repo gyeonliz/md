@@ -223,9 +223,9 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 | AST-00 | 제공 에셋 인수 감사 | ZIP 14개와 해제본의 상대 경로·크기 일치 및 팩별 호환성·이식 위험 기록 |
 | AST-01 | 제공 Drone 에셋 선별 적용 | UE 5.8 스테이징 검증 후 기능 코드 변경 없이 Integration BP에서 외형 교체 |
 
-현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`, `TUT-03`과 `TUT-04B` 기술 구현을 완료했다. TUT-03은 Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료와 World Game Time·Telemetry 위치 표본 기반 실제 거리·평균 속도 원본 기록을 포함한다. 최신 공유 기준선은 `6a18210`이며 이후 Smart Object 방향 보강이 로컬에 있다. 실제 두 Lap의 표시 판정은 남아 있다.
+현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`, `TUT-03`과 `TUT-04B` 기술 구현을 완료했다. TUT-03은 Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료와 World Game Time·Telemetry 위치 표본 기반 실제 거리·평균 속도 원본 기록을 포함한다. 최신 공유 기준선은 `2d6a459`이며 FLOW-01~03과 NPC Visual 기반이 로컬 미커밋이다. 실제 두 Lap의 표시 판정은 남아 있다.
 
-TUT-04B의 이전 성공 평균·Best 집계와 HUD 결과 행은 구현·자동 검증됐고 실제 두 Lap 수동 확인이 남았다. 새 우선순위에 따라 다음 신규 기능은 `FLOW-01` Flow 상태·Mission/Drone 데이터 계약이다. Flight 상태와 NavigationArrows Host/Wrapper는 Mission Vertical Slice에서 필요한 시점에 연결한다.
+TUT-04B의 이전 성공 평균·Best 집계와 HUD 결과 행은 구현·자동 검증됐고 실제 두 Lap 수동 확인이 남았다. 새 우선순위의 `FLOW-01~03` 상태·데이터, 정적 Opening→Lobby, 미션 선택·설명·시작은 로컬 구현·검증했고 다음 신규 기능은 `FLOW-04` 브리핑→선택 Map 로드다. Flight 상태와 NavigationArrows Host/Wrapper는 Mission Vertical Slice에서 필요한 시점에 연결한다.
 
 2026-08-27부터 구현한 NPC·Smart Object·Rifle/Shotgun·MG·Cover 기반은 폐기하지 않고 Mission Map 내부 전투에 재사용한다. 다만 아군 NPC 대화와 사람 Operator는 더 이상 Front-end나 Mission 시작의 선행조건이 아니다. 상세 AI 절차는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md), 최신 화면 흐름은 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 따른다.
 

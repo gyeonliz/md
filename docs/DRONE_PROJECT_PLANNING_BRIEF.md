@@ -2,7 +2,7 @@
 
 기준일: 2026-09-03 (Asia/Seoul)
 
-문서 상태: 기획 기준선 확정·Front-end 신규 구현 대기
+문서 상태: FLOW-01~03 로컬 구현 완료·FLOW-04 대기
 
 이 문서는 Drone 프로젝트의 게임 기획, 현재 구현 상태, 다음 개발 순서와 검증 기준을 한 번에 확인하기 위한 통합 문서다. 세부 기술 계약은 링크된 구현 문서를 따르며, 구현 완료 여부는 실제 Unreal 코드·Asset·빌드·자동화·화면 확인을 근거로 판정한다.
 
@@ -12,13 +12,12 @@
 |---|---|
 | 장르 | 싱글플레이 드론 운용·정찰·미션 게임 |
 | 엔진 | Unreal Engine 5.8.1 |
-| 현재 작업 루트 | `D:\JGY\project` |
-| Unreal 프로젝트 | `D:\JGY\project\drone` |
-| 문서 저장소 | `D:\JGY\project\md` |
-| Unreal 공유 기준 | `main=origin/main=6a18210` |
+| 현재 작업 루트 | Unreal `C:\URproject\drone`, 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
+| 다른 PC의 이전 경로 | `D:\JGY\project\drone`, `D:\JGY\project\md` |
+| Unreal 공유 기준 | `main=origin/main=2d6a459` |
 | 플레이어 표현 | 사람 캐릭터 없이 Drone 조작 중심 |
 | 핵심 모드 | Tutorial 비행 훈련, Story Mission |
-| 현재 신규 개발 | `FLOW-01` Front-end 상태·Mission/Drone 데이터 계약 |
+| 현재 신규 개발 | `FLOW-04` 정적 브리핑→선택 Map 로드. FLOW-01~03은 로컬 완료 |
 | 제외 범위 | Android, Network/협동, 실제 군사 장비 1:1 재현 |
 
 핵심 경험은 다음과 같다.
@@ -196,23 +195,22 @@ Figma의 UI 참고 이미지는 청록·녹색 계열 전술 HUD, 얇은 선, �
 | 전투 | Rifle/Shotgun Trace·Damage·탄창·즉시 Reload, MG 조준·사격 |
 | 체력·사망 | NPC/Drone 공통 체력, 사망 1회, 전투·입력·예약 정리 |
 | 협업 자산 | FPV Drone, 환경 Map, Ground Drone/MG, NPC·VFX·SFX 후보 선별 이식 |
+| Front-end 기반 | GameInstance Flow/Catalog, 실제 Mission·Drone Data Asset, 전용 Map/BP GameMode·Controller/WBP, 정적 Opening→Lobby, Training Mission 선택·설명·시작 |
 
-공유 Unreal 기준은 `6a18210`이다. 이 기준에 전투 Greybox와 Blueprint 발사·재장전 표현 Event까지 들어 있다.
+공유 Unreal 기준은 `2d6a459`이다. 이 기준에 전투 Greybox, Blueprint 발사·재장전 표현 Event와 Smart Object 방향 보강까지 들어 있다. FLOW-01~03은 아직 로컬 미커밋이다.
 
 ### 로컬 구현·수동 확인 대기
 
-- Smart Object 도착 방향을 Cyan Preview 화살표 Yaw와 일치시키는 코드·테스트
-- `SO_Def_FriendlyBasePatrol` 저장 변경
 - `Lvl_NPCSmartObjectGreybox`에서 Patrol·Cover·MG 도착 방향 실제 화면 확인
+- FLOW-01~03 Source/Test, Data Asset 2개, Front-end BP/WBP/Map과 기본 Game Map 설정
+- NPC Weapon Visual/Muzzle Component와 Character 표현 Event 기반. 실제 Mesh는 미연결
 - Training 두 Lap에서 첫 기준·이전 평균·Best·Delta 표시 확인
 - Drone Loop 단일 재생과 종료 정지 청감
 - MilitaryCamp·MilitaryBase·Battlefield·OilRig의 조명·재질·충돌·성능·채택 여부
 
 ### 아직 구현하지 않음
 
-- Front-end Flow 상태와 Mission/Drone Data Asset
-- 시작 트레일러와 로비
-- 미션 선택 목록·측면 설명·하단 시작 버튼
+- 실제 시작 트레일러 영상과 최종 로비 외형
 - 미션 트레일러와 선택 Map 전환
 - Map 안 Drone 선택·Preview·허용 목록 검증
 - Mission Director와 측면 목표 UI
@@ -283,6 +281,7 @@ ADroneMissionDirector
 
 | Map | 역할 후보 | 현재 상태 |
 |---|---|---|
+| `Lvl_DroneFrontEnd` | 게임 시작·정적 Opening·로비 | FLOW-02 로컬 구현·자동 PIE 통과 |
 | `Lvl_DronePrototype` | 입력·Collision 단위 시험 | 구현됨 |
 | `Lvl_DroneTraining` | 첫 Tutorial Mission Vertical Slice | 구현됨·두 Lap 수동 확인 대기 |
 | `Lvl_NPCSmartObjectGreybox` | AI·Smart Object·전투 시험 | 구현됨·방향 수동 확인 대기 |
@@ -294,7 +293,7 @@ ADroneMissionDirector
 새 Front-end 권장 Content 경계:
 
 ```text
-/Game/Drone/FrontEnd/Maps/
+/Game/Drone/Maps/Lvl_DroneFrontEnd
 /Game/Drone/FrontEnd/UI/
 /Game/Drone/FrontEnd/Media/
 /Game/Drone/Data/Missions/
@@ -315,9 +314,9 @@ ADroneMissionDirector
 
 | ID | 작업 | 완료 조건 |
 |---|---|---|
-| FLOW-01 | Flow 상태·Mission/Drone 데이터 계약 | 정상 전환, 잘못된 ID와 중복 요청 거부 자동화 |
-| FLOW-02 | 시작 트레일러 → 로비 | 실행마다 Widget·전환 요청 한 개 |
-| FLOW-03 | 미션 선택·측면 설명·하단 시작 | 같은 Mission Definition으로 목록·설명·시작 연결 |
+| FLOW-01 Done | Flow 상태·Mission/Drone 데이터 계약 | 정상 전환, 잘못된 ID와 중복 요청 거부 자동화 통과 |
+| FLOW-02 Done | 시작 트레일러 → 로비 | 정적 Opening→Lobby, 실행마다 Root Widget·전환 요청 한 개 PIE 통과 |
+| FLOW-03 Done | 미션 선택·측면 설명·하단 시작 | 같은 Mission Definition으로 목록·설명·시작 연결, 오류·중복 거부 PIE 통과 |
 | FLOW-04 | 미션 트레일러 → Map | 선택 Mission의 브리핑 뒤 지정 Map 로드 |
 | FLOW-05 | Map 내 Drone 선택 | 확정 전 Pawn 0, 확정 뒤 허용 Drone 1대 |
 | FLOW-06 | Mission 시작·측면 목표 UI | Drone 확정 뒤에만 Director·목표 Event 시작 |

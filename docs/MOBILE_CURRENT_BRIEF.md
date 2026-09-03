@@ -6,16 +6,17 @@
 
 ## 30초 요약
 
-- Unreal 공유 기준선은 `main=origin/main=6a18210`이며 AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01·AI-VIS-01A까지 반영돼 있다.
+- Unreal 공유 기준선은 `main=origin/main=2d6a459`이며 전투 Greybox·AI-VIS-01A와 Smart Object 방향 보강까지 반영돼 있다.
 - Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개, Segment/Lap 원본과 이전 평균·Best·Delta 결과까지 구현됐다.
-- 현재 개발 완료 지점은 `TUT-04B` 기술 구현과 전투 Greybox다. 새 신규 기능은 `FLOW-01` Front-end 상태·Mission/Drone 데이터 계약이다.
+- 현재 개발 완료 지점은 `FLOW-03` 미션 선택·측면 설명·하단 시작이며 다음 신규 기능은 `FLOW-04` 정적 브리핑→선택 Map 로드다.
 - 확정 화면 흐름은 `시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → Map → Drone 선택 → Mission 시작/측면 목표 UI`다. 사람 Operator·NPC 대화 수령·Operator↔Drone 전환은 폐기했다.
-- 현재 작업 기준은 Unreal `D:\JGY\project\drone`, 문서 `D:\JGY\project\md`다. 제공 에셋 원본은 별도 보관하며 직접 수정하지 않는다.
+- 현재 실행 세션은 Unreal `C:\URproject\drone`, 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6`다. D 드라이브 경로는 다른 PC의 이전 기준이며 제공 에셋 원본은 직접 수정하지 않는다.
 - NavigationArrows 최소 자산 6개와 전용 테스트는 main에 병합됐다. 화면 Host는 아직 미구현이다.
 - 프로젝트 사용 맵은 `/Game/Drone/Maps`로 중앙화했다. 환경 맵 3종에 `Lvl_OilRig`을 추가했고, 남은 제공 자산 891개를 후보 라이브러리로 선별 이식했다.
 - 사용자는 Gate나 기록 C++를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도와 Drone Loop를 확인하면 된다.
 - MG Claim·Move뿐 아니라 Occupied·Aim·Damage·사망 뒤 다른 AI 재점유, Cover 대응과 Drone 파괴 시 전체 교전 종료까지 공유 main에 반영했다.
 - 전투 비주얼 감사와 BP `OnWeaponFired`·`OnReloadCompleted`까지 준비됐다. Manny Rifle Animation 38개와 Weapon Mesh 70개를 확인했지만 이름으로 식별되는 Shotgun Weapon Mesh는 0개다.
+- FLOW-01은 8개 상태의 GameInstance Subsystem과 실제 Training Mission/Scout Drone Data Asset을 만들었다. FLOW-02는 실제 `WBP_DroneFrontEndRoot`, 전용 BP Controller/GameMode와 `Lvl_DroneFrontEnd`를 만들고 Opening→Lobby를 같은 Widget 한 개로 전환한다. FLOW-03은 Training Mission 버튼·설명·지역/난이도·하단 시작을 같은 Data Asset에 연결했다.
 - 확정된 학습 항목은 `정보처리산업기사`와 `C++ 코딩테스트` 두 가지뿐이다.
 - 정보처리산업기사 2026년 3회 필기 접수는 끝났다. 오늘 가장 먼저 Q-Net에서 자신의 접수·면제·응시 상태를 확인해야 한다.
 - 코딩테스트는 공통 시험일이 없으므로 자격시험 일정에 맞춰 주간 반복 학습으로 운영한다.
@@ -24,9 +25,9 @@
 
 | 구분 | 현재 상태 |
 |---|---|
-| Unreal 저장소 | `D:\JGY\project\drone` |
-| Unreal 기준 Commit | `6a18210` |
-| Git 상태 | `main=origin/main=6a18210`; Smart Object 방향 보강 Source/Test 7개와 Definition 1개 로컬 미커밋 |
+| Unreal 저장소 | `C:\URproject\drone` |
+| Unreal 기준 Commit | `2d6a459` |
+| Git 상태 | `main=origin/main=2d6a459`; FLOW-01~03·NPC Visual 기반 Source/Test, Data Asset, Front-end BP/Map을 합쳐 26개 경로 로컬 미커밋 |
 | Git LFS | `fsck` 정상 |
 | 최종 Game/Editor Build | 성공 |
 | Tutorial 자동화 | 7/7 통과 |
@@ -36,8 +37,9 @@
 | Standalone | 실제 WBP HUD·Cyan Course·Current/Inactive Gate 표시 확인 |
 | 에셋 이식 | 환경 3종+OilRig와 후보 라이브러리 891개. 새 Root 수량 일치·대표 로드·외부/누락 0, LFS fsck 통과 |
 | NPC/Smart Object | 공유 main에 MG Claim/Move·Occupied·Aim·Damage·사망 교대·Cover·Drone 파괴 교전 종료·탄창과 BP 표현 Event까지 구성. 단계별 Editor Build·무기 테스트 3/3 통과 |
+| Front-end Flow | FLOW-03 뒤 Game/Editor Build와 최종 `Drone.Flow` 3/3 통과. WBP Root 1개·중복 전환 0·선택 전 Drone 0대·Mission Definition과 표시 일치 확인 |
 
-공유 이전 기준선에서 Game/Editor Build, AI 11개와 전체 Drone 27개를 실행했다. 실패는 0이고 Rifle의 빈 시험 World에서 RecastNavMesh가 없다는 예상 경고 1건만 있다. Blueprint 전체 Compile은 오류·Blueprint 경고·로드 실패 0이며 별도 공급사 Pose GUID와 MCP 고지 경고 29건은 기능 결과와 분리한다. 최신 `6a18210` 반영 뒤에는 단계별 Editor Build와 집중 테스트만 확인했고 전체 회귀·Blueprint 전체 Compile·LFS는 아직 다시 실행하지 않았다.
+공유 이전 기준선에서 Game/Editor Build, AI 11개와 전체 Drone 27개를 실행했다. 실패는 0이고 Rifle의 빈 시험 World에서 RecastNavMesh가 없다는 예상 경고 1건만 있다. Blueprint 전체 Compile은 오류·Blueprint 경고·로드 실패 0이며 별도 공급사 Pose GUID와 MCP 고지 경고 29건은 기능 결과와 분리한다. 최신 FLOW-01에서는 Editor Build와 직접 관련 테스트·Data Validate만 확인했고 전체 회귀·Blueprint 전체 Compile은 반복하지 않았다.
 
 ## 2. 코드가 어떻게 연결되는가
 
@@ -101,6 +103,9 @@ Lvl_NPCSmartObjectGreybox
 | `UDroneTrainingGateSequenceComponent` | 현재 Gate와 정상 통과 여부를 판정하고 `OnGateAccepted`를 발생 |
 | `UDroneTrainingLapRecorderComponent` | 정상 승인·Telemetry Event를 구독해 Segment/Lap 원본 기록 생성 |
 | `ADroneNPCNavigationFloor` | Greybox NavMesh에 사용할 BlockAll·Navigation Relevant 바닥 제공 |
+| `UDroneGameFlowSubsystem` | GameInstance 수명으로 Flow 상태·Mission/Drone Catalog와 선택을 보존 |
+| `ADroneFrontEndPlayerController` | Front-end WBP Root 한 개를 만들고 Flow와 UI 입력을 연결 |
+| `UDroneFrontEndRootWidget` | 정적 Opening과 Lobby 표시를 전환하고 실제 Trailer/WBP 표현 Event를 제공 |
 
 ### C++와 Blueprint의 경계
 
@@ -116,6 +121,9 @@ Lvl_NPCSmartObjectGreybox
 구현됨:
 
 - 실제 Blueprint Widget `WBP_DroneFlightHUD`
+- 실제 Blueprint Widget `WBP_DroneFrontEndRoot`와 전용 Front-end BP Controller/GameMode/Map
+- 실제 영상 전의 정적 Opening 화면, `계속` 버튼, 같은 Root의 Lobby 전환
+- Training Mission 목록 버튼, 선택 시 Data Asset 기반 이름·설명·지역/난이도, 하단 `미션 시작`
 - Speed, Altitude, Vertical Speed, Heading 표시
 - 우측 상단 Drone 내구도 100/100·피해·파괴 상태 표시
 - Gate Ring의 `Inactive`, `Current`, `Completed` 색 전환
@@ -123,7 +131,7 @@ Lvl_NPCSmartObjectGreybox
 
 아직 없음:
 
-- 시작 트레일러·로비·미션 선택 목록·측면 미션 설명·하단 시작 버튼
+- 실제 시작 트레일러 영상·최종 로비 외형
 - 미션 트레일러·Map 로드 Flow·Map 내 Drone 선택 화면
 - Mission 측면 목표 패널과 성공/실패 결과 화면
 - 다음 Gate 번호·화살표
@@ -171,11 +179,12 @@ Lvl_NPCSmartObjectGreybox
 - Greybox Map Cover Station 2개와 사망 뒤 Cover 병사의 MG 재점유
 - Drone 파괴 Event 1회와 살아 있는 적의 감지·사격·MG/Cover 정리, Search 없는 순찰 복귀
 - Rifle 30발·Shotgun 8발 탄창, 발사당 1발 소모, 빈 탄창 정지·거부와 즉시 Reload
+- GameInstance Flow 상태·Mission/Drone Data Asset, 정적 Opening→Lobby
+- Training Mission 선택·Definition 기반 설명·하단 시작→MissionTrailer 상태
 
 ### 미구현
 
-- Front-end Flow 상태와 Mission/Drone Data Asset
-- 시작 트레일러·로비·미션 선택·미션 트레일러·Map 내 Drone 선택
+- 실제 시작 영상·최종 로비 외형, 미션 트레일러·Map 내 Drone 선택
 - Drone 선택 뒤 Mission 시작과 측면 목표 UI·결과/재도전/로비 복귀
 - 다음 Gate·잘못된 순서/방향 안내와 완주 팝업·구간별 결과 표
 - 명시적인 Take Off·Landing·Crash 상태와 최종 비행 물리
@@ -186,7 +195,7 @@ Lvl_NPCSmartObjectGreybox
 - 배터리·통신거리·재밍
 - SaveGame·Multiplayer·최종 에셋 전면 적용
 
-남아 있는 C++ `Variant_Combat`와 복구된 Template Content에 AI·StateTree 예제가 있어도 Drone Enemy AI가 구현됐다는 뜻은 아니다. 현재 전역 시작 Map은 `/Game/Drone/Maps/Lvl_DroneTraining`이다.
+남아 있는 C++ `Variant_Combat`와 복구된 Template Content는 참고용이다. 현재 전역 Game 시작 Map은 `/Game/Drone/Maps/Lvl_DroneFrontEnd`, Editor 시작 Map은 `/Game/Drone/Maps/Lvl_DroneTraining`이다.
 
 ## 4. 사용자가 지금 해야 하는 일
 
@@ -207,8 +216,8 @@ Lvl_NPCSmartObjectGreybox
 ### PC 앞에서 할 일
 
 1. 다른 PC라면 `drone`과 `md` 저장소를 Pull한다.
-2. Unreal 기준 Commit이 `origin/main=6a18210`인지 확인하고, 현재 Smart Object 로컬 변경 8개의 수동 확인·Commit 범위를 먼저 정리한다.
-3. UE 5.8.1에서 `/Game/Drone/Maps/Lvl_DroneTraining`을 직접 연다.
+2. Unreal 기준 Commit이 `origin/main=2d6a459`인지 확인한다. FLOW-01~03은 현재 PC의 로컬 미커밋이므로 다른 PC에는 아직 보이지 않는 것이 정상이다.
+3. 현재 PC에서는 `/Game/Drone/Maps/Lvl_DroneFrontEnd`를 열어 `계속`→로비→Training Mission 선택→설명/지역/난이도→하단 시작까지 확인한다. 시작 뒤 실제 영상·Map 이동이 없는 것은 FLOW-04 전 정상이다.
 4. Gate 0→1→2→3을 정방향으로 완주한다.
 5. 미래 Gate를 먼저 통과하거나 현재 Gate를 역방향으로 통과해 진행되지 않는지 확인한다.
 6. 마지막 Gate 뒤 네 Gate가 모두 Completed 색인지 확인한다.
@@ -255,8 +264,11 @@ TUT-03 Segment/Lap 기록 Done
 → AI-AMMO-01 Rifle·Shotgun 탄창·재장전 Greybox Done
 → AI-VIS-01A 자산 호환성 감사·BP 발사/재장전 Event Done
 → FLOW-00 사람 Operator 폐기·Front-end Mission Flow 문서 기준선 Done
-→ FLOW-01 상태·Mission/Drone 데이터 계약 Next
-→ FLOW-02~06 시작 트레일러·로비·미션 선택·브리핑·Map·Drone 선택·목표 UI
+→ FLOW-01 상태·Mission/Drone 데이터 계약 Done
+→ FLOW-02 정적 시작 화면→로비 Done
+→ FLOW-03 미션 선택·측면 설명·하단 시작 Done
+→ FLOW-04 브리핑·Map 로드 Next
+→ FLOW-05~06 Drone 선택·목표 UI
 → AI-VIS-01B 실제 전투 표현은 Mission 흐름 뒤 · Shotgun Mesh/최종 진영 외형 미정
 ```
 

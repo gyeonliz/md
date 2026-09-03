@@ -447,7 +447,7 @@ Inbox → Todo → Doing → Done
 
 ### 1순위: Tutorial Vertical Slice와 기능 우선 Greybox
 
-TUT-04 비교·결과 UI는 기술 구현됐고 실제 두 Lap 확인이 남았다. 2026-09-03 이후 신규 기능은 `FLOW-01 상태·Mission/Drone 데이터 → 시작 트레일러·로비 → 미션 선택/설명 → 미션 트레일러·맵 → Drone 선택 → Mission/목표 UI → AI/MG/Jamming` 순서로 진행한다. 사람 Operator와 NPC 대화 수령 흐름은 만들지 않는다. 상세 기준은 `docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`를 따른다.
+TUT-04 비교·결과 UI는 기술 구현됐고 실제 두 Lap 확인이 남았다. 2026-09-03 이후 신규 기능은 `FLOW-01 상태·Mission/Drone 데이터 → 시작 트레일러·로비 → 미션 선택/설명 → 미션 트레일러·맵 → Drone 선택 → Mission/목표 UI → AI/MG/Jamming` 순서로 진행한다. 현재 FLOW-01~03은 로컬 구현·집중 검증을 완료했고 다음 카드는 FLOW-04다. 사람 Operator와 NPC 대화 수령 흐름은 만들지 않는다. 상세 기준은 `docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`를 따른다.
 
 ### 병행: PC 간 공유 검증
 
