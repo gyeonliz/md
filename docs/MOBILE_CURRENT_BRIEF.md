@@ -1,19 +1,20 @@
 # 이동 중 읽는 Drone 현황·내 작업·학습 일정
 
-기준일: 2026-09-02 (Asia/Seoul)
+기준일: 2026-09-03 (Asia/Seoul)
 
 이 문서는 휴대폰으로 현재 상태와 다음 행동을 빠르게 확인하기 위한 요약본이다. 코드의 상세 설명은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md), 학습 기록 양식은 [`STUDY_PLANS.md`](STUDY_PLANS.md)를 따른다.
 
 ## 30초 요약
 
-- Unreal 공유 기준선은 `main=origin/main=0d92a5f`이며 작업 트리는 깨끗하다.
+- Unreal 공유 기준선은 `main=origin/main=249d6cd`이며 AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01·AI-VIS-01A는 로컬 미커밋 상태다.
 - Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개, Segment/Lap 원본과 이전 평균·Best·Delta 결과까지 구현됐다.
 - 현재 개발 완료 지점은 `TUT-04B` 기술 구현이며, 실제 두 Lap HUD 확인 뒤 Flight 상태로 진행한다.
-- 현재 D 드라이브 작업 PC의 제공 에셋 루트는 `D:\JGY\project\Unreal_260821`이다. FPV·Loop 선택 자산과 프로젝트 Integration BP의 파일·참조·LFS·자동 검증은 통과했다.
+- 현재 실행 세션은 Unreal `C:\URproject\drone`, 문서 저장소는 이 문서가 있는 C 드라이브 경로를 사용한다. 제공 에셋 원본은 `C:\에셋`이며 수정하지 않는다.
 - NavigationArrows 최소 자산 6개와 전용 테스트는 main에 병합됐다. 화면 Host는 아직 미구현이다.
 - 프로젝트 사용 맵은 `/Game/Drone/Maps`로 중앙화했다. 환경 맵 3종에 `Lvl_OilRig`을 추가했고, 남은 제공 자산 891개를 후보 라이브러리로 선별 이식했다.
 - 사용자는 Gate나 기록 C++를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도와 Drone Loop를 확인하면 된다.
-- Hostile/Friendly Smart Object 기본 이동, Hostile 감지·3초 Search·순찰 복귀와 Rifle·Shotgun Greybox Trace까지 완료했다. 다음 기능은 MG 1-Slot Claim·Move다.
+- MG Claim·Move는 공유됐고 로컬에서 Occupied·Aim·Damage·사망 뒤 다른 AI 재점유, Cover 대응과 Drone 파괴 시 전체 교전 종료까지 구현했다.
+- 전투 비주얼 감사와 BP `OnWeaponFired`·`OnReloadCompleted`까지 준비됐다. Manny Rifle Animation 38개와 Weapon Mesh 70개를 확인했지만 이름으로 식별되는 Shotgun Weapon Mesh는 0개다.
 - 확정된 학습 항목은 `정보처리산업기사`와 `C++ 코딩테스트` 두 가지뿐이다.
 - 정보처리산업기사 2026년 3회 필기 접수는 끝났다. 오늘 가장 먼저 Q-Net에서 자신의 접수·면제·응시 상태를 확인해야 한다.
 - 코딩테스트는 공통 시험일이 없으므로 자격시험 일정에 맞춰 주간 반복 학습으로 운영한다.
@@ -22,9 +23,9 @@
 
 | 구분 | 현재 상태 |
 |---|---|
-| Unreal 저장소 | `D:\JGY\project\drone` |
-| Unreal 기준 Commit | `0d92a5f` |
-| Git 상태 | `main=origin/main=0d92a5f`, Unreal 작업 트리 Clean |
+| Unreal 저장소 | `C:\URproject\drone` |
+| Unreal 기준 Commit | `249d6cd` |
+| Git 상태 | `main=origin/main=249d6cd`; AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01·AI-VIS-01A 포함 30개 파일 로컬 수정 |
 | Git LFS | `fsck` 정상 |
 | 최종 Game/Editor Build | 성공 |
 | Tutorial 자동화 | 7/7 통과 |
@@ -33,7 +34,7 @@
 | Blueprint Compile | 0 errors, 0 Blueprint warnings, 0 failed loads. 별도 공급사/MCP 경고 29건 |
 | Standalone | 실제 WBP HUD·Cyan Course·Current/Inactive Gate 표시 확인 |
 | 에셋 이식 | 환경 3종+OilRig와 후보 라이브러리 891개. 새 Root 수량 일치·대표 로드·외부/누락 0, LFS fsck 통과 |
-| NPC/Smart Object | 기반·Definition/Station BP 6쌍·역할 BP·Greybox·Hostile/Friendly StateTree·Perception/Search·Rifle/Shotgun Greybox Trace 구성. AI 11/11, 전체 27/27 통과 |
+| NPC/Smart Object | 원격은 MG Claim/Move까지. 로컬은 Occupied·Aim·Damage·사망 교대·Cover·Drone 파괴 교전 종료·탄창과 BP 표현 Event까지 구성. 최신 Editor Build·무기 테스트 3/3 통과 |
 
 현재 작업 기준에서 Game/Editor Build, AI 11개와 전체 Drone 27개를 실행했다. 실패는 0이고 Rifle의 빈 시험 World에서 RecastNavMesh가 없다는 예상 경고 1건만 있다. Blueprint 전체 Compile은 오류·Blueprint 경고·로드 실패 0이며 별도 공급사 Pose GUID와 MCP 고지 경고 29건은 기능 결과와 분리한다.
 
@@ -80,7 +81,7 @@ ADroneNPCSpawnPoint 또는 직접 배치
 
 Lvl_NPCSmartObjectGreybox
 ├─ Hostile Rifle 1 + Hostile Shotgun 1 + Friendly 2
-├─ Smart Object Station 10개
+├─ Smart Object Station 12개 (기존 10 + Cover 2)
 ├─ ADroneNPCNavigationFloor + NavMeshBoundsVolume
 ├─ Hostile: EnemyPatrol Claim → Move → Wait → Release 반복
 └─ Friendly: BasePatrol/Ambient Claim → Move → Wait → Release 반복
@@ -115,6 +116,7 @@ Lvl_NPCSmartObjectGreybox
 
 - 실제 Blueprint Widget `WBP_DroneFlightHUD`
 - Speed, Altitude, Vertical Speed, Heading 표시
+- 우측 상단 Drone 내구도 100/100·피해·파괴 상태 표시
 - Gate Ring의 `Inactive`, `Current`, `Completed` 색 전환
 - 최근/완료 Segment 통계와 이전 완주 평균·Best·시간/속도 Delta 표시
 
@@ -149,22 +151,31 @@ Lvl_NPCSmartObjectGreybox
 - Drone Sight 감지 대상 등록과 Hostile Detected/Lost StateTree Event
 - Smart Object Definition·Station Blueprint 6쌍
 - Hostile Rifle·Hostile Shotgun·Friendly Base Blueprint와 Spawn Point BP
-- `Lvl_NPCSmartObjectGreybox`의 NPC 4명·Station 10개·Navigation Floor
+- `Lvl_NPCSmartObjectGreybox`의 NPC 4명·Station 12개·Navigation Floor
 - 역할 Profile·Possess·Activity Tag·시작 위치 NavMesh 투영 자동 검증
 - `ST_NPC_HostilePatrol`과 Native Claim·Move·Wait·Release Task
 - Hostile 2명의 반복 순찰, 각 2회 이상 완료·서로 다른 2지점 이상 방문 자동 검증
 - `ST_NPC_FriendlyBaseRoutine`과 Base Patrol/Ambient 교대·Fallback·방문 기록
 - Friendly 2명의 반복 이동, 각 두 Activity·서로 다른 2지점 이상 방문 자동 검증
 - 직전 지점 우선 회피와 감지·실패·UnPossess 시 예약 해제
+- MG Claim→Move→Occupied→조준→발당 8 Damage와 중단/사망 해제
+- 사망한 MG 사수 뒤 다른 MG 가능 Hostile의 재점유
+- NPC·Drone 공통 기본 체력 100, 사망 1회와 사망 후 Damage 무시
+- Rifle 발당 10, Shotgun 적중 Pellet당 8 Greybox Damage
+- NPC 사망 시 이동·충돌·무기·StateTree 정지, Drone 사망 시 입력·이동·충돌 정지
+- MG 실패 병사의 Cover 1-Slot Claim·이동·Occupied 개인 무기 대응
+- Greybox Map Cover Station 2개와 사망 뒤 Cover 병사의 MG 재점유
+- Drone 파괴 Event 1회와 살아 있는 적의 감지·사격·MG/Cover 정리, Search 없는 순찰 복귀
+- Rifle 30발·Shotgun 8발 탄창, 발사당 1발 소모, 빈 탄창 정지·거부와 즉시 Reload
 
 ### 미구현
 
 - 다음 Gate·잘못된 순서/방향 안내와 완주 팝업·구간별 결과 표
 - 명시적인 Take Off·Landing·Crash 상태와 최종 비행 물리
 - Mission·귀환·평가
-- MG를 사용하지 않는 전투원의 Cover와 통합 Return
-- Rifle·Shotgun Damage·탄약·재장전 상태·Animation·FX·SFX
-- MG Turret 점유·조준·공격과 중단 뒤 재점유
+- Rifle·Shotgun 예비 탄약·재장전 시간·Animation·FX·SFX
+- MG 승하차 Animation·FX·SFX와 최종 밸런스
+- NPC 래그돌·시체 제거, Drone 폭발·Respawn·최종 Mission 실패 화면
 - 배터리·통신거리·재밍
 - SaveGame·Multiplayer·최종 에셋 전면 적용
 
@@ -200,7 +211,7 @@ Lvl_NPCSmartObjectGreybox
 10. Gate 크기·높이·간격·색 대비와 Keyboard/Gamepad 조종 체감을 메모한다.
 11. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가고 종료 후 즉시 멈추는지 기록한다.
 12. AI 기반 Merge 뒤 Editor를 재시작해 Smart Objects와 Gameplay Interactions Plugin을 확인한다.
-13. `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`을 열어 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 10개의 위치·방향을 확인한다.
+13. `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`을 열어 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 12개(기존 10 + Cover 2)의 위치·방향을 확인한다.
 14. `P` 키로 네 NPC 시작점과 Station 사이의 녹색 NavMesh 연결을 확인한다.
 15. PIE에서 Hostile 2명이 EnemyPatrol 3개 사이를 반복 이동하고 같은 자리에만 머물지 않는지 확인한다.
 16. Friendly 2명이 FriendlyBasePatrol/Ambient 사이를 이동하고 같은 1-Slot에 동시에 머물지 않는지 눈으로 확인한다.
@@ -229,8 +240,14 @@ TUT-03 Segment/Lap 기록 Done
 → AI-WPN-01 공용 Weapon 계약 Done
 → AI-WPN-02 Rifle Greybox Trace Done
 → AI-WPN-03 Shotgun Pellet/Spread Done
-→ AI-MG-01 MG 1-Slot Claim·Move
-→ AI-MG-02 Occupy·Aim·Fire·Release
+→ AI-MG-01 MG 1-Slot Claim·Move Done
+→ AI-MG-02 Occupy·Aim·Fire·Release·사망 교대 Done
+→ HP-01 NPC·Drone 100 체력·사망·Drone HUD Done
+→ AI-COVER-01 Cover 이동·점유·사망 뒤 MG 교대 Done
+→ AI-COMBAT-END-01 Drone 파괴 교전 종료·실패 Event Done
+→ AI-AMMO-01 Rifle·Shotgun 탄창·재장전 Greybox Done
+→ AI-VIS-01A 자산 호환성 감사·BP 발사/재장전 Event Done
+→ AI-VIS-01B Manny Rifle·MG 표현 연결 Next · Shotgun Mesh/최종 진영 외형 미정
 ```
 
 TUT-03은 기존 Gate 판정과 분리된 Recorder가 정상 `OnGateAccepted`와 Telemetry Event를 구독하도록 완료했다. TUT-04B도 이 원본을 사용해 비교 결과를 C++에서 만들고 Widget은 표시만 한다.

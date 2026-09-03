@@ -1,6 +1,6 @@
 # 현재 작업 상태
 
-기준일: 2026-09-02 (Asia/Seoul)
+기준일: 2026-09-03 (Asia/Seoul)
 
 이 문서는 PC별로 명령으로 확인된 상태와 사용자가 아직 결정하지 않은 항목을 분리한다. 현재 D 드라이브 작업 기준과 다른 PC의 검증 기록을 같은 항목에서 섞지 않고 경로와 검증 시점을 함께 적는다.
 
@@ -20,12 +20,12 @@
 | Git 사용자 이름 | 전역 `gyeonliz` 설정 확인 |
 | Git 사용자 이메일 | 전역 `jkw6483@gmail.com` 설정 확인 |
 | GitHub CLI | 설치되어 있지 않음 |
-| 현재 기본 작업 루트 | Unreal `D:\JGY\project\drone`; 문서 `D:\JGY\project\md` |
-| 다른 PC 검증 기록 | Unreal `C:\URproject\drone`; 당시 문서 Clone `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
-| Unreal 프로젝트 저장소 | `main=origin/main=0d92a5f`, 작업 트리 Clean |
-| 문서 작업 저장소 | 본 갱신 전 `main=origin/main=08c4b61`; Rifle·Shotgun 완료 기록을 한글 커밋으로 Push |
-| Commit·Push 처리 | Rifle·Shotgun 코드와 테스트는 `0d92a5f`로 Unreal 원격에 Push 완료. 문서도 같은 기준으로 갱신·Push |
-| 실행 상태 | Game/Editor Build 성공, AI 11/11·전체 `Drone.` 27/27, Blueprint 0 errors·0 warnings·0 failed loads, LFS fsck 성공. Rifle 빈 시험 World 경고 1건과 공급사/MCP 전역 경고 29건은 별도 |
+| 현재 실행 세션 작업 루트 | Unreal `C:\URproject\drone`; 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
+| 다른 PC의 이전 기준 경로 | Unreal `D:\JGY\project\drone`; 문서 `D:\JGY\project\md` |
+| Unreal 프로젝트 저장소 | `main=origin/main=249d6cd`; AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01·AI-VIS-01A 포함 30개 파일 로컬 수정·미커밋 |
+| 문서 작업 저장소 | `main=origin/main=747bc02`; 문서 6개와 유지보수 도구 6개 로컬 수정·미커밋 |
+| Commit·Push 처리 | 마지막 원격은 MG Claim·Move `249d6cd`. 사용자 요청에 따라 이후 코드·에셋·문서는 로컬에만 유지하고 자동 Commit·Push하지 않음 |
+| 실행 상태 | 공유 기준선은 Game/Editor Build·AI 11/11·전체 27/27·Blueprint 0/0/0·LFS 성공. 최신 로컬은 Editor Build, WeaponContract·RifleTrace·ShotgunTrace 3/3과 NPC 비주얼 자산 감사 통과 |
 | 별도 `droner` 주의 | `main=origin/main=551e287`; `Config/DefaultEditor.ini` 변경과 `Content/Asset` 10,928개·36,360,181,427 bytes 전체가 Untracked. 공급사 원본·스테이징 복사본이므로 일괄 Stage·Commit 금지 |
 | 팀원 변경 | 환경 맵·재질 변경은 중앙 `main`에 반영된 상태. Battlefield의 새 프로젝트 머티리얼 3개와 Camp/Base 의존성을 검증했고 개인 `.vsconfig` 변경·`//test`를 별도 정리. 팀원 PC Remote 실측만 남음 |
 
@@ -59,6 +59,60 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 - `Drone Win64 Development`, `DroneEditor Win64 Development`, AI 11/11, 전체 27/27, Blueprint 0/0/0, `git lfs fsck`가 통과했다. Rifle 빈 시험 World의 RecastNavMesh 경고 1건과 공급사/MCP 전역 경고 29건은 기능 실패가 아니다.
 - 한글 Commit `0d92a5f`를 `origin/main`에 Push했다. 실제 Damage·탄약·Animation·FX·SFX는 미구현이며 다음 카드는 `AI-MG-01`이다.
 
+## 2026-09-02 AI-MG-01 MG 1-Slot Claim·Move 구현·검증 결과
+
+- `ST_NPC_HostilePatrol`의 감지 경로를 `ClaimMGTurretSlot → MoveToMGTurret → HoldMGTurretReservation`으로 확장했다. MG 사용 권한이 없거나 빈 Slot이 없으면 기존 `DroneDetected` 개인 무기 상태로 즉시 대체한다.
+- MG 사용 가능 Rifle Hostile은 감지 뒤 개인 무기 Timer와 순찰 이동을 정리하고 MGTurret 1-Slot을 예약해 NavMesh로 이동한다. 도착 뒤에는 `AI-MG-02` 전까지 Claim만 유지하며, Shotgun Hostile은 개인 무기 사격을 계속한다.
+- 반복 Sight 자극이 진행 중인 MG Claim을 해제하지 않도록 첫 감지 Event만 상태 전환에 사용한다. DroneLost·이동 실패·상태 중단·UnPossess에서는 이동과 예약을 정리하고 Search 또는 개인 무기 Fallback으로 이어진다.
+- 저장된 StateTree는 전용 Upgrade/Validate 도구와 Asset 자동화로 9개 상태·Native Task·Event 전환을 재검증했다. NPC PIE는 MG 운영자 정확히 1명, 유효 예약 정확히 1개, 도착·개인 무기 정지, Shotgun Fallback, Friendly 비무장을 확인한다.
+- Game/Editor Build, AI 11/11, 전체 `Drone.` 27/27, Blueprint 0/0/0, `git lfs fsck`와 `git diff --check`를 통과했다. 기존 예상 경고 수는 변하지 않았다.
+- 한글 Commit `249d6cd` (`기능: 적 AI의 MG 터렛 예약과 이동 구현`)을 `origin/main`에 Push했다. 실제 MG 점유 전환·포신 조준·Trace 사격·Damage·사망 뒤 재점유는 `AI-MG-02` 범위다.
+
+## 2026-09-03 AI-MG-02·HP-01 MG 교대와 체력·사망 완료 결과
+
+- 도착한 Smart Object Claim을 `Occupied`로 전환하고 해당 Station Actor를 Controller의 활성 MG로 연결했다.
+- `ADroneSmartObjectStation`에 외형 Bone 이름과 분리된 `MGTurretAimPivot`, 6,000cm·0.15초 Greybox Visibility Trace, 사용자·표적·조준점·발사 횟수와 Blueprint용 사용/발사 Event를 추가했다. 수치는 최종 밸런스가 아니다.
+- 기존 `HoldMGTurretReservation` StateTree Task는 저장된 Struct 경로를 유지하면서 실제 MG 사용 시작·조준·Cooldown 사격을 수행한다. 개인 Rifle Timer는 MG 사용 중 정지한다.
+- DroneLost·Task 실패·UnPossess·EndPlay에서 Station 사용자와 Occupied Slot을 정리한다. Editor Development Build와 `Drone.AI.NPCPerceptionSearchPIE` 1/1이 통과했다.
+- `UDroneHealthComponent`를 NPC와 Drone에 공통 부착하고 둘 다 기본 `100/100`, 0 이하 사망 1회, 사망 뒤 추가 Damage 무시 규칙을 적용했다.
+- Rifle은 발당 10, Shotgun은 적중 Pellet당 8, MG는 발당 8의 Greybox Damage를 Unreal 표준 `ApplyDamage` 경로로 전달한다. 수치는 최종 밸런스가 아니다.
+- NPC 사망 시 이동·충돌·개인 무기·StateTree·MG 사용·Smart Object 예약을 정리한다. 사망한 MG 사수가 Slot을 놓으면 감지 중인 다른 MG 가능 Hostile이 재Claim해 Occupied·조준·사격을 이어간다.
+- Drone 사망 시 기체는 현 위치에 남고 입력 Mapping·이동·충돌을 정지한다. `OnDroneDestroyed`를 한 번 보내지만 최종 파괴 연출·Respawn·Mission 실패 화면은 현재 미정이다.
+- Flight HUD 우측 상단에 Event 기반 `기체 내구도 100 / 100`과 `파괴됨` 표시를 추가했다. C++가 동적 패널을 만들므로 기존 WBP Designer에 같은 계산을 중복할 필요가 없다.
+- Editor Development Build와 직접 관련 `Drone.AI.NPCPerceptionSearchPIE`, `Drone.UI.FlightHUDTelemetryBinding` 각 1/1이 통과했다. 전체 27개·Blueprint 전체 Compile·LFS 검사는 사용량 절약 원칙에 따라 반복하지 않았다.
+- `AI-MG-02`와 `HP-01`은 코드·집중 자동화 기준 Done이다. 이후 AI-COVER-01·AI-COMBAT-END-01까지 합친 현재 Unreal 변경 27개 파일과 문서는 로컬 미커밋으로 남긴다.
+
+## 2026-09-03 AI-COVER-01 엄폐 이동·점유 완료 결과
+
+- Hostile StateTree를 12개 상태로 확장해 `MG 우선 Claim → 실패 시 Cover Claim → Cover 이동 → Occupied 개인 무기 사격 → Cover도 실패하면 제자리 사격` 순서로 구성했다.
+- `FDroneStateTreeClaimCoverTask`, `MoveToCover`, `UseCover` Task와 Controller의 Cover Claim/Use 카운터·중단 정리를 추가했다. Cover 이동 실패, DroneLost, 사망, MG 재시도 전환에서 예약 누수를 막는다.
+- `Lvl_NPCSmartObjectGreybox`에 `BP_SO_Cover` 기반 1-Slot Station 2개를 배치했다. 기존 10개에서 총 12개 Station이 됐다.
+- MG 사망 시 Cover를 사용 중인 다른 MG 가능 Hostile이 Cover Slot을 해제하고 비어진 MG를 재Claim하도록 연결했다.
+- Editor Development Build와 갱신/검증 도구가 성공했고, 집중 `Drone.AI.NPCPerceptionSearchPIE` 1/1이 MG·Cover 동시 대응, 사망 뒤 Cover→MG 교대, DroneLost 뒤 Search→Patrol 복귀를 통과했다.
+- 전체 테스트·Blueprint Compile·LFS는 반복하지 않았다. `AI-COVER-01`은 코드·에셋·집중 자동화 기준 Done이며 모든 변경은 로컬 미커밋이다.
+
+## 2026-09-03 AI-COMBAT-END-01 드론 파괴 교전 종료 완료 결과
+
+- `ADronePrototypePawn::OnDroneDestroyed` Blueprint Event를 추가했다. 체력 0에서 정확히 한 번 발생하며 Mission/GameMode가 실패 화면이나 재시작 규칙을 붙일 수 있는 경계다.
+- 파괴된 Drone은 AI Perception Source에서 해제된다. 현재 표적이던 살아 있는 Hostile은 개인 무기·MG·Cover 예약과 이동을 즉시 정리하고 마지막 감지 위치를 폐기해 Search 없이 Patrol로 복귀한다.
+- 사망한 Hostile과 Friendly는 이 파괴 응답을 실행하지 않으며, 파괴 뒤 추가 Damage도 Health 사망 Event와 Drone 파괴 Event를 다시 발생시키지 않는다.
+- `DroneEditor Win64 Development` Build와 확장한 `Drone.AI.NPCPerceptionSearchPIE` 1/1이 통과했다. 전체 테스트·Blueprint Compile·LFS는 반복하지 않았고 Commit·Push도 하지 않았다.
+
+## 2026-09-03 AI-AMMO-01 Rifle·Shotgun 탄창·재장전 완료 결과
+
+- `UDroneNPCWeaponComponent`에 Blueprint 조회 가능한 현재 탄약·탄창 용량과 `ConfigureMagazineGreybox`를 추가했다. 시험 기본값은 Rifle 30발, Shotgun 8발이다.
+- Rifle Trace 한 번에 한 발, Shotgun Volley 한 번에 Shell 한 발을 소모한다. Pellet 수만큼 탄약이 빠지지 않으며 사거리·Cooldown으로 거부된 요청도 탄약을 소모하지 않는다.
+- 마지막 탄을 쏘면 반복 발사를 정지하고 빈 탄창의 새 발사를 거부한다. `Reload()`는 현재 탄창이 일부 소모됐을 때만 즉시 채우며, AI는 교전 지속 중 빈 탄창이면 이 공용 경계를 호출해 재개한다.
+- 예비 탄약 수, 재장전 시간·Animation·FX·SFX는 아직 미정이다. 최종 Editor Build 성공, `NPCPerceptionSearchPIE`·`RifleTrace`·`ShotgunTrace` 통과 뒤 Owner 없는 공용 계약 경계를 수정해 `WeaponContract`도 최종 1/1 통과했다.
+
+## 2026-09-03 AI-VIS-01A 전투 비주얼 연결 준비 결과
+
+- 읽기 전용 감사 도구로 Manny, Modular Soldier/Insurgent, AR4, MG, Niagara, Sound Cue 후보가 실제 로드되는지 재검증했다.
+- Modular Soldier와 Insurgent Skeleton은 현재 Manny Skeleton과 직접 일치하지 않는다. 두 ThirdParty Root에는 Animation Asset이 0개이므로 최종 외형 교체는 Retarget/AnimBP 검증 없이 바로 적용하지 않는다.
+- 프로젝트의 Manny Rifle Root에는 Fire·Reload·Aim·Walk/Jog 등을 포함한 Animation 38개가 있고 FPS Weapon Bundle에는 Mesh 70개가 있다. 반면 이름으로 식별되는 Shotgun Weapon Mesh는 0개여서 Shotgun 외형은 미정으로 남긴다.
+- `UDroneNPCWeaponComponent`에 BlueprintAssignable `OnWeaponFired`와 `OnReloadCompleted`를 추가했다. Rifle은 실제 Trace마다 한 번, Shotgun은 Pellet마다가 아닌 Volley마다 한 번 발생하며 거절된 Cooldown/Reload 요청은 이벤트를 만들지 않는다.
+- 최종 Editor Build와 WeaponContract·RifleTrace·ShotgunTrace 3/3이 통과했다. 실제 Mesh·Montage·Niagara·Sound 연결과 Editor 화면 판정은 `AI-VIS-01B` 범위다.
+
 ## 2026-08-28 팀원 변경 인수·정리 결과
 
 - 원격 감사 당시 팀원 변경은 Fork에만 있었지만, 현재 중앙 저장소 `main=2fcfb04`에는 환경 맵·재질 변경이 반영돼 있다.
@@ -72,13 +126,13 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 
 ## PC별 Drone 프로젝트 기준
 
-현재 작업컴의 기본 프로젝트 경로는 다음과 같다.
+현재 실행 세션에서 확인한 프로젝트 경로는 다음과 같다.
 
 ```text
-D:\JGY\project\drone\Drone.uproject
+C:\URproject\drone\Drone.uproject
 ```
 
-이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 현재 공유 기준선은 `origin/main=0d92a5f`다.
+다른 PC에서 사용한 `D:\JGY\project\drone`도 같은 저장소의 이전 작업 경로로 기록한다. 이 프로젝트는 2026-08-19 초기 감사 당시 `C:\project\Drone`에서 발견하고 정비했다. 아래의 "시작 시" 수치와 `91498b7`은 당시 사실을 보존한 역사 기록이다. `C:\project\Drone`은 현재 기준보다 뒤처진 복제본이므로 사용하지 않는다. 현재 공유 기준선은 `origin/main=249d6cd`다.
 
 확인 결과:
 
@@ -89,7 +143,7 @@ D:\JGY\project\drone\Drone.uproject
 - 시작 시 Git 저장소가 아니었음
 - 작업 시작 시 Content에는 `.uasset` 749개와 `.umap` 4개가 있었음
 
-초기에는 Third Person 기본 맵과 전역 기본 GameMode를 유지한 채 Git 준비, Android 제외 설정, 별도 Drone Prototype Source를 적용했다. 이후 시작 맵을 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode를 프로젝트 소유 `BP_DronePrototypeGameMode`로 바꿨다. 기존 자산·TUT-04B 병합 기준선 `55b3ffe`에서 Unreal 생성 기본 Map 4개만 제거하고 Template 비맵 자산은 복구했으며, 최신 공유 기준선은 문서 상단의 `0d92a5f`다.
+초기에는 Third Person 기본 맵과 전역 기본 GameMode를 유지한 채 Git 준비, Android 제외 설정, 별도 Drone Prototype Source를 적용했다. 이후 시작 맵을 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode를 프로젝트 소유 `BP_DronePrototypeGameMode`로 바꿨다. 기존 자산·TUT-04B 병합 기준선 `55b3ffe`에서 Unreal 생성 기본 Map 4개만 제거하고 Template 비맵 자산은 복구했으며, 최신 공유 기준선은 문서 상단의 `249d6cd`다.
 
 - `main` Branch의 로컬 Git 저장소 초기화
 - 프로젝트 로컬 Git LFS 초기화
@@ -117,7 +171,7 @@ D:\JGY\project\drone\Drone.uproject
 
 첫 Commit은 863개 파일이며 `Content`는 761개로 `.uasset` 756개와 `.umap` 5개다. 가장 큰 파일은 약 21.0 MB이고 100 MB를 넘는 파일은 없다. 새 Prototype `.uasset`과 `.umap`을 포함한 Unreal Asset에는 Git LFS의 filter·diff·merge 속성이 적용된다. WBP·BP Controller·TUT-01 Asset에 이어 TUT-02의 신규 `BP_DroneTrainingGate`와 갱신한 `Lvl_DroneTraining` 두 Asset도 Git LFS로 Push했다.
 
-현재 공유 main에는 Prototype Pawn/GameMode, 입력, Telemetry, Flight HUD, Tutorial 기록·비교 결과와 NPC Smart Object 기반이 있다. Hostile 2명은 감지 즉시 Claim·이동을 중단하고 Rifle 또는 Shotgun Greybox Trace를 시작하며, 실종 뒤 마지막 위치 Search를 거쳐 EnemyPatrol로 복귀한다. Friendly 2명은 감지 Event와 무관하게 FriendlyBasePatrol/Ambient를 계속 반복한다. Game/Editor Build, AI 11/11, 전체 `Drone.` 27/27을 통과했다. 실제 Damage·탄약과 MG 점유·공격, 생활/전투 Animation·FX·SFX는 아직 미구현이다.
+현재 공유 main에는 Prototype Pawn/GameMode, 입력, Telemetry, Flight HUD, Tutorial 기록·비교 결과와 NPC Smart Object 기반, MG Claim·Move까지 있다. 로컬 미커밋 작업에는 MG Occupied·조준·Trace·사망 교대, NPC/Drone 체력 100, Rifle/Shotgun/MG Damage, Drone 체력 HUD, Drone 파괴 교전 종료, Rifle/Shotgun 탄창·즉시 Reload와 BP 발사/Reload 표현 Event가 추가됐다. 예비 탄약·재장전 시간, 실제 생활/전투 Animation·FX·SFX와 최종 사망/Respawn 연출은 아직 미구현이다.
 
 2026-08-27에는 `C:\에셋`에서 ArmyVFX·InfantrySFX·Ground Drone/MG 외형·Modular Soldier/Insurgent 외형·Quad v4·PBR Sting과 OilRig을 선별 이식했다. ThirdParty 891개와 중앙 `Lvl_OilRig` 1개이며 새 Root 수량 일치, 대표 로드, 외부·누락 참조 0을 확인했다. OilRig 명령줄 Map Check는 장시간 완료되지 않아 Editor 수동 확인이 남았다. 상세 내용은 [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md)를 따른다.
 
@@ -127,7 +181,7 @@ D:\JGY\project\drone\Drone.uproject
 
 ## 2026-08-25 제공 에셋 인수·이식 재검증
 
-이 절의 `C:\에셋` 결과는 다른 PC에서 2026-08-25에 수행한 재감사 기록이다. 현재 D 드라이브 작업 PC에는 `C:\에셋`이 없고 `D:\JGY\project\Unreal_260821`이 존재한다. D 경로에는 최상위 ZIP 14개·공급사 폴더 14개와 `_Staging`이 있으며 `D:\JGY\project\Unreal\_260821`은 존재하지 않는다. 아래 C 드라이브 수치는 PC 간 이력 비교용으로 보존한다.
+이 절의 `C:\에셋` 결과는 2026-08-25에 수행한 재감사 기록이다. 이후 D 드라이브 작업 PC에서는 `C:\에셋`이 없고 `D:\JGY\project\Unreal_260821`이 존재했으며, 현재 C 드라이브 실행 세션에서는 사용자가 지정한 `C:\에셋`을 다시 확인했다. 아래 수치는 PC 간 이력 비교용으로 보존한다.
 
 - 공급사 해제본 14개 기준선: 10,499개, 35,677,612,290 bytes
 - `_Staging`, 내부 FBX 해제본, 생성 캐시를 포함한 `C:\에셋` 현재 전체: 10,928개, 36,360,181,427 bytes
@@ -246,7 +300,7 @@ C:\Users\jkw11\Documents\Codex\2026-08-12\c-project-factoryenvironmentcollect\wo
 
 1. 사용자가 실제 Training Map에서 Gate 0→3 한 Lap과 Drone Loop 단일 재생·종료 정지를 수동 확인
 2. `TUT-04B` 첫 기준·이전 평균·Best·Delta를 두 번 완주해 실제 HUD에서 확인
-3. 기능 다음 카드는 `AI-MG-01`, 이후 `AI-MG-02 → AI-COVER-01` 순으로 진행
+3. 기능 다음 후보는 `AI-VIS-01B`; Manny Rifle 임시 표현과 MG FX/SFX를 먼저 연결하고 Shotgun 실제 Mesh·최종 진영 외형은 미정 유지
 4. 병행으로 팀원 PC의 실제 Remote URL·Push 대상 규칙을 확인
 5. 다른 PC에서 최신 `origin/main` Pull, LFS/UE 5.8.1 실행과 문서 Pull 확인
 6. 정보처리산업기사는 Q-Net 개인 접수·수험일·필기면제 상태를 확인해 Track A/B/C를 선택하고, 코딩테스트는 주간 반복으로 병행
@@ -277,8 +331,13 @@ PFN-06 Done
 → AI-WPN-01 공용 Weapon 계약 Done
 → AI-WPN-02 Rifle Greybox Trace Done
 → AI-WPN-03 Shotgun Pellet/Spread Done
-→ AI-MG-01 MG 1-Slot Claim·Move
-→ AI-MG 점유·공격
+→ AI-MG-01 MG 1-Slot Claim·Move Done
+→ AI-MG-02 MG 점유·조준·공격·사망 교대 Done
+→ AI-COVER-01 엄폐 후보 검색·이동·점유 Done
+→ AI-COMBAT-END-01 드론 파괴 시 교전 종료·실패 Event Done
+→ AI-AMMO-01 Rifle·Shotgun 탄창·재장전 Greybox Done
+→ AI-VIS-01A 자산 호환성 감사·BP 발사/재장전 Event Done
+→ AI-VIS-01B NPC·무기·MG 실제 외형과 Animation·FX·SFX Next
 → Take Off·Landing·Crash, Operator↔Drone, Mission UI·Jamming은 활성화 조건에 맞춰 후속 통합
 ```
 
@@ -339,6 +398,6 @@ UE 5.8의 Dataflow·Chaos Cloth·Chaos Destruction을 부분 고정 그물과 �
 - 맵 파괴: Dataflow Geometry Collection, Anchor/World Support, Damage Threshold, Strain/Force와 Debris Sleep/Disable
 - Cloth 변형·파괴 연출과 포획·Damage·Mission 판정을 분리
 - 현재 생산 Cloth/Geometry Collection Asset 0, 관련 C++ 0
-- `TUT-04` 실제 두 Lap 확인은 유지한다. AI-PER-01부터 AI-WPN-03까지 완료했고 다음 구현 우선순위는 `AI-MG-01 → AI-MG-02 → AI-COVER-01`; 첫 물리 작업은 별도 `PHY-DF-00` Sandbox
+- `TUT-04` 실제 두 Lap 확인은 유지한다. AI-PER-01부터 AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01·AI-VIS-01A까지 완료했고 다음 구현 후보는 `AI-VIS-01B`; 첫 물리 작업은 별도 `PHY-DF-00` Sandbox
 
 상세 설계는 [`docs/DRONE_CHAOS_DATAFLOW_PLAN.md`](docs/DRONE_CHAOS_DATAFLOW_PLAN.md)를 따른다.

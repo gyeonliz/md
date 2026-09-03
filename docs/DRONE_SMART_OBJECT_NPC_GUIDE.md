@@ -1,10 +1,10 @@
 # Drone Smart Object NPC 준비·사용 가이드
 
-기준일: 2026-09-02 (Asia/Seoul)
+기준일: 2026-09-03 (Asia/Seoul)
 
 이 문서는 적군 순찰과 드론 발견 대응, 소총·샷건 분기, 기지 아군 NPC의 생활·순찰 이동, 한 명만 사용하는 MG Turret을 같은 기반 위에 구성하기 위한 실전 가이드다.
 
-현재 단계는 **C++·Smart Object 기반, Hostile/Friendly 기본 이동, Hostile Perception/Search와 Rifle·Shotgun Greybox Trace를 완료한 상태**다. `ST_NPC_HostilePatrol`은 EnemyPatrol 중 감지 Event를 받으면 즉시 Claim을 해제하고, 감지 중 개인 무기로 발사하며, 실종 Event 뒤 마지막 감지 위치를 3초 Search한 다음 순찰로 복귀한다. `ST_NPC_FriendlyBaseRoutine`은 이 Event와 무관하게 FriendlyBasePatrol/Ambient Slot의 Claim → NavMesh 이동 → 1초 대기 → Release를 반복한다. 실제 Damage·탄약·MG·생활/전투 Animation·FX·SFX는 아직 완성된 기능이 아니다.
+현재 단계는 **MG·체력·사망 교대·Cover·Drone 파괴 교전 종료와 Rifle/Shotgun 탄창까지 로컬 구현한 상태**다. `ST_NPC_HostilePatrol`은 MGTurret을 먼저 시도하고 실패한 Hostile은 Cover 1-Slot으로 이동해 개인 무기로 대응한다. 사수가 사망하면 Cover 병사가 자기 Slot을 놓고 빈 MG를 재Claim할 수 있다. Cover도 없으면 제자리 개인 무기로 대응하며, 실종 Event 뒤에는 모든 Slot을 정리하고 3초 Search 후 순찰로 복귀한다. Drone이 파괴되면 Search 없이 즉시 전투 자원을 정리하고 Patrol로 돌아간다. 예비 탄약·재장전 시간·생활/전투 Animation·FX·SFX와 최종 사망 연출은 아직 완성된 기능이 아니다.
 
 ## 1. 이번 구조로 만들 동작
 
@@ -77,7 +77,7 @@ Smart Object는 NPC를 생성하는 장치가 아니다.
 - Weapon Type: `Unarmed`, `Rifle`, `Shotgun`
 - `bCanUseMGTurret`: 적 NPC가 드론 발견 뒤 MG 후보를 검색할 수 있는지
 
-`UDroneNPCWeaponComponent`가 Rifle·Shotgun 공통 `CanFire/StartFire/StopFire/Reload`와 Target Actor·Aim Point를 관리한다. Controller의 `UsesRifle()`과 `UsesShotgun()`은 분류 API로 남기되, AI 발사 요청은 같은 경로를 사용한다. Rifle은 4,000cm·0.25초 단일 Visibility Trace, Shotgun은 1,600cm·0.9초·8 Pellet·6도 반각의 결정적 Spread를 Greybox 기본값으로 사용한다. 이 수치는 시험값이며 실제 Damage·탄약·최종 밸런스는 아직 없다.
+`UDroneNPCWeaponComponent`가 Rifle·Shotgun 공통 `CanFire/StartFire/StopFire/Reload`와 Target Actor·Aim Point를 관리한다. Controller의 `UsesRifle()`과 `UsesShotgun()`은 분류 API로 남기되, AI 발사 요청은 같은 경로를 사용한다. Rifle은 4,000cm·0.25초·발당 10 Damage·30발 탄창, Shotgun은 1,600cm·0.9초·8 Pellet·6도 반각·적중 Pellet당 8 Damage·8발 탄창을 Greybox 기본값으로 사용한다. Volley 한 번은 Pellet 수와 무관하게 Shell 한 발만 소모한다. 예비 탄약·재장전 시간과 최종 밸런스는 아직 미정이다.
 
 ### Smart Object Activity
 
@@ -155,13 +155,15 @@ Hostile Controller가 `ADronePrototypePawn`을 처음 감지하면 현재 Smart 
    └─ Shotgun/
 ```
 
-외형 후보는 다음 ThirdParty 자산을 열어 Skeleton·Animation 호환성을 직접 확인한 뒤 프로젝트 Blueprint의 Mesh에 연결한다.
+외형 후보는 다음 ThirdParty 자산을 프로젝트 Blueprint의 Mesh에 연결하기 전에 Skeleton·Animation 호환성을 확인한다.
 
 - Modular Soldier: 적 또는 아군 외형 후보
 - Modular Insurgents: 적 또는 아군 외형 후보
 - MG Turret Mesh: `/Game/Drone/ThirdParty/GroundDroneKit/Meshes/Alt_Turrets/MG_Turret/MG_Turret_SK`
 
-외형 후보만 이식된 상태이므로 특정 외형을 적·아군으로 확정하지 않는다. Animation Blueprint와 무기 손 위치도 아직 검증 전이다.
+`AI-VIS-01A` 읽기 전용 감사 결과 Modular Soldier와 Insurgent Skeleton은 현재 Manny Skeleton과 직접 일치하지 않으며, 이식된 두 Root의 Animation Asset은 각각 0개다. 특정 외형을 적·아군으로 확정하지 않았고 Retarget·T Pose·손 위치 검증 전에는 역할 BP에 강제 적용하지 않는다.
+
+현재 프로젝트에는 Manny Skeleton용 Rifle Animation 38개와 FPS Weapon Mesh 70개가 있다. `MM_Rifle_Fire`, `MM_Rifle_Reload`, AR4 Rifle 후보는 정상 로드된다. 이름으로 식별되는 Shotgun Weapon Mesh는 0개이므로 Rifle Mesh를 Shotgun으로 속여 적용하지 않고 실제 후보가 정해질 때까지 기능 전용 Greybox로 유지한다.
 
 ## 5. 생성된 Smart Object 지점 확인·사용하기
 
@@ -265,7 +267,7 @@ Spawn Point의 `Spawn On Begin Play` 기본값은 꺼져 있다. 실수로 PIE�
 | `BP_NPC_Friendly_Base` | Friendly / Unarmed / MG 사용 불가 | 2명 |
 | `BP_NPCSpawnPoint` | `ADroneNPCSpawnPoint` Blueprint 자식 | 필요할 때 사용 |
 
-경로는 `/Game/Drone/AI/Blueprints`다. 현재 Mesh와 Animation은 Manny Simple·`ABP_Unarmed` 임시 Greybox이므로 최종 외형이 아니다. Soldier/Insurgent 후보 중 실제 역할별 외형 선택은 `AI-VIS-01`에서 자산을 직접 확인한 뒤 결정한다.
+경로는 `/Game/Drone/AI/Blueprints`다. 현재 Mesh와 Animation은 Manny Simple·`ABP_Unarmed` 임시 Greybox이므로 최종 외형이 아니다. Soldier/Insurgent 후보 중 실제 역할별 외형 선택은 `AI-VIS-01B`에서 Retarget과 화면을 확인한 뒤 결정한다.
 
 Controller의 엔진 자동 시작은 꺼져 있고 C++가 Profile에 맞는 Asset을 명시적으로 선택한다. Smart Object Runtime이 준비된 World BeginPlay 뒤 Hostile은 `ST_NPC_HostilePatrol`, Friendly는 `ST_NPC_FriendlyBaseRoutine`을 시작한다.
 
@@ -329,9 +331,9 @@ HostilePatrol
 - Hostile만 Tree를 실행하고 EnemyPatrol Activity만 Claim한다.
 - 드론이 감지되면 이동을 멈추고 예약을 해제한 뒤 Claim 단계에서 대기한다. 이 안전 중단은 Search·공격 구현 완료를 뜻하지 않는다.
 
-### 후속 확장 적 StateTree
+### 현재 감지·MG 확장 StateTree
 
-감지·무기·MG 카드까지 진행하면 아래 구조로 확장한다. 현재 구현된 상태처럼 읽으면 안 된다.
+`AI-PER-01`부터 `AI-MG-01`까지 진행한 현재 구조는 다음과 같다.
 
 ```text
 Root
@@ -341,13 +343,10 @@ Root
 │  ├─ WaitOrGuard
 │  └─ ReleaseSlot
 ├─ DroneDetected
-│  ├─ TryMGTurret
-│  │  ├─ FindAndClaimMG
-│  │  ├─ MoveToMG
-│  │  └─ UseMG
-│  └─ PersonalWeapon
-│     ├─ RifleFire
-│     └─ ShotgunFire
+│  ├─ ClaimMGTurretSlot
+│  ├─ MoveToMGTurret
+│  ├─ HoldMGTurretReservation
+│  └─ PersonalWeapon Fallback
 ├─ Search
 └─ ReturnToPatrol
 ```
@@ -355,9 +354,10 @@ Root
 - `Drone.AI.Event.DroneDetected`가 오면 Patrol에서 DroneDetected로 전환한다.
 - `PrepareMGTurretSearch()`가 false면 바로 PersonalWeapon으로 간다.
 - MG 검색에 실패해도 PersonalWeapon으로 내려가야 한다.
-- `UsesRifle()`과 `UsesShotgun()`으로 사격 Task를 분기한다.
+- Rifle과 Shotgun은 같은 Weapon Component의 Target·Aim Point 계약을 사용한다.
 - `Drone.AI.Event.DroneLost`가 오면 Search로 이동하고, 정해진 시간 또는 탐색 완료 뒤 ReturnToPatrol로 간다.
 - 상태가 성공·실패·중단되는 모든 경로에서 예약을 해제한다.
+- 저장된 이름은 `HoldMGTurretReservation`이지만 Native Task는 현재 Claim을 Occupied로 전환하고 MG 사용·조준·Trace를 실행한다. 기존 Struct 경로와 StateTree 에셋 호환성을 지키기 위해 이름을 즉시 바꾸지 않았다.
 
 ### 현재 아군 StateTree `ST_NPC_FriendlyBaseRoutine`
 
@@ -374,17 +374,19 @@ Friendly는 `FriendlyBasePatrol`과 `Ambient`를 번갈아 먼저 시도하며, 
 
 ## 9. 소총과 샷건 구현 경계
 
-현재 준비된 것은 **NPC의 무기 종류 선택과 StateTree 분기 조건**까지다. 다음 항목은 아직 구현되지 않았다.
+현재 공용 Weapon 계약, Rifle·Shotgun Greybox Trace, Drone 체력 Damage, 탄창·즉시 Reload와 Blueprint 표현 Event까지 구현됐다. 다음 항목은 아직 구현되지 않았다.
 
-- 공용 Weapon Component 또는 Weapon Actor
-- 발사 간격, 탄창, 재장전
-- 소총 단일 Hitscan
-- 샷건 다중 Pellet과 Spread
-- 드론 Damage 적용과 피격 판정
-- 사거리·명중률·난이도 수치
+- 예비 탄약·재장전 시간과 최종 사거리·명중률·난이도 수치
 - Aim Offset, 발사 Montage, Motion Warping
 - Muzzle Flash, 탄흔, 소리
 - 아군 오사 방지와 팀 판정
+
+Blueprint에서는 `NPCWeaponComponent`의 다음 Event에 표현만 연결한다.
+
+- `OnWeaponFired`: `WeaponType`, `TraceStart`, `AimPoint`를 받는다. Rifle은 한 발마다 1회, Shotgun은 Pellet마다가 아니라 Volley마다 1회다.
+- `OnReloadCompleted`: `WeaponType`, `CurrentAmmo`, `MagazineCapacity`를 받는다. 실제 Reload 성공 때만 1회다.
+
+Animation Blueprint/Montage, Niagara와 Sound가 없어도 Trace·Damage는 이미 C++에서 작동한다. Event Graph에서 Line Trace, Damage, 탄약 감소를 다시 작성하면 이중 피해와 이중 소모가 생기므로 넣지 않는다.
 
 권장 구현 순서는 다음과 같다.
 
@@ -393,9 +395,10 @@ Friendly는 `FriendlyBasePatrol`과 `Ambient`를 번갈아 먼저 시도하며, 
 3. Rifle: 단일 Trace 한 발과 Cooldown
 4. Shotgun: 같은 Trigger에서 여러 Pellet Trace와 Spread
 5. 표적이 드론인지, 사거리 안인지, 시야가 막히지 않았는지 검사
-6. Damage와 실패 처리
-7. Animation·FX·SFX 연결
-8. Data Asset으로 수치 분리
+6. Damage와 체력 0 정지 처리 — 현재 Greybox 완료
+7. Rifle 30발·Shotgun 8발 탄창과 즉시 Reload — 현재 Greybox 완료
+8. `OnWeaponFired`·`OnReloadCompleted`에 Animation·FX·SFX 연결 — Event 경계 완료, 실제 표현은 후속
+9. Data Asset으로 수치 분리
 
 소총과 샷건의 최종 사거리·연사 속도·Pellet 수·Spread는 현재 미정이다. Greybox 테스트에서 임시값을 기록하고 플레이 결과로 조정한다.
 
@@ -414,7 +417,50 @@ Hostile + CanUseMGTurret
 → Free
 ```
 
-현재 Reservation Component는 Owner의 EndPlay와 Controller의 UnPossess에서 예약을 해제한다. 이후 실제 StateTree Task를 만들 때는 상태 Exit·Task Failed·Task Stopped에서도 반드시 해제해야 한다. 점유자가 사망한 뒤 다른 AI가 이어서 Claim할 수 있는지 별도 자동화와 PIE로 검증한다.
+현재 Reservation Component는 도착한 Claim을 `Occupied`로 전환한다. Station의 `MGTurretAimPivot`은 표적을 바라보고, 6,000cm·0.15초·발당 8 Damage의 Greybox Visibility Trace를 수행한다. DroneLost·Task 실패·UnPossess·EndPlay·사용자 사망에서는 Station 사용자와 Slot을 정리한다. 사망 해제 직후 감지 중인 다른 MG 가능 Hostile에 Event를 보내 재Claim시키는 흐름까지 PIE에서 검증했다.
+
+Cover 분기는 `ClaimCoverSlot → MoveToCover → UseCover` 세 상태다. `UseCover` 진입에서 Slot을 Occupied로 바꾸고 개인 Rifle/Shotgun Timer를 시작한다. DroneLost·이동 실패·사망·MG 재시도 전환에서는 Cover 예약을 해제한다. 현재는 위치 점유와 사격 계약까지이며 Crouch·Lean·벽 방향 판정은 Animation/고급 Cover 카드 범위다.
+
+### 체력·사망 시스템 사용 가이드
+
+왜 필요한가:
+
+- Rifle·Shotgun·MG가 같은 체력 규칙을 사용하고, 무기 코드가 NPC/Drone의 사망 연출까지 결정하지 않게 분리한다.
+
+담당 클래스:
+
+- `UDroneHealthComponent`: 기본 100/100, Damage 감소, `OnHealthChanged`, `OnDeath`, 사망 뒤 Damage 무시
+- `ADroneNPCCharacter`: 사망 시 CharacterMovement·충돌·AI 전투를 정지
+- `ADronePrototypePawn`: 사망 시 Input Mapping·이동·충돌을 정지
+- `UDroneFlightHUDWidget`: Possess Drone의 Health Event를 받아 우측 상단 내구도를 표시
+
+Header/CPP 연결:
+
+- 새 NPC나 Drone C++ Actor에는 `CreateDefaultSubobject<UDroneHealthComponent>`로 Component 하나만 소유한다.
+- 외부 피해는 직접 체력을 빼지 말고 `UGameplayStatics::ApplyDamage(Target, Damage, Instigator, Causer, nullptr)`를 사용한다.
+- 현재 기본 피해는 Rifle 10, Shotgun 적중 Pellet당 8, MG 8이며 각 Component의 Greybox 설정 함수나 Class Defaults에서 바꿀 수 있다.
+
+Blueprint 설정:
+
+- 기존 `BP_NPC_*`와 `BP_DronePrototypePawn`은 부모 C++에서 Health Component를 상속하므로 새 Component를 중복 추가하지 않는다.
+- 피격 Flash·Sound는 Health Component의 `OnHealthChanged`, 사망 Montage·폭발·실패 UI는 `OnDeath` Event에 연결한다.
+- 기존 Flight WBP는 C++가 체력 패널을 동적으로 붙이므로 Designer에 `HealthValueText`를 다시 만들 필요가 없다. 최종 외형을 WBP 전용으로 바꾸는 작업은 별도 UI 카드에서 한다.
+
+Editor 테스트:
+
+1. `Lvl_NPCSmartObjectGreybox`에서 PIE한다.
+2. 적이 Drone을 맞히면 우측 상단 `기체 내구도`가 100에서 감소하는지 본다.
+3. 체력 0에서 Drone 이동·입력이 정지하고 `파괴됨`이 표시되는지 본다.
+4. MG 사용 NPC에 `Apply Damage` 100을 호출했을 때 사수가 멈추고 Slot이 다른 MG 가능 적에게 넘어가는지 본다.
+
+정상 결과와 확인 항목:
+
+- 사망 Event는 한 번만 발생하고 추가 Pellet/Trace는 체력을 더 낮추지 않는다.
+- NPC는 맵에 남지만 이동·충돌·사격·StateTree·예약이 정지한다.
+- Drone도 맵에 남지만 입력·이동·충돌이 정지한다.
+- Drone은 `OnDroneDestroyed` Blueprint Event를 한 번 보내고, 감지 중이던 살아 있는 적은 개인 무기·MG·Cover를 정리한 뒤 Search 없이 순찰로 복귀한다.
+- 체력이 줄지 않으면 Target에 Health Component가 하나만 있는지, 무기 Trace가 실제 Target을 맞혔는지 확인한다.
+- MG 교대가 안 되면 두 번째 Hostile의 `bCanUseMGTurret`, MGTurret Activity User Tag, 빈 Slot 여부와 NavMesh를 확인한다.
 
 ## 11. 단계별 작업 카드
 
@@ -431,12 +477,16 @@ Hostile + CanUseMGTurret
 | `AI-WPN-01` | 공용 Weapon 계약 | **Done** — Weapon Component의 공용 호출, 단일 Target·Aim Point 경로, Lost·UnPossess 정리와 Unarmed 거부 자동 검증 |
 | `AI-WPN-02` | Rifle Greybox 발사 | **Done** — 단일 Visibility Trace, 장애물·사거리·Cooldown과 공용 계약 회귀 검증 |
 | `AI-WPN-03` | Shotgun Greybox 발사 | **Done** — 한 Trigger의 다중 Pellet, 결정적 Spread, 장애물·사거리·Cooldown 검증 |
-| `AI-MG-01` | MG Claim·Move | 두 AI 중 한 명만 MG에 도착 |
-| `AI-MG-02` | MG Occupy·Aim·Fire·Release | 사망·중단 뒤 다음 AI가 재점유 |
-| `AI-COVER-01` | 비점유 병사 엄폐 | MG 실패 병사가 Cover 지점 사용 |
-| `AI-VIS-01` | 외형·Animation 연결 | T Pose·손 위치·Root Motion 문제 없음 |
+| `AI-MG-01` | MG Claim·Move | **Done** — MG 운영자 1명만 1-Slot Claim·이동·도착 뒤 유지, Shotgun 개인 무기 Fallback |
+| `AI-MG-02` | MG Occupy·Aim·Fire·Release | **Done** — Occupied·Aim·8 Damage Trace·중단/사망 해제·다른 AI 재점유 집중 PIE 통과, 로컬 미커밋 |
+| `HP-01` | NPC·Drone Health·Death·HUD | **Done** — 기본 100/100, 사망 1회, 무기 Damage, Drone 정지·내구도 HUD 집중 테스트 통과, 로컬 미커밋 |
+| `AI-COVER-01` | MG 실패 병사의 Cover 대응 | **Done** — Cover 1-Slot Claim·Move·Occupied 사격, Map Station 2개, 사망 뒤 Cover→MG 교대 집중 PIE 통과, 로컬 미커밋 |
+| `AI-COMBAT-END-01` | Drone 파괴 교전 종료·실패 신호 | **Done** — Blueprint Event 1회, Perception 해제, 개인 무기·MG·Cover 정리, Search 없는 Patrol 복귀 집중 PIE 통과, 로컬 미커밋 |
+| `AI-AMMO-01` | Rifle·Shotgun 탄창·재장전 | **Done** — Rifle 30/Shotgun 8, Trace·Volley당 1발, 빈 탄창 정지·거부, 즉시 Reload와 AI 재개 집중 테스트 통과, 로컬 미커밋 |
+| `AI-VIS-01A` | 자산 호환성 감사·BP 표현 Event | **Done** — Manny Rifle Animation 38개, Weapon Mesh 70개, 이름 기반 Shotgun Mesh 0개와 서로 다른 NPC Skeleton을 기록. 발사/Reload Event 및 집중 테스트 3/3 통과 |
+| `AI-VIS-01B` | 외형·Animation·FX·SFX 연결 | Manny 임시 Rifle과 MG 표현부터 연결해 T Pose·손 위치·Muzzle 기준 확인. Shotgun 실제 Mesh와 최종 역할 외형은 미정 |
 
-`AI-SO-00 → AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01 → AI-PER-01 → AI-WPN-01 → AI-WPN-02 → AI-WPN-03`은 완료했다. 다음은 `AI-MG-01`로, MG 사용 가능 Hostile 여러 명 중 한 명만 MGTurret 1-Slot을 Claim하고 이동하도록 만든다.
+`AI-SO-00 → AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01 → AI-PER-01 → AI-WPN-01 → AI-WPN-02 → AI-WPN-03 → AI-MG-01 → AI-MG-02 → HP-01 → AI-COVER-01 → AI-COMBAT-END-01 → AI-AMMO-01 → AI-VIS-01A`는 코드·에셋과 해당 집중 자동화 기준 완료했다. 다음 후보는 `AI-VIS-01B`다.
 
 ### Asset 재검증 명령
 
@@ -478,6 +528,14 @@ Hostile 감지·Search 전환까지 포함한 최종 StateTree는 다음 명령�
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneHostilePerceptionStateTreeSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
 ```
 
+MG Claim·Move·Hold 분기까지 포함한 현재 최종 StateTree는 다음 명령으로 확인한다.
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneHostileMGTurretStateTreeSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
+```
+
+일반 Pull 뒤에는 `Validate`만 사용한다. `Upgrade`는 정확한 기존 6-State 감지 Tree에 MG 세 상태를 추가하는 유지보수용이며, 이미 9-State로 업그레이드된 자산에는 변경을 만들지 않는다.
+
 ## 12. 첫 PIE 검증 체크리스트
 
 - [x] Smart Objects와 Gameplay Interactions Plugin 활성 상태를 프로젝트 설정과 자동화로 확인
@@ -489,7 +547,9 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 - [x] 드론이 보이지 않을 때 Hostile 2명이 각각 2회 이상 순찰하고 서로 다른 2개 이상 지점 방문
 - [x] 드론이 Sight Event에 들어오면 Hostile만 순찰 예약 해제
 - [x] Friendly는 같은 드론 감지 자극에도 전투 상태로 바뀌지 않고 BaseRoutine 지속
-- [ ] MG 사용 가능 적만 MG를 검색
+- [x] MG 사용 가능 적만 MG를 검색하고 1-Slot을 Claim·이동
+- [x] 도착한 MG를 Occupied로 전환하고 표적 조준·Cooldown Trace 수행
+- [x] DroneLost 뒤 MG 사용자와 Occupied Slot 해제
 - [x] 드론을 놓치면 마지막 감지 위치 Search를 거쳐 순찰 Claim 재개
 - [x] Rifle과 Shotgun이 공용 Weapon 호출과 같은 Target·Aim Point 경로를 사용
 - [x] 감지 실종과 UnPossess에서 발사 상태 정리, Friendly·Unarmed 비발사
@@ -509,7 +569,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 - Friendly와 Hostile의 기본 Smart Object 검색 범위 분리
 - Smart Object Definition·Station Blueprint 6쌍
 - 역할별 NPC Blueprint 3종과 Spawn Point Blueprint
-- `Lvl_NPCSmartObjectGreybox`의 NPC 4명·Station 10개·Navigation Floor
+- `Lvl_NPCSmartObjectGreybox`의 NPC 4명·Station 12개(기존 10 + Cover 2)·Navigation Floor
 - Profile·Possess·Activity Tag·NavMesh 투영 자동화
 - Hostile `ST_NPC_HostilePatrol`과 Claim·Move·Wait·Release Native Task
 - 직전 지점 우선 회피, 이동 실패·감지·UnPossess 시 예약 해제
@@ -520,13 +580,17 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 - `UDroneNPCWeaponComponent` 공용 호출과 Controller의 단일 Target Actor·Aim Point 전달 계약
 - Rifle 단일 Trace와 Shotgun 다중 Pellet·Spread, 장애물·사거리·Cooldown Greybox
 - Rifle·Shotgun 동일 경로, Friendly 비발사, Lost 정리를 검증하는 `Drone.AI.WeaponContract`와 NPC Greybox PIE
+- MG Claim·Move·Hold Native StateTree Task, 개인 무기 Fallback과 DroneLost 예약 정리
+- MG 운영자 1명·예약 1개·도착과 Friendly 비무장을 검증하는 NPC Greybox PIE
+- Station Aim Pivot·Blueprint 사용/발사 Event와 MG Greybox Trace
 - Game/Editor Build, AI 11/11, 전체 `Drone.` 27/27, Blueprint 0/0/0와 LFS 검증
 
 ### 아직 구현·수동 검증 필요
 
 - 최종 NPC 외형·Skeleton·Animation Blueprint 선택과 연결
-- Rifle·Shotgun Damage·탄약·재장전 상태·Animation·FX·SFX
-- MG 승하차·조준·사격 Animation과 Turret 제어
+- Rifle·Shotgun 예비 탄약·재장전 시간·Animation·FX·SFX
+- MG 승하차 Animation·FX·SFX와 최종 밸런스
+- NPC 래그돌·시체 제거, Drone 폭발·Respawn·Mission 실패 화면
 - Cover와 전투 종료 뒤 통합 Return 실제 행동
 - 최종 맵에 NPC와 Smart Object 배치
 

@@ -1,10 +1,10 @@
 # Drone 현재 코드 구조와 사용자 확인 작업
 
-기준일: 2026-09-02 (Asia/Seoul)
+기준일: 2026-09-03 (Asia/Seoul)
 
 이 문서는 현재 Unreal `drone` 저장소를 직접 확인한 결과를 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
 
-TUT-03 완료 기능 Commit은 `551e287`이다. 현재 공유 main은 `0d92a5f`이며, NPC Smart Object 기반, Definition·Station BP 6쌍, 역할별 NPC BP, Hostile/Friendly StateTree, Perception/Search와 Rifle·Shotgun Greybox Trace까지 구성돼 있다. 팀원 환경 맵·재질 변경과 정리 Merge `888414f`도 보존한다. 환경 Map은 후보 공간이며 Tutorial 기본 실행 구조를 바꾸지 않는다.
+TUT-03 완료 기능 Commit은 `551e287`이다. 현재 공유 main은 `249d6cd`이며 MG 1-Slot Claim·Move까지 구성돼 있다. 로컬 미커밋 작업에는 AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01, AI-AMMO-01과 AI-VIS-01A Blueprint 발사/재장전 이벤트까지 추가됐다. 팀원 환경 맵·재질 변경과 정리 Merge `888414f`도 보존한다. 환경 Map은 후보 공간이며 Tutorial 기본 실행 구조를 바꾸지 않는다.
 
 NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합됐다. 자산은 main에 있지만 프로젝트 소유 Widget Host는 아직 구현하지 않았으므로 화면에 나타나지 않는 것이 정상이다.
 
@@ -16,6 +16,7 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합�
 | `Drone.Tutorial` Automation | 7/7 통과 |
 | `Drone.AI` Automation | 11/11 통과. Rifle 빈 시험 World의 예상 RecastNavMesh 경고 1건 |
 | 전체 `Drone.` Automation | 27/27 통과, 실패 0 |
+| 전투 로컬 집중 검증 | AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01 관련 집중 테스트 통과. 최신 AI-VIS-01A Editor Build와 WeaponContract·RifleTrace·ShotgunTrace 3/3 통과. 전체 묶음은 사용량 절약을 위해 반복하지 않음 |
 | `CompileAllBlueprints` | Blueprint Errors 0, Blueprint warnings 0, failed load 0. 별도 Summary에 기존 Battlefield Pose GUID와 MCP 고지 경고 유지 |
 | 현재 에셋 이식 재검증 | FPV 전용 1/1, Blueprint 0/0/0, 스테이징 선택 자산·현재 Integration 금지 의존성 0, 이식 13개 LFS와 fsck 통과 |
 | 기존 Standalone 시각 기록 | FPV 외형, 고정 추적 Camera, 실제 WBP HUD, Cyan 안내선, Current/Inactive Gate 표시 확인 |
@@ -146,7 +147,7 @@ ADroneSmartObjectStation
       └─ MGTurret 1-Slot
 ```
 
-Hostile은 `ST_NPC_HostilePatrol`에서 EnemyPatrol을 검색하고 Friendly는 `ST_NPC_FriendlyBaseRoutine`에서 FriendlyBasePatrol/Ambient를 번갈아 검색한다. 두 Tree 모두 Smart Object Runtime 초기화 뒤 Claim·NavMesh 이동·대기·해제를 반복하며 1-Slot 배타 예약과 직전 지점 회피를 사용한다. `ADronePrototypePawn` 감지 시 Hostile은 이동·예약을 중단하고 개인 Rifle 또는 Shotgun Greybox Trace를 시작한다. 실종 뒤 마지막 위치를 3초 Search하고 순찰로 복귀하며 Friendly 루틴은 계속된다. 실제 Damage·탄약·Animation·FX·SFX는 아직 없다.
+Hostile은 `ST_NPC_HostilePatrol`에서 EnemyPatrol을 검색하고 Friendly는 `ST_NPC_FriendlyBaseRoutine`에서 FriendlyBasePatrol/Ambient를 번갈아 검색한다. `ADronePrototypePawn` 감지 시 Hostile은 MG를 우선 Claim하고, 실패한 병사는 Cover 1-Slot으로 이동·점유해 개인 Rifle/Shotgun 사격을 한다. Cover도 없으면 제자리 사격하며 실종 뒤 마지막 위치를 3초 Search한 후 순찰로 복귀한다. 로컬 작업에는 Damage, 사망 뒤 Cover 병사의 MG 재점유, Drone 파괴 교전 종료와 Rifle/Shotgun 탄창까지 있다. Animation·FX·SFX는 아직 없다.
 
 Definition·Station Blueprint 6쌍과 역할별 NPC Blueprint 3종, Spawn Point BP, 전용 Greybox 맵, Hostile/Friendly StateTree가 생성됐다. Profile·Possess·역할 Tag·NavMesh 투영에 더해 Hostile 2명과 Friendly 2명이 각각 2회 이상 완료하고 서로 다른 2지점 이상을 방문하도록 자동 검증했다. Friendly는 Base Patrol과 Ambient를 모두 방문한다. 후속 감지·점유 순서는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md)를 따른다.
 
@@ -217,8 +218,8 @@ Source/Drone/
 | `ADronePrototypeGameMode` | Prototype Pawn과 PlayerController의 native 기본 Class 제공 | Mission·Lap·점수 규칙 |
 | `ADronePrototypePawn` | Enhanced Input Binding, 이동, 고도 이동, Actor Yaw, Camera Pitch, Component 소유 | HUD 생성, Gate 순서 판정, 최종 비행 물리 |
 | `UDroneTelemetryComponent` | 0.1초 기본 Timer와 즉시 갱신으로 Telemetry Snapshot 계산·Broadcast, Lap Recorder의 위치 표본 주기 제공 | 화면 배치, Lap 계산, 지형 AGL 계산 |
-| `ADronePrototypePlayerController` | 로컬 HUD 한 개의 생성·재사용·정리, Possess Pawn과 Telemetry 연결 | Telemetry 수치 계산, HUD Designer 외형 |
-| `UDroneFlightHUDWidget` | Snapshot 표시 문자열 생성, C++↔WBP TextBlock 연결, native fallback | Pawn 검색 Tick, 비행 수치 계산, Gate 안내 UI |
+| `ADronePrototypePlayerController` | 로컬 HUD 한 개의 생성·재사용·정리, Possess Pawn의 Telemetry·Health 연결 | Telemetry·체력 계산, HUD Designer 외형 |
+| `UDroneFlightHUDWidget` | Snapshot·Drone 체력 표시 문자열 생성, C++↔WBP TextBlock 연결, native fallback | Pawn 검색 Tick, 비행/체력 수치 계산, Gate 안내 UI |
 | `ADroneTrainingCourse` | Spline·안내선, `CourseId`, 명시적 `OrderedGates`, Sequence와 Lap Recorder Component 소유 | Trigger 감지, 방향 수학, 결과 UI |
 | `ADroneTrainingGate` | Ring Visual, Box Trigger, 진입 위치 보존, 이탈 시 Sequence에 통과 시도 전달 | 현재 Gate 결정, 순서 진행, Lap 기록 |
 | `UDroneTrainingGateSequenceComponent` | 구성 검증, 현재 Gate, 순서·방향·중복 판정, Visual State, 승인 Actor·위치를 포함한 `OnGateAccepted`, Reset·Reconfigure Event | Visual Mesh 생성, Overlap 감지, 시간·점수·SaveGame |
@@ -230,13 +231,15 @@ Source/Drone/
 | `EDroneTrainingGateVisualState` | `Inactive`, `Current`, `Completed` 상태 표현 | Lap 상태 표현 |
 | `EDroneTrainingLapRecordState` | `Idle`, `Recording`, `Completed` 기록 상태 표현 | Gate 시각 상태 표현 |
 | `FDroneNPCProfile` | NPC의 Friendly/Hostile 역할, Rifle/Shotgun 장비 종류와 MG 사용 가능 여부 | 최종 진영 설정, 무기 수치·피해·Animation |
-| `ADroneNPCCharacter` | 프로젝트 소유 NPC Character, Profile과 Smart Object User Component 소유 | 외형·Animation 확정, 행동 의사결정 |
-| `ADroneNPCAIController` | StateTree·Sight·예약 Component 소유, 역할별 Tree 시작, Hostile/Friendly Slot Claim과 방문 기록, 드론 감지·Search·개인 무기 공용 호출 | MG/Cover 전환, Damage·Animation |
+| `ADroneNPCCharacter` | 프로젝트 소유 NPC Character, Profile·Smart Object User·Health Component 소유, 사망 시 이동·충돌·AI 정리 | 외형·Animation·Respawn 확정, 행동 의사결정 |
+| `UDroneHealthComponent` | NPC·Drone 기본 100 체력, 표준 Damage 수신, 0 이하 사망 1회와 Event | 최종 밸런스, 방어력, Respawn·Mission 실패 규칙 |
+| `ADroneNPCAIController` | StateTree·Sight·예약 Component 소유, 감지·Search·개인 무기·MG·Cover 점유와 사망 뒤 교대 | 전투 종료·Animation |
 | `FDroneStateTree*PatrolSlotTask` | Hostile/Friendly Claim, 공용 NavMesh Move·Wait, 역할별 Release 실행 | MG·Cover·Animation |
-| `UDroneNPCWeaponComponent` | Rifle 단일 Trace와 Shotgun 다중 Pellet·Spread, 사거리·Cooldown·Target/Aim Point·Timer 정리 | Damage·탄약·재장전 상태·Animation·FX·SFX |
+| `FDroneStateTree*CoverTask` | MG 실패 뒤 Cover Claim·Move·Occupied 개인 무기 상태 실행 | 실제 Crouch·Lean·엄폐 방향 Animation |
+| `UDroneNPCWeaponComponent` | Rifle 단일 Trace·10 Damage와 Shotgun 다중 Pellet·Spread·적중 Pellet당 8 Damage, 사거리·Cooldown·Timer, Rifle 30/Shotgun 8 탄창·즉시 Reload | 예비 탄약·재장전 시간·Animation·FX·SFX |
 | `UDroneSmartObjectReservationComponent` | Activity/User Tag로 빈 Slot 검색·Claim·Release, 직전 위치 반경 회피 검색 | Animation, StateTree 상태 선택 |
 | `UDroneAIStateTreeAuthoringLibrary` | Editor에서 Hostile 순찰·Friendly 기지 루틴 StateTree 생성 및 Schema/상태/Task 검증 | 런타임 의사결정, 기존 Asset 덮어쓰기 |
-| `ADroneSmartObjectStation` | Definition이 연결될 프로젝트 소유 Host와 방향 Preview, Authoring Tool용 Definition·Mesh 연결 함수 | Interaction StateTree와 NPC 행동 실행 |
+| `ADroneSmartObjectStation` | Definition Host, MG Aim Pivot·발당 8 Damage Trace·사용자/표적·Blueprint FX Event | 최종 Turret Bone·Animation·FX·SFX |
 | `ADroneNPCSpawnPoint` | NPC Class·Profile·수·간격에 따른 명시적 Spawn | NPC의 순찰 위치와 행동 선택 |
 | `ADroneNPCNavigationFloor` | Greybox에서 BlockAll 충돌과 Navigation Relevant 바닥을 제공 | 최종 환경 Mesh·대규모 맵 NavMesh 성능 정책 |
 
@@ -279,7 +282,18 @@ Content/Drone/Maps/
 └─ Lvl_NPCSmartObjectGreybox.umap
 ```
 
-맵에는 Rifle 1명, Shotgun 1명, Friendly 2명과 Smart Object Station 10개가 있다. Manny Simple·`ABP_Unarmed`은 기능 배치 확인용 임시 외형이다. Soldier/Insurgent 후보 중 최종 선택은 아직 미정이다.
+맵에는 Rifle 1명, Shotgun 1명, Friendly 2명과 Smart Object Station 12개가 있다. 기존 순찰·생활·MG Station 10개에 Cover 2개가 추가됐다. Manny Simple·`ABP_Unarmed`은 기능 배치 확인용 임시 외형이다. Soldier/Insurgent 후보 중 최종 선택은 아직 미정이다.
+
+### 현재 전투 비주얼 연결 경계
+
+`UDroneNPCWeaponComponent`는 Blueprint에서 다음 두 Event를 바인딩할 수 있다.
+
+- `OnWeaponFired(WeaponType, TraceStart, AimPoint)`: Rifle 실제 Trace마다 1회, Shotgun 실제 Volley마다 1회
+- `OnReloadCompleted(WeaponType, CurrentAmmo, MagazineCapacity)`: 소모된 탄창을 실제로 채운 경우에만 1회
+
+Cooldown·사거리·빈 탄창으로 거절된 발사와 가득 찬 탄창의 Reload는 Event를 만들지 않는다. 따라서 역할 Blueprint에서는 이 Event에 Montage·Muzzle Flash·Sound만 연결하고 Trace나 탄약 계산을 다시 구현하지 않는다.
+
+읽기 전용 감사 결과 Manny Rifle Animation은 38개, FPS Weapon Mesh는 70개다. AR4 Rifle·MG Niagara/Sound 후보는 정상 로드된다. Modular Soldier/Insurgent는 Manny와 Skeleton이 다르고 이식 Root에 Animation Asset이 0개이므로 Retarget 없이 강제 교체하지 않는다. 이름으로 식별되는 Shotgun Weapon Mesh도 0개라 Shotgun 외형은 현재 미정이다.
 
 ### 중앙 Map Asset
 
@@ -571,6 +585,19 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
 - Friendly `ST_NPC_FriendlyBaseRoutine`과 Base Patrol/Ambient 교대·Fallback·방문 기록
 - Hostile/Friendly 4명의 역할별 이동과 Smart Object 1-Slot 배타 Claim
 - 감지·이동 실패·UnPossess 경로의 예약 해제
+- Hostile 감지 시 MG 권한 확인, MGTurret 1-Slot Claim·NavMesh 이동·도착 뒤 Claim 유지
+- MG 권한 없음·빈 Slot 없음 시 Rifle/Shotgun 개인 무기 상태로 Fallback
+- 반복 Sight 자극, DroneLost와 MG 이동 실패 경로의 중복 Claim·예약 누수 방지
+- Smart Object `Claimed → Occupied → Free` 전환과 활성 MG Station 사용자 추적
+- Station `MGTurretAimPivot`, 6,000cm·0.15초 Greybox Trace와 Blueprint 사용/발사 Event
+- NPC·Drone 공통 100/100 체력, 0 이하 사망 1회와 사망 후 Damage 무시
+- Rifle 10·Shotgun 적중 Pellet당 8·MG 8 Greybox Damage
+- NPC 사망 시 이동·충돌·무기·StateTree·MG Slot 정리와 대기 Hostile 재점유
+- Drone 사망 시 입력·이동·충돌 정지와 HUD `파괴됨` 표시
+- MG 실패 뒤 Cover 1-Slot Claim·NavMesh 이동·Occupied·개인 무기 대응
+- Greybox Map의 Cover Station 2개와 MG 사망 뒤 Cover→MG 교대
+- Drone 파괴 Event 1회, Perception Source 해제, 살아 있는 적의 개인 무기·MG·Cover 정리와 Search 없는 Patrol 복귀
+- Rifle 30발·Shotgun 8발 탄창, 발사당 1발 소모, 빈 탄창 정지·거부와 명시적 즉시 Reload
 
 ### 아직 구현하지 않은 것
 
@@ -585,10 +612,10 @@ Ring은 Engine Cube 16개로 원을 근사한 Greybox다. 기본 Radius는 220 c
 - 최종 Gate Mesh·VFX·SFX·Animation
 - 최종 코스 배치·크기·난이도
 - 배터리·통신거리·재밍 같은 후보 시스템
-- MG를 사용하지 않는 전투원의 Cover와 통합 Return
-- Rifle·Shotgun Damage·탄약·재장전 상태·Animation·FX·SFX
-- MG 이동·한 명 점유·조준·사격과 사망/중단 뒤 재점유
-- Cover·Search·Return 실제 행동
+- Rifle·Shotgun 예비 탄약·재장전 시간·Animation·FX·SFX
+- MG 승하차 Animation·FX·SFX와 최종 난이도 수치
+- NPC 래그돌/시체 제거, Drone 폭발·Respawn·Mission 실패 화면
+- Cover Crouch·Lean·벽 방향 판정과 실제 Animation
 
 TUT-03의 원본 시간·거리·평균 속도와 TUT-04B의 이전 평균·Best·Delta·HUD 표시는 구현됐다. `USaveGame` 영속화와 점수는 아직 구현하지 않았다. `SegmentDistance`는 현재도 배치 메타데이터이며 실제 이동 거리 계산에 사용하지 않는다.
 
@@ -613,10 +640,14 @@ TUT-03의 원본 시간·거리·평균 속도와 TUT-04B의 이전 평균·Best
 15. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가며 PIE/Standalone 종료 즉시 멈추는지 확인한다.
 16. AI 기능이 병합된 뒤 Editor를 재시작하고 Smart Objects와 Gameplay Interactions Plugin 활성 상태를 확인한다.
 17. Content Browser에서 생성된 Definition·Station BP 6쌍과 MG Mesh 연결을 확인한다.
-18. `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`을 열고 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 10개의 위치·방향이 알아보기 쉬운지 확인한다.
+18. `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`을 열고 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 12개(기존 10 + Cover 2)의 위치·방향이 알아보기 쉬운지 확인한다.
 19. Editor에서 `P` 키를 눌러 네 NPC 시작점과 Station 사이에 녹색 NavMesh가 이어지는지 눈으로 확인한다.
 20. Manny/Unarmed 외형은 임시임을 전제로 PIE에서 Hostile 2명이 EnemyPatrol 3개 사이를 반복하는지, 서로 겹치거나 제자리만 다시 고르지 않는지 눈으로 확인한다.
 21. Friendly 2명이 FriendlyBasePatrol 3개와 Ambient 2개 사이를 이동하고 같은 지점에 동시에 머물지 않는지 눈으로 확인한다.
+22. 드론 감지 뒤 Rifle Hostile이 MG로 이동·점유하고 조준 방향을 갱신하며, Shotgun Hostile은 개인 무기 대응을 유지하는지 확인한다.
+23. 드론 피격 때 우측 상단 내구도가 100에서 내려가고 0에서 `파괴됨`과 함께 입력·이동이 정지하는지 확인한다.
+24. MG 사수에게 `Apply Damage` 100을 주면 사수가 멈추고 Slot이 Free가 되는지 확인한다.
+25. 다른 Hostile이 Cover로 이동·점유해 개인 무기를 사용하고, MG 사망 뒤 빈 MG를 이어서 점유하는지 확인한다.
 
 사용자가 지금 판단해야 하는 것은 플레이할 때의 가독성·조종 난이도, 실제 비행에서 기록값이 자연스럽게 증가하는지, FPV 외형·Camera·소리가 실제 환경에서 자연스러운지다. 정확한 공식과 파일·참조 구조는 자동 검증했지만, Gate 배치와 사람이 체감하는 시간·거리·속도·청감은 직접 확인이 필요하다.
 
@@ -642,7 +673,9 @@ TUT-03의 원본 시간·거리·평균 속도와 TUT-04B의 이전 평균·Best
 - 역할별 NPC Blueprint와 Greybox 맵을 다시 만들 필요 없음
 - Hostile 순찰 StateTree를 BP Event Graph에서 다시 만들 필요 없음
 - Friendly BaseRoutine을 BP Event Graph에서 다시 만들 필요 없음
-- Hostile이 드론 감지 뒤 아직 Search·사격하지 않는 현상을 현재 단계 오류로 오해할 필요 없음
+- 기존 NPC/Drone BP에 Health Component를 중복 추가하거나 BP Tick에서 체력을 다시 계산할 필요 없음
+- 역할 BP에서 발사 Trace·탄약 감소·Reload 판정을 중복 구현할 필요 없음. `OnWeaponFired`와 `OnReloadCompleted`에는 표현만 연결
+- MG 포신 조준·Trace·Damage가 구현됐으므로 FX/SFX/Animation이 없는 것을 사격 실패로 오해할 필요 없음
 
 코드나 BP·Map Asset을 실제로 수정했다면 그때 Build, Tutorial 테스트, 전체 회귀, Blueprint Compile을 다시 실행한다.
 
@@ -685,13 +718,17 @@ TUT-03의 원본 시간·거리·평균 속도와 TUT-04B의 이전 평균·Best
 ### Drone 전체 데이터 흐름까지 이어서 읽을 때
 
 15. `Source/Drone/Prototype/DronePrototypePawn.h/.cpp`
-16. `Source/Drone/Telemetry/DroneTelemetryTypes.h`
-17. `Source/Drone/Telemetry/DroneTelemetryComponent.h/.cpp`
-18. `Source/Drone/Prototype/DronePrototypePlayerController.h/.cpp`
-19. `Source/Drone/UI/DroneFlightHUDWidget.h/.cpp`
-20. `Source/Drone/Prototype/DronePrototypeGameMode.h/.cpp`
+16. `Source/Drone/Health/DroneHealthComponent.h/.cpp`
+17. `Source/Drone/AI/Weapons/DroneNPCWeaponComponent.h/.cpp`
+18. `Source/Drone/AI/DroneSmartObjectStation.h/.cpp`
+19. `Source/Drone/AI/DroneNPCAIController.h/.cpp`
+20. `Source/Drone/Telemetry/DroneTelemetryTypes.h`
+21. `Source/Drone/Telemetry/DroneTelemetryComponent.h/.cpp`
+22. `Source/Drone/Prototype/DronePrototypePlayerController.h/.cpp`
+23. `Source/Drone/UI/DroneFlightHUDWidget.h/.cpp`
+24. `Source/Drone/Prototype/DronePrototypeGameMode.h/.cpp`
 
-이 순서는 `Gate 판정 규칙 → Overlap 입력 → 기록 데이터 → Lap Recorder → Course 연결 → 자동화 근거 → Pawn·Telemetry·HUD 실행 경로` 순으로 책임을 따라가게 한다.
+이 순서는 `Gate 판정 → 기록 → Pawn → Health → 무기 Damage → MG/AI 사망 정리 → Telemetry·HUD` 순으로 책임을 따라가게 한다.
 
 ## 8. Editor 수동 확인법과 정상 결과
 
