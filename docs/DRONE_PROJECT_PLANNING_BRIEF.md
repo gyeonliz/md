@@ -1,8 +1,8 @@
 # Project:Droner 통합 기획·개발 현황서
 
-기준일: 2026-09-03 (Asia/Seoul)
+기준일: 2026-09-04 (Asia/Seoul)
 
-문서 상태: FLOW-01~03 로컬 구현 완료·FLOW-04 대기
+문서 상태: FLOW-01~03 공유 완료·AI-GAZE 축 교정/MG 전용 임시 3분할 구현 완료·수동 확인 및 FLOW-04 대기
 
 이 문서는 Drone 프로젝트의 게임 기획, 현재 구현 상태, 다음 개발 순서와 검증 기준을 한 번에 확인하기 위한 통합 문서다. 세부 기술 계약은 링크된 구현 문서를 따르며, 구현 완료 여부는 실제 Unreal 코드·Asset·빌드·자동화·화면 확인을 근거로 판정한다.
 
@@ -12,12 +12,12 @@
 |---|---|
 | 장르 | 싱글플레이 드론 운용·정찰·미션 게임 |
 | 엔진 | Unreal Engine 5.8.1 |
-| 현재 작업 루트 | Unreal `C:\URproject\drone`, 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
-| 다른 PC의 이전 경로 | `D:\JGY\project\drone`, `D:\JGY\project\md` |
-| Unreal 공유 기준 | `main=origin/main=2d6a459` |
+| 현재 작업 루트 | Unreal `D:\JGY\project\drone`, 문서 `D:\JGY\project\md` |
+| 다른 PC의 이전 경로 | `C:\URproject\drone`과 해당 PC 문서 복제본 |
+| Unreal 공유 기준 | `main=origin/main=46f7f37` |
 | 플레이어 표현 | 사람 캐릭터 없이 Drone 조작 중심 |
 | 핵심 모드 | Tutorial 비행 훈련, Story Mission |
-| 현재 신규 개발 | `FLOW-04` 정적 브리핑→선택 Map 로드. FLOW-01~03은 로컬 완료 |
+| 현재 신규 개발 | `AI-GAZE-01D` Component Space 고개 시선과 `AI-MG-03` 원기둥 3분할 회전 수동 확인, 다음 흐름 카드는 `FLOW-04` 정적 브리핑→선택 Map 로드 |
 | 제외 범위 | Android, Network/협동, 실제 군사 장비 1:1 재현 |
 
 핵심 경험은 다음과 같다.
@@ -193,16 +193,19 @@ Figma의 UI 참고 이미지는 청록·녹색 계열 전술 HUD, 얇은 선, �
 | 적 AI | 순찰, Drone 감지·실종 Search, NavMesh 이동 |
 | Smart Object | 1-Slot Claim·Occupied·Release, Patrol·Ambient·Cover·MG 역할 |
 | 전투 | Rifle/Shotgun Trace·Damage·탄창·즉시 Reload, MG 조준·사격 |
+| AI 시선 | 감지 Actor·1초 유예·Search 마지막 위치, Rifle AnimBP 상체/목/고개 Component Space 보간 |
+| MG 3축 | MG 전용 Class에 고정 Base·Yaw 몸체·Pitch 포신·Muzzle와 임시 원기둥 3개, 목표 정렬 후 발사 |
 | 체력·사망 | NPC/Drone 공통 체력, 사망 1회, 전투·입력·예약 정리 |
 | 협업 자산 | FPV Drone, 환경 Map, Ground Drone/MG, NPC·VFX·SFX 후보 선별 이식 |
 | Front-end 기반 | GameInstance Flow/Catalog, 실제 Mission·Drone Data Asset, 전용 Map/BP GameMode·Controller/WBP, 정적 Opening→Lobby, Training Mission 선택·설명·시작 |
 
-공유 Unreal 기준은 `2d6a459`이다. 이 기준에 전투 Greybox, Blueprint 발사·재장전 표현 Event와 Smart Object 방향 보강까지 들어 있다. FLOW-01~03은 아직 로컬 미커밋이다.
+공유 Unreal 기준은 `46f7f37`이다. 이 기준에 FLOW-01~03, 전투 Greybox, Projectile·사격 분산, 프로젝트 Rifle AnimBP와 Smart Object 방향 보강까지 들어 있다. AI-GAZE Component Space 교정과 MG 전용 3분할 임시 외형은 그 위 로컬 미커밋이다.
 
 ### 로컬 구현·수동 확인 대기
 
 - `Lvl_NPCSmartObjectGreybox`에서 Patrol·Cover·MG 도착 방향 실제 화면 확인
-- FLOW-01~03 Source/Test, Data Asset 2개, Front-end BP/WBP/Map과 기본 Game Map 설정
+- 사용자 화면에서 확인된 좌우 미추적·위아래 까딱임 수정 뒤 NPC 고개 Yaw/Pitch·보간과 Rifle/MG/Cover 자세 확인
+- 임시 원기둥 MG Base 고정, Body Yaw, Barrel Pitch 실제 회전 확인. 최종 에셋 연결은 공급 후 세 Static Mesh 교체로 처리
 - NPC Weapon Visual/Muzzle Component와 Character 표현 Event 기반. 실제 Mesh는 미연결
 - Training 두 Lap에서 첫 기준·이전 평균·Best·Delta 표시 확인
 - Drone Loop 단일 재생과 종료 정지 청감
@@ -217,7 +220,7 @@ Figma의 UI 참고 이미지는 청록·녹색 계열 전술 HUD, 얇은 선, �
 - 성공/실패 결과·재도전·로비 복귀
 - 명시적 Take Off·Landing·Crash 상태
 - Jamming Runtime
-- 실제 NPC·무기·MG Animation·Niagara·Sound 표현
+- 최종 NPC·무기·MG 승하차 Animation·Niagara·Sound 표현
 - Drone 폭발·Respawn과 최종 Mission 실패 연출
 
 ## 7. 폐기·보존 결정
@@ -380,10 +383,11 @@ ADroneMissionDirector
 
 ## 13. 현재 사용자가 확인할 것
 
-우선순위가 높은 수동 확인은 두 가지다.
+우선순위가 높은 수동 확인은 세 가지다.
 
-1. `Lvl_NPCSmartObjectGreybox`에서 Cyan 화살표와 Patrol·Cover·MG 도착 방향이 일치하는지 확인
-2. `Lvl_DroneTraining`을 두 번 완주해 첫 기준·이전 평균·Best·시간/속도 Delta가 실제 HUD에 맞게 표시되는지 확인
+1. `Lvl_NPCSmartObjectGreybox`에서 Drone을 좌우·상하로 움직여 병사 고개·상체가 까딱임 없이 자연스럽게 따라보는지 확인
+2. 같은 Map에서 Cyan 화살표와 Patrol·Cover·MG 도착 방향, 임시 원기둥 Base 고정·Body Yaw·Barrel Pitch가 일치하는지 확인
+3. `Lvl_DroneTraining`을 두 번 완주해 첫 기준·이전 평균·Best·시간/속도 Delta가 실제 HUD에 맞게 표시되는지 확인
 
 그다음 확인:
 

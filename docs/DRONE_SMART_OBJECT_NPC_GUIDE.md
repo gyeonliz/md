@@ -1,10 +1,10 @@
 # Drone Smart Object NPC 준비·사용 가이드
 
-기준일: 2026-09-03 (Asia/Seoul)
+기준일: 2026-09-04 (Asia/Seoul)
 
 이 문서는 적군 순찰과 드론 발견 대응, 소총·샷건 분기, 기지 아군 NPC의 생활·순찰 이동, 한 명만 사용하는 MG Turret을 같은 기반 위에 구성하기 위한 실전 가이드다.
 
-현재 공유 기준선 `2d6a459`에는 **MG·체력·사망 교대·Cover·Drone 파괴 교전 종료·Rifle/Shotgun 탄창과 Smart Object 도착 방향 보강**까지 반영돼 있다. `ST_NPC_HostilePatrol`은 MGTurret을 먼저 시도하고 실패한 Hostile은 Cover 1-Slot으로 이동해 개인 무기로 대응한다. 사수가 사망하면 Cover 병사가 자기 Slot을 놓고 빈 MG를 재Claim할 수 있다. Cover도 없으면 제자리 개인 무기로 대응하며, 실종 Event 뒤에는 모든 Slot을 정리하고 3초 Search 후 순찰로 복귀한다. Drone이 파괴되면 Search 없이 즉시 전투 자원을 정리하고 Patrol로 돌아간다. 예비 탄약·재장전 시간·생활/전투 Animation·FX·SFX와 최종 사망 연출은 아직 완성된 기능이 아니다.
+현재 공유 기준선 `46f7f37`에는 **MG·체력·사망 교대·Cover·Drone 파괴 교전 종료·Rifle/Shotgun 탄창, Smart Object 도착 방향, 이동 Projectile·사격 분산과 프로젝트 소유 Rifle AnimBP**까지 반영돼 있다. 그 위 로컬 변경으로 Drone 감지·1초 유예·Search 마지막 위치를 잇는 상체/목/고개 Gaze와 MG 전용 `고정 Base → Yaw 몸체 → Pitch 포신 → Muzzle` 및 임시 원기둥 Mesh 3개를 구현했다. `ST_NPC_HostilePatrol`은 MGTurret을 먼저 시도하고 실패한 Hostile은 Cover 1-Slot으로 이동해 개인 무기로 대응한다. 사수가 사망하면 Cover 병사가 자기 Slot을 놓고 빈 MG를 재Claim할 수 있다. Cover도 없으면 제자리 개인 무기로 대응하며, 실종 Event 뒤에는 모든 Slot을 정리하고 3초 Search 후 순찰로 복귀한다. Drone이 파괴되면 Search 없이 즉시 전투 자원을 정리하고 Patrol로 돌아간다. 예비 탄약·재장전 시간·FX·SFX와 최종 사망 연출은 완성 기능이 아니다.
 
 ## 바로 찾는 수정 위치
 
@@ -15,14 +15,15 @@ Smart Object는 하나의 파일만 고치는 기능이 아니다. **장소**, *
 | 지점의 월드 위치·방향 | `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox` 또는 적용할 실제 맵 | 배치된 `BP_SO_*` Actor를 이동·회전한다. Cyan 화살표 `+X`가 NPC 도착 방향이다 |
 | Mesh와 NPC 대기 위치 사이 Offset | `/Game/Drone/AI/SmartObjects/Blueprints/BP_SO_*` | Blueprint Viewport에서 상속된 `SmartObjectComponent`의 상대 Location·Rotation을 조정한다. `SlotFacingPreview`가 같이 움직인다 |
 | Slot 수·Activity Tag·Behavior | `/Game/Drone/AI/SmartObjects/Definitions/SO_Def_*` | Definition Editor의 Slots에서 수정한다. 현재 프로젝트 계약은 역할별 Slot 1개·Activity Tag 1개다 |
-| 역할·Definition·MG Mesh 연결 | `/Game/Drone/AI/SmartObjects/Blueprints/BP_SO_*` | Class Defaults의 `Activity`, Smart Object Definition, MG Mesh를 맞춘다 |
-| MG 사거리·발사 간격·피해·총구 Offset | `BP_SO_MGTurret` Class Defaults | `Drone > AI > MG`의 Range, Cooldown, Damage, Muzzle Offset을 조정한다 |
+| 역할·Definition·MG 외형 연결 | `/Game/Drone/AI/SmartObjects/Blueprints/BP_SO_*` | Class Defaults의 `Activity`, Smart Object Definition을 맞춘다. MG는 상속된 Base/Body/Barrel Static Mesh 3개의 Asset·Transform만 교체한다 |
+| MG 사거리·발사 간격·피해·총구·조준 속도 | `BP_SO_MGTurret` Class Defaults | `Drone > AI > MG`의 Range/Cooldown/Damage/Muzzle와 `Aim`의 Yaw/Pitch/보간/발사 허용각을 조정한다 |
 | AI의 Smart Object 검색 범위 | `Source/Drone/AI/DroneSmartObjectReservationComponent.h` | `SearchRadius`, `SearchHalfHeight` 기본값을 수정한다. 역할별 차이가 필요하면 Controller Blueprint 분리를 먼저 한다 |
 | 순찰 재선택 회피 거리 | `Source/Drone/AI/DroneNPCAIController.h` | `PatrolRepeatAvoidanceRadius`를 조정한다 |
 | 도착 허용 반경·대기·재시도 시간 | `/Game/Drone/AI/StateTrees/ST_NPC_HostilePatrol`, `ST_NPC_FriendlyBaseRoutine` | 해당 Native Task 노드의 `AcceptanceRadius`, `WaitDuration`, `RetryInterval`을 조정한다 |
 | MG/Cover 우선순위와 실패 분기 | `/Game/Drone/AI/StateTrees/ST_NPC_HostilePatrol` | State와 Transition을 조정한다. Native Task Struct 이름·순서는 검증 도구 계약과 같이 갱신한다 |
 | 검색·Claim·Occupied·Release 코드 | `DroneSmartObjectReservationComponent.*`, `DroneNPCAIController.*` | 예약 Handle은 Component 한 곳에서만 소유한다. Blueprint에 별도 Claim 로직을 중복하지 않는다 |
-| Station 구조·MG Trace | `DroneSmartObjectStation.*` | Station Component 구조와 MG Pivot·Trace·Damage 공용 규칙을 수정한다 |
+| 일반 Station 구조·MG 공용 전투 규칙 | `DroneSmartObjectStation.*` | 일반 Smart Object Component와 MG 사용/Projectile 공용 규칙을 수정한다. 일반 Station에 포탑 Mesh나 Pivot을 추가하지 않는다 |
+| MG 전용 3분할 구조 | `DroneMGTurretStation.*` | MG 전용 Base/Yaw/Pitch/Muzzle와 Base/Body/Barrel Mesh 구조·임시 크기를 수정한다 |
 | Definition/BP 생성·정합성 검사 | `md/tools/unreal/Setup-DroneSmartObjectStations.py` | 새 역할을 추가할 때 `SPECS`와 Tag Enum을 함께 갱신한다 |
 
 ### 에디터에서 지점 하나 조정하는 순서
@@ -31,7 +32,7 @@ Smart Object는 하나의 파일만 고치는 기능이 아니다. **장소**, *
 2. `W/E`로 Actor 전체 위치와 Yaw를 조정한다. Cyan 화살표가 NPC가 도착해 바라볼 방향이다.
 3. 외형은 그대로 두고 NPC가 서는 위치만 옮겨야 하면 대응 `BP_SO_*`를 열고 `SmartObjectComponent` 상대 Transform을 조정한다.
 4. `SlotFacingPreview`는 `SmartObjectComponent`의 자식이므로 실제 Slot Offset과 함께 움직이는지 Viewport에서 확인한다.
-5. MG는 `MGTurretAimPivot`이 회전축, `StationMesh`가 외형, `SmartObjectComponent`가 병사가 서는 위치다. 세 Component의 역할을 섞지 않는다.
+5. MG는 전용 `BP_SO_MGTurret`에서만 `MGTurretBaseMount`가 고정 하단부, `MGTurretYawPivot`이 좌우 몸체, `MGTurretAimPivot`이 상하 포신, `MGTurretMuzzle`이 발사 위치다. `MGTurretBaseMesh / BodyMesh / BarrelMesh`는 각각 해당 축 아래에 상속돼 있다. `SmartObjectComponent`는 병사가 서는 위치이므로 포탑 Pivot과 섞지 않는다.
 6. `P` 키로 NPC 시작 위치부터 Slot까지 녹색 NavMesh가 끊기지 않는지 확인한다.
 7. PIE에서 NPC가 Slot에 도착한 뒤 Cyan 화살표 방향으로 회전하는지 확인한다. 이번 보완부터 순찰·아군 활동·Cover·MG 모두 예약 Slot Yaw를 적용한다.
 8. 이동 실패 시 Actor를 지면 위로 조금 올리는 방식으로 숨기지 말고 NavMesh 경계, 장애물 Collision, Acceptance Radius를 순서대로 확인한다.
@@ -472,7 +473,7 @@ Hostile + CanUseMGTurret
 → Free
 ```
 
-현재 Reservation Component는 도착한 Claim을 `Occupied`로 전환한다. Station의 `MGTurretAimPivot`은 표적 중심을 바라보고, 실제 탄환은 기본 3.5도 반각 원뿔 안에서 무작위 방향을 고른다. 6,000cm·0.15초·발당 8 Damage·`5,500 cm/s`는 Greybox 값이다. DroneLost·Task 실패·UnPossess·EndPlay·사용자 사망에서는 Station 사용자와 Slot을 정리한다. 사망 해제 직후 감지 중인 다른 MG 가능 Hostile에 Event를 보내 재Claim시키는 흐름까지 PIE에서 검증했다.
+현재 Reservation Component는 도착한 Claim을 `Occupied`로 전환한다. MG 전용 Station은 Base를 고정하고 Yaw 몸체와 Pitch 포신을 독립 보간하며, 포신이 목표 기본 4도 안에 정렬된 뒤 실제 탄환을 3.5도 반각 원뿔 안에서 발사한다. 점유 중 Controller Tick이 조준을 계속 갱신한다. 6,000cm·0.15초·발당 8 Damage·`5,500 cm/s`는 Greybox 값이다. DroneLost·Task 실패·UnPossess·EndPlay·사용자 사망에서는 Station 사용자와 Slot을 정리한다. 사망 해제 직후 감지 중인 다른 MG 가능 Hostile에 Event를 보내 재Claim시키는 흐름까지 PIE에서 검증했다. 임시 3분할 Mesh와 최종 교체 절차는 [`DRONE_MG_TURRET_3PART_GUIDE.md`](DRONE_MG_TURRET_3PART_GUIDE.md)를 따른다.
 
 Cover 분기는 `ClaimCoverSlot → MoveToCover → UseCover` 세 상태다. `UseCover` 진입에서 Slot을 Occupied로 바꾸고 개인 Rifle/Shotgun Timer를 시작한다. DroneLost·이동 실패·사망·MG 재시도 전환에서는 Cover 예약을 해제한다. 현재는 위치 점유와 사격 계약까지이며 Crouch·Lean·벽 방향 판정은 Animation/고급 Cover 카드 범위다.
 
@@ -537,6 +538,8 @@ Editor 테스트:
 | `AI-ANIM-TEMP-01` | Manny 임시 무기 Animation | **Done** — Hostile 전용 Rifle Idle·8방향 Walk/Jog·Jump AnimBP와 Fire/Reload DefaultSlot Montage 연결. Fire 2.4x로 Rifle 연사 재시작 떨림 구조 제거, Friendly Unarmed 유지, Build·자동화·저장 Asset 검증 통과. 손 위치·총기 정렬과 반복 동작은 수동 재확인 |
 | `AI-MG-01` | MG Claim·Move | **Done** — MG 운영자 1명만 1-Slot Claim·이동·도착 뒤 유지, Shotgun 개인 무기 Fallback |
 | `AI-MG-02` | MG Occupy·Aim·Fire·Release | **Done** — Occupied·Aim·8 Damage Projectile·중단/사망 해제·다른 AI 재점유 집중 PIE 통과, 로컬 미커밋 |
+| `AI-MG-03` | Base/Yaw/Pitch/Muzzle 3분할 조준 | **Doing** — 범용 Station에서 포탑 Component 제거, MG 전용 Class/BP에 원기둥 Base/Body/Barrel 3개·계층 복구·연속 보간·정렬 후 발사 구현. Build·통합 PIE 완료, 화면 축 확인 대기 |
+| `AI-GAZE-01` | 감지 뒤 상체·목·고개 Drone 추적 | **Doing** — 독립 Gaze·1초 유예·Search 마지막 위치와 Rifle AnimBP 20/45/35% 보정. 사용자 확인의 위아래 까딱임을 반영해 Bone Space에서 Component Space로 교정·재저장. Build·자동화 완료, 화면 재확인 대기 |
 | `HP-01` | NPC·Drone Health·Death·HUD | **Done** — 기본 100/100, 사망 1회, 무기 Damage, Drone 정지·내구도 HUD 집중 테스트 통과, 로컬 미커밋 |
 | `AI-COVER-01` | MG 실패 병사의 Cover 대응 | **Done** — Cover 1-Slot Claim·Move·Occupied 사격, Map Station 2개, 사망 뒤 Cover→MG 교대 집중 PIE 통과, 로컬 미커밋 |
 | `AI-COMBAT-END-01` | Drone 파괴 교전 종료·실패 신호 | **Done** — Blueprint Event 1회, Perception 해제, 개인 무기·MG·Cover 정리, Search 없는 Patrol 복귀 집중 PIE 통과, 로컬 미커밋 |
@@ -554,7 +557,7 @@ Editor 테스트:
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneSmartObjectSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
 ```
 
-`VALIDATION_OK`가 출력되면 6쌍의 형식·부모 Class·Slot Tag·Definition·MG Mesh 연결이 일치한다. `Create` 모드는 정확한 12개 Asset을 재구성하는 유지보수용이며 일반 작업에서는 실행할 필요가 없다.
+`VALIDATION_OK`가 출력되면 6쌍의 형식·역할별 정확한 부모 Class·Slot Tag·Definition과 MG 원기둥 3개 연결이 일치한다. `MGTurret`만 `ADroneMGTurretStation`, 나머지 5개는 `ADroneSmartObjectStation`을 직접 부모로 사용한다. `Create` 모드는 정확한 12개 Asset을 재구성하는 유지보수용이며 일반 작업에서는 실행할 필요가 없다.
 
 NPC 역할 Blueprint와 Greybox 맵까지 다시 확인할 때는 다음 명령을 사용한다.
 
@@ -640,14 +643,18 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 - Rifle·Shotgun 동일 경로, Friendly 비발사, Lost 정리를 검증하는 `Drone.AI.WeaponContract`와 NPC Greybox PIE
 - MG Claim·Move·Hold Native StateTree Task, 개인 무기 Fallback과 DroneLost 예약 정리
 - MG 운영자 1명·예약 1개·도착과 Friendly 비무장을 검증하는 NPC Greybox PIE
-- Station Aim Pivot·Blueprint 사용/발사 Event와 MG Greybox Projectile
-- Game/Editor Build, AI 11/11, 전체 `Drone.` 27/27, Blueprint 0/0/0와 LFS 검증
+- MG 전용 Station의 Base/Yaw/Pitch/Muzzle 계층, 원기둥 Base/Body/Barrel 3개와 Blueprint 사용/발사 Event·Greybox Projectile
+- 범용 Station은 MG 외형 Component 없이 Patrol·Ambient·Cover 공용 구조 유지
+- Hostile Rifle AnimBP 상체·목·고개 Component Space Gaze, 1초 유예와 Search 마지막 위치 추적
+- 최신 Game/Editor Build, 저장 Asset 새 프로세스 검증, Smart Object 6쌍 Validation과 Gaze/MG 집중 자동화 5/5 통과. 과거 전체 `Drone.` 27/27·Blueprint 0/0/0·LFS 검증 기준은 유지하되 이번 변경 뒤 전체 묶음은 미재실행
 
 ### 아직 구현·수동 검증 필요
 
 - 최종 NPC 외형·Skeleton·Animation Blueprint 선택과 연결
 - Rifle·Shotgun 예비 탄약·재장전 시간·Animation·FX·SFX
 - MG 승하차 Animation·FX·SFX와 최종 밸런스
+- 임시 원기둥 MG Base/Body/Barrel 축·Muzzle·손 위치 수동 확인. 최종 에셋은 도착 뒤 상속된 세 Static Mesh 교체
+- Component Space 교정 뒤 Manny Gaze 좌우·상하 회전축·보간·Rifle/MG/Cover 자세 수동 확인
 - NPC 래그돌·시체 제거, Drone 폭발·Respawn·Mission 실패 화면
 - Cover와 전투 종료 뒤 통합 Return 실제 행동
 - 최종 맵에 NPC와 Smart Object 배치

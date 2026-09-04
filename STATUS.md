@@ -20,18 +20,28 @@
 | Git 사용자 이름 | 전역 `gyeonliz` 설정 확인 |
 | Git 사용자 이메일 | 전역 `jkw6483@gmail.com` 설정 확인 |
 | GitHub CLI | 설치되어 있지 않음 |
-| 현재 실행 세션 작업 루트 | Unreal `C:\URproject\drone`; 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
-| 다른 PC의 이전 기준 경로 | Unreal `D:\JGY\project\drone`; 문서 `D:\JGY\project\md` |
-| Unreal 프로젝트 저장소 | `main=origin/main=2d6a459`; FLOW-01~03·NPC Visual 기반과 AI Projectile Source/Test, Data Asset, Front-end BP/Map이 로컬 수정·미커밋 |
-| 문서 작업 저장소 | `main=origin/main=14c4ae6`; 상태 문서와 FLOW Data/Front-end 작성·검증 도구 4개 로컬 미커밋 |
-| Commit·Push 처리 | 사용자 측 최신 공유 기준은 Unreal `2d6a459`, 문서 `14c4ae6`. 이번 FLOW-01~03과 Visual 기반은 Commit·Push하지 않음 |
-| 실행 상태 | FLOW-03 검증 기준 유지. AI Projectile·원뿔 내 무작위 분산과 무장 NPC 전용 Rifle AnimBP를 보강했다. 최신 DroneEditor Build, `NPCGreyboxAssets`·`WeaponContract`·`NPCPerceptionSearchPIE` 3/3 및 저장 Animation Asset 읽기 검증 성공. 전체 회귀·Blueprint 전체 Compile은 반복하지 않음 |
+| 현재 실행 세션 작업 루트 | Unreal `D:\JGY\project\drone`; 문서 `D:\JGY\project\md` |
+| 다른 PC의 이전 기준 경로 | Unreal `C:\URproject\drone`; 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
+| Unreal 프로젝트 저장소 | `main=origin/main=46f7f37`; AI-GAZE Component Space 보정·Rifle AnimBP·MG 전용 원기둥 3분할 로컬 변경. 최종 Git 상태에서 `Lvl_MilitaryBase.umap`은 변경 없음 |
+| 문서 작업 저장소 | 작업 시작 기준 `main=origin/main=b8799c3`; 이번 AI-GAZE/MG 계획과 상태 최신화가 로컬 미커밋 |
+| Commit·Push 처리 | 사용자 측 최신 공유 기준은 Unreal `46f7f37`, 문서 `b8799c3`. Codex는 이번 작업에서 Commit·Push하지 않음 |
+| 실행 상태 | 명령줄 검증 뒤 Unreal Editor 종료 상태. FLOW-01~03은 공유 커밋에 포함. AI 시선/고개 축 교정과 MG 전용 3분할 임시 외형은 로컬 구현·Build·집중 테스트 완료, 수동 화면 확인 전 |
 | 별도 `droner` 주의 | `main=origin/main=551e287`; `Config/DefaultEditor.ini` 변경과 `Content/Asset` 10,928개·36,360,181,427 bytes 전체가 Untracked. 공급사 원본·스테이징 복사본이므로 일괄 Stage·Commit 금지 |
 | 팀원 변경 | 환경 맵·재질 변경은 중앙 `main`에 반영된 상태. Battlefield의 새 프로젝트 머티리얼 3개와 Camp/Base 의존성을 검증했고 개인 `.vsconfig` 변경·`//test`를 별도 정리. 팀원 PC Remote 실측만 남음 |
 
 GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도했으나 Windows Installer가 종료 코드 1602로 취소되어 설치되지 않았다. GitHub 웹과 Git Credential Manager만으로도 기본 Push/Clone 작업은 가능하다.
 
 전역 Git 작성자 정보는 `gyeonliz <jkw6483@gmail.com>`으로 설정되어 있다. Unreal 프로젝트는 `https://github.com/gyeonliz/drone.git`, 문서 저장소는 `https://github.com/gyeonliz/md.git`를 `origin`으로 사용하며 둘 다 첫 Commit과 Push를 완료했다. 기준선 확인 시 각 로컬 `main`과 `origin/main`이 일치했다. Git 작성자 이름·이메일과 GitHub Desktop 로그인 계정은 Commit 작성자·인증 정보이며 Push 목적지는 아니다. Push 목적지는 선택한 로컬 저장소의 Remote URL과 선택 Branch가 결정한다. 작업컴 기본 PowerShell 정책은 `.ps1` 직접 실행을 차단하므로 컨텍스트 도구 검증에는 영구 설정 변경 없이 실행 1회에만 `-ExecutionPolicy Bypass`를 적용했다.
+
+## 2026-09-04 AI-GAZE-01·AI-MG-03 구현 상태
+
+- `ADroneNPCAIController`가 감지 중 Drone Actor, 1초 Sight 실종 유예, Search의 마지막 감지 위치를 독립 Gaze Target으로 관리한다. Yaw `±65°`, Pitch `-25°~+40°`, 추적 `6.0`, 복귀 `3.5` Greybox 보간값을 AnimInstance에 공급한다.
+- Gameplay `SetFocus/SetFocalPoint`는 사용하지 않는다. 초기 구현에서 AI Focus가 Smart Object Slot 몸 방향과 경쟁해 MG 통합 테스트를 막은 것을 확인했고, NPC 몸은 이동/Slot Yaw, 고개는 AnimBP Gaze가 담당하도록 분리했다.
+- 프로젝트 소유 `ABP_NPC_Rifle_Greybox`를 `UDroneNPCAnimInstance` 기반으로 바꾸고 기존 Rifle Pose·DefaultSlot 뒤에 `spine_03 → neck_01 → head` 회전 보정을 `20% / 45% / 35%`로 연결했다. 첫 사용자 화면 확인에서 Bone Space가 좌우 Yaw를 고개 까딱임으로 보이게 만든 것을 확인해 세 노드를 Component Space로 교정·재저장했다. 공급사 AnimBP와 Friendly `ABP_Unarmed`는 수정하지 않았다.
+- 범용 `ADroneSmartObjectStation`에서는 포탑 Pivot과 일체형 `StationMesh`를 제거했다. MG만 파생 `ADroneMGTurretStation`을 쓰며 `MGTurretBaseMount → MGTurretYawPivot → MGTurretAimPivot(Pitch) → MGTurretMuzzle`과 `MGTurretBaseMesh / BodyMesh / BarrelMesh` 원기둥 3개를 가진다. Base는 고정, 몸체는 좌우, 포신은 상하만 움직이며 기본 4° 정렬 범위 안에서 발사한다.
+- `BP_SO_MGTurret` 한 개만 새 전용 부모로 이관했다. 기존 저장 Attachment가 Pitch를 Yaw에서 분리해 조준 오차가 24.35°에 고정된 문제는 전용 Actor의 Construction 계층 복구로 수정했으며, 점유 중 Controller 갱신으로 부드러운 조준을 계속 수행한다. 다른 5개 Smart Object Blueprint는 범용 부모와 기존 역할을 유지한다.
+- `DroneEditor Win64 Development`와 `Drone Win64 Development`가 MSVC 14.51.36256으로 성공했다. 저장 AnimBP·MG BP 새 프로세스 검증, Smart Object 6쌍 Validation과 `NPCGreyboxAssets`, `NPCPerceptionSearchPIE`, `SmartObjectFoundationDefaults`, `SmartObjectStationAssets`, `ProjectileBallistics` 집중 5/5가 통과했다.
+- 자동화가 확인하지 못하는 Component Space 적용 후 Manny 좌우·상하 시선 체감, Rifle/MG/Cover 자세와 임시 원기둥 Base/Body/Barrel 육안 축은 `Lvl_NPCSmartObjectGreybox` 수동 확인이 남았다. 최종 기관총 에셋이 오면 상속된 세 Static Mesh의 Asset·상대 Transform만 바꾼다. 연결 절차는 [`docs/DRONE_NPC_GAZE_TRACKING_PLAN.md`](docs/DRONE_NPC_GAZE_TRACKING_PLAN.md)와 [`docs/DRONE_MG_TURRET_3PART_GUIDE.md`](docs/DRONE_MG_TURRET_3PART_GUIDE.md)를 따른다.
 
 ## 2026-09-03 Front-end·Mission 진입 기획 변경
 

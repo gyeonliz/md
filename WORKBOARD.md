@@ -4,29 +4,29 @@
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 공유 기준선은 `origin/main=2d6a459`다. 전투 Greybox·AI-VIS-01A와 Smart Object 방향 보강까지 Push됐다. 실제 Mesh·Animation·FX·SFX 연결은 후속 작업이다.
+Unreal 공유 기준선은 `main=origin/main=46f7f37`, 문서 공유 기준선은 `main=origin/main=b8799c3`다. FLOW-01~03, Projectile·사격 분산과 프로젝트 소유 Rifle AnimBP까지 Push됐다. 그 위에 AI-GAZE와 MG 전용 3분할 임시 외형이 로컬 변경으로 추가됐다. 작업 시작에 수정 표기되던 `Lvl_MilitaryBase.umap`은 최종 내용 비교에서 Git 변경이 아니며 이번 작업이 직접 수정하지 않았다.
 
 2026-09-03 게임 흐름은 `실행 → 시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → 맵 → Drone 선택 → Mission 시작/측면 목표 UI`로 변경됐다. 사람 Operator 조작·NPC 대화 수령·Operator↔Drone 전환은 폐기하며 [`docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 최우선 실행 기준으로 사용한다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-09-04 — AI-ANIM-TEMP-01 무장 자세·연사 떨림 구조 수정
+마지막 갱신: 2026-09-04 — 병사 시선 축 수정·MG 전용 원기둥 3분할 구현 및 자동화 완료, 수동 화면 확인 대기
 
 | 항목 | 상태 |
 |---|---|
 | 현재 단계 | FLOW-01~03 데이터·시작 화면·로비 미션 선택 완료, FLOW-04 브리핑→Map 준비 |
 | 진행 정도 | GameInstance Flow/Catalog, 실제 Mission·Drone Data Asset, 전용 Front-end BP/WBP/Map, 정적 Opening→Lobby와 Training Mission 목록·측면 설명·하단 시작 완료. Rifle·Shotgun·MG는 이동 Projectile과 BP 조정형 무작위 사격 원뿔을 기본 사용. Hostile Rifle·Shotgun은 프로젝트 소유 Rifle AnimBP 사용 |
-| 지금 작업 중 | `FLOW-03` 데이터 기반 로비 UI·집중 PIE 완료. 다음 활성 카드는 `FLOW-04` |
-| 완료 근거 | 기존 FLOW 검증 유지. Editor Build, `NPCGreyboxAssets`·`WeaponContract`·`NPCPerceptionSearchPIE` 3/3, 저장된 Rifle Idle·27개 Rifle BlendSpace Sample·역할별 AnimBP 분리 읽기 검증 성공 |
-| 수동 미확인 | 수정된 Manny 연사 반복 동작, 임시 발사·Reload 손 위치/총기 정렬, Training 두 Lap 비교 HUD, OilRig Map Check·재질·조명·스케일·충돌·성능, Ground Drone/MG·NPC·Raw Drone 외형 채택 |
+| 지금 작업 중 | `AI-GAZE-01D`와 `AI-MG-03` 수동 화면 확인. 사용자 화면 피드백의 고개 까딱임은 AnimBP 3개 Bone을 Component Space로 교정했다. MG는 전용 `ADroneMGTurretStation`과 Base/Body/Barrel 원기둥 3개로 분리했다 |
+| 완료 근거 | `DroneEditor`·`Drone` Win64 Development Build 성공. 저장 AnimBP·MG BP 새 프로세스 검증, Smart Object 6쌍 검증과 `NPCGreyboxAssets`·`NPCPerceptionSearchPIE`·`SmartObjectFoundationDefaults`·`SmartObjectStationAssets`·`ProjectileBallistics` 5/5 통과. MG 연속 조준·발사·사망 교대·Search 회귀 통과 |
+| 수동 미확인 | Component Space 수정 뒤 NPC가 좌우·상하 Drone을 실제로 자연스럽게 따라보는지, 임시 MG Base 고정/Body Yaw/Barrel Pitch 육안 회전, Rifle/MG/Cover 자세, 수정된 Manny 연사·Reload 손 위치/총기 정렬, Training 두 Lap 비교 HUD, OilRig Map Check·재질·조명·스케일·충돌·성능 |
 | 현재 차단 | FLOW-04 코드 차단 없음. 실제 Mission Trailer Asset 형식은 미정이므로 정적 Briefing 대체 화면 뒤 `MissionMap` Soft Reference를 여는 경로로 먼저 검증 가능 |
-| 다음 행동 | `FLOW-04`에서 MissionTrailer 대체 패널 종료 → `LoadingMissionMap` → 선택 Definition의 Training Map 로드와 GameInstance 선택 보존 연결 |
-| 다음 기능 | `FLOW-04 → FLOW-06` 한 Mission·한 Drone Front-end Vertical Slice. `AI-VIS-01B`는 Mission 흐름 뒤 실제 전투 표현 단계로 유지 |
+| 다음 행동 | `Lvl_NPCSmartObjectGreybox`에서 Drone을 좌우·상하로 움직여 병사가 까딱임 없이 따라보는지 확인하고, 임시 원기둥 MG의 Base 고정/Body Yaw/Barrel Pitch를 확인해 결과 기록 |
+| 다음 기능 | 수동 Gaze·MG 축 Pass 뒤 `FLOW-04 → FLOW-06` 한 Mission·한 Drone Front-end Vertical Slice. 최종 기관총 에셋이 준비되면 상속된 3개 Mesh의 Static Mesh만 교체 |
 | 에셋 인수 | `C:\에셋` 원본은 보존. ArmyVFX·InfantrySFX·Ground Drone·NPC 외형·Raw Drone을 정확한 의존성 묶음으로 이식 |
 | 맵 이식 | 기존 환경 3종에 `Lvl_OilRig`을 추가. Vendor FirstPerson Sample 의존성을 끌어오던 Door Actor 8개는 중앙 사본에서 제거 |
-| Editor/MCP | Build·Headless 검증 뒤 모든 Unreal Editor 프로세스 종료. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
+| Editor/MCP | 명령줄 검증 뒤 Editor 종료 상태. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
-| Git 처리 | Unreal `main=origin/main=2d6a459` 위 FLOW-01~03·NPC Visual 기반 26개 경로, 문서 `main=origin/main=14c4ae6` 위 상태 문서와 Flow 작성/검증 도구 4개가 로컬 미커밋. Codex는 Commit·Push하지 않음 |
+| Git 처리 | Unreal `main=origin/main=46f7f37` 위 AI-GAZE·AnimBP·MG 3분할 기반이 로컬 미커밋. 최종 Git 상태에서 `Lvl_MilitaryBase.umap`은 변경 없음. 문서는 `b8799c3` 위 최신화가 미커밋. Codex는 Commit·Push하지 않음 |
 | UI/기획 참고 | Figma `Project:Droner`는 세계관·청록/녹색 HUD·경고 아이콘 참고용으로만 읽음. Figma는 수정하지 않았고 게임 제목 통일은 보류 |
 | 협업 Git | 팀원 환경 맵·재질은 중앙 `main`에 들어온 상태다. Battlefield의 새 `M_Enemy`·`M_Start`·`M_Target` 의존성과 세 중앙 맵 로드를 검증했고, `.vsconfig` 14.50 복원과 `//test` 제거를 별도 정리했다. 팀원 PC의 실제 Remote 구성 확인은 남음 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
@@ -86,6 +86,8 @@ Unreal 공유 기준선은 `origin/main=2d6a459`다. 전투 Greybox·AI-VIS-01A�
 | TUT-04B | Drone / Tutorial / UI | 이전 평균·Best·Delta 결과 | 현재 시도 제외 평균, 첫 기준, Best와 Segment 비교, Blueprint Event, HUD 네 행 구현. Build·16/16 통과 | 실제 두 Lap에서 표시 값과 부호 확인 |
 | AST-05 | Drone / Unreal / Asset | 남은 제공 에셋 선별 라이브러리 | ThirdParty 891개와 `Lvl_OilRig` 1개. 수량·대표 로드·외부/누락 0 | Editor 시각·성능·Map Check와 실제 채택 후보 결정 |
 | AI-SO-TUNE-01 | Drone / AI / Smart Object | 배치·Offset·Definition·검색·StateTree 조정 가이드와 Slot 도착 방향 적용 | 공유 `2d6a459`에 방향 보강과 Definition이 Push됨. DroneEditor Build, Slot Yaw 판정 포함 자동화 2/2, Definition/BP 6쌍 Validate 통과 | `Lvl_NPCSmartObjectGreybox`에서 Cyan 화살표와 순찰·Cover·MG 도착 방향의 화면 일치만 확인 |
+| AI-GAZE-01 | Drone / AI / Animation | 감지 뒤 Drone 시선 유지와 자연스러운 고개 회전 | Controller 독립 Gaze, 1초 유예, Search 마지막 위치, 해제·제한·보간과 Rifle AnimBP 상체/목/고개 20/45/35% 연결. 사용자 확인에서 Bone Space가 위아래 까딱임을 만든 것을 확인해 세 노드를 Component Space로 교정·재저장. Build·자산 검증·집중 자동화 통과 | `Lvl_NPCSmartObjectGreybox`에서 좌우 Yaw·상하 Pitch·보간과 Rifle/MG/Cover 자세 수동 Pass |
+| AI-MG-03 | Drone / AI / MG / Assets | 기관총 전용 3분할 조준·임시 외형 | 범용 Station의 포탑 Component와 일체형 Mesh를 제거하고 `ADroneMGTurretStation`에만 `BaseMount → YawPivot → PitchPivot → Muzzle` 및 원기둥 Base/Body/Barrel 3개 구성. `BP_SO_MGTurret`만 전용 부모로 이관, 연속 조준·정렬 후 발사·구형 Attachment 복구와 통합 PIE 통과 | 임시 원기둥 Base 고정/Body Yaw/Barrel Pitch·손 위치 수동 Pass. 최종 에셋 도착 뒤 세 Static Mesh만 교체 |
 
 ## Done
 

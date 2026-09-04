@@ -1,6 +1,6 @@
 # 작업컴 Codex/GPT 기준 컨텍스트
 
-기준일: 2026-09-03 (Asia/Seoul)
+기준일: 2026-09-04 (Asia/Seoul)
 
 이 문서는 메인컴 ChatGPT/Codex에서 진행하던 작업을 작업컴에서 이어가기 위한 기준 컨텍스트다. 추측해서 내용을 추가하지 않고, 사용자가 실제 진행 상황을 알려준 경우에만 상태를 갱신한다.
 
@@ -644,3 +644,13 @@ TUT-04 비교·결과 UI는 기술 구현됐고 실제 두 Lap 확인이 남았�
 - Game/Editor Build, AI 9/9 경고·오류 0, 전체 `Drone.` 25/25를 통과했다. 전체 중 24개는 무경고이며 기존 `PIEInputLifecycle` RecastNavMesh 경고 포함 성공 1개만 유지된다.
 - 직전 Blueprint 전체 Compile은 0/0/0이다. AI-WPN-01은 Blueprint 자산을 수정하지 않았고 NPC Blueprint 자동 로드를 통과했다.
 - 공유 기준은 `origin/main=2fcfb04`다. Unreal과 문서의 로컬 `main` 변경은 사용자가 직접 처리하도록 Commit·Push하지 않는다.
+
+## 40. 2026-09-04 NPC Gaze와 MG 3분할 확정
+
+- 적 NPC는 Drone 감지 뒤 이동·Cover·MG 사용 중에도 상체·목·고개로 Drone을 추적한다. 1초 Sight 유예 동안 시선을 유지하고 실종 확정 뒤 Search에서는 마지막 감지 위치를 보며, Search 완료·Drone 파괴·NPC 사망에서는 정면으로 복귀한다.
+- AI Gameplay Focus는 몸 전체와 Smart Object Slot Yaw를 바꿀 수 있으므로 고개 표현에 사용하지 않는다. StateTree는 행동 상태, Controller는 독립 Gaze 수치, 프로젝트 AnimBP는 Bone 표현만 담당한다.
+- 첫 사용자 화면 확인에서 병사가 Drone을 좌우로 따라보지 않고 위아래로 까딱이는 문제가 확인됐다. Manny Bone 로컬축과 Look Yaw축 불일치가 원인이므로 `spine_03 / neck_01 / head`의 Additive 회전 공간을 Bone Space에서 Component Space로 교정해 저장했다. 교정 뒤 실제 화면 재확인은 남아 있다.
+- MG 최종 모델은 `고정 하단부 Base`, `좌우 회전 몸체 Yaw`, `상하 회전 포신 Pitch`의 3분할을 사용한다. NPC 몸은 Slot 방향에 고정하고 기관총 자체가 Drone을 조준하며, NPC 고개 추적과 기관총 Transform은 서로 덮어쓰지 않는다.
+- 포탑 구조를 범용 Station에 넣지 않는다. 범용 `ADroneSmartObjectStation`은 Smart Object와 Slot Preview만 유지하고, `BP_SO_MGTurret` 한 개만 `ADroneMGTurretStation`으로 이관했다. 전용 클래스는 `BaseMount → YawPivot → PitchPivot → Muzzle`과 Base/Body/Barrel 원기둥 Static Mesh 3개를 갖는다.
+- 임시 Base는 고정, Body는 Yaw, Barrel은 Pitch만 상속한다. 기존 BP Attachment를 Construction에서 복구하고 점유 중 Controller가 조준을 연속 갱신하며, 4° 안에 정렬된 뒤 발사한다. 최종 3분할 에셋이 준비되면 새 Component를 더 만들지 않고 세 원기둥의 Static Mesh와 상대 Transform만 교체한다.
+- Editor/Game 빌드, 저장 AnimBP·MG BP 새 프로세스 검증, Smart Object 6쌍 Validation과 집중 자동화 5/5는 통과했다. Manny 고개 축·Rifle/MG/Cover 자세와 임시 MG 세 부품의 육안 회전은 화면 확인 전까지 Done으로 판정하지 않는다.

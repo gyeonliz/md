@@ -17,7 +17,8 @@ PREFIX = "DRONE_SO_SETUP"
 DEFINITION_FOLDER = "/Game/Drone/AI/SmartObjects/Definitions"
 BLUEPRINT_FOLDER = "/Game/Drone/AI/SmartObjects/Blueprints"
 STATION_NATIVE_PATH = "/Script/Drone.DroneSmartObjectStation"
-MG_MESH_PATH = "/Game/Drone/ThirdParty/GroundDroneKit/Meshes/Alt_Turrets/MG_Turret/MG_Turret_SK"
+MG_STATION_NATIVE_PATH = "/Script/Drone.DroneMGTurretStation"
+TEMP_CYLINDER_PATH = "/Engine/BasicShapes/Cylinder"
 
 SPECS = (
     {
@@ -149,7 +150,7 @@ def configure_definition(
 
 def create_or_load_blueprint(
     editor_assets: unreal.EditorAssetSubsystem,
-    station_native: unreal.Class,
+    expected_parent: unreal.Class,
     spec: dict[str, object],
 ) -> unreal.Blueprint:
     path = blueprint_path(spec)
@@ -160,7 +161,7 @@ def create_or_load_blueprint(
         log(f"REUSED_BLUEPRINT|{path}")
     else:
         factory = unreal.BlueprintFactory()
-        factory.set_editor_property("parent_class", station_native)
+        factory.set_editor_property("parent_class", expected_parent)
         blueprint = unreal.AssetToolsHelpers.get_asset_tools().create_asset(
             asset_name(path),
             asset_folder(path),
@@ -171,8 +172,13 @@ def create_or_load_blueprint(
         require(blueprint is not None, f"Could not create Station Blueprint: {path}")
         log(f"CREATED_BLUEPRINT|{path}")
 
+    current_parent = unreal.BlueprintEditorLibrary.get_blueprint_parent_class(blueprint)
+    if current_parent != expected_parent:
+        unreal.BlueprintEditorLibrary.reparent_blueprint(blueprint, expected_parent)
+        log(f"REPARENTED_BLUEPRINT|{path}|{expected_parent.get_path_name()}")
+
     require(
-        unreal.BlueprintEditorLibrary.get_blueprint_parent_class(blueprint) == station_native,
+        unreal.BlueprintEditorLibrary.get_blueprint_parent_class(blueprint) == expected_parent,
         f"Station Blueprint has the wrong parent: {path}",
     )
     compile_blueprint(blueprint)
@@ -184,14 +190,12 @@ def configure_blueprint(
     blueprint: unreal.Blueprint,
     definition: unreal.SmartObjectDefinition,
     spec: dict[str, object],
-    mg_mesh: unreal.SkeletalMesh,
 ) -> None:
     cdo = unreal.get_default_object(blueprint.generated_class())
     require(cdo is not None, f"Station Blueprint CDO is unavailable: {blueprint.get_path_name()}")
     cdo.set_editor_property("activity", spec["activity"])
 
     cdo.set_smart_object_definition(definition)
-    cdo.set_station_skeletal_mesh(mg_mesh if spec["name"] == "MGTurret" else None)
 
     save_asset(editor_assets, blueprint)
 
@@ -215,9 +219,14 @@ def validate_blueprint(
     blueprint: unreal.Blueprint,
     definition: unreal.SmartObjectDefinition,
     spec: dict[str, object],
-    mg_mesh: unreal.SkeletalMesh,
+    expected_parent: unreal.Class,
+    temporary_cylinder: unreal.StaticMesh,
 ) -> None:
     compile_blueprint(blueprint)
+    require(
+        unreal.BlueprintEditorLibrary.get_blueprint_parent_class(blueprint) == expected_parent,
+        f"Station native parent mismatch: {blueprint.get_path_name()}",
+    )
     cdo = unreal.get_default_object(blueprint.generated_class())
     require(cdo.get_editor_property("activity") == spec["activity"], f"Station Activity mismatch: {blueprint.get_path_name()}")
 
@@ -226,11 +235,22 @@ def validate_blueprint(
         f"Station Definition mismatch: {blueprint.get_path_name()}",
     )
 
-    expected_mesh = mg_mesh if spec["name"] == "MGTurret" else None
-    require(
-        cdo.get_station_skeletal_mesh() == expected_mesh,
-        f"Station Mesh mismatch: {blueprint.get_path_name()}",
-    )
+    if spec["name"] == "MGTurret":
+        parts = (
+            cdo.get_mg_turret_base_mesh(),
+            cdo.get_mg_turret_body_mesh(),
+            cdo.get_mg_turret_barrel_mesh(),
+        )
+        require(all(parts), "MG Turret must own base/body/barrel mesh components")
+        require(
+            all(part.get_editor_property("static_mesh") == temporary_cylinder for part in parts),
+            "MG Turret temporary base/body/barrel must all use Engine Cylinder",
+        )
+    else:
+        require(cdo.get_mg_turret_base_mount() is None, "Generic Station must not own an MG base")
+        require(cdo.get_mg_turret_yaw_pivot() is None, "Generic Station must not own an MG Yaw pivot")
+        require(cdo.get_mg_turret_aim_pivot() is None, "Generic Station must not own an MG Pitch pivot")
+        require(cdo.get_mg_turret_muzzle() is None, "Generic Station must not own an MG Muzzle")
 
 
 def main() -> None:
@@ -238,14 +258,17 @@ def main() -> None:
     require(editor_assets is not None, "EditorAssetSubsystem is unavailable")
     station_native = unreal.load_class(None, STATION_NATIVE_PATH)
     require(station_native is not None, "Native DroneSmartObjectStation Class is unavailable")
-    mg_mesh = unreal.load_asset(MG_MESH_PATH)
-    require(isinstance(mg_mesh, unreal.SkeletalMesh), f"MG Turret Skeletal Mesh is unavailable: {MG_MESH_PATH}")
+    mg_station_native = unreal.load_class(None, MG_STATION_NATIVE_PATH)
+    require(mg_station_native is not None, "Native DroneMGTurretStation Class is unavailable")
+    temporary_cylinder = unreal.load_asset(TEMP_CYLINDER_PATH)
+    require(isinstance(temporary_cylinder, unreal.StaticMesh), "Engine temporary Cylinder is unavailable")
 
     validate_only = os.environ.get("DRONE_SMART_OBJECT_VALIDATE_ONLY") == "1"
     definitions: dict[str, unreal.SmartObjectDefinition] = {}
     blueprints: dict[str, unreal.Blueprint] = {}
 
     for spec in SPECS:
+        expected_parent = mg_station_native if spec["name"] == "MGTurret" else station_native
         path = definition_path(spec)
         if validate_only:
             definition = editor_assets.load_asset(path)
@@ -260,14 +283,21 @@ def main() -> None:
             blueprint = editor_assets.load_asset(bp_path)
             require(isinstance(blueprint, unreal.Blueprint), f"Missing Station Blueprint: {bp_path}")
         else:
-            blueprint = create_or_load_blueprint(editor_assets, station_native, spec)
-            configure_blueprint(editor_assets, blueprint, definition, spec, mg_mesh)
+            blueprint = create_or_load_blueprint(editor_assets, expected_parent, spec)
+            configure_blueprint(editor_assets, blueprint, definition, spec)
         blueprints[str(spec["name"])] = blueprint
 
     for spec in SPECS:
         name = str(spec["name"])
+        expected_parent = mg_station_native if name == "MGTurret" else station_native
         validate_definition(definitions[name], spec)
-        validate_blueprint(blueprints[name], definitions[name], spec, mg_mesh)
+        validate_blueprint(
+            blueprints[name],
+            definitions[name],
+            spec,
+            expected_parent,
+            temporary_cylinder,
+        )
         log(f"VALIDATED_PAIR|{definition_path(spec)}|{blueprint_path(spec)}")
 
     log("VALIDATION_OK")
