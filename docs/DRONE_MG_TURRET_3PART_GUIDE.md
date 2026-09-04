@@ -14,6 +14,7 @@ StationRoot
    ├─ MGTurretBaseMesh     고정 원기둥
    └─ MGTurretYawPivot     좌우 회전 몸체
       ├─ MGTurretBodyMesh  Yaw 원기둥
+      ├─ MGTurretOperatorAnchor  몸체와 함께 도는 사수 후방 위치·방향
       └─ MGTurretAimPivot  상하 회전 포신(Pitch, 기존 이름 호환)
          ├─ MGTurretBarrelMesh  Pitch 원기둥
          └─ MGTurretMuzzle 발사 위치
@@ -21,8 +22,9 @@ StationRoot
 
 - 이 계층은 `ADroneMGTurretStation`과 이를 직접 부모로 쓰는 `BP_SO_MGTurret`에만 존재한다.
 - Patrol·Ambient·Cover 등 일반 `ADroneSmartObjectStation`에는 포탑 Pivot이나 Mesh가 없다.
-- NPC는 Smart Object Slot 위치와 Yaw에 고정한다.
-- NPC 고개는 AnimBP Gaze로 Drone을 따라간다.
+- Smart Object Slot은 검색·한 명 점유 계약에 사용하고, 실제 MG 사수 위치·몸 방향은 `MGTurretOperatorAnchor`가 담당한다.
+- `MGTurretOperatorAnchor`는 `MGTurretYawPivot`의 자식이다. 몸체가 Yaw 회전하면 사수의 후방 위치와 몸 방향도 같은 회전을 직접 상속한다.
+- 별도의 사수 Yaw 보정값은 두지 않는다. NPC 고개는 AnimBP Gaze로 Drone 방향을 보조한다.
 - 기관총 몸체는 `MGTurretYawPivot`, 포신은 `MGTurretAimPivot`만 따라간다.
 - 사격은 현재 포신 방향과 목표 방향의 오차가 기본 `4°` 이하일 때 시작한다.
 - `BP_SO_MGTurret`은 전용 부모로 이관됐고, 예전 저장 Attachment는 `OnConstruction`에서 위 계층으로 복구한다.
@@ -52,14 +54,24 @@ StationRoot
 대상은 `/Game/Drone/AI/SmartObjects/Blueprints/BP_SO_MGTurret`다.
 
 1. Blueprint의 Parent Class가 `DroneMGTurretStation`인지 확인한다.
-2. Components에서 상속된 `MGTurretBaseMount`, `MGTurretYawPivot`, `MGTurretAimPivot`, `MGTurretMuzzle`을 확인한다.
+2. Components에서 상속된 `MGTurretBaseMount`, `MGTurretOperatorAnchor`, `MGTurretYawPivot`, `MGTurretAimPivot`, `MGTurretMuzzle`을 확인한다.
 3. 상속된 `MGTurretBaseMesh`, `MGTurretBodyMesh`, `MGTurretBarrelMesh` 세 개를 확인한다. 새 Mesh Component를 추가하지 않는다.
 4. 최종 Base/Body/Barrel Asset이 준비되면 대응 Component의 `Static Mesh`를 원기둥에서 최종 Mesh로 바꾼다.
 5. 원점이 실제 회전축과 다르면 각 Mesh의 상대 Location·Rotation·Scale만 조정한다. Pivot Component 계층은 바꾸지 않는다.
 6. `MGTurretMuzzle`을 실제 Barrel 총구 끝으로 이동한다. 이 Component의 +X가 발사 방향이다.
-7. Smart Object Slot과 Cyan 화살표는 사수가 서서 손잡이를 잡을 위치·몸 Yaw로 맞춘다. 포탑 조준용 Pivot 위치와 섞지 않는다.
+7. Smart Object Slot과 Cyan 화살표는 검색·예약 기준으로 유지한다. 실제 사수 위치는 초록 `MGTurretOperatorAnchor`이며 아래 Operator 값을 조정한다. 포탑 조준 Pivot과 섞지 않는다.
 
-## 4. 조준값 조정 위치
+## 4. 사수 위치·조준값 조정 위치
+
+`BP_SO_MGTurret`의 Class Defaults에서 `Drone > AI > MG > Operator`를 조정한다.
+
+| 값 | 기본값 | 용도 |
+|---|---:|---|
+| Operator Distance | `120 cm` | 포탑 중심에서 뒤쪽으로 떨어지는 거리 |
+| Operator Lateral Offset | `0 cm` | 포탑 기준 좌우 위치, `+`는 오른쪽 |
+| Operator Vertical Offset | `0 cm` | 사수 발 위치 높이 보정 |
+
+초록 `MGTurretOperatorAnchor` 화살표가 사수의 몸 정면이다. 이 화살표와 위치는 `MGTurretYawPivot`을 그대로 따라가므로 회전값을 따로 맞추지 않는다. 손·발 위치가 어색하면 Distance, Lateral, Vertical 세 위치값만 조정한다.
 
 `BP_SO_MGTurret`의 Class Defaults에서 `Drone > AI > MG > Aim`을 조정한다.
 
@@ -77,18 +89,19 @@ StationRoot
 
 `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`에서 다음 순서로 본다.
 
-1. Rifle Hostile이 MG Slot에 도착한 뒤 NPC 몸이 Cyan 화살표 방향을 유지하는지 확인한다.
+1. Rifle Hostile이 MG에 도착한 뒤 초록 Operator Anchor 위치에 붙는지 확인한다.
 2. 원기둥이 정확히 세 개이고 다른 Patrol·Ambient·Cover Station에는 원기둥 포탑이 생기지 않았는지 본다.
-3. Drone을 좌우로 움직여 Base 원기둥은 고정되고 Body 원기둥만 Yaw 회전하는지 본다.
+3. Drone을 좌우로 움직여 Base 원기둥은 고정되고 Body 원기둥이 Yaw 회전할 때 사수도 몸체 뒤를 유지하며 같은 방향으로 함께 도는지 본다.
 4. Drone을 위아래로 움직여 Barrel 원기둥과 Muzzle만 Pitch 회전하는지 본다.
 5. 포탑이 목표 방향에 도착하기 전에 탄이 옆으로 발사되지 않는지 본다.
 6. 사수 고개는 Drone을 따라가되 몸과 기관총 Transform을 덮어쓰지 않는지 본다.
 7. 사수 사망 뒤 다음 MG 가능 NPC가 같은 Slot을 점유하고 포탑 조준을 이어가는지 본다.
+8. 거리·좌우·높이가 어색하면 `BP_SO_MGTurret > Class Defaults > Drone|AI|MG|Operator`의 세 위치값만 조정하고 Smart Object Slot, 회전 Pivot, 별도 Yaw 값은 만들지 않는다.
 
 통과 기록 형식:
 
 ```text
-원기둥 3개만 표시, 일반 Station 영향 없음, Base 고정, Body Yaw 정상,
-Barrel Pitch 정상, Muzzle 방향 정상, 정렬 후 발사 정상,
+원기둥 3개만 표시, 일반 Station 영향 없음, 사수가 Body 회전을 따라 후방 위치·방향 유지,
+Base 고정, Body Yaw 정상, Barrel Pitch 정상, Muzzle 방향 정상, 정렬 후 발사 정상,
 NPC 몸/고개/포탑 간섭 없음, 사망 교대 정상
 ```

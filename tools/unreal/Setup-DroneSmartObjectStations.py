@@ -246,6 +246,16 @@ def validate_blueprint(
             all(part.get_editor_property("static_mesh") == temporary_cylinder for part in parts),
             "MG Turret temporary base/body/barrel must all use Engine Cylinder",
         )
+        operator_anchor = cdo.get_mg_turret_operator_anchor()
+        require(operator_anchor is not None, "MG Turret must expose an operator anchor")
+        require(
+            operator_anchor.get_attach_parent() == cdo.get_mg_turret_yaw_pivot(),
+            "MG operator anchor must follow the MG Yaw body",
+        )
+        require(
+            abs(cdo.get_mg_turret_operator_distance() - 120.0) <= 0.01,
+            "MG default operator rear distance must be 120 cm",
+        )
     else:
         require(cdo.get_mg_turret_base_mount() is None, "Generic Station must not own an MG base")
         require(cdo.get_mg_turret_yaw_pivot() is None, "Generic Station must not own an MG Yaw pivot")

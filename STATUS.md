@@ -22,10 +22,10 @@
 | GitHub CLI | 설치되어 있지 않음 |
 | 현재 실행 세션 작업 루트 | Unreal `D:\JGY\project\drone`; 문서 `D:\JGY\project\md` |
 | 다른 PC의 이전 기준 경로 | Unreal `C:\URproject\drone`; 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
-| Unreal 프로젝트 저장소 | `main=origin/main=46f7f37`; AI-GAZE Component Space 보정·Rifle AnimBP·MG 전용 원기둥 3분할 로컬 변경. 최종 Git 상태에서 `Lvl_MilitaryBase.umap`은 변경 없음 |
-| 문서 작업 저장소 | 작업 시작 기준 `main=origin/main=b8799c3`; 이번 AI-GAZE/MG 계획과 상태 최신화가 로컬 미커밋 |
-| Commit·Push 처리 | 사용자 측 최신 공유 기준은 Unreal `46f7f37`, 문서 `b8799c3`. Codex는 이번 작업에서 Commit·Push하지 않음 |
-| 실행 상태 | 명령줄 검증 뒤 Unreal Editor 종료 상태. FLOW-01~03은 공유 커밋에 포함. AI 시선/고개 축 교정과 MG 전용 3분할 임시 외형은 로컬 구현·Build·집중 테스트 완료, 수동 화면 확인 전 |
+| Unreal 프로젝트 저장소 | `main=origin/main=46f7f37`; AI-GAZE Component Space 보정·Rifle AnimBP·MG 전용 원기둥 3분할·후방 조작 앵커·개인화기 몸 회전 로컬 변경. 최종 Git 상태에서 `Lvl_MilitaryBase.umap`은 변경 없음 |
+| 문서 작업 저장소 | 현재 `main=origin/main=2cc51f1`; 그 위 MG Operator·개인화기 Facing 구현과 검증 기록이 로컬 미커밋 |
+| Commit·Push 처리 | 사용자 측 최신 공유 기준은 Unreal `46f7f37`, 문서 `2cc51f1`. Codex는 이번 작업에서 Commit·Push하지 않음 |
+| 실행 상태 | 명령줄 검증 뒤 Unreal Editor 종료 상태. FLOW-01~03은 공유 커밋에 포함. AI 시선/고개 축 교정, MG 전용 3분할·후방 조작점과 개인화기 Drone 방향 몸 회전은 로컬 구현·Build·집중 테스트 완료, 수동 화면 확인 전 |
 | 별도 `droner` 주의 | `main=origin/main=551e287`; `Config/DefaultEditor.ini` 변경과 `Content/Asset` 10,928개·36,360,181,427 bytes 전체가 Untracked. 공급사 원본·스테이징 복사본이므로 일괄 Stage·Commit 금지 |
 | 팀원 변경 | 환경 맵·재질 변경은 중앙 `main`에 반영된 상태. Battlefield의 새 프로젝트 머티리얼 3개와 Camp/Base 의존성을 검증했고 개인 `.vsconfig` 변경·`//test`를 별도 정리. 팀원 PC Remote 실측만 남음 |
 
@@ -36,12 +36,13 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 ## 2026-09-04 AI-GAZE-01·AI-MG-03 구현 상태
 
 - `ADroneNPCAIController`가 감지 중 Drone Actor, 1초 Sight 실종 유예, Search의 마지막 감지 위치를 독립 Gaze Target으로 관리한다. Yaw `±65°`, Pitch `-25°~+40°`, 추적 `6.0`, 복귀 `3.5` Greybox 보간값을 AnimInstance에 공급한다.
-- Gameplay `SetFocus/SetFocalPoint`는 사용하지 않는다. 초기 구현에서 AI Focus가 Smart Object Slot 몸 방향과 경쟁해 MG 통합 테스트를 막은 것을 확인했고, NPC 몸은 이동/Slot Yaw, 고개는 AnimBP Gaze가 담당하도록 분리했다.
+- Gameplay `SetFocus/SetFocalPoint`는 사용하지 않는다. 초기 구현에서 AI Focus가 Smart Object 이동·MG 방향과 경쟁해 통합 테스트를 막았다. 이동 중은 CharacterMovement, MG 점유 중은 Operator Anchor 방향, MG가 아닌 개인화기 교전 중은 Controller의 부드러운 Drone 방향 몸 Yaw, 고개는 AnimBP Gaze가 담당한다.
 - 프로젝트 소유 `ABP_NPC_Rifle_Greybox`를 `UDroneNPCAnimInstance` 기반으로 바꾸고 기존 Rifle Pose·DefaultSlot 뒤에 `spine_03 → neck_01 → head` 회전 보정을 `20% / 45% / 35%`로 연결했다. 첫 사용자 화면 확인에서 Bone Space가 좌우 Yaw를 고개 까딱임으로 보이게 만든 것을 확인해 세 노드를 Component Space로 교정·재저장했다. 공급사 AnimBP와 Friendly `ABP_Unarmed`는 수정하지 않았다.
 - 범용 `ADroneSmartObjectStation`에서는 포탑 Pivot과 일체형 `StationMesh`를 제거했다. MG만 파생 `ADroneMGTurretStation`을 쓰며 `MGTurretBaseMount → MGTurretYawPivot → MGTurretAimPivot(Pitch) → MGTurretMuzzle`과 `MGTurretBaseMesh / BodyMesh / BarrelMesh` 원기둥 3개를 가진다. Base는 고정, 몸체는 좌우, 포신은 상하만 움직이며 기본 4° 정렬 범위 안에서 발사한다.
-- `BP_SO_MGTurret` 한 개만 새 전용 부모로 이관했다. 기존 저장 Attachment가 Pitch를 Yaw에서 분리해 조준 오차가 24.35°에 고정된 문제는 전용 Actor의 Construction 계층 복구로 수정했으며, 점유 중 Controller 갱신으로 부드러운 조준을 계속 수행한다. 다른 5개 Smart Object Blueprint는 범용 부모와 기존 역할을 유지한다.
-- `DroneEditor Win64 Development`와 `Drone Win64 Development`가 MSVC 14.51.36256으로 성공했다. 저장 AnimBP·MG BP 새 프로세스 검증, Smart Object 6쌍 Validation과 `NPCGreyboxAssets`, `NPCPerceptionSearchPIE`, `SmartObjectFoundationDefaults`, `SmartObjectStationAssets`, `ProjectileBallistics` 집중 5/5가 통과했다.
-- 자동화가 확인하지 못하는 Component Space 적용 후 Manny 좌우·상하 시선 체감, Rifle/MG/Cover 자세와 임시 원기둥 Base/Body/Barrel 육안 축은 `Lvl_NPCSmartObjectGreybox` 수동 확인이 남았다. 최종 기관총 에셋이 오면 상속된 세 Static Mesh의 Asset·상대 Transform만 바꾼다. 연결 절차는 [`docs/DRONE_NPC_GAZE_TRACKING_PLAN.md`](docs/DRONE_NPC_GAZE_TRACKING_PLAN.md)와 [`docs/DRONE_MG_TURRET_3PART_GUIDE.md`](docs/DRONE_MG_TURRET_3PART_GUIDE.md)를 따른다.
+- `BP_SO_MGTurret` 한 개만 새 전용 부모로 이관했다. `MGTurretOperatorAnchor`는 `MGTurretYawPivot`의 자식이며 사수를 기본 120cm 뒤에 세운다. 포탑 몸체가 Yaw 회전하면 Anchor 위치·방향과 사수도 같은 회전을 직접 따라간다. 별도 사수 Yaw 보정은 없고 거리·좌우·높이만 `BP_SO_MGTurret` Class Defaults의 `Drone|AI|MG|Operator`에서 조정한다.
+- 개인화기 교전 상태인 `DroneDetected`와 `UseCover`에서는 몸 Yaw를 기본 초당 180°로 Drone 쪽에 돌린 뒤 로컬 Gaze를 계산한다. MG 이동·점유와 Patrol에는 이 몸 회전을 적용하지 않는다.
+- `DroneEditor Win64 Development`와 `Drone Win64 Development`가 MSVC 14.51.36256으로 성공했다. 저장 AnimBP·MG BP 새 프로세스 검증, Smart Object 6쌍 Validation과 `NPCGreyboxAssets`, `NPCPerceptionSearchPIE`, `SmartObjectFoundationDefaults`, `SmartObjectStationAssets`, `ProjectileBallistics` 집중 5/5가 통과했다. PIE는 MG 사수의 앵커 XY·방향, 개인화기 병사의 Drone 방향 5° 이내 몸 정렬까지 확인한다.
+- 자동화가 확인하지 못하는 Manny 좌우·상하 시선 체감, MG 사수가 Body Yaw를 따라 후방을 유지할 때의 발 미끄러짐·손 위치, Rifle/MG/Cover 자세와 임시 원기둥 Base/Body/Barrel 육안 축은 `Lvl_NPCSmartObjectGreybox` 수동 확인이 남았다. 최종 기관총 에셋이 오면 상속된 세 Static Mesh의 Asset·상대 Transform만 바꾼다. 연결 절차는 [`docs/DRONE_NPC_GAZE_TRACKING_PLAN.md`](docs/DRONE_NPC_GAZE_TRACKING_PLAN.md)와 [`docs/DRONE_MG_TURRET_3PART_GUIDE.md`](docs/DRONE_MG_TURRET_3PART_GUIDE.md)를 따른다.
 
 ## 2026-09-03 Front-end·Mission 진입 기획 변경
 

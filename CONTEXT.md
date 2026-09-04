@@ -648,9 +648,10 @@ TUT-04 비교·결과 UI는 기술 구현됐고 실제 두 Lap 확인이 남았�
 ## 40. 2026-09-04 NPC Gaze와 MG 3분할 확정
 
 - 적 NPC는 Drone 감지 뒤 이동·Cover·MG 사용 중에도 상체·목·고개로 Drone을 추적한다. 1초 Sight 유예 동안 시선을 유지하고 실종 확정 뒤 Search에서는 마지막 감지 위치를 보며, Search 완료·Drone 파괴·NPC 사망에서는 정면으로 복귀한다.
-- AI Gameplay Focus는 몸 전체와 Smart Object Slot Yaw를 바꿀 수 있으므로 고개 표현에 사용하지 않는다. StateTree는 행동 상태, Controller는 독립 Gaze 수치, 프로젝트 AnimBP는 Bone 표현만 담당한다.
+- AI Gameplay Focus는 이동·Smart Object·MG 방향과 경쟁하므로 사용하지 않는다. StateTree는 행동 상태, Controller는 MG Operator 정렬·개인화기 몸 Yaw·독립 Gaze 수치, 프로젝트 AnimBP는 Bone 표현만 담당한다.
 - 첫 사용자 화면 확인에서 병사가 Drone을 좌우로 따라보지 않고 위아래로 까딱이는 문제가 확인됐다. Manny Bone 로컬축과 Look Yaw축 불일치가 원인이므로 `spine_03 / neck_01 / head`의 Additive 회전 공간을 Bone Space에서 Component Space로 교정해 저장했다. 교정 뒤 실제 화면 재확인은 남아 있다.
-- MG 최종 모델은 `고정 하단부 Base`, `좌우 회전 몸체 Yaw`, `상하 회전 포신 Pitch`의 3분할을 사용한다. NPC 몸은 Slot 방향에 고정하고 기관총 자체가 Drone을 조준하며, NPC 고개 추적과 기관총 Transform은 서로 덮어쓰지 않는다.
+- MG 최종 모델은 `고정 하단부 Base`, `좌우 회전 몸체 Yaw`, `상하 회전 포신 Pitch`의 3분할을 사용한다. 사수는 포탑 뒤 전용 Operator Anchor에 고정되어 포탑을 바라보고 기관총 자체가 Drone을 조준한다. 개인화기 병사는 사격 중 몸과 고개를 Drone 쪽으로 돌린다.
 - 포탑 구조를 범용 Station에 넣지 않는다. 범용 `ADroneSmartObjectStation`은 Smart Object와 Slot Preview만 유지하고, `BP_SO_MGTurret` 한 개만 `ADroneMGTurretStation`으로 이관했다. 전용 클래스는 `BaseMount → YawPivot → PitchPivot → Muzzle`과 Base/Body/Barrel 원기둥 Static Mesh 3개를 갖는다.
-- 임시 Base는 고정, Body는 Yaw, Barrel은 Pitch만 상속한다. 기존 BP Attachment를 Construction에서 복구하고 점유 중 Controller가 조준을 연속 갱신하며, 4° 안에 정렬된 뒤 발사한다. 최종 3분할 에셋이 준비되면 새 Component를 더 만들지 않고 세 원기둥의 Static Mesh와 상대 Transform만 교체한다.
-- Editor/Game 빌드, 저장 AnimBP·MG BP 새 프로세스 검증, Smart Object 6쌍 Validation과 집중 자동화 5/5는 통과했다. Manny 고개 축·Rifle/MG/Cover 자세와 임시 MG 세 부품의 육안 회전은 화면 확인 전까지 Done으로 판정하지 않는다.
+- 임시 Base는 고정, Body는 Yaw, Barrel은 Pitch만 상속한다. `MGTurretOperatorAnchor`는 Yaw Body의 자식이며 기본 후방 거리 120cm로, Body가 회전하면 사수 위치·방향도 직접 따라간다. 별도 Yaw 보정 없이 좌우·높이·거리만 `BP_SO_MGTurret` Class Defaults에서 조정한다. 기존 BP Attachment를 Construction에서 복구하고 점유 중 Controller가 포탑을 먼저 갱신한 뒤 같은 프레임에 사수를 Anchor에 정렬하며, 4° 안에 정렬된 뒤 발사한다.
+- MG가 아닌 `DroneDetected`·`UseCover` 개인화기 교전은 몸 Yaw를 초당 180°로 Drone 방향에 돌린 뒤 AnimBP 상체 Gaze를 적용한다. MG 점유자는 포탑 방향을 유지하므로 두 동작은 서로 덮어쓰지 않는다.
+- Editor/Game 빌드, 저장 AnimBP·MG BP 새 프로세스 검증, Smart Object 6쌍 Validation과 집중 자동화 5/5는 통과했다. 테스트는 MG Operator Anchor 위치·방향과 개인화기 Drone 방향 5° 이내 정렬을 포함한다. Manny 고개 축·사수 손 위치·Rifle/MG/Cover 자세와 임시 MG 세 부품의 육안 회전은 화면 확인 전까지 Done으로 판정하지 않는다.

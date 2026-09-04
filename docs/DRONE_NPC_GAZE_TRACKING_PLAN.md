@@ -16,6 +16,8 @@ StateTree
         ↓
 ADroneNPCAIController
   현재 Drone 또는 마지막 감지 위치를 시선 목표로 유지
+  개인화기 교전은 몸 Yaw도 Drone 방향으로 부드럽게 회전
+  MG 점유자는 후방 Operator Anchor 위치·포탑 방향 유지
   목표 방향을 NPC 로컬 Yaw/Pitch로 계산하고 제한·보간
         ↓
 ABP_NPC_Rifle_Greybox
@@ -48,7 +50,8 @@ Friendly NPC는 현재 드론 감지를 전투 조건으로 쓰지 않으므로 
 4. Search 완료, Drone 파괴, NPC 사망, `OnUnPossess`에서는 시선 Alpha와 회전을 정면으로 부드럽게 복귀시킨다.
 5. 원하는 시선 방향을 NPC Actor Rotation 기준 로컬 회전으로 바꾸고 `Yaw/Pitch`를 제한한 뒤 보간한다.
 6. AnimBP는 Controller가 공급하는 `DroneLookRotation`, 3개 Bone 분배 회전, `DroneLookAlpha`, `bHasDroneLookTarget`만 읽는다. AnimBP가 Perception이나 StateTree를 직접 조회하지 않는다.
-7. `AAIController::SetFocus/SetFocalPoint`는 사용하지 않는다. Gameplay Focus가 Controller Yaw를 바꿔 Smart Object Slot·Cover·MG 몸 방향과 경쟁한 회귀가 확인되어, 몸과 무관한 시각용 Gaze 상태로 분리했다.
+7. `AAIController::SetFocus/SetFocalPoint`는 사용하지 않는다. Gameplay Focus가 이동·Smart Object·MG 몸 방향과 경쟁한 회귀가 확인됐다.
+8. `DroneDetected`와 `UseCover` 개인화기 교전만 몸 Yaw를 Drone 쪽으로 부드럽게 돌리고, MG 점유자는 Operator Anchor의 포탑 방향을 유지한다. 몸 정렬 뒤 로컬 Gaze를 계산해 고개·상체가 남은 각도를 자연스럽게 보조한다.
 
 Greybox 시작값:
 
@@ -60,14 +63,16 @@ Greybox 시작값:
 | 추적 보간 속도 | `6.0` | 감지 뒤 목표를 따라가는 속도 |
 | 정면 복귀 속도 | `3.5` | 목표 해제 뒤 급히 튕기지 않는 복귀 |
 | 시선 Alpha 보간 | `6.0` | AnimGraph 적용 강도 |
+| 개인화기 몸 회전 | `180°/s` | MG가 아닌 사격 상태에서 Drone 방향으로 도는 속도 |
 
 이 수치는 최종 밸런스가 아니다. Class Defaults 또는 역할별 Child BP에서 조정 가능한 값으로 둔다.
 
 ## 4. 몸 회전과 고개 회전 분리
 
-- AI Gameplay Focus는 사용하지 않는다. 이동 중 몸 방향은 CharacterMovement 또는 Smart Object Slot Yaw가 담당하고, Drone 추적은 AnimBP Bone 보정만 담당한다.
-- 표적이 고개 제한각을 벗어나도 첫 단계에서는 Actor Rotation을 즉시 바꾸지 않는다. `AI-GAZE-02`에서 일정 시간·각도 기준의 느린 몸 회전을 별도로 검토한다.
-- MG 조준은 `고정 BaseMount → Yaw 몸체 → Pitch 포신 → Muzzle` 계약으로 분리했다. NPC 몸·고개와 MG Pivot이 서로 Transform을 덮어쓰지 않는다. 자세한 연결은 [`DRONE_MG_TURRET_3PART_GUIDE.md`](DRONE_MG_TURRET_3PART_GUIDE.md)를 따른다.
+- AI Gameplay Focus는 사용하지 않는다. 이동 중 몸 방향은 CharacterMovement가 담당한다.
+- MG가 아닌 `DroneDetected`·`UseCover` 개인화기 교전은 Actor Yaw를 기본 `180°/s`로 Drone 방향에 돌린다. 한 프레임 순간 회전이 아니며, 몸 회전 뒤 남은 로컬 각도를 AnimBP Bone Gaze가 담당한다.
+- MG 점유자는 `MGTurretYawPivot`의 자식인 `MGTurretOperatorAnchor`에 정렬된다. Yaw 몸체가 돌면 사수의 후방 위치·몸 방향도 직접 상속되며 별도 사수 회전값은 없다. 포탑은 `고정 BaseMount → Yaw 몸체 → Pitch 포신 → Muzzle` 계약으로 조준하고 NPC 고개만 Gaze를 보조하므로 Transform 책임이 겹치지 않는다. 자세한 연결은 [`DRONE_MG_TURRET_3PART_GUIDE.md`](DRONE_MG_TURRET_3PART_GUIDE.md)를 따른다.
+- 고개 제한각·몸 회전 시작 지연·Aim Offset의 세밀한 역할별 차이는 `AI-GAZE-02` 후속 튜닝으로 남긴다.
 
 ## 5. AnimBP 연결
 
@@ -105,7 +110,8 @@ Rifle Locomotion
 5. Search 완료, Drone 파괴, NPC 사망, UnPossess 뒤 Gaze가 해제된다.
 6. Friendly는 Drone을 보더라도 Gaze와 Look Alpha가 활성화되지 않는다.
 7. Look Yaw/Pitch가 설정 제한을 넘지 않고 목표 해제 뒤 0으로 수렴한다.
-8. Slot 몸 방향과 분리된 상태로 MG 점유·발사·교대, Cover 사격과 Search→Patrol 회귀가 유지된다.
+8. MG 사수는 후방 Operator Anchor의 XY와 포탑 방향을 유지하고 MG 점유·발사·교대가 계속된다.
+9. 개인화기 `UseCover` 병사는 Drone 방향 5° 이내로 몸 Yaw를 맞추며 Cover 사격과 Search→Patrol 회귀가 유지된다.
 
 2026-09-04 검증 결과:
 
@@ -119,7 +125,7 @@ Rifle Locomotion
 
 1. Drone을 NPC 정면에서 왼쪽·오른쪽·위·아래 순서로 천천히 이동한다.
 2. 왼쪽/오른쪽 이동에는 고개·상체가 좌우로 돌고, 위/아래 이동에만 고개가 상하로 움직이는지 본다. 이전처럼 좌우 이동에도 까딱이기만 하면 실패다.
-3. 발견 뒤 눈·고개·상체가 먼저 따라오고 몸 전체가 한 프레임에 꺾이지 않는지 본다.
+3. 개인화기 병사가 발견 뒤 Drone 방향으로 몸을 부드럽게 돌리고 고개·상체가 남은 각도를 따라오는지 본다. 한 프레임에 몸이 꺾이거나 반대 방향으로 돌면 실패다.
 4. NPC가 MG 또는 Cover로 이동하는 중에도 시선이 끊기지 않는지 본다.
 5. 장애물에 0.5초 가렸다 다시 보여 고개가 정면으로 튀지 않는지 본다.
 6. 1초 이상 숨긴 뒤 마지막 위치를 바라보며 Search하고, Search 완료 후 정면으로 부드럽게 복귀하는지 본다.
@@ -130,7 +136,7 @@ Rifle Locomotion
 ```text
 좌우 Yaw 정상, 상하 Pitch 정상, 까딱임 없음, 감지 추적 정상, 이동 중 시선 유지,
 1초 유예 끊김 없음, Search 마지막 위치 정상, 정면 복귀 자연스러움,
-몸 순간 회전 없음, Rifle/MG/Cover 자세 이상 없음
+개인화기 몸 회전 자연스러움, MG 사수는 포탑 방향 유지, Rifle/MG/Cover 자세 이상 없음
 ```
 
 ## 8. 구현 순서
@@ -138,7 +144,8 @@ Rifle Locomotion
 1. [x] `AI-GAZE-01A`: Controller의 독립 Gaze Target 수명과 부드러운 로컬 Look 값
 2. [x] `AI-GAZE-01B`: PIE 감지·유예·Search·해제·몸 방향 비간섭 자동화
 3. [x] `AI-GAZE-01C`: `ABP_NPC_Rifle_Greybox` 상체·목·고개 연결
-4. `AI-GAZE-01D`: Greybox Map 화면 튜닝과 수동 Pass
-5. `AI-GAZE-02`: 필요할 때만 제한각 밖 느린 몸 회전·Aim Offset 검토
+4. [x] `AI-GAZE-01D-TECH`: 개인화기 교전 몸 Yaw와 MG Operator 방향 분리·자동화
+5. `AI-GAZE-01D`: Greybox Map 화면 튜닝과 수동 Pass
+6. `AI-GAZE-02`: 역할별 몸 회전 시작 지연·속도·Aim Offset 검토
 
 현재 Editor는 자동 검증 뒤 종료된 상태다. `Lvl_MilitaryBase.umap`은 이번 작업에서 직접 수정·체크아웃하지 않았고 최종 Git 상태에서도 변경 파일로 잡히지 않는다.

@@ -4,29 +4,29 @@
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 공유 기준선은 `main=origin/main=46f7f37`, 문서 공유 기준선은 `main=origin/main=b8799c3`다. FLOW-01~03, Projectile·사격 분산과 프로젝트 소유 Rifle AnimBP까지 Push됐다. 그 위에 AI-GAZE와 MG 전용 3분할 임시 외형이 로컬 변경으로 추가됐다. 작업 시작에 수정 표기되던 `Lvl_MilitaryBase.umap`은 최종 내용 비교에서 Git 변경이 아니며 이번 작업이 직접 수정하지 않았다.
+Unreal 공유 기준선은 `main=origin/main=46f7f37`, 문서 공유 기준선은 `main=origin/main=2cc51f1`이다. FLOW-01~03, Projectile·사격 분산과 프로젝트 소유 Rifle AnimBP까지 Push됐다. 그 위에 AI-GAZE와 MG 전용 3분할 임시 외형이 Unreal 로컬 변경으로 추가됐다. 작업 시작에 수정 표기되던 `Lvl_MilitaryBase.umap`은 최종 내용 비교에서 Git 변경이 아니며 이번 작업이 직접 수정하지 않았다.
 
 2026-09-03 게임 흐름은 `실행 → 시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → 맵 → Drone 선택 → Mission 시작/측면 목표 UI`로 변경됐다. 사람 Operator 조작·NPC 대화 수령·Operator↔Drone 전환은 폐기하며 [`docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 최우선 실행 기준으로 사용한다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-09-04 — 병사 시선 축 수정·MG 전용 원기둥 3분할 구현 및 자동화 완료, 수동 화면 확인 대기
+마지막 갱신: 2026-09-04 — MG 조작 앵커를 Yaw 몸체 아래로 연결해 후방 위치·방향 직접 추종, 개인화기 Drone 방향 몸 회전 구현 및 자동화 완료, 수동 화면 확인 대기
 
 | 항목 | 상태 |
 |---|---|
 | 현재 단계 | FLOW-01~03 데이터·시작 화면·로비 미션 선택 완료, FLOW-04 브리핑→Map 준비 |
 | 진행 정도 | GameInstance Flow/Catalog, 실제 Mission·Drone Data Asset, 전용 Front-end BP/WBP/Map, 정적 Opening→Lobby와 Training Mission 목록·측면 설명·하단 시작 완료. Rifle·Shotgun·MG는 이동 Projectile과 BP 조정형 무작위 사격 원뿔을 기본 사용. Hostile Rifle·Shotgun은 프로젝트 소유 Rifle AnimBP 사용 |
-| 지금 작업 중 | `AI-GAZE-01D`와 `AI-MG-03` 수동 화면 확인. 사용자 화면 피드백의 고개 까딱임은 AnimBP 3개 Bone을 Component Space로 교정했다. MG는 전용 `ADroneMGTurretStation`과 Base/Body/Barrel 원기둥 3개로 분리했다 |
-| 완료 근거 | `DroneEditor`·`Drone` Win64 Development Build 성공. 저장 AnimBP·MG BP 새 프로세스 검증, Smart Object 6쌍 검증과 `NPCGreyboxAssets`·`NPCPerceptionSearchPIE`·`SmartObjectFoundationDefaults`·`SmartObjectStationAssets`·`ProjectileBallistics` 5/5 통과. MG 연속 조준·발사·사망 교대·Search 회귀 통과 |
-| 수동 미확인 | Component Space 수정 뒤 NPC가 좌우·상하 Drone을 실제로 자연스럽게 따라보는지, 임시 MG Base 고정/Body Yaw/Barrel Pitch 육안 회전, Rifle/MG/Cover 자세, 수정된 Manny 연사·Reload 손 위치/총기 정렬, Training 두 Lap 비교 HUD, OilRig Map Check·재질·조명·스케일·충돌·성능 |
+| 지금 작업 중 | `AI-GAZE-01D`와 `AI-MG-03` 수동 화면 확인. MG 사수 Anchor는 `MGTurretYawPivot`의 자식으로 몸체 Yaw를 직접 상속해 뒤쪽 위치·방향을 유지하고, MG가 아닌 개인화기 병사는 교전 중 몸 Yaw와 상체 Gaze로 Drone을 바라보도록 수정했다 |
+| 완료 근거 | `DroneEditor`·`Drone` Win64 Development Build 성공. 저장 AnimBP·MG BP 새 프로세스 검증, Smart Object 6쌍 검증과 `NPCGreyboxAssets`·`NPCPerceptionSearchPIE`·`SmartObjectFoundationDefaults`·`SmartObjectStationAssets`·`ProjectileBallistics` 5/5 통과. MG 몸체 갱신 뒤 같은 프레임에 Yaw 종속 Anchor로 사수 정렬, 개인화기 Drone 방향 5° 이내 몸 정렬, 연속 조준·발사·사망 교대·Search 회귀 통과 |
+| 수동 미확인 | MG 사수가 Body Yaw 회전을 따라 포탑 뒤를 자연스럽게 유지하는지와 발 미끄러짐·손 위치, 개인화기 병사가 Drone 쪽으로 부드럽게 몸·고개를 돌리는지, Component Space 좌우·상하 시선 체감, 임시 MG Base/Body/Barrel 육안 축, Manny 연사·Reload 총기 정렬, Training 두 Lap 비교 HUD, OilRig Map Check·재질·조명·스케일·충돌·성능 |
 | 현재 차단 | FLOW-04 코드 차단 없음. 실제 Mission Trailer Asset 형식은 미정이므로 정적 Briefing 대체 화면 뒤 `MissionMap` Soft Reference를 여는 경로로 먼저 검증 가능 |
-| 다음 행동 | `Lvl_NPCSmartObjectGreybox`에서 Drone을 좌우·상하로 움직여 병사가 까딱임 없이 따라보는지 확인하고, 임시 원기둥 MG의 Base 고정/Body Yaw/Barrel Pitch를 확인해 결과 기록 |
+| 다음 행동 | `Lvl_NPCSmartObjectGreybox`에서 MG Body가 돌 때 사수가 같은 방향으로 뒤를 유지하는지와 발·손 위치를 확인해 `BP_SO_MGTurret > Drone|AI|MG|Operator`의 거리·좌우·높이만 조정하고, 개인화기 병사의 Drone 방향 몸 Yaw와 고개 추적 및 임시 MG 3축을 육안 확인 |
 | 다음 기능 | 수동 Gaze·MG 축 Pass 뒤 `FLOW-04 → FLOW-06` 한 Mission·한 Drone Front-end Vertical Slice. 최종 기관총 에셋이 준비되면 상속된 3개 Mesh의 Static Mesh만 교체 |
 | 에셋 인수 | `C:\에셋` 원본은 보존. ArmyVFX·InfantrySFX·Ground Drone·NPC 외형·Raw Drone을 정확한 의존성 묶음으로 이식 |
 | 맵 이식 | 기존 환경 3종에 `Lvl_OilRig`을 추가. Vendor FirstPerson Sample 의존성을 끌어오던 Door Actor 8개는 중앙 사본에서 제거 |
 | Editor/MCP | 명령줄 검증 뒤 Editor 종료 상태. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
-| Git 처리 | Unreal `main=origin/main=46f7f37` 위 AI-GAZE·AnimBP·MG 3분할 기반이 로컬 미커밋. 최종 Git 상태에서 `Lvl_MilitaryBase.umap`은 변경 없음. 문서는 `b8799c3` 위 최신화가 미커밋. Codex는 Commit·Push하지 않음 |
+| Git 처리 | Unreal `main=origin/main=46f7f37` 위 AI-GAZE·AnimBP·MG 3분할·후방 조작 앵커·개인화기 몸 회전이 로컬 미커밋. `Lvl_MilitaryBase.umap`은 변경 없음. 문서는 `main=origin/main=2cc51f1` 위 본 작업 기록이 로컬 미커밋. Codex는 Commit·Push하지 않음 |
 | UI/기획 참고 | Figma `Project:Droner`는 세계관·청록/녹색 HUD·경고 아이콘 참고용으로만 읽음. Figma는 수정하지 않았고 게임 제목 통일은 보류 |
 | 협업 Git | 팀원 환경 맵·재질은 중앙 `main`에 들어온 상태다. Battlefield의 새 `M_Enemy`·`M_Start`·`M_Target` 의존성과 세 중앙 맵 로드를 검증했고, `.vsconfig` 14.50 복원과 `//test` 제거를 별도 정리했다. 팀원 PC의 실제 Remote 구성 확인은 남음 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
