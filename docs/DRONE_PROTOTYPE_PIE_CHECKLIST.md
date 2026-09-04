@@ -69,7 +69,7 @@ TUT-04B    Implemented, 자동 검증 Pass · 실제 두 Lap 확인 대기
 - [x] `Lvl_DronePrototype`에서 새 PIE 시작
 - [x] BP Prototype Pawn 정확히 한 대 Spawn
 - [x] `PlayerController_0`가 해당 Pawn Possess
-- [x] `IMC_DronePrototype` 정확히 한 개, Priority 1, 15개 Mapping
+- [x] `IMC_DronePrototype` 정확히 한 개, Priority 1, 16개 Mapping
 - [x] `W` Forward, `S` Backward
 - [x] `A` Left, `D` Right
 - [x] `Space Bar` Up, `Left Ctrl` Down
@@ -78,6 +78,7 @@ TUT-04B    Implemented, 자동 검증 Pass · 실제 두 Lap 확인 대기
 - [x] Mouse Y가 CameraBoom Pitch만 바꾸고 Actor/Controller 회전은 변경하지 않음
 - [x] Gamepad Left Stick 전후좌우, `RT/LT` 상승·하강
 - [x] Gamepad Right Stick X Drone Yaw, Y Camera Pitch
+- [x] `P` Mapping과 Pawn 소유 `Started` Binding이 각각 정확히 한 개
 - [x] `W+Space`, `D+E` 같은 복합 입력이 한 번씩 반응
 - [x] `W+S`, `A+D` 반대 입력에서 비정상 가속이나 이중 전달 없음
 - [x] 같은 입력 시간 기준으로 이전 PIE보다 입력 세기가 갑자기 두 배가 되지 않음
@@ -86,7 +87,7 @@ TUT-04B    Implemented, 자동 검증 Pass · 실제 두 Lap 확인 대기
 
 세 번의 위치 절대값을 같게 만드는 것이 목적은 아니다. 각 새 PIE의 시작 위치와 같은 입력 시간 기준으로 반응이 갑자기 두 배가 되지 않는지 비교한다.
 
-자동화 3회가 모두 통과한 뒤 `Lvl_DronePrototype`을 한 번 화면으로 확인한다. BP Prototype Pawn 한 대, Drone 뒤에 고정된 추적 Camera, Mouse X Drone Yaw, Mouse Y Camera Pitch, 기체 이동 방향과 정상 종료를 직접 확인한다. 실제 Gamepad가 연결돼 있으면 동일 회차에서 Stick과 Trigger 체감도 기록한다. 자동화 3/3과 이 수동 확인을 모두 완료한 경우에만 PFN-06을 Done으로 옮긴다.
+자동화 3회가 모두 통과한 뒤 `Lvl_DronePrototype`을 한 번 화면으로 확인한다. BP Prototype Pawn 한 대, Mouse X Drone Yaw, Mouse Y Camera Pitch, 기체 이동 방향과 정상 종료를 직접 확인한다. `P`를 눌러 3인칭 고정 추적과 1인칭을 왕복하고, 1인칭에서 W/S Pitch·A/D Roll·피격 흔들림을 Camera가 따라가는지와 Mesh 가림·멀미 여부를 기록한다. 실제 Gamepad가 연결돼 있으면 동일 회차에서 Stick과 Trigger 체감도 기록한다.
 
 ## 반복 결과표
 

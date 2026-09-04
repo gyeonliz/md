@@ -2,7 +2,7 @@
 
 기준일: 2026-08-26 (Asia/Seoul)
 
-이 문서는 `C:\URproject\drone`의 현재 구현과 `/Game/Drone/Maps/Lvl_DroneTraining` 저장 상태를 기준으로 한다. 코스 제작 시 순서의 원본은 `BP_DroneTrainingCourse` 한 개가 가진 `OrderedGates` 배열이다. 생성된 빛나는 선 Component나 GateIndex를 직접 관리하지 않는다.
+이 문서는 `D:\JGY\project\drone`의 현재 구현과 `/Game/Drone/Maps/Lvl_DroneTraining` 저장 상태를 기준으로 한다. 코스 제작 시 순서의 원본은 `BP_DroneTrainingCourse` 한 개가 가진 `OrderedGates` 배열이다. 생성된 빛나는 선 Component나 GateIndex를 직접 관리하지 않는다.
 
 ## 1. 현재 맵과 자산 위치
 

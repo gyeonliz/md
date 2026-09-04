@@ -655,3 +655,14 @@ TUT-04 비교·결과 UI는 기술 구현됐고 실제 두 Lap 확인이 남았�
 - 임시 Base는 고정, Body는 Yaw, Barrel은 Pitch만 상속한다. `MGTurretOperatorAnchor`는 Yaw Body의 자식이며 기본 후방 거리 120cm로, Body가 회전하면 사수 위치·방향도 직접 따라간다. 별도 Yaw 보정 없이 좌우·높이·거리만 `BP_SO_MGTurret` Class Defaults에서 조정한다. 기존 BP Attachment를 Construction에서 복구하고 점유 중 Controller가 포탑을 먼저 갱신한 뒤 같은 프레임에 사수를 Anchor에 정렬하며, 4° 안에 정렬된 뒤 발사한다.
 - MG가 아닌 `DroneDetected`·`UseCover` 개인화기 교전은 몸 Yaw를 초당 180°로 Drone 방향에 돌린 뒤 AnimBP 상체 Gaze를 적용한다. MG 점유자는 포탑 방향을 유지하므로 두 동작은 서로 덮어쓰지 않는다.
 - Editor/Game 빌드, 저장 AnimBP·MG BP 새 프로세스 검증, Smart Object 6쌍 Validation과 집중 자동화 5/5는 통과했다. 테스트는 MG Operator Anchor 위치·방향과 개인화기 Drone 방향 5° 이내 정렬을 포함한다. Manny 고개 축·사수 손 위치·Rifle/MG/Cover 자세와 임시 MG 세 부품의 육안 회전은 화면 확인 전까지 Done으로 판정하지 않는다.
+
+## 41. 2026-09-04 차량·Drone 움직임 표현 확정
+
+- 차량은 완전한 Chaos 물리보다 네 바퀴 지점 Trace로 지형 높이와 굴곡을 따라가는 4점 지면 추종을 우선한다.
+- Greybox 단계의 완료 기준은 차량 Z·Pitch·Roll, 바퀴 네 지점 시각 추종과 차량 탑재 포탑의 부모 Transform 추종이다. 타이어 마찰·슬립·질량 이동·브레이크는 후속 필요가 생길 때 확장한다.
+- Drone은 W/S 전후 이동 때 본체와 Rotor 외형이 Pitch하고 A/D 좌우 이동 때 진행 방향으로 Roll해야 한다. 전진은 기수를 아래로, 후진은 기수를 위로 기울이며 수동 확인에서 발견된 A/D 반대 방향은 Roll 부호를 뒤집어 수정한다. Camera와 Collision은 기울이지 않아 조작·충돌 계약을 유지한다.
+- 해당 보정의 기본값은 전후 최대 14°, 좌우 최대 18°이며 Editor Build와 `Drone.Prototype` 5/5 자동화가 통과했다. 최종 축 방향과 체감은 실제 화면에서 W/S·A/D·W+D로 한 번 더 확인한다.
+- 차량 Wheel은 실제 전진축 이동거리/반지름으로 회전하며 후진 시 반대로 돈다. Drone Camera는 P로 1/3인칭을 전환하고 1인칭 CameraBoom은 `VisualTiltPivot`을 부모로 사용해 이동 Pitch·Roll을 화면도 따른다. 입력 자산은 `/Game/Drone/Prototype` 아래만 사용하고 최종 Camera Socket 전까지 Offset은 Greybox 값이다.
+- 현재 Greybox Cylinder Wheel의 화면 기준 회전축은 첫 수동 확인을 반영한 `WheelVisualSpinDirectionMultiplier=+1`로 고정한다. 최종 Wheel Mesh로 교체할 때만 해당 Mesh 축에 따라 다시 조정한다.
+- Drone이 실제 Damage를 받으면 본체와 Camera View가 짧게 흔들려 피격을 알린다. 흔들림은 이동·Collision 판정을 바꾸지 않고 피해량에 따라 강도가 달라지며, 방향성·Gamepad 진동·HUD Flash는 후속으로 둔다.
+- 구현·조정·수동 확인 기준은 [`docs/DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md`](docs/DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md)를 따른다.

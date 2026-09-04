@@ -2,7 +2,7 @@
 
 기준일: 2026-08-26 (Asia/Seoul)
 
-이 문서는 현재 기준 프로젝트 `C:\URproject\drone`의 실제 `ADroneTrainingCourse` 소스, 자동화 테스트, `BP_DroneTrainingCourse`, `Lvl_DroneTraining` 자산을 기준으로 한다. Editor에서 Gate를 설치하고 Spline 점을 추가하는 실제 절차는 [`DRONE_TRAINING_AUTHORING_GUIDE.md`](DRONE_TRAINING_AUTHORING_GUIDE.md)를 따른다.
+이 문서는 현재 기준 프로젝트 `D:\JGY\project\drone`의 실제 `ADroneTrainingCourse` 소스, 자동화 테스트, `BP_DroneTrainingCourse`, `Lvl_DroneTraining` 자산을 기준으로 한다. Editor에서 Gate를 설치하고 Spline 점을 추가하는 실제 절차는 [`DRONE_TRAINING_AUTHORING_GUIDE.md`](DRONE_TRAINING_AUTHORING_GUIDE.md)를 따른다.
 
 TUT-01의 범위는 다음 두 가지뿐이다.
 

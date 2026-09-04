@@ -10,7 +10,7 @@
 - Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개, Segment/Lap 원본과 이전 평균·Best·Delta 결과까지 구현됐다.
 - 현재 개발 완료 지점은 `FLOW-03` 미션 선택·측면 설명·하단 시작이며 다음 신규 기능은 `FLOW-04` 정적 브리핑→선택 Map 로드다.
 - 확정 화면 흐름은 `시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → Map → Drone 선택 → Mission 시작/측면 목표 UI`다. 사람 Operator·NPC 대화 수령·Operator↔Drone 전환은 폐기했다.
-- 현재 실행 세션은 Unreal `C:\URproject\drone`, 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6`다. D 드라이브 경로는 다른 PC의 이전 기준이며 제공 에셋 원본은 직접 수정하지 않는다.
+- 현재 실행 세션은 Unreal `D:\JGY\project\drone`, 문서 `D:\JGY\project\md`다. `C:\URproject\drone`은 다른 PC의 이전 검증 경로이며 제공 에셋 원본은 직접 수정하지 않는다.
 - NavigationArrows 최소 자산 6개와 전용 테스트는 main에 병합됐다. 화면 Host는 아직 미구현이다.
 - 프로젝트 사용 맵은 `/Game/Drone/Maps`로 중앙화했다. 환경 맵 3종에 `Lvl_OilRig`을 추가했고, 남은 제공 자산 891개를 후보 라이브러리로 선별 이식했다.
 - 사용자는 Gate나 기록 C++를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도와 Drone Loop를 확인하면 된다.
@@ -25,7 +25,7 @@
 
 | 구분 | 현재 상태 |
 |---|---|
-| Unreal 저장소 | `C:\URproject\drone` |
+| Unreal 저장소 | `D:\JGY\project\drone` |
 | Unreal 기준 Commit | `2d6a459` |
 | Git 상태 | `main=origin/main=2d6a459`; FLOW-01~03·NPC Visual 기반 Source/Test, Data Asset, Front-end BP/Map을 합쳐 26개 경로 로컬 미커밋 |
 | Git LFS | `fsck` 정상 |

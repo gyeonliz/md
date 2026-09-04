@@ -170,7 +170,7 @@
 
 ### 의존성·Git·Unreal 검증
 
-- 현재 Integration Asset Registry 재감사에서 Engine Audio 아이콘 2개, 프로젝트 Input Action 5개와 IMC 1개, FPV Mesh 5개, 프로젝트 Cue 1개, `/Script/Drone`만 확인
+- 최신 Integration Asset Registry 기준 Engine Audio 아이콘 2개, 프로젝트 Input Action 6개와 IMC 1개, FPV Mesh 5개, 프로젝트 Cue 1개, `/Script/Drone`만 확인
 - 원본 `/Game/Drone_Pack`, `/Game/Drone-Sounds`, ThirdPerson, Variant 금지 의존성 0
 - 이식 자산 13개 모두 Git LFS 추적, `git lfs fsck` 통과
 - 이번 재검증 `Drone.Integration.FPVAsset`: 1/1 Success

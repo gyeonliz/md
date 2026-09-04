@@ -31,7 +31,7 @@ Spawn
 확인된 현재 상태는 다음과 같다.
 
 - 작업컴 기본 작업 루트: `D:\JGY\project`
-- UE 5.8.1 프로젝트: 이번 확인 PC 작업 경로 `C:\URproject\drone`; `main=origin/main=55b3ffe`
+- UE 5.8.1 프로젝트: 현재 작업 경로 `D:\JGY\project\drone`; 공유 기준 `main=origin/main=6fd0e77` 위 로컬 미커밋 변경 존재
 - 문서 저장소: 현재 작업 경로 `D:\JGY\project\md`; 최신화 직전 로컬 `main=origin/main=466609d`이며 이후 상태는 [`STATUS.md`](../STATUS.md)를 따른다.
 - 별도 `ADronePrototypePawn`과 `ADronePrototypeGameMode` C++ 구현 완료
 - 컴포넌트 기본값과 standalone Spawn/Possess 자동화 테스트 완료
@@ -161,8 +161,8 @@ P6. 통합 Greybox + 에셋 교체 준비
 | ID | 작업 | 예상 크기 | 의존성 | 완료 조건 |
 |---|---|---:|---|---|
 | PFN-01 | 임시 입력 계약 결정 | 1시간 | 없음 | Move·Altitude·Yaw·Look의 테스트 키와 Action Value Type 기록 |
-| PFN-02 | Input Action 5개와 전용 IMC 생성 | 1~2시간 | PFN-01 | 5개 Action과 Keyboard·Mouse·Gamepad 15개 Mapping이 기록됨 |
-| PFN-03 | `BP_DronePrototypePawn` 생성·자산 연결 | 1~2시간 | PFN-02 | IMC와 5개 Action이 BP Class Defaults에 연결됨 |
+| PFN-02 | Input Action 6개와 전용 IMC 생성 | 1~2시간 | PFN-01 | 6개 Action과 Keyboard·Mouse·Gamepad 16개 Mapping이 기록되고 `ToggleView/P`가 한 번만 존재함 |
+| PFN-03 | Prototype BP Pawn 생성·자산 연결 | 1~2시간 | PFN-02 | IMC와 6개 Action이 BP Class Defaults에 연결됨 |
 | PFN-04 | `BP_DronePrototypeGameMode` 연결 | 1시간 | PFN-03 | Default Pawn이 BP Prototype Pawn을 사용함 |
 | PFN-05 | `Lvl_DronePrototype` Greybox 생성 | 2~3시간 | PFN-04 | PlayerStart·지면·장애물·높이 표식이 있는 별도 Map 실행 |
 | PFN-06 | Spawn/Input 기준선 반복 PIE | 1시간 | PFN-05 | 새 PIE 3회 모두 Pawn 한 대 Spawn·Possess, 네 Callback 값 전달, IMC·입력 중복 없음 |

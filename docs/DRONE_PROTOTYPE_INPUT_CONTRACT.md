@@ -23,6 +23,7 @@
 |  |  | Gamepad `LT` | Negate X | World Down |
 | `IA_DronePrototype_Yaw` | Axis1D | Gamepad Right X | Dead Zone | 기체 Yaw Rate |
 | `IA_DronePrototype_CameraPitchRate` | Axis1D | Gamepad Right Y | Dead Zone | CameraBoom Pitch Rate |
+| `IA_DronePrototype_ToggleView` | Boolean | `P` | 없음 | 3인칭 고정 추적 ↔ 1인칭 전환, 누를 때 한 번만 실행 |
 
 전용 Mapping Context 이름은 `IMC_DronePrototype`이고 우선순위는 C++ 기본값 `1`을 사용한다. Keyboard/Mouse에는 별도 Trigger나 Dead Zone을 추가하지 않고 Gamepad Stick에는 기본 `0.2` Dead Zone을 적용한다.
 
@@ -60,8 +61,8 @@ Editor lifecycle을 포함한 새 PIE 3회 자동화와 별도 수동 화면 확
 
 ## 6. 현재 검증 상태
 
-- 자산 재로드 검증에서 5개 Action의 Value Type과 IMC의 15개 Mapping·Modifier 순서를 확인했다.
-- Mouse X Drone Yaw, Mouse Y CameraBoom Pitch, Gamepad 6축을 포함한 lifecycle 자동화가 새 PIE 3회를 통과했다.
-- 전체 Automation Report는 3 succeeded, 0 warnings, 0 errors다.
+- 자산 재로드 검증에서 6개 Action의 Value Type과 IMC의 16개 Mapping·Modifier 순서, `ToggleView/P` 단일 연결을 확인했다.
+- Mouse X Drone Yaw, Mouse Y CameraBoom Pitch, Gamepad 6축과 P의 `Started` 단일 Binding을 포함한 lifecycle 자동화가 새 PIE 3회를 통과했다.
+- 최신 Prototype Automation Report는 5/5 성공이며 빈 시험 World의 기존 Recast 경고만 남는다.
 - 사전 부분 확인 두 번은 모두 전체 조건을 끝내지 않아 Pass로 산정하지 않았다.
 - PFN-06 자동화 3/3과 Standalone Keyboard·Mouse 수동 조작, 창 닫기 정상 종료가 통과해 Done이다. 실제 Gamepad 체감은 장치 연결 여부 미보고로 미확인이다. 정식 판정은 [`DRONE_PROTOTYPE_PIE_CHECKLIST.md`](DRONE_PROTOTYPE_PIE_CHECKLIST.md)를 따른다.

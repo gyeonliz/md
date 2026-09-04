@@ -36,6 +36,7 @@ Tutorial을 먼저 완성해 조작감, 카메라, HUD, 비행 기록 계산을 
 | Keyboard | `W/S`, `A/D` | Actor-relative 전후·좌우 이동 |
 | Keyboard | `Space/Left Ctrl` | World Up 기준 상승·하강 |
 | Keyboard | `Q/E` | 세밀한 좌/우 Drone Yaw |
+| Keyboard | `P` | 3인칭 고정 추적 ↔ 1인칭 임시 전환 |
 | Mouse | X | Drone Actor Yaw, 추적 카메라도 함께 회전 |
 | Mouse | Y | SpringArm Camera Pitch만 조정 |
 | Gamepad | Left Stick | 전후·좌우 이동 |
@@ -202,7 +203,7 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 
 | ID | 작업 | 완료 조건 |
 |---|---|---|
-| CTRL-01 | 고정 추적 Camera와 Mouse/Gamepad 입력 | 5 Action, 15 Mapping, 자동화 3/3과 수동 체감 확인 |
+| CTRL-01 | 1/3인칭 Camera와 Mouse/Gamepad 입력 | 6 Action, 16 Mapping, P 단일 연결과 자동화 3/3 확인. 1인칭 위치·가림·멀미는 수동 확인 |
 | HUD-01 | Telemetry Snapshot Component | 속도·고도·수직 속도·Heading을 10Hz Event로 제공 |
 | HUD-02 | C++ 기능 + WBP Flight HUD | Drone Possess 중 실제 WBP로 네 수치를 화면에서 확인 |
 | TUT-01 | Training Map과 비충돌 Spline | 별도 Map에서 수정 가능한 Spline과 Runtime 표시선이 비행·Collision·Overlap·Physics·Nav에 영향 없음 |

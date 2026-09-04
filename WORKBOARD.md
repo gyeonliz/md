@@ -4,31 +4,31 @@
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 공유 기준선은 `main=origin/main=46f7f37`, 문서 공유 기준선은 `main=origin/main=2cc51f1`이다. FLOW-01~03, Projectile·사격 분산과 프로젝트 소유 Rifle AnimBP까지 Push됐다. 그 위에 AI-GAZE와 MG 전용 3분할 임시 외형이 Unreal 로컬 변경으로 추가됐다. 작업 시작에 수정 표기되던 `Lvl_MilitaryBase.umap`은 최종 내용 비교에서 Git 변경이 아니며 이번 작업이 직접 수정하지 않았다.
+Unreal 공유 기준선은 `main=origin/main=6fd0e77`, 문서 공유 기준선은 `main=origin/main=82181db`이다. 그 위 로컬 작업으로 설치형/차량형 무인 자동포탑, 4점 지면 추종 차량과 굴곡 노면, Drone W/S 외형 Pitch·A/D 외형 Roll·피격 흔들림을 구현했다. Codex는 Commit·Push하지 않으며 현재 Unreal·문서 작업 트리는 이 작업과 이전 문서 점검 변경 때문에 깨끗하지 않다.
 
 2026-09-03 게임 흐름은 `실행 → 시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → 맵 → Drone 선택 → Mission 시작/측면 목표 UI`로 변경됐다. 사람 Operator 조작·NPC 대화 수령·Operator↔Drone 전환은 폐기하며 [`docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 최우선 실행 기준으로 사용한다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-09-04 — MG 조작 앵커를 Yaw 몸체 아래로 연결해 후방 위치·방향 직접 추종, 개인화기 Drone 방향 몸 회전 구현 및 자동화 완료, 수동 화면 확인 대기
+마지막 갱신: 2026-09-04 — 차량 속도 비례 정·역 바퀴 회전과 Drone P키 1/3인칭 전환 구현·자동화 완료, 수동 화면 확인 대기
 
 | 항목 | 상태 |
 |---|---|
 | 현재 단계 | FLOW-01~03 데이터·시작 화면·로비 미션 선택 완료, FLOW-04 브리핑→Map 준비 |
 | 진행 정도 | GameInstance Flow/Catalog, 실제 Mission·Drone Data Asset, 전용 Front-end BP/WBP/Map, 정적 Opening→Lobby와 Training Mission 목록·측면 설명·하단 시작 완료. Rifle·Shotgun·MG는 이동 Projectile과 BP 조정형 무작위 사격 원뿔을 기본 사용. Hostile Rifle·Shotgun은 프로젝트 소유 Rifle AnimBP 사용 |
-| 지금 작업 중 | `AI-GAZE-01D`와 `AI-MG-03` 수동 화면 확인. MG 사수 Anchor는 `MGTurretYawPivot`의 자식으로 몸체 Yaw를 직접 상속해 뒤쪽 위치·방향을 유지하고, MG가 아닌 개인화기 병사는 교전 중 몸 Yaw와 상체 Gaze로 Drone을 바라보도록 수정했다 |
-| 완료 근거 | `DroneEditor`·`Drone` Win64 Development Build 성공. 저장 AnimBP·MG BP 새 프로세스 검증, Smart Object 6쌍 검증과 `NPCGreyboxAssets`·`NPCPerceptionSearchPIE`·`SmartObjectFoundationDefaults`·`SmartObjectStationAssets`·`ProjectileBallistics` 5/5 통과. MG 몸체 갱신 뒤 같은 프레임에 Yaw 종속 Anchor로 사수 정렬, 개인화기 Drone 방향 5° 이내 몸 정렬, 연속 조준·발사·사망 교대·Search 회귀 통과 |
-| 수동 미확인 | MG 사수가 Body Yaw 회전을 따라 포탑 뒤를 자연스럽게 유지하는지와 발 미끄러짐·손 위치, 개인화기 병사가 Drone 쪽으로 부드럽게 몸·고개를 돌리는지, Component Space 좌우·상하 시선 체감, 임시 MG Base/Body/Barrel 육안 축, Manny 연사·Reload 총기 정렬, Training 두 Lap 비교 HUD, OilRig Map Check·재질·조명·스케일·충돌·성능 |
+| 지금 작업 중 | `VEH-WHEEL-01` 첫 화면 확인에서 반대였던 바퀴 회전축을 `-1→+1`로 수정하고 재빌드·차량 1/1·BP/맵 재로드 검증 완료, 화면 방향 재확인 대기. `DR-CAM-01` P키 1/3인칭 전환 수동 확인도 유지 |
+| 완료 근거 | MSVC 14.51.36256 `DroneEditor Win64 Development` Build 성공. 피격·기울기·차량·포탑·HUD 집중 6/6과 실제 `ApplyDamage`·파괴 후 중복 피해를 검증하는 `NPCPerceptionSearchPIE` 1/1 통과. 저장 BP/맵 Validation과 Map Check 0/0 유지 |
+| 수동 미확인 | 차량 Z·Pitch·Roll·바퀴·포탑 추종, Drone A/D Roll, 실제 탄환 피격 본체·카메라 흔들림과 Camera/Collision 안정. 자동포탑 발사·장애물 차단, MG 사수·Gaze·임시 MG 3축, Training HUD, OilRig 시각·성능 확인도 유지 |
 | 현재 차단 | FLOW-04 코드 차단 없음. 실제 Mission Trailer Asset 형식은 미정이므로 정적 Briefing 대체 화면 뒤 `MissionMap` Soft Reference를 여는 경로로 먼저 검증 가능 |
-| 다음 행동 | `Lvl_NPCSmartObjectGreybox`에서 MG Body가 돌 때 사수가 같은 방향으로 뒤를 유지하는지와 발·손 위치를 확인해 `BP_SO_MGTurret > Drone|AI|MG|Operator`의 거리·좌우·높이만 조정하고, 개인화기 병사의 Drone 방향 몸 Yaw와 고개 추적 및 임시 MG 3축을 육안 확인 |
-| 다음 기능 | 수동 Gaze·MG 축 Pass 뒤 `FLOW-04 → FLOW-06` 한 Mission·한 Drone Front-end Vertical Slice. 최종 기관총 에셋이 준비되면 상속된 3개 Mesh의 Static Mesh만 교체 |
+| 다음 행동 | `Lvl_NPCSmartObjectGreybox`에서 차량 굴곡 추종과 포탑 발사를 확인하면서 Drone이 실제 탄환에 맞을 때 약 0.3초 흔들리고 Camera/Collision이 밀리지 않는지 본다. 이어 Prototype/Training에서 A/D Roll·수평 복귀를 확인 |
+| 다음 기능 | 자동포탑 화면 Pass 뒤 진영/표적 우선순위와 포탑 체력·파괴를 별도 카드로 확장하거나, 원래 순서대로 `FLOW-04 → FLOW-06` 한 Mission·한 Drone Front-end Vertical Slice 진행. 최종 포탑 에셋은 각 BP의 Base/Body/Barrel Mesh만 교체 |
 | 에셋 인수 | `C:\에셋` 원본은 보존. ArmyVFX·InfantrySFX·Ground Drone·NPC 외형·Raw Drone을 정확한 의존성 묶음으로 이식 |
 | 맵 이식 | 기존 환경 3종에 `Lvl_OilRig`을 추가. Vendor FirstPerson Sample 의존성을 끌어오던 Door Actor 8개는 중앙 사본에서 제거 |
 | Editor/MCP | 명령줄 검증 뒤 Editor 종료 상태. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
-| Git 처리 | Unreal `main=origin/main=46f7f37` 위 AI-GAZE·AnimBP·MG 3분할·후방 조작 앵커·개인화기 몸 회전이 로컬 미커밋. `Lvl_MilitaryBase.umap`은 변경 없음. 문서는 `main=origin/main=2cc51f1` 위 본 작업 기록이 로컬 미커밋. Codex는 Commit·Push하지 않음 |
+| Git 처리 | Unreal `main=origin/main=6fd0e77`은 원격 실측까지 일치하고 작업 트리·LFS Push 대기가 없다. 문서는 `main=origin/main=82181db` 위 팀 환경 점검 기록만 로컬 미커밋. Codex는 Commit·Push하지 않음 |
 | UI/기획 참고 | Figma `Project:Droner`는 세계관·청록/녹색 HUD·경고 아이콘 참고용으로만 읽음. Figma는 수정하지 않았고 게임 제목 통일은 보류 |
-| 협업 Git | 팀원 환경 맵·재질은 중앙 `main`에 들어온 상태다. Battlefield의 새 `M_Enemy`·`M_Start`·`M_Target` 의존성과 세 중앙 맵 로드를 검증했고, `.vsconfig` 14.50 복원과 `//test` 제거를 별도 정리했다. 팀원 PC의 실제 Remote 구성 확인은 남음 |
+| 협업 Git | 중앙 `origin/main=6fd0e77`은 깨끗하고 필수 입력 영역의 Git 제외 누락은 0개다. 별도 `yook34/main=c845430`이 중앙보다 18 Commit 뒤인 사실은 원격 참고값이지만, 사용자가 팀원은 권한을 받아 중앙 `gyeonliz/drone`에서 직접 Pull한다고 확인했으므로 현재 증상의 원인으로 사용하지 않는다. 새 Worktree의 빈 `Binaries/Intermediate`에서 Editor Build가 성공했다. 팀원 PC에서 사격 AnimBP·기관총이 동시에 없으면 실제 HEAD·LFS 파일 크기·Pull 뒤 `DroneEditor` 재빌드 여부를 확인한다. [`docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md`](docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md)에 판별 순서를 기록 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
 | 학습 다음 행동 | Q-Net 상태를 확인해 Track A/B/C를 고르고 첫 학습 블록 실행 |
 
@@ -88,6 +88,10 @@ Unreal 공유 기준선은 `main=origin/main=46f7f37`, 문서 공유 기준선�
 | AI-SO-TUNE-01 | Drone / AI / Smart Object | 배치·Offset·Definition·검색·StateTree 조정 가이드와 Slot 도착 방향 적용 | 공유 `2d6a459`에 방향 보강과 Definition이 Push됨. DroneEditor Build, Slot Yaw 판정 포함 자동화 2/2, Definition/BP 6쌍 Validate 통과 | `Lvl_NPCSmartObjectGreybox`에서 Cyan 화살표와 순찰·Cover·MG 도착 방향의 화면 일치만 확인 |
 | AI-GAZE-01 | Drone / AI / Animation | 감지 뒤 Drone 시선 유지와 자연스러운 고개 회전 | Controller 독립 Gaze, 1초 유예, Search 마지막 위치, 해제·제한·보간과 Rifle AnimBP 상체/목/고개 20/45/35% 연결. 사용자 확인에서 Bone Space가 위아래 까딱임을 만든 것을 확인해 세 노드를 Component Space로 교정·재저장. Build·자산 검증·집중 자동화 통과 | `Lvl_NPCSmartObjectGreybox`에서 좌우 Yaw·상하 Pitch·보간과 Rifle/MG/Cover 자세 수동 Pass |
 | AI-MG-03 | Drone / AI / MG / Assets | 기관총 전용 3분할 조준·임시 외형 | 범용 Station의 포탑 Component와 일체형 Mesh를 제거하고 `ADroneMGTurretStation`에만 `BaseMount → YawPivot → PitchPivot → Muzzle` 및 원기둥 Base/Body/Barrel 3개 구성. `BP_SO_MGTurret`만 전용 부모로 이관, 연속 조준·정렬 후 발사·구형 Attachment 복구와 통합 PIE 통과 | 임시 원기둥 Base 고정/Body Yaw/Barrel Pitch·손 위치 수동 Pass. 최종 에셋 도착 뒤 세 Static Mesh만 교체 |
+| AI-AUTO-TURRET-01 | Drone / AI / Combat / Assets | 설치형·차량형 무인 자동포탑 | `ADroneAutomaticTurret`가 Prototype Drone을 주기적으로 거리+Visibility 검사하고 유인 MG 3분할 조준·Projectile을 재사용한다. 설치형/차량형 Native Class와 BP 2개, 테스트 맵 각 1기, 차량 Carrier Attach, Build·집중 3/3·맵 PIE 1/1 통과 | `Lvl_NPCSmartObjectGreybox`에서 탐지 진입/이탈, Base 고정·Body Yaw·Barrel Pitch, 발사, 장애물 차단, 차량 Carrier 추종을 수동 확인. 진영/우선순위·체력/파괴·FX/SFX는 후속 |
+| VEH-GROUND-01 | Drone / Vehicle / Greybox | 4점 지면 추종 차량 | `ADroneGroundConformingVehicle`, 차량 BP, 바퀴 4·TurretMount, 굴곡 노면 5개와 자동 왕복을 구현. Build·집중 테스트·저장 맵 Validation·Map Check 통과 | `Lvl_NPCSmartObjectGreybox`에서 Z·Pitch·Roll 보간, 바퀴 접촉 외형, 급격한 튐 없음과 차량 포탑 부모 추종 수동 Pass |
+| DR-VBANK-01 | Drone / Flight / Visual | 좌우 이동 외형 Roll | `VisualTiltPivot` 아래 Drone Body·Rotor만 최대 ±18° Roll하고 Camera/Collision은 고정. 실제 FPV Integration 대상으로 자동화 통과 | A/D 양방향 기울기, 입력 해제 수평 복귀, Camera 수평선·Collision 이동 안정 수동 Pass |
+| DR-DMGFX-01 | Drone / Combat / Feedback | 피격 외형·카메라 감쇠 흔들림 | 공용 Health Damage에서 피해량 비례 0.30초 본체·Camera View 흔들림을 발생시키고 Actor/Collision은 유지. 실제 전투 ApplyDamage PIE 통과 | 실제 Rifle/MG/자동포탑 탄환 피격 체감, 연속 피격, 흔들림 종료 뒤 Camera 복원과 멀미 유발 여부 수동 Pass |
 
 ## Done
 
@@ -123,8 +127,8 @@ Unreal 공유 기준선은 `main=origin/main=46f7f37`, 문서 공유 기준선�
 | DR-PROTOTYPE-04 | Drone / Unreal | 기존 맵 저장 변경 없이 명령줄 GameMode Override 실행과 정상 종료 확인 |
 | DR-PLAN-PREASSET | Drone / Unreal | Placeholder만으로 Greybox Vertical Slice를 완성하고 구매 후 교체하는 계획 작성 |
 | PFN-01 | Drone / Unreal | Prototype 전용 임시 키·Value Type·Modifier·기대 부호를 입력 계약에 기록 |
-| PFN-02 | Drone / Unreal | Input Action 5개와 전용 IMC 생성, Action 타입과 Keyboard·Mouse·Gamepad 15개 Mapping 검증 |
-| PFN-03 | Drone / Unreal | BP Pawn에 IMC·Input Action 5개와 Engine Cube Placeholder 연결 |
+| PFN-02 | Drone / Unreal | Input Action 6개와 전용 IMC 생성, Action 타입과 Keyboard·Mouse·Gamepad 16개 Mapping 검증. `ToggleView`는 P에 정확히 한 번 연결 |
+| PFN-03 | Drone / Unreal | BP Pawn에 IMC·Input Action 6개와 Engine Cube Placeholder 연결 |
 | PFN-04 | Drone / Unreal | BP GameMode의 Default Pawn을 BP Prototype Pawn으로 연결 |
 | PFN-05 | Drone / Unreal | 별도 Map에 GameMode Override, PlayerStart 한 개, 배치 Pawn 0개와 Greybox 시험 요소 구성 |
 | PFN-06 | Drone / Unreal | Camera·Spawn/Input 반복 PIE: 확정 조작 Automation 3/3, Standalone Keyboard·Mouse 조작과 창 닫기 정상 종료 Pass. 실제 Gamepad 체감은 미확인 |

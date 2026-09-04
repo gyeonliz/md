@@ -18,21 +18,81 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-09-04 — MG 후방 Operator Anchor·개인화기 Drone 방향 몸 회전 완료
+마지막 갱신: 2026-09-04 — 차량 바퀴 속도비례 정·역회전과 Drone P 1/3인칭 전환 구현·자동화 완료, 수동 화면 확인 대기
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | FLOW-01~03 공유 완료, AI-GAZE Controller/AnimBP 축 교정, 개인화기 Drone 방향 몸 회전과 MG 전용 Base/Yaw/Pitch/Muzzle·원기둥 3개·후방 Operator Anchor 구현 완료, 수동 화면 확인 대기 |
-| Unreal 기준선 | 공유 `main=origin/main=46f7f37`; AI-GAZE·AnimBP·MG 전용 3분할 임시 외형 로컬 수정. `Lvl_MilitaryBase.umap`은 최종 Git 변경 없음 |
-| 자동 검증 | Editor/Game Build, 저장 AnimBP·MG BP·후방 Operator Anchor 새 프로세스 검증, Smart Object 6쌍 Validation, MG 사수 Anchor 정렬·개인화기 Drone 방향 5° 이내 몸 정렬을 포함한 집중 5/5 성공 |
+| 전체 단계 | FLOW-01~03 공유 완료. 자동포탑·4점 차량·바퀴 회전·Drone 이동 기울기·피격 흔들림·P 1/3인칭 전환까지 구현 완료, 수동 화면 확인 대기 |
+| Unreal 기준선 | 공유 `main=origin/main=6fd0e77`; 그 위 자동포탑·차량·Drone 외형 로컬 미커밋 변경 존재 |
+| 자동 검증 | Editor Build 성공. 바퀴 속도비례·후진을 포함한 차량 1/1, P Mapping/Binding 새 PIE 3회와 1인칭 Camera 추종을 포함한 Prototype 5/5 성공. 앞선 자동포탑·HUD·Damage PIE와 저장 BP/맵 검증도 통과 상태 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | `AI-GAZE-01D` 개인화기 몸·고개 추적 수동 재확인과 `AI-MG-03` 사수 후방 위치·포탑 방향·임시 원기둥 3축 화면 확인 대기 |
+| 지금 작업 중 | `VEH-WHEEL-01` 바퀴 축 방향·속도 체감과 `DR-CAM-01` P 전환·FPV 위치 수동 확인. 기존 차량 4점 추종·기울기·피격 흔들림·자동포탑 수동 확인도 유지 |
 | 차단 조건 | FLOW-04 코드 차단 없음. 실제 Mission 영상 형식은 미정이므로 정적 대체 Briefing으로 진행 |
-| 다음 행동 | `Lvl_NPCSmartObjectGreybox`에서 개인화기 몸·고개 Drone 추적과 MG 사수 후방 위치·포탑 방향·Base 고정/Body Yaw/Barrel Pitch를 수동 확인 |
-| 다음 기능 | Gaze·MG 축 Pass 뒤 `FLOW-04 → FLOW-06` 한 Mission·한 Drone Front-end Vertical Slice. 최종 기관총 Asset은 준비 뒤 상속된 세 Static Mesh만 교체 |
+| 다음 행동 | `Lvl_NPCSmartObjectGreybox`에서 차량 4점 추종·바퀴 정/역회전·포탑과 실제 탄환 피격 흔들림을 보고, Prototype/Training에서 W/S·A/D 기울기와 P 1/3인칭 왕복·Camera/Collision 안정을 확인 |
+| 다음 기능 | 수동 Pass 뒤 포탑 진영/우선순위·체력/파괴 확장 여부를 결정하거나 `FLOW-04 → FLOW-06` 진행. 최종 포탑 Asset은 BP의 세 Mesh만 교체 |
 | 이후 | 결과/재시도, Flight 실패 연결, AI/MG·Jamming과 실제 비주얼 통합 |
-| Git 처리 | Unreal 공유 Commit은 유지하고 AI-GAZE/MG 로컬 변경과 사용자 Map 변경을 분리 보존. 문서 최신화도 로컬 미커밋. Codex는 Commit·Push하지 않음 |
-| 협업 Git | 환경 맵·재질 중앙 반영 및 검증 완료. 개인 `.vsconfig`·시험 주석 정리 완료. 팀원 PC Remote 실측만 남음 |
+| Git 처리 | Unreal·문서 모두 공유 기준 위 로컬 미커밋 변경 존재. Codex는 Commit·Push하지 않음 |
+| 협업 Git | 중앙 `6fd0e77` 실측 완료. 별도 Fork `c845430` 지연은 참고값이며 사용자가 팀원은 중앙 저장소에서 직접 Pull한다고 정정. 팀원 PC 실제 HEAD·LFS·재빌드 확인 필요 |
+
+## 2026-09-04 — DR-DMGFX-01 Drone 피격 본체·카메라 흔들림
+
+- `UDroneHealthComponent`의 Blueprint `OnHealthChanged`는 유지하고 C++ 표현 수신용 Native Event를 추가했다. 모든 무기가 공용 Health Damage를 사용하면 별도 무기 분기 없이 같은 피격 반응을 실행한다.
+- `ADronePrototypePawn`은 피해량을 25 Damage에서 최대 강도로 제한하고 작은 피해에는 최소 25% 강도를 준다. 기본 0.30초 동안 본체 최대 6°, Camera View 최대 5cm·1.5°를 18Hz로 흔들며 제곱 감쇠한다.
+- 본체 흔들림은 기존 A/D Visual Bank와 합성하고 Camera는 기존 Additive Offset을 보존했다가 종료 시 복원한다. Actor 위치·Collision 회전·이동 속도에는 변화가 없다. 연속 피격은 시간을 다시 시작하고 더 강한 피해 강도를 유지한다.
+- 첫 자동화는 Editor 임시 World에서 게임 실행 전용 Delegate 수명주기가 아직 시작되지 않는 차이를 발견했다. Construction·Runtime 모두 같은 Native Health Binding을 보장하도록 수정했고, 최종 `Drone.Prototype.DamageShake`가 Health Damage→흔들림→Camera 복원과 Collision 불변을 통과했다.
+- 최종 MSVC 14.51.36256 Editor Build와 `DamageShake`, `VisualBank`, `GroundConformingSuspension`, `AutomaticTurretTargeting`, `NPCGreyboxAssets`, `FlightHUDTelemetryBinding` 6/6이 통과했다. 이어 `NPCPerceptionSearchPIE`에 실제 `UGameplayStatics::ApplyDamage`가 피격 흔들림을 정확히 한 번 늘리고 파괴 뒤 중복 피해는 다시 시작하지 않는 조건을 추가해 1/1 재통과했다. 빈 시험 World의 기존 RecastNavMesh 경고 외 실패는 없다.
+- 실제 탄환 피격의 강도·멀미 체감과 연속 피격은 수동 확인 전이다. 방향성 반동, Gamepad 진동, HUD Flash, Sound·Niagara는 후속이며 Commit·Push하지 않았다.
+
+## 2026-09-04 — VEH-GROUND-01 4점 지면 추종·DR-VBANK-01 Drone 외형 Roll
+
+- 완전한 차량 물리 대신 앞좌·앞우·뒤좌·뒤우 네 지점의 Visibility Trace로 굴곡을 읽는 `ADroneGroundConformingVehicle`를 추가했다. 접촉점 세 개 이상에서 평균 높이와 접촉 평면으로 Z·Pitch·Roll을 계산하고 최대 28° 안에서 보간한다. Collision은 Query 전용이고 Chaos Simulation은 사용하지 않는다.
+- 임시 Cube Body, Cylinder Wheel 네 개와 `TurretMount`를 분리했다. 수동 `SetDriveInput(-1~1)`과 Controller 없이 왕복하는 Greybox Auto Drive를 제공해 향후 실제 Vehicle AI와 시험 배치를 분리했다.
+- `/Game/Drone/Vehicles/Blueprints/BP_GroundConformingVehicle_Greybox`를 만들고 `Lvl_NPCSmartObjectGreybox`의 정적 Carrier를 교체했다. `VehicleRoughRoad_01`~`05` 다섯 굴곡 노면을 추가하고 차량형 자동포탑을 `TurretMount`에 Attach했다.
+- `ADronePrototypePawn`에 Collision 자식 `VisualTiltPivot`을 추가했다. 최초 구현은 A/D 좌우 입력만 최대 ±18° Roll했으나 수동 확인에서 전후 기울기 누락과 좌우 방향 반대가 발견됐다. W/S는 최대 ±14° Pitch(전진 기수 아래·후진 기수 위)를 추가하고 A/D Roll 부호를 반전했으며 복합 입력에서는 두 축을 동시에 합성한다. CameraBoom과 Collision은 기존 부모를 유지하며 실제 FPV Integration의 Body·Rotor 네 개를 Pivot 아래로 정리한다. `DroneNoVisualBank` Tag로 개별 Mesh를 제외할 수 있다.
+- 보정 뒤 MSVC 14.51.36256 Editor Build가 성공했다. `Drone.Prototype` 5/5가 통과해 Pitch·Roll 방향과 복귀, Camera/Collision 불변, 피격 흔들림 합성, Pawn 기본값, Spawn/Possess 및 새 PIE 3회 입력 수명주기를 재검증했다. Move Action은 조작용 Triggered 1개와 외형 복귀용 Completed/Canceled 각 1개만 Pawn에 연결되는 계약으로 검사한다.
+- MSVC 14.51.36256로 `DroneEditor Win64 Development` Build가 성공했다. 첫 실제 Compile에서 lambda capture와 Camera proxy 타입 접근 두 건을 바로잡은 뒤 최종 소스가 통과했다.
+- `Drone.Vehicle.GroundConformingSuspension`, `Drone.Prototype.VisualBank`, `Drone.AI.AutomaticTurretTargeting`, `Drone.AI.NPCGreyboxAssets` 집중 4/4가 성공했다. 실제 맵 자산 테스트는 차량 1·Wheel 4·굴곡 노면 5·포탑 Attach와 자동 주행 설정을 확인했다.
+- 저장 자산 Validation은 자동포탑 BP 2개와 차량 BP를 재컴파일하고 `MAP_VALIDATION_OK|emplaced=1|vehicle=1|vehicle_attached=true|suspension=4|road=5`, Map Check 0 errors/0 warnings로 종료했다.
+- 전체 Blueprint Commandlet는 0 errors, 29 warnings로 성공했다. 경고는 전부 공급사 `/Game/Battlefield/Demo/Characters/Mannequins/Rigs/Poses`의 Manny/Quinn Pose GUID 불일치이며 이번 `/Game/Drone` 자산의 Compile 실패가 아니다.
+- 수동 화면 확인은 남았다. 자세한 조정과 보고 형식은 [`DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md`](DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md)를 따른다. Commit·Push는 사용자 요청대로 하지 않았다.
+
+### 진행 중 — VEH-WHEEL-01·DR-CAM-01
+
+- 차량 네 바퀴는 Throttle 표시값이 아니라 프레임 사이 실제 전진축 이동거리와 `WheelRadius`로 회전각을 계산하도록 C++를 작성했다. 전진은 누적각 증가, 후진은 감소하며 반속 이동에서는 회전속도도 절반이 되는 자동화 조건을 추가했다.
+- Drone은 기존 FollowCamera 하나를 재사용한다. 3인칭은 CameraBoom이 Collision Root와 500cm Arm을 사용하고, 1인칭은 CameraBoom이 `VisualTiltPivot`에 붙어 Arm 0과 전방 Offset을 사용하므로 이동 Pitch·Roll과 피격 흔들림을 화면도 따른다. 전환 입력은 `P`로 설계했고 Enhanced Input Action·IMC 연결 및 PIE 검증을 이어서 적용한다.
+- 최초 Link는 사용자가 실행한 `Drone - 언리얼 에디터`가 모듈 DLL을 잡아 중단됐다. 저장하지 않은 작업 보호를 위해 강제 종료하지 않았고 사용자 저장·종료 뒤 같은 Build를 재개해 성공했다.
+- `/Game/Drone/Prototype/Input/Actions/IA_DronePrototype_ToggleView`를 생성하고 `IMC_DronePrototype`의 P에 한 번 매핑했다. 전체 16 Mapping과 `BP_DroneFPVIntegration.ToggleViewAction` 저장을 재실행 가능한 `BuildDroneViewToggleInput.py`로 검증했다.
+- 최종 MSVC 14.51.36256 Editor Build, 차량 회전비례·후진 조건 `GroundConformingSuspension` 1/1, P Mapping/Binding 새 PIE 3회와 Camera 추종을 포함한 `Drone.Prototype` 5/5가 성공했다. 빈 시험 World의 기존 Recast 경고 외 실패는 없다.
+- 실제 화면에서 바퀴 Mesh 축 방향과 속도 체감, P 전환, FPV 위치·Mesh 가림·멀미 여부를 확인해야 한다. Commit·Push는 하지 않았다.
+- 첫 차량 화면 확인에서 실제 이동과 바퀴 구름 방향이 반대인 것이 확인됐다. Greybox Cylinder의 `WheelVisualSpinDirectionMultiplier`를 `-1`에서 `+1`로 바꾸고 BP·맵 배치 Actor에도 같은 값을 저장·검증하도록 생성 도구를 보강했다. 방향 재확인은 남아 있다.
+- 축 교정 뒤 MSVC 14.51.36256 Editor Build가 성공했다. 생성 도구의 동일 Cube 재배정 멱등성 오류도 수정한 뒤 차량 BP·맵 Actor를 저장했고, 새 프로세스 `VALIDATION_OK`, Map Check 0/0과 `GroundConformingSuspension` 1/1을 통과했다. 자동화의 유일한 경고는 빈 시험 World의 기존 Recast 경고다.
+
+## 2026-09-04 — AI-AUTO-TURRET-01 설치형·차량형 무인 자동포탑
+
+- 사용자가 요청한 차량 위 무인 포탑과 지면 설치형 자동포탑을 기존 유인 MG 베이스로 구현했다. 유인 MG의 3분할 회전 계층, 정렬 후 발사, Projectile/Trace 선택, Damage·탄속·분산은 한 경로를 공유하고 자동 탐지만 새 계층에서 담당한다.
+- `ADroneAutomaticTurret`는 0.2초 간격으로 살아 있는 Prototype Drone을 검색한다. 첫 획득 거리와 더 큰 이탈 거리를 분리하고 Visibility 시야선을 요구해 사거리 경계 깜박임과 벽 너머 획득을 막았다. 표적 사망·이탈·차단 시 내부 MG 사용을 종료한다.
+- `ADroneEmplacedAutomaticTurret`와 `ADroneVehicleAutomaticTurret`를 분리했다. 설치형은 높은 받침대와 저속/고피해 기본값, 차량형은 낮은 장착판과 긴 탐지·발사거리/빠른 연사 기본값을 사용한다. 값은 BP Class Defaults에서 교체 가능한 Greybox다.
+- 차량형 Actor는 차량 Mesh Socket 또는 부모 Actor에 Attach해서 쓰며, Projectile과 Trace가 Attach Parent/Owner를 무시하도록 공통 MG 발사 경로를 보강했다. 탄환 Source에는 `AutomaticTurret`를 추가해 유인 MG 결과와 분리했다.
+- `/Game/Drone/AI/AutomaticTurrets/Blueprints/BP_AutoTurret_Emplaced`, `BP_AutoTurret_Vehicle`를 생성했다. `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox` 우측 `(2600,1600)`에 설치형, `(2600,-1600)`에 차량 Carrier와 차량형을 배치했다. 차량형은 `AutoTurret_VehicleCarrier_Greybox`에 실제 Attach돼 있다.
+- 재현용 `Tools/AssetMigration/BuildAutomaticTurretGreybox.py`는 두 BP와 소유 Actor 3개만 생성/검증하며 기존 맵 내용을 덮어쓰지 않는다. 읽기 전용 모드는 `DRONE_AUTO_TURRET_VALIDATE_ONLY=1`이다.
+- `DroneEditor Win64 Development` Build 성공. `AutomaticTurretTargeting`, `SmartObjectFoundationDefaults`, `NPCGreyboxAssets` 3/3, 실제 맵 시작·종료 `NPCGreyboxPIE` 1/1이 통과했다. 전용 테스트는 Blocking Box가 시야를 가리면 획득하지 않고 Collision을 끄면 즉시 재획득하는 경로까지 확인했다. 자동화 보고서는 실패 0이며 빈 시험 World의 기존 Crowd/NavMesh 경고 1건만 있다.
+- 화면 수동 확인은 남았다. 현재 포탑은 Prototype Drone만 적으로 보고 진영/우선순위·포탑 체력/파괴·최종 차량/포탑 Mesh·FX/SFX는 후속이다. 상세 조정법은 [`DRONE_AUTOMATIC_TURRET_GUIDE.md`](DRONE_AUTOMATIC_TURRET_GUIDE.md)에 기록했다.
+
+## 2026-09-04 — 팀원 Plugin·Git·LFS 재현성 점검
+
+- 중앙 저장소는 로컬·원격 모두 `6fd0e77`이고 작업 트리가 깨끗하다. 별도 `yook34/main=c845430`은 중앙의 정확한 조상이며 `18 Commit 뒤 / 0 Commit 앞`이지만, 이후 사용자가 팀원 작업 PC는 중앙 `gyeonliz/drone` 권한을 받아 중앙에서 직접 Pull한다고 확인했다. 따라서 이 Fork 상태를 팀원 증상의 원인으로 단정하지 않는다.
+- 두 Head 사이에는 총 586개 파일 차이가 있고 그중 Content 520개, Source 61개다. AI, MG, Mission Flow, NPC/무기 Asset이 포함되므로 팀원 PC에서 기능과 화면이 다르게 열리는 직접 원인이 될 수 있다.
+- 두 Head의 `Drone.uproject`와 `Plugins` 경로 차이는 0이다. 프로젝트 자체 `Plugins` 폴더와 Git Submodule도 없으므로 현재 확인 범위에는 공유되지 않은 Project Plugin이 없다.
+- `Drone.uproject`가 명시한 UE 내장 Plugin 13개를 작업컴 UE 5.8.1 CL 56057345에서 대조했고 모두 존재했다. StateTree·SmartObjects·GameplayInteractions는 Runtime 의존성이고 ModelContextProtocol·Toolset 계열은 Editor 전용이다.
+- 최근 Unreal 로그 20개에서 Plugin 로드 실패, `/Script` 누락, Unknown Class, Package Load 실패는 0건이었다. `Binaries`, `Intermediate`, `Saved`, `DerivedDataCache`는 정상적으로 Git 제외되며 PC마다 달라도 정상이다. 단, C++ 변경 뒤 각 PC에서 Project Files 재생성과 Editor Build가 필요하다.
+- LFS 추적 Package는 4,563개이고 `git lfs fsck --pointers HEAD`가 통과했으며 중앙으로 Push할 LFS 객체가 없다. 팀원은 중앙 Branch를 Fast-forward한 뒤 `git lfs pull`을 실행해야 실제 Asset 본문을 받는다.
+- Water는 현재 UE 설치에 존재하고 최근 로그에서 정상 Mount됐지만 `.uproject`의 직접 선언 목록에는 없다. 동일 5.8.1 환경에서는 현재 오류가 없으며, 팀원 동기화 뒤 Military Map에서 Water 관련 오류가 재현될 때만 명시 의존성 추가를 별도 변경으로 검토한다.
+- 팀원 실행 순서는 새 [`DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md`](DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md)에 고정했다. 먼저 원격/Commit/LFS를 맞추고, 그 뒤에도 재현될 때만 Plugin·생성 파일 문제로 분리한다.
+- 두 번째 정밀 점검에서 `Drone.uproject`, `Config`, `Content`, `Source`, `Tools`, 향후 `Plugins`·`Build`에 Git Untracked/Ignore 필수 파일이 0개이고 외부 Junction/Symlink도 0개임을 확인했다. 현재 제외 대상은 `Binaries`, `Intermediate`, `Saved`, `DerivedDataCache` 등 재생성 항목뿐이다.
+- Commit `6fd0e77`을 LFS Smudge 없이 별도 Worktree에 Checkout하자 `Binaries=False`, `Intermediate=False`, 필수 Untracked 0 상태였다. 그 상태에서 MSVC 14.51.36256으로 `DroneEditor Win64 Development`를 처음부터 Build해 `UnrealEditor-Drone.dll` 생성과 Exit Code 0을 확인했다. 검증 Worktree는 즉시 삭제했다. 따라서 DLL을 Git에 올리지 않아도 기능 소스는 재현되지만, 팀원이 Pull 뒤 빌드하지 않으면 기존 DLL 때문에 옛 기능처럼 보일 수 있다.
+- Runtime 설정과 Source에는 PC 절대 경로가 없다. `Tools/AssetMigration/ImportRawDroneCandidates.py`만 `C:\에셋` 공급 원본을 가리키므로 이미 이식된 Asset 실행에는 영향이 없지만 다른 PC에서 원본 재수입은 재현되지 않는다.
+- `/Script/Fab` 메타데이터가 Project의 Megascans Asset 4개에 남아 있고 작업컴에서는 별도 설치된 Fab 0.0.15 Editor Plugin이 Mount됐다. Fab가 없는 팀원 PC에서는 해당 4개의 재수입 메타데이터 경고 가능성이 있으나, 현재 Drone C++·MG·AI Runtime 기능 누락 원인은 아니다.
+- 팀원 화면에서 사격 모션과 기관총 기능이 없다는 보고 뒤 중앙 파일을 재확인했다. 중앙 `6fd0e77`에는 `ABP_NPC_Rifle_Greybox` 473,761 bytes, `BS_NPC_Rifle_Locomotion` 49,269 bytes, 최신 `BP_SO_MGTurret` 26,966 bytes와 `DroneMGTurretStation`, `DroneNPCAnimInstance`, MG StateTree Source가 모두 있다. 이 기능들은 새 C++ 부모와 그 부모를 쓰는 Asset이 한 Commit에 묶여 있다. 팀원이 중앙을 직접 Pull했다면 `Plugins`보다 LFS 파일이 포인터로 남았는지와 Git에서 제외되는 `UnrealEditor-Drone.dll`을 Pull 뒤 새 Source로 재빌드했는지가 우선 확인 대상이다. 팀원 PC 자체 출력 전에는 원인을 확정하지 않는다.
 
 ## 2026-09-04 — AI-GAZE-01 감지·추적 시선/고개 회전·AI-MG-03 3분할 조준 기반
 

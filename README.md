@@ -54,7 +54,7 @@ tools/unreal/              Prototype·Tutorial 자산 생성·재검증용 안�
 
 ## 현재 진행 지점
 
-현재 실행 세션의 Unreal 저장소는 `C:\URproject\drone`, 문서 저장소는 이 폴더다. `D:\JGY\project`는 다른 PC에서 사용한 이전 경로다. 별도 `ADronePrototypePawn`과 GameMode, 5개 Input Action, Keyboard·Mouse·Gamepad 15개 Mapping, BP Pawn/GameMode와 Greybox Map을 연결했다. Camera는 Drone 뒤 고정 추적, Mouse X는 Drone Yaw, Mouse Y는 Camera Pitch로 동작한다.
+현재 실행 세션의 Unreal 저장소는 `D:\JGY\project\drone`, 문서 저장소는 `D:\JGY\project\md`다. 별도 `ADronePrototypePawn`과 GameMode, 6개 Input Action, Keyboard·Mouse·Gamepad 16개 Mapping, BP Pawn/GameMode와 Greybox Map을 연결했다. Mouse X는 Drone Yaw, Mouse Y는 Camera Pitch로 동작하며 `P`로 3인칭 고정 추적과 기체 기울기·피격 흔들림을 따르는 1인칭을 전환한다.
 
 확정 조작을 반영한 PFN-06은 자동화와 Standalone 수동 조작을 통과해 Done이다. HUD-01 공용 Telemetry Component는 기본 10Hz Snapshot Event를 제공한다. HUD-02는 C++가 계산·생성·Possession·Delegate 수명주기를 맡고 실제 `WBP_DroneFlightHUD`가 화면 외형을 맡도록 연결했다.
 
