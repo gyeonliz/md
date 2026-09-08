@@ -2,7 +2,7 @@
 
 기준일: 2026-09-08 (Asia/Seoul)
 
-문서 상태: 역할 기능 3종·FLOW-01~08 로컬 구현 및 전체 수명주기 새 PIE 실행 3회 자동화 완료·Editor 수동 확인 대기
+문서 상태: 역할 기능 3종·FLOW-01~08 공유 main 반영 완료. Mission Definition 3종을 Integration Pawn으로 실연결하고 Build·Prototype 7/7·Flow 5/5·FPV Asset 1/1 통과. 실제 화면 확인과 Pull/Stash 바이너리 충돌 정리 대기
 
 이 문서는 Drone 프로젝트의 게임 기획, 현재 구현 상태, 다음 개발 순서와 검증 기준을 한 번에 확인하기 위한 통합 문서다. 세부 기술 계약은 링크된 구현 문서를 따르며, 구현 완료 여부는 실제 Unreal 코드·Asset·빌드·자동화·화면 확인을 근거로 판정한다.
 
@@ -11,13 +11,13 @@
 | 항목 | 현재 기준 |
 |---|---|
 | 장르 | 싱글플레이 드론 운용·정찰·미션 게임 |
-| 엔진 | Unreal Engine 5.8.1 |
-| 현재 작업 루트 | Unreal `C:\URproject\drone`, 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
+| 엔진 | Unreal Engine 5.8 계열, 현재 실행 Editor 5.8.2 |
+| 현재 작업 루트 | Unreal `D:\JGY\project\drone`, 문서 `D:\JGY\project\md` |
 | 다른 PC의 경로 | PC마다 다르므로 Git Commit과 LFS 상태로 판별 |
-| Unreal 공유 기준 | `main=origin/main=dbc0dd8`; 이후 역할·FLOW 변경은 로컬 미커밋 |
+| Unreal 공유 기준 | `main=origin/main=63f60c1`; 역할·FLOW 변경 공유 완료, 현재 LFS 충돌 2개는 로컬 정리 전 |
 | 플레이어 표현 | 사람 캐릭터 없이 Drone 조작 중심 |
 | 핵심 모드 | Tutorial 비행 훈련, Story Mission |
-| 현재 신규 개발 | 정찰 Scan·FPV 충돌 자폭·드랍 Payload, 공통 역할 입력과 FLOW-01~08 자동화 완료. 다음은 Training 역할 Target·상태 UI와 전체 흐름 수동 확인 |
+| 현재 신규 개발 | 정찰 Scan·FPV 충돌 자폭·드랍 Payload와 FLOW-01~08 Source 존재. Mission Data Asset 3종을 Integration Pawn으로 실연결하고 자동 검증 완료, 모델·조작·역할 기능 수동 화면 확인 대기 |
 | 제외 범위 | Android, Network/협동, 실제 군사 장비 1:1 재현 |
 
 핵심 경험은 다음과 같다.
@@ -199,7 +199,7 @@ Figma의 UI 참고 이미지는 청록·녹색 계열 전술 HUD, 얇은 선, �
 | 협업 자산 | FPV Drone, 환경 Map, Ground Drone/MG, NPC·VFX·SFX 후보 선별 이식 |
 | Front-end 기반 | GameInstance Flow/Catalog, 실제 Mission·Drone Data Asset, 전용 Map/BP GameMode·Controller/WBP, 정적 Opening→Lobby, Training Mission 선택·설명·시작 |
 
-현재 C 드라이브 공유 Unreal 기준은 `dbc0dd8`이다. 역할 기능 3종, 조작 모드 분리와 FLOW-04~08은 그 위 로컬 미커밋이며 Codex는 Commit·Push하지 않는다. 과거 `46f7f37` 기준 설명은 이전 작업 PC의 역사 기록이다.
+현재 D 드라이브 공유 Unreal 기준은 `63f60c1`이다. 역할 기능 3종, 조작 모드 분리와 FLOW-04~08은 공유 main에 반영됐다. 다만 Pull 때 복원된 Stash의 `test1.umap`, `M_Start.uasset`이 Upstream과 충돌해 정리 전이며 Codex는 바이너리 선택·Commit·Push하지 않았다. 과거 `46f7f37` 기준 설명은 이전 작업 PC의 역사 기록이다.
 
 ### 로컬 구현·수동 확인 대기
 
@@ -385,9 +385,10 @@ ADroneMissionDirector
 
 우선순위가 높은 수동 확인은 세 가지다.
 
-1. `Lvl_NPCSmartObjectGreybox`에서 Drone을 좌우·상하로 움직여 병사 고개·상체가 까딱임 없이 자연스럽게 따라보는지 확인
-2. 같은 Map에서 Cyan 화살표와 Patrol·Cover·MG 도착 방향, 임시 원기둥 Base 고정·Body Yaw·Barrel Pitch가 일치하는지 확인
-3. `Lvl_DroneTraining`을 두 번 완주해 첫 기준·이전 평균·Best·시간/속도 Delta가 실제 HUD에 맞게 표시되는지 확인
+1. Front-end에서 `Lvl_DroneTraining`에 진입해 정찰 DroneSpy·자폭 FPV·드랍 Delivery 외형이 서로 다른지 확인하고, 맵의 역할 표적 3개에서 Scan·고속 충돌 자폭·탑뷰 투하를 실제 조작한다.
+2. `Lvl_NPCSmartObjectGreybox`에서 Drone을 좌우·상하로 움직여 병사 고개·상체가 까딱임 없이 자연스럽게 따라보는지 확인한다.
+3. 같은 Map에서 Cyan 화살표와 Patrol·Cover·MG 도착 방향, 임시 원기둥 Base 고정·Body Yaw·Barrel Pitch가 일치하는지 확인한다.
+4. `Lvl_DroneTraining`을 두 번 완주해 첫 기준·이전 평균·Best·시간/속도 Delta가 실제 HUD에 맞게 표시되는지 확인한다.
 
 그다음 확인:
 

@@ -224,7 +224,7 @@ Lvl_DroneTraining (?game=DroneMissionGameMode)
 - Mission Trailer Media 형식은 미정이다. 현재 정적 Briefing의 `FinishMissionBriefing()`이 실제 Map 진입 Callback이며 추후 영상 종료도 같은 함수를 호출한다.
 - Mission GameMode는 선택 전 비-Drone Spectator만 사용하고 Controller가 확정된 Integration Pawn을 한 대 Spawn/Possess한다. 최종 Drone Preview는 미구현이다.
 - Mission Director의 Training Lap 성공·Health 0 실패는 현재 Vertical Slice 규칙이며 최종 Story Mission 규칙 확정이 아니다.
-- 출격 뒤 역할 기능은 임시 `Primary/Secondary` Action으로 연결됐다. 좌클릭/우클릭은 정찰 Scan/취소, FPV Arm/Disarm, 드랍 투하/탑뷰로 분기하며 최종 키는 미정이다.
+- 출격 뒤 역할 기능은 임시 `Primary/Secondary` Action으로 연결됐다. 좌클릭/RB와 우클릭/LB는 정찰 Scan/취소, FPV Arm/Disarm, 드랍 투하/탑뷰로 분기하며 최종 키는 미정이다.
 - 검증: `DroneEditor Win64 Development`, `Drone.Flow` 5/5, `Drone.Prototype` 7/7. `MissionEntryPIE`는 성공→재도전→실패→로비 복귀를 완전히 새 PIE 실행에서 3회 반복해 3/3 통과했다. 매회 Root Widget 1, Map 요청 1, Drone 1, Director 1, Finish Event 1과 로비 복귀 뒤 Drone 0을 확인했다.
 
 ## 7. 검증 게이트

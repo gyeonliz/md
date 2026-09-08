@@ -1,8 +1,18 @@
 # 작업컴 Codex/GPT 기준 컨텍스트
 
-기준일: 2026-09-04 (Asia/Seoul)
+기준일: 2026-09-08 (Asia/Seoul)
 
 이 문서는 메인컴 ChatGPT/Codex에서 진행하던 작업을 작업컴에서 이어가기 위한 기준 컨텍스트다. 추측해서 내용을 추가하지 않고, 사용자가 실제 진행 상황을 알려준 경우에만 상태를 갱신한다.
+
+## 2026-09-08 현재 Drone 역할 시험 기준
+
+- 전체 역할 시험 진입점은 `/Game/Drone/Maps/Lvl_DroneFrontEnd`, 실제 표적 배치 맵은 `/Game/Drone/Maps/Lvl_DroneTraining`이다. Front-end의 Mission/Drone 선택 흐름으로 들어가야 정찰·FPV·드랍 세 역할을 모두 바꿔 시험할 수 있다.
+- 정찰은 DroneSpy, FPV는 FPV, 드랍은 Delivery 제공 모델을 각각 전용 Integration Pawn으로 사용한다. Training에는 Cyan 정찰, Red 자폭 충돌, Yellow 투하 표적이 각 1개 있다.
+- 임시 공통 입력은 `좌클릭/패드 RB=Primary`, `우클릭/패드 LB=Secondary`, `P/패드 Y=1·3인칭 전환`이며 IMC 21 Mapping을 새 PIE 3회에서 확인한다. 최종 제품 키 확정값은 아니다.
+- FPV 폭발은 Pawn을 파괴한다. Training Map 직접 실행에는 복구 UI가 없고, Front-end Mission 흐름에서는 결과 UI의 재도전/로비 복귀를 사용한다. 폭발 자체가 Unreal Editor를 종료하지는 않는다.
+- 역할별 모델·표적·상태 UI 로컬 변경은 MSVC 14.51.36256 Editor Build와 Prototype 7/7, Integration 3/3, Tutorial 7/7, Flow 5/5로 검증했다. 화면 크기·방향·FX 체감은 사용자 수동 확인 항목이다.
+- 드랍 역할에는 별도 맵 배치 BP `/Game/Drone/Abilities/Payload/BP_DroneCarryablePayload`가 있다. 선적재 화물을 투하해 적재 수가 0이 된 뒤 300cm 안에서 좌클릭/RB를 누르면 실제 크레이트 Actor를 기체 하단에 붙이고, 다시 누르면 같은 Actor를 투하한다. BP 외형/수명, Pawn의 `PayloadCarryAnchor`, Pickup Range는 Blueprint 조정값이다.
+- `test1.umap`, `M_Start.uasset` LFS 충돌, `.vsconfig` 혼합 상태와 `Drone.cpp //test` Staged 변경은 기능 범위 밖이며 사용자 선택 전 해결·Stage·Commit하지 않는다.
 
 ## 1. 전체 작업 목록
 
@@ -185,7 +195,7 @@ Briefing → Recon → Detect → Information acquisition → Enemy response →
 
 이는 Figma의 현재 기획 목록이며 최종 명칭·게임 규칙·모든 역할의 구현 완료를 뜻하지 않는다. Figma 내부는 수정·댓글·공유 설정 변경을 하지 않는다.
 
-현재 Unreal 선택 Catalog는 공통 비행을 검증할 `정찰/FPV 자폭/드랍` 3종만 준비한다. 정찰 스캔·충돌 자폭·Payload 투하는 아직 미구현으로 구분한다. 광섬유·UGV·장거리 타격은 후속이며, UGV는 공중 Pawn과 분리한다.
+현재 Unreal 선택 Catalog는 `정찰/FPV 자폭/드랍` 3종을 준비한다. 세 역할은 각각 DroneSpy/FPV/Delivery 전용 Pawn과 정찰 Scan·충돌 자폭·Payload 투하 Greybox를 가지며 Training Map 표적과 상태 UI까지 자동 검증됐다. 광섬유·UGV·장거리 타격은 후속이며, UGV는 공중 Pawn과 분리한다.
 
 기체 역할과 조작 설정은 분리한다.
 
@@ -457,7 +467,7 @@ Inbox → Todo → Doing → Done
 
 ### 1순위: Tutorial Vertical Slice와 기능 우선 Greybox
 
-TUT-04 비교·결과 UI는 기술 구현됐고 실제 두 Lap 확인이 남았다. 2026-09-08 현재 정찰 Scan·FPV 충돌 자폭·드랍 탑뷰/Payload, 임시 좌/우 클릭 공통 역할 입력과 `FLOW-01~08`의 시작 화면→로비→브리핑→Map→Drone 선택→Mission 목표 UI→성공/실패→재도전/로비 복귀를 로컬 구현했다. 전체 수명주기는 완전히 새 PIE 실행 기준 3회 자동 검증을 통과했다. 다음 단계는 Training Map의 Scan/Payload Target·역할 상태 UI와 Editor 수동 Vertical Slice 확인이다. 최종 역할 키는 현재 미정이다. 사람 Operator와 NPC 대화 수령 흐름은 만들지 않는다. 실제 Mission Trailer Media, 최종 WBP 외형, 세부 Mission 규칙은 현재 미정이며 상세 기준은 `docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`를 따른다.
+TUT-04 비교·결과 UI는 기술 구현됐고 실제 두 Lap 확인이 남았다. 2026-09-08 현재 정찰 Scan·FPV 충돌 자폭·드랍 탑뷰/Payload, 임시 좌/우 클릭 공통 역할 입력과 `FLOW-01~08`의 시작 화면→로비→브리핑→Map→Drone 선택→Mission 목표 UI→성공/실패→재도전/로비 복귀를 로컬 구현했다. 세 역할은 DroneSpy/FPV/Delivery 전용 모델로 분리됐고 Training Map 정찰·자폭·투하 표적, 보이는 적재물, 폭발 표현과 Event 기반 역할 상태 UI가 추가됐다. 전체 수명주기와 역할 자산/기능 자동 검증이 통과했으며 다음 단계는 Editor 수동 Vertical Slice 확인이다. 최종 역할 키는 현재 미정이다. 사람 Operator와 NPC 대화 수령 흐름은 만들지 않는다. 실제 Mission Trailer Media, 최종 WBP 외형, 세부 Mission 규칙은 현재 미정이며 상세 기준은 `docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`를 따른다.
 
 ### 병행: PC 간 공유 검증
 

@@ -4,7 +4,7 @@
 
 이 문서는 현재 Unreal `drone` 저장소를 직접 확인한 결과를 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
 
-현재 C 드라이브 공유 기준은 Unreal `main=origin/main=dbc0dd8`, 문서 `main=origin/main=aaef93d`다. 그 위 역할 기능·공통 역할 입력·FLOW-04~08은 로컬 미커밋이다. 과거 TUT-03·AI Commit 번호는 아래 날짜별 역사 기록으로 보존하며 Codex는 Commit·Push하지 않는다.
+현재 D 드라이브 공유 기준은 Unreal `main=origin/main=63f60c1`, 문서 `main=origin/main=d30e098`이다. 역할 기능·공통 역할 입력·FLOW-04~08은 공유 main에 반영됐다. 그 위 로컬 변경으로 세 Mission Definition을 정찰 DroneSpy, 자폭 FPV, 드랍 Delivery 전용 Integration Pawn에 각각 연결하고 Training 역할 표적 3개·FPV 폭발 표현·드랍 적재물·역할 상태 UI를 구현했다. Editor Build와 Prototype 7/7·Integration 3/3·Tutorial 7/7·Flow 5/5가 통과했다. 실제 화면 확인과 Unreal Index의 별도 LFS 충돌 2개 해소는 남아 있으며, 과거 TUT-03·AI Commit 번호는 아래 날짜별 역사 기록으로 보존한다.
 
 NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합됐다. 자산은 main에 있지만 프로젝트 소유 Widget Host는 아직 구현하지 않았으므로 화면에 나타나지 않는 것이 정상이다.
 
@@ -18,7 +18,7 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합�
 | 전체 `Drone.` Automation | 27/27 통과, 실패 0 |
 | 전투 집중 검증 | AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01 관련 집중 테스트 통과. AI-VIS-01A Editor Build와 WeaponContract·RifleTrace·ShotgunTrace 3/3 통과. 이 변경을 포함한 `6a18210` 뒤 전체 묶음은 아직 반복하지 않음 |
 | Front-end Flow | FLOW-01~08 완료. `Drone.Flow` 5/5 통과, 전체 수명주기를 완전히 새 PIE 실행 3회 반복해 Root·Map 요청·Drone·Director·Finish 중복 0 확인 |
-| 역할·비행 회귀 | 공통 Primary/Secondary Action 포함 `Drone.Prototype` 7/7 통과. IMC 18 Mapping과 Pawn 소유 Binding 확인 |
+| 역할·비행 회귀 | 공통 Primary/Secondary Action 포함 `Drone.Prototype` 7/7 통과. IMC 21 Mapping과 Pawn 소유 Binding 확인 |
 | `CompileAllBlueprints` | Blueprint Errors 0, Blueprint warnings 0, failed load 0. 별도 Summary에 기존 Battlefield Pose GUID와 MCP 고지 경고 유지 |
 | 현재 에셋 이식 재검증 | FPV 전용 1/1, Blueprint 0/0/0, 스테이징 선택 자산·현재 Integration 금지 의존성 0, 이식 13개 LFS와 fsck 통과 |
 | 기존 Standalone 시각 기록 | FPV 외형, 고정 추적 Camera, 실제 WBP HUD, Cyan 안내선, Current/Inactive Gate 표시 확인 |
@@ -30,7 +30,9 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합�
 
 2026-09-03 사용자 결정으로 사람 Operator Character와 NPC 대화 기반 Mission 수령, Operator↔Drone 전환은 폐기됐다. 새 실행 흐름은 `시작 트레일러 → 로비 → 미션 선택/측면 설명 → 미션 트레일러 → Map → Drone 선택 → Mission 시작/측면 목표 UI`다.
 
-현재 Source/Asset에는 FLOW-01~08 전체 상태와 정적 Opening→Lobby→Briefing→Training Map→3종 선택→Drone 한 대 Spawn/Possess→목표→결과→재도전/로비 복귀가 있다. Front-end와 Mission 선택 전에는 비-Drone Spectator만 사용한다. 실제 Trailer 영상·최종 WBP/Preview와 Training 역할 Target·상태 HUD는 아직 없고 C++ 기본 Layout이 기능 흐름을 실행한다. 기존 `ADronePrototypeGameMode`의 즉시 Spawn/Possess는 Training 단독 검증용으로 유지한다. 상세 책임과 작업 순서는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)와 문서 맨 아래 최신 절을 따른다.
+현재 Source/Asset에는 FLOW-01~08 전체 상태와 정적 Opening→Lobby→Briefing→Training Map→3종 선택→Drone 한 대 Spawn/Possess→목표→결과→재도전/로비 복귀가 있다. Front-end와 Mission 선택 전에는 비-Drone Spectator만 사용한다. Training 역할 Target 3개와 Event 기반 상태 HUD는 구현됐고 실제 Trailer 영상·최종 WBP/Preview 외형이 남았다. 기존 `ADronePrototypeGameMode`의 즉시 Spawn/Possess는 Training 단독 검증용으로 유지한다. 상세 책임과 작업 순서는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)와 문서 맨 아래 최신 절을 따른다.
+
+Mission 선택 출격은 `ADroneMissionPlayerController::StartSelectedDrone()`이 선택 Definition의 `PawnClass`를 그대로 Spawn한다. 2026-09-08 감사에서 확인한 기본 Pawn 오연결과 세 역할 동일 FPV 외형을 모두 수정했다. 현재 정확한 Class는 Scout=`BP_DroneScoutIntegration`, FPV=`BP_DroneFPVIntegration`, Drop=`BP_DroneDropIntegration`이며 Class·Mesh 회귀 테스트와 Build·자동화는 통과했다. 실제 화면 모델 크기·방향과 조작 확인만 수동으로 남는다.
 
 ## 1. 런타임 연결 구조
 
@@ -967,7 +969,8 @@ UDroneGameFlowSubsystem (GameInstance 수명)
 | `Mission/DroneMissionDirector.*` | 출격 뒤 목표 시작, Event Snapshot, 성공/실패 1회 확정 |
 | `Abilities/DroneReconScanComponent.*` | 거리·화각·LOS 유지형 정찰 Scan |
 | `Abilities/DroneImpactDetonationComponent.*` | Arm 뒤 유효 속도 충돌 시 1회 폭발·기체 파괴 |
-| `Abilities/DronePayloadDropComponent.*` | 상단 시점, 한 발 Payload, 목표 접촉 결과와 재장전 |
+| `Abilities/DronePayloadDropComponent.*` | 상단 시점, 투하, 빈 상태의 근접 운반 화물 검색·실제 Actor 부착·재투하, 목표 접촉 결과와 재장전 |
+| `Abilities/DroneDroppedPayload.*` | 투하 중 충돌 판정과 맵 배치 Pickup/Carried 상태; `BP_DroneCarryablePayload`의 Native 부모 |
 | `UI/DroneMissionObjectiveWidget.*` | Director Event만 구독하는 측면 목표 패널; Tick/Actor 전체 검색 없음 |
 | `UI/DroneMissionResultWidget.*` | 성공/실패, 재도전, 로비 복귀 |
 
@@ -994,10 +997,11 @@ Training Mission의 현재 Greybox 규칙은 `Gate 0→3 Lap 완료=성공`, `Dr
 3. Training Map에서 선택 전 Drone이 없고 정찰·FPV 자폭·드랍 카드 세 개가 보이는지 확인한다.
 4. `쉬운 조작/실제 조작형`과 `안정/균형/고기동`을 각각 바꿔 본 뒤 한 기체를 출격시킨다.
 5. 선택한 Drone 한 대만 생성되고 Flight HUD와 측면 목표가 표시되는지 확인한다.
-6. Gate 0→1→2→3을 통과해 성공 화면과 `재도전`을 확인한다.
-7. 재도전 뒤 다른 기체를 선택하고 파괴/체력 0 경로에서 실패 화면과 `로비 복귀`를 확인한다.
-8. 로비에 돌아왔을 때 이전 Drone·목표·결과 UI가 남아 있지 않은지 확인한다.
+6. Drop Drone은 선적재 화물을 좌클릭/RB로 한 번 투하한 뒤 `RoleTest_CarryablePayload` 크레이트 300cm 안에서 같은 키로 적재한다. 크레이트가 기체 하단을 따라가고 다시 누르면 실제 크레이트가 투하되는지 확인한다.
+7. Gate 0→1→2→3을 통과해 성공 화면과 `재도전`을 확인한다.
+8. 재도전 뒤 다른 기체를 선택하고 파괴/체력 0 경로에서 실패 화면과 `로비 복귀`를 확인한다.
+9. 로비에 돌아왔을 때 이전 Drone·목표·결과 UI가 남아 있지 않은지 확인한다.
 
-정찰 `StartScan`, FPV `ArmImpactDetonation`, 드랍 `SetDropViewEnabled/DropPayload` API와 Event에 공통 `Primary Ability / Secondary Ability` Input Action을 연결했다. 임시 Greybox 키는 좌클릭/우클릭이며 최종 키로 확정한 것이 아니다. 정찰은 좌클릭으로 가장 가까운 유효 Target Scan·우클릭 취소, FPV는 좌클릭 Arm·우클릭 Disarm, 드랍은 좌클릭 투하·우클릭 탑뷰 전환이다. Training Map에는 아직 Scan/Payload Target 시험 표식과 역할 상태 HUD가 없으므로 다음 카드 `DR-ROLE-TARGET-01`에서 배치·피드백을 연결한다.
+정찰 `StartScan`, FPV `ArmImpactDetonation`, 드랍 `ActivatePrimaryPayloadAction/SetDropViewEnabled` API와 Event에 공통 `Primary Ability / Secondary Ability` Input Action을 연결했다. 임시 Greybox 키는 좌클릭/RB와 우클릭/LB이며 최종 키로 확정한 것이 아니다. 정찰은 Primary로 가장 가까운 유효 Target Scan·Secondary로 취소, FPV는 Arm/Disarm, 드랍은 적재 중 투하·빈 상태 근접 화물 적재/탑뷰 전환이다. Training Map에는 정찰·자폭·투하 시험 표적, 배치형 크레이트와 Event 기반 한글 역할 상태 UI가 배치되어 있다.
 
-자동 검증은 `DroneEditor Win64 Development`, `Drone.Flow` 5/5, `Drone.Prototype` 7/7을 통과했다. `MissionEntryPIE`는 위 전체 수명주기를 완전히 새 PIE 실행에서 3회 반복해 3/3 통과했다. Commit·Push는 하지 않았다.
+자동 검증은 `DroneEditor Win64 Development`, `Drone.Flow` 5/5, `Drone.Prototype` 7/7, `Drone.Integration` 3/3, `Drone.Tutorial` 7/7을 통과했다. `MissionEntryPIE`는 Scout 전용 Pawn과 재시도 Drop 전용 Pawn을 포함한 전체 수명주기를 완전히 새 PIE 실행에서 3회 반복해 3/3 통과했다. Commit·Push는 하지 않았다.

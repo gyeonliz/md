@@ -2,9 +2,30 @@
 
 기준일: 2026-09-08 (Asia/Seoul)
 
-이 문서는 PC별로 명령으로 확인된 상태와 사용자가 아직 결정하지 않은 항목을 분리한다. 현재 C 드라이브 실행 세션과 다른 PC의 검증 기록을 같은 항목에서 섞지 않고 경로와 검증 시점을 함께 적는다.
+이 문서는 PC별로 명령으로 확인된 상태와 사용자가 아직 결정하지 않은 항목을 분리한다. 현재 D 드라이브 실행 세션과 다른 PC의 검증 기록을 같은 항목에서 섞지 않고 경로와 검증 시점을 함께 적는다.
 
 실시간 작업 위치와 바로 다음 행동은 [`WORKBOARD.md`](WORKBOARD.md), 날짜별 변경과 검증 이력은 [`docs/DRONE_WORKLOG.md`](docs/DRONE_WORKLOG.md)에 기록한다. 이 문서는 검증된 기준선이 달라질 때 함께 갱신한다.
+
+## 2026-09-08 DR-DROP-02 맵 배치형 운반 화물
+
+- `/Game/Drone/Abilities/Payload/BP_DroneCarryablePayload`를 별도 Blueprint로 만들고 MilitaryCamp의 `SM_MilitaryCrate_01`을 외형으로 연결했다. `Lvl_DroneTraining`에는 `RoleTest_CarryablePayload` 한 개를 `(300, -300, 70)`에 배치했다.
+- Drop Drone에 `PayloadCarryAnchor`를 추가했다. 적재 화물이 없을 때 좌클릭/패드 RB를 누르면 300cm 안의 가장 가까운 사용 가능 화물을 찾아 실제 Actor를 기체 하단에 붙이고, 다시 누르면 같은 Actor를 투하한다. 탑뷰는 기존 우클릭/패드 LB를 유지한다.
+- BP Class Defaults에서 `Starts As Carryable Pickup`과 크레이트 Mesh/Scale을 조정할 수 있다. Drop Pawn의 `PayloadCarryAnchor` Transform과 `PayloadDropComponent > Carryable Pickup Range Centimeters`도 Blueprint에서 조정 가능하다. `Dropped Payload Lifetime Seconds`는 일반 1회용 Payload에만 적용된다.
+- 첫 수동 확인에서 투하물이 착지 직후 사라지는 문제를 확인했다. 기존 공용 Payload 충돌 경로의 `0.1초 후 제거`가 원인이었으며, Carryable로 활성화된 Actor는 자동 수명을 사용하지 않고 착지 후 월드에 남아 다시 적재할 수 있도록 수정했다. Drop Pawn의 최초 선적재 Payload Class도 새 크레이트 BP로 연결해 첫 투하부터 같은 영구 잔류·재적재 규칙을 사용한다. 일반 1회용 Payload의 제거 규칙은 유지한다.
+- MSVC 14.51.36256 `DroneEditor Win64 Development` Build와 `Drone.Prototype` 7/7, `Drone.Integration` 3/3, `Drone.Tutorial` 7/7, `Drone.Flow` 5/5가 통과했다. 적재·부착·동일 Actor 재투하, BP Parent/Crate Mesh, Training Map 배치를 자동 검증했다.
+- 수정 뒤 Editor Build와 `Drone.Prototype.RoleAbilities` 1/1을 재통과했다. 실제 화면에서 크레이트 크기, 기체 하단 부착 위치와 착지 후 잔류는 다시 확인해야 한다. Commandlet의 종료 코드 1은 별도 미해결 `test1.umap`, `M_Start.uasset` LFS Pointer 오류이며 이번 스크립트는 성공 표식과 자산 저장을 확인했다. Commit·Push하지 않았다.
+
+## 2026-09-08 최신 Pull·실행 상태 감사
+
+- Unreal과 문서는 각각 `main=origin/main=63f60c1`, `main=origin/main=d30e098`로 원격 최신 상태다. `63f60c1`에는 역할 기능 3종, 공통 역할 입력과 FLOW-04~08 Source/Test/Data Asset이 포함된다.
+- Unreal Pull은 Fast-forward였지만 자동 복원된 Stash가 Upstream과 같은 경로를 추가해 `Content/Drone/Maps/test1.umap`, `Content/Material/M_Start.uasset`이 `AA` 충돌 상태다. 두 파일의 Worktree는 실제 Asset이 아니라 충돌 마커가 든 LFS Pointer이므로 Unreal에서 저장하거나 Commit하면 안 된다.
+- `test1.umap`은 Upstream 36,998,062 bytes와 Stash 48,817 bytes, `M_Start.uasset`은 Upstream 11,569 bytes와 Stash 11,456 bytes 중 보존할 쪽을 사용자가 결정해야 한다. 현재 HEAD 자체는 Upstream 버전을 가리킨다.
+- `.vsconfig`는 Staged 14.44와 Worktree/HEAD 14.50이 엇갈리고, `Source/Drone/Drone.cpp`에는 과거 정리 대상으로 확정한 `//test`가 Staged 상태로 다시 들어왔다. 충돌 해소 때 함께 정리한다.
+- 첫 감사에서 세 Definition이 기본 `BP_DronePrototypePawn`을 가리키던 문제를 고친 뒤, 후속 요구에 따라 세 역할이 같은 FPV 외형을 공유하던 임시 연결도 분리했다. 정찰은 `BP_DroneScoutIntegration`의 DroneSpy 본체·카메라·로터 4개, FPV 자폭은 기존 `BP_DroneFPVIntegration`, 드랍은 `BP_DroneDropIntegration`의 Delivery 본체·카메라·로터 6개와 보이는 임시 적재물을 사용한다.
+- `Lvl_DroneTraining`에 정찰 Scan, FPV 고속 충돌 자폭, Payload 투하를 위한 Native Greybox 표적 3개를 배치했다. 드랍은 별도 지정 없이 가장 가까운 미완료 투하 표적을 자동 선택하고, 적재물은 투하 시 숨고 재장전 시 복원된다. FPV 자폭에는 제공 Niagara 폭발과 Explosion Cue를 연결했다.
+- Mission 측면 목표 패널에 선택 역할의 한글 조작 안내와 실시간 상태를 추가했다. 정찰 진행률/완료 수, FPV 안전·무장 상태, 드랍 적재 수·성공 수·탑뷰 여부를 Event 기반으로 표시한다.
+- MSVC 14.51.36256 `DroneEditor Win64 Development` Build 성공. `Drone.Prototype` 7/7, `Drone.Integration` 3/3, `Drone.Tutorial` 7/7, `Drone.Flow` 5/5가 통과했다. `MissionEntryPIE`는 Scout 전용 Pawn과 재시도 Drop 전용 Pawn, 역할 안내/상태 UI를 검사한다. 실제 렌더 크기·방향, 폭발·투하 체감은 사용자 수동 확인이 남아 있으며 LFS 충돌 2개는 이 수정과 별개로 유지된다.
+- 공유 전 자동화 기록에 더해 현재 `63f60c1` 위 로컬 역할 모델/표적/UI 변경을 Editor Build와 Prototype·Integration·Tutorial·Flow 묶음으로 다시 실행해 모두 통과했다. Git 충돌은 자동화 결과와 분리해 사용자 선택 뒤 정리한다.
 
 ## 2026-09-08 역할 기능 3종·FLOW-04~08 수직 슬라이스
 
@@ -12,13 +33,13 @@
 - `UDroneImpactDetonationComponent`는 FPV 기체에서 명시적 Arm 뒤 600cm/s 이상 충돌을 한 번만 받아 기본 350cm·100 Damage를 적용하고 자기 기체도 공용 Health 경로로 파괴한다.
 - `UDronePayloadDropComponent`, Payload Actor와 Target을 추가했다. 드랍 기체만 기존 시점을 복원하는 상단 카메라, 한 발 투하·목표 접촉 성공·명시적 재장전을 사용한다.
 - 세 Definition의 `ImplementedCapabilities`는 이제 각각 `ReconScan`, `ImpactDetonation`, `PayloadDrop` 한 개를 가진다. 다른 역할 기능이 같은 Pawn에서 중첩 활성화되지 않는 것을 자동화로 확인했다.
-- 공통 `PrimaryRoleAbility`·`SecondaryRoleAbility` Enhanced Input을 추가했다. 임시 좌/우 클릭은 정찰 Scan/취소, FPV Arm/Disarm, 드랍 투하/탑뷰로 역할별 분기한다. Mapping 18개와 Pawn 소유 Binding을 새 PIE 3회에서 확인했으며 최종 키는 현재 미정이다.
+- 공통 `PrimaryRoleAbility`·`SecondaryRoleAbility` Enhanced Input을 추가했다. 임시 좌클릭/RB와 우클릭/LB는 정찰 Scan/취소, FPV Arm/Disarm, 드랍 투하/탑뷰로 역할별 분기하며 `P`/패드 Y는 1·3인칭을 전환한다. Mapping 21개와 Pawn 소유 Binding을 새 PIE 3회에서 확인하며 최종 키는 현재 미정이다.
 - `UDroneFrontEndRootWidget`에 선택 Mission 기반 정적 Briefing과 초기 목표, `FinishMissionBriefing()`을 추가했다. 실제 Media 형식은 미정이며 현재 버튼은 `MissionMap` Soft Reference를 연다.
 - `ADroneMissionGameMode`·`ADroneMissionPlayerController`·`UDroneSelectionWidget`이 Training Map 위에서 정찰/FPV/드랍 카드를 표시한다. 쉬운/실제 조작형과 안정/균형/고기동을 독립 선택하고 확정 전 Drone 0대, 확정 뒤 선택 Definition 한 대만 Spawn/Possess한다.
 - `ADroneMissionDirector`가 출격 뒤 시작 요청을 한 번 소비하고 Data Asset의 초기 목표를 `UDroneMissionObjectiveWidget`에 Event로 보낸다. 현재 Training Greybox는 Lap 완료를 성공, 기체 Health 0을 실패로 연결하지만 최종 Mission 규칙은 미정이다.
 - `UDroneMissionResultWidget`은 성공/실패, 같은 Mission 재도전, 로비 복귀를 제공한다. 중복 요청은 Flow가 거부하고 Front-end가 로비 복귀 요청을 한 번 소비한다.
 - 실제 PIE는 `Opening → Lobby → Briefing → Training Map → DroneSelect → Scout 출격 → Success → Retry → Drop 출격 → Health 0 Failure → Lobby`를 완전히 새 실행 기준으로 3회 반복해 3/3 통과했다. 매회 Root Widget 1, Map 요청 1, Drone 1, Mission Director 1, Finish Event 1과 로비 복귀 뒤 Drone 0을 확인했다.
-- 최종 `DroneEditor Win64 Development`, `Drone.Flow` 5/5, `Drone.Prototype` 7/7이 성공했고 빈 Class Spawn 경고도 제거했다. FLOW-01~08과 역할 입력 자동화 게이트는 완료됐다. Mission Map의 실제 Scan/Payload Target·화면 피드백, 최종 WBP Designer·Drone Preview·Mission Trailer Media와 손 조작 체감은 수동/후속 작업이며 Commit·Push는 하지 않았다.
+- 최종 `DroneEditor Win64 Development`, `Drone.Flow` 5/5, `Drone.Prototype` 7/7이 성공했고 빈 Class Spawn 경고도 제거했다. FLOW-01~08과 역할 입력 자동화 게이트는 완료됐다. Mission Map 역할 표적·상태 UI·역할별 제공 모델은 후속 로컬 작업에서 구현 및 자동화됐고, 최종 WBP Designer·Drone Preview·Mission Trailer Media와 손 조작 체감은 수동/후속 작업이며 Commit·Push는 하지 않았다.
 
 ## 2026-09-08 Figma 기체 역할·조작 모드 기반 구현
 

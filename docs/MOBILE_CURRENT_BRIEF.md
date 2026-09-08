@@ -6,10 +6,10 @@
 
 ## 30초 요약
 
-- 현재 C 드라이브 Unreal 공유 기준선은 `main=origin/main=dbc0dd8`, 문서는 `main=origin/main=aaef93d`다. 그 위 변경은 로컬 미커밋이며 Codex는 Commit·Push하지 않는다.
+- 현재 D 드라이브 Unreal 공유 기준선은 `main=origin/main=63f60c1`, 문서는 `main=origin/main=d30e098`이다. 역할 기능·FLOW-04~08은 공유됐지만 Unreal에는 Pull/Stash LFS 충돌 2개가 남아 있다.
 - Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개, Segment/Lap 원본과 이전 평균·Best·Delta 결과까지 구현됐다.
-- 역할 기체 3종과 `FLOW-01~08` 자동화 Vertical Slice가 완료됐다. 정적 브리핑→Map→Drone 선택→목표→성공/실패→재도전/로비 복귀를 새 PIE 실행 3회로 검증했다.
-- 임시 역할 입력도 연결했다. 좌클릭은 정찰 Scan/FPV Arm/드랍 투하, 우클릭은 정찰 취소/FPV Disarm/드랍 탑뷰이며 최종 키는 미정이다.
+- 역할 기능 3종과 `FLOW-01~08` Source는 공유됐다. 세 Drone Definition이 기본 Pawn을 Spawn하던 연결 오류를 고쳐 모두 모델·로터·입력을 가진 `BP_DroneFPVIntegration`으로 실제 저장했다. Editor Build, Prototype 7/7, Flow 5/5, FPV Asset 1/1이 통과했으며 실제 화면 확인만 남았다.
+- 임시 역할 입력은 좌클릭/RB=정찰 Scan/FPV Arm/드랍 투하, 우클릭/LB=정찰 취소/FPV Disarm/드랍 탑뷰다. 자동화 연결은 통과했고 세 역할별 손 조작을 다시 확인한다.
 - 확정 화면 흐름은 `시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → Map → Drone 선택 → Mission 시작/측면 목표 UI`다. 사람 Operator·NPC 대화 수령·Operator↔Drone 전환은 폐기했다.
 - 현재 실행 세션은 Unreal `D:\JGY\project\drone`, 문서 `D:\JGY\project\md`다. `C:\URproject\drone`은 다른 PC의 이전 검증 경로이며 제공 에셋 원본은 직접 수정하지 않는다.
 - NavigationArrows 최소 자산 6개와 전용 테스트는 main에 병합됐다. 화면 Host는 아직 미구현이다.
@@ -26,9 +26,9 @@
 
 | 구분 | 현재 상태 |
 |---|---|
-| Unreal 저장소 | `C:\URproject\drone` |
-| Unreal 기준 Commit | `dbc0dd8` |
-| Git 상태 | `main=origin/main=dbc0dd8`; 역할 기능·조작 모드·FLOW-04~08 Source/Test/Data Asset이 로컬 미커밋 |
+| Unreal 저장소 | `D:\JGY\project\drone` |
+| Unreal 기준 Commit | `63f60c1` |
+| Git 상태 | `main=origin/main=63f60c1`; `test1.umap`, `M_Start.uasset` LFS 충돌. `.vsconfig` Index 불일치와 `Drone.cpp //test` Staged 상태 |
 | Git LFS | `fsck` 정상 |
 | 최종 Game/Editor Build | 성공 |
 | Tutorial 자동화 | 7/7 통과 |
@@ -222,13 +222,13 @@ Lvl_NPCSmartObjectGreybox
 ### PC 앞에서 할 일
 
 1. 다른 PC라면 `drone`과 `md` 저장소를 Pull한다.
-2. Unreal 기준 Commit이 `origin/main=dbc0dd8`인지 확인한다. FLOW-04~08과 역할 기능은 현재 PC의 로컬 미커밋이므로 다른 PC에는 아직 보이지 않는 것이 정상이다.
+2. Unreal 기준 Commit이 `origin/main=63f60c1`인지 확인한다. FLOW-04~08과 역할 기능은 공유됐지만 이 PC에서는 두 LFS 바이너리 충돌을 해결하기 전 Commit·Push하지 않는다.
 3. 현재 PC에서는 `/Game/Drone/Maps/Lvl_DroneFrontEnd`를 열어 `계속`→로비→Training Mission→정적 Briefing→Training Map→Drone 선택→출격까지 확인한다.
 4. 쉬운/실제 조작형과 안정/균형/고기동을 바꿔 선택 값이 출격 기체에 적용되는지 확인한다.
 5. Gate 0→3 완주 뒤 성공→재도전, 기체 체력 0 뒤 실패→로비 복귀를 확인한다.
-   - 정찰: 유효 표식 앞 좌클릭 Scan, 우클릭 취소
-   - FPV: 좌클릭 Arm, 우클릭 Disarm, Arm 뒤 충돌
-   - 드랍: 우클릭 탑뷰, 좌클릭 투하
+   - 정찰: 유효 표식 앞 좌클릭/RB Scan, 우클릭/LB 취소
+   - FPV: 좌클릭/RB Arm, 우클릭/LB Disarm, Arm 뒤 충돌
+   - 드랍: 우클릭/LB 탑뷰, 좌클릭/RB 투하
 6. Gate 0→1→2→3을 정방향으로 완주한다.
 7. 미래 Gate를 먼저 통과하거나 현재 Gate를 역방향으로 통과해 진행되지 않는지 확인한다.
 8. 마지막 Gate 뒤 네 Gate가 모두 Completed 색인지 확인한다.

@@ -2,6 +2,8 @@
 
 이 폴더는 실제 Unreal 프로젝트가 아니라 다음 작업을 준비하고 PC 간 문맥을 이어가기 위한 문서·템플릿·도구 저장소다. GitHub `gyeonliz/md`를 이 폴더의 공유 원격으로 사용하고, 실제 Unreal 프로젝트는 별도 `gyeonliz/drone` 저장소로 관리한다.
 
+현재 2026-09-08 D 드라이브 작업에서는 정찰=`DroneSpy`, FPV 자폭=`DronePackFPV`, 드랍=`Delivery` 전용 Pawn과 Training 역할 표적·한글 상태 UI를 연결했다. 드랍은 별도 `BP_DroneCarryablePayload` 크레이트를 맵에 배치해 빈 기체가 근접 적재하고 실제 Actor를 하단에 붙인 뒤 재투하할 수 있다. Editor Build·Prototype 7/7·Integration 3/3·Tutorial 7/7·Flow 5/5가 통과했으며 실제 화면 확인과 별도 LFS 충돌 정리가 다음 작업이다. 최신 판정은 `STATUS.md`와 `WORKBOARD.md`를 우선한다.
+
 ## 먼저 읽을 파일
 
 1. [`CONTEXT.md`](CONTEXT.md): 사용자가 제공한 확정 기준과 미정 사항
@@ -54,21 +56,21 @@ tools/unreal/              Prototype·Tutorial 자산 생성·재검증용 안�
 
 ## 현재 진행 지점
 
-현재 실행 세션의 Unreal 저장소는 `C:\URproject\drone`, 문서 저장소는 이 저장소다. 별도 `ADronePrototypePawn`과 GameMode, 8개 Input Action, Keyboard·Mouse·Gamepad 18개 Mapping, BP Pawn/GameMode와 Greybox Map을 연결했다. Mouse X는 Drone Yaw, Mouse Y는 Camera Pitch로 동작하며 `P`로 3인칭 고정 추적과 기체 기울기·피격 흔들림을 따르는 1인칭을 전환한다. 임시 좌/우 클릭은 선택한 역할의 Primary/Secondary 기능을 실행한다.
+현재 실행 세션의 Unreal 저장소는 `D:\JGY\project\drone`, 문서 저장소는 `D:\JGY\project\md`다. 별도 `ADronePrototypePawn`과 GameMode, 8개 Input Action, Keyboard·Mouse·Gamepad 21개 Mapping, BP Pawn/GameMode와 Greybox Map을 연결했다. Mouse X는 Drone Yaw, Mouse Y는 Camera Pitch로 동작하며 `P` 또는 패드 `Y`로 3인칭 고정 추적과 기체 기울기·피격 흔들림을 따르는 1인칭을 전환한다. 임시 좌/우 클릭 또는 패드 RB/LB는 선택한 역할의 Primary/Secondary 기능을 실행한다.
 
 확정 조작을 반영한 PFN-06은 자동화와 Standalone 수동 조작을 통과해 Done이다. HUD-01 공용 Telemetry Component는 기본 10Hz Snapshot Event를 제공한다. HUD-02는 C++가 계산·생성·Possession·Delegate 수명주기를 맡고 실제 `WBP_DroneFlightHUD`가 화면 외형을 맡도록 연결했다.
 
 TUT-01~03을 완료했다. 별도 `Lvl_DroneTraining` Map의 실제 `BP_DroneTrainingCourse`가 편집 가능한 Spline과 Runtime 표시용 SplineMesh를 소유한다. `ADroneTrainingGate`는 비충돌 Ring Visual과 별도 Pawn Overlap Trigger를 분리하고, `UDroneTrainingGateSequenceComponent`가 Course의 명시적 Gate 배열을 기준으로 현재 순서·정방향·중복 통과를 판정한다. 실제 `BP_DroneTrainingGate` 네 개를 Map에 연결했으며 기존 Prototype BP GameMode·FPV Integration Pawn·PlayerController·WBP를 그대로 재사용한다.
 
-TUT-03에서는 Course 소유 `UDroneTrainingLapRecorderComponent`를 Gate 판정과 분리했다. Gate 0 승인으로 Lap을 시작하고 이후 Gate마다 Segment를 확정하며, 마지막 Gate에서 Lap을 완료한다. TUT-04B는 현재 기록을 제외한 이전 성공 평균, Best, 시간·속도 Delta와 Segment 비교를 계산하고 Flight HUD에 표시한다. 최신 전체 검증은 Game/Editor Build와 전체 `Drone.` 25/25를 통과했다. 직전 Blueprint Compile은 0/0/0이며 실제 두 Lap 화면 확인은 남아 있다.
+TUT-03에서는 Course 소유 `UDroneTrainingLapRecorderComponent`를 Gate 판정과 분리했다. Gate 0 승인으로 Lap을 시작하고 이후 Gate마다 Segment를 확정하며, 마지막 Gate에서 Lap을 완료한다. TUT-04B는 현재 기록을 제외한 이전 성공 평균, Best, 시간·속도 Delta와 Segment 비교를 계산하고 Flight HUD에 표시한다. 당시 Game/Editor Build와 전체 `Drone.` 25/25를 통과했으며 실제 두 Lap 화면 확인은 남아 있다.
 
-2026-09-03부터 게임 진입 흐름은 `시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → Map → Drone 선택 → Mission 시작/측면 목표 UI → 결과 → 재도전/로비`다. 사람 Player Character, 로비 NPC 대화 수령과 Operator↔Drone 전환은 폐기했다. 2026-09-08 현재 `FLOW-01~08`과 정찰 Scan·FPV 충돌 자폭·드랍 탑뷰/Payload, 임시 좌/우 클릭 공통 역할 입력을 로컬 구현했고 전체 흐름을 완전히 새 PIE 실행 3회로 자동 검증했다. 기존 적 NPC·Smart Object·전투 기능은 Mission Map 내부에 재사용한다.
+2026-09-03부터 게임 진입 흐름은 `시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → Map → Drone 선택 → Mission 시작/측면 목표 UI → 결과 → 재도전/로비`다. 사람 Player Character, 로비 NPC 대화 수령과 Operator↔Drone 전환은 폐기했다. 2026-09-08 현재 `FLOW-01~08`과 정찰 Scan·FPV 충돌 자폭·드랍 탑뷰/Payload, 임시 좌/우 클릭 공통 역할 입력을 공유 main에 반영했고 공유 전 전체 흐름을 완전히 새 PIE 실행 3회로 자동 검증했다. 기존 적 NPC·Smart Object·전투 기능은 Mission Map 내부에 재사용한다.
 
 현재 D 드라이브 작업 PC의 제공 에셋 루트는 `D:\JGY\project\Unreal_260821`이다. 초기 FPV 외형·Loop와 Integration BP에 이어 ArmyVFX·InfantrySFX·Ground Drone/MG·NPC 외형·Raw Drone 후보와 OilRig을 선별 이식했다. 원본 제공 폴더는 수정하지 않았고 실제 프로젝트의 새 자산 외부·누락 참조는 0이다. 실제 스피커의 Loop 단일 재생과 종료 정지는 수동 미확인이므로 `AST-01`은 Doing이다. 상세 결과는 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)와 [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md)를 따른다.
 
-NPC·AI를 위해 Smart Objects와 Gameplay Interactions 모듈, Faction·Rifle·Shotgun Profile, Activity Tag, NPC Character/Controller/Spawn Point, Slot 예약 Component와 드론 Sight를 구성했다. 현재 공유 `2d6a459`에는 Rifle/Shotgun Trace·Damage·탄창, MG 점유·조준·사격·사망 교대, Cover, Drone 체력·파괴 교전 종료, Blueprint 표현 Event와 Smart Object 방향 보강까지 포함한다. 실제 Mesh·Animation·FX·SFX와 Mission 결과 화면은 미구현이며, AI 비주얼 작업은 새 Front-end Mission Vertical Slice 뒤에 잇는다.
+NPC·AI를 위해 Smart Objects와 Gameplay Interactions 모듈, Faction·Rifle·Shotgun Profile, Activity Tag, NPC Character/Controller/Spawn Point, Slot 예약 Component와 드론 Sight를 구성했다. 현재 공유 main에는 Rifle/Shotgun Trace·Damage·탄창, MG 점유·조준·사격·사망 교대, Cover, Drone 체력·파괴 교전 종료, Blueprint 표현 Event와 Smart Object 방향 보강까지 포함한다. 실제 Mesh·Animation·FX·SFX는 계속 수동·후속 작업이며 AI 비주얼은 Mission 수직 슬라이스 재검증 뒤 잇는다.
 
-2026-09-08 현재 C 드라이브 Unreal 공유 기준은 `main=origin/main=dbc0dd8`, 문서 공유 기준은 `main=origin/main=aaef93d`다. 그 위 역할 기능·조작 모드·FLOW-04~08과 문서 변경은 사용자가 직접 Commit하기 전 로컬 미커밋 상태다. Codex는 Commit·Push하지 않았다.
+2026-09-08 현재 D 드라이브 Unreal 공유 기준은 `main=origin/main=63f60c1`, 문서 공유 기준은 `main=origin/main=d30e098`이다. 역할별 실제 모델·시험 표적·상태 UI는 이 기준선 위 로컬 미커밋 변경이며 사용자가 Commit/Push한다. Pull 중 자동 복원된 Stash와 Upstream이 충돌한 `test1.umap`, `M_Start.uasset`, `Drone.cpp`의 잘못된 `//test`, `.vsconfig` Index 불일치는 이번 기능과 별개로 남아 있어 다음 Commit 전 선택·정리가 필요하다.
 
 외부 제공 소스는 전체 팩을 흡수하지 않고 검증된 대표 자산과 정확한 의존성만 ThirdParty 경계로 선별 이식했다. 기능 구현은 계속 프로젝트 C++와 Greybox 기준을 유지하며 외부 Pawn·GameMode·Input은 사용하지 않는다. 현재 신규 기능 실행 순서는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)가 우선하고 Tutorial·PFN 카드 번호와 교체 경계는 기존 계획 문서를 함께 따른다.
 
@@ -89,7 +91,8 @@ PFN-06 Camera/Input 기준선 Done
 → FLOW-08 새 PIE 실행 전체 수명주기 3회 Done
 → Editor 수동 Vertical Slice·TUT-04 두 Lap 확인 Next
 → 역할 공통 Input Done
-→ Training 역할 Target·상태 UI와 최종 WBP/Preview
+→ Training 역할 Target·상태 UI·역할별 실제 모델 구현 및 자동화 통과
+→ Editor 수동 화면·조작 확인
 → Flight 상태·Jamming
 → AI/MG와 에셋 통합
 ```

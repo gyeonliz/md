@@ -23,11 +23,11 @@
 
 ## 기체 역할별 현재 상태
 
-| 역할 | 현재 공통 Pawn 비행 | 역할 고유 기능 | 다음 구현 |
+| 역할 | 현재 Pawn/제공 모델 | 역할 고유 기능 | 다음 확인·구현 |
 |---|---|---|---|
-| 정찰 드론 | 구현·자동화 통과 | 거리·화각·LOS 유지형 Scan 구현 | Scan 대상 배치·최종 UI/FX는 후속 |
-| FPV 자폭 드론 | 구현·자동화 통과, FPV 기본 시점 | 명시적 Arm·최소 속도 충돌·1회 폭발 구현 | 최종 폭발 FX/SFX·Mission별 Damage 조정 |
-| 드랍 드론 | 구현·자동화 통과 | 탑뷰·1회 Payload·목표 접촉 구현 | 최종 Payload Mesh/FX와 Mission별 투하 규칙 |
+| 정찰 드론 | `BP_DroneScoutIntegration`; DroneSpy 본체·카메라·로터 4 | 거리·화각·LOS 유지형 Scan과 Training 표적 구현 | 모델 스케일/방향·Scan 체감, 최종 UI/FX |
+| FPV 자폭 드론 | `BP_DroneFPVIntegration`; FPV 본체·로터 4, FPV 기본 시점 | 명시적 Arm·최소 속도 충돌·1회 폭발, 제공 Niagara/Cue 연결 | 폭발 크기/청감·Mission별 Damage 조정 |
+| 드랍 드론 | `BP_DroneDropIntegration`; Delivery 본체·카메라·로터 6·크레이트 선적재 화물 | 탑뷰·투하·착지 후 잔류·가장 가까운 목표 자동 선택·맵 크레이트 근접 적재·실제 Actor 재투하 구현 | 부착 위치/크기 체감, FX와 Mission별 투하 규칙 |
 | 광섬유 드론 | 미구현 | 재밍 면역 미구현 | FPV 공통 기능 뒤 별도 Data Asset과 재밍 규칙 |
 | 지상 드론 UGV | 공중 Pawn으로 처리하지 않음 | 주행·무장·연료 미구현 | 별도 Ground Pawn/Movement로 구현 |
 | 장거리 타격 드론 | 플레이 기체 미등록 | 출격/타격 연출 미구현 | 플레이 가능 여부 확정 뒤 Sequencer 또는 Pawn 결정 |
@@ -53,7 +53,7 @@
 
 ## Blueprint에서 바꾸는 방법
 
-대상은 `BP_DroneFPVIntegration` 또는 `ADronePrototypePawn` 파생 Blueprint다.
+대상은 `BP_DroneScoutIntegration`, `BP_DroneFPVIntegration`, `BP_DroneDropIntegration` 또는 `ADronePrototypePawn` 파생 Blueprint다.
 
 1. Pawn 참조에서 `Set Control Mode`를 호출한다.
 2. `Assisted Easy` 또는 `Manual Realistic Greybox`를 전달한다.
@@ -97,17 +97,38 @@ Pawn Class Defaults에서 다음 Struct를 연다.
 6. FLOW-05 Mission 허용 3종 카드·설정·선택 Definition 1대 Spawn/Possess — 실제 PIE 완료
 7. FLOW-06~07 Mission Director·목표 패널·성공/실패·재도전·로비 복귀 — 실제 PIE 완료
 8. FLOW-08 새 실행 기준 전체 흐름 3회 반복 — 3/3 자동화 완료
-9. 공통 역할 입력 — 임시 좌클릭 1차/우클릭 2차, IMC 18 Mapping과 Pawn Binding 자동화 완료
-10. Training Map Scan/Payload Target·역할 상태 UI와 조작/핸들링 체감 — 수동/후속 확인 대기
+9. 공통 역할 입력 — 임시 좌클릭/RB 1차, 우클릭/LB 2차, `P`/패드 Y 시점 전환, IMC 21 Mapping과 Pawn Binding 자동화 완료
+10. Training Map 정찰/자폭/투하 Target·역할 상태 UI·역할별 제공 모델 — 구현 및 자동화 완료, 수동 화면 확인 대기
 
 현재 역할 입력은 다음처럼 동작한다.
 
-| 역할 | 좌클릭: Primary | 우클릭: Secondary |
+| 역할 | 좌클릭 / 패드 RB: Primary | 우클릭 / 패드 LB: Secondary |
 |---|---|---|
 | 정찰 | 거리·화각·LOS를 만족하는 가장 가까운 미완료 Target Scan | 진행 중 Scan 취소 |
 | FPV 자폭 | 충돌 자폭 Arm | Disarm |
-| 드랍 | 적재 Payload 한 발 투하 | 탑뷰 진입/복귀 |
+| 드랍 | 적재 중이면 투하, 비어 있으면 300cm 안의 가장 가까운 운반 화물 적재 | 탑뷰 진입/복귀 |
 
 이 키는 기능 검증용 임시값이다. 최종 키보드·마우스·Gamepad 배치는 현재 미정이다.
+
+세 역할을 바꿔가며 시험할 때는 `/Game/Drone/Maps/Lvl_DroneFrontEnd`에서 시작해 `계속 → Training Mission 선택 → 미션 시작 → 작전 시작 → Drone 선택 → 출격` 순서로 진입한다. `/Game/Drone/Maps/Lvl_DroneTraining`은 실제 표적이 놓인 맵이지만 직접 PIE하면 기본 기체만 시작해 전체 역할 선택 흐름을 건너뛴다. 특히 FPV 폭발 뒤 Pawn이 파괴되므로 직접 실행에서는 더 조종할 대상이 없고, Front-end Mission 흐름에서는 결과 UI의 재도전 또는 로비 복귀를 사용한다. 폭발 기능 자체는 Unreal Editor를 종료하지 않는다.
+
+Training 역할 시험 표적은 코스 진행 판정과 분리되어 있다.
+
+- `RoleTest_ReconTarget`: 시작점 우측의 Cyan 안내 표적. 정찰 드론으로 바라본 뒤 좌클릭 또는 패드 RB를 유지한다.
+- `RoleTest_ImpactTarget`: Red 안내 충돌 표적. FPV 드론에서 좌클릭 또는 패드 RB로 무장하고 600cm/s 이상으로 충돌한다.
+- `RoleTest_PayloadTarget`: 시작점 반대편 Yellow 투하 패드. 드랍 드론에서 우클릭 또는 패드 LB로 탑뷰 전환 후 패드 위에서 좌클릭 또는 패드 RB로 투하한다. 별도 Target 지정 없이 가장 가까운 미완료 패드를 자동 선택한다.
+- `RoleTest_CarryablePayload`: 시작점 부근의 MilitaryCamp 크레이트. 선적재 화물을 먼저 투하해 적재 수를 0으로 만든 뒤 300cm 안에서 좌클릭/RB로 적재하고, 기체 하단에 붙은 상태에서 다시 좌클릭/RB로 재투하한다.
+- Mission 측면 UI는 정찰 진행률/완료 수, FPV 안전·무장, 드랍 적재/성공/탑뷰 상태를 한글로 표시한다.
+
+### 맵 배치 화물 BP 사용·조정
+
+1. Content Browser에서 `/Game/Drone/Abilities/Payload/BP_DroneCarryablePayload`를 원하는 Mission Map으로 끌어다 놓는다.
+2. 다른 외형은 Blueprint의 `PayloadVisual > Static Mesh`, `Transform > Scale`에서 바꾼다. 부모는 `ADroneDroppedPayload`를 유지한다.
+3. 맵에서 처음부터 주울 수 있는 물체는 Class Defaults의 `Starts As Carryable Pickup`을 켠다. 이 Actor는 투하·착지 후 사라지지 않고 다시 적재할 수 있다. `Dropped Payload Lifetime Seconds`는 Carryable이 아닌 일반 1회용 Payload에만 적용된다.
+4. 드론에 붙는 위치·회전은 각 Drop Pawn Blueprint의 Components에서 `PayloadCarryAnchor` Transform을 바꾼다. 이 Anchor는 외형 기울기를 따라가되 Collision Root와 분리된다.
+5. 적재 거리는 Drop Pawn의 `PayloadDropComponent > Carryable Pickup Range Centimeters`에서 바꾸며 기본값은 300cm다.
+6. 별도 Event Graph 적재 로직이나 Level Blueprint 입력을 추가하지 않는다. Pawn의 공통 Primary 입력과 C++ Component가 검색·부착·투하 상태를 단일 소유한다.
+
+`BP_DroneDropIntegration`의 `PayloadDropComponent > Payload Class`도 이 BP로 연결되어 있다. 따라서 기체가 처음 들고 시작하는 화물과 맵에 미리 배치한 화물이 모두 같은 크레이트·착지 잔류·재적재 규칙을 사용한다.
 
 광섬유·UGV·장거리 타격은 위 3종 Vertical Slice 뒤 진행한다. 특히 UGV는 공중 Pawn의 핸들링 프리셋을 재사용하지 않고 별도 지상 이동 구조로 만든다.
