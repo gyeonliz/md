@@ -1,10 +1,35 @@
 # 현재 작업 상태
 
-기준일: 2026-09-04 (Asia/Seoul)
+기준일: 2026-09-08 (Asia/Seoul)
 
 이 문서는 PC별로 명령으로 확인된 상태와 사용자가 아직 결정하지 않은 항목을 분리한다. 현재 C 드라이브 실행 세션과 다른 PC의 검증 기록을 같은 항목에서 섞지 않고 경로와 검증 시점을 함께 적는다.
 
 실시간 작업 위치와 바로 다음 행동은 [`WORKBOARD.md`](WORKBOARD.md), 날짜별 변경과 검증 이력은 [`docs/DRONE_WORKLOG.md`](docs/DRONE_WORKLOG.md)에 기록한다. 이 문서는 검증된 기준선이 달라질 때 함께 갱신한다.
+
+## 2026-09-08 역할 기능 3종·FLOW-04~08 수직 슬라이스
+
+- `UDroneReconScanComponent`와 Scan Target을 추가했다. 정찰 기체만 거리 3,000cm·반각 25도·LOS·2초 유지라는 조정 가능한 Greybox 조건으로 진행·취소·1회 완료 Event를 낸다. 값은 최종 규칙이 아니다.
+- `UDroneImpactDetonationComponent`는 FPV 기체에서 명시적 Arm 뒤 600cm/s 이상 충돌을 한 번만 받아 기본 350cm·100 Damage를 적용하고 자기 기체도 공용 Health 경로로 파괴한다.
+- `UDronePayloadDropComponent`, Payload Actor와 Target을 추가했다. 드랍 기체만 기존 시점을 복원하는 상단 카메라, 한 발 투하·목표 접촉 성공·명시적 재장전을 사용한다.
+- 세 Definition의 `ImplementedCapabilities`는 이제 각각 `ReconScan`, `ImpactDetonation`, `PayloadDrop` 한 개를 가진다. 다른 역할 기능이 같은 Pawn에서 중첩 활성화되지 않는 것을 자동화로 확인했다.
+- 공통 `PrimaryRoleAbility`·`SecondaryRoleAbility` Enhanced Input을 추가했다. 임시 좌/우 클릭은 정찰 Scan/취소, FPV Arm/Disarm, 드랍 투하/탑뷰로 역할별 분기한다. Mapping 18개와 Pawn 소유 Binding을 새 PIE 3회에서 확인했으며 최종 키는 현재 미정이다.
+- `UDroneFrontEndRootWidget`에 선택 Mission 기반 정적 Briefing과 초기 목표, `FinishMissionBriefing()`을 추가했다. 실제 Media 형식은 미정이며 현재 버튼은 `MissionMap` Soft Reference를 연다.
+- `ADroneMissionGameMode`·`ADroneMissionPlayerController`·`UDroneSelectionWidget`이 Training Map 위에서 정찰/FPV/드랍 카드를 표시한다. 쉬운/실제 조작형과 안정/균형/고기동을 독립 선택하고 확정 전 Drone 0대, 확정 뒤 선택 Definition 한 대만 Spawn/Possess한다.
+- `ADroneMissionDirector`가 출격 뒤 시작 요청을 한 번 소비하고 Data Asset의 초기 목표를 `UDroneMissionObjectiveWidget`에 Event로 보낸다. 현재 Training Greybox는 Lap 완료를 성공, 기체 Health 0을 실패로 연결하지만 최종 Mission 규칙은 미정이다.
+- `UDroneMissionResultWidget`은 성공/실패, 같은 Mission 재도전, 로비 복귀를 제공한다. 중복 요청은 Flow가 거부하고 Front-end가 로비 복귀 요청을 한 번 소비한다.
+- 실제 PIE는 `Opening → Lobby → Briefing → Training Map → DroneSelect → Scout 출격 → Success → Retry → Drop 출격 → Health 0 Failure → Lobby`를 완전히 새 실행 기준으로 3회 반복해 3/3 통과했다. 매회 Root Widget 1, Map 요청 1, Drone 1, Mission Director 1, Finish Event 1과 로비 복귀 뒤 Drone 0을 확인했다.
+- 최종 `DroneEditor Win64 Development`, `Drone.Flow` 5/5, `Drone.Prototype` 7/7이 성공했고 빈 Class Spawn 경고도 제거했다. FLOW-01~08과 역할 입력 자동화 게이트는 완료됐다. Mission Map의 실제 Scan/Payload Target·화면 피드백, 최종 WBP Designer·Drone Preview·Mission Trailer Media와 손 조작 체감은 수동/후속 작업이며 Commit·Push는 하지 않았다.
+
+## 2026-09-08 Figma 기체 역할·조작 모드 기반 구현
+
+- 사용자 제공 [Figma `Project:Droner`](https://www.figma.com/design/x9CAVMxSxFdME9XUIlrf78/Project-Droner?node-id=0-1&t=tXU1hQ5hhU1MmrDq-1)는 읽기만 했고 수정·댓글·공유 설정 변경을 하지 않았다.
+- 현재 기획에서 `정찰`, `드랍`, `FPV 자폭`, `광섬유`, `지상 UGV`, `장거리 타격` 역할을 확인했다. 이는 Figma의 현재 기획 역할이며 최종 확정·구현 완료를 뜻하지 않는다.
+- 기존 임시 `균형 정찰형/고기동형/안정 관측형` 기체 분류를 제거했다. 기체 역할 `EDroneMissionRole`, 조작 방식 `쉬운/실제 조작형`, 핸들링 `안정/균형/고기동`을 서로 독립된 축으로 구현했다.
+- 현재 Catalog에는 공통 비행 Pawn을 사용하는 `정찰`, `FPV 자폭`, `드랍` Definition 3개만 등록했다. 각 역할 고유 기능은 위 수직 슬라이스에서 구현·자동화돼 `PlannedCapabilities`와 `ImplementedCapabilities`에 모두 기록된다.
+- 쉬운 조작은 World Up과 기존 이동 보조를 유지한다. 실제 조작형 Greybox는 자동 감속·Turning Boost를 줄이고 Root Pitch/Roll 및 Local Up을 이동 축에 반영한다. 모터별 추력 물리 구현으로 표현하지 않는다.
+- `Set/Toggle Control Mode`, `Set/Cycle Handling Preset`, Blueprint용 변경 Event를 추가했다. 키는 아직 확정하지 않고 FLOW-05 선택 Widget 버튼이 이 API의 값을 Spawn Pawn에 적용한다.
+- 초기 데이터 계약 당시 `Drone.Prototype.FlightProfiles` 1/1과 `Drone.Flow` 3/3이 성공했으며, 후속 전체 결과는 위 최신 절의 5/5·7/7을 따른다. Commit·Push하지 않았다.
+- 세부 구조·Blueprint 사용·수동 확인·FLOW-05 전 작업은 [`docs/DRONE_TYPES_AND_CONTROL_MODES.md`](docs/DRONE_TYPES_AND_CONTROL_MODES.md)를 따른다.
 
 ## PC별 확인 완료
 
@@ -114,9 +139,9 @@ GitHub CLI는 필수 구성요소는 아니다. 자동 설치를 한 번 시도�
 - `UDroneGameFlowSubsystem::GetRegisteredMissionIds()`가 Catalog의 ID를 이름순으로 공급해 UI가 내부 `TMap` 순서나 하드코딩 Text에 의존하지 않는다.
 - `WBP_DroneFrontEndRoot`의 C++ fallback에 첫 Training Mission 버튼, 선택 상세 이름·설명·지역/난이도, 하단 `미션 시작` 버튼을 추가했다.
 - 미션 버튼은 `DA_Mission_Tutorial_Training`을 `SelectMission`으로 선택한다. 표시 문자열은 같은 Definition에서 읽고, 하단 시작은 `ConfirmMissionSelection`으로 `MissionTrailer` 상태까지만 전환한다.
-- 실제 Mission 영상 재생과 `OpenLevel`은 FLOW-04 범위이므로 아직 실행하지 않는다. 최종 로비 Designer도 미정이며 WBP에는 같은 이름 Widget과 Blueprint 표현 Event만 사용할 수 있게 경계를 유지한다.
+- 이 절 당시에는 `MissionTrailer`까지만 전환했다. 현재는 FLOW-04 정적 Briefing과 실제 `OpenLevel`이 후속 구현됐고, 최종 Media·로비 Designer는 계속 미정이다.
 - 최종 Drone Game/Editor Build와 `Drone.Flow` 3/3이 통과했다. PIE에서 잘못된 Mission 거부, 저장 Definition과 표시 이름·설명 일치, 중복 Mission 확정 거부, Root 생성 1회를 확인했다.
-- 다음 활성 카드는 `FLOW-04` 정적 Mission Briefing 종료→선택 Map 로드다.
+- FLOW-03 뒤 FLOW-04~07까지 후속 구현됐으며 최신 상태는 문서 상단 절을 따른다.
 
 ## 2026-09-03 AI-BALLISTIC-01 회피 가능한 탄속 구현 결과
 
@@ -403,7 +428,7 @@ C:\Users\jkw11\Documents\Codex\2026-08-12\c-project-factoryenvironmentcollect\wo
 
 1. 사용자가 실제 Training Map에서 Gate 0→3 한 Lap과 Drone Loop 단일 재생·종료 정지를 수동 확인
 2. `TUT-04B` 첫 기준·이전 평균·Best·Delta를 두 번 완주해 실제 HUD에서 확인
-3. 신규 기능은 `FLOW-04`; 정적 Mission Briefing 종료 뒤 선택 Definition의 Training Map을 열고 GameInstance 선택이 유지되는지 검증
+3. `FLOW-08` 자동화는 완료. Editor에서 새 실행부터 결과·재도전·로비 복귀, 역할 기능과 조작/핸들링을 직접 확인
 4. 병행으로 팀원 PC의 실제 Remote URL·Push 대상 규칙을 확인
 5. 다른 PC에서 최신 `origin/main` Pull, LFS/UE 5.8.1 실행과 문서 Pull 확인
 6. 정보처리산업기사는 Q-Net 개인 접수·수험일·필기면제 상태를 확인해 Track A/B/C를 선택하고, 코딩테스트는 주간 반복으로 병행
@@ -444,8 +469,9 @@ PFN-06 Done
 → FLOW-01 상태·Mission/Drone 데이터 계약 Done
 → FLOW-02 정적 시작 화면→로비 Done
 → FLOW-03 미션 선택·측면 설명·하단 시작 Done
-→ FLOW-04 브리핑·Map 로드 Next
-→ FLOW-05~06 Drone 선택·측면 목표 UI
+→ FLOW-04~07 브리핑·Map·Drone 선택·목표·결과 흐름 Done
+→ FLOW-08 전체 수명주기 새 실행 3회 반복 Done
+→ Editor 수동 Vertical Slice·TUT-04 두 Lap 확인 Next
 → Take Off·Landing·Crash와 Mission UI·Jamming 통합
 → AI-VIS-01B NPC·무기·MG 실제 외형과 Animation·FX·SFX
 ```
@@ -507,6 +533,6 @@ UE 5.8의 Dataflow·Chaos Cloth·Chaos Destruction을 부분 고정 그물과 �
 - 맵 파괴: Dataflow Geometry Collection, Anchor/World Support, Damage Threshold, Strain/Force와 Debris Sleep/Disable
 - Cloth 변형·파괴 연출과 포획·Damage·Mission 판정을 분리
 - 현재 생산 Cloth/Geometry Collection Asset 0, 관련 C++ 0
-- `TUT-04` 실제 두 Lap 확인은 유지한다. FLOW-01~03까지 로컬 완료했고 새 기획 우선순위는 `FLOW-04~06` Front-end Mission Vertical Slice다. `AI-VIS-01B`와 첫 물리 작업 `PHY-DF-00` Sandbox는 그 뒤 후보로 둔다.
+- `TUT-04` 실제 두 Lap 확인은 유지한다. FLOW-01~08까지 로컬 구현·자동화했고 새 우선순위는 Editor 수동 Vertical Slice 확인이다. `AI-VIS-01B`와 첫 물리 작업 `PHY-DF-00` Sandbox는 그 뒤 후보로 둔다.
 
 상세 설계는 [`docs/DRONE_CHAOS_DATAFLOW_PLAN.md`](docs/DRONE_CHAOS_DATAFLOW_PLAN.md)를 따른다.

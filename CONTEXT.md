@@ -174,15 +174,25 @@ Briefing → Recon → Detect → Information acquisition → Enemy response →
 
 ## 7. 드론 종류
 
-초기에는 정찰용 멀티콥터 1종부터 구현한다.
+2026-09-08 사용자 제공 Figma를 읽기 전용으로 확인한 현재 기획 역할:
 
-향후 후보:
+- 정찰 드론
+- 드랍 드론
+- FPV 자폭 드론
+- 광섬유 드론
+- 지상 드론 UGV
+- 장거리 타격 드론
 
-- Scout
-- FPV
-- Carrier / Support
-- Fixed Wing
-- Counter Drone / Interceptor
+이는 Figma의 현재 기획 목록이며 최종 명칭·게임 규칙·모든 역할의 구현 완료를 뜻하지 않는다. Figma 내부는 수정·댓글·공유 설정 변경을 하지 않는다.
+
+현재 Unreal 선택 Catalog는 공통 비행을 검증할 `정찰/FPV 자폭/드랍` 3종만 준비한다. 정찰 스캔·충돌 자폭·Payload 투하는 아직 미구현으로 구분한다. 광섬유·UGV·장거리 타격은 후속이며, UGV는 공중 Pawn과 분리한다.
+
+기체 역할과 조작 설정은 분리한다.
+
+- 조작 방식: 쉬운 조작 / 실제 조작형 Greybox
+- 핸들링 프리셋: 안정 / 균형 / 고기동
+
+같은 기체에서 조작 방식과 핸들링을 각각 변경할 수 있다. 실제 조작형 Greybox는 기체 Root 자세·Local Up·낮은 자동 감속을 사용하는 1차 구현이며 모터별 실제 비행 물리로 표현하지 않는다. 세부 기준은 [`docs/DRONE_TYPES_AND_CONTROL_MODES.md`](docs/DRONE_TYPES_AND_CONTROL_MODES.md)를 따른다.
 
 실제 군용 드론을 정확히 1:1 구현하는 방향은 아니다. 가상의 드론 이름과 디자인을 사용하는 방안도 고려한다.
 
@@ -447,7 +457,7 @@ Inbox → Todo → Doing → Done
 
 ### 1순위: Tutorial Vertical Slice와 기능 우선 Greybox
 
-TUT-04 비교·결과 UI는 기술 구현됐고 실제 두 Lap 확인이 남았다. 2026-09-03 이후 신규 기능은 `FLOW-01 상태·Mission/Drone 데이터 → 시작 트레일러·로비 → 미션 선택/설명 → 미션 트레일러·맵 → Drone 선택 → Mission/목표 UI → AI/MG/Jamming` 순서로 진행한다. 현재 FLOW-01~03은 로컬 구현·집중 검증을 완료했고 다음 카드는 FLOW-04다. 사람 Operator와 NPC 대화 수령 흐름은 만들지 않는다. 상세 기준은 `docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`를 따른다.
+TUT-04 비교·결과 UI는 기술 구현됐고 실제 두 Lap 확인이 남았다. 2026-09-08 현재 정찰 Scan·FPV 충돌 자폭·드랍 탑뷰/Payload, 임시 좌/우 클릭 공통 역할 입력과 `FLOW-01~08`의 시작 화면→로비→브리핑→Map→Drone 선택→Mission 목표 UI→성공/실패→재도전/로비 복귀를 로컬 구현했다. 전체 수명주기는 완전히 새 PIE 실행 기준 3회 자동 검증을 통과했다. 다음 단계는 Training Map의 Scan/Payload Target·역할 상태 UI와 Editor 수동 Vertical Slice 확인이다. 최종 역할 키는 현재 미정이다. 사람 Operator와 NPC 대화 수령 흐름은 만들지 않는다. 실제 Mission Trailer Media, 최종 WBP 외형, 세부 Mission 규칙은 현재 미정이며 상세 기준은 `docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`를 따른다.
 
 ### 병행: PC 간 공유 검증
 

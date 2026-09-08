@@ -1,10 +1,10 @@
 # Drone 현재 코드 구조와 사용자 확인 작업
 
-기준일: 2026-09-03 (Asia/Seoul)
+기준일: 2026-09-08 (Asia/Seoul)
 
 이 문서는 현재 Unreal `drone` 저장소를 직접 확인한 결과를 정리한다. 모든 소스 경로는 이 저장소 루트를 기준으로 적는다.
 
-TUT-03 완료 기능 Commit은 `551e287`이다. 현재 공유 main은 `2d6a459`이며 MG 점유·조준·사격·사망 뒤 재점유, 공통 체력, Cover 대응, Drone 파괴 시 교전 종료, 탄창·AI-VIS-01A 표현 Event와 Smart Object 방향 보강까지 포함한다. FLOW-01~03과 NPC Weapon Visual 기반은 이 위의 로컬 미커밋이다. 팀원 환경 맵·재질 변경과 정리 Merge `888414f`도 보존한다.
+현재 C 드라이브 공유 기준은 Unreal `main=origin/main=dbc0dd8`, 문서 `main=origin/main=aaef93d`다. 그 위 역할 기능·공통 역할 입력·FLOW-04~08은 로컬 미커밋이다. 과거 TUT-03·AI Commit 번호는 아래 날짜별 역사 기록으로 보존하며 Codex는 Commit·Push하지 않는다.
 
 NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합됐다. 자산은 main에 있지만 프로젝트 소유 Widget Host는 아직 구현하지 않았으므로 화면에 나타나지 않는 것이 정상이다.
 
@@ -17,7 +17,8 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합�
 | `Drone.AI` Automation | 11/11 통과. Rifle 빈 시험 World의 예상 RecastNavMesh 경고 1건 |
 | 전체 `Drone.` Automation | 27/27 통과, 실패 0 |
 | 전투 집중 검증 | AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01 관련 집중 테스트 통과. AI-VIS-01A Editor Build와 WeaponContract·RifleTrace·ShotgunTrace 3/3 통과. 이 변경을 포함한 `6a18210` 뒤 전체 묶음은 아직 반복하지 않음 |
-| Front-end Flow | FLOW-01~03 Game/Editor Build, Data/Front-end Asset 새 프로세스 Validate, 최종 `Drone.Flow` 3/3 통과. Root Widget 1개·중복 전환 0·선택 전 Drone 0대·Definition 기반 Mission 설명 일치 확인 |
+| Front-end Flow | FLOW-01~08 완료. `Drone.Flow` 5/5 통과, 전체 수명주기를 완전히 새 PIE 실행 3회 반복해 Root·Map 요청·Drone·Director·Finish 중복 0 확인 |
+| 역할·비행 회귀 | 공통 Primary/Secondary Action 포함 `Drone.Prototype` 7/7 통과. IMC 18 Mapping과 Pawn 소유 Binding 확인 |
 | `CompileAllBlueprints` | Blueprint Errors 0, Blueprint warnings 0, failed load 0. 별도 Summary에 기존 Battlefield Pose GUID와 MCP 고지 경고 유지 |
 | 현재 에셋 이식 재검증 | FPV 전용 1/1, Blueprint 0/0/0, 스테이징 선택 자산·현재 Integration 금지 의존성 0, 이식 13개 LFS와 fsck 통과 |
 | 기존 Standalone 시각 기록 | FPV 외형, 고정 추적 Camera, 실제 WBP HUD, Cyan 안내선, Current/Inactive Gate 표시 확인 |
@@ -29,7 +30,7 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합�
 
 2026-09-03 사용자 결정으로 사람 Operator Character와 NPC 대화 기반 Mission 수령, Operator↔Drone 전환은 폐기됐다. 새 실행 흐름은 `시작 트레일러 → 로비 → 미션 선택/측면 설명 → 미션 트레일러 → Map → Drone 선택 → Mission 시작/측면 목표 UI`다.
 
-현재 Source/Asset에는 FLOW-01 상태·Mission/Drone Definition, FLOW-02 정적 Opening→Lobby, FLOW-03 Training Mission 선택·설명·시작까지 있다. `Lvl_DroneFrontEnd`의 전용 GameMode는 Pawn을 만들지 않고 전용 Controller가 `WBP_DroneFrontEndRoot` 하나만 소유한다. 실제 영상, Map 이동과 Drone Spawn은 아직 없다. 기존 `ADronePrototypeGameMode`의 즉시 Spawn/Possess는 Training 단독 검증용으로 유지한다. 상세 책임과 작업 순서는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 따른다.
+현재 Source/Asset에는 FLOW-01~08 전체 상태와 정적 Opening→Lobby→Briefing→Training Map→3종 선택→Drone 한 대 Spawn/Possess→목표→결과→재도전/로비 복귀가 있다. Front-end와 Mission 선택 전에는 비-Drone Spectator만 사용한다. 실제 Trailer 영상·최종 WBP/Preview와 Training 역할 Target·상태 HUD는 아직 없고 C++ 기본 Layout이 기능 흐름을 실행한다. 기존 `ADronePrototypeGameMode`의 즉시 Spawn/Possess는 Training 단독 검증용으로 유지한다. 상세 책임과 작업 순서는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)와 문서 맨 아래 최신 절을 따른다.
 
 ## 1. 런타임 연결 구조
 
@@ -37,17 +38,18 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합�
 
 ```text
 /Game/Drone/Maps/Lvl_DroneFrontEnd
-└─ BP_DroneFrontEndGameMode (Default Pawn 없음)
+└─ BP_DroneFrontEndGameMode (비-Drone Spectator)
    └─ BP_DroneFrontEndPlayerController
       ├─ GameInstance의 UDroneGameFlowSubsystem
-      │  ├─ Mission/Drone Catalog 각 1개
+      │  ├─ Mission 1개 / 역할 Drone 3개 Catalog
       │  └─ Boot → OpeningTrailer → LobbyMissionSelect
       └─ WBP_DroneFrontEndRoot 한 개
          ├─ OpeningPanel + ContinueButton
-         └─ LobbyPanel
+         ├─ LobbyPanel
             ├─ Training Mission 선택 버튼
             ├─ Definition 기반 이름·설명·지역/난이도
-            └─ 하단 시작 → MissionTrailer
+         │  └─ 하단 시작 → MissionTrailer
+         └─ MissionBriefingPanel → 선택 Map OpenLevel
 ```
 
 `WBP_DroneFrontEndRoot`는 현재 Designer가 비어 있어 C++ 정적 대체 Layout을 쓴다. 사용자가 UI를 꾸밀 때 `OpeningPanel`, `LobbyPanel`, `ContinueButton` 이름을 지키면 C++ 수명·전환 로직을 다시 만들 필요가 없다. 실제 Trailer 종료는 `FinishOpeningTrailer`, Blueprint Animation/표현은 `ReceiveFrontEndStateDisplayed`를 사용한다.
@@ -244,11 +246,12 @@ Source/Drone/
 |---|---|---|
 | `ADronePrototypeGameMode` | Prototype Pawn과 PlayerController의 native 기본 Class 제공 | Mission·Lap·점수 규칙 |
 | `UDroneGameFlowSubsystem` | GameInstance 수명의 8개 상태, Mission/Drone Catalog·선택, 잘못된 순서·중복 요청 거부 | Widget 외형, OpenLevel, Pawn Spawn |
-| `UDroneMissionDefinition` / `UDroneDefinition` | 로비 Text·Map·허용 Drone과 실제 Pawn Class의 데이터 원본 | 화면 생성, Mission 실행 판정 |
+| `UDroneMissionDefinition` / `UDroneDefinition` | 로비 Text·Map·허용 Drone, 기체 역할, 계획/구현 Capability와 실제 Pawn Class의 데이터 원본 | 화면 생성, Mission 실행 판정 |
+| `EDroneControlMode` / `EDroneHandlingPreset` | 쉬운/실제 조작형과 안정/균형/고기동을 서로 독립된 설정으로 표현 | 기체 역할, 최종 물리 모델 |
 | `ADroneFrontEndGameMode` | Drone 선택 전 Pawn을 만들지 않는 Front-end 실행 경계 | Training/Mission Gameplay |
 | `ADroneFrontEndPlayerController` | WBP Root 한 개 생성·정리, Flow 연결, UI 입력 | Flow 상태 중복 소유, 미션 목록 하드코딩 |
 | `UDroneFrontEndRootWidget` | Opening/Lobby 전환, Mission 선택·Definition 표시·확정, WBP 표현 Event와 native fallback | 실제 영상 재생, Map 로드, Drone Spawn |
-| `ADronePrototypePawn` | Enhanced Input Binding, 이동, 고도 이동, Actor Yaw, Camera Pitch, Component 소유 | HUD 생성, Gate 순서 판정, 최종 비행 물리 |
+| `ADronePrototypePawn` | Enhanced Input Binding, 이동·고도·Yaw·Camera, Definition 적용, 조작 방식/핸들링 전환과 Blueprint 변경 Event | HUD 생성, Gate 순서 판정, 모터별 최종 비행 물리 |
 | `UDroneTelemetryComponent` | 0.1초 기본 Timer와 즉시 갱신으로 Telemetry Snapshot 계산·Broadcast, Lap Recorder의 위치 표본 주기 제공 | 화면 배치, Lap 계산, 지형 AGL 계산 |
 | `ADronePrototypePlayerController` | 로컬 HUD 한 개의 생성·재사용·정리, Possess Pawn의 Telemetry·Health 연결 | Telemetry·체력 계산, HUD Designer 외형 |
 | `UDroneFlightHUDWidget` | Snapshot·Drone 체력 표시 문자열 생성, C++↔WBP TextBlock 연결, native fallback | Pawn 검색 Tick, 비행/체력 수치 계산, Gate 안내 UI |
@@ -755,18 +758,22 @@ TUT-03의 원본 시간·거리·평균 속도와 TUT-04B의 이전 평균·Best
 
 ### Drone 전체 데이터 흐름까지 이어서 읽을 때
 
-15. `Source/Drone/Prototype/DronePrototypePawn.h/.cpp`
-16. `Source/Drone/Health/DroneHealthComponent.h/.cpp`
-17. `Source/Drone/AI/Weapons/DroneNPCWeaponComponent.h/.cpp`
-18. `Source/Drone/AI/DroneSmartObjectStation.h/.cpp`
-19. `Source/Drone/AI/DroneNPCAIController.h/.cpp`
-20. `Source/Drone/Telemetry/DroneTelemetryTypes.h`
-21. `Source/Drone/Telemetry/DroneTelemetryComponent.h/.cpp`
-22. `Source/Drone/Prototype/DronePrototypePlayerController.h/.cpp`
-23. `Source/Drone/UI/DroneFlightHUDWidget.h/.cpp`
-24. `Source/Drone/Prototype/DronePrototypeGameMode.h/.cpp`
+15. `Source/Drone/Mission/DroneDefinition.h/.cpp`
+16. `Source/Drone/Prototype/DroneFlightControlTypes.h`
+17. `Source/Drone/Prototype/DronePrototypePawn.h/.cpp`
+18. `Source/Drone/Health/DroneHealthComponent.h/.cpp`
+19. `Source/Drone/AI/Weapons/DroneNPCWeaponComponent.h/.cpp`
+20. `Source/Drone/AI/DroneSmartObjectStation.h/.cpp`
+21. `Source/Drone/AI/DroneNPCAIController.h/.cpp`
+22. `Source/Drone/Telemetry/DroneTelemetryTypes.h`
+23. `Source/Drone/Telemetry/DroneTelemetryComponent.h/.cpp`
+24. `Source/Drone/Prototype/DronePrototypePlayerController.h/.cpp`
+25. `Source/Drone/UI/DroneFlightHUDWidget.h/.cpp`
+26. `Source/Drone/Prototype/DronePrototypeGameMode.h/.cpp`
 
-이 순서는 `Gate 판정 → 기록 → Pawn → Health → 무기 Damage → MG/AI 사망 정리 → Telemetry·HUD` 순으로 책임을 따라가게 한다.
+이 순서는 `Gate 판정 → 기록 → 기체 역할/조작 설정 → Pawn → Health → 무기 Damage → MG/AI 사망 정리 → Telemetry·HUD` 순으로 책임을 따라가게 한다.
+
+기체 역할별 현재 구현 여부와 Blueprint 설정 절차는 [`DRONE_TYPES_AND_CONTROL_MODES.md`](DRONE_TYPES_AND_CONTROL_MODES.md)를 먼저 본다.
 
 ## 8. Editor 수동 확인법과 정상 결과
 
@@ -928,4 +935,69 @@ Gate는 정상 완료되지만 기록이 만들어지지 않으면 다음을 확
 5. 중간에 `ResetSequence`, Course Reconfigure 또는 Pawn 파괴가 발생하지 않았는지
 6. 4 Gate 완료 기록의 Segment 수가 `Gate 수 - 1`, 즉 3인지
 
-수동 확인 결과는 TUT-04와 Front-end 화면 기록에 남긴다. 현재 신규 구현 카드는 `FLOW-04`이며, 정적 Mission Briefing 종료 뒤 선택한 `UDroneMissionDefinition::MissionMap`을 열고 GameInstance 선택을 보존한다.
+수동 확인 결과는 TUT-04와 Front-end 화면 기록에 남긴다.
+
+## 2026-09-08 현재 역할·Front-end·Mission 구조
+
+현재 코드 흐름은 아래처럼 연결된다.
+
+```text
+UDroneGameFlowSubsystem (GameInstance 수명)
+  → UDroneFrontEndRootWidget
+  → ADroneFrontEndPlayerController가 선택 MissionMap OpenLevel
+  → ADroneMissionGameMode + ADroneMissionPlayerController
+  → UDroneSelectionWidget
+  → 선택 Definition Pawn 1대 Spawn/Possess
+  → ADroneMissionDirector
+  → UDroneMissionObjectiveWidget
+  → UDroneMissionResultWidget
+  → 같은 Mission Retry 또는 Front-end Lobby
+```
+
+핵심 책임은 다음과 같다.
+
+| 코드 | 현재 책임 |
+|---|---|
+| `Flow/DroneGameFlowSubsystem.*` | 맵을 넘어 유지되는 상태, Mission/Drone 선택, 중복 요청 거부 |
+| `Flow/DroneFrontEndPlayerController.*` | Front-end Root 1개 생성, 선택한 Map을 정확히 한 번 열기 |
+| `UI/DroneFrontEndRootWidget.*` | Opening·Lobby·정적 Briefing 표시와 버튼 입력 |
+| `Flow/DroneMissionGameMode.*` | 선택 전 비-Drone Spectator 사용, 자동 Drone Spawn 방지 |
+| `Flow/DroneMissionPlayerController.*` | 선택 UI, 선택 Definition 한 대 Spawn/Possess, Director·목표·결과 UI 수명주기 |
+| `UI/DroneSelectionWidget.*` | 정찰/FPV/드랍과 쉬운/실제 조작형·안정/균형/고기동 선택 |
+| `Mission/DroneMissionDirector.*` | 출격 뒤 목표 시작, Event Snapshot, 성공/실패 1회 확정 |
+| `Abilities/DroneReconScanComponent.*` | 거리·화각·LOS 유지형 정찰 Scan |
+| `Abilities/DroneImpactDetonationComponent.*` | Arm 뒤 유효 속도 충돌 시 1회 폭발·기체 파괴 |
+| `Abilities/DronePayloadDropComponent.*` | 상단 시점, 한 발 Payload, 목표 접촉 결과와 재장전 |
+| `UI/DroneMissionObjectiveWidget.*` | Director Event만 구독하는 측면 목표 패널; Tick/Actor 전체 검색 없음 |
+| `UI/DroneMissionResultWidget.*` | 성공/실패, 재도전, 로비 복귀 |
+
+Training Mission의 현재 Greybox 규칙은 `Gate 0→3 Lap 완료=성공`, `Drone Health 0=실패`다. 이는 Vertical Slice 시험 규칙이며 최종 Story Mission 규칙은 현재 미정이다.
+
+### 현재 UI의 정확한 상태
+
+- Front-end에는 기존 `WBP_DroneFrontEndRoot`가 있지만 FLOW-04 이후 필수 이름이 모두 없으면 C++ 기본 Layout으로 안전하게 대체된다.
+- Drone 선택·목표·결과는 현재 C++ native fallback UI로 실제 실행 가능하다.
+- 최종 WBP Designer와 Drone 3D Preview는 아직 만들지 않았다. 기능 완료와 최종 외형 완료를 같은 것으로 기록하지 않는다.
+- 최종 WBP를 만들 때 아래 이름을 그대로 배치하면 C++ 상태·버튼·Delegate 로직을 재사용할 수 있다. Blueprint Event Graph에 Flow나 Spawn 로직을 다시 만들지 않는다.
+
+| Widget 부모 | 필수 Designer 이름 |
+|---|---|
+| `UDroneFrontEndRootWidget` | `OpeningPanel`, `LobbyPanel`, `MissionBriefingPanel`, `ContinueButton`, `OpeningTitleText`, `LobbyTitleText`, `LobbyStatusText`, `MissionSelectButton`, `MissionSelectButtonText`, `MissionNameText`, `MissionDescriptionText`, `MissionMetaText`, `StartMissionButton`, `MissionBriefingTitleText`, `MissionBriefingBodyText`, `FinishMissionBriefingButton` |
+| `UDroneSelectionWidget` | `DroneSelectionPanel`, `MissionNameText`, `DroneNameText`, `DroneDescriptionText`, `DroneProfileText`, `DroneButton0~2`, `DroneButton0Text~2Text`, `ControlModeButton`, `ControlModeButtonText`, `HandlingPresetButton`, `HandlingPresetButtonText`, `LaunchDroneButton` |
+| `UDroneMissionObjectiveWidget` | `MissionObjectivePanel`, `MissionObjectiveTitleText`, `MissionObjectiveText`, `MissionObjectiveProgressText` |
+| `UDroneMissionResultWidget` | `MissionResultPanel`, `MissionResultTitleText`, `RetryMissionButton`, `ReturnToLobbyButton` |
+
+### 사용자가 지금 Editor에서 확인할 순서
+
+1. `/Game/Drone/Maps/Lvl_DroneFrontEnd`를 연 뒤 PIE를 시작한다.
+2. `계속 → Training Mission 선택 → 미션 시작 → 작전 시작` 순서로 누른다.
+3. Training Map에서 선택 전 Drone이 없고 정찰·FPV 자폭·드랍 카드 세 개가 보이는지 확인한다.
+4. `쉬운 조작/실제 조작형`과 `안정/균형/고기동`을 각각 바꿔 본 뒤 한 기체를 출격시킨다.
+5. 선택한 Drone 한 대만 생성되고 Flight HUD와 측면 목표가 표시되는지 확인한다.
+6. Gate 0→1→2→3을 통과해 성공 화면과 `재도전`을 확인한다.
+7. 재도전 뒤 다른 기체를 선택하고 파괴/체력 0 경로에서 실패 화면과 `로비 복귀`를 확인한다.
+8. 로비에 돌아왔을 때 이전 Drone·목표·결과 UI가 남아 있지 않은지 확인한다.
+
+정찰 `StartScan`, FPV `ArmImpactDetonation`, 드랍 `SetDropViewEnabled/DropPayload` API와 Event에 공통 `Primary Ability / Secondary Ability` Input Action을 연결했다. 임시 Greybox 키는 좌클릭/우클릭이며 최종 키로 확정한 것이 아니다. 정찰은 좌클릭으로 가장 가까운 유효 Target Scan·우클릭 취소, FPV는 좌클릭 Arm·우클릭 Disarm, 드랍은 좌클릭 투하·우클릭 탑뷰 전환이다. Training Map에는 아직 Scan/Payload Target 시험 표식과 역할 상태 HUD가 없으므로 다음 카드 `DR-ROLE-TARGET-01`에서 배치·피드백을 연결한다.
+
+자동 검증은 `DroneEditor Win64 Development`, `Drone.Flow` 5/5, `Drone.Prototype` 7/7을 통과했다. `MissionEntryPIE`는 위 전체 수명주기를 완전히 새 PIE 실행에서 3회 반복해 3/3 통과했다. Commit·Push는 하지 않았다.

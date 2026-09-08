@@ -1,14 +1,15 @@
 # 이동 중 읽는 Drone 현황·내 작업·학습 일정
 
-기준일: 2026-09-03 (Asia/Seoul)
+기준일: 2026-09-08 (Asia/Seoul)
 
 이 문서는 휴대폰으로 현재 상태와 다음 행동을 빠르게 확인하기 위한 요약본이다. 코드의 상세 설명은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md), 학습 기록 양식은 [`STUDY_PLANS.md`](STUDY_PLANS.md)를 따른다.
 
 ## 30초 요약
 
-- Unreal 공유 기준선은 `main=origin/main=2d6a459`이며 전투 Greybox·AI-VIS-01A와 Smart Object 방향 보강까지 반영돼 있다.
+- 현재 C 드라이브 Unreal 공유 기준선은 `main=origin/main=dbc0dd8`, 문서는 `main=origin/main=aaef93d`다. 그 위 변경은 로컬 미커밋이며 Codex는 Commit·Push하지 않는다.
 - Drone 입력·Telemetry·실제 WBP HUD·Training Course·Ring Gate 4개, Segment/Lap 원본과 이전 평균·Best·Delta 결과까지 구현됐다.
-- 현재 개발 완료 지점은 `FLOW-03` 미션 선택·측면 설명·하단 시작이며 다음 신규 기능은 `FLOW-04` 정적 브리핑→선택 Map 로드다.
+- 역할 기체 3종과 `FLOW-01~08` 자동화 Vertical Slice가 완료됐다. 정적 브리핑→Map→Drone 선택→목표→성공/실패→재도전/로비 복귀를 새 PIE 실행 3회로 검증했다.
+- 임시 역할 입력도 연결했다. 좌클릭은 정찰 Scan/FPV Arm/드랍 투하, 우클릭은 정찰 취소/FPV Disarm/드랍 탑뷰이며 최종 키는 미정이다.
 - 확정 화면 흐름은 `시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → Map → Drone 선택 → Mission 시작/측면 목표 UI`다. 사람 Operator·NPC 대화 수령·Operator↔Drone 전환은 폐기했다.
 - 현재 실행 세션은 Unreal `D:\JGY\project\drone`, 문서 `D:\JGY\project\md`다. `C:\URproject\drone`은 다른 PC의 이전 검증 경로이며 제공 에셋 원본은 직접 수정하지 않는다.
 - NavigationArrows 최소 자산 6개와 전용 테스트는 main에 병합됐다. 화면 Host는 아직 미구현이다.
@@ -16,7 +17,7 @@
 - 사용자는 Gate나 기록 C++를 다시 만들 필요가 없다. 직접 비행하며 Gate 크기·간격·색·조종 난이도와 Drone Loop를 확인하면 된다.
 - MG Claim·Move뿐 아니라 Occupied·Aim·Damage·사망 뒤 다른 AI 재점유, Cover 대응과 Drone 파괴 시 전체 교전 종료까지 공유 main에 반영했다.
 - 전투 비주얼 감사와 BP `OnWeaponFired`·`OnReloadCompleted`까지 준비됐다. Manny Rifle Animation 38개와 Weapon Mesh 70개를 확인했지만 이름으로 식별되는 Shotgun Weapon Mesh는 0개다.
-- FLOW-01은 8개 상태의 GameInstance Subsystem과 실제 Training Mission/Scout Drone Data Asset을 만들었다. FLOW-02는 실제 `WBP_DroneFrontEndRoot`, 전용 BP Controller/GameMode와 `Lvl_DroneFrontEnd`를 만들고 Opening→Lobby를 같은 Widget 한 개로 전환한다. FLOW-03은 Training Mission 버튼·설명·지역/난이도·하단 시작을 같은 Data Asset에 연결했다.
+- FLOW-01~03은 상태·Data Asset·Opening/Lobby/Mission 선택, FLOW-04~07은 Briefing·Map 이동·3종 선택·목표·결과, FLOW-08은 전체 수명주기 3회 반복을 담당한다. 정찰 Scan·FPV 충돌 자폭·드랍 탑뷰/Payload API도 역할별로 구현됐다.
 - 확정된 학습 항목은 `정보처리산업기사`와 `C++ 코딩테스트` 두 가지뿐이다.
 - 정보처리산업기사 2026년 3회 필기 접수는 끝났다. 오늘 가장 먼저 Q-Net에서 자신의 접수·면제·응시 상태를 확인해야 한다.
 - 코딩테스트는 공통 시험일이 없으므로 자격시험 일정에 맞춰 주간 반복 학습으로 운영한다.
@@ -25,9 +26,9 @@
 
 | 구분 | 현재 상태 |
 |---|---|
-| Unreal 저장소 | `D:\JGY\project\drone` |
-| Unreal 기준 Commit | `2d6a459` |
-| Git 상태 | `main=origin/main=2d6a459`; FLOW-01~03·NPC Visual 기반 Source/Test, Data Asset, Front-end BP/Map을 합쳐 26개 경로 로컬 미커밋 |
+| Unreal 저장소 | `C:\URproject\drone` |
+| Unreal 기준 Commit | `dbc0dd8` |
+| Git 상태 | `main=origin/main=dbc0dd8`; 역할 기능·조작 모드·FLOW-04~08 Source/Test/Data Asset이 로컬 미커밋 |
 | Git LFS | `fsck` 정상 |
 | 최종 Game/Editor Build | 성공 |
 | Tutorial 자동화 | 7/7 통과 |
@@ -37,9 +38,9 @@
 | Standalone | 실제 WBP HUD·Cyan Course·Current/Inactive Gate 표시 확인 |
 | 에셋 이식 | 환경 3종+OilRig와 후보 라이브러리 891개. 새 Root 수량 일치·대표 로드·외부/누락 0, LFS fsck 통과 |
 | NPC/Smart Object | 공유 main에 MG Claim/Move·Occupied·Aim·Damage·사망 교대·Cover·Drone 파괴 교전 종료·탄창과 BP 표현 Event까지 구성. 단계별 Editor Build·무기 테스트 3/3 통과 |
-| Front-end Flow | FLOW-03 뒤 Game/Editor Build와 최종 `Drone.Flow` 3/3 통과. WBP Root 1개·중복 전환 0·선택 전 Drone 0대·Mission Definition과 표시 일치 확인 |
+| Front-end Flow | FLOW-01~08 완료. Editor Build, `Drone.Flow` 5/5, `Drone.Prototype` 7/7 통과. 전체 흐름을 새 PIE 실행 3회 반복해 Root/Map 요청/Drone/Director/Finish 중복 0 확인 |
 
-공유 이전 기준선에서 Game/Editor Build, AI 11개와 전체 Drone 27개를 실행했다. 실패는 0이고 Rifle의 빈 시험 World에서 RecastNavMesh가 없다는 예상 경고 1건만 있다. Blueprint 전체 Compile은 오류·Blueprint 경고·로드 실패 0이며 별도 공급사 Pose GUID와 MCP 고지 경고 29건은 기능 결과와 분리한다. 최신 FLOW-01에서는 Editor Build와 직접 관련 테스트·Data Validate만 확인했고 전체 회귀·Blueprint 전체 Compile은 반복하지 않았다.
+이전 공유 기준선의 AI·Blueprint 검증 기록은 그대로 유효한 역사 기록이다. 이번 로컬 변경은 Editor Build, `Drone.Flow` 5/5, `Drone.Prototype` 7/7로 다시 확인했다. 빈 시험 World에서 RecastNavMesh가 없다는 기존 경고는 기능 실패와 분리한다.
 
 ## 2. 코드가 어떻게 연결되는가
 
@@ -124,6 +125,11 @@ Lvl_NPCSmartObjectGreybox
 - 실제 Blueprint Widget `WBP_DroneFrontEndRoot`와 전용 Front-end BP Controller/GameMode/Map
 - 실제 영상 전의 정적 Opening 화면, `계속` 버튼, 같은 Root의 Lobby 전환
 - Training Mission 목록 버튼, 선택 시 Data Asset 기반 이름·설명·지역/난이도, 하단 `미션 시작`
+- 선택 Mission 기반 정적 Briefing과 실제 Training Map 이동
+- 정찰/FPV 자폭/드랍 선택, 쉬운/실제 조작형과 안정/균형/고기동 설정
+- 선택 전 Drone 0대, 확정 뒤 선택 Definition 한 대 Spawn/Possess
+- Event 기반 측면 목표 패널, 성공/실패 결과, 재도전과 로비 복귀
+- 공통 Primary/Secondary 역할 Input Action과 IMC/Pawn Binding
 - Speed, Altitude, Vertical Speed, Heading 표시
 - 우측 상단 Drone 내구도 100/100·피해·파괴 상태 표시
 - Gate Ring의 `Inactive`, `Current`, `Completed` 색 전환
@@ -132,8 +138,8 @@ Lvl_NPCSmartObjectGreybox
 아직 없음:
 
 - 실제 시작 트레일러 영상·최종 로비 외형
-- 미션 트레일러·Map 로드 Flow·Map 내 Drone 선택 화면
-- Mission 측면 목표 패널과 성공/실패 결과 화면
+- 실제 미션 트레일러 영상과 최종 WBP Designer·Drone 3D Preview
+- Training Map의 실제 Scan/Payload Target 시험 표식과 역할 상태 HUD
 - 다음 Gate 번호·화살표
 - Wrong Order·Wrong Direction 메시지
 - 현재 Lap/Segment 실시간 타이머와 구간별 결과 표
@@ -184,8 +190,8 @@ Lvl_NPCSmartObjectGreybox
 
 ### 미구현
 
-- 실제 시작 영상·최종 로비 외형, 미션 트레일러·Map 내 Drone 선택
-- Drone 선택 뒤 Mission 시작과 측면 목표 UI·결과/재도전/로비 복귀
+- 실제 시작/미션 영상·최종 로비/선택/목표/결과 WBP 외형과 Drone Preview
+- Training Map 역할 Target과 최종 HUD 피드백
 - 다음 Gate·잘못된 순서/방향 안내와 완주 팝업·구간별 결과 표
 - 명시적인 Take Off·Landing·Crash 상태와 최종 비행 물리
 - Mission·귀환·평가
@@ -216,21 +222,26 @@ Lvl_NPCSmartObjectGreybox
 ### PC 앞에서 할 일
 
 1. 다른 PC라면 `drone`과 `md` 저장소를 Pull한다.
-2. Unreal 기준 Commit이 `origin/main=2d6a459`인지 확인한다. FLOW-01~03은 현재 PC의 로컬 미커밋이므로 다른 PC에는 아직 보이지 않는 것이 정상이다.
-3. 현재 PC에서는 `/Game/Drone/Maps/Lvl_DroneFrontEnd`를 열어 `계속`→로비→Training Mission 선택→설명/지역/난이도→하단 시작까지 확인한다. 시작 뒤 실제 영상·Map 이동이 없는 것은 FLOW-04 전 정상이다.
-4. Gate 0→1→2→3을 정방향으로 완주한다.
-5. 미래 Gate를 먼저 통과하거나 현재 Gate를 역방향으로 통과해 진행되지 않는지 확인한다.
-6. 마지막 Gate 뒤 네 Gate가 모두 Completed 색인지 확인한다.
-7. 두 번 완주해 첫 시도 `기준 기록 생성`, 두 번째 시도 이전 평균·Best·Delta 부호를 확인한다.
-8. `Lvl_OilRig`을 열어 Map Check와 재질·조명·스케일·충돌·성능을 기록한다.
-9. Ground Drone/MG·Soldier/Insurgent·Quad v4/Sting 후보의 외형과 스케일을 확인한다.
-10. Gate 크기·높이·간격·색 대비와 Keyboard/Gamepad 조종 체감을 메모한다.
-11. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가고 종료 후 즉시 멈추는지 기록한다.
-12. AI 기반 Merge 뒤 Editor를 재시작해 Smart Objects와 Gameplay Interactions Plugin을 확인한다.
-13. `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`을 열어 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 12개(기존 10 + Cover 2)의 위치·방향을 확인한다.
-14. `P` 키로 네 NPC 시작점과 Station 사이의 녹색 NavMesh 연결을 확인한다.
-15. PIE에서 Hostile 2명이 EnemyPatrol 3개 사이를 반복 이동하고 같은 자리에만 머물지 않는지 확인한다.
-16. Friendly 2명이 FriendlyBasePatrol/Ambient 사이를 이동하고 같은 1-Slot에 동시에 머물지 않는지 눈으로 확인한다.
+2. Unreal 기준 Commit이 `origin/main=dbc0dd8`인지 확인한다. FLOW-04~08과 역할 기능은 현재 PC의 로컬 미커밋이므로 다른 PC에는 아직 보이지 않는 것이 정상이다.
+3. 현재 PC에서는 `/Game/Drone/Maps/Lvl_DroneFrontEnd`를 열어 `계속`→로비→Training Mission→정적 Briefing→Training Map→Drone 선택→출격까지 확인한다.
+4. 쉬운/실제 조작형과 안정/균형/고기동을 바꿔 선택 값이 출격 기체에 적용되는지 확인한다.
+5. Gate 0→3 완주 뒤 성공→재도전, 기체 체력 0 뒤 실패→로비 복귀를 확인한다.
+   - 정찰: 유효 표식 앞 좌클릭 Scan, 우클릭 취소
+   - FPV: 좌클릭 Arm, 우클릭 Disarm, Arm 뒤 충돌
+   - 드랍: 우클릭 탑뷰, 좌클릭 투하
+6. Gate 0→1→2→3을 정방향으로 완주한다.
+7. 미래 Gate를 먼저 통과하거나 현재 Gate를 역방향으로 통과해 진행되지 않는지 확인한다.
+8. 마지막 Gate 뒤 네 Gate가 모두 Completed 색인지 확인한다.
+9. 두 번 완주해 첫 시도 `기준 기록 생성`, 두 번째 시도 이전 평균·Best·Delta 부호를 확인한다.
+10. `Lvl_OilRig`을 열어 Map Check와 재질·조명·스케일·충돌·성능을 기록한다.
+11. Ground Drone/MG·Soldier/Insurgent·Quad v4/Sting 후보의 외형과 스케일을 확인한다.
+12. Gate 크기·높이·간격·색 대비와 Keyboard/Gamepad 조종 체감을 메모한다.
+13. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가고 종료 후 즉시 멈추는지 기록한다.
+14. AI 기반 Merge 뒤 Editor를 재시작해 Smart Objects와 Gameplay Interactions Plugin을 확인한다.
+15. `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`을 열어 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 12개(기존 10 + Cover 2)의 위치·방향을 확인한다.
+16. `P` 키로 네 NPC 시작점과 Station 사이의 녹색 NavMesh 연결을 확인한다.
+17. PIE에서 Hostile 2명이 EnemyPatrol 3개 사이를 반복 이동하고 같은 자리에만 머물지 않는지 확인한다.
+18. Friendly 2명이 FriendlyBasePatrol/Ambient 사이를 이동하고 같은 1-Slot에 동시에 머물지 않는지 눈으로 확인한다.
 
 다시 만들 필요가 없는 것:
 
@@ -264,11 +275,12 @@ TUT-03 Segment/Lap 기록 Done
 → AI-AMMO-01 Rifle·Shotgun 탄창·재장전 Greybox Done
 → AI-VIS-01A 자산 호환성 감사·BP 발사/재장전 Event Done
 → FLOW-00 사람 Operator 폐기·Front-end Mission Flow 문서 기준선 Done
-→ FLOW-01 상태·Mission/Drone 데이터 계약 Done
-→ FLOW-02 정적 시작 화면→로비 Done
-→ FLOW-03 미션 선택·측면 설명·하단 시작 Done
-→ FLOW-04 브리핑·Map 로드 Next
-→ FLOW-05~06 Drone 선택·목표 UI
+→ FLOW-01~03 상태·로비·Mission 선택 Done
+→ FLOW-04~07 브리핑·Map·Drone 선택·목표·결과 Done
+→ FLOW-08 전체 수명주기 새 PIE 실행 3회 Done
+→ Editor 수동 Vertical Slice·TUT-04 두 Lap 확인 Next
+→ 역할 공통 Input Action Done
+→ Training Map 역할 Target·상태 HUD와 최종 WBP/Preview 후속
 → AI-VIS-01B 실제 전투 표현은 Mission 흐름 뒤 · Shotgun Mesh/최종 진영 외형 미정
 ```
 

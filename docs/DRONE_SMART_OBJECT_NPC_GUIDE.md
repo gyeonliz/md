@@ -547,7 +547,7 @@ Editor 테스트:
 | `AI-VIS-01A` | 자산 호환성 감사·BP 표현 Event | **Done** — Manny Rifle Animation 38개, Weapon Mesh 70개, 이름 기반 Shotgun Mesh 0개와 서로 다른 NPC Skeleton을 기록. 발사/Reload Event 및 집중 테스트 3/3 통과 |
 | `AI-VIS-01B` | 외형·Animation·FX·SFX 연결 | Manny 임시 Rifle과 MG 표현부터 연결해 T Pose·손 위치·Muzzle 기준 확인. Shotgun 실제 Mesh와 최종 역할 외형은 미정 |
 
-`AI-SO-00 → AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01 → AI-PER-01 → AI-WPN-01 → AI-WPN-02 → AI-WPN-03 → AI-MG-01 → AI-MG-02 → HP-01 → AI-COVER-01 → AI-COMBAT-END-01 → AI-AMMO-01 → AI-VIS-01A`는 코드·에셋과 해당 집중 자동화 기준 완료했다. AI 하위 기능의 다음 후보는 `AI-VIS-01B`지만, 프로젝트 전체 신규 기능 우선순위는 FLOW-01~03 완료 뒤 `FLOW-04~06` Front-end Mission 흐름이다.
+`AI-SO-00 → AI-SO-01 → AI-NPC-01 → AI-PATROL-01 → AI-FRIEND-01 → AI-PER-01 → AI-WPN-01 → AI-WPN-02 → AI-WPN-03 → AI-MG-01 → AI-MG-02 → HP-01 → AI-COVER-01 → AI-COMBAT-END-01 → AI-AMMO-01 → AI-VIS-01A`는 코드·에셋과 해당 집중 자동화 기준 완료했다. FLOW-01~08 Front-end Mission 자동화도 후속 완료됐으며, 다음 AI 후보 `AI-VIS-01B`는 전체 흐름·역할 조작과 TUT-04 두 Lap 수동 확인 뒤 진행한다.
 
 ### Asset 재검증 명령
 

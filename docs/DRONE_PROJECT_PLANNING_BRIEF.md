@@ -1,8 +1,8 @@
 # Project:Droner 통합 기획·개발 현황서
 
-기준일: 2026-09-04 (Asia/Seoul)
+기준일: 2026-09-08 (Asia/Seoul)
 
-문서 상태: FLOW-01~03 공유 완료·AI-GAZE 축 교정/MG 전용 임시 3분할 구현 완료·수동 확인 및 FLOW-04 대기
+문서 상태: 역할 기능 3종·FLOW-01~08 로컬 구현 및 전체 수명주기 새 PIE 실행 3회 자동화 완료·Editor 수동 확인 대기
 
 이 문서는 Drone 프로젝트의 게임 기획, 현재 구현 상태, 다음 개발 순서와 검증 기준을 한 번에 확인하기 위한 통합 문서다. 세부 기술 계약은 링크된 구현 문서를 따르며, 구현 완료 여부는 실제 Unreal 코드·Asset·빌드·자동화·화면 확인을 근거로 판정한다.
 
@@ -12,12 +12,12 @@
 |---|---|
 | 장르 | 싱글플레이 드론 운용·정찰·미션 게임 |
 | 엔진 | Unreal Engine 5.8.1 |
-| 현재 작업 루트 | Unreal `D:\JGY\project\drone`, 문서 `D:\JGY\project\md` |
-| 다른 PC의 이전 경로 | `C:\URproject\drone`과 해당 PC 문서 복제본 |
-| Unreal 공유 기준 | `main=origin/main=46f7f37` |
+| 현재 작업 루트 | Unreal `C:\URproject\drone`, 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
+| 다른 PC의 경로 | PC마다 다르므로 Git Commit과 LFS 상태로 판별 |
+| Unreal 공유 기준 | `main=origin/main=dbc0dd8`; 이후 역할·FLOW 변경은 로컬 미커밋 |
 | 플레이어 표현 | 사람 캐릭터 없이 Drone 조작 중심 |
 | 핵심 모드 | Tutorial 비행 훈련, Story Mission |
-| 현재 신규 개발 | `AI-GAZE-01D` Component Space 고개 시선과 `AI-MG-03` 원기둥 3분할 회전 수동 확인, 다음 흐름 카드는 `FLOW-04` 정적 브리핑→선택 Map 로드 |
+| 현재 신규 개발 | 정찰 Scan·FPV 충돌 자폭·드랍 Payload, 공통 역할 입력과 FLOW-01~08 자동화 완료. 다음은 Training 역할 Target·상태 UI와 전체 흐름 수동 확인 |
 | 제외 범위 | Android, Network/협동, 실제 군사 장비 1:1 재현 |
 
 핵심 경험은 다음과 같다.
@@ -199,7 +199,7 @@ Figma의 UI 참고 이미지는 청록·녹색 계열 전술 HUD, 얇은 선, �
 | 협업 자산 | FPV Drone, 환경 Map, Ground Drone/MG, NPC·VFX·SFX 후보 선별 이식 |
 | Front-end 기반 | GameInstance Flow/Catalog, 실제 Mission·Drone Data Asset, 전용 Map/BP GameMode·Controller/WBP, 정적 Opening→Lobby, Training Mission 선택·설명·시작 |
 
-공유 Unreal 기준은 `46f7f37`이다. 이 기준에 FLOW-01~03, 전투 Greybox, Projectile·사격 분산, 프로젝트 Rifle AnimBP와 Smart Object 방향 보강까지 들어 있다. AI-GAZE Component Space 교정과 MG 전용 3분할 임시 외형은 그 위 로컬 미커밋이다.
+현재 C 드라이브 공유 Unreal 기준은 `dbc0dd8`이다. 역할 기능 3종, 조작 모드 분리와 FLOW-04~08은 그 위 로컬 미커밋이며 Codex는 Commit·Push하지 않는다. 과거 `46f7f37` 기준 설명은 이전 작업 PC의 역사 기록이다.
 
 ### 로컬 구현·수동 확인 대기
 
@@ -284,7 +284,7 @@ ADroneMissionDirector
 
 | Map | 역할 후보 | 현재 상태 |
 |---|---|---|
-| `Lvl_DroneFrontEnd` | 게임 시작·정적 Opening·로비 | FLOW-02 로컬 구현·자동 PIE 통과 |
+| `Lvl_DroneFrontEnd` | 게임 시작·정적 Opening·로비·Mission 선택·Briefing | FLOW-01~08 로컬 구현·새 실행 3회 자동 PIE 통과 |
 | `Lvl_DronePrototype` | 입력·Collision 단위 시험 | 구현됨 |
 | `Lvl_DroneTraining` | 첫 Tutorial Mission Vertical Slice | 구현됨·두 Lap 수동 확인 대기 |
 | `Lvl_NPCSmartObjectGreybox` | AI·Smart Object·전투 시험 | 구현됨·방향 수동 확인 대기 |
@@ -320,13 +320,13 @@ ADroneMissionDirector
 | FLOW-01 Done | Flow 상태·Mission/Drone 데이터 계약 | 정상 전환, 잘못된 ID와 중복 요청 거부 자동화 통과 |
 | FLOW-02 Done | 시작 트레일러 → 로비 | 정적 Opening→Lobby, 실행마다 Root Widget·전환 요청 한 개 PIE 통과 |
 | FLOW-03 Done | 미션 선택·측면 설명·하단 시작 | 같은 Mission Definition으로 목록·설명·시작 연결, 오류·중복 거부 PIE 통과 |
-| FLOW-04 | 미션 트레일러 → Map | 선택 Mission의 브리핑 뒤 지정 Map 로드 |
-| FLOW-05 | Map 내 Drone 선택 | 확정 전 Pawn 0, 확정 뒤 허용 Drone 1대 |
-| FLOW-06 | Mission 시작·측면 목표 UI | Drone 확정 뒤에만 Director·목표 Event 시작 |
-| FLOW-07 | 결과·재도전·로비 | 성공/실패 뒤 안전한 재시작·복귀 |
-| FLOW-08 | 전체 회귀 | 새 실행부터 결과까지 3회 중복 0 |
+| FLOW-04 Done | 미션 트레일러 → Map | 정적 Briefing 뒤 선택 Mission Map 로드와 선택 보존 PIE 통과 |
+| FLOW-05 Done | Map 내 Drone 선택 | 확정 전 Drone 0, 확정 뒤 허용 Definition 1대 Spawn/Possess 통과 |
+| FLOW-06 Done | Mission 시작·측면 목표 UI | Drone 확정 뒤 Director 시작과 Event 기반 목표 패널 통과 |
+| FLOW-07 Done | 결과·재도전·로비 | 성공/실패 뒤 같은 Mission 재도전·로비 복귀 통과 |
+| FLOW-08 Done | 전체 회귀 | 완전히 새 PIE 실행 3회에서 전체 흐름과 중복 0 통과 |
 
-첫 Vertical Slice는 `Lvl_DroneTraining` 한 Mission과 FPV Integration Drone 한 대를 사용한다.
+첫 Vertical Slice는 `Lvl_DroneTraining` 한 Mission과 정찰·FPV 자폭·드랍 Definition 3종을 사용한다. 임시 좌/우 클릭 공통 역할 Input은 연결됐고 Training 역할 Target·상태 UI와 최종 WBP 외형·Preview는 후속이다.
 
 ### 3단계 — Flight·Mission 완성
 

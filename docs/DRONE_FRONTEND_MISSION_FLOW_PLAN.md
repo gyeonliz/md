@@ -144,11 +144,11 @@ Widget은 상태를 직접 추론하지 않고 C++의 상태 변경 Event와 Mis
 | FLOW-01 Done | Flow 상태·Mission/Drone 데이터 계약 | 실제 Training Mission/Scout Drone 등록, 정상·오류·중복·재도전·로비 복귀 계약 자동 검증 통과 |
 | FLOW-02 Done | 시작 트레일러 → 로비 | 새 실행에서 정적 Opening 종료 후 같은 Root가 로비를 표시하며 Widget 생성 1회·중복 전환 0 PIE 통과 |
 | FLOW-03 Done | 로비 미션 선택 UI | Training Mission 선택 시 Definition 기반 측면 설명이 바뀌고 하단 시작으로 MissionTrailer 상태 확정, 오류·중복 거부 PIE 통과 |
-| FLOW-04 | 미션 트레일러 → 맵 로드 | 선택한 Mission Definition의 영상/대체 화면이 끝난 뒤 지정 Map으로 이동 |
-| FLOW-05 | 맵 내 드론 선택 | 허용 목록 밖 선택을 거부하고 확정 전 Drone Pawn 0대, 확정 뒤 1대만 Spawn/Possess |
-| FLOW-06 | Mission 시작·목표 UI | Drone 확정 뒤에만 Mission이 시작되고 측면 목표 패널이 Event 기반으로 갱신됨 |
-| FLOW-07 | 결과·재도전·로비 | 성공/실패에서 재도전과 로비 복귀가 중복 전환 없이 동작 |
-| FLOW-08 | 전체 반복 검증 | 새 실행부터 결과까지 3회 반복해 Widget·Pawn·IMC·Delegate·Mission 상태 중복 0 |
+| FLOW-04 Done | 미션 트레일러 → 맵 로드 | 정적 Briefing 종료 뒤 선택 Definition의 Map으로 이동하고 GameInstance 선택 보존 PIE 통과 |
+| FLOW-05 Done | 맵 내 드론 선택 | 정찰/FPV 자폭/드랍 카드와 독립 조작·핸들링 설정, 확정 전 Drone 0대·확정 뒤 1대 Spawn/Possess PIE 통과 |
+| FLOW-06 Done | Mission 시작·목표 UI | Drone 확정 뒤 Director가 시작 요청을 소비하고 측면 목표 패널이 Event로 갱신됨 |
+| FLOW-07 Done | 결과·재도전·로비 | 성공·실패 결과, 같은 Mission 재도전과 로비 복귀를 실제 Map 전환으로 검증 |
+| FLOW-08 Done | 전체 반복 검증 | 완전히 새 PIE 실행 3회에서 성공→재도전→실패→로비 복귀, Widget·Pawn·Director·Event 중복 0 통과 |
 
 첫 기능 Vertical Slice는 `Lvl_DroneTraining`을 Tutorial Mission 한 개로 등록해 기존 Course/Gate/HUD를 재사용한다. Front-end 골격이 안정된 뒤 MilitaryCamp·MilitaryBase·Battlefield 후보를 실제 Story Mission에 연결한다.
 
@@ -183,7 +183,7 @@ Source/Drone/Mission/
 
 FLOW-01에서는 Widget Blueprint, 동영상, 실제 Map 이동과 Pawn Spawn을 만들지 않는다. 먼저 데이터와 상태 계약을 자동화로 고정한 다음 FLOW-02부터 화면을 연결한다.
 
-### 2026-09-03 FLOW-01~03 구현 결과
+### 2026-09-08 FLOW-01~08 구현 결과
 
 ```text
 GameInstance
@@ -193,22 +193,39 @@ GameInstance
    └─ Boot → OpeningTrailer → LobbyMissionSelect
 
 Lvl_DroneFrontEnd (새 GameDefaultMap)
-└─ BP_DroneFrontEndGameMode (Default Pawn 없음)
+└─ BP_DroneFrontEndGameMode (비-Drone Spectator만 사용)
    └─ BP_DroneFrontEndPlayerController
       └─ WBP_DroneFrontEndRoot 정확히 한 개
          ├─ OpeningPanel + ContinueButton
-         └─ LobbyPanel
+         ├─ LobbyPanel
             ├─ MissionSelectButton
             ├─ Mission 이름·설명·지역/난이도
             └─ StartMissionButton → MissionTrailer
+         └─ MissionBriefingPanel
+            └─ FinishMissionBriefingButton → 선택 MissionMap OpenLevel
+
+Lvl_DroneTraining (?game=DroneMissionGameMode)
+└─ DroneMissionPlayerController
+   ├─ DroneSelectionWidget (정찰/FPV/드랍 + 조작/핸들링)
+   ├─ 확정 전 Drone 0대 / 확정 뒤 선택 Pawn 1대
+   ├─ DroneMissionDirector
+   │  ├─ Definition 초기 목표 → Event 기반 측면 패널
+   │  ├─ Training Lap 완료 → Success
+   │  └─ Drone Health 0 → Failure
+   └─ MissionResultWidget
+      ├─ Retry → 같은 Map의 DroneSelect
+      └─ Lobby → Front-end Lobby
 ```
 
 - Source: `Source/Drone/Flow/DroneGameFlowSubsystem.*`, `DroneFrontEndGameMode.*`, `DroneFrontEndPlayerController.*`, `Source/Drone/UI/DroneFrontEndRootWidget.*`
 - Data: `/Game/Drone/Data/Drones/DA_Drone_Scout_Greybox`, `/Game/Drone/Data/Missions/DA_Mission_Tutorial_Training`
 - Front-end: `/Game/Drone/FrontEnd/UI/WBP_DroneFrontEndRoot`, 두 전용 BP Class, `/Game/Drone/Maps/Lvl_DroneFrontEnd`
-- WBP Designer가 비어 있으면 C++ 정적 대체 Layout이 동작한다. 최종 외형은 `OpeningPanel`, `LobbyPanel`, `ContinueButton` 이름 계약과 `ReceiveFrontEndStateDisplayed` Event를 유지하며 Blueprint에서 교체한다.
-- 현재 한 개 Training Mission의 목록/설명/시작 버튼은 연결됐다. 실제 영상·OpenLevel·Drone Spawn은 없으며, 영상이 준비되면 `FinishOpeningTrailer()`를 종료 Callback에 연결한다. 다음 생산 범위는 FLOW-04 정적 Mission Briefing→선택 Map 로드다.
-- 검증: Drone Game/Editor Build, Data/Front-end 새 프로세스 Validate, 최종 `Drone.Flow` 3/3.
+- WBP Designer가 비어 있으면 C++ 정적 대체 Layout이 동작한다. 최종 외형은 동일 이름 Widget과 Blueprint 표현 Event를 유지하며 교체한다.
+- Mission Trailer Media 형식은 미정이다. 현재 정적 Briefing의 `FinishMissionBriefing()`이 실제 Map 진입 Callback이며 추후 영상 종료도 같은 함수를 호출한다.
+- Mission GameMode는 선택 전 비-Drone Spectator만 사용하고 Controller가 확정된 Integration Pawn을 한 대 Spawn/Possess한다. 최종 Drone Preview는 미구현이다.
+- Mission Director의 Training Lap 성공·Health 0 실패는 현재 Vertical Slice 규칙이며 최종 Story Mission 규칙 확정이 아니다.
+- 출격 뒤 역할 기능은 임시 `Primary/Secondary` Action으로 연결됐다. 좌클릭/우클릭은 정찰 Scan/취소, FPV Arm/Disarm, 드랍 투하/탑뷰로 분기하며 최종 키는 미정이다.
+- 검증: `DroneEditor Win64 Development`, `Drone.Flow` 5/5, `Drone.Prototype` 7/7. `MissionEntryPIE`는 성공→재도전→실패→로비 복귀를 완전히 새 PIE 실행에서 3회 반복해 3/3 통과했다. 매회 Root Widget 1, Map 요청 1, Drone 1, Director 1, Finish Event 1과 로비 복귀 뒤 Drone 0을 확인했다.
 
 ## 7. 검증 게이트
 
@@ -231,4 +248,4 @@ Lvl_DroneFrontEnd (새 GameDefaultMap)
 - Mission 결과에서 Tutorial Lap 통계를 함께 보여 줄 범위
 - 최종 게임 제목을 `Project:Droner`, `DRONE LINE`, 다른 이름 중 무엇으로 통일할지
 
-보류 항목은 다음 FLOW-04~06 Greybox를 막지 않는다. 현재는 `매 실행 트레일러`, `정적 대체 가능`, `Mission Map 위 드론 선택`, `한 Mission·한 Drone` 기준을 유지한다.
+보류 항목은 완료된 FLOW-08 반복 검증과 분리한다. 현재는 `새 실행 Opening`, `정적 Briefing`, `Mission Map 위 드론 선택`, `한 번에 플레이 Drone 한 대` 기준을 유지한다.

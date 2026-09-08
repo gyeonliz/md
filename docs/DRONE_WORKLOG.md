@@ -1,6 +1,6 @@
 # Drone 개발 진행 기록
 
-기준일: 2026-09-04 (Asia/Seoul)
+기준일: 2026-09-08 (Asia/Seoul)
 
 이 문서는 Drone 개발의 **진행 이력**을 시간순으로 남긴다. 가장 최신의 현재 상태는 [`../WORKBOARD.md`](../WORKBOARD.md), 확정 구현 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)를 따른다.
 
@@ -18,21 +18,61 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-09-04 — 차량 바퀴 속도비례 정·역회전과 Drone P 1/3인칭 전환 구현·자동화 완료, 수동 화면 확인 대기
+마지막 갱신: 2026-09-08 — 역할 기능·공통 입력과 FLOW-04~08 전체 Map·Mission 수명주기 구현·새 실행 3회 자동화 완료
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | FLOW-01~03 공유 완료. 자동포탑·4점 차량·바퀴 회전·Drone 이동 기울기·피격 흔들림·P 1/3인칭 전환까지 구현 완료, 수동 화면 확인 대기 |
-| Unreal 기준선 | 공유 `main=origin/main=6fd0e77`; 그 위 자동포탑·차량·Drone 외형 로컬 미커밋 변경 존재 |
-| 자동 검증 | Editor Build 성공. 바퀴 속도비례·후진을 포함한 차량 1/1, P Mapping/Binding 새 PIE 3회와 1인칭 Camera 추종을 포함한 Prototype 5/5 성공. 앞선 자동포탑·HUD·Damage PIE와 저장 BP/맵 검증도 통과 상태 |
+| 전체 단계 | 역할 기능 3종·공통 입력과 FLOW-01~08 로컬 구현·자동 검증 완료. Front-end 자동화 게이트 8/8 통과 |
+| Unreal 기준선 | 공유 `main=origin/main=dbc0dd8`; 그 위 역할 기능·Map 진입·Mission 런타임 Source/Data Asset이 로컬 미커밋 |
+| 자동 검증 | Editor Build 성공. `Drone.Flow` 5/5, `Drone.Prototype` 7/7 성공 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | `VEH-WHEEL-01` 바퀴 축 방향·속도 체감과 `DR-CAM-01` P 전환·FPV 위치 수동 확인. 기존 차량 4점 추종·기울기·피격 흔들림·자동포탑 수동 확인도 유지 |
-| 차단 조건 | FLOW-04 코드 차단 없음. 실제 Mission 영상 형식은 미정이므로 정적 대체 Briefing으로 진행 |
-| 다음 행동 | `Lvl_NPCSmartObjectGreybox`에서 차량 4점 추종·바퀴 정/역회전·포탑과 실제 탄환 피격 흔들림을 보고, Prototype/Training에서 W/S·A/D 기울기와 P 1/3인칭 왕복·Camera/Collision 안정을 확인 |
-| 다음 기능 | 수동 Pass 뒤 포탑 진영/우선순위·체력/파괴 확장 여부를 결정하거나 `FLOW-04 → FLOW-06` 진행. 최종 포탑 Asset은 BP의 세 Mesh만 교체 |
-| 이후 | 결과/재시도, Flight 실패 연결, AI/MG·Jamming과 실제 비주얼 통합 |
-| Git 처리 | Unreal·문서 모두 공유 기준 위 로컬 미커밋 변경 존재. Codex는 Commit·Push하지 않음 |
+| 지금 작업 중 | 자동화 수직 슬라이스 종료. 선택·목표·결과 화면, 역할 기능과 조작/핸들링 수동 확인 대기 |
+| 차단 조건 | 코드 차단 없음. 실제 Trailer Media·최종 WBP·Preview와 최종 Mission 규칙은 현재 미정 |
+| 다음 행동 | Front-end부터 전체 흐름을 손으로 실행하고 Training Map에서 조작/핸들링·역할 기능을 확인 |
+| 다음 기능 | `수동 Vertical Slice 확인 → TUT-04 실제 두 Lap → AI-VIS-01B` |
+| 이후 | Flight 실패 세부 규칙, AI/MG·Jamming과 실제 비주얼 통합 |
+| Git 처리 | Unreal `dbc0dd8`, 문서 `aaef93d` 위 로컬 미커밋 변경 존재. Codex는 Commit·Push하지 않음 |
 | 협업 Git | 중앙 `6fd0e77` 실측 완료. 별도 Fork `c845430` 지연은 참고값이며 사용자가 팀원은 중앙 저장소에서 직접 Pull한다고 정정. 팀원 PC 실제 HEAD·LFS·재빌드 확인 필요 |
+
+## 2026-09-08 — FLOW-08 새 실행 3회 반복 완료
+
+- `DroneMissionEntryPIE`가 하나의 PIE를 재활용하지 않고 완전히 종료한 뒤 새 PIE를 시작하도록 Lazy Start와 종료 안정화 대기를 추가했다. Engine Start 명령이 생성 즉시 `EndPIE`를 구독해 다음 실행이 조기 실패하던 문제를 실제 실행 차례에 생성하는 방식으로 고쳤다.
+- 각 실행은 `Opening→Lobby→Briefing→Training Map→Scout 성공→Retry→Drop Health 0 실패→Lobby`를 끝까지 수행한다. Root Widget 1, Map 요청 1, 선택 전 Drone 0, 출격 뒤 Drone 1·Director 1, Finish Event 1, 로비 복귀 뒤 Drone 0을 검증한다.
+- UI 전용 GameMode는 빈 Pawn/HUD Class 대신 비-Drone `ASpectatorPawn`과 기본 HUD를 사용해 `SpawnActor failed because no class was specified` 경고를 0건으로 만들었다.
+- 최종 `DroneEditor Win64 Development` Build, `Drone.Flow` 5/5와 `Drone.Prototype` 7/7이 통과했다. 빈 시험 World의 기존 RecastNavMesh 경고만 남았으며 기능 실패는 아니다.
+- FLOW-01~08 자동화 게이트를 모두 닫았다. 다음은 Editor 수동 Vertical Slice와 TUT-04 두 Lap 확인이다. Commit·Push하지 않았다.
+
+## 2026-09-08 — DR-ROLE-INPUT-01 공통 역할 입력
+
+- `IA_DronePrototype_PrimaryAbility`, `IA_DronePrototype_SecondaryAbility` Boolean Action을 만들고 `IMC_DronePrototype`과 `BP_DroneFPVIntegration` CDO에 연결했다. Mapping은 기존 16개에서 18개가 됐다.
+- 최종 키를 확정하지 않고 Greybox 임시값으로 좌클릭=1차, 우클릭=2차를 사용한다. 정찰은 가장 가까운 유효 Target Scan/취소, FPV는 Arm/Disarm, 드랍은 Payload 투하/상단 Camera 전환으로 분기한다.
+- 정찰 자동 표적 검색은 클릭 시점에만 World를 한 번 순회하며 Tick에서 Actor를 계속 찾지 않는다. 거리·화각·LOS와 완료 여부는 기존 Scan Component 단일 검증 함수를 재사용한다.
+- `Drone.Prototype.RoleAbilities`에서 세 역할 분기와 상태를, `PIEInputLifecycle`에서 두 Action의 Mapping·Pawn 소유 Started Binding·3회 PIE 수명주기를 확인했다. 전체 `Drone.Prototype` 7/7과 `Drone.Flow` 5/5가 재통과했다.
+- Training Map에 실제 `UDroneReconScanTargetComponent`와 `UDronePayloadTargetComponent`가 붙은 시험 표식, 역할 상태 HUD는 아직 없다. 이는 `DR-ROLE-TARGET-01`로 분리한다. Commit·Push하지 않았다.
+
+## 2026-09-08 — 역할 기능 3종·FLOW-04~07 완료
+
+- 정찰은 `UDroneReconScanComponent`와 Target Component로 거리·화각·시야선 유지 중 진행하고 이탈 시 취소하며 한 번만 완료한다. FPV는 명시적 Arm과 최소 충돌 속도 뒤 1회 Radial Damage·자기 Health 0을 적용한다. 드랍은 기존 1/3인칭 상태를 복원하는 상단 Camera와 한 발 Payload·목표 접촉·재장전을 사용한다.
+- `DA_Drone_Scout_Greybox`, `DA_Drone_FPVStrike_Greybox`, `DA_Drone_Drop_Greybox`의 구현 Capability를 각각 하나씩 활성화했다. `Drone.Prototype.RoleAbilities`와 Flight Profile 검증에서 다른 역할 기능 중첩이 없음을 확인했다.
+- Front-end Root에 선택 Mission의 정적 Briefing·초기 목표와 종료 버튼을 추가했다. Controller는 정확히 한 번 선택 `MissionMap`을 열며 URL 전용 `DroneMissionGameMode`로 Map의 기존 Prototype GameMode를 이번 진입에만 덮어쓴다.
+- Mission Map의 `UDroneSelectionWidget`은 세 역할 카드, 쉬운/실제 조작형, 안정/균형/고기동을 표시한다. 선택 전에는 비-Drone Spectator만 있고, 확정 뒤 Data Asset Pawn 한 대에 Profile과 이번 설정을 적용해 Possess한다.
+- 새 `ADroneMissionDirector`는 출격 뒤 시작 요청을 한 번 소비하고 Data Asset 목표를 `UDroneMissionObjectiveWidget`에 Event로 보낸다. 현재 Training 연결은 Lap 완료=성공, Drone Health 0=실패인 Greybox이며 최종 Story 규칙은 아니다.
+- `UDroneMissionResultWidget`의 성공/실패, 같은 Mission 재도전과 Front-end 로비 복귀를 구현했다. 로비 복귀 표지는 새 Front-end Controller가 한 번 소비한다.
+- `DroneMissionEntryPIE`가 `Opening→Lobby→Briefing→Training Map→Scout 출격→Success→Retry→Drop 출격→Health 0 Failure→Lobby`를 실제 Map 전환으로 통과했다. `DroneEditor Win64 Development`, `Drone.Flow` 5/5, `Drone.Prototype` 7/7이 성공했다.
+- 실제 Trailer Media, 최종 WBP Designer·Preview, 최종 성공/실패 규칙과 손 조작 체감은 미정/수동 대기다. Commit·Push하지 않았다. FLOW-08 결과는 바로 위 최신 절을 따른다.
+
+## 2026-09-08 — Figma 기체 역할·조작 모드 분리
+
+- 사용자 제공 Figma `Project:Droner`를 로그인된 Browser에서 읽기만 했다. 수정·댓글·공유 설정 변경은 하지 않았다.
+- 현재 기획 역할로 정찰, 드랍, FPV 자폭, 광섬유, 지상 UGV, 장거리 타격을 확인했다. 최종 확정·완료 목록으로 해석하지 않는다.
+- 잘못된 임시 기체 분류 `균형 정찰형/고기동형/안정 관측형`을 역할과 핸들링으로 분리했다.
+- `EDroneMissionRole`, `EDroneGameplayCapability`, `EDroneControlMode`, `EDroneHandlingPreset`을 추가했다.
+- `UDroneDefinition`에 플레이 가능 여부와 계획/구현 Capability 목록을 추가했다. 구현 기능은 계획 기능의 부분집합이어야 Validation을 통과한다.
+- `ADronePrototypePawn`에 쉬운/실제 조작형과 안정/균형/고기동 변경 API·Blueprint Event를 추가했다. 실제 조작형은 낮은 자동 감속/선회 보조, Root Pitch/Roll, Local Up을 사용하는 Greybox이며 실제 모터 물리로 표현하지 않는다.
+- Data Asset은 `DA_Drone_Scout_Greybox`, `DA_Drone_FPVStrike_Greybox`, `DA_Drone_Drop_Greybox` 3종으로 정리했다. 이 시점에는 역할 기능을 Planned로 시작했고 같은 날짜 후속 절에서 구현 Capability로 승격했다.
+- `DroneEditor Win64 Development` Build 성공. `Drone.Prototype.FlightProfiles` 1/1과 `Drone.Flow` 3/3 성공.
+- Unreal 기준 `main=origin/main=dbc0dd8`, 문서 기준 `main=origin/main=aaef93d` 위 로컬 변경이다. Commit·Push하지 않았다.
+- 상세 가이드: [`DRONE_TYPES_AND_CONTROL_MODES.md`](DRONE_TYPES_AND_CONTROL_MODES.md)
 
 ## 2026-09-04 — DR-DMGFX-01 Drone 피격 본체·카메라 흔들림
 
@@ -141,7 +181,7 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 - 하단 `StartMissionButton`은 유효한 선택이 있을 때만 활성화되고 `ConfirmSelectedMission()`으로 `MissionTrailer` 상태까지만 전환한다. 실제 영상·Map 이동은 FLOW-04로 남겼다.
 - WBP가 최종 Designer를 만들 때 사용할 이름 계약은 `MissionSelectButton`, `MissionSelectButtonText`, `MissionNameText`, `MissionDescriptionText`, `MissionMetaText`, `StartMissionButton`이다. Blueprint는 선택/확정 판정을 중복 구현하지 않는다.
 - 최종 Drone Game/Editor Build와 `Drone.Flow` 3/3이 성공했다. PIE에서 잘못된 Mission ID 거부, Definition과 표시 이름·설명 일치, 중복 확정 거부, 같은 Root Widget 1회 생성을 확인했다.
-- 새 Asset을 추가하지 않아 Unreal 변경 경로 수는 26개로 유지한다. Commit·Push하지 않았고 다음 카드는 `FLOW-04`다.
+- 이 시점에는 새 Asset을 추가하지 않아 Unreal 변경 경로 수는 26개로 유지했다. Commit·Push하지 않았고 당시 다음 카드는 `FLOW-04`였다. 최신 상태는 문서 상단을 따른다.
 
 ## 2026-09-03 — FLOW-02 시작 화면→로비 완료
 

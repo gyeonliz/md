@@ -1,33 +1,33 @@
 # 현재 작업 보드
 
-기준일: 2026-09-04 (Asia/Seoul)
+기준일: 2026-09-08 (Asia/Seoul)
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 공유 기준선은 `main=origin/main=6fd0e77`, 문서 공유 기준선은 `main=origin/main=82181db`이다. 그 위 로컬 작업으로 설치형/차량형 무인 자동포탑, 4점 지면 추종 차량과 굴곡 노면, Drone W/S 외형 Pitch·A/D 외형 Roll·피격 흔들림을 구현했다. Codex는 Commit·Push하지 않으며 현재 Unreal·문서 작업 트리는 이 작업과 이전 문서 점검 변경 때문에 깨끗하지 않다.
+Unreal 공유 기준선은 `main=origin/main=dbc0dd8`, 문서 공유 기준선은 `main=origin/main=aaef93d`이다. 그 위 로컬 작업으로 역할별 Drone 기능과 FLOW-04~08을 포함한 변경을 구현했다. Codex는 Commit·Push하지 않으며 현재 Unreal·문서 작업 트리는 깨끗하지 않다.
 
 2026-09-03 게임 흐름은 `실행 → 시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → 맵 → Drone 선택 → Mission 시작/측면 목표 UI`로 변경됐다. 사람 Operator 조작·NPC 대화 수령·Operator↔Drone 전환은 폐기하며 [`docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 최우선 실행 기준으로 사용한다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-09-04 — 차량 속도 비례 정·역 바퀴 회전과 Drone P키 1/3인칭 전환 구현·자동화 완료, 수동 화면 확인 대기
+마지막 갱신: 2026-09-08 — 역할 기능 3종·공통 입력과 FLOW-04~08 전체 수명주기를 구현하고 새 PIE 실행 3회 반복 통과
 
 | 항목 | 상태 |
 |---|---|
-| 현재 단계 | FLOW-01~03 데이터·시작 화면·로비 미션 선택 완료, FLOW-04 브리핑→Map 준비 |
-| 진행 정도 | GameInstance Flow/Catalog, 실제 Mission·Drone Data Asset, 전용 Front-end BP/WBP/Map, 정적 Opening→Lobby와 Training Mission 목록·측면 설명·하단 시작 완료. Rifle·Shotgun·MG는 이동 Projectile과 BP 조정형 무작위 사격 원뿔을 기본 사용. Hostile Rifle·Shotgun은 프로젝트 소유 Rifle AnimBP 사용 |
-| 지금 작업 중 | `VEH-WHEEL-01` 첫 화면 확인에서 반대였던 바퀴 회전축을 `-1→+1`로 수정하고 재빌드·차량 1/1·BP/맵 재로드 검증 완료, 화면 방향 재확인 대기. `DR-CAM-01` P키 1/3인칭 전환 수동 확인도 유지 |
-| 완료 근거 | MSVC 14.51.36256 `DroneEditor Win64 Development` Build 성공. 피격·기울기·차량·포탑·HUD 집중 6/6과 실제 `ApplyDamage`·파괴 후 중복 피해를 검증하는 `NPCPerceptionSearchPIE` 1/1 통과. 저장 BP/맵 Validation과 Map Check 0/0 유지 |
+| 현재 단계 | `DR-RECON-01`, `DR-FPV-01`, `DR-DROP-01`과 FLOW-04~08 로컬 구현·자동 검증 완료. Front-end Vertical Slice의 필수 자동화 게이트 8/8 통과 |
+| 진행 정도 | 정찰 스캔, FPV Arm·충돌 자폭, 드랍 탑뷰·Payload를 역할별 Component로 구현하고 공통 좌/우 클릭 Greybox 입력까지 연결. 정적 브리핑→Training Map→3종 선택→조작/핸들링→1대 Spawn/Possess→목표 UI→성공/실패→재도전/로비 복귀까지 연결 |
+| 지금 작업 중 | 자동화 수직 슬라이스와 역할 입력은 닫혔다. Mission Map의 실제 Scan/Payload Target 배치, 최종 WBP 외형·Drone Preview와 손 체감은 수동/후속 대기 |
+| 완료 근거 | `DroneEditor Win64 Development` Build 성공. `Drone.Flow` 5/5와 `Drone.Prototype` 7/7 성공. `MissionEntryPIE`가 새 PIE 실행마다 성공→재도전→기체 사망 실패→로비 복귀를 수행해 3/3 통과. 빈 Class Spawn 경고 0. Commit·Push하지 않음 |
 | 수동 미확인 | 차량 Z·Pitch·Roll·바퀴·포탑 추종, Drone A/D Roll, 실제 탄환 피격 본체·카메라 흔들림과 Camera/Collision 안정. 자동포탑 발사·장애물 차단, MG 사수·Gaze·임시 MG 3축, Training HUD, OilRig 시각·성능 확인도 유지 |
-| 현재 차단 | FLOW-04 코드 차단 없음. 실제 Mission Trailer Asset 형식은 미정이므로 정적 Briefing 대체 화면 뒤 `MissionMap` Soft Reference를 여는 경로로 먼저 검증 가능 |
-| 다음 행동 | `Lvl_NPCSmartObjectGreybox`에서 차량 굴곡 추종과 포탑 발사를 확인하면서 Drone이 실제 탄환에 맞을 때 약 0.3초 흔들리고 Camera/Collision이 밀리지 않는지 본다. 이어 Prototype/Training에서 A/D Roll·수평 복귀를 확인 |
-| 다음 기능 | 자동포탑 화면 Pass 뒤 진영/표적 우선순위와 포탑 체력·파괴를 별도 카드로 확장하거나, 원래 순서대로 `FLOW-04 → FLOW-06` 한 Mission·한 Drone Front-end Vertical Slice 진행. 최종 포탑 에셋은 각 BP의 Base/Body/Barrel Mesh만 교체 |
+| 현재 차단 | 코드 차단 없음. 실제 Mission Trailer Media 형식·최종 WBP Designer·Drone Preview는 현재 미정이며 정적 C++ 대체 UI가 전체 흐름을 실행함 |
+| 다음 행동 | Editor에서 전체 흐름과 조작/핸들링을 확인한 뒤 Training Map에 `ReconScanTarget`·`PayloadTarget` 시험 표식을 배치해 역할 입력을 손으로 검증 |
+| 다음 기능 | `수동 Vertical Slice 확인 → TUT-04 실제 두 Lap → AI-VIS-01B`. 광섬유·UGV·장거리 타격은 첫 3종 확인 뒤 별도 카드로 진행 |
 | 에셋 인수 | `C:\에셋` 원본은 보존. ArmyVFX·InfantrySFX·Ground Drone·NPC 외형·Raw Drone을 정확한 의존성 묶음으로 이식 |
 | 맵 이식 | 기존 환경 3종에 `Lvl_OilRig`을 추가. Vendor FirstPerson Sample 의존성을 끌어오던 Door Actor 8개는 중앙 사본에서 제거 |
 | Editor/MCP | 명령줄 검증 뒤 Editor 종료 상태. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
-| Git 처리 | Unreal `main=origin/main=6fd0e77`은 원격 실측까지 일치하고 작업 트리·LFS Push 대기가 없다. 문서는 `main=origin/main=82181db` 위 팀 환경 점검 기록만 로컬 미커밋. Codex는 Commit·Push하지 않음 |
-| UI/기획 참고 | Figma `Project:Droner`는 세계관·청록/녹색 HUD·경고 아이콘 참고용으로만 읽음. Figma는 수정하지 않았고 게임 제목 통일은 보류 |
+| Git 처리 | 현재 작업 PC의 공유 기준은 Unreal `dbc0dd8`, 문서 `aaef93d`. 그 위 역할/조작 모드와 문서 변경이 로컬 미커밋이며 Codex는 Commit·Push하지 않음 |
+| UI/기획 참고 | Figma `Project:Droner`에서 기체 역할과 조작 요구를 읽기만 함. Figma는 수정·댓글·공유 설정 변경하지 않았고 게임 제목 통일은 보류 |
 | 협업 Git | 중앙 `origin/main=6fd0e77`은 깨끗하고 필수 입력 영역의 Git 제외 누락은 0개다. 별도 `yook34/main=c845430`이 중앙보다 18 Commit 뒤인 사실은 원격 참고값이지만, 사용자가 팀원은 권한을 받아 중앙 `gyeonliz/drone`에서 직접 Pull한다고 확인했으므로 현재 증상의 원인으로 사용하지 않는다. 새 Worktree의 빈 `Binaries/Intermediate`에서 Editor Build가 성공했다. 팀원 PC에서 사격 AnimBP·기관총이 동시에 없으면 실제 HEAD·LFS 파일 크기·Pull 뒤 `DroneEditor` 재빌드 여부를 확인한다. [`docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md`](docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md)에 판별 순서를 기록 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
 | 학습 다음 행동 | Q-Net 상태를 확인해 Track A/B/C를 고르고 첫 학습 블록 실행 |
@@ -44,10 +44,6 @@ Unreal 공유 기준선은 `main=origin/main=6fd0e77`, 문서 공유 기준선�
 | PFN-P3 | Drone | Mission Runtime 카드 PFN-15~21 활성화 | FLOW-06과 PFN-14 통과 |
 | PFN-P4 | Drone / Unreal | Enemy AI·Turret 카드 PFN-22~32 활성화 | PFN-21 통과 |
 | PFN-P5 | Drone / Unreal | 통합 Greybox 카드 PFN-33~38 활성화 | PFN-32 통과 |
-| FLOW-05 | Drone / Mission / UI | Map 진입 뒤 Drone 선택·Spawn/Possess | FLOW-04 통과 |
-| FLOW-06 | Drone / Mission / UI | Mission 시작과 측면 목표 UI | FLOW-05 통과 |
-| FLOW-07 | Drone / Mission / UI | 성공·실패 결과, 재도전·로비 복귀 | FLOW-06 통과 |
-| FLOW-08 | Drone / Front-end / Test | 전체 흐름 새 실행 3회 반복 | FLOW-07 통과 |
 | PFN-P6 | Drone / Unreal | 에셋 교체 준비 카드 PFN-39~43 활성화 | PFN-38 완료 + 최신 PFN-37 결과 3회 Pass |
 | ASSET-GATE-01 | Drone / Unreal | 구매 소스 후보 비교와 구매 결정 | Greybox Vertical Slice 3회 Pass와 차단 결함 0건 |
 | PHY-DF-00 | Drone / Physics / Unreal | Dataflow·Chaos Physics Sandbox | TUT-04 완료 또는 사용자 우선순위 변경 후 별도 Branch에서 Plugin·Build·회귀 검증 |
@@ -66,7 +62,7 @@ Unreal 공유 기준선은 `main=origin/main=6fd0e77`, 문서 공유 기준선�
 | ID | 태그 | 작업 | 완료 조건 |
 |---|---|---|---|
 | GIT-10 | Git / Unreal | 다른 PC Clone과 실행 | LFS 포함 Clone 후 UE 5.8.1에서 열림 |
-| FLOW-04 | Drone / Front-end / Mission | 미션 트레일러 → 선택 Map 로드 | 정적 Briefing 종료 뒤 선택 Definition의 Training Map으로 이동하고 GameInstance의 Mission 선택이 유지됨 |
+| DR-ROLE-TARGET-01 | Drone / Mission / Input | Training Map 역할 시험 Target·피드백 연결 | 정찰 좌클릭 Scan/우클릭 취소, FPV 좌클릭 Arm/우클릭 Disarm 후 충돌, 드랍 우클릭 탑뷰/좌클릭 투하를 화면에서 재현 |
 | GIT-TEAM-01 | Git / Unreal / 협업 | 팀원 PC 원격 규칙 확인 | 환경 맵·재질 중앙 반영과 개인 설정 정리는 완료. 팀원 PC에서 `origin`/`upstream` 또는 `origin`/`fork`, `pushurl`을 실제 확인 |
 | SYNC-04 | Codex Sync | 두 PC 간 실제 수동 인계 시험 | Git 흐름과 문맥 패키지 흐름을 각각 완료 |
 | TUT-04 | Drone / Tutorial / UI | 비교 결과 수동 판정 | 두 번 완주해 첫 기준 생성과 두 번째 이전 평균·Best·부호를 실제 HUD에서 확인 |
@@ -102,6 +98,16 @@ Unreal 공유 기준선은 `main=origin/main=6fd0e77`, 문서 공유 기준선�
 | FLOW-01 | Drone / Front-end / Data | `UDroneGameFlowSubsystem`, 8개 상태, Mission/Drone Primary Data Asset, ID/Catalog/중복 요청 검증을 구현했다. 실제 `DA_Mission_Tutorial_Training`과 `DA_Drone_Scout_Greybox`를 생성해 새 프로세스 Validate 및 `Drone.Flow.Contract` 1/1 통과. 로컬 미커밋 |
 | FLOW-02 | Drone / Front-end / UI | `Lvl_DroneFrontEnd`, 전용 BP GameMode/Controller, `WBP_DroneFrontEndRoot`와 C++ 정적 대체 Layout을 구현했다. 새 실행 Opening→계속→Lobby, Root 1개, 중복 전환 0, 선택 전 Drone 0대를 PIE에서 확인. 로컬 미커밋 |
 | FLOW-03 | Drone / Front-end / UI | 등록 Mission ID 목록을 이름순으로 공급하고 첫 Training Mission 버튼·이름·설명·지역/난이도·하단 시작을 같은 Definition에 연결했다. 시작은 `MissionTrailer`까지만 전환하며 잘못된 ID·중복 확정을 거부한다. 최종 Flow 3/3 통과, 로컬 미커밋 |
+| DR-TYPE-01 | Drone / Flight / Data | Figma 역할 6종 계약과 `Planned/ImplementedCapabilities`, 쉬운/실제 조작형 및 안정/균형/고기동 독립 전환을 구현. 정찰/FPV/드랍 Asset 3종, Editor Build, FlightProfiles 1/1·Flow 3/3 통과. 수동 체감은 별도 대기 |
+| DR-RECON-01 | Drone / Flight / Mission | 거리·화각·LOS 유지형 정찰 Scan, 취소·진행·1회 완료 Event와 Target Component 구현. 역할 기능 자동화 통과 |
+| DR-FPV-01 | Drone / Flight / Combat | 명시적 Arm, 최소 충돌 속도, 1회 Radial Damage와 기체 자폭을 구현. 역할 기능 자동화 통과 |
+| DR-DROP-01 | Drone / Flight / Mission | 복원 가능한 탑뷰, Payload 1개 투하, 목표 접촉 성공과 재장전 경계를 구현. 역할 기능 자동화 통과 |
+| DR-ROLE-INPUT-01 | Drone / Input / Roles | `PrimaryRoleAbility`·`SecondaryRoleAbility` Boolean Action을 IMC와 FPV Integration Pawn에 연결. 임시 좌클릭/우클릭으로 정찰 Scan/취소, FPV Arm/Disarm, 드랍 투하/탑뷰를 역할별 분기하며 Mapping 18개·Pawn 소유 Binding 1개씩과 기능 계약 자동화 통과. 최종 키는 미정 |
+| FLOW-04 | Drone / Front-end / Mission | 선택 Mission의 정적 Briefing과 초기 목표를 표시하고 `MissionMap` Soft Reference를 실제 OpenLevel. GameInstance 선택 보존 PIE 통과 |
+| FLOW-05 | Drone / Mission / UI | Training Map 위 3종 카드와 조작/핸들링 설정, 확정 전 Drone 0대·확정 뒤 선택 Definition 한 대 Spawn/Possess를 실제 PIE로 확인 |
+| FLOW-06 | Drone / Mission / UI | 출격 뒤에만 Mission Director가 시작 요청을 소비하고 Data Asset 목표를 Event 기반 측면 패널에 표시. Training Lap 성공·체력 0 실패 경계 연결 |
+| FLOW-07 | Drone / Mission / UI | 성공/실패 결과 Widget, 같은 Mission 재도전과 로비 복귀를 실제 두 번의 Map 이동으로 확인하고 중복 요청을 거부 |
+| FLOW-08 | Drone / Front-end / Test | `MissionEntryPIE`를 완전히 새 PIE 실행 3회로 반복했다. 매회 Root Widget 1, Map 요청 1, 선택 전 Drone 0, 출격 뒤 Drone 1·Director 1, Finish Event 1, 성공→재도전→Health 0 실패→로비 복귀와 잔존 Drone 0을 통과 |
 | PLAN-01 | Drone / Planning | 세계관·화면 흐름·Tutorial/Story·UI·구현 현황·기술 구조·로드맵·검증·보류 결정을 통합 기획서로 정리 |
 | ENV-01 | Unreal | 작업컴 UE 5.8.1 설치 확인 |
 | GIT-01 | Git | Git 2.53.0.windows.3 실행 확인 |
@@ -184,4 +190,4 @@ UE-MCP-01도 완료했다. 이후 Editor 내부 Actor·Asset·Blueprint·UMG·Au
 - `AST-02A`의 기술 이식·검증·기능 Branch와 `main` Push는 완료했다. 실제 Training HUD 연결은 아직 하지 않았다.
 - HUD 연결 전에도 자산은 안전하게 로드 가능한 상태지만, 화면에 보이는 구현으로 과장하지 않는다.
 - 프로젝트 소유 맵은 `/Game/Drone/Maps` 한 곳에서 관리한다. 공급사 원본 맵을 추가할 때도 검토용 사본만 이 폴더에 두고 의존 자산은 각 ThirdParty 폴더에 유지한다.
-- TUT-04 실제 두 Lap 확인은 그대로 남긴다. `FLOW-01~03`은 로컬 완료됐고 현재 신규 기능은 `FLOW-04`다. `AI-VIS-01B`는 Mission 흐름 뒤로 이동했다.
+- TUT-04 실제 두 Lap 확인은 그대로 남긴다. `FLOW-01~08`은 로컬 구현·자동 검증 완료됐고 다음은 Editor 수동 Vertical Slice 확인이다. `AI-VIS-01B`는 그 뒤로 이동했다.

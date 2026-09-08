@@ -1,6 +1,6 @@
 # 드론 프로젝트 MVP 개발 가이드
 
-> 현재 구현 지점: Camera/Input PFN-06, HUD-01·02, TUT-01~03과 TUT-04B 결과, 적 NPC·Smart Object·Rifle/Shotgun·MG·Cover·체력 Greybox까지 구현했다. 공유 기준은 `main=origin/main=2d6a459`이며 그 위에 FLOW-01~03과 NPC Visual 기반이 로컬 미커밋이다. 실제 Training 두 Lap HUD와 환경 Map 4종, Smart Object 도착 방향은 수동 검토 대기다. 입력 결과는 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md), Telemetry/HUD 결과는 [`DRONE_TELEMETRY_IMPLEMENTATION.md`](DRONE_TELEMETRY_IMPLEMENTATION.md), 기록·비교 결과는 [`DRONE_TRAINING_RECORDING_IMPLEMENTATION.md`](DRONE_TRAINING_RECORDING_IMPLEMENTATION.md), 현재 C++·BP 책임은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
+> 현재 구현 지점: Camera/Input PFN-06, HUD-01·02, TUT-01~03과 TUT-04B 결과, 적 NPC·Smart Object·Rifle/Shotgun·MG·Cover·체력 Greybox, 정찰/FPV/드랍 역할 기능·임시 공통 역할 입력과 FLOW-01~08까지 구현했다. C 드라이브 공유 기준은 `main=origin/main=dbc0dd8`이며 그 위 역할·FLOW 변경은 로컬 미커밋이다. 전체 수명주기는 새 PIE 실행 3회 자동 검증을 통과했고 실제 Training 두 Lap, 역할 Target·상태 UI, 최종 WBP와 환경 Map은 수동 검토 대기다. 입력 결과는 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md), Telemetry/HUD 결과는 [`DRONE_TELEMETRY_IMPLEMENTATION.md`](DRONE_TELEMETRY_IMPLEMENTATION.md), 기록·비교 결과는 [`DRONE_TRAINING_RECORDING_IMPLEMENTATION.md`](DRONE_TRAINING_RECORDING_IMPLEMENTATION.md), 현재 C++·BP 책임은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
 
 > 현재 실행 순서는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)가 최우선이고 Tutorial·조작은 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md), PFN 카드와 Placeholder 교체 경계는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 
@@ -22,7 +22,7 @@
 - 첫 구현 대상: 정찰용 멀티콥터 1종
 - 핵심 요소: 드론 운용, 정찰, 침투, 탐지, 적 AI 반응, 임무, 귀환, 평가
 - 현재 v1 조작: 고정 추적 Camera, Actor-relative 이동, World Up 고도, Mouse X Drone Yaw, Mouse Y Camera Pitch, Gamepad Left Stick·Trigger·Right Stick
-- 현재 기능 우선 순서: TUT-04B 두 Lap 수동 확인 병행 → FLOW-01 상태·Mission/Drone 데이터 → 시작 트레일러·로비·미션 선택 → 미션 트레일러·Map·Drone 선택·목표 UI → Flight 실패·Jamming → AI/MG·에셋 통합. 사람 Operator와 NPC 대화 수령 흐름은 2026-09-03 폐기
+- 현재 기능 우선 순서: FLOW-01~08·역할 공통 Input 자동화 완료 → Training 역할 Target·상태 UI → 전체 흐름·TUT-04B 두 Lap 수동 확인 → Flight 실패·Jamming → AI/MG·에셋 통합. 사람 Operator와 NPC 대화 수령 흐름은 2026-09-03 폐기
 - 후속 물리 환경: Dataflow/Chaos Sandbox → 부분 고정 그물 → 선택형 벽·Jammer 파괴. Flight Collision/Damage 기준 뒤 연결
 - J3C: 프로젝트 콘셉트에서 사용하는 가상의 외주 발주처 설정일 뿐이며, 실제 계약·협력·지원·공식 관계가 아니다.
 
