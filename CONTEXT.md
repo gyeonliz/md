@@ -1,6 +1,6 @@
 # 작업컴 Codex/GPT 기준 컨텍스트
 
-기준일: 2026-09-08 (Asia/Seoul)
+기준일: 2026-09-09 (Asia/Seoul)
 
 이 문서는 메인컴 ChatGPT/Codex에서 진행하던 작업을 작업컴에서 이어가기 위한 기준 컨텍스트다. 추측해서 내용을 추가하지 않고, 사용자가 실제 진행 상황을 알려준 경우에만 상태를 갱신한다.
 
@@ -12,7 +12,7 @@
 - FPV 폭발은 Pawn을 파괴한다. Training Map 직접 실행에는 복구 UI가 없고, Front-end Mission 흐름에서는 결과 UI의 재도전/로비 복귀를 사용한다. 폭발 자체가 Unreal Editor를 종료하지는 않는다.
 - 역할별 모델·표적·상태 UI 로컬 변경은 MSVC 14.51.36256 Editor Build와 Prototype 7/7, Integration 3/3, Tutorial 7/7, Flow 5/5로 검증했다. 화면 크기·방향·FX 체감은 사용자 수동 확인 항목이다.
 - 드랍 역할에는 별도 맵 배치 BP `/Game/Drone/Abilities/Payload/BP_DroneCarryablePayload`가 있다. 선적재 화물을 투하해 적재 수가 0이 된 뒤 300cm 안에서 좌클릭/RB를 누르면 실제 크레이트 Actor를 기체 하단에 붙이고, 다시 누르면 같은 Actor를 투하한다. BP 외형/수명, Pawn의 `PayloadCarryAnchor`, Pickup Range는 Blueprint 조정값이다.
-- `test1.umap`, `M_Start.uasset` LFS 충돌, `.vsconfig` 혼합 상태와 `Drone.cpp //test` Staged 변경은 기능 범위 밖이며 사용자 선택 전 해결·Stage·Commit하지 않는다.
+- `test1.umap`, `M_Start.uasset`은 사용자 선택에 따라 팀원 Stash 버전으로 복구해 `ac88992`에 Push했다. `.vsconfig`는 기존 14.50 설정을 유지했고 현재 Unreal 작업 트리는 Clean이다. 보존된 Stash는 다시 Restore하지 않고 팀원 재현 확인 뒤 정리한다.
 
 ## 1. 전체 작업 목록
 

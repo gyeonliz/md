@@ -2,7 +2,7 @@
 
 이 폴더는 실제 Unreal 프로젝트가 아니라 다음 작업을 준비하고 PC 간 문맥을 이어가기 위한 문서·템플릿·도구 저장소다. GitHub `gyeonliz/md`를 이 폴더의 공유 원격으로 사용하고, 실제 Unreal 프로젝트는 별도 `gyeonliz/drone` 저장소로 관리한다.
 
-현재 2026-09-08 D 드라이브 작업에서는 정찰=`DroneSpy`, FPV 자폭=`DronePackFPV`, 드랍=`Delivery` 전용 Pawn과 Training 역할 표적·한글 상태 UI를 연결했다. 드랍은 별도 `BP_DroneCarryablePayload` 크레이트를 맵에 배치해 빈 기체가 근접 적재하고 실제 Actor를 하단에 붙인 뒤 재투하할 수 있다. Editor Build·Prototype 7/7·Integration 3/3·Tutorial 7/7·Flow 5/5가 통과했으며 실제 화면 확인과 별도 LFS 충돌 정리가 다음 작업이다. 최신 판정은 `STATUS.md`와 `WORKBOARD.md`를 우선한다.
+현재 2026-09-09 D 드라이브 작업에서는 정찰=`DroneSpy`, FPV 자폭=`DronePackFPV`, 드랍=`Delivery` 전용 Pawn과 Training 역할 표적·한글 상태 UI를 연결했다. 드랍은 `BP_DroneCarryablePayload` 크레이트를 근접 적재·부착·재투하하며 착지 후에도 남는다. Editor Build와 집중 자동화 22/22가 통과했고, 팀원 LFS 자산 충돌도 `ac88992`에서 복구·Push했다. 다음은 실제 역할 Vertical Slice와 Training HUD 두 Lap 확인이다. 최신 판정은 `STATUS.md`와 `WORKBOARD.md`를 우선한다.
 
 ## 먼저 읽을 파일
 
@@ -33,6 +33,7 @@
 25. [`docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md`](docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md): 지원서·이력서용 Unreal 프로젝트 경험 기술 예시와 사실 확인 경계
 26. [`docs/STUDY_PLANS.md`](docs/STUDY_PLANS.md): 정보처리산업기사·C++ 코딩테스트 병행 계획
 27. [`docs/DRONE_PROJECT_PLANNING_BRIEF.md`](docs/DRONE_PROJECT_PLANNING_BRIEF.md): 게임 기획·화면 흐름·UI·현재 구현·로드맵·검증을 한 문서로 정리한 통합 기획서
+28. [`docs/DRONE_TRELLO_BOARD_2026-09-09.md`](docs/DRONE_TRELLO_BOARD_2026-09-09.md): Trello에 복사할 완료·수동 확인·다음 개발·장기 후보 카드와 체크리스트
 
 ## 구성
 

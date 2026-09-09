@@ -1,6 +1,6 @@
 # Drone 개발 진행 기록
 
-기준일: 2026-09-08 (Asia/Seoul)
+기준일: 2026-09-09 (Asia/Seoul)
 
 이 문서는 Drone 개발의 **진행 이력**을 시간순으로 남긴다. 가장 최신의 현재 상태는 [`../WORKBOARD.md`](../WORKBOARD.md), 확정 구현 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)를 따른다.
 
@@ -18,21 +18,42 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-09-08 — 맵 배치형 운반 화물 BP와 적재·실제 Actor 재투하 구현, Build 및 집중 자동화 22/22 통과, 화면 확인 대기
+마지막 갱신: 2026-09-09 — Rotor 외형 회전·Blueprint 튜닝·역할 표적 BP 전환 구현/검증 완료
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | 역할 기능 3종·공통 입력과 FLOW-01~08은 공유 main. 역할별 모델·기능 시험 표적·상태 UI와 맵 배치 운반 화물은 로컬 구현/자동화 완료 |
-| Unreal 기준선 | `main=origin/main=63f60c1`; 역할 기능·Map 진입·Mission 런타임 Source/Data Asset 공유 완료 |
-| 자동 검증 | 현재 PC Editor Build, Prototype 7/7, Integration 3/3, Tutorial 7/7, Flow 5/5 성공 |
+| 전체 단계 | 역할 기능 3종·공통 입력과 FLOW-01~08은 공유 main. Rotor 외형 회전·Blueprint 튜닝·역할 표적 BP 전환은 로컬 구현/자동화 완료 |
+| Unreal 기준선 | `main=origin/main=ac88992`; 역할 기능·Map 진입·Mission 런타임·역할 자산·운반 화물과 팀원 LFS 복구 공유 완료 |
+| 자동 검증 | VS 업데이트 후 Editor Build 성공. 이번 변경 집중 자동화 6/6, Blueprint 420개 컴파일 실패 0, Training Map Check 0/0, Git LFS fsck 성공 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | `BP_DroneCarryablePayload` 생성·Training 배치와 Drop 적재→부착→재투하 완료. 실제 렌더 부착 위치/크기와 손 조작, 별도 LFS 충돌 정리 대기 |
-| 차단 조건 | `test1.umap`, `M_Start.uasset`에서 Upstream/Stash 중 보존할 바이너리 결정 필요 |
-| 다음 행동 | Front-end→Training에서 선적재 투하→근접 크레이트 적재→하단 부착→재투하와 세 역할 화면 확인→필요 Transform 조정→LFS/Index 충돌 선택·정리 |
+| 지금 작업 중 | Rotor·BP 튜닝·역할 표적 BP 작업까지 구현/자동 검증 완료. 실제 Rotor 방향/축/속도와 역할 표적 표시 확인 대기 |
+| 차단 조건 | 코드·Git 차단 없음. 보존된 Stash 두 개는 팀원 재현 확인 뒤 정리 |
+| 다음 행동 | `Lvl_DroneTraining`에서 세 Drone Rotor와 역할 표적 3개 확인 → 선적재 투하/재적재/재투하 → 세 역할 기능 → TUT-04 두 Lap |
 | 다음 기능 | `수동 Vertical Slice 확인 → TUT-04 실제 두 Lap → AI-VIS-01B` |
 | 이후 | Flight 실패 세부 규칙, AI/MG·Jamming과 실제 비주얼 통합 |
-| Git 처리 | Unreal `63f60c1`, 문서 `d30e098`이 원격과 일치. Unreal Index 충돌 때문에 추가 Commit 불가, Codex는 선택·Commit·Push하지 않음 |
-| 협업 Git | 중앙 `63f60c1` Pull 완료. 현재 문제는 원격 지연이 아니라 복원된 로컬 Stash와 Upstream 충돌 |
+| Git 처리 | Unreal `ac88992`, 문서 `9a4f715`이 원격 기준선. 이번 코드·자산·문서 변경은 로컬이며 Commit·Push하지 않음 |
+| 협업 Git | 팀원 Stash의 정상 LFS 바이너리를 중앙 `ac88992`에 반영. Stash는 안전 확인 전까지 보존 |
+
+## 2026-09-09 — Rotor 외형 회전·Blueprint 튜닝·역할 표적 BP 전환
+
+- `ADronePrototypePawn`이 `DroneRotor` Component Tag 또는 기존 `Rotor` 이름을 가진 Static Mesh를 수집해 Tick에서 회전시키도록 구현했다. 이동·Collision에는 영향을 주지 않으며 사망 시 정지한다. FPV·Scout는 Rotor 4개, Drop은 6개에 Tag를 저장했다.
+- 첫 화면 확인에서 Rotor가 자기 자리가 아니라 기체 주위를 크게 공전했다. 공급 Drone Pack의 일부 분리 Mesh는 Asset Pivot이 기체 원점에 있고 날개 Geometry만 떨어져 있기 때문이었다. 회전 전후 Static Mesh Bounds 중심의 Parent-space 위치 차이를 Relative Location으로 상쇄해 각 Rotor가 자기 Bounds 중심에서만 돌도록 수정했다.
+- 후속 화면 확인에서 FPV 자폭 Drone의 Rotor 4개가 본체 중앙에 겹친 상태를 확인했다. FPV 전용 Rotor Mesh에는 이미 본체 기준 네 모서리 Geometry 좌표가 들어 있는데 BP Component Location이 반대 Offset을 한 번 더 적용해 중심을 `(0, 0)`으로 상쇄한 것이 원인이었다. FPV Rotor A~D Component Location을 원점으로 복구해 Mesh 내부 좌표대로 네 암 끝에 배치했다.
+- Pawn BP Class Defaults에 `Rotor Visual Spin Enabled`, 초당 회전 각도, 로컬 회전축, 교차 방향, Component Tag를 노출했다. 역할별 BP에서 모델 축과 체감에 맞춰 수정할 수 있다.
+- `Override Definition Flight Profile In Blueprint`를 켜면 Data Asset 대신 Pawn BP의 Flight Profile로 최대 속도·가속/감속·Yaw·Pitch/Roll·시작 시점·체력 등 비행 프로필을 한 번에 덮어쓸 수 있다. 기본값은 꺼짐이라 기존 DA_Drone 설정을 유지한다.
+- NPC Controller BP에는 Sight/Lose Sight 거리, 주변 시야각, 자극 유지시간과 진영 감지 옵션을 노출했다. AnimBP에는 Spine/Neck/Head 시선 회전 분배 비중을 노출했다. 기존 런타임 캐시·안전 상수·상태값은 조정값이 아니므로 내부에 유지한다.
+- Training의 Native Recon/Impact/Payload 표적을 `/Game/Drone/Abilities/RoleTargets/BP_RoleTest_*` 3개로 교체했다. 표적 Mesh/Scale과 안내 문구·색·크기·위치·회전을 BP Class Defaults 또는 맵 배치 Instance에서 조정할 수 있다.
+- VS 업데이트 뒤 설치된 MSVC 14.51.36231 Toolchain(cl 19.51.36257)으로 `DroneEditor Win64 Development` 전체 Build가 성공했다. 이전 14.38 실패는 UE 5.8 SharedPCH와 구형 컴파일러의 호환 문제였고 프로젝트 코드 오류가 아니었다.
+- `FlightProfiles`, `VisualBank`, `RoleDroneAssets`, `TrainingAssets`, `NPCGreyboxAssets`, `NPCPerceptionSearchPIE` 집중 자동화 6/6 성공. Pivot 보정 뒤 `VisualBank`, `RoleDroneAssets` 2/2를 다시 실행해 FPV·Scout·Drop 모두 회전값은 변하고 실제 Rotor Bounds 중심은 0.1cm 오차 안에서 고정됨을 확인했다. FPV 배치 보정 뒤 `FPVAsset`, `VisualBank`, `RoleDroneAssets` 3/3을 다시 통과해 Rotor 중심이 본체에서 20cm 이상 떨어지고 네 사분면에 하나씩 배치됨도 확인했다. 전체 Blueprint 420개는 컴파일 실패 0이며, 종료 요약의 29 warnings는 기존 Battlefield Quinn Pose GUID 불일치다. Training Map Check 0 errors/0 warnings, `git diff --check`, `git lfs fsck`도 통과했다.
+- 남은 작업은 Editor에서 Rotor 회전축·교차 방향·속도, 역할 표적 표시, 역할별 기능과 드랍 화물 루프를 화면으로 확인하는 것이다. 수치 보정은 해당 Pawn/Controller/AnimBP/표적 BP의 Class Defaults에서 처리한다.
+
+## 2026-09-09 — 팀원 LFS 자산 복구와 Trello 정리
+
+- GitHub Desktop에서 Stashed Changes Restore를 반복하면 `test1.umap`, `M_Start.uasset: needs merge`, `could not write index`가 발생했다. 첫 Restore가 이미 두 LFS 바이너리 충돌을 만든 상태라 두 번째 적용이 거부된 것이며 Stash 자체는 보존됐다.
+- 현재 main의 손상된 277/274-byte 충돌문자 LFS Object는 선택하지 않고 사용자 결정에 따라 팀원 Stash 버전을 보존했다. `test1.umap` 48,817 bytes와 `M_Start.uasset` 11,456 bytes 모두 Unreal Package Magic과 팀원 OID를 확인했다.
+- 두 파일만 충돌 해결·Stage한 뒤 사용자가 `ac88992`로 Commit/Push했다. Fetch 뒤 `HEAD=origin/main=ac88992`, 원격 LFS OID 일치와 Clean 작업 트리를 확인했다.
+- `.vsconfig`는 공유 가능한 구성요소 목록이지만 Stash의 14.44 Toolset 변경은 UE 5.8 기준에 맞지 않아 제외했다. 기존 14.50 파일을 유지했고 복구 Commit에 포함하지 않았다.
+- 지금까지 구현한 기능과 앞으로 할 작업을 Trello List/카드/체크리스트 형식으로 [`DRONE_TRELLO_BOARD_2026-09-09.md`](DRONE_TRELLO_BOARD_2026-09-09.md)에 정리했다.
 
 ## 2026-09-08 — DR-DROP-02 맵 배치형 운반 화물
 

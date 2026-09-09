@@ -1,10 +1,28 @@
 # 현재 작업 상태
 
-기준일: 2026-09-08 (Asia/Seoul)
+기준일: 2026-09-09 (Asia/Seoul)
 
 이 문서는 PC별로 명령으로 확인된 상태와 사용자가 아직 결정하지 않은 항목을 분리한다. 현재 D 드라이브 실행 세션과 다른 PC의 검증 기록을 같은 항목에서 섞지 않고 경로와 검증 시점을 함께 적는다.
 
 실시간 작업 위치와 바로 다음 행동은 [`WORKBOARD.md`](WORKBOARD.md), 날짜별 변경과 검증 이력은 [`docs/DRONE_WORKLOG.md`](docs/DRONE_WORKLOG.md)에 기록한다. 이 문서는 검증된 기준선이 달라질 때 함께 갱신한다.
+
+## 2026-09-09 Rotor·Blueprint 튜닝·역할 표적 BP 검증
+
+- FPV·Scout 4개, Drop 6개 Rotor Mesh에 `DroneRotor` Tag를 저장하고 `ADronePrototypePawn`에서 외형 회전을 구현했다. 공급 Mesh Pivot 때문에 기체 주위를 공전하던 첫 구현은 폐기하고, 회전 전후 Mesh Bounds 중심을 고정해 각 Rotor가 제자리에서만 돌도록 보정했다. FPV는 Mesh 내부에 이미 네 암 위치가 있으므로 중복 Component Offset을 제거해 본체 중앙 겹침도 수정했다. 회전 활성화·속도·축·교차 방향은 Pawn BP Class Defaults에서 조정한다.
+- 선택적 Pawn BP Flight Profile Override를 추가해 최대 속도·가속/감속·Yaw·Pitch/Roll·시작 시점·체력 등을 역할별 BP에서 덮어쓸 수 있다. 기본은 꺼짐이며 기존 Data Asset 설정을 유지한다.
+- AI Sight 거리·각도·유지시간·진영 감지와 AnimBP Spine/Neck/Head 시선 분배 비중을 Blueprint 기본값으로 노출했다.
+- Training의 Recon·Impact·Payload 표적은 `/Game/Drone/Abilities/RoleTargets/BP_RoleTest_*` 3개로 교체했다. Mesh/Scale과 안내 텍스트 표시값을 BP 또는 배치 Instance에서 조정할 수 있다.
+- VS 업데이트 후 MSVC 14.51.36231 Toolchain(cl 19.51.36257) `DroneEditor Win64 Development` Build 성공. 관련 자동화 6/6, Pivot 보정 뒤 중심 고정 2/2, FPV 배치 보정 뒤 네 사분면 배치·제자리 회전 3/3을 통과했다. Blueprint 420개 컴파일 실패 0, Training Map Check 0/0, `git diff --check`, `git lfs fsck`도 통과했다. Blueprint 전체 검사의 29 warnings는 기존 Battlefield Quinn Pose GUID 경고다.
+- 코드·자산·문서는 로컬 변경 상태이며 Commit·Push하지 않았다. 다음 필수 확인은 `Lvl_DroneTraining` 화면에서 Rotor 축/방향/속도와 역할 표적 표시를 확인하는 것이다.
+
+## 2026-09-09 팀원 LFS 자산 복구·공유 완료
+
+- Unreal은 `main=origin/main=ac88992`, 문서는 최신화 시작 전 `main=origin/main=9a4f715`이고 두 작업 트리가 Clean임을 확인했다.
+- GitHub Desktop Stash Restore는 `test1.umap`, `M_Start.uasset`이 이미 `needs merge`인 상태에서 다시 실행돼 `could not write index`로 실패했다. Stash는 삭제되지 않아 데이터 손실은 없었다.
+- 현재 `0221522`에 잘못 들어갔던 277/274-byte 충돌문자 LFS Object 대신 팀원 Stash의 정상 Unreal 바이너리를 선택했다. `test1.umap`은 48,817 bytes/OID `5925e9ae...`, `M_Start.uasset`은 11,456 bytes/OID `478513e0...`다.
+- 두 파일의 Unreal Package Magic, Stage LFS Pointer와 원격 `origin/main` OID 일치를 확인했고 충돌 0 상태로 `ac88992`에 Push했다.
+- `.vsconfig`는 Stash의 MSVC 14.44 변경을 제외하고 기존 14.50 구성요소 목록을 유지했다. 이번 복구 Commit에는 두 Unreal 자산만 포함된다.
+- GitHub Desktop이 보존한 Stash 두 개는 아직 남아 있다. `Restore`를 다시 누르지 않고 팀원 PC Pull·LFS·Editor 확인 후 내용 감사와 삭제 여부를 결정한다.
 
 ## 2026-09-08 DR-DROP-02 맵 배치형 운반 화물
 

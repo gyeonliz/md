@@ -1,34 +1,34 @@
 # 현재 작업 보드
 
-기준일: 2026-09-08 (Asia/Seoul)
+기준일: 2026-09-09 (Asia/Seoul)
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 공유 기준선은 `main=origin/main=63f60c1`, 문서 공유 기준선은 `main=origin/main=d30e098`이다. 역할별 Drone 기능과 FLOW-04~08은 2026-09-08 Pull로 공유 main에 반영됐다. 현재 Unreal Index에는 자동 복원된 Stash와 Upstream 사이의 LFS 바이너리 충돌 2개가 남아 있으며 문서는 이번 상태 갱신 전 Clean이었다.
+Unreal 공유 기준선은 `main=origin/main=ac88992`, 문서 공유 기준선은 `main=origin/main=9a4f715`이다. 역할별 Drone 기능·모델·표적·UI·맵 배치 운반 화물과 FLOW-04~08이 공유 main에 반영됐다. 현재는 `ac88992` 위에 Rotor 외형 회전·Blueprint 튜닝·역할 표적 BP 전환 변경이 로컬에 있으며 Commit·Push는 사용자가 진행한다.
 
 2026-09-03 게임 흐름은 `실행 → 시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → 맵 → Drone 선택 → Mission 시작/측면 목표 UI`로 변경됐다. 사람 Operator 조작·NPC 대화 수령·Operator↔Drone 전환은 폐기하며 [`docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 최우선 실행 기준으로 사용한다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-09-08 — 맵 배치형 운반 화물 BP와 Drop 적재→재투하 루프 추가, Build 및 집중 자동화 22/22 통과, 화면 확인 대기
+마지막 갱신: 2026-09-09 — Rotor 외형 회전·Blueprint 튜닝·역할 표적 BP 전환 구현/자동 검증 완료, 수동 화면 확인 대기
 
 | 항목 | 상태 |
 |---|---|
-| 현재 단계 | `DR-DROP-02` 맵 배치 화물 코드·BP·Training 배치·자동화 완료, 수동 Vertical Slice 확인 대기. 역할 기능과 FLOW-04~08은 공유 `63f60c1`, 역할별 모델/표적/UI/운반 화물은 그 위 로컬 변경 |
-| 진행 정도 | 정찰 DroneSpy, 자폭 FPV, 드랍 Delivery 모델을 분리했다. Training 표적 3개와 MilitaryCamp 크레이트 기반 `BP_DroneCarryablePayload`를 배치했다. Drop의 최초 선적재물도 같은 BP라 착지 후 남고, 빈 기체는 300cm 안에서 Primary로 실제 Actor를 적재·부착한 뒤 같은 키로 재투하한다. 역할 UI와 IMC 21 Mapping도 유지한다 |
-| 지금 작업 중 | 자동 구현·검증을 마쳤다. Editor에서 세 역할 외형 크기/방향과 정찰·자폭·투하 실제 조작을 수동 확인하고 필요 시 Transform·표적 위치만 조정할 차례 |
-| 완료 근거 | MSVC 14.51.36256 Editor Build, `Drone.Prototype` 7/7, `Drone.Integration` 3/3, `Drone.Tutorial` 7/7, `Drone.Flow` 5/5 전부 성공. RoleAbilities는 적재→부착→동일 Actor 재투하, RoleDroneAssets는 BP Parent·Crate Mesh, TrainingAssets는 맵 배치 1개를 검사 |
-| 수동 미확인 | 차량 Z·Pitch·Roll·바퀴·포탑 추종, Drone A/D Roll, 실제 탄환 피격 본체·카메라 흔들림과 Camera/Collision 안정. 자동포탑 발사·장애물 차단, MG 사수·Gaze·임시 MG 3축, Training HUD, OilRig 시각·성능 확인도 유지 |
-| 현재 차단 | Git Index에서 `test1.umap`, `M_Start.uasset`이 `Updated upstream` 대 `Stashed changes` 양쪽 추가 충돌이고 두 Worktree 파일은 충돌 마커가 든 LFS Pointer다. 실행 중 Editor에서 Asset을 저장하거나 두 번째 Editor로 수정하지 않는다 |
-| 다음 행동 | Editor에서 Front-end→Training 진입 후 Drop Drone의 선적재 화물을 먼저 투하 → 배치 크레이트 300cm 안에서 좌클릭/RB로 적재 → 기체 하단 부착 → 다시 좌클릭/RB로 재투하를 확인한다. 이어 정찰·FPV와 모델 Transform을 확인한 뒤 LFS 충돌 보존본을 선택한다 |
+| 현재 단계 | Rotor 외형 회전·Blueprint 튜닝·역할 표적 BP 전환의 코드/자산/자동 검증 완료. `main=origin/main=ac88992` 위 로컬 변경의 수동 Vertical Slice 확인 대기 |
+| 진행 정도 | FPV·Scout 4개, Drop 6개 Rotor Mesh를 `DroneRotor` Tag로 연결했다. 공급 Mesh의 Pivot이 기체 원점에 있어도 각 Mesh Bounds 중심을 고정해 제자리 회전하며, FPV의 중복 Component Offset을 제거해 네 Rotor가 본체 중앙이 아니라 네 암 끝에 배치된다. 회전 속도/축/교차 방향, Drone Flight Profile 전체 Override, AI Sight, AnimBP 시선 Bone 비중을 Blueprint Class Defaults에서 조정할 수 있다. Training의 Recon·Impact·Payload 표적도 별도 BP 3개다 |
+| 지금 작업 중 | 구현과 자동 검증을 마쳤다. Editor에서 역할별 Rotor가 실제 축으로 자연스럽게 돌고 교차 방향/속도가 맞는지, 새 역할 표적 3개가 정상 표시되는지 확인할 차례 |
+| 완료 근거 | VS 업데이트 후 MSVC 14.51.36231 Toolchain으로 `DroneEditor Win64 Development` Build 성공. 집중 6/6, Pivot 중심 고정 2/2, FPV 배치 보정 뒤 FPVAsset·VisualBank·RoleDroneAssets 3/3 성공. FPV Rotor가 본체에서 20cm 이상 떨어져 네 사분면을 모두 차지하고 회전 중 중심이 고정되는지 검사했다. Blueprint 420개 컴파일 실패 0, Training Map Check 0/0, `git diff --check`와 `git lfs fsck` 통과 |
+| 수동 미확인 | Drone Rotor 회전축·방향·속도와 기체 외형 크기/방향, 역할 기능 3종, 차량 Z·Pitch·Roll·바퀴·포탑 추종, 실제 탄환 피격 흔들림을 확인해야 한다. 자동포탑 발사·장애물 차단, MG 사수·Gaze·임시 MG 3축, Training HUD 두 Lap, OilRig 시각·성능 확인도 유지 |
+| 현재 차단 | 코드·Git 차단 없음. GitHub Desktop이 보존한 Stash 두 개는 현재 기능과 팀원 복구 확인이 끝날 때까지 유지하며 Restore를 다시 누르지 않는다 |
+| 다음 행동 | Editor에서 `/Game/Drone/Maps/Lvl_DroneTraining`을 열고 FPV·Scout·Drop Rotor 방향/속도와 새 역할 표적 3개의 표시를 먼저 확인한다. 이어 Drop 선적재 투하·착지 잔류 → 근접 적재 → 하단 부착 → 재투하, 정찰/FPV 기능과 Training HUD 두 Lap을 확인한다 |
 | 다음 기능 | `수동 Vertical Slice 확인 → TUT-04 실제 두 Lap → AI-VIS-01B`. 광섬유·UGV·장거리 타격은 첫 3종 확인 뒤 별도 카드로 진행 |
 | 에셋 인수 | `C:\에셋` 원본은 보존. ArmyVFX·InfantrySFX·Ground Drone·NPC 외형·Raw Drone을 정확한 의존성 묶음으로 이식 |
 | 맵 이식 | 기존 환경 3종에 `Lvl_OilRig`을 추가. Vendor FirstPerson Sample 의존성을 끌어오던 Door Actor 8개는 중앙 사본에서 제거 |
-| Editor/MCP | UE 5.8.2 Editor가 `D:\JGY\project\drone\Drone.uproject`로 실행 중. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
+| Editor/MCP | UE 5.8.2 Editor는 현재 종료 상태. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
-| Git 처리 | Unreal `main=origin/main=63f60c1`, 문서 `main=origin/main=d30e098`. Unreal은 충돌 2개·Staged 2개·`.vsconfig` Worktree 차이가 남아 Commit 불가 상태. Codex는 충돌 선택·Commit·Push하지 않음 |
+| Git 처리 | Unreal·문서 기준선은 각각 `ac88992`, `9a4f715`. 두 저장소에 현재 로컬 변경이 있으며 Commit·Push하지 않았다. 팀원 LFS 자산 복구 Commit `ac88992`까지의 원격 반영은 유지하고 `.vsconfig`는 건드리지 않았다 |
 | UI/기획 참고 | Figma `Project:Droner`에서 기체 역할과 조작 요구를 읽기만 함. Figma는 수정·댓글·공유 설정 변경하지 않았고 게임 제목 통일은 보류 |
-| 협업 Git | 중앙 `origin/main=63f60c1`까지 Pull 완료. 현재 문제는 원격 지연이 아니라 Pull 시 복원된 로컬 Stash가 같은 바이너리 경로와 충돌한 상태다. 팀원 PC에서 기능이 다르면 실제 HEAD·LFS 파일 크기·Pull 뒤 `DroneEditor` 재빌드 여부를 확인한다. [`docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md`](docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md)에 판별 순서를 기록 |
+| 협업 Git | 중앙 `origin/main=ac88992`까지 동기화했다. 팀원 PC에서 기능이 다르면 실제 HEAD·LFS 파일 크기·Pull 뒤 `DroneEditor` 재빌드 여부를 확인한다. 보존 중인 Stash는 재적용하지 않고 내용 감사 뒤 삭제한다. [`docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md`](docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md)에 판별 순서를 기록 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
 | 학습 다음 행동 | Q-Net 상태를 확인해 Track A/B/C를 고르고 첫 학습 블록 실행 |
 
@@ -121,7 +121,9 @@ Unreal 공유 기준선은 `main=origin/main=63f60c1`, 문서 공유 기준선�
 | GIT-08B | Git / Unreal | `.vsconfig`에는 공유 가능한 VS component ID만 있어 첫 Commit 포함을 권장안으로 기록 |
 | GIT-08 | Git / Unreal | 863개 파일의 첫 Stage 범위를 검토하고 생성물·민감 정보 제외 확인 |
 | GIT-09 | Git / Unreal | `91498b7` 첫 Commit을 `gyeonliz/drone`의 `origin/main`에 Push하고 LFS 추적 확인 |
+| GIT-LFS-REPAIR-01 | Git / Unreal / 협업 | 손상 커밋의 `test1.umap`, `M_Start.uasset`을 팀원 Stash의 정상 Unreal 바이너리로 복구했다. Package Magic·LFS OID·원격 일치를 확인하고 `ac88992`로 Push, 충돌 0·Clean 상태 확인 |
 | MD-01 | Codex Sync / Git | 현재 문서 작업 폴더의 `origin`을 `https://github.com/gyeonliz/md.git`로 연결 |
+| PLAN-TRELLO-01 | Drone / Planning | 현재 구현·검증·수동 확인·다음 개발·장기 후보를 Trello List와 복사 가능한 카드/체크리스트로 정리 |
 | MD-02 | Codex Sync / Git | `md` 저장소 첫 Stage 범위를 검토하고 민감 정보·생성 패키지를 제외 |
 | MD-03 | Codex Sync / Git | `9e81de0` 첫 Commit을 `gyeonliz/md`의 `origin/main`에 Push하고 로컬·원격 일치 확인 |
 | GIT-ANDROID-01 | Git / Unreal | 사용자 결정에 따라 Android File Server Plugin·네트워크를 끄고 토큰 할당을 비움 |
