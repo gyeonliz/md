@@ -18,20 +18,20 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-09-11 16:38 — Spline Point별 Ring 직접 편집 구현과 `3df654a` 동기화 감사
+마지막 갱신: 2026-09-11 17:25 — CourseSpline과 분리된 Ring별 Handle 최종 검증과 `9de1ead` 동기화 감사
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | 팀원 `3df654a` Pull 완료. TUT-05 Point 직접 편집 코드 검증 후 Map 정합성 수정 대기 |
-| Unreal 기준선 | `main=origin/main=3df654a`; `.vsconfig` Git 추적 제외 유지 |
-| 자동 검증 | Editor Build 성공. Point 직접 편집 Course 테스트 1/1. Pull 이후 알려진 전체 실패 테스트 3개는 아래 이력에 기록 |
+| 전체 단계 | `9de1ead` 동기화 완료. TUT-05 독립 Ring Handle 코드 검증 후 Map 정합성 수정 대기 |
+| Unreal 기준선 | `main=origin/main=9de1ead`; `.vsconfig` Git 추적 제외 유지 |
+| 자동 검증 | Editor Build 성공. 독립 Ring Handle Course 테스트 1/1. Pull 이후 알려진 전체 실패 테스트 3개는 아래 이력에 기록 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | Point 직접 편집 Source/Test와 문서 정리. 팀원 Map/에셋은 원격과 동일한 Clean 상태 |
+| 지금 작업 중 | 독립 Ring Handle Source/Test와 문서 정리. 팀원 Map/에셋은 원격과 동일한 Clean 상태 |
 | 차단 조건 | Gate 17/Sequence 4, 역할 표적·Carryable 0, MG 사망 사수 정리/재점유 실패 |
-| 다음 행동 | 맵 화면에서 실제 코스 Gate 범위·순서 확인 → Point 모드 적용/표적 배치 → AI 재점유 진단 → 전체 40개 재검증 |
+| 다음 행동 | 맵 화면에서 실제 코스 Gate 범위·순서 확인 → 독립 Handle 변환/표적 배치 → AI 재점유 진단 → 전체 40개 재검증 |
 | 다음 기능 | `TUT-05 완료 → TUT-04 실제 두 Lap → Mission 목표 Rule 데이터화·Jamming` |
 | 이후 | Flight 실패 세부 규칙, AI/MG·Jamming과 실제 비주얼 통합 |
-| Git 처리 | Unreal `3df654a`, 문서 `6501fd5`가 원격 기준선. 이번 코드·테스트·문서 변경은 로컬이며 Commit·Push하지 않음 |
+| Git 처리 | Unreal `9de1ead`, 문서 `6501fd5`가 원격 기준선. 독립 Handle Source/Test 3개와 문서는 로컬이며 이번 작업에서 Commit·Push하지 않음 |
 | 협업 Git | 15:56 GitHub Desktop 자동 Stash에서 개발 파일만 선택 복구. Stash는 안전 확인 전까지 보존 |
 
 ## 2026-09-11 — 팀원 Pull·Discard 자동 Stash 복구와 푸시 준비
@@ -1281,13 +1281,14 @@ HeadingValueText
 
 - UE 5.8.1 Editor에서 환경 Map 3개를 각각 열어 조명·재질·스케일·Landscape·Collision과 드론 Spawn 위치를 눈으로 확인한다.
 - 세 맵 중 어느 것을 데모 주력 Map으로 쓸지는 현재 미정이며, 기술 이식 완료를 최종 채택으로 표현하지 않는다.
-## 2026-09-11 16:38 — Spline Point별 Ring 직접 편집 모드
+## 2026-09-11 17:13 — CourseSpline과 분리된 Ring별 Handle 직접 편집
 
-- 사용자 요구를 숫자 배열 편집이 아니라 `Spline Point 1개 = Ring 1개`인 뷰포트 작업 방식으로 확정했다.
-- `ADroneTrainingCourse`에 Point 직접 편집 모드와 실제 Ring 수 조회를 추가했다. 모드를 켜면 Point의 누적 Spline 거리를 같은 Index Ring이 사용하고 Spline 접선 회전을 유지한다.
-- Point 이동은 해당 Ring 이동, Point 추가·삭제는 Ring 추가·삭제로 반영된다. 기존 균등/고정 간격·절대 거리 배열은 보조 모드로 유지하고 공통/Index별 거리·로컬 Offset은 미세 보정에 계속 사용할 수 있다.
-- 자동화에 Point 수 일치, Point 이동 위치, Point 추가/삭제 시 Ring·Sequence 수 변경을 추가했다.
-- Unreal Editor가 없는 상태에서 MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공, `Drone.Tutorial.TrainingCourse` 1/1 성공(0 warning/0 error), `git diff --check` 통과.
-- 작업 중 팀원 후속 커밋 `3df654a`가 Fast-forward됐다. 차량 자동포탑 BP와 Training/NPC Smart Object 맵 변경을 받았고 로컬 Source와 미추적 기관총 자산은 보존됐다.
-- 최신 `Lvl_DroneTraining`은 원격과 같은 Clean 상태로 보존했다. 읽기 전용 감사와 `TrainingAssets` 재실행에서 Gate Actor 17개·Course Sequence 4개·역할 표적/Carryable 0개를 확인했다. 화면에서 실제 코스 Gate 범위와 순서를 확인한 뒤 Point 모드를 맵에 적용한다.
+- 첫 구현의 `Spline Point 1개=Ring 1개`는 Ring 이동이 코스 곡선까지 바꾸므로 사용자 요구와 다름을 확인하고 폐기했다.
+- `ADroneTrainingCourse`에 CourseSpline과 분리된 `Ring별 Spline Handle` 배열을 추가했다. `MakeEditWidget` 3D 점을 움직이면 가장 가까운 Spline 위치로 투영되고 Ring만 해당 위치·접선 회전을 따른다.
+- Handle 배열 항목 수가 Ring 수이며 추가·삭제가 Ring·Sequence 수에 반영된다. 현재 숫자/수동 배치에서 Handle을 초기화하는 Editor 버튼과 전체 Handle을 다시 Spline에 붙이는 버튼도 추가했다.
+- 자동화에 Handle Spline 투영, 추가·삭제, Ring·Sequence 수 변경과 CourseSpline 제어점 수·위치 불변 검사를 추가했다.
+- Unreal Editor가 없는 상태에서 MSVC 14.51.36257 `DroneEditor Win64 Development` 최종 Build 성공, 최종 `Drone.Tutorial.TrainingCourse` 1/1 성공(0 warning/0 error), `git diff --check`와 `git lfs fsck` 통과.
+- 작업 중 `3df654a`에 이어 사용자 `0911임시버전` 커밋 `46efd2e`까지 동기화됐다. 기존 자동 Ring/Gate 색상 Source·테스트·도구와 기관총 자산 10개는 이 커밋에 추적됐고 독립 Handle 변경 3개는 로컬에 보존됐다.
+- 최종 감사 중 팀원 Training Map 후속 `55d6c61`과 Merge `9de1ead`가 추가되어 Fast-forward했다. 코드 충돌은 없었고 최신 Map에서도 Gate 17/Sequence 4, 역할 표적/Carryable 0 상태가 동일함을 `TrainingAssets`로 다시 확인했다.
+- 최신 `Lvl_DroneTraining`은 원격과 같은 Clean 상태로 보존했다. 읽기 전용 감사와 `TrainingAssets` 재실행에서 Gate Actor 17개·Course Sequence 4개·역할 표적/Carryable 0개를 확인했다. 화면에서 실제 코스 Gate 범위와 순서를 확인한 뒤 독립 Handle 모드를 맵에 적용한다.
 - Commit·Push하지 않았다.

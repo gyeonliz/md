@@ -2,7 +2,7 @@
 
 기준일: 2026-09-11 (Asia/Seoul)
 
-이 문서는 `D:\JGY\project\drone`의 현재 구현과 `/Game/Drone/Maps/Lvl_DroneTraining` 저장 상태를 기준으로 한다. 코스 제작은 `BP_DroneTrainingCourse` 한 개에서 관리한다. 권장 자동 편집 방식은 `Spline Point 1개당 Ring 1개`이며, 각 Point의 배열 순서가 곧 Gate 통과 순서다. 생성된 빛나는 선 Component, 자동 Gate Child Actor와 GateIndex를 직접 관리하지 않는다.
+이 문서는 `D:\JGY\project\drone`의 현재 구현과 `/Game/Drone/Maps/Lvl_DroneTraining` 저장 상태를 기준으로 한다. 코스 제작은 `BP_DroneTrainingCourse` 한 개에서 관리한다. 권장 자동 편집 방식은 Course Spline과 분리된 `Ring별 Spline Handle`이며, Handle 배열 순서가 곧 Gate 통과 순서다. 생성된 빛나는 선 Component, 자동 Gate Child Actor와 GateIndex를 직접 관리하지 않는다.
 
 ## 1. 현재 맵과 자산 위치
 
@@ -13,7 +13,7 @@
 /Game/Drone/Tutorial/Materials/M_DroneTrainingGuide
 ```
 
-현재 `3df654a` Pull 기준 맵 감사 결과는 Gate Actor 17개, Course Sequence 4개, 역할 표적 3종과 Carryable Payload 0개다. 이 맵은 원격 LFS 파일과 같은 Clean 상태라 이번 코드 작업에서 저장하거나 덮어쓰지 않았다. 17개 링의 의도와 배치 위치를 화면에서 확인한 뒤 Point 직접 편집 방식으로 변환해야 한다.
+현재 `9de1ead` 기준 맵 감사 결과는 Gate Actor 17개, Course Sequence 4개, 역할 표적 3종과 Carryable Payload 0개다. 이 맵은 원격 LFS 파일과 같은 Clean 상태라 이번 코드 작업에서 저장하거나 덮어쓰지 않았다. 17개 링의 의도와 배치 위치를 화면에서 확인한 뒤 독립 Handle 방식으로 변환해야 한다.
 
 ## 2. 루트 만들기와 Spline 점 추가
 
@@ -25,7 +25,7 @@
 6. 닫힌 순환 코스가 필요하지 않으면 `Closed Loop`를 켜지 않는다. 현재 기록 규칙은 열린 코스의 Gate 0에서 시작해 마지막 Gate에서 끝난다.
 7. 맵을 저장하기 전에 코스 Actor의 `Synchronize Gate Definitions` 버튼을 한 번 실행하고 BP·Map을 저장한다. Construction과 BeginPlay에서도 같은 동기화가 자동 실행된다.
 
-`Spline Point 1개당 Ring 1개`를 켠 상태에서는 제어점 수와 Ring 수가 항상 같다. Point를 움직이면 같은 Index의 Ring이 움직이고, Point를 추가·삭제하면 Ring도 하나씩 추가·삭제된다. 숫자 배치 모드나 수동 `OrderedGates` 모드에서만 Spline 제어점 수와 Gate 수를 다르게 운용한다.
+Spline 제어점은 코스 곡선만 만든다. Ring 수와 위치는 별도의 `Ring별 Spline Handle` 배열이 담당하므로 제어점을 움직이지 않고 Ring만 옮길 수 있다. Handle을 움직이면 가장 가까운 Spline 위치로 투영되고, Handle 항목을 추가·삭제하면 Ring도 하나씩 추가·삭제된다.
 
 ## 3. 빛나는 코스가 각져 보였던 이유와 현재 규칙
 
@@ -51,8 +51,9 @@
 | 항목 | 역할 |
 |---|---|
 | `Use Automatic Spline Gates` | 자동 Ring 생성 사용 여부 |
-| `Spline Point 1개당 Ring 1개` | 권장 직접 편집 모드. Point 이동·추가·삭제가 같은 Index Ring에 반영 |
-| `Automatic Gate Count` | Point 직접 편집 모드를 끈 경우의 Ring 수, 최소 2개·최대 64개 |
+| `개별 Ring 위치 Handle 사용` | 권장 직접 편집 모드. Course Spline은 유지하고 Ring 전용 Handle을 사용 |
+| `Ring별 Spline Handle` | Viewport에 표시되는 Ring별 독립 3D 위치점. 배열 Index가 통과 순서 |
+| `Automatic Gate Count` | 독립 Handle 모드를 끈 경우의 Ring 수, 최소 2개·최대 64개 |
 | `Automatic Gate Class` | 기본 Native Gate 또는 외형을 가진 `BP_DroneTrainingGate` |
 | `Evenly Distribute Automatic Gates` | 켜면 시작 거리~끝 여백 사이 균등 분배 |
 | `Automatic Gate Start Distance Centimeters` | 첫 Ring을 Spline 시작점에서 띄우는 거리 |
@@ -68,16 +69,16 @@
 
 값이나 Spline 점을 바꾸면 Construction에서 Ring을 다시 만들고 스플라인 위치·접선 회전을 따라 자동 정렬한다. 즉시 갱신이 필요하면 Details의 `Rebuild Automatic Gates`를 누른다.
 
-### 권장: 링 하나씩 화면에서 직접 배치
+### 권장: Spline 위에서 링만 하나씩 직접 이동
 
-1. Course에서 `Use Automatic Spline Gates`와 `Spline Point 1개당 Ring 1개`를 켠다.
-2. Components에서 `CourseSpline`을 선택한다.
-3. Viewport에서 Point 0, 1, 2…를 각각 링을 놓을 위치로 이동한다. 링은 해당 Point 위치와 Spline 접선 회전을 따른다.
-4. 링이 더 필요하면 Spline 위를 우클릭해 `Add Spline Point Here`를 사용한다. 새 Point와 새 Ring이 같은 Index에 생긴다.
-5. 링을 없애려면 해당 Spline Point를 선택해 삭제한다. 시작·종료 판정을 위해 Point는 최소 2개를 유지한다.
-6. 위치를 조정한 뒤 `Rebuild Automatic Gates`를 누르고 Ring 수와 순서를 확인한다.
+1. Course에서 `Use Automatic Spline Gates`를 켠다.
+2. `현재 배치에서 Ring Handle 만들기`를 한 번 누른다. 현재 숫자 배치 또는 수동 `OrderedGates` 위치를 복사해 `Ring별 Spline Handle` 배열을 만들고 독립 Handle 모드를 켠다.
+3. Details에서 `Ring별 Spline Handle`의 원하는 Index를 선택하고 Viewport의 3D Widget을 드래그한다.
+4. Handle은 드래그한 위치에서 Course Spline의 가장 가까운 지점으로 붙고, Ring만 그 위치와 접선 회전을 따라간다. CourseSpline 제어점과 코스 곡선은 바뀌지 않는다.
+5. Ring을 추가하려면 Handle 배열에 항목을 추가한 뒤 새 Widget을 원하는 Spline 구간 가까이 옮긴다. 삭제하면 같은 Index Ring도 제거된다. 시작·종료 판정을 위해 최소 2개를 유지한다.
+6. 즉시 붙지 않거나 전체를 재정렬하려면 `모든 Ring Handle을 Spline에 붙이기`, 이어서 `Rebuild Automatic Gates`를 누른다.
 
-생성된 `AutomaticSplineGate_*`를 직접 드래그하면 다음 Construction 때 위치가 다시 계산된다. 반드시 `CourseSpline` Point를 잡아 움직인다. `Automatic Gate Distance Offset(s)`와 `Automatic Gate Local Offset(s)`은 Point 위치를 바꾸지 않고 앞뒤·좌우·높이를 미세 보정할 때만 사용한다.
+생성된 `AutomaticSplineGate_*`를 직접 드래그하면 다음 Construction 때 위치가 다시 계산된다. 반드시 `Ring별 Spline Handle`의 3D Widget을 잡아 움직인다. `Automatic Gate Distance Offset(s)`와 `Automatic Gate Local Offset(s)`은 Handle 원본을 바꾸지 않고 앞뒤·좌우·높이를 미세 보정할 때만 사용한다.
 
 자동 Gate의 순서는 Spline 거리 증가 방향이며 Actor 로컬 `+X`가 해당 지점의 Spline 진행 방향을 따른다. `GateIndex`, `CourseId`, `SegmentDistance`와 Sequence 배열은 자동 동기화된다. 생성된 `AutomaticSplineGate_*` Component나 그 Child Actor를 Outliner에서 직접 옮기지 않는다.
 
@@ -85,11 +86,12 @@
 
 ```text
 Use Automatic Spline Gates = true
-Spline Point 1개당 Ring 1개 = true
+개별 Ring 위치 Handle 사용 = true
+Ring별 Spline Handle = Ring 수만큼
 Automatic Gate Class = BP_DroneTrainingGate
 ```
 
-기존 숫자 배치가 필요한 경우에만 `Spline Point 1개당 Ring 1개`를 끄고 `Automatic Gate Count`, 균등 분배 또는 절대 거리 배열을 사용한다. 프로젝트 재설정 도구 `Tools/AssetMigration/ConfigureAutomaticTrainingGates.py`의 설정 실행은 사용자 배치를 기본 4개 숫자 배치로 되돌릴 수 있으므로 현재 맵에는 실행하지 않고 검증 모드만 사용한다.
+기존 숫자 배치가 필요한 경우에만 `개별 Ring 위치 Handle 사용`을 끄고 `Automatic Gate Count`, 균등 분배 또는 절대 거리 배열을 사용한다. 프로젝트 재설정 도구 `Tools/AssetMigration/ConfigureAutomaticTrainingGates.py`의 설정 실행은 사용자 배치를 기본 4개 숫자 배치로 되돌릴 수 있으므로 현재 맵에는 실행하지 않고 검증 모드만 사용한다.
 
 Ring 사이 간격을 완전히 직접 지정하려면 `Automatic Gate Spline Distances Centimeters` 배열을 Ring 수만큼 만든다. 예를 들어 `500, 1300, 2600, 4100`은 Spline 시작점에서 각각 5m, 13m, 26m, 41m 지점에 Ring 0~3을 둔다. 배열 값은 통과 순서대로 증가시키는 것이 권장되며, 항목이 없거나 음수인 Index는 균등/고정 간격 계산값을 사용한다.
 
@@ -126,9 +128,9 @@ Ring 사이 간격을 완전히 직접 지정하려면 `Automatic Gate Spline Di
 
 ## 6. 루트 수정 권장 순서
 
-1. Point 직접 편집 모드에서는 Ring 위치가 필요한 곳에 Spline Point를 놓고 Tangent로 접근 방향과 곡률을 함께 만든다.
+1. CourseSpline 제어점과 Tangent로 코스 곡선과 접근 방향을 먼저 만든다.
 2. 편집 카메라로 빛나는 선이 Spline을 부드럽게 따르는지 확인한다.
-3. 권장 자동 모드에서는 Point 수로 Ring 수를 정한다. 숫자 자동 모드는 균등 배치가 필요한 코스에만 쓰고, 수동 모드에서만 Gate Actor와 `OrderedGates`를 직접 구성한다.
+3. 권장 자동 모드에서는 독립 Handle 배열 수로 Ring 수를 정하고 각 Widget을 Spline 위에서 옮긴다. 숫자 자동 모드는 균등 배치가 필요한 코스에만 쓰고, 수동 모드에서만 Gate Actor와 `OrderedGates`를 직접 구성한다.
 4. 자동 Ring이 Spline 접선과 진행 방향을 따르는지 확인한다.
 5. `Standalone Game`에서 Gate 0부터 끝까지 한 번 통과한다.
 6. 역순, 같은 Gate 재통과, Gate 우회가 기록을 변경하지 않는지 확인한다.

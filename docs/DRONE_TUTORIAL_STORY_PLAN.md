@@ -87,7 +87,7 @@ Widget에서 매 프레임 Pawn을 검색하거나 Property Binding으로 계산
 - `TUT-02` 완료: Gate 목록, Gate Actor와 Trigger, 순서·정방향·중복 통과 판정과 시각 상태
 - `TUT-03` 완료: Segment/Lap World Game Time, 실제 3차원 이동 거리와 평균 속도 원본 기록
 - `TUT-04B` 기술 구현 완료: 이전 성공 평균·Best·Segment 비교와 HUD 결과 행. 실제 두 Lap 수동 확인 대기
-- `TUT-05` 기술 구현 진행: `Spline Point 1개=Ring 1개` 직접 편집과 숫자/절대거리 보조 배치, 접선 정렬·3상태 색상 구현. 최신 팀원 Map 적용과 전체 회귀·화면 비행 확인 대기
+- `TUT-05` 기술 구현 진행: CourseSpline과 분리된 Ring별 3D Handle 직접 편집, 숫자/절대거리 보조 배치, 접선 정렬·3상태 색상 구현. 최신 팀원 Map 적용과 전체 회귀·화면 비행 확인 대기
 
 구매 에셋은 이 Vertical Slice의 선행 조건이 아니다. 현재는 Engine 기본 도형과 프로젝트 소유 Material로 기능을 검증하며, Android는 범위에서 제외한다.
 
@@ -160,15 +160,15 @@ TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경
 
 ### TUT-05 — Spline 기반 Ring 자동 배치 (코드 단위 검증 완료·Map 적용 대기)
 
-- 권장 모드에서는 Course의 `Spline Point 1개당 Ring 1개`를 켜고 Viewport에서 Point를 직접 이동·추가·삭제한다. Point 배열 순서가 Gate 통과 순서다.
+- 권장 모드에서는 CourseSpline과 별도인 `Ring별 Spline Handle`을 Viewport에서 이동하고 배열 항목을 추가·삭제한다. Handle은 가장 가까운 Spline 위치로 투영되며 배열 순서가 Gate 통과 순서다.
 - 숫자 보조 모드에서는 `Automatic Gates` 값으로 Ring 개수, 균등 분배/고정 간격, 시작·끝 여백을 조정한다.
 - 모든 Ring을 미는 전역 거리 Offset과 Index별 거리 Offset을 제공한다.
 - Ring 위치와 로컬 `+X` 정방향은 해당 Spline 거리의 위치·접선을 따른다.
 - 위치·회전·Scale 보정과 Gate Blueprint Class를 Details에서 교체할 수 있다.
 - 자동 모드에서는 생성 Ring 배열이, 수동 모드에서는 기존 `OrderedGates`가 Sequence의 단일 순서 기준이다.
 - Spline을 수정하거나 `Rebuild Automatic Gates`를 누르면 이전 생성 Component를 제거하고 중복 없이 다시 만든다.
-- `3df654a`의 `Lvl_DroneTraining`은 Gate Actor 17개·Course Sequence 4개이고 역할 표적/Carryable이 없다. 실제 코스에 사용할 Gate 범위와 순서를 화면에서 확인한 뒤 Point 모드로 변환한다.
-- Point 직접 편집 변경은 Editor Build와 `Drone.Tutorial.TrainingCourse` 1/1에서 Point 이동·추가·삭제까지 통과했다. 팀원 Pull 이후 전체 자동화는 알려진 실패 3개가 있어 최신 40/40으로 표시하지 않는다.
+- `9de1ead`의 `Lvl_DroneTraining`은 Gate Actor 17개·Course Sequence 4개이고 역할 표적/Carryable이 없다. 실제 코스에 사용할 Gate 범위와 순서를 화면에서 확인한 뒤 독립 Handle 모드로 변환한다.
+- 독립 Handle 변경은 Editor Build와 `Drone.Tutorial.TrainingCourse` 1/1에서 Spline 투영·추가·삭제 및 CourseSpline 불변까지 통과했다. 팀원 Pull 이후 전체 자동화는 알려진 실패 3개가 있어 최신 40/40으로 표시하지 않는다.
 - 남은 완료 조건은 Map에 Point 배치를 저장하고 역할 표적/Carryable을 복원한 뒤 Tutorial 7/7·전체 40/40, Ring 방향·세 상태 색과 전체 순서 비행을 확인하는 것이다.
 
 ## 5. Mission Mode
