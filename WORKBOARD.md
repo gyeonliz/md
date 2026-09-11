@@ -1,34 +1,34 @@
 # 현재 작업 보드
 
-기준일: 2026-09-09 (Asia/Seoul)
+기준일: 2026-09-11 (Asia/Seoul)
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 공유 기준선은 `main=origin/main=ac88992`, 문서 공유 기준선은 `main=origin/main=9a4f715`이다. 역할별 Drone 기능·모델·표적·UI·맵 배치 운반 화물과 FLOW-04~08이 공유 main에 반영됐다. 현재는 `ac88992` 위에 Rotor 외형 회전·Blueprint 튜닝·역할 표적 BP 전환 변경이 로컬에 있으며 Commit·Push는 사용자가 진행한다.
+Unreal 공유 기준선은 `main=origin/main=3df654a`, 문서 공유 기준선은 `main=origin/main=6501fd5`이다. 팀원 Training Map·Shotgun·STF·NPC 외형과 자동포탑/맵 후속 변경을 Pull했고 `.vsconfig`는 Git 추적에서 제외됐다. 자동 Stash에서 자동 Spline Ring 코드·테스트·도구만 선택 복구했으며 Commit·Push는 사용자가 진행한다.
 
 2026-09-03 게임 흐름은 `실행 → 시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → 맵 → Drone 선택 → Mission 시작/측면 목표 UI`로 변경됐다. 사람 Operator 조작·NPC 대화 수령·Operator↔Drone 전환은 폐기하며 [`docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 최우선 실행 기준으로 사용한다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-09-09 — Rotor 외형 회전·Blueprint 튜닝·역할 표적 BP 전환 구현/자동 검증 완료, 수동 화면 확인 대기
+마지막 갱신: 2026-09-11 16:38 — Spline Point별 Ring 직접 편집 모드 구현·단위 자동화 통과
 
 | 항목 | 상태 |
 |---|---|
-| 현재 단계 | Rotor 외형 회전·Blueprint 튜닝·역할 표적 BP 전환의 코드/자산/자동 검증 완료. `main=origin/main=ac88992` 위 로컬 변경의 수동 Vertical Slice 확인 대기 |
-| 진행 정도 | FPV·Scout 4개, Drop 6개 Rotor Mesh를 `DroneRotor` Tag로 연결했다. 공급 Mesh의 Pivot이 기체 원점에 있어도 각 Mesh Bounds 중심을 고정해 제자리 회전하며, FPV의 중복 Component Offset을 제거해 네 Rotor가 본체 중앙이 아니라 네 암 끝에 배치된다. 회전 속도/축/교차 방향, Drone Flight Profile 전체 Override, AI Sight, AnimBP 시선 Bone 비중을 Blueprint Class Defaults에서 조정할 수 있다. Training의 Recon·Impact·Payload 표적도 별도 BP 3개다 |
-| 지금 작업 중 | 구현과 자동 검증을 마쳤다. Editor에서 역할별 Rotor가 실제 축으로 자연스럽게 돌고 교차 방향/속도가 맞는지, 새 역할 표적 3개가 정상 표시되는지 확인할 차례 |
-| 완료 근거 | VS 업데이트 후 MSVC 14.51.36231 Toolchain으로 `DroneEditor Win64 Development` Build 성공. 집중 6/6, Pivot 중심 고정 2/2, FPV 배치 보정 뒤 FPVAsset·VisualBank·RoleDroneAssets 3/3 성공. FPV Rotor가 본체에서 20cm 이상 떨어져 네 사분면을 모두 차지하고 회전 중 중심이 고정되는지 검사했다. Blueprint 420개 컴파일 실패 0, Training Map Check 0/0, `git diff --check`와 `git lfs fsck` 통과 |
+| 현재 단계 | TUT-05의 링 개별 배치 UX를 `Spline Point 1개 = Ring 1개`로 구현. 푸시 전 팀원 맵 기준 정합성 수정 단계 |
+| 진행 정도 | Point 이동·추가·삭제가 같은 Index Ring 위치·수량을 직접 갱신한다. 기존 절대 거리/로컬 보정과 Gate 3상태 색상도 유지한다. `3df654a` Training Map에는 Gate Actor 17개, Course Sequence 4개이며 역할 표적 3개와 Carryable은 없다 |
+| 지금 작업 중 | 코드 기능과 단위 검증 완료. 원격 Map은 Clean으로 보존했으며 17개 기존 Gate 중 실제 코스 범위와 Point 순서를 화면에서 정할 차례 |
+| 완료 근거 | MSVC 14.51.36257 Editor Build 성공. `Drone.Tutorial.TrainingCourse` 1/1에서 Point별 Ring 수, 이동, 추가, 삭제, 기존 숫자 배치 회귀 통과. 기존 NPC 집중 3/4, `git diff --check`, `git lfs fsck` 통과 |
 | 수동 미확인 | Drone Rotor 회전축·방향·속도와 기체 외형 크기/방향, 역할 기능 3종, 차량 Z·Pitch·Roll·바퀴·포탑 추종, 실제 탄환 피격 흔들림을 확인해야 한다. 자동포탑 발사·장애물 차단, MG 사수·Gaze·임시 MG 3축, Training HUD 두 Lap, OilRig 시각·성능 확인도 유지 |
-| 현재 차단 | 코드·Git 차단 없음. GitHub Desktop이 보존한 Stash 두 개는 현재 기능과 팀원 복구 확인이 끝날 때까지 유지하며 Restore를 다시 누르지 않는다 |
-| 다음 행동 | Editor에서 `/Game/Drone/Maps/Lvl_DroneTraining`을 열고 FPV·Scout·Drop Rotor 방향/속도와 새 역할 표적 3개의 표시를 먼저 확인한다. 이어 Drop 선적재 투하·착지 잔류 → 근접 적재 → 하단 부착 → 재투하, 정찰/FPV 기능과 Training HUD 두 Lap을 확인한다 |
-| 다음 기능 | `수동 Vertical Slice 확인 → TUT-04 실제 두 Lap → AI-VIS-01B`. 광섬유·UGV·장거리 타격은 첫 3종 확인 뒤 별도 카드로 진행 |
+| 현재 차단 | Pull 직후 전체 `Drone.`은 36/40. Mesh 기준 수정 뒤 알려진 실패 테스트는 3개: MG 사망 사수 정리/재점유, Training 역할 표적/Carryable 누락, Gate 17/Sequence 4 불일치 |
+| 다음 행동 | Training Map 화면에서 17개 Gate 중 실제 코스 범위·순서 확인 → Course에 Point 직접 편집 모드 적용·Point별 위치 저장 → 역할 표적/Carryable 복원 → AI 재점유 원인 확인 → 전체 40개 재실행 |
+| 다음 기능 | `TUT-05 자동 Ring 완료 → TUT-04 실제 두 Lap → Mission 목표 Rule 데이터화 → Jamming`. 기존 Rotor/역할 수동 확인도 유지 |
 | 에셋 인수 | `C:\에셋` 원본은 보존. ArmyVFX·InfantrySFX·Ground Drone·NPC 외형·Raw Drone을 정확한 의존성 묶음으로 이식 |
 | 맵 이식 | 기존 환경 3종에 `Lvl_OilRig`을 추가. Vendor FirstPerson Sample 의존성을 끌어오던 Door Actor 8개는 중앙 사본에서 제거 |
-| Editor/MCP | UE 5.8.2 Editor는 현재 종료 상태. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
+| Editor/MCP | UE 5.8 Editor와 명령줄 검사 프로세스는 종료 상태. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
-| Git 처리 | Unreal·문서 기준선은 각각 `ac88992`, `9a4f715`. 두 저장소에 현재 로컬 변경이 있으며 Commit·Push하지 않았다. 팀원 LFS 자산 복구 Commit `ac88992`까지의 원격 반영은 유지하고 `.vsconfig`는 건드리지 않았다 |
+| Git 처리 | Unreal·문서 기준선은 각각 `3df654a`, `6501fd5`. Unreal 푸시 후보는 Source 9개·도구 1개이고 Map/팀원 에셋은 Clean이다. 사용자 미추적 `Content/Item/machinegun*`은 별도 보존한다. 두 저장소 모두 Commit·Push하지 않았다 |
 | UI/기획 참고 | Figma `Project:Droner`에서 기체 역할과 조작 요구를 읽기만 함. Figma는 수정·댓글·공유 설정 변경하지 않았고 게임 제목 통일은 보류 |
-| 협업 Git | 중앙 `origin/main=ac88992`까지 동기화했다. 팀원 PC에서 기능이 다르면 실제 HEAD·LFS 파일 크기·Pull 뒤 `DroneEditor` 재빌드 여부를 확인한다. 보존 중인 Stash는 재적용하지 않고 내용 감사 뒤 삭제한다. [`docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md`](docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md)에 판별 순서를 기록 |
+| 협업 Git | 중앙 `origin/main=3df654a`까지 동기화했다. 15:56 GitHub Desktop 자동 Stash는 전체 적용하지 않고 개발 파일만 선택 복구했으며 안전 확인 전 삭제하지 않는다. [`docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md`](docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md)에 판별 순서를 기록 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
 | 학습 다음 행동 | Q-Net 상태를 확인해 Track A/B/C를 고르고 첫 학습 블록 실행 |
 
@@ -75,6 +75,7 @@ Unreal 공유 기준선은 `main=origin/main=ac88992`, 문서 공유 기준선�
 
 | ID | 태그 | 작업 | 현재 확인 | 남은 완료 조건 |
 |---|---|---|---|---|
+| TUT-05 | Drone / Tutorial / Authoring | Spline 기반 Ring 자동 배치 | `Spline Point 1개=Ring 1개` 직접 편집, 기존 숫자/절대거리 보조 배치, Gate 3상태 BP 색상 구현. Build와 Course 단위 테스트 통과. 최신 팀원 Map은 Gate Actor 17개·Sequence 4개로 불일치 | 맵 화면에서 실제 코스 Gate 범위 확인 → Point 순서·위치로 변환 → 역할 표적/Carryable 배치 → Tutorial 7/7·전체 40/40·수동 완주 후 Done 이동 |
 | AST-01 | Drone / Unreal | 제공 에셋 최소 외형 Spike | FPV 본체·로터 4·재질/Texture와 44.1 kHz Loop Cue/Wave를 `/Game/Drone/ThirdParty`로 선별 이식. Integration BP와 GameMode 연결. 이번 재검증에서 전용 자동화 1/1·의존성 감사·Blueprint 0/0/0·LFS fsck 통과. 전체 14/14는 TUT-03 당시 같은 Commit의 기준선이며 이번에 미재실행 | 실제 스피커 출력의 Loop 단일 재생·종료 정지는 미확인. 결과 확보 전까지 Doing 유지 |
 | AST-01C | Drone / Unreal / Asset | DronePack 드론 시각 라이브러리·데모 맵 | 드론 Mesh·Material·Texture와 정리 Map 154개를 `/Game/Drone/ThirdParty/DronePack`에 선별 이식. Build·전체 14/14·BP 0/0/0·Map Check 0/0·의존성·LFS 검증 통과 | Editor에서 드론 6종·맵 화면을 확인하고 재질·스케일·조명 이상 유무를 기록 |
 | TUT-04A | Drone / Tutorial / UI | 한글 비행·구간 통계 HUD와 Course Authoring 보강 | 병합 main Build·전체 15/15·BP 0/0/0 통과. PIE에서 한글 HUD 두 패널·현재 Gate·세분화 코스 선 초기 렌더 확인 | Gate 0→3 실제 한 Lap 뒤 최근·완료 구간 숫자 갱신 확인 |

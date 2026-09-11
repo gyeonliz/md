@@ -1,10 +1,34 @@
 # 현재 작업 상태
 
-기준일: 2026-09-09 (Asia/Seoul)
+기준일: 2026-09-11 (Asia/Seoul)
 
 이 문서는 PC별로 명령으로 확인된 상태와 사용자가 아직 결정하지 않은 항목을 분리한다. 현재 D 드라이브 실행 세션과 다른 PC의 검증 기록을 같은 항목에서 섞지 않고 경로와 검증 시점을 함께 적는다.
 
 실시간 작업 위치와 바로 다음 행동은 [`WORKBOARD.md`](WORKBOARD.md), 날짜별 변경과 검증 이력은 [`docs/DRONE_WORKLOG.md`](docs/DRONE_WORKLOG.md)에 기록한다. 이 문서는 검증된 기준선이 달라질 때 함께 갱신한다.
+
+## 2026-09-11 팀원 Pull·Discard 복구·푸시 준비 상태
+
+- 팀원 커밋 `44303a1`을 받은 뒤 작업 중 새 원격 커밋 `3df654a`(`BP_AutoTurret_Vehicle`, `Lvl_DroneTraining`, `Lvl_NPCSmartObjectGreybox`)도 Fast-forward되어 Unreal은 다시 `main=origin/main`이다. 로컬 Source 변경과 사용자 미추적 기관총 자산은 보존됐다.
+- GitHub Desktop `Discard Changes` 전에 생성된 15:56 자동 Stash에서 자동 Ring·Gate 색상 관련 C++/테스트 9개와 `ConfigureAutomaticTrainingGates.py`만 복구했다. 원격과 같은 Map/에셋은 복구 대상에서 제외했고 Stash는 안전망으로 보존한다.
+- Hostile Rifle/Shotgun BP는 팀원 변경대로 Modular Insurgents `SK_Preset1`/`SK_Preset2`를 사용한다. 기존 Manny 고정 테스트를 역할별 Mesh 계약으로 갱신한 뒤 `NPCGreyboxAssets`, `NPCGreyboxPIE`, `NPCBaseRoutinesPIE`는 통과했다.
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. Pull 직후 전체 `Drone.` 결과는 40개 중 36 성공·4 실패였고, Mesh 기준 수정 뒤 NPC 집중 결과는 3/4다. 현재 알려진 실패 테스트는 `NPCPerceptionSearchPIE`의 MG 사망 사수 정리/재점유, `TrainingAssets`의 역할 표적/Carryable 누락과 Gate/Sequence 불일치, `TrainingPIESmoke`의 같은 Sequence 불일치 3개다.
+- 최신 `3df654a` Training Map은 원격 LFS 파일과 같은 Clean 상태다. 읽기 전용 재감사 결과 Gate Actor 17개, Course Sequence 4개, 역할 표적 3종과 Carryable 0개다. 맵은 이번 푸시 후보 변경에 포함하지 않으며 배치 확인 없이 설정 스크립트를 실행하지 않는다.
+- 푸시 후보는 Source 9개와 새 설정 도구 1개다. `git diff --check`와 `git lfs fsck`는 통과했으며 Commit/Push는 사용자가 진행한다. 알려진 실패 테스트 3개를 해결하기 전에는 완전 통과로 표시하지 않는다.
+
+## 2026-09-11 TUT-05 자동 Spline Ring 작업 상태
+
+- Unreal과 문서의 확인된 공유 기준선은 각각 `main=origin/main=3df654a`, `main=origin/main=6501fd5`다. `.vsconfig` Git 추적 제외가 Unreal 기준선에 반영됐다.
+- 기존 FLOW-01~08, Training Mission 선택/출격/목표/결과, Lap 완료 성공과 Drone 사망 실패 연결은 유지한다.
+- 로컬 C++에는 Course Blueprint에서 Ring 개수·균등/고정 간격·시작/끝 여백·전체/개별 거리 이동·위치/회전/Scale·Gate Class를 조정하는 자동 Spline Gate 모드를 추가했다.
+- 자동 Ring은 Spline 위치와 접선 방향에 맞춰 생성되고 기존 Gate Sequence·Lap Recorder를 재사용한다. 반복 Rebuild 중복 방지와 5개 Ring 위치·방향·순서 검증을 자동화 테스트에 추가했다.
+- `/Game/Drone/Maps/Lvl_DroneTraining`의 15:31 검증본은 자동 모드·사용자 설정 Ring 14개·수동 Gate 0개로 별도 프로세스 재로드 검증을 통과했다. 이후 사용자가 맵 덮어쓰기를 시작했으므로 현재 파일은 작업 중이며 최종 판정하지 않는다.
+- 첫 UHT의 배열 `Units` 메타데이터 오류와 PIE 간 Recast 경고 횟수에 의존하던 테스트를 수정했다. 기능 판정은 그대로 두고 같은 예상 경고가 1회 이상이면 실행 순서와 무관하게 허용한다.
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build, `Drone.Tutorial` 7/7, 전체 `Drone.` 40/40, Blueprint 컴파일 실패 0, Training Map Check 0 errors/0 warnings, `git diff --check`와 `git lfs fsck`를 통과했다. Blueprint 전체 요약의 29개 경고는 기존 Battlefield Quinn Pose GUID다.
+- 후속 요청으로 Ring별 `Spline 절대 거리`와 `로컬 위치 Offset` 배열을 추가했다. 각 Ring 사이 간격과 좌우·높이를 Course Blueprint에서 Index별로 직접 정할 수 있으며, 테스트도 5개 Ring의 서로 다른 절대 거리·위치를 검증한다.
+- 16:38 후속 요청에 맞춰 배열 입력보다 직접적인 `Spline Point 1개당 Ring 1개` 모드를 추가했다. BP/Level Viewport에서 Point를 이동·추가·삭제하면 같은 Index Ring의 위치와 전체 Ring 수가 따라가며, 기존 숫자/절대거리 방식은 보조 모드로 유지한다. MSVC 14.51.36257 Editor Build와 `Drone.Tutorial.TrainingCourse` 1/1(이동·추가·삭제 포함)은 통과했다.
+- `BP_DroneTrainingGate`에는 `통과 전/현재 목표/통과 후` 세 색을 Class Defaults와 Blueprint Graph에서 바꾸는 속성·함수를 추가했다.
+- 후속 변경까지 MSVC 14.51.36257 Editor Build, Tutorial 7/7, 전체 `Drone.` 40/40, Training Map 재로드 `count=14/manual=0`, Map Check 0/0, Blueprint Compile 오류 0을 통과했다. 전체 Blueprint 경고 29개는 기존 Battlefield Quinn Pose GUID다.
+- 현재 Editor는 종료 상태이며 코드·테스트·문서는 로컬 미커밋이다. 원격과 같은 Training Map은 이번 작업에서 변경하지 않았다. 화면에서 17개 기존 Gate 중 실제 코스 범위와 순서를 확인한 뒤 Point 직접 편집 모드를 맵에 적용하고 역할 표적/Carryable과 전체 완주를 다시 검증한다.
 
 ## 2026-09-09 Rotor·Blueprint 튜닝·역할 표적 BP 검증
 

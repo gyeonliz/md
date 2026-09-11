@@ -1,6 +1,6 @@
 # Drone 개발 진행 기록
 
-기준일: 2026-09-09 (Asia/Seoul)
+기준일: 2026-09-11 (Asia/Seoul)
 
 이 문서는 Drone 개발의 **진행 이력**을 시간순으로 남긴다. 가장 최신의 현재 상태는 [`../WORKBOARD.md`](../WORKBOARD.md), 확정 구현 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)를 따른다.
 
@@ -18,21 +18,51 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-09-09 — Rotor 외형 회전·Blueprint 튜닝·역할 표적 BP 전환 구현/검증 완료
+마지막 갱신: 2026-09-11 16:38 — Spline Point별 Ring 직접 편집 구현과 `3df654a` 동기화 감사
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | 역할 기능 3종·공통 입력과 FLOW-01~08은 공유 main. Rotor 외형 회전·Blueprint 튜닝·역할 표적 BP 전환은 로컬 구현/자동화 완료 |
-| Unreal 기준선 | `main=origin/main=ac88992`; 역할 기능·Map 진입·Mission 런타임·역할 자산·운반 화물과 팀원 LFS 복구 공유 완료 |
-| 자동 검증 | VS 업데이트 후 Editor Build 성공. 이번 변경 집중 자동화 6/6, Blueprint 420개 컴파일 실패 0, Training Map Check 0/0, Git LFS fsck 성공 |
+| 전체 단계 | 팀원 `3df654a` Pull 완료. TUT-05 Point 직접 편집 코드 검증 후 Map 정합성 수정 대기 |
+| Unreal 기준선 | `main=origin/main=3df654a`; `.vsconfig` Git 추적 제외 유지 |
+| 자동 검증 | Editor Build 성공. Point 직접 편집 Course 테스트 1/1. Pull 이후 알려진 전체 실패 테스트 3개는 아래 이력에 기록 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | Rotor·BP 튜닝·역할 표적 BP 작업까지 구현/자동 검증 완료. 실제 Rotor 방향/축/속도와 역할 표적 표시 확인 대기 |
-| 차단 조건 | 코드·Git 차단 없음. 보존된 Stash 두 개는 팀원 재현 확인 뒤 정리 |
-| 다음 행동 | `Lvl_DroneTraining`에서 세 Drone Rotor와 역할 표적 3개 확인 → 선적재 투하/재적재/재투하 → 세 역할 기능 → TUT-04 두 Lap |
-| 다음 기능 | `수동 Vertical Slice 확인 → TUT-04 실제 두 Lap → AI-VIS-01B` |
+| 지금 작업 중 | Point 직접 편집 Source/Test와 문서 정리. 팀원 Map/에셋은 원격과 동일한 Clean 상태 |
+| 차단 조건 | Gate 17/Sequence 4, 역할 표적·Carryable 0, MG 사망 사수 정리/재점유 실패 |
+| 다음 행동 | 맵 화면에서 실제 코스 Gate 범위·순서 확인 → Point 모드 적용/표적 배치 → AI 재점유 진단 → 전체 40개 재검증 |
+| 다음 기능 | `TUT-05 완료 → TUT-04 실제 두 Lap → Mission 목표 Rule 데이터화·Jamming` |
 | 이후 | Flight 실패 세부 규칙, AI/MG·Jamming과 실제 비주얼 통합 |
-| Git 처리 | Unreal `ac88992`, 문서 `9a4f715`이 원격 기준선. 이번 코드·자산·문서 변경은 로컬이며 Commit·Push하지 않음 |
-| 협업 Git | 팀원 Stash의 정상 LFS 바이너리를 중앙 `ac88992`에 반영. Stash는 안전 확인 전까지 보존 |
+| Git 처리 | Unreal `3df654a`, 문서 `6501fd5`가 원격 기준선. 이번 코드·테스트·문서 변경은 로컬이며 Commit·Push하지 않음 |
+| 협업 Git | 15:56 GitHub Desktop 자동 Stash에서 개발 파일만 선택 복구. Stash는 안전 확인 전까지 보존 |
+
+## 2026-09-11 — 팀원 Pull·Discard 자동 Stash 복구와 푸시 준비
+
+- GitHub Desktop Pull 중 Hostile Rifle/Shotgun `.uasset` 교체가 Windows의 일시적 파일 점유로 실패했다. 재시도 과정에서 `Discard Changes`를 눌렀지만 Desktop이 직전 변경을 15:56 자동 Stash에 보존한 것을 확인했다.
+- 이후 `44303a1` Fast-forward는 성공했다. Training Map SHA-256은 원격 LFS OID `ea66a333...`와 일치하고 Shotgun 9개·STF 492개가 정상 추적된다.
+- 자동 Stash 전체에는 Map 삭제와 이미 원격에 들어간 대형 에셋도 함께 있어 그대로 적용하지 않았다. TUT-05 Source/Test 9개와 새 `ConfigureAutomaticTrainingGates.py`만 선택 복구했고 Stash는 삭제하지 않았다.
+- 팀원 Hostile Rifle/Shotgun BP는 각각 Modular Insurgents `SK_Preset1`/`SK_Preset2`를 사용한다. 자산 테스트의 Manny 고정을 역할별 실제 Mesh 계약으로 바꿨고 NPC 자산·기본 PIE·Greybox PIE 3개가 통과했다. `NPCPerceptionSearchPIE`의 MG 사망 사수 정리/재점유는 재현되어 별도 실패로 남는다.
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build는 성공했다. Pull 직후 전체 `Drone.` 40개 중 36개가 성공했고 4개가 실패했다. Mesh 기준 수정 뒤 알려진 실패 테스트는 `NPCPerceptionSearchPIE`, `TrainingAssets`, `TrainingPIESmoke` 3개다.
+- 최신 Training Map에는 Gate Actor 18개가 있지만 Course Sequence는 4개다. Recon/Impact/Payload 역할 표적과 Carryable Payload도 모두 0개여서 `TrainingAssets`, `TrainingPIESmoke`가 실패했다. 393MB 원격 맵을 임의 고정 좌표로 다시 저장하지 않고 화면에서 의도와 위치를 확인한 뒤 수정한다.
+- `git diff --check`와 새로 받은 LFS Object 전체 `git lfs fsck`는 통과했다. Commit·Push는 하지 않았고, 전체 자동화가 다시 통과하기 전까지 현재 상태를 완전 검증으로 표시하지 않는다.
+
+## 2026-09-11 — TUT-05 Spline 기반 자동 Ring Gate 구현·자동 검증
+
+- 공통 Mission Flow, Drone 선택, 목표 패널, Training Lap 성공과 Drone 사망 실패 연결은 이미 구현된 상태로 확인했다. 이번 작업에서 같은 Flow를 중복 작성하지 않는다.
+- `ADroneTrainingCourse`에 자동/수동 Gate 모드를 분리했다. 자동 모드는 수치로 Ring 개수, 균등 분배/고정 간격, 시작·끝 여백, 전체 거리 이동, Index별 거리 이동, 로컬 위치·회전·Scale과 Gate Class를 조정한다.
+- 자동 Ring은 `UChildActorComponent`로 Course가 소유하며 현재 Spline 거리의 위치와 접선 회전을 따른다. Spline 또는 수치를 바꿀 때 이전 생성 Component를 Tag로 제거한 뒤 다시 만들어 중복을 막는다.
+- 자동 모드는 생성 Ring 배열, 수동 모드는 기존 `OrderedGates`를 Sequence의 단일 기준으로 사용한다. `CourseId`, `GateIndex`, `SegmentDistance`는 기존 Sequence 계약으로 동기화한다.
+- `Drone.Tutorial.TrainingCourse`에 5개 자동 Ring 생성, Spline 위치·방향·Index·거리, Sequence 유효성, 반복 재생성 중복 0, 자동 모드 종료 정리를 검사하는 항목을 추가했다.
+- 첫 빌드는 `TArray<float>`에 허용되지 않는 `Units` UHT 메타데이터 한 건을 발견해 제거했다. 사용자 Editor 종료 뒤 MSVC 14.51.36257로 `DroneEditor Win64 Development` Build를 통과했다.
+- 15:31의 `/Game/Drone/Maps/Lvl_DroneTraining` 검증본은 사용자 조정값인 자동 Ring 14개, 수동 Gate 0개였다. 별도 명령줄 프로세스 재로드에서 Gate Class·개수·Sequence와 수동 Gate 부재를 확인했다.
+- 자동 Map 전환 뒤 자산 테스트의 Construction 재실행 포인터와 PIE 복제 시 Child Actor Cache 복원 문제를 발견해, 생성 Component Tag 재검색·정렬로 보강했다. 최종 `Drone.Tutorial` 7/7이 경고·오류 없이 통과했다.
+- 전체 Suite에서는 RecastNavMesh 초기화 경고가 선행 Map 상태에 따라 1회 또는 2회 발생하는데 기존 테스트가 정확히 2회로 고정돼 2건이 실패했다. 기능 검증은 유지하고 예상 경고 1회 이상을 허용하도록 바꾼 뒤 전체 `Drone.` 40/40을 통과했다.
+- 전체 Blueprint Compile은 실패 0이다. 종료 요약의 29 warnings는 기존 Battlefield Quinn Pose GUID 경고이며 이번 Course/Map 변경의 Blueprint 경고가 아니다. Training Map Check는 0 errors/0 warnings다.
+- `git diff --check`, `git lfs fsck`를 통과했고 Unreal Editor와 명령줄 검사 프로세스는 종료 상태다. 코드·Map·테스트·문서는 로컬 미커밋이며 사용자가 Commit/Push한다.
+- 이후 사용자가 Training Map을 의도적으로 덮어쓰는 중이라고 알려 현재 Map 변경을 수정·복구하지 않았다. 교체 완료 뒤 최종 Ring 수·Sequence·Map Check와 전체 순서 비행을 다시 확인한다.
+- 후속 요청에 따라 `AutomaticGateSplineDistancesCentimeters`와 `AutomaticGateLocalOffsets`를 추가했다. 배열 Index별로 Spline 절대 거리와 X 진행방향/Y 좌우/Z 높이를 직접 지정하며, 항목이 없는 Ring은 기존 균등/고정 배치와 0 위치 보정을 유지한다.
+- `ConfigureAutomaticGateOverrides` Blueprint 함수와 5개 Ring의 서로 다른 절대 거리·로컬 위치 자동화 검증을 추가했다. 저장 맵의 Ring 수를 4로 고정하던 자산/PIE 테스트도 2개 이상이며 Course·Sequence 수와 일치하는지를 검사하도록 일반화했다.
+- `BP_DroneTrainingGate`에서 `통과 전`, `현재 목표`, `통과 후` 색을 한글 Class Defaults로 편집하고 Blueprint Graph의 `Set Gate State Colors`로 런타임 변경할 수 있게 했다.
+- 후속 변경 뒤 MSVC 14.51.36257 Editor Build, Tutorial 7/7, 전체 `Drone.` 40/40, 저장 맵 재로드 `count=14/manual=0`, Map Check 0/0을 통과했다. `BP_DroneTrainingCourse`와 `BP_DroneTrainingGate`를 포함한 전체 Blueprint Compile은 오류 0이며 29 warnings는 기존 Battlefield Quinn Pose GUID다.
+- Mission 다음 구현은 목표 종류·필요 수량·제한 시간·대상 ID를 데이터화하고 정찰/투하/파괴/귀환 Event를 Director에 연결한 뒤 Jamming Rule로 확장한다.
 
 ## 2026-09-09 — Rotor 외형 회전·Blueprint 튜닝·역할 표적 BP 전환
 
@@ -1251,3 +1281,13 @@ HeadingValueText
 
 - UE 5.8.1 Editor에서 환경 Map 3개를 각각 열어 조명·재질·스케일·Landscape·Collision과 드론 Spawn 위치를 눈으로 확인한다.
 - 세 맵 중 어느 것을 데모 주력 Map으로 쓸지는 현재 미정이며, 기술 이식 완료를 최종 채택으로 표현하지 않는다.
+## 2026-09-11 16:38 — Spline Point별 Ring 직접 편집 모드
+
+- 사용자 요구를 숫자 배열 편집이 아니라 `Spline Point 1개 = Ring 1개`인 뷰포트 작업 방식으로 확정했다.
+- `ADroneTrainingCourse`에 Point 직접 편집 모드와 실제 Ring 수 조회를 추가했다. 모드를 켜면 Point의 누적 Spline 거리를 같은 Index Ring이 사용하고 Spline 접선 회전을 유지한다.
+- Point 이동은 해당 Ring 이동, Point 추가·삭제는 Ring 추가·삭제로 반영된다. 기존 균등/고정 간격·절대 거리 배열은 보조 모드로 유지하고 공통/Index별 거리·로컬 Offset은 미세 보정에 계속 사용할 수 있다.
+- 자동화에 Point 수 일치, Point 이동 위치, Point 추가/삭제 시 Ring·Sequence 수 변경을 추가했다.
+- Unreal Editor가 없는 상태에서 MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공, `Drone.Tutorial.TrainingCourse` 1/1 성공(0 warning/0 error), `git diff --check` 통과.
+- 작업 중 팀원 후속 커밋 `3df654a`가 Fast-forward됐다. 차량 자동포탑 BP와 Training/NPC Smart Object 맵 변경을 받았고 로컬 Source와 미추적 기관총 자산은 보존됐다.
+- 최신 `Lvl_DroneTraining`은 원격과 같은 Clean 상태로 보존했다. 읽기 전용 감사와 `TrainingAssets` 재실행에서 Gate Actor 17개·Course Sequence 4개·역할 표적/Carryable 0개를 확인했다. 화면에서 실제 코스 Gate 범위와 순서를 확인한 뒤 Point 모드를 맵에 적용한다.
+- Commit·Push하지 않았다.

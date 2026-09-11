@@ -1,6 +1,6 @@
 # 작업컴 Codex/GPT 기준 컨텍스트
 
-기준일: 2026-09-09 (Asia/Seoul)
+기준일: 2026-09-11 (Asia/Seoul)
 
 이 문서는 메인컴 ChatGPT/Codex에서 진행하던 작업을 작업컴에서 이어가기 위한 기준 컨텍스트다. 추측해서 내용을 추가하지 않고, 사용자가 실제 진행 상황을 알려준 경우에만 상태를 갱신한다.
 
@@ -13,6 +13,25 @@
 - 역할별 모델·표적·상태 UI 로컬 변경은 MSVC 14.51.36256 Editor Build와 Prototype 7/7, Integration 3/3, Tutorial 7/7, Flow 5/5로 검증했다. 화면 크기·방향·FX 체감은 사용자 수동 확인 항목이다.
 - 드랍 역할에는 별도 맵 배치 BP `/Game/Drone/Abilities/Payload/BP_DroneCarryablePayload`가 있다. 선적재 화물을 투하해 적재 수가 0이 된 뒤 300cm 안에서 좌클릭/RB를 누르면 실제 크레이트 Actor를 기체 하단에 붙이고, 다시 누르면 같은 Actor를 투하한다. BP 외형/수명, Pawn의 `PayloadCarryAnchor`, Pickup Range는 Blueprint 조정값이다.
 - `test1.umap`, `M_Start.uasset`은 사용자 선택에 따라 팀원 Stash 버전으로 복구해 `ac88992`에 Push했다. `.vsconfig`는 기존 14.50 설정을 유지했고 현재 Unreal 작업 트리는 Clean이다. 보존된 Stash는 다시 Restore하지 않고 팀원 재현 확인 뒤 정리한다.
+
+## 2026-09-11 팀원 Pull·푸시 준비 기준
+
+- Unreal은 `44303a1`에 이어 팀원 후속 커밋 `3df654a`까지 Fast-forward되어 `main=origin/main`이다. 후속 커밋은 차량 자동포탑 BP와 Training/NPC Smart Object 맵을 갱신했으며 로컬 Source 변경과 미추적 기관총 자산은 보존됐다.
+- GitHub Desktop의 `Discard Changes` 직전 로컬 변경은 `stash@{2026-09-11 15:56:54}`에 자동 보존됐다. 맵 삭제와 이미 원격에 들어간 대형 에셋을 포함한 전체 Stash는 적용하지 않고, 자동 Ring·Gate 색상 C++/테스트 9개와 설정 도구 1개만 선택 복구했다. Stash 자체는 삭제하지 않는다.
+- 팀원 BP의 캐릭터 외형은 Rifle=`/Game/Modular_Insurgents/Mesh/SK_Preset1`, Shotgun=`SK_Preset2`다. Friendly는 Manny를 유지하며 자산 테스트도 역할별 실제 Mesh 계약을 검사한다.
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build는 성공했다. Pull 직후 전체 `Drone.` 자동화는 40개 중 36개 성공이었다. 역할별 Mesh 테스트 수정 뒤 NPC 집중 재검증은 3/4이며, 현재 알려진 실패 테스트는 `NPCPerceptionSearchPIE`, `TrainingAssets`, `TrainingPIESmoke` 3개다. `3df654a` Training Map에는 Gate Actor 17개가 있지만 Course Sequence는 4개이고 역할 표적 3개와 Carryable Payload가 0개다.
+- 따라서 현재 상태는 Commit/Push 후보 파일 정리 단계이며 자동화 전체 Pass 상태가 아니다. 393MB Training Map은 원격과 동일한 Clean 파일로 유지하고, Ring 순서·역할 표적 배치는 맵 위치 확인 뒤 수정한다.
+
+## 2026-09-11 Tutorial·Mission 작업 기준
+
+- Unreal 공유 기준선은 `main=origin/main=3df654a`, 문서 공유 기준선은 `main=origin/main=6501fd5`다. `.vsconfig`는 PC별 Visual Studio 차이를 위해 Git 추적에서 제외됐다.
+- FLOW-01~08, Mission/Drone Data Asset, Drone 선택, 측면 목표 UI, Training Lap 성공과 Drone Health 0 실패는 이미 구현된 공통 기반이다. 같은 화면 흐름을 다시 만들지 않는다.
+- 현재 구현 카드는 `TUT-05 Spline 기반 자동 Ring Gate`다. 권장 모드는 `Spline Point 1개=Ring 1개`이며 BP/Level Viewport에서 Point 이동·추가·삭제가 Ring 위치·개수에 직접 반영된다. 기존 개수·간격/균등 분배·절대 거리·로컬 Offset 방식은 정밀 보정/보조 모드로 유지한다. 현재 팀원 맵은 Gate Actor 17개·Sequence 4개라 화면에서 실제 코스 Gate 범위와 순서를 확인한 뒤 Point 방식으로 변환해야 한다.
+- 자동 모드의 생성 Gate와 수동 모드의 기존 `OrderedGates`를 분리하되 기존 Sequence·Recorder·HUD 판정 경계는 재사용한다.
+- `BP_DroneTrainingGate` Class Defaults에서 `통과 전 색상`, `현재 목표 색상`, `통과 후 색상`을 각각 바꿀 수 있고 `Set Gate State Colors`로 런타임 변경도 가능하다.
+- 다음 Mission 기능은 목표 종류·필요 수량·제한 시간·대상 ID 데이터화, 정찰/투하/파괴/귀환 Event 연결, Jamming Rule 순서다.
+- 새 Point 직접 편집 변경은 MSVC 14.51.36257 `DroneEditor Win64 Development` Build와 `Drone.Tutorial.TrainingCourse` 1/1을 통과했다. 이전 전체 40/40은 팀원 Pull 전 기록이며 현재 알려진 실패 3개 때문에 최신 전체 Pass로 간주하지 않는다.
+- Unreal Editor는 종료 상태다. 코드·테스트·문서는 로컬 미커밋이며 Training Map은 원격과 같은 Clean 상태다. 화면 확인 뒤 Point별 Ring 배치·3상태 색상, 역할 표적/Carryable, 최종 Gate 수와 완주를 다시 확인한다.
 
 ## 1. 전체 작업 목록
 

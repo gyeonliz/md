@@ -1,6 +1,6 @@
 # Drone Tutorial·Mission 구현 계획
 
-기준일: 2026-09-03 (Asia/Seoul)
+기준일: 2026-09-11 (Asia/Seoul)
 
 ## 1. 목표와 우선순위
 
@@ -87,6 +87,7 @@ Widget에서 매 프레임 Pawn을 검색하거나 Property Binding으로 계산
 - `TUT-02` 완료: Gate 목록, Gate Actor와 Trigger, 순서·정방향·중복 통과 판정과 시각 상태
 - `TUT-03` 완료: Segment/Lap World Game Time, 실제 3차원 이동 거리와 평균 속도 원본 기록
 - `TUT-04B` 기술 구현 완료: 이전 성공 평균·Best·Segment 비교와 HUD 결과 행. 실제 두 Lap 수동 확인 대기
+- `TUT-05` 기술 구현 진행: `Spline Point 1개=Ring 1개` 직접 편집과 숫자/절대거리 보조 배치, 접선 정렬·3상태 색상 구현. 최신 팀원 Map 적용과 전체 회귀·화면 비행 확인 대기
 
 구매 에셋은 이 Vertical Slice의 선행 조건이 아니다. 현재는 Engine 기본 도형과 프로젝트 소유 Material로 기능을 검증하며, Android는 범위에서 제외한다.
 
@@ -157,6 +158,19 @@ TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경
 
 기록은 현재 실행 동안만 유지한다. TUT-04 비교·표시 계산을 검증한 뒤에만 `USaveGame`으로 Course별 Attempt Count, 평균, Best 기록을 영속화한다.
 
+### TUT-05 — Spline 기반 Ring 자동 배치 (코드 단위 검증 완료·Map 적용 대기)
+
+- 권장 모드에서는 Course의 `Spline Point 1개당 Ring 1개`를 켜고 Viewport에서 Point를 직접 이동·추가·삭제한다. Point 배열 순서가 Gate 통과 순서다.
+- 숫자 보조 모드에서는 `Automatic Gates` 값으로 Ring 개수, 균등 분배/고정 간격, 시작·끝 여백을 조정한다.
+- 모든 Ring을 미는 전역 거리 Offset과 Index별 거리 Offset을 제공한다.
+- Ring 위치와 로컬 `+X` 정방향은 해당 Spline 거리의 위치·접선을 따른다.
+- 위치·회전·Scale 보정과 Gate Blueprint Class를 Details에서 교체할 수 있다.
+- 자동 모드에서는 생성 Ring 배열이, 수동 모드에서는 기존 `OrderedGates`가 Sequence의 단일 순서 기준이다.
+- Spline을 수정하거나 `Rebuild Automatic Gates`를 누르면 이전 생성 Component를 제거하고 중복 없이 다시 만든다.
+- `3df654a`의 `Lvl_DroneTraining`은 Gate Actor 17개·Course Sequence 4개이고 역할 표적/Carryable이 없다. 실제 코스에 사용할 Gate 범위와 순서를 화면에서 확인한 뒤 Point 모드로 변환한다.
+- Point 직접 편집 변경은 Editor Build와 `Drone.Tutorial.TrainingCourse` 1/1에서 Point 이동·추가·삭제까지 통과했다. 팀원 Pull 이후 전체 자동화는 알려진 실패 3개가 있어 최신 40/40으로 표시하지 않는다.
+- 남은 완료 조건은 Map에 Point 배치를 저장하고 역할 표적/Carryable을 복원한 뒤 Tutorial 7/7·전체 40/40, Ring 방향·세 상태 색과 전체 순서 비행을 확인하는 것이다.
+
 ## 5. Mission Mode
 
 ### 프런트엔드 진입
@@ -175,6 +189,14 @@ TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경
 - Mission UI는 화면 측면에 현재 목표, 진행값과 선택적 목표 거리를 표시한다.
 - Crash, 목표 획득, 귀환과 적 대응 결과를 중복 없이 Mission Event로 연결한다.
 - 적 NPC·Smart Object·MG·Cover는 Mission Map 내부의 전투 요소이며 로비 진입이나 Drone 선택을 담당하지 않는다.
+
+현재 공통 Mission Flow와 Training Mission의 Lap 성공·Drone 사망 실패 연결은 구현돼 있다. 다음 Mission 기능 작업은 기존 Flow를 다시 만드는 것이 아니라 아래 Rule을 Data Asset/Director 경계에 추가하는 순서다.
+
+1. 목표 종류와 필요 수량·제한 시간·대상 ID를 데이터로 정의
+2. 정찰 Scan, Payload 투하, 지정 대상 파괴와 귀환 Event를 목표 진행값에 연결
+3. Jamming Volume과 Jammer 무력화를 Mission Rule로 연결
+4. 목표별 성공·실패·선택 목표 및 결과 평가값 확장
+5. MilitaryCamp·MilitaryBase·Battlefield 후보 맵마다 Mission Definition을 분리
 
 ### Jamming
 
