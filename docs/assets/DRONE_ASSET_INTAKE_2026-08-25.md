@@ -2,7 +2,7 @@
 
 기준일: 2026-08-25 (Asia/Seoul)
 
-> 최초 D 드라이브 감사 기록은 역사 자료로 보존하고, 같은 날짜에 확인한 현재 `C:\에셋` 상태와 실제 프로젝트 이식 재검증을 앞부분과 7절에 덧붙였다. 이후 구현·Git 상태는 [`STATUS.md`](../STATUS.md)와 [`DRONE_WORKLOG.md`](DRONE_WORKLOG.md)를 따른다.
+> 최초 D 드라이브 감사 기록은 역사 자료로 보존하고, 같은 날짜에 확인한 현재 `C:\에셋` 상태와 실제 프로젝트 이식 재검증을 앞부분과 7절에 덧붙였다. 이후 구현·Git 상태는 [`STATUS.md`](../../STATUS.md)와 [`DRONE_WORKLOG.md`](../history/DRONE_WORKLOG.md)를 따른다.
 
 ## 0. 현재 `C:\에셋` 재감사 요약
 

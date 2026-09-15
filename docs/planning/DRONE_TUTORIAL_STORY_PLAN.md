@@ -220,7 +220,7 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 - 외부 Pawn/GameMode/Input Mapping을 신규 게임플레이 부모로 사용하지 않는다.
 - 적용 전에 Plugin, 부모 클래스, Collision, Pivot/Forward, Scale, Socket/Bone, Animation, License, LFS 용량을 감사한다.
 
-2026-08-25 제공 ZIP 14개 감사 결과와 팩별 UE 버전·경로·위험, 첫 `DronePack FPV + Drone-Sounds` Spike 절차는 [`DRONE_ASSET_INTAKE_2026-08-25.md`](DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다. `GC_DroneS` 기능 Blueprint는 UE 4.24 `PhysXVehicles` 의존성이 있어 메시·재질·Turret Part만 후보로 보고 기능은 프로젝트 코드로 재구현한다.
+2026-08-25 제공 ZIP 14개 감사 결과와 팩별 UE 버전·경로·위험, 첫 `DronePack FPV + Drone-Sounds` Spike 절차는 [`DRONE_ASSET_INTAKE_2026-08-25.md`](../assets/DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다. `GC_DroneS` 기능 Blueprint는 UE 4.24 `PhysXVehicles` 의존성이 있어 메시·재질·Turret Part만 후보로 보고 기능은 프로젝트 코드로 재구현한다.
 
 ## 7. 작업 카드
 
@@ -251,7 +251,7 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 
 TUT-04B의 이전 성공 평균·Best 집계와 HUD 결과 행은 구현·자동 검증됐고 실제 두 Lap 수동 확인이 남았다. `FLOW-01~08`의 상태·데이터, 정적 Opening→Lobby→Briefing→Map→Drone 선택→목표→성공/실패→재도전/로비 복귀는 로컬 구현됐고 완전히 새 PIE 실행 3회 자동 검증을 통과했다. 다음은 Editor 수동 Vertical Slice와 역할 공통 Input이며, Flight 상태와 NavigationArrows Host/Wrapper는 이후 필요한 시점에 연결한다.
 
-2026-08-27부터 구현한 NPC·Smart Object·Rifle/Shotgun·MG·Cover 기반은 폐기하지 않고 Mission Map 내부 전투에 재사용한다. 다만 아군 NPC 대화와 사람 Operator는 더 이상 Front-end나 Mission 시작의 선행조건이 아니다. 상세 AI 절차는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md), 최신 화면 흐름은 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 따른다.
+2026-08-27부터 구현한 NPC·Smart Object·Rifle/Shotgun·MG·Cover 기반은 폐기하지 않고 Mission Map 내부 전투에 재사용한다. 다만 아군 NPC 대화와 사람 Operator는 더 이상 Front-end나 Mission 시작의 선행조건이 아니다. 상세 AI 절차는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](../ai/DRONE_SMART_OBJECT_NPC_GUIDE.md), 최신 화면 흐름은 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 따른다.
 
 ## 8. 검증 게이트
 
@@ -291,4 +291,4 @@ TUT-04B의 이전 성공 평균·Best 집계와 HUD 결과 행은 구현·자동
 - 선택형 벽·출입구·Jammer 설비는 Dataflow로 만든 Geometry Collection, Anchor/World Support, Damage Threshold와 Strain Field를 사용한다.
 - 맵 전체 파괴는 범위에서 제외하고 명시적으로 지정한 대상만 파괴 가능하게 한다.
 - 첫 Sandbox는 `TUT-04` 이후 또는 사용자가 우선순위를 명시적으로 변경했을 때 시작한다. 실제 그물 충돌은 Flight Collision, 파괴 Mission은 Damage/Crash와 Mission Shell 뒤에 연결한다.
-- Plugin 활성화·자산 생성은 아직 하지 않았다. 상세 카드는 [`DRONE_CHAOS_DATAFLOW_PLAN.md`](DRONE_CHAOS_DATAFLOW_PLAN.md)를 따른다.
+- Plugin 활성화·자산 생성은 아직 하지 않았다. 상세 카드는 [`DRONE_CHAOS_DATAFLOW_PLAN.md`](../gameplay/DRONE_CHAOS_DATAFLOW_PLAN.md)를 따른다.

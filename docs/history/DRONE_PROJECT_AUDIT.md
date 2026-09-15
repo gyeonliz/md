@@ -1,6 +1,6 @@
 # Drone Unreal 프로젝트 읽기 전용 감사
 
-> 이 문서는 2026-08-19 Prototype 구현 전의 읽기 전용 스냅샷이다. 당시 감사 경로는 `C:\project\Drone`이었다. 현재 작업 기준은 `D:\JGY\project\drone`, 공유 기준 `main=origin/main=6fd0e77`이며 이후 구현은 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](DRONE_PROTOTYPE_IMPLEMENTATION.md), 현재 폴더 구조는 [`DRONE_CONTENT_FOLDER_GUIDE.md`](DRONE_CONTENT_FOLDER_GUIDE.md)를 따른다. 아래의 “현재” 표현은 모두 감사 당시 상태를 뜻한다.
+> 이 문서는 2026-08-19 Prototype 구현 전의 읽기 전용 스냅샷이다. 당시 감사 경로는 `C:\project\Drone`이었다. 현재 작업 기준은 `D:\JGY\project\drone`, 공유 기준 `main=origin/main=6fd0e77`이며 이후 구현은 [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](../tutorial/DRONE_PROTOTYPE_IMPLEMENTATION.md), 현재 폴더 구조는 [`DRONE_CONTENT_FOLDER_GUIDE.md`](../assets/DRONE_CONTENT_FOLDER_GUIDE.md)를 따른다. 아래의 “현재” 표현은 모두 감사 당시 상태를 뜻한다.
 
 ## 1. 감사 범위와 안전 기준
 
@@ -395,7 +395,7 @@ Content/Prototype/Drone/
 - `BP_ThirdPersonGameMode`의 실제 Default Pawn/Player Controller 설정
 - IMC의 실제 키·Trigger·Modifier
 - Map 내부 Actor 배치와 World Settings
-- 대화형 Editor에서의 PIE 시작·종료 결과. C++ 빌드와 Blueprint Commandlet 결과는 별도 [`STATUS.md`](../STATUS.md)에 기록되어 있다.
+- 대화형 Editor에서의 PIE 시작·종료 결과. C++ 빌드와 Blueprint Commandlet 결과는 별도 [`STATUS.md`](../../STATUS.md)에 기록되어 있다.
 - Live Coding 상태
 - 최종 Pawn/Character 적합성
 - 최종 입력, 물리, 멀티플레이, 게임 규칙

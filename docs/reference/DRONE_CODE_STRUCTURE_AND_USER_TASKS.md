@@ -30,7 +30,7 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합�
 
 2026-09-03 사용자 결정으로 사람 Operator Character와 NPC 대화 기반 Mission 수령, Operator↔Drone 전환은 폐기됐다. 새 실행 흐름은 `시작 트레일러 → 로비 → 미션 선택/측면 설명 → 미션 트레일러 → Map → Drone 선택 → Mission 시작/측면 목표 UI`다.
 
-현재 Source/Asset에는 FLOW-01~08 전체 상태와 정적 Opening→Lobby→Briefing→Training Map→3종 선택→Drone 한 대 Spawn/Possess→목표→결과→재도전/로비 복귀가 있다. Front-end와 Mission 선택 전에는 비-Drone Spectator만 사용한다. Training 역할 Target 3개와 Event 기반 상태 HUD는 구현됐고 실제 Trailer 영상·최종 WBP/Preview 외형이 남았다. 기존 `ADronePrototypeGameMode`의 즉시 Spawn/Possess는 Training 단독 검증용으로 유지한다. 상세 책임과 작업 순서는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)와 문서 맨 아래 최신 절을 따른다.
+현재 Source/Asset에는 FLOW-01~08 전체 상태와 정적 Opening→Lobby→Briefing→Training Map→3종 선택→Drone 한 대 Spawn/Possess→목표→결과→재도전/로비 복귀가 있다. Front-end와 Mission 선택 전에는 비-Drone Spectator만 사용한다. Training 역할 Target 3개와 Event 기반 상태 HUD는 구현됐고 실제 Trailer 영상·최종 WBP/Preview 외형이 남았다. 기존 `ADronePrototypeGameMode`의 즉시 Spawn/Possess는 Training 단독 검증용으로 유지한다. 상세 책임과 작업 순서는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](../planning/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)와 문서 맨 아래 최신 절을 따른다.
 
 Mission 선택 출격은 `ADroneMissionPlayerController::StartSelectedDrone()`이 선택 Definition의 `PawnClass`를 그대로 Spawn한다. 2026-09-08 감사에서 확인한 기본 Pawn 오연결과 세 역할 동일 FPV 외형을 모두 수정했다. 현재 정확한 Class는 Scout=`BP_DroneScoutIntegration`, FPV=`BP_DroneFPVIntegration`, Drop=`BP_DroneDropIntegration`이며 Class·Mesh 회귀 테스트와 Build·자동화는 통과했다. 실제 화면 모델 크기·방향과 조작 확인만 수동으로 남는다.
 
@@ -179,7 +179,7 @@ ADroneSmartObjectStation
 
 Hostile은 `ST_NPC_HostilePatrol`에서 EnemyPatrol을 검색하고 Friendly는 `ST_NPC_FriendlyBaseRoutine`에서 FriendlyBasePatrol/Ambient를 번갈아 검색한다. `ADronePrototypePawn` 감지 시 Hostile은 MG를 우선 Claim하고, 실패한 병사는 Cover 1-Slot으로 이동·점유해 개인 Rifle/Shotgun 사격을 한다. Cover도 없으면 제자리 사격하며 실종 뒤 마지막 위치를 3초 Search한 후 순찰로 복귀한다. 로컬 작업에는 Damage, 사망 뒤 Cover 병사의 MG 재점유, Drone 파괴 교전 종료와 Rifle/Shotgun 탄창까지 있다. Animation·FX·SFX는 아직 없다.
 
-Definition·Station Blueprint 6쌍과 역할별 NPC Blueprint 3종, Spawn Point BP, 전용 Greybox 맵, Hostile/Friendly StateTree가 생성됐다. Profile·Possess·역할 Tag·NavMesh 투영에 더해 Hostile 2명과 Friendly 2명이 각각 2회 이상 완료하고 서로 다른 2지점 이상을 방문하도록 자동 검증했다. Friendly는 Base Patrol과 Ambient를 모두 방문한다. 후속 감지·점유 순서는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md)를 따른다.
+Definition·Station Blueprint 6쌍과 역할별 NPC Blueprint 3종, Spawn Point BP, 전용 Greybox 맵, Hostile/Friendly StateTree가 생성됐다. Profile·Possess·역할 Tag·NavMesh 투영에 더해 Hostile 2명과 Friendly 2명이 각각 2회 이상 완료하고 서로 다른 2지점 이상을 방문하도록 자동 검증했다. Friendly는 Base Patrol과 Ambient를 모두 방문한다. 후속 감지·점유 순서는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](../ai/DRONE_SMART_OBJECT_NPC_GUIDE.md)를 따른다.
 
 ## 2. 디렉터리와 클래스 책임
 
@@ -389,7 +389,7 @@ Source/Drone/Variant_Platforming/
 Source/Drone/Variant_SideScrolling/
 ```
 
-`Config/DefaultEngine.ini`의 Game·Editor 시작 Map은 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode는 프로젝트 소유 `BP_DronePrototypeGameMode`를 가리킨다. 세 제작 Map의 현재 구조와 추가 규칙은 [`DRONE_CONTENT_FOLDER_GUIDE.md`](DRONE_CONTENT_FOLDER_GUIDE.md)를 따른다. Variant에 AI·StateTree 코드가 남아 있다는 사실은 Enemy AI MVP가 구현됐다는 뜻이 아니다.
+`Config/DefaultEngine.ini`의 Game·Editor 시작 Map은 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode는 프로젝트 소유 `BP_DronePrototypeGameMode`를 가리킨다. 세 제작 Map의 현재 구조와 추가 규칙은 [`DRONE_CONTENT_FOLDER_GUIDE.md`](../assets/DRONE_CONTENT_FOLDER_GUIDE.md)를 따른다. Variant에 AI·StateTree 코드가 남아 있다는 사실은 Enemy AI MVP가 구현됐다는 뜻이 아니다.
 
 ## 3. C++와 Blueprint·Editor의 경계
 
@@ -775,7 +775,7 @@ TUT-03의 원본 시간·거리·평균 속도와 TUT-04B의 이전 평균·Best
 
 이 순서는 `Gate 판정 → 기록 → 기체 역할/조작 설정 → Pawn → Health → 무기 Damage → MG/AI 사망 정리 → Telemetry·HUD` 순으로 책임을 따라가게 한다.
 
-기체 역할별 현재 구현 여부와 Blueprint 설정 절차는 [`DRONE_TYPES_AND_CONTROL_MODES.md`](DRONE_TYPES_AND_CONTROL_MODES.md)를 먼저 본다.
+기체 역할별 현재 구현 여부와 Blueprint 설정 절차는 [`DRONE_TYPES_AND_CONTROL_MODES.md`](../gameplay/DRONE_TYPES_AND_CONTROL_MODES.md)를 먼저 본다.
 
 ## 8. Editor 수동 확인법과 정상 결과
 

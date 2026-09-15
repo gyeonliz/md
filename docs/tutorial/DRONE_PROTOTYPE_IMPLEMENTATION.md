@@ -353,9 +353,9 @@ Editor Python은 프로젝트 Plugin 설정을 바꾸지 않고 실행 시점에
 
 ## 12. 현재 다음 완료 게이트
 
-현재 Tutorial/Story 우선 실행 순서와 Greybox 기준은 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)를 우선하며, PFN 카드 세부 정의는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
+현재 Tutorial/Story 우선 실행 순서와 Greybox 기준은 [`DRONE_TUTORIAL_STORY_PLAN.md`](../planning/DRONE_TUTORIAL_STORY_PLAN.md)를 우선하며, PFN 카드 세부 정의는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](../planning/DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 
-`HUD-01` Telemetry Snapshot, `HUD-02` 공용 Flight HUD, `TUT-01` Training Map·비충돌 Spline, `TUT-02` 순서형 Ring Gate와 `TUT-03` Segment/Lap 원본 기록을 완료했다. Source 기준은 `main=origin/main=551e287`이고 전체 `Drone.` 자동화 14/14, Tutorial 6/6, Blueprint Compile Errors/Warnings/Load Failures 0/0/0을 통과했다. 현재 코드 책임과 Editor 확인법은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다. 다음 완료 게이트는 `TUT-04` 이전 기록 비교·Best·결과 UI다.
+`HUD-01` Telemetry Snapshot, `HUD-02` 공용 Flight HUD, `TUT-01` Training Map·비충돌 Spline, `TUT-02` 순서형 Ring Gate와 `TUT-03` Segment/Lap 원본 기록을 완료했다. Source 기준은 `main=origin/main=551e287`이고 전체 `Drone.` 자동화 14/14, Tutorial 6/6, Blueprint Compile Errors/Warnings/Load Failures 0/0/0을 통과했다. 현재 코드 책임과 Editor 확인법은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](../reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다. 다음 완료 게이트는 `TUT-04` 이전 기록 비교·Best·결과 UI다.
 
 ```text
 PFN-06 Done

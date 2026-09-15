@@ -100,4 +100,4 @@ Import 스크립트는 `handoff.md`, `manifest.json` 두 파일만 받는다. �
 - `-Force`: 안전한 기존 목적지에서 알려진 두 파일만 교체한다.
 - `-WhatIf`: 전체 검증 후 쓰기 작업을 미리 확인한다.
 
-PC 간 전체 운영 절차는 [`../../docs/CODEX_CONTEXT_SYNC.md`](../../docs/CODEX_CONTEXT_SYNC.md)를 참고한다.
+PC 간 전체 운영 절차는 [`../../docs/CODEX_CONTEXT_SYNC.md`](../../docs/git/CODEX_CONTEXT_SYNC.md)를 참고한다.

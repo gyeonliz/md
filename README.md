@@ -1,111 +1,32 @@
-# Unreal · Git · Codex 작업 공유 저장소
+# Drone 프로젝트 문서
 
-이 폴더는 실제 Unreal 프로젝트가 아니라 다음 작업을 준비하고 PC 간 문맥을 이어가기 위한 문서·템플릿·도구 저장소다. GitHub `gyeonliz/md`를 이 폴더의 공유 원격으로 사용하고, 실제 Unreal 프로젝트는 별도 `gyeonliz/drone` 저장소로 관리한다.
+이 저장소는 `D:\JGY\project\drone` Unreal 프로젝트의 기획, 현재 상태, 작업 순서와 팀 가이드를 관리한다.
 
-현재 2026-09-15 D 드라이브 작업에서는 팀원 Production `Lvl_DroneTraining`을 건드리지 않고 경량 `Lvl_DroneTutorialSystemsTest`에 곡선 Course·독립 Ring 5개·역할 표적 3종·Carryable을 분리했다. TestMap Map Check 0/0·전용 자동화 1/1과 Editor Build가 통과했다. 유인 MG 사망 뒤 생존 NPC 재점유는 단독 3/3 및 후속 묶음 안 해당 항목을 통과했고, 지점 배치·방향·NavMesh·StateTree 팀 가이드를 추가했다. 다음은 TestMap 한/두 Lap과 AI 배치 화면 확인이며 최신 판정은 `STATUS.md`와 `WORKBOARD.md`를 우선한다.
+## 먼저 볼 문서
 
-## 먼저 읽을 파일
+| 문서 | 용도 |
+|---|---|
+| [`STATUS.md`](STATUS.md) | 지금 실제로 확인된 구현·Git·검증 상태 |
+| [`WORKBOARD.md`](WORKBOARD.md) | 현재 작업, 사용자 확인 항목, 바로 다음 개발 |
+| [`CONTEXT.md`](CONTEXT.md) | 경로·맵 소유권·코드/Blueprint 책임 등 변경 금지 기준 |
+| [`docs/README.md`](docs/README.md) | 주제별 상세 문서 찾기 |
+| [`docs/history/DRONE_WORKLOG.md`](docs/history/DRONE_WORKLOG.md) | 날짜별 작업과 검증 이력 |
 
-1. [`CONTEXT.md`](CONTEXT.md): 사용자가 제공한 확정 기준과 미정 사항
-2. [`STATUS.md`](STATUS.md): 현재 작업컴에서 실제 확인한 환경과 남은 선택
-3. [`WORKBOARD.md`](WORKBOARD.md): 실제 확인 결과를 반영한 현재 보드
-4. [`docs/MOBILE_CURRENT_BRIEF.md`](docs/MOBILE_CURRENT_BRIEF.md): 이동 중 읽는 코드 현황·내 작업·공식 시험 일정·날짜별 공부 계획
-5. [`docs/DRONE_WORKLOG.md`](docs/DRONE_WORKLOG.md): 현재 작업 위치와 날짜별 변경·검증·다음 작업 기록
-6. [`docs/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](docs/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md): 현재 코드·Asset 책임, 구현 경계와 사용자가 직접 확인할 작업
-7. [`docs/GIT_UNREAL_GUIDE.md`](docs/GIT_UNREAL_GUIDE.md): Unreal 프로젝트 Git/GitHub 실전 절차
-8. [`docs/CODEX_CONTEXT_SYNC.md`](docs/CODEX_CONTEXT_SYNC.md): 메인컴 ↔ 작업컴 문맥 전달 절차
-9. [`docs/DRONE_PROJECT_AUDIT.md`](docs/DRONE_PROJECT_AUDIT.md): 현재 후보 프로젝트의 실제 C++·입력·맵 구조 감사
-10. [`docs/DRONE_PROTOTYPE_IMPLEMENTATION.md`](docs/DRONE_PROTOTYPE_IMPLEMENTATION.md): 실제 C++ Prototype 구현·검증과 Editor 연결 절차
-11. [`docs/DRONE_PROTOTYPE_INPUT_CONTRACT.md`](docs/DRONE_PROTOTYPE_INPUT_CONTRACT.md): 현재 Prototype 전용 임시 입력 계약
-12. [`docs/DRONE_PROTOTYPE_PIE_CHECKLIST.md`](docs/DRONE_PROTOTYPE_PIE_CHECKLIST.md): PFN-06 자동화 결과와 수동 화면 체크리스트
-13. [`docs/DRONE_TELEMETRY_IMPLEMENTATION.md`](docs/DRONE_TELEMETRY_IMPLEMENTATION.md): HUD-01 Snapshot 공급과 HUD-02 Flight HUD 구현·검증
-14. [`docs/DRONE_TRAINING_RECORDING_IMPLEMENTATION.md`](docs/DRONE_TRAINING_RECORDING_IMPLEMENTATION.md): TUT-03 구간·랩 기록 구조, Blueprint 연결점과 검증 절차
-15. [`docs/DRONE_PREASSET_FUNCTION_PLAN.md`](docs/DRONE_PREASSET_FUNCTION_PLAN.md): 구매 소스 없이 Greybox 기능을 먼저 완성하는 실행 계획
-16. [`docs/DRONE_MVP_GUIDE.md`](docs/DRONE_MVP_GUIDE.md): Flight MVP부터 데모까지의 개발 단위
-17. [`docs/DRONE_SMART_OBJECT_NPC_GUIDE.md`](docs/DRONE_SMART_OBJECT_NPC_GUIDE.md): 적 순찰·드론 감지·Rifle/Shotgun·MG와 기지 아군 Smart Object 이동 준비·사용 절차
-18. [`docs/DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md`](docs/DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md): 팀 공유용 Smart Object 지점 이동·복제·방향·NavMesh·StateTree·유인/무인 포탑 구분 가이드
-19. [`docs/WORK_MANAGEMENT.md`](docs/WORK_MANAGEMENT.md): Inbox → Todo → Doing → Done 운영
-20. [`docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md): 시작 트레일러·로비·미션 선택·브리핑·Map·Drone 선택·목표 UI의 최신 최우선 흐름
-21. [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md): 확정 조작, Tutorial 코스·기록 UI, Mission·Jamming·에셋 적용 계획
-22. [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md): 최초 D 드라이브 14팩 압축 감사, 다른 PC의 C 드라이브 재감사와 FPV·Loop 선별 이식 검증
-23. [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md): 남은 제공 자산 891개·OilRig 중앙 맵·TUT-04B 이식 및 검증
-24. [`docs/DRONE_UNREAL_MCP.md`](docs/DRONE_UNREAL_MCP.md): UE 5.8 공식 Unreal MCP·Codex 연결, 선택 Toolset과 검증 기준
-25. [`docs/DRONE_CHAOS_DATAFLOW_PLAN.md`](docs/DRONE_CHAOS_DATAFLOW_PLAN.md): UE 5.8 Dataflow 기반 부분 고정 그물·선택형 맵 파괴 설계와 검증 순서
-26. [`docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md`](docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md): 지원서·이력서용 Unreal 프로젝트 경험 기술 예시와 사실 확인 경계
-27. [`docs/STUDY_PLANS.md`](docs/STUDY_PLANS.md): 정보처리산업기사·C++ 코딩테스트 병행 계획
-28. [`docs/DRONE_PROJECT_PLANNING_BRIEF.md`](docs/DRONE_PROJECT_PLANNING_BRIEF.md): 게임 기획·화면 흐름·UI·현재 구현·로드맵·검증을 한 문서로 정리한 통합 기획서
-29. [`docs/DRONE_TRELLO_BOARD_2026-09-09.md`](docs/DRONE_TRELLO_BOARD_2026-09-09.md): Trello에 복사할 완료·수동 확인·다음 개발·장기 후보 카드와 체크리스트
-30. [`docs/EXTERNAL_ENGINEERING_REFERENCES/README.md`](docs/EXTERNAL_ENGINEERING_REFERENCES/README.md): Ponytail·ECC·Archify·fmt·Matt Pocock Skills 검토와 Drone 팀 적용 기준
-31. [`docs/DRONE_GIT_LFS_CAPACITY_PLAN.md`](docs/DRONE_GIT_LFS_CAPACITY_PLAN.md): 실제 27.66GiB LFS 분포, 크기 Threshold의 한계와 Core/선택형 Asset 분리·선택 Clone·원격 정리 계획
-32. [`docs/CS_GAMEDEV_READING_PLAN.md`](docs/CS_GAMEDEV_READING_PLAN.md): 게임 Pattern·선형대수·OS·Interpreter·그래픽스·네트워크·AI/NLP 추천자료 8종의 장기 병행 학습 순서와 기록 양식
+현재 판단은 위 순서대로 우선한다. 오래된 문서 안의 `현재`, Commit ID, Todo는 당시 기록이며 최신 상태를 뜻하지 않는다.
 
-## 구성
+## 저장소
 
-```text
-CONTEXT.md                 기준 컨텍스트
-STATUS.md                  작업컴 점검 결과와 다음 결정
-WORKBOARD.md               현재 Inbox/Todo/Doing/Done
-docs/                      실행 가이드와 계획
-templates/unreal/          Unreal 프로젝트 루트용 Git 템플릿
-tools/context-sync/        검토 가능한 작업 문맥 Export/Import 도구
-tools/unreal/              Prototype·Tutorial 자산 생성·재검증용 안전 실행 도구
-```
+- Unreal: `D:\JGY\project\drone`
+- 문서: `D:\JGY\project\md`
+- Production 코드: `Source/Drone`
+- 프로젝트 소유 자산: `/Game/Drone`
+- 팀원 Tutorial 맵: `/Game/Drone/Maps/Lvl_DroneTraining`
+- 기능 시험 맵: `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`
 
-## 중요한 경계
+## 문서 관리 규칙
 
-- Unreal 프로젝트 파일은 `gyeonliz/drone` Git/GitHub 저장소로 전달한다.
-- 검토 가능한 Markdown 작업 문맥·계획·가이드는 `gyeonliz/md` 저장소로 전달한다.
-- 특정 시점의 단일 인계본이 필요하면 사람이 읽을 수 있는 별도 handoff 패키지를 보조 수단으로 사용한다.
-- `.codex` 전체, `auth.json`, 토큰, 비밀번호, 브라우저 프로필, 원시 세션 DB는 이 방식으로 복사하지 않는다.
-- `templates/unreal`의 파일은 실제 프로젝트의 기존 규칙을 확인한 뒤 병합한다. 기존 파일을 무조건 덮어쓰지 않는다.
-
-## 현재 진행 지점
-
-현재 실행 세션의 Unreal 저장소는 `D:\JGY\project\drone`, 문서 저장소는 `D:\JGY\project\md`다. 별도 `ADronePrototypePawn`과 GameMode, 8개 Input Action, Keyboard·Mouse·Gamepad 21개 Mapping, BP Pawn/GameMode와 Greybox Map을 연결했다. Mouse X는 Drone Yaw, Mouse Y는 Camera Pitch로 동작하며 `P` 또는 패드 `Y`로 3인칭 고정 추적과 기체 기울기·피격 흔들림을 따르는 1인칭을 전환한다. 임시 좌/우 클릭 또는 패드 RB/LB는 선택한 역할의 Primary/Secondary 기능을 실행한다.
-
-확정 조작을 반영한 PFN-06은 자동화와 Standalone 수동 조작을 통과해 Done이다. HUD-01 공용 Telemetry Component는 기본 10Hz Snapshot Event를 제공한다. HUD-02는 C++가 계산·생성·Possession·Delegate 수명주기를 맡고 실제 `WBP_DroneFlightHUD`가 화면 외형을 맡도록 연결했다.
-
-TUT-01~03을 완료했다. 별도 `Lvl_DroneTraining` Map의 실제 `BP_DroneTrainingCourse`가 편집 가능한 Spline과 Runtime 표시용 SplineMesh를 소유한다. `ADroneTrainingGate`는 비충돌 Ring Visual과 별도 Pawn Overlap Trigger를 분리하고, `UDroneTrainingGateSequenceComponent`가 Course의 명시적 Gate 배열을 기준으로 현재 순서·정방향·중복 통과를 판정한다. 실제 `BP_DroneTrainingGate` 네 개를 Map에 연결했으며 기존 Prototype BP GameMode·FPV Integration Pawn·PlayerController·WBP를 그대로 재사용한다.
-
-TUT-03에서는 Course 소유 `UDroneTrainingLapRecorderComponent`를 Gate 판정과 분리했다. Gate 0 승인으로 Lap을 시작하고 이후 Gate마다 Segment를 확정하며, 마지막 Gate에서 Lap을 완료한다. TUT-04B는 현재 기록을 제외한 이전 성공 평균, Best, 시간·속도 Delta와 Segment 비교를 계산하고 Flight HUD에 표시한다. 당시 Game/Editor Build와 전체 `Drone.` 25/25를 통과했으며 실제 두 Lap 화면 확인은 남아 있다.
-
-2026-09-03부터 게임 진입 흐름은 `시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → Map → Drone 선택 → Mission 시작/측면 목표 UI → 결과 → 재도전/로비`다. 사람 Player Character, 로비 NPC 대화 수령과 Operator↔Drone 전환은 폐기했다. 2026-09-08 현재 `FLOW-01~08`과 정찰 Scan·FPV 충돌 자폭·드랍 탑뷰/Payload, 임시 좌/우 클릭 공통 역할 입력을 공유 main에 반영했고 공유 전 전체 흐름을 완전히 새 PIE 실행 3회로 자동 검증했다. 기존 적 NPC·Smart Object·전투 기능은 Mission Map 내부에 재사용한다.
-
-현재 D 드라이브 작업 PC의 제공 에셋 루트는 `D:\JGY\project\Unreal_260821`이다. 초기 FPV 외형·Loop와 Integration BP에 이어 ArmyVFX·InfantrySFX·Ground Drone/MG·NPC 외형·Raw Drone 후보와 OilRig을 선별 이식했다. 원본 제공 폴더는 수정하지 않았고 실제 프로젝트의 새 자산 외부·누락 참조는 0이다. 실제 스피커의 Loop 단일 재생과 종료 정지는 수동 미확인이므로 `AST-01`은 Doing이다. 상세 결과는 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)와 [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md)를 따른다.
-
-NPC·AI를 위해 Smart Objects와 Gameplay Interactions 모듈, Faction·Rifle·Shotgun Profile, Activity Tag, NPC Character/Controller/Spawn Point, Slot 예약 Component와 드론 Sight를 구성했다. 현재 공유 main에는 Rifle/Shotgun Trace·Damage·탄창, MG 점유·조준·사격·사망 교대, Cover, Drone 체력·파괴 교전 종료, Blueprint 표현 Event와 Smart Object 방향 보강까지 포함한다. 실제 Mesh·Animation·FX·SFX는 계속 수동·후속 작업이며 AI 비주얼은 Mission 수직 슬라이스 재검증 뒤 잇는다.
-
-2026-09-15 로컬 후속 변경은 유인 MG 1개와 차량형/설치형 무인 자동포탑 2종을 테스트에서 명확히 분리하고, 사수 사망 뒤 재할당 재시도와 이동 정체 감시·재경로·조작 위치 정렬을 보강했다. 현재 Smart Object 순찰은 Actor 번호나 Spline 순서가 아니라 태그가 맞는 최근접 빈 Slot을 선택한다. 팀 배치 절차는 [`docs/DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md`](docs/DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md)를 따른다.
-
-2026-09-08 현재 D 드라이브 Unreal 공유 기준은 `main=origin/main=63f60c1`, 문서 공유 기준은 `main=origin/main=d30e098`이다. 역할별 실제 모델·시험 표적·상태 UI는 이 기준선 위 로컬 미커밋 변경이며 사용자가 Commit/Push한다. Pull 중 자동 복원된 Stash와 Upstream이 충돌한 `test1.umap`, `M_Start.uasset`, `Drone.cpp`의 잘못된 `//test`, `.vsconfig` Index 불일치는 이번 기능과 별개로 남아 있어 다음 Commit 전 선택·정리가 필요하다.
-
-외부 제공 소스는 전체 팩을 흡수하지 않고 검증된 대표 자산과 정확한 의존성만 ThirdParty 경계로 선별 이식했다. 기능 구현은 계속 프로젝트 C++와 Greybox 기준을 유지하며 외부 Pawn·GameMode·Input은 사용하지 않는다. 현재 신규 기능 실행 순서는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)가 우선하고 Tutorial·PFN 카드 번호와 교체 경계는 기존 계획 문서를 함께 따른다.
-
-2026-08-25에는 UE 5.8.1에 포함된 Epic 공식 `Unreal MCP`를 프로젝트에 Editor 전용으로 연결했다. 전체 `AllToolsets` 대신 Editor·Automation·UMG·StateTree·AI Toolset만 선택했고, Codex 프로젝트 설정과 자동 시작 기본값을 추가했다. 연결 당시 실제 HTTP MCP 초기화, 23개 Toolset, Training Map 조회와 당시 12개 Drone 테스트 탐색까지 통과했다. 상세 기준은 [`docs/DRONE_UNREAL_MCP.md`](docs/DRONE_UNREAL_MCP.md)를 따른다.
-
-```text
-PFN-06 Camera/Input 기준선 Done
-→ HUD-01 Telemetry Done
-→ HUD-02 Flight HUD Done
-→ TUT-01 Training Course/Spline Done
-→ TUT-02 Gate·순서·정방향 Done
-→ TUT-03 Segment/Lap 기록 Done
-→ TUT-04B 비교·결과 UI 기술 구현 Done · 실제 두 Lap 확인 대기
-→ FLOW-01 상태·Mission/Drone 데이터 계약 Done
-→ FLOW-02 정적 시작 화면·로비 Host Done
-→ FLOW-03 미션 선택·측면 설명·하단 시작 Done
-→ FLOW-04~07 Briefing·Map·Drone 선택·Mission 목표·결과 Done
-→ FLOW-08 새 PIE 실행 전체 수명주기 3회 Done
-→ Editor 수동 Vertical Slice·TUT-04 두 Lap 확인 Next
-→ 역할 공통 Input Done
-→ Training 역할 Target·상태 UI·역할별 실제 모델 구현 및 자동화 통과
-→ Editor 수동 화면·조작 확인
-→ Flight 상태·Jamming
-→ AI/MG와 에셋 통합
-```
-
-## 2026-08-26 자산 작업 메모
-
-`NavigationArrows` 원본 11개를 UE 5.8에서 감사해 기능에 필요한 6개만 `/Game/Drone/ThirdParty/NavigationArrows`로 이식했다. Commit `5a052c8`을 기능 Branch에 Push한 뒤 Merge Commit `fb1d7ad`로 `origin/main`에도 반영했다. 병합된 `main`에서 Build, 전용 자동화 1/1, 전체 `Drone.` 15/15, Blueprint Compile 0/0/0과 LFS 검증을 다시 통과했다. 자산 인수와 main 공유는 완료했지만 Training Map/HUD의 실제 Host/Wrapper 화면 연결은 아직 하지 않았다. 상세 내용은 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)를 따른다.
-
-프로젝트 사용 맵은 `/Game/Drone/Maps`로 중앙화했다. Unreal 생성 기본 Map 4개만 제거했고 ThirdPerson·Variant 비맵 콘텐츠 62개는 복구했다. 환경 맵 3종은 중앙 사본으로 두되 대형 공급사 의존성 Root는 참조 안정성을 위해 보존했다. RabbitHole 참고 근거, 현재 폴더 트리, 삭제 경계와 검증 결과는 [`docs/DRONE_CONTENT_FOLDER_GUIDE.md`](docs/DRONE_CONTENT_FOLDER_GUIDE.md)에 정리했다.
+- 진행 상황은 새 파일을 만들지 않고 `STATUS.md`, `WORKBOARD.md`, `DRONE_WORKLOG.md`에 반영한다.
+- 기능 설명이 장기적으로 반복 사용될 때만 주제별 상세 문서를 추가한다.
+- 완료된 일회성 보고서는 `docs/history`로 옮긴다.
+- 상세 문서와 현재 상태가 충돌하면 실제 Git·코드·실행 로그와 `STATUS.md`를 우선한다.
+- 문서 변경의 Commit과 Push는 별도 사용자 지시가 없으면 사용자가 처리한다.

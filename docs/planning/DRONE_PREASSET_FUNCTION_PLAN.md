@@ -32,7 +32,7 @@ Spawn
 
 - 작업컴 기본 작업 루트: `D:\JGY\project`
 - UE 5.8.1 프로젝트: 현재 작업 경로 `D:\JGY\project\drone`; 공유 기준 `main=origin/main=6fd0e77` 위 로컬 미커밋 변경 존재
-- 문서 저장소: 현재 작업 경로 `D:\JGY\project\md`; 최신화 직전 로컬 `main=origin/main=466609d`이며 이후 상태는 [`STATUS.md`](../STATUS.md)를 따른다.
+- 문서 저장소: 현재 작업 경로 `D:\JGY\project\md`; 최신화 직전 로컬 `main=origin/main=466609d`이며 이후 상태는 [`STATUS.md`](../../STATUS.md)를 따른다.
 - 별도 `ADronePrototypePawn`과 `ADronePrototypeGameMode` C++ 구현 완료
 - 컴포넌트 기본값과 standalone Spawn/Possess 자동화 테스트 완료
 - 현재 기본 실행·Editor 시작 맵은 `/Game/Drone/Maps/Lvl_DroneTraining`, 전역 GameMode는 `BP_DronePrototypeGameMode`
@@ -45,7 +45,7 @@ Spawn
 
 `TUT-02`에서는 실제 `BP_DroneTrainingGate` 4개, Course의 명시적 Gate 순서와 정방향 통과 판정을 구현했다. 이어진 `TUT-03`에서는 정상 Gate Event만 구독하는 Course 소유 Recorder를 추가해 Segment/Lap 시간, 실제 3차원 이동 거리와 평균 속도 원본을 기록한다. `TUT-04B`는 이전 성공 평균·Best·Delta 결과까지 추가했고 현재 main에서 전체 `Drone.` 자동화 16/16과 Blueprint 오류 0을 통과했다.
 
-현재 실행 카드는 `TUT-04 이전 기록 비교·Best·결과 UI`다. 비교 규칙과 표시 형식은 구현 전에 확정하며, 현재 C++·BP·Editor 책임과 사용자 수동 확인법은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
+현재 실행 카드는 `TUT-04 이전 기록 비교·Best·결과 UI`다. 비교 규칙과 표시 형식은 구현 전에 확정하며, 현재 C++·BP·Editor 책임과 사용자 수동 확인법은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](../reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
 
 새 생산 코드는 `Source/Drone`, 새 프로젝트 소유 자산은 `/Game/Drone` 아래에 둔다. 복구한 ThirdPerson·Combat·Platforming·SideScrolling 참고 Content와 Legacy/Variant Source에는 신규 상속·참조를 만들지 않는다. Prototype IMC는 Pawn만 등록·제거하며 PlayerController와 Level Blueprint에는 같은 책임을 추가하지 않는다. 현재도 네트워크·Android는 제외한다. FPV 외형·Loop 최소 이식과 환경 Map 3종의 기술 이식은 완료됐지만 기능 구현은 계속 프로젝트 소유 코드·Wrapper 기준이다.
 

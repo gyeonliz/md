@@ -2,7 +2,7 @@
 
 기준일: 2026-09-08 (Asia/Seoul)
 
-이 문서는 휴대폰으로 현재 상태와 다음 행동을 빠르게 확인하기 위한 요약본이다. 코드의 상세 설명은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md), 학습 기록 양식은 [`STUDY_PLANS.md`](STUDY_PLANS.md)를 따른다.
+이 문서는 휴대폰으로 현재 상태와 다음 행동을 빠르게 확인하기 위한 요약본이다. 코드의 상세 설명은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](../reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md), 학습 기록 양식은 [`STUDY_PLANS.md`](STUDY_PLANS.md)를 따른다.
 
 ## 30초 요약
 

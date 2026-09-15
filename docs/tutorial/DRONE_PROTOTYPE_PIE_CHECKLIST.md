@@ -17,7 +17,7 @@ TUT-03     Done, Segment/Lap 시간 · 실제 이동 거리 · 평균 속도 원
 TUT-04B    Implemented, 자동 검증 Pass · 실제 두 Lap 확인 대기
 ```
 
-현재 main 기준은 `55b3ffe`이며 전체 `Drone.` 자동화 16/16과 Blueprint 오류 0을 통과했다. TUT-04B 결과 HUD가 추가됐으므로 두 번 완주해 첫 기준과 이전 평균·Best·Delta 표시를 확인한다. 현재 구조와 사용자 수동 확인 절차는 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
+현재 main 기준은 `55b3ffe`이며 전체 `Drone.` 자동화 16/16과 Blueprint 오류 0을 통과했다. TUT-04B 결과 HUD가 추가됐으므로 두 번 완주해 첫 기준과 이전 평균·Best·Delta 표시를 확인한다. 현재 구조와 사용자 수동 확인 절차는 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](../reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
 
 2026-08-19 사전 PIE 두 번에서 Prototype 입력 계열이 실제로 반응하는 것은 확인했다. 그러나 어느 실행도 한 번의 새 PIE 안에서 전체 체크리스트를 끝내지 못했으므로 Pass로 계산하지 않는다. 두 실행은 이미 종료된 역사적 부분 확인이며 현재 열린 PIE가 있다는 뜻이 아니다.
 

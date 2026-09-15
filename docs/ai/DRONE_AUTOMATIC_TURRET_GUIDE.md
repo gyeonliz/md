@@ -58,7 +58,7 @@ BP를 열고 `Class Defaults`에서 다음 Category를 사용한다.
 5. 상대 위치·회전은 Socket에서 맞추고 Actor Scale은 가능하면 `(1,1,1)`을 유지한다.
 6. 포신 끝에 `MGTurretMuzzle`이 오도록 Barrel Mesh 상대 위치를 조정한다.
 
-레벨에 차량과 포탑을 각각 배치한다면 World Outliner에서 포탑을 차량 아래로 Attach해도 된다. 현재 시험 맵의 `AutoTurret_Vehicle_A`는 `AutoTurret_VehicleCarrier_Greybox`의 `TurretMount` Component에 붙어 있다. 차량이 4점 Trace로 굴곡 노면을 따라 이동·Pitch·Roll하면 포탑 전체가 같이 움직이고, Yaw/Pitch는 그 부모 Transform 안에서 계속 로컬 회전한다. 차량 세부 조정은 [`DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md`](DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md)를 따른다.
+레벨에 차량과 포탑을 각각 배치한다면 World Outliner에서 포탑을 차량 아래로 Attach해도 된다. 현재 시험 맵의 `AutoTurret_Vehicle_A`는 `AutoTurret_VehicleCarrier_Greybox`의 `TurretMount` Component에 붙어 있다. 차량이 4점 Trace로 굴곡 노면을 따라 이동·Pitch·Roll하면 포탑 전체가 같이 움직이고, Yaw/Pitch는 그 부모 Transform 안에서 계속 로컬 회전한다. 차량 세부 조정은 [`DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md`](../gameplay/DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md)를 따른다.
 
 ## 최종 포탑 메시 교체
 

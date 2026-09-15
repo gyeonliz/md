@@ -141,4 +141,4 @@ Import 스크립트는 복사 전에 패키지 구조와 해시를 확인한다.
 
 자동화 이후에도 데이터 분리와 안전 경계는 그대로 유지한다. Codex Profile을 몰래 검색하거나 원시 Session/Credential을 복사하거나 환경변수를 덤프하면 안 된다. Git Push의 종료 코드를 확인하지 않고 성공했다고 추측해서도 안 된다.
 
-스크립트별 사용법과 매개변수는 [`../tools/context-sync/README.md`](../tools/context-sync/README.md)를 참고한다.
+스크립트별 사용법과 매개변수는 [`../tools/context-sync/README.md`](../../tools/context-sync/README.md)를 참고한다.

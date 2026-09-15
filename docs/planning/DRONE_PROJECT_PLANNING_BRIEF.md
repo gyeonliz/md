@@ -413,11 +413,11 @@ ADroneMissionDirector
 
 ## 15. 문서와 Git 운영
 
-- 현재 상태: [`../WORKBOARD.md`](../WORKBOARD.md)
-- 검증된 환경·기준선: [`../STATUS.md`](../STATUS.md)
-- 날짜별 작업 기록: [`DRONE_WORKLOG.md`](DRONE_WORKLOG.md)
+- 현재 상태: [`../WORKBOARD.md`](../../WORKBOARD.md)
+- 검증된 환경·기준선: [`../STATUS.md`](../../STATUS.md)
+- 날짜별 작업 기록: [`DRONE_WORKLOG.md`](../history/DRONE_WORKLOG.md)
 - Front-end 상세 설계: [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)
 - Tutorial·Mission 세부 계획: [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)
-- 현재 코드·Asset 구조: [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)
+- 현재 코드·Asset 구조: [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](../reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)
 
 매 작업 종료 시 `WORKBOARD → WORKLOG → STATUS/CONTEXT → 관련 계획 문서` 순서로 실제 변경·검증·다음 작업을 갱신한다. Commit·Push는 사용자 지시와 저장소별 변경 범위를 확인한 뒤 수행한다.
