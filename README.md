@@ -2,7 +2,7 @@
 
 이 폴더는 실제 Unreal 프로젝트가 아니라 다음 작업을 준비하고 PC 간 문맥을 이어가기 위한 문서·템플릿·도구 저장소다. GitHub `gyeonliz/md`를 이 폴더의 공유 원격으로 사용하고, 실제 Unreal 프로젝트는 별도 `gyeonliz/drone` 저장소로 관리한다.
 
-현재 2026-09-09 D 드라이브 작업에서는 정찰=`DroneSpy`, FPV 자폭=`DronePackFPV`, 드랍=`Delivery` 전용 Pawn과 Training 역할 표적·한글 상태 UI를 연결했다. 드랍은 `BP_DroneCarryablePayload` 크레이트를 근접 적재·부착·재투하하며 착지 후에도 남는다. Editor Build와 집중 자동화 22/22가 통과했고, 팀원 LFS 자산 충돌도 `ac88992`에서 복구·Push했다. 다음은 실제 역할 Vertical Slice와 Training HUD 두 Lap 확인이다. 최신 판정은 `STATUS.md`와 `WORKBOARD.md`를 우선한다.
+현재 2026-09-15 D 드라이브 작업에서는 팀원 Production `Lvl_DroneTraining`을 건드리지 않고 경량 `Lvl_DroneTutorialSystemsTest`에 곡선 Course·독립 Ring 5개·역할 표적 3종·Carryable을 분리했다. TestMap Map Check 0/0·전용 자동화 1/1과 Editor Build가 통과했다. 유인 MG 사망 뒤 생존 NPC 재점유는 단독 3/3 및 후속 묶음 안 해당 항목을 통과했고, 지점 배치·방향·NavMesh·StateTree 팀 가이드를 추가했다. 다음은 TestMap 한/두 Lap과 AI 배치 화면 확인이며 최신 판정은 `STATUS.md`와 `WORKBOARD.md`를 우선한다.
 
 ## 먼저 읽을 파일
 
@@ -23,17 +23,21 @@
 15. [`docs/DRONE_PREASSET_FUNCTION_PLAN.md`](docs/DRONE_PREASSET_FUNCTION_PLAN.md): 구매 소스 없이 Greybox 기능을 먼저 완성하는 실행 계획
 16. [`docs/DRONE_MVP_GUIDE.md`](docs/DRONE_MVP_GUIDE.md): Flight MVP부터 데모까지의 개발 단위
 17. [`docs/DRONE_SMART_OBJECT_NPC_GUIDE.md`](docs/DRONE_SMART_OBJECT_NPC_GUIDE.md): 적 순찰·드론 감지·Rifle/Shotgun·MG와 기지 아군 Smart Object 이동 준비·사용 절차
-18. [`docs/WORK_MANAGEMENT.md`](docs/WORK_MANAGEMENT.md): Inbox → Todo → Doing → Done 운영
-19. [`docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md): 시작 트레일러·로비·미션 선택·브리핑·Map·Drone 선택·목표 UI의 최신 최우선 흐름
-20. [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md): 확정 조작, Tutorial 코스·기록 UI, Mission·Jamming·에셋 적용 계획
-21. [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md): 최초 D 드라이브 14팩 압축 감사, 다른 PC의 C 드라이브 재감사와 FPV·Loop 선별 이식 검증
-22. [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md): 남은 제공 자산 891개·OilRig 중앙 맵·TUT-04B 이식 및 검증
-23. [`docs/DRONE_UNREAL_MCP.md`](docs/DRONE_UNREAL_MCP.md): UE 5.8 공식 Unreal MCP·Codex 연결, 선택 Toolset과 검증 기준
-24. [`docs/DRONE_CHAOS_DATAFLOW_PLAN.md`](docs/DRONE_CHAOS_DATAFLOW_PLAN.md): UE 5.8 Dataflow 기반 부분 고정 그물·선택형 맵 파괴 설계와 검증 순서
-25. [`docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md`](docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md): 지원서·이력서용 Unreal 프로젝트 경험 기술 예시와 사실 확인 경계
-26. [`docs/STUDY_PLANS.md`](docs/STUDY_PLANS.md): 정보처리산업기사·C++ 코딩테스트 병행 계획
-27. [`docs/DRONE_PROJECT_PLANNING_BRIEF.md`](docs/DRONE_PROJECT_PLANNING_BRIEF.md): 게임 기획·화면 흐름·UI·현재 구현·로드맵·검증을 한 문서로 정리한 통합 기획서
-28. [`docs/DRONE_TRELLO_BOARD_2026-09-09.md`](docs/DRONE_TRELLO_BOARD_2026-09-09.md): Trello에 복사할 완료·수동 확인·다음 개발·장기 후보 카드와 체크리스트
+18. [`docs/DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md`](docs/DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md): 팀 공유용 Smart Object 지점 이동·복제·방향·NavMesh·StateTree·유인/무인 포탑 구분 가이드
+19. [`docs/WORK_MANAGEMENT.md`](docs/WORK_MANAGEMENT.md): Inbox → Todo → Doing → Done 운영
+20. [`docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md): 시작 트레일러·로비·미션 선택·브리핑·Map·Drone 선택·목표 UI의 최신 최우선 흐름
+21. [`docs/DRONE_TUTORIAL_STORY_PLAN.md`](docs/DRONE_TUTORIAL_STORY_PLAN.md): 확정 조작, Tutorial 코스·기록 UI, Mission·Jamming·에셋 적용 계획
+22. [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md): 최초 D 드라이브 14팩 압축 감사, 다른 PC의 C 드라이브 재감사와 FPV·Loop 선별 이식 검증
+23. [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md): 남은 제공 자산 891개·OilRig 중앙 맵·TUT-04B 이식 및 검증
+24. [`docs/DRONE_UNREAL_MCP.md`](docs/DRONE_UNREAL_MCP.md): UE 5.8 공식 Unreal MCP·Codex 연결, 선택 Toolset과 검증 기준
+25. [`docs/DRONE_CHAOS_DATAFLOW_PLAN.md`](docs/DRONE_CHAOS_DATAFLOW_PLAN.md): UE 5.8 Dataflow 기반 부분 고정 그물·선택형 맵 파괴 설계와 검증 순서
+26. [`docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md`](docs/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md): 지원서·이력서용 Unreal 프로젝트 경험 기술 예시와 사실 확인 경계
+27. [`docs/STUDY_PLANS.md`](docs/STUDY_PLANS.md): 정보처리산업기사·C++ 코딩테스트 병행 계획
+28. [`docs/DRONE_PROJECT_PLANNING_BRIEF.md`](docs/DRONE_PROJECT_PLANNING_BRIEF.md): 게임 기획·화면 흐름·UI·현재 구현·로드맵·검증을 한 문서로 정리한 통합 기획서
+29. [`docs/DRONE_TRELLO_BOARD_2026-09-09.md`](docs/DRONE_TRELLO_BOARD_2026-09-09.md): Trello에 복사할 완료·수동 확인·다음 개발·장기 후보 카드와 체크리스트
+30. [`docs/EXTERNAL_ENGINEERING_REFERENCES/README.md`](docs/EXTERNAL_ENGINEERING_REFERENCES/README.md): Ponytail·ECC·Archify·fmt·Matt Pocock Skills 검토와 Drone 팀 적용 기준
+31. [`docs/DRONE_GIT_LFS_CAPACITY_PLAN.md`](docs/DRONE_GIT_LFS_CAPACITY_PLAN.md): 실제 27.66GiB LFS 분포, 크기 Threshold의 한계와 Core/선택형 Asset 분리·선택 Clone·원격 정리 계획
+32. [`docs/CS_GAMEDEV_READING_PLAN.md`](docs/CS_GAMEDEV_READING_PLAN.md): 게임 Pattern·선형대수·OS·Interpreter·그래픽스·네트워크·AI/NLP 추천자료 8종의 장기 병행 학습 순서와 기록 양식
 
 ## 구성
 
@@ -70,6 +74,8 @@ TUT-03에서는 Course 소유 `UDroneTrainingLapRecorderComponent`를 Gate 판�
 현재 D 드라이브 작업 PC의 제공 에셋 루트는 `D:\JGY\project\Unreal_260821`이다. 초기 FPV 외형·Loop와 Integration BP에 이어 ArmyVFX·InfantrySFX·Ground Drone/MG·NPC 외형·Raw Drone 후보와 OilRig을 선별 이식했다. 원본 제공 폴더는 수정하지 않았고 실제 프로젝트의 새 자산 외부·누락 참조는 0이다. 실제 스피커의 Loop 단일 재생과 종료 정지는 수동 미확인이므로 `AST-01`은 Doing이다. 상세 결과는 [`docs/DRONE_ASSET_INTAKE_2026-08-25.md`](docs/DRONE_ASSET_INTAKE_2026-08-25.md)와 [`docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md`](docs/DRONE_REMAINING_ASSET_MIGRATION_2026-08-27.md)를 따른다.
 
 NPC·AI를 위해 Smart Objects와 Gameplay Interactions 모듈, Faction·Rifle·Shotgun Profile, Activity Tag, NPC Character/Controller/Spawn Point, Slot 예약 Component와 드론 Sight를 구성했다. 현재 공유 main에는 Rifle/Shotgun Trace·Damage·탄창, MG 점유·조준·사격·사망 교대, Cover, Drone 체력·파괴 교전 종료, Blueprint 표현 Event와 Smart Object 방향 보강까지 포함한다. 실제 Mesh·Animation·FX·SFX는 계속 수동·후속 작업이며 AI 비주얼은 Mission 수직 슬라이스 재검증 뒤 잇는다.
+
+2026-09-15 로컬 후속 변경은 유인 MG 1개와 차량형/설치형 무인 자동포탑 2종을 테스트에서 명확히 분리하고, 사수 사망 뒤 재할당 재시도와 이동 정체 감시·재경로·조작 위치 정렬을 보강했다. 현재 Smart Object 순찰은 Actor 번호나 Spline 순서가 아니라 태그가 맞는 최근접 빈 Slot을 선택한다. 팀 배치 절차는 [`docs/DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md`](docs/DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md)를 따른다.
 
 2026-09-08 현재 D 드라이브 Unreal 공유 기준은 `main=origin/main=63f60c1`, 문서 공유 기준은 `main=origin/main=d30e098`이다. 역할별 실제 모델·시험 표적·상태 UI는 이 기준선 위 로컬 미커밋 변경이며 사용자가 Commit/Push한다. Pull 중 자동 복원된 Stash와 Upstream이 충돌한 `test1.umap`, `M_Start.uasset`, `Drone.cpp`의 잘못된 `//test`, `.vsconfig` Index 불일치는 이번 기능과 별개로 남아 있어 다음 Commit 전 선택·정리가 필요하다.
 

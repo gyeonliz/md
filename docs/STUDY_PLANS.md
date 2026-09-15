@@ -15,6 +15,8 @@
 
 날짜별 실행안과 현재 Drone 상태를 한 번에 볼 때는 [`MOBILE_CURRENT_BRIEF.md`](MOBILE_CURRENT_BRIEF.md)를 먼저 읽는다.
 
+컴퓨터과학·게임개발 추천자료 8종은 이 시험·코딩테스트 계획과 분리한 [`CS_GAMEDEV_READING_PLAN.md`](CS_GAMEDEV_READING_PLAN.md)를 따른다. 평상시 주 2시간, 바쁜 주 25분 한 번을 기준으로 하며 시험 D-Day와 Drone 통합 작업이 우선이다.
+
 ## 2. 공식 일정과 현재 분기
 
 공식 출처:

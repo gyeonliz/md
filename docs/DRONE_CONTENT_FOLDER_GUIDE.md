@@ -1,7 +1,7 @@
 # Drone Content 폴더 정리 기준
 
-기준일: 2026-08-28
-Drone 기준선: `main=origin/main=2fcfb04`
+기준일: 2026-09-15
+Drone 기준선: 로컬 추적 `main=origin/main=10da7ce`
 Unreal Engine: 5.8.1
 
 ## 1. 레빗홀 프로젝트에서 확인한 기준
@@ -66,6 +66,7 @@ Map의 현재 용도는 다음과 같다.
 | Map | 용도 | 상태 |
 |---|---|---|
 | `Lvl_DroneTraining` | Tutorial Vertical Slice와 현재 기본 실행 Map | PIE 초기 화면·자동화 확인, 한 Lap 수동 확인 대기 |
+| `TestMap/Lvl_DroneTutorialSystemsTest` | 팀원 Training과 분리된 Ring·역할 표적·Carryable·HUD 기능 시험 | 경량 맵 생성, Build·Map Check 0/0·전용 자동화 1/1 통과, Editor 한/두 Lap 수동 확인 대기 |
 | `Lvl_DronePrototype` | Drone Pawn·입력·Camera·Telemetry 기능 시험 | 자동화 확인 |
 | `Lvl_NPCSmartObjectGreybox` | 적·아군 NPC와 Smart Object·NavMesh 기능 시험 | Hostile 2명 EnemyPatrol 반복 이동 검증 완료, Friendly 2명 이동은 미구현 |
 | `Lvl_DronePackShowcase` | 공급사 DronePack 외형 6종 비교용 정리 Map | 기술 검증 완료, Editor 최종 시각 검토 대기 |
@@ -120,11 +121,45 @@ Content Browser 기본 선택 경로는 `/Game/Drone`이다. 예전 `ThirdPerson
 
 ### Map
 
-- 실제 프로젝트 Map은 `/Game/Drone/Maps` 한 폴더에 둔다.
+- 실제 플레이·환경 Map은 `/Game/Drone/Maps`에 두고, 기능 개발·Greybox·Showcase 전용 Map은 `/Game/Drone/Maps/TestMap` 하위에 분리한다.
 - 이름은 `Lvl_역할` 형식을 사용한다.
-- 임시 시험 Map도 사용 목적이 생기면 이름을 붙이고 이 폴더로 옮긴다.
+- 임시 시험 Map도 사용 목적이 생기면 이름을 붙이고 `TestMap`으로 옮긴다. `test1`, `test2` 같은 의미 없는 이름은 팀원 소유권과 용도를 확인한 뒤 개명한다.
 - 공급사 원본 Demo를 그대로 옮기지 않는다. 실제 프로젝트에서 쓸 구성으로 정리한 사본만 중앙 Maps에 둔다.
 - Map 담당자를 정하고 같은 `.umap`을 두 명이 동시에 수정하지 않는다.
+
+### TestMap 분리 목표
+
+사용자 확인에 따라 `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 실제 Tutorial 환경을 제작 중인 소유 Map이다. 링·역할 표적·HUD·미션 기능 시험 때문에 원본을 직접 저장하거나 복제·분할하지 않는다.
+
+2026-09-15에 `Lvl_DroneTutorialSystemsTest`는 실제 생성됐고 나머지 시험 맵 이동은 아직 수행하지 않았다. 현재/목표 혼합 구조는 다음과 같다.
+
+```text
+/Game/Drone/Maps/
+├─ Lvl_DroneFrontEnd
+├─ Lvl_DroneTraining
+├─ Lvl_Battlefield
+├─ Lvl_MilitaryBase
+├─ Lvl_MilitaryCamp
+├─ Lvl_OilRig
+└─ TestMap/
+   ├─ Lvl_DroneTutorialSystemsTest
+   ├─ Lvl_DronePrototype
+   ├─ Lvl_NPCSmartObjectGreybox
+   ├─ Lvl_DronePackShowcase
+   └─ Lvl_MilitaryBase_Test
+```
+
+`test1`과 `test2`는 이름만으로 용도를 확정할 수 없고 팀원 수정 이력이 있으므로 즉시 이동하지 않는다. 담당자와 실제 용도를 확인한 뒤 `Lvl_<기능>_Test` 형태로 개명해 `TestMap`에 넣는다.
+
+분리 절차는 다음으로 고정한다.
+
+1. Editor에서 `Lvl_DroneTraining`을 저장하지 않고 닫는다.
+2. Engine 기본 바닥 또는 빈 레벨에서 경량 `Lvl_DroneTutorialSystemsTest`를 새로 만든다. Training의 Environment·Landscape·World Partition 데이터는 복사하지 않는다.
+3. 확인된 시험 전용 맵을 AssetTools Rename/Move로 이동한다. Windows Explorer에서 `.umap`만 직접 옮기지 않는다.
+4. C++ 자동화의 Map Package, `Tools/AssetMigration`의 Map 경로, Data Asset Soft Reference를 목적에 따라 갱신한다.
+5. 시험 자동화는 TestMap을 사용하되 Front-end와 실제 Mission 계약 검사는 계속 원본 Training을 읽기 전용 감사 대상으로 유지해 팀원 작업 상태를 숨기지 않는다.
+6. Redirector를 정리하고 Map Load, Map Check, Blueprint Compile, 전체 `Drone.` 자동화, `git lfs fsck`를 확인한다.
+7. TestMap 기능이 통과해도 원본 Training을 자동 수정하지 않는다. C++/Blueprint/Data Asset과 배치 가이드를 Training 담당자에게 전달하고 통합 시점과 담당자를 별도로 정한다.
 
 ### Blueprint와 자산
 

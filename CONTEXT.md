@@ -1,8 +1,26 @@
 # 작업컴 Codex/GPT 기준 컨텍스트
 
-기준일: 2026-09-11 (Asia/Seoul)
+기준일: 2026-09-15 (Asia/Seoul)
 
 이 문서는 메인컴 ChatGPT/Codex에서 진행하던 작업을 작업컴에서 이어가기 위한 기준 컨텍스트다. 추측해서 내용을 추가하지 않고, 사용자가 실제 진행 상황을 알려준 경우에만 상태를 갱신한다.
+
+## 2026-09-15 현재 인계 기준
+
+- Unreal 저장소는 `main=origin/main=10da7ce`, 문서 저장소는 `main=origin/main=27d002d`인 로컬 추적 상태에서 시작했고 두 작업 트리는 Clean이었다. 2026-09-15 실시간 Fetch는 DNS 오류(`Could not resolve host: github.com`)로 실패했으므로, 이 원격 일치는 마지막으로 내려받은 로컬 `origin/main` 기준이며 GitHub 서버의 새 Commit 유무까지 확인한 결과는 아니다.
+- 독립 Ring Handle Source/Test 3개는 더 이상 미커밋이 아니다. Unreal `10da7ce`에 포함됐고 관련 문서도 `27d002d`에 포함됐다.
+- `Drone.Tutorial.TrainingCourse` 최종 보고서는 1/1 성공, 0 warning/0 error다. Handle 투영·추가·삭제와 CourseSpline 불변을 검증했다.
+- 최신 저장 Training Map 감사 결과는 Gate Actor 17개·Course Sequence 4개, 역할 표적 3종 0개, Carryable Payload 0개다. `TrainingAssets`는 8 errors로 실패했고 `TrainingPIESmoke`도 같은 Sequence 불일치가 남아 있다. 이는 팀원이 제작 중인 Production Map 감사 결과이며 TestMap 통과와 구분한다.
+- 별도 알려진 실패였던 `NPCPerceptionSearchPIE`의 MG 사망 사수 정리/재점유는 로컬에서 수정했다. 단독 3회 연속과 후속 NPC 묶음의 해당 항목이 성공했다. 같은 묶음에서는 기존 `NPCBaseRoutinesPIE`가 느린 Headless 실행에서 35초 안에 적 한 명의 두 번째 순찰을 마치지 못해 간헐 실패했으며 별도 추적한다.
+- UE 5.8 Editor와 명령줄 검사 프로세스는 종료 상태다. 다음 C++ 변경이나 전체 빌드 전에도 열려 있는 Editor가 있다면 저장 후 종료한다.
+- 다음 순서는 `TestMap 곡선/색/역할/HUD 한 Lap·두 Lap 확인 → AI 시험 맵 MG 교대·Smart Object 방향 확인 → 기존 시험 맵 참조/소유권 감사·AssetTools 이동 → Mission 목표 Rule 데이터화 → Jamming`으로 고정한다.
+- 사용자 후속 확인으로 `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 실제 Tutorial 환경을 제작 중인 소유 Map이다. Codex 기능 시험에서는 열람만 하고 저장·복제·자동 배치·분할하지 않는다. Ring·표적·HUD 개발 시험은 환경을 복사하지 않은 경량 `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`에서 진행한다.
+- 전용 시험 맵은 `/Game/Drone/Maps/TestMap` 아래로 분리한다. 우선 이동 후보는 `Lvl_DronePrototype`, `Lvl_NPCSmartObjectGreybox`, `Lvl_DronePackShowcase`, `Lvl_MilitaryBase_Test`이며 `test1`, `test2`는 팀원 용도·소유권을 확인한 뒤 의미 있는 이름으로 바꿔 이동한다. FrontEnd·Training·Battlefield·MilitaryBase·MilitaryCamp·OilRig는 프로젝트/환경 맵으로 상위 `Maps`에 유지한다.
+- Tutorial 시스템 시험 맵은 기본 바닥·PlayerStart·Prototype GameMode·Course/Gate·역할 표적·Carryable·HUD에 필요한 최소 Actor만 둔다. 통과한 C++/Blueprint/Data Asset과 배치 가이드를 팀원에게 전달하고 실제 Training 배치는 해당 맵 담당자와 정한 통합 시점에만 수행한다.
+- 외부 개발 도구와 방법론은 [`docs/EXTERNAL_ENGINEERING_REFERENCES/README.md`](docs/EXTERNAL_ENGINEERING_REFERENCES/README.md)의 검토 기준을 따른다. Ponytail의 최소 의존성 순서, ECC의 계획·테스트·구현·검토·검증·기록 Loop, Archify의 근거 기반 Diagram, Matt Pocock Skills의 공유 용어·ADR·TDD·원인 우선 진단만 팀 규칙으로 채택했다.
+- ECC/Ponytail Hook·Plugin, Archify와 fmt Library는 현재 Project/Runtime에 추가하지 않는다. 개인 Codex 환경에는 반복되는 원인 진단과 테스트 우선 작업에 필요한 Matt Pocock Skills의 `diagnosing-bugs`, `tdd`만 최소 설치했다. 다음 Codex 작업부터 사용 가능하며 팀원 PC나 Unreal Build 의존성이 아니다. TestMap Vertical Slice 뒤 정확한 Version/Commit, License, Dry Run, Hook/Network, 중복과 Rollback을 확인하고 ECC/Ponytail은 최대 하나만 격리 평가한다. Unreal Runtime 문자열·UI는 `FText`·`FString`·Unreal 로그 체계를 유지한다.
+- 경량 `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`는 2026-09-15 실제 생성됐다. 기본 바닥·PlayerStart·Light·곡선 Course·독립 Ring 5개·역할 표적 3종·Carryable·Prototype GameMode만 포함하며, Build·Map Check 0/0·전용 자동화 1/1을 통과했다. 팀원 `Lvl_DroneTraining`은 Git 변경 0으로 보존했다.
+- 유인 기관총은 `BP_SO_MGTurret` 1개만 NPC 점유 대상으로 취급한다. 차량형 `BP_AutoTurret_Vehicle`과 설치형 `BP_AutoTurret_Emplaced`는 Smart Object Definition이 없는 무인 자동포탑이다. 사수 사망 뒤 0.75초 간격·15초 창 재시도, 이동 정체 감시·1회 재경로·250cm Greybox 조작 위치 Snap이 로컬 변경으로 들어갔다.
+- Smart Object 동선은 스플라인이나 Actor Label 번호를 따라 고정 순서로 도는 구조가 아니라 태그가 맞는 최근접 빈 Slot 선택이다. 팀원이 지점 이동·복제·방향·NavMesh·Offset·StateTree를 조정할 때는 [`docs/DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md`](docs/DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md)를 따른다.
 
 ## 2026-09-08 현재 Drone 역할 시험 기준
 

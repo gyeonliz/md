@@ -1,12 +1,43 @@
 # 현재 작업 상태
 
-기준일: 2026-09-11 (Asia/Seoul)
+기준일: 2026-09-15 (Asia/Seoul)
 
 이 문서는 PC별로 명령으로 확인된 상태와 사용자가 아직 결정하지 않은 항목을 분리한다. 현재 D 드라이브 실행 세션과 다른 PC의 검증 기록을 같은 항목에서 섞지 않고 경로와 검증 시점을 함께 적는다.
 
 실시간 작업 위치와 바로 다음 행동은 [`WORKBOARD.md`](WORKBOARD.md), 날짜별 변경과 검증 이력은 [`docs/DRONE_WORKLOG.md`](docs/DRONE_WORKLOG.md)에 기록한다. 이 문서는 검증된 기준선이 달라질 때 함께 갱신한다.
 
-## 2026-09-11 팀원 Pull·Discard 복구·푸시 준비 상태
+## 2026-09-15 현재 상태
+
+- Unreal `main`과 로컬 추적 `origin/main`은 `10da7ce`, 문서 `main`과 로컬 추적 `origin/main`은 `27d002d`였다. 확인 시작 시 두 저장소 모두 Clean이었다. 다만 당일 실시간 Fetch가 DNS 오류로 실패했으므로 GitHub 서버에 더 새 Commit이 없는지는 네트워크 복구 후 다시 확인해야 한다.
+- 독립 Ring Handle 변경은 `10da7ce`에 반영됐다. CourseSpline을 고정한 채 `Ring별 Spline Handle`을 가장 가까운 Spline 위치로 투영하고, 배열 항목 추가·삭제로 Ring 수를 바꾸는 기능이다.
+- 최종 자동화 근거는 `IndependentRingHandles_Final_20260911`의 `Drone.Tutorial.TrainingCourse` 1/1 성공이다. 최신 Map 감사 `TrainingAssets_9de1ead`는 역할 표적/Carryable 누락과 Gate 17/Sequence 4 불일치로 1/1 실패·8 errors다.
+- Production Training 감사의 알려진 실패는 `TrainingAssets`, `TrainingPIESmoke` 2개다. 팀원이 실제 맵을 구성 중인 상태를 보여주는 검사이므로 Codex가 원본 맵을 수정해 녹색으로 만들지 않는다.
+- 별도 코드 결함이던 `NPCPerceptionSearchPIE`의 사망 사수 정리·기관총 재점유는 수정했다. 단독 3회 연속과 후속 `Drone.AI.NPC` 묶음 안의 해당 테스트가 통과했다. 같은 묶음에서는 기존 `NPCBaseRoutinesPIE`가 느린 Headless 실행에서 35초 안에 적 한 명의 두 번째 순찰을 완료하지 못해 간헐 실패했으며 기관총 재점유 실패와 구분해 기록한다.
+- UE 5.8 Editor와 명령줄 검사 프로세스는 종료 상태다. 지금은 경량 TestMap의 수동 화면·한/두 Lap 확인과 AI 배치 화면 확인을 기다리는 단계다.
+- 바로 다음 작업은 ① 경량 TestMap에서 곡선 Ring·3상태 색·역할 표적·Carryable·HUD 확인, ② 한 Lap 및 두 Lap 비교값 확인, ③ AI 시험 맵에서 유인 MG 재점유·도착 정렬과 Smart Object 방향 확인, ④ 기존 시험 맵의 소유권/참조 감사 후 AssetTools 이동이다. 이후 Mission 목표 Rule 데이터화와 Jamming을 진행한다.
+- 후속 사용자 확인에 따라 `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 실제 Tutorial 환경을 제작 중인 소유 Map이다. 이를 복제한 `Lvl_DroneTraining_Test` 계획은 폐기하고, 환경·Landscape를 복사하지 않은 `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`를 새로 만든다. 원본 Training은 열람만 허용하고 저장·덮어쓰기·자동 설정 스크립트 실행·분할을 금지한다.
+- 현재는 TestMap 자산 이동을 아직 실행하지 않았다. Unreal AssetTools로 이동해 Redirector/Soft Reference/하드코딩 경로를 함께 갱신하고, 팀원 맵일 수 있는 `test1`·`test2`는 용도를 확인하기 전 이동·개명하지 않는다.
+- `TrainingAssets`와 `TrainingPIESmoke`의 현재 실패는 팀원이 작업 중인 실제 Map의 중간 상태를 보여주는 Production 감사 결과로 유지한다. 개발 편의를 위해 원본 검사를 억지로 통과시키지 않고 TestMap용 검사를 별도로 둔다.
+- Ponytail·ECC·Archify·fmt·Matt Pocock Skills를 2026-09-15 기본 브랜치 문서 기준으로 검토했다. 최소 의존성, 계획→테스트→구현→검토→검증→기록, 공유 용어/ADR, 근거 기반 Diagram 원칙을 [`docs/EXTERNAL_ENGINEERING_REFERENCES/README.md`](docs/EXTERNAL_ENGINEERING_REFERENCES/README.md)에 반영했다. 프로젝트 Plugin/Hook/Unreal C++ Library는 추가하지 않았고, 개인 Codex 환경에 `diagnosing-bugs`, `tdd` Skill만 최소 설치했다. 이 두 Skill은 팀원 프로젝트 의존성이 아니며 다음 Codex 작업부터 사용 가능하다.
+- 현재 `Source/Drone`에는 fmt 사용이 없고 Unreal의 `FText`·`FString`·로그 체계를 사용하므로 `Drone.Build.cs`에 fmt를 추가하지 않는다. 외부 도구 도입은 TestMap Vertical Slice 이후 `AI-TOOL-REVIEW-01`에서 격리·Dry Run·Rollback을 확인한 뒤 결정한다.
+- `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`를 284,865-byte 경량 Map으로 새로 만들었다. 기본 바닥·PlayerStart·Light, 곡선 Course, CourseSpline과 분리된 Ring Handle 5개, Recon/Impact/Payload 표적 각 1개, Carryable 1개와 Prototype GameMode Override를 포함한다.
+- 새 `BuildDroneTutorialSystemsTestMap.py`는 TestMap이 이미 있으면 기본 읽기 전용 검증만 하며, `Invoke-DroneTutorialSystemsTestMap.ps1 -Mode Rebuild`를 명시한 경우에만 Tag로 소유한 TestMap Actor를 다시 만든다. `Lvl_DroneTraining`을 Script 대상으로 사용하지 않으며 이번 Unreal Git 변경에도 Training Map은 없다.
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공, 생성 도구 새 프로세스 Validate 성공, TestMap Map Check 0 errors/0 warnings, `Drone.Tutorial.TutorialSystemsTestMap` 1/1 Success다. Editor는 종료 상태이며 링 곡선·색·표적 위치·HUD 한/두 Lap은 수동 미확인이다.
+- 유인 기관총은 `BP_SO_MGTurret` 1개만 NPC 점유 대상으로 판정한다. 차량형 `BP_AutoTurret_Vehicle`과 설치형 `BP_AutoTurret_Emplaced`는 Smart Object Definition이 없는 무인 포탑이며 재점유 검사에서 제외한다. 사수 사망 뒤 0.75초 간격·15초 창 재시도, 이동 정체 감시와 1회 재경로, 250cm Greybox Snap 반경을 추가했고 값은 Blueprint/StateTree에서 조정할 수 있다.
+- 팀 공유용 [`docs/DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md`](docs/DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md)를 추가했다. 현재 동선은 번호/스플라인 고정 순서가 아니라 태그가 맞는 최근접 빈 Slot 선택이며, 지점 이동·복제·방향·NavMesh·Offset·StateTree 조정 및 유인/무인 포탑 구분을 기록했다.
+- TestMap의 Recon/Impact/Payload 표적과 Carryable 위 긴 한글 `TextRender`는 기본 Font에서 깨져 보여 기본 숨김으로 바꿨다. 역할 표적은 BP/배치 Instance의 `Show Instruction Text`, Carryable은 BP Class Defaults의 `Show Pickup Label`로 필요할 때만 켤 수 있으며, 다시 켤 때는 `SCAN`·`IMPACT`·`DROP`·`PICKUP` 짧은 표식을 사용한다. 전용 테스트가 수정 전 visible 3+1로 실패하고 수정 후 0+0으로 통과했다.
+- Gate의 임시 16각 Cube Ring은 조각 사이가 벌어지고 Trigger와 크기가 달라 보이는 문제 때문에 폐기했다. 기존 Blueprint 직렬화 호환용 Component 16개는 유지하되 앞 4개만 `Box Trigger` 안쪽과 정확히 맞는 상·하·좌·우 발광 Frame으로 표시한다. 정사각형 안쪽 전체를 실제 통과 영역으로 사용하며 `통과 전/현재 목표/통과 후` 3상태 색상은 그대로 유지한다. MSVC 14.51.36257 Editor Build와 `Drone.Tutorial.TrainingGateSequence`, `Drone.Tutorial.TutorialSystemsTestMap` 각 1/1이 성공했고 Production Training Map은 변경하지 않았다. 화면 확인은 남아 있다.
+- 추천자료 8종은 [`docs/CS_GAMEDEV_READING_PLAN.md`](docs/CS_GAMEDEV_READING_PLAN.md)에 별도 장기 계획으로 정리했다. Game Programming Patterns와 Immersive Linear Algebra부터 시작하고, OSTEP→Crafting Interpreters→PBRT→Network→Deep Learning/SLP 순으로 평상시 주 2시간·바쁜 주 25분 최소 단위를 사용한다.
+- `.gitattributes`는 크기 기준이 아니라 모든 `*.uasset`, `*.umap`을 Git LFS로 처리한다. 새 TestMap도 `filter=lfs diff=lfs merge=lfs` 적용 대상이며 C++·Python·Markdown은 일반 Git이다.
+- 현재 Commit의 LFS는 정확한 JSON Byte 기준 5,550개·약 27.66GiB다. 1MiB 미만 3,602개는 0.45GiB뿐이고 10~100MiB 942개가 21.34GiB(77.2%)를 차지한다. 프로젝트 소유 `Content/Drone` 중 ThirdParty 제외 범위는 0.89GiB, `Content/Drone/ThirdParty`는 4.61GiB, 외부 Vendor Root는 22.16GiB다.
+- 따라서 `100MB 이상만 LFS`로 바꾸지 않는다. Unreal Binary를 일반 Git 이력으로 옮겨도 데이터가 사라지지 않고 Clone·Merge가 더 나빠진다. 대형 환경 Pack의 정확한 Dependency Closure·Demo/중복 범위를 감사하고 Core와 선택형 Asset Depot를 분리하는 [`DRONE_GIT_LFS_CAPACITY_PLAN.md`](docs/DRONE_GIT_LFS_CAPACITY_PLAN.md)를 기준으로 사용한다.
+- 70MiB Threshold를 새 저장소에 적용한다고 가정하면 5,538개·25.67GiB가 일반 Git으로 넘어가고 LFS에는 12개·1.99GiB만 남는다. 이는 100MiB Hard Limit에 대한 30MiB 여유만 만들 뿐, 일반 Git 저장소를 GitHub 권장 10GB보다 훨씬 크게 만들 가능성과 Binary 이력·Clone 부담을 해결하지 않는다. 현재 원격 LFS Object도 자동 삭제되지 않는다.
+- 이번 용량 감사에서는 `.gitattributes`, Unreal Asset, Git 이력과 원격을 변경하지 않았다. 원격 저장량 초기화는 삭제·재생성 또는 Support 협의가 필요한 팀 결정이며 Codex가 임의 실행하지 않는다.
+- Free/Pro와 원격 Associated Storage를 로컬 전체 Ref 29.62GiB로 가정하면 추가 저장비는 약 `$1.37/월`이다. 현재 27.66GiB 전체 Clone 1회가 같은 달 발생하면 총 약 `$2.92`, 2회면 약 `$5.34`다. `$5`는 두 달치 선불로 보지 않고 월 Budget으로 설정하며, 실제 GitHub Billing 사용량과 `Stop usage when budget limit is reached`를 확인한다.
+
+아래 2026-09-11 항목은 당시 작업 이력이며, 현재 Git·Editor 상태는 위 2026-09-15 항목을 우선한다.
+
+## 2026-09-11 팀원 Pull·Discard 복구·푸시 준비 상태 — 당시 기록
 
 - `44303a1`, `3df654a`, 사용자의 `0911임시버전` `46efd2e`에 이어 팀원 Training Map 후속 Merge `9de1ead`까지 받아 Unreal은 `main=origin/main`이다. `46efd2e`에는 자동 Ring/Gate 색상 Source·테스트·도구와 기관총 자산 10개가 포함됐고, 독립 Ring Handle 변경 3개만 로컬 미커밋으로 남았다.
 - GitHub Desktop `Discard Changes` 전에 생성된 15:56 자동 Stash에서 자동 Ring·Gate 색상 관련 C++/테스트 9개와 `ConfigureAutomaticTrainingGates.py`만 복구했다. 원격과 같은 Map/에셋은 복구 대상에서 제외했고 Stash는 안전망으로 보존한다.
@@ -15,7 +46,7 @@
 - 최신 `9de1ead`의 Training Map은 원격 LFS 파일과 같은 Clean 상태다. `TrainingAssets` 재감사 결과 Gate Actor 17개, Course Sequence 4개, 역할 표적 3종과 Carryable 0개가 그대로다. 맵은 이번 푸시 후보 변경에 포함하지 않으며 배치 확인 없이 설정 스크립트를 실행하지 않는다.
 - 현재 추가 푸시 후보는 독립 Ring Handle Source/Test 3개다. `git diff --check`와 `git lfs fsck`는 통과했으며 Commit/Push는 사용자가 진행한다. 알려진 실패 테스트 3개를 해결하기 전에는 완전 통과로 표시하지 않는다.
 
-## 2026-09-11 TUT-05 자동 Spline Ring 작업 상태
+## 2026-09-11 TUT-05 자동 Spline Ring 작업 상태 — 당시 기록
 
 - Unreal과 문서의 확인된 공유 기준선은 각각 `main=origin/main=9de1ead`, `main=origin/main=6501fd5`다. `.vsconfig` Git 추적 제외가 Unreal 기준선에 반영됐다.
 - 기존 FLOW-01~08, Training Mission 선택/출격/목표/결과, Lap 완료 성공과 Drone 사망 실패 연결은 유지한다.

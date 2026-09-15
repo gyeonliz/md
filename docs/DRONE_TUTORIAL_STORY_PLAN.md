@@ -104,10 +104,11 @@ TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경
 ### TUT-02 — 순서형 Ring Gate (완료)
 
 - `ADroneTrainingCourse`에 명시적 순서의 Gate 목록과 비-Primitive Gate Sequence Component를 연결했다.
-- `ADroneTrainingGate`는 비충돌 원형 Visual과 별도 Pawn Overlap Trigger를 분리한다.
+- `ADroneTrainingGate`는 비충돌 4변 발광 Frame과 별도 Pawn Overlap Trigger를 분리한다. Frame 안쪽과 실제 승인 범위는 같은 정사각형이며 모서리까지 통과할 수 있다.
 - Gate는 `CourseId`, `GateIndex`, `SegmentDistance`를 가지며 Actor 로컬 `+X`를 유일한 정방향으로 사용한다. `SegmentDistance`는 배치/표시용 메타데이터이며 TUT-03 실제 이동 거리 계산에는 사용하지 않는다.
 - 실제 `BP_DroneTrainingGate` 네 개를 Training Map에 배치하고 Course 배열 순서와 GateIndex를 일치시켰다.
 - 현재 목표 Gate는 Current, 정상 통과한 Gate는 Completed, 이후 Gate는 Inactive로 표시한다.
+- `BP_DroneTrainingGate`의 `통과 영역 반쪽 크기`로 Frame 안쪽/Trigger를 함께 조정하고 `프레임 굵기`로 테두리 굵기와 깊이를 조정한다. 기존 16각형 반지름은 직렬화 호환용 Legacy 값으로만 남긴다.
 - 현재 순서가 아닌 Gate, 역방향, 중복 통과와 잘못된 Actor는 진행 상태를 바꾸지 않는다.
 
 ### TUT-03 — Lap과 구간 원본 기록 (완료)

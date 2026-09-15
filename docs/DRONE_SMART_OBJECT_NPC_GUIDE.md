@@ -1,6 +1,8 @@
 # Drone Smart Object NPC 준비·사용 가이드
 
-기준일: 2026-09-04 (Asia/Seoul)
+기준일: 2026-09-15 (Asia/Seoul)
+
+팀원이 맵에서 실제 지점과 동선을 수정할 때는 먼저 [`DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md`](DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md)를 따른다. 이 문서는 코드·Asset 계약과 전체 기능 설명을 담당한다.
 
 이 문서는 적군 순찰과 드론 발견 대응, 소총·샷건 분기, 기지 아군 NPC의 생활·순찰 이동, 한 명만 사용하는 MG Turret을 같은 기반 위에 구성하기 위한 실전 가이드다.
 

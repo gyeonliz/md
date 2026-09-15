@@ -1,38 +1,53 @@
 # 현재 작업 보드
 
-기준일: 2026-09-11 (Asia/Seoul)
+기준일: 2026-09-15 (Asia/Seoul)
 
 이 보드는 실제로 확인한 결과만 반영한다. 개별 준비 카드가 Done이어도 `Git + Unreal 환경 구축` 전체는 첫 Push, 다른 PC Clone, LFS 확인, Clone한 프로젝트 실행까지 성공해야 완료다.
 
-Unreal 공유 기준선은 `main=origin/main=9de1ead`, 문서 공유 기준선은 `main=origin/main=6501fd5`이다. 팀원 Training Map·Shotgun·STF·NPC 외형과 자동포탑/맵 후속 변경을 Pull했고 사용자의 `0911임시버전`에 자동 Ring/Gate 색상과 기관총 자산이 포함됐다. 현재 독립 Ring Handle 3개 파일만 로컬 미커밋이며 Commit·Push는 사용자가 진행한다.
+확인된 로컬 추적 기준선은 Unreal `main=origin/main=10da7ce`, 문서 `main=origin/main=27d002d`이다. 독립 Ring Handle Source/Test는 `10da7ce`에 포함됐고 확인 시작 시 두 작업 트리는 Clean이었다. 2026-09-15 실시간 Fetch는 DNS 오류로 실패했으므로 GitHub 서버의 새 Commit 유무는 네트워크 복구 뒤 다시 확인한다. 이번 문서 최신화는 로컬 변경으로 남기며 Commit·Push는 사용자가 진행한다.
 
 2026-09-03 게임 흐름은 `실행 → 시작 트레일러 → 로비 → 미션 선택/측면 설명 → 하단 시작 → 미션 트레일러 → 맵 → Drone 선택 → Mission 시작/측면 목표 UI`로 변경됐다. 사람 Operator 조작·NPC 대화 수령·Operator↔Drone 전환은 폐기하며 [`docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](docs/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 최우선 실행 기준으로 사용한다.
 
 ## 현재 작업 스냅샷
 
-마지막 갱신: 2026-09-11 17:25 — Spline과 분리된 Ring별 3D Handle 구현·최종 자동화 통과
+마지막 갱신: 2026-09-15 — Gate 시각 Frame/판정 정합화·경량 TestMap 회귀
 
 | 항목 | 상태 |
 |---|---|
-| 현재 단계 | TUT-05의 링 개별 배치 UX를 CourseSpline과 분리된 `Ring별 Spline Handle`로 구현. 푸시 전 팀원 맵 기준 정합성 수정 단계 |
-| 진행 정도 | Handle 이동은 가장 가까운 Spline 위치로 Ring을 투영하고, 배열 추가·삭제가 Ring 수를 갱신한다. CourseSpline 제어점은 바뀌지 않는다. 기존 거리/로컬 보정과 Gate 3상태 색상도 유지한다. `9de1ead` Training Map에는 Gate Actor 17개, Course Sequence 4개이며 역할 표적 3개와 Carryable은 없다 |
-| 지금 작업 중 | 코드 기능과 단위 검증 완료. 원격 Map은 Clean으로 보존했으며 17개 기존 Gate 중 실제 코스 범위와 Point 순서를 화면에서 정할 차례 |
-| 완료 근거 | MSVC 14.51.36257 Editor Build 성공. `Drone.Tutorial.TrainingCourse` 1/1에서 독립 Handle 투영·추가·삭제, CourseSpline 불변, 기존 숫자 배치 회귀 통과. 기존 NPC 집중 3/4, `git diff --check`, `git lfs fsck` 통과 |
+| 현재 단계 | 팀원 Training과 분리된 경량 `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest` 생성 완료. 이 맵에서 Tutorial·역할·HUD 수동 Vertical Slice를 확인하는 단계 |
+| 진행 정도 | 새 맵에 기본 바닥·PlayerStart·Light·곡선 Course·독립 Ring Handle 5개·역할 표적 3종·Carryable 1개·Prototype GameMode를 배치했다. Gate의 엉성한 16각 Cube Ring은 Trigger 안쪽을 정확히 따르는 4변 발광 Frame으로 교체했고 Frame 안쪽 전체를 통과 판정과 일치시켰다 |
+| 지금 작업 중 | Editor는 종료 상태다. 새 TestMap 기술 검증, Gate Frame 자동 검증과 유인 MG 사망 교대 코드 검증을 마쳤으며 다음은 TestMap에서 Frame 외형·3상태 색과 한/두 Lap을 화면 확인하는 일이다 |
+| 완료 근거 | MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. Gate Frame 테스트는 변경 전 의도한 실패를 확인한 뒤 `Drone.Tutorial.TrainingGateSequence` 1/1, `Drone.Tutorial.TutorialSystemsTestMap` 1/1 성공. 생성 도구 Validate·TestMap Map Check 0/0과 `NPCPerceptionSearchPIE` 단독 3/3도 유지 |
 | 수동 미확인 | Drone Rotor 회전축·방향·속도와 기체 외형 크기/방향, 역할 기능 3종, 차량 Z·Pitch·Roll·바퀴·포탑 추종, 실제 탄환 피격 흔들림을 확인해야 한다. 자동포탑 발사·장애물 차단, MG 사수·Gaze·임시 MG 3축, Training HUD 두 Lap, OilRig 시각·성능 확인도 유지 |
-| 현재 차단 | Pull 직후 전체 `Drone.`은 36/40. Mesh 기준 수정 뒤 알려진 실패 테스트는 3개: MG 사망 사수 정리/재점유, Training 역할 표적/Carryable 누락, Gate 17/Sequence 4 불일치 |
-| 다음 행동 | Training Map 화면에서 17개 Gate 중 실제 코스 범위·순서 확인 → 현재 배치를 독립 Handle로 변환·Handle 위치 저장 → 역할 표적/Carryable 복원 → AI 재점유 원인 확인 → 전체 40개 재실행 |
-| 다음 기능 | `TUT-05 자동 Ring 완료 → TUT-04 실제 두 Lap → Mission 목표 Rule 데이터화 → Jamming`. 기존 Rotor/역할 수동 확인도 유지 |
+| 현재 차단 | 실제 Training은 팀원이 제작 중이므로 `TrainingAssets`·`TrainingPIESmoke` 실패를 Codex가 Map 수정으로 해결하지 않는다. AI 묶음에서 `NPCBaseRoutinesPIE`가 느린 Headless 실행 시 적 한 명의 두 번째 순찰을 35초 내 끝내지 못하는 간헐성은 별도 추적한다 |
+| 다음 행동 | TestMap에서 Gate 4변 Frame과 통과 전/현재/통과 후 색 화면 확인 → 한 Lap → 두 번째 Lap 비교 UI → AI 시험 맵에서 MG 교대·Smart Object 방향 화면 확인 → 기존 시험 맵 참조/소유권 감사 |
+| 다음 기능 | `TUT-05 Map 완료 → TUT-04 실제 두 Lap → Mission 목표 Rule 데이터화 → 정찰/투하/파괴/귀환 Event 연결 → Jamming`. Rotor·역할·AI·차량·포탑 수동 확인도 병행 |
 | 에셋 인수 | `C:\에셋` 원본은 보존. ArmyVFX·InfantrySFX·Ground Drone·NPC 외형·Raw Drone을 정확한 의존성 묶음으로 이식 |
 | 맵 이식 | 기존 환경 3종에 `Lvl_OilRig`을 추가. Vendor FirstPerson Sample 의존성을 끌어오던 Door Actor 8개는 중앙 사본에서 제거 |
-| Editor/MCP | UE 5.8 Editor와 명령줄 검사 프로세스는 종료 상태. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인 |
+| Editor/MCP | UE 5.8 Editor는 종료 상태. Codex 네이티브 Tool 노출은 `UE-MCP-02` 미확인. 수동 확인 때 기준 `Drone.uproject`에서 새 TestMap을 연다 |
 | 확정 후속 방향 | UE 5.8 Dataflow/Chaos로 부분 고정 그물과 선택형 맵 파괴를 구현 후보로 채택. Plugin·자산·코드는 아직 변경하지 않았으며 TUT-04/Flight Collision 기준 뒤 별도 Spike |
-| Git 처리 | Unreal·문서 기준선은 각각 `9de1ead`, `6501fd5`. Unreal 추가 푸시 후보는 독립 Ring Handle Source/Test 3개이며 Map은 Clean이다. 기관총 자산과 기존 자동 Ring 변경은 `46efd2e`에 추적됐다. 문서는 미커밋이며 이번 작업에서 Commit·Push하지 않았다 |
+| Git 처리 | 로컬 추적 기준 Unreal `10da7ce`, 문서 `27d002d`. 현재 LFS 5,550개·27.66GiB 중 10~100MiB가 21.34GiB다. 70MiB Threshold도 25.67GiB를 일반 Git으로 옮길 뿐이므로 전체 Unreal Package LFS 규칙은 유지하고 Core/선택형 Asset 분리안을 문서화했다. Asset 삭제·이력 재작성·Push는 하지 않는다 |
 | UI/기획 참고 | Figma `Project:Droner`에서 기체 역할과 조작 요구를 읽기만 함. Figma는 수정·댓글·공유 설정 변경하지 않았고 게임 제목 통일은 보류 |
-| 협업 Git | 중앙 `origin/main=9de1ead`까지 동기화했다. 15:56 GitHub Desktop 자동 Stash는 안전 확인 전 삭제하지 않는다. [`docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md`](docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md)에 판별 순서를 기록 |
+| 협업 Git | 마지막 로컬 추적 `origin/main`은 Unreal `10da7ce`, 문서 `27d002d`. 15:56 GitHub Desktop 자동 Stash는 안전 확인 전 삭제하지 않는다. 네트워크 복구 뒤 Fetch하고 [`docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md`](docs/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md) 순서로 판별 |
+| 외부 도구 검토 | Ponytail·ECC·Archify·fmt·Matt Pocock Skills를 검토했다. Project Plugin/Hook/Library는 추가하지 않았고 개인 Codex 환경에 `diagnosing-bugs`, `tdd` Skill만 최소 설치했다. 다음 작업부터 사용 가능하며 팀원 Unreal 의존성은 0이다 |
 | 학습 일정 | 정보처리산업기사 2026년 공식 일정 확인 완료. 개인 접수·필기일·면제 상태는 미확인, 코딩테스트는 공통 시험일 없음 |
 | 학습 다음 행동 | Q-Net 상태를 확인해 Track A/B/C를 고르고 첫 학습 블록 실행 |
 
 상세 변경 이력은 [`docs/DRONE_WORKLOG.md`](docs/DRONE_WORKLOG.md)에 계속 추가한다. 매 구현 작업 종료 시 이 스냅샷의 현재 작업·완료 근거·다음 작업을 함께 갱신한다.
+
+## 차후 진행 순서
+
+1. `MAP-TEST-01 시험 맵 분리`: 경량 `Lvl_DroneTutorialSystemsTest` 생성·저장 계약·Map Check·전용 자동화는 완료했다. Editor 수동 확인과 기존 시험 맵 이동은 남아 있다. 팀원 소유 `Lvl_DroneTraining`은 복제·변경하지 않는다.
+2. `기존 시험 맵 이동`: `Lvl_DronePrototype`, `Lvl_NPCSmartObjectGreybox`, `Lvl_DronePackShowcase`, `Lvl_MilitaryBase_Test`를 AssetTools로 TestMap 아래로 옮기고 코드·도구·문서 경로를 갱신한다. `test1`·`test2`는 팀원 용도 확인 후 개명·이동한다.
+3. `TUT-05 시스템 시험`: 경량 Tutorial Systems Test Map의 짧은 Spline과 Ring Handle에서 4변 Gate Frame의 순서·위치·Trigger 정합·상태 색을 검증한다. 실제 Training의 17개 Gate는 건드리지 않는다.
+4. `역할 시스템 시험`: 같은 경량 맵에 Recon·Impact·Payload 역할 표적과 `BP_DroneCarryablePayload`를 배치해 기능 연결을 검증한다.
+5. `TUT-04/05 수동 검증`: 한 Lap으로 현재 값·구간 값 갱신, 두 Lap으로 이전 평균·Best·± 부호, Gate 3상태 색과 정상 종료를 확인한다.
+6. `자동화 복구`: TestMap용 자동화와 `NPCPerceptionSearchPIE`는 수정했다. Production Training 검사는 팀원 작업 상태를 숨기지 않고 별도로 유지하며, 느린 묶음 실행의 `NPCBaseRoutinesPIE` 순찰 시간 간헐성만 별도 추적한다.
+7. `팀원 통합 전달`: TestMap이 통과해도 Training을 자동 수정하지 않는다. 검증된 C++/Blueprint/Data Asset과 Ring 배치 가이드를 전달하고 Training 담당자가 통합하거나 함께 작업한다.
+8. `Mission 데이터화`: 목표 종류·필요 수량·제한 시간·대상 ID를 Mission Definition/Rule로 옮기고 정찰·투하·파괴·귀환 Event를 공통 Objective 경로에 연결한다.
+9. `Jamming Vertical Slice`: 감지 범위·신호 단계·HUD 경고·조작/영상 방해·회복 조건을 데이터로 만들고 Mission Rule로 활성화한다.
+10. `수동 회귀 묶음`: 드론 Rotor/기울임/피격 흔들림/역할 3종, NPC Gaze·MG 재점유, 유인·설치형·차량형 포탑, 4점 차량 추종을 지정 TestMap에서 확인한다.
+11. `후순위 Physics Spike`: 위 Vertical Slice가 안정된 뒤 Dataflow/Chaos 그물과 선택형 맵 파괴를 별도 Branch·TestMap에서 시험한다.
 
 ## Inbox
 
@@ -63,25 +78,29 @@ Unreal 공유 기준선은 `main=origin/main=9de1ead`, 문서 공유 기준선�
 |---|---|---|---|
 | GIT-10 | Git / Unreal | 다른 PC Clone과 실행 | LFS 포함 Clone 후 UE 5.8.1에서 열림 |
 | GIT-TEAM-01 | Git / Unreal / 협업 | 팀원 PC 원격 규칙 확인 | 환경 맵·재질 중앙 반영과 개인 설정 정리는 완료. 팀원 PC에서 `origin`/`upstream` 또는 `origin`/`fork`, `pushurl`을 실제 확인 |
+| GIT-LFS-CAP-01 | Git / Unreal / 협업 | LFS Current Checkout·팀원 Download 축소 | 대표 Map별 Dependency Closure를 재산출하고 Demo/중복/Source 후보를 분류. Core/선택형 Asset Depot Manifest를 정한 뒤 별도 Clone에서 Sparse Checkout+선택 LFS Profile·Asset Registry·Build·Map Load 검증 |
 | SYNC-04 | Codex Sync | 두 PC 간 실제 수동 인계 시험 | Git 흐름과 문맥 패키지 흐름을 각각 완료 |
 | TUT-04 | Drone / Tutorial / UI | 비교 결과 수동 판정 | 두 번 완주해 첫 기준 생성과 두 번째 이전 평균·Best·부호를 실제 HUD에서 확인 |
 | UE-MCP-02 | Drone / Unreal / Codex Sync | Codex 네이티브 MCP Tool 노출 확인 | Unreal Editor 실행 후 `D:\JGY\project\drone` 루트의 새 Codex 작업에서 `unreal-mcp` Tool을 찾고 Current Level을 한 번 조회 |
 | STUDY-EXAM-01 | 정보처리산업기사 | Q-Net 개인 상태 확인 | 3회 접수·수험일·응시 여부·필기 합격/면제 상태를 확인하고 Track A/B/C 기록 |
 | STUDY-EXAM-02 | 정보처리산업기사 | 선택 Track 첫 학습 | 필기 60문항 진단 또는 실기 기초 1블록과 오답 기록 완료 |
 | STUDY-CT-01 | Coding Test | C++ 기본 진단 시작 | 첫 문제 직접 풀이·실패 이유·재풀이 날짜 기록 |
+| STUDY-CS-READ-01 | Computer Science / Game Development | 추천자료 장기 읽기 시작 | `CS_GAMEDEV_READING_PLAN.md`의 첫 4주표에 따라 Game Programming Patterns 1장 30분을 읽고 세션 기록 1개 작성 |
 | AI-VIS-01B | Drone / AI / Assets | NPC·Rifle·Shotgun·MG 실제 외형과 전투 표현 연결 | 프로젝트 Integration BP에서 T Pose·손 위치·발사 표현 검증. Shotgun은 실제 후보 Mesh 확보 필요 |
+| AI-TOOL-REVIEW-01 | Tooling / Codex / Security | 외부 Plugin·Skill 격리 도입 여부 판정 | TestMap Vertical Slice 이후 정확한 Version/Commit·License·Dry Run·Hook/Network·중복·Rollback 검토. ECC/Ponytail은 최대 하나만 선택하고 필요 없으면 미도입으로 종료 |
 
 ## Doing
 
 | ID | 태그 | 작업 | 현재 확인 | 남은 완료 조건 |
 |---|---|---|---|---|
-| TUT-05 | Drone / Tutorial / Authoring | Spline 기반 Ring 자동 배치 | CourseSpline과 분리된 Ring별 3D Handle, 기존 숫자/절대거리 보조 배치, Gate 3상태 BP 색상 구현. Build와 Course 단위 테스트 통과. 최신 팀원 Map은 Gate Actor 17개·Sequence 4개로 불일치 | 맵 화면에서 실제 코스 Gate 범위 확인 → 독립 Handle 순서·위치로 변환 → 역할 표적/Carryable 배치 → Tutorial 7/7·전체 40/40·수동 완주 후 Done 이동 |
+| MAP-TEST-01 | Drone / Unreal / Maps | 시험 맵을 `/Game/Drone/Maps/TestMap`으로 분리 | 경량 Tutorial Systems Test Map과 생성/검증 도구·전용 자동화 추가. 바닥·PlayerStart·곡선 Course·독립 Ring 5·역할 표적 3·Carryable 1, Prototype GameMode. Build·Map Check 0/0·전용 테스트 1/1 통과. Training Git 변경 0 | Editor 화면·한/두 Lap 확인 → 기존 시험 맵 참조/소유권 감사 → AssetTools 이동·Redirector/경로·전체 회귀·LFS 확인 |
+| TUT-05 | Drone / Tutorial / Authoring | Spline 기반 Ring 자동 배치 | CourseSpline과 분리된 Ring별 3D Handle, 숫자/절대거리 보조 배치, Gate 3상태 BP 색상이 `10da7ce`에 포함됨. 새 TestMap에서 곡선 Course와 독립 Ring 5개 저장 계약·전용 자동화 통과 | TestMap에서 Handle 개별 이동, Ring 순서·3상태 색, 한/두 Lap UI를 수동 확인한 뒤 검증된 배치 절차만 Training 담당자에게 전달 |
 | AST-01 | Drone / Unreal | 제공 에셋 최소 외형 Spike | FPV 본체·로터 4·재질/Texture와 44.1 kHz Loop Cue/Wave를 `/Game/Drone/ThirdParty`로 선별 이식. Integration BP와 GameMode 연결. 이번 재검증에서 전용 자동화 1/1·의존성 감사·Blueprint 0/0/0·LFS fsck 통과. 전체 14/14는 TUT-03 당시 같은 Commit의 기준선이며 이번에 미재실행 | 실제 스피커 출력의 Loop 단일 재생·종료 정지는 미확인. 결과 확보 전까지 Doing 유지 |
 | AST-01C | Drone / Unreal / Asset | DronePack 드론 시각 라이브러리·데모 맵 | 드론 Mesh·Material·Texture와 정리 Map 154개를 `/Game/Drone/ThirdParty/DronePack`에 선별 이식. Build·전체 14/14·BP 0/0/0·Map Check 0/0·의존성·LFS 검증 통과 | Editor에서 드론 6종·맵 화면을 확인하고 재질·스케일·조명 이상 유무를 기록 |
 | TUT-04A | Drone / Tutorial / UI | 한글 비행·구간 통계 HUD와 Course Authoring 보강 | 병합 main Build·전체 15/15·BP 0/0/0 통과. PIE에서 한글 HUD 두 패널·현재 Gate·세분화 코스 선 초기 렌더 확인 | Gate 0→3 실제 한 Lap 뒤 최근·완료 구간 숫자 갱신 확인 |
 | TUT-04B | Drone / Tutorial / UI | 이전 평균·Best·Delta 결과 | 현재 시도 제외 평균, 첫 기준, Best와 Segment 비교, Blueprint Event, HUD 네 행 구현. Build·16/16 통과 | 실제 두 Lap에서 표시 값과 부호 확인 |
 | AST-05 | Drone / Unreal / Asset | 남은 제공 에셋 선별 라이브러리 | ThirdParty 891개와 `Lvl_OilRig` 1개. 수량·대표 로드·외부/누락 0 | Editor 시각·성능·Map Check와 실제 채택 후보 결정 |
-| AI-SO-TUNE-01 | Drone / AI / Smart Object | 배치·Offset·Definition·검색·StateTree 조정 가이드와 Slot 도착 방향 적용 | 공유 `2d6a459`에 방향 보강과 Definition이 Push됨. DroneEditor Build, Slot Yaw 판정 포함 자동화 2/2, Definition/BP 6쌍 Validate 통과 | `Lvl_NPCSmartObjectGreybox`에서 Cyan 화살표와 순찰·Cover·MG 도착 방향의 화면 일치만 확인 |
+| AI-SO-TUNE-01 | Drone / AI / Smart Object | 배치·Offset·Definition·검색·StateTree 조정 가이드와 Slot 도착 방향 적용 | 공유 `2d6a459`의 방향 보강에 더해 팀 공유용 `DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md` 작성. 최근접 빈 Slot 규칙, 이동·복제·방향·NavMesh·Offset·StateTree, 유인 MG 1개/무인 포탑 2종을 구분. Editor Build와 재점유 집중 검증 통과 | `Lvl_NPCSmartObjectGreybox`에서 Cyan 화살표, 순찰·Cover·MG 도착 방향과 사망 뒤 생존 사수 정렬을 화면 확인 |
 | AI-GAZE-01 | Drone / AI / Animation | 감지 뒤 Drone 시선 유지와 자연스러운 고개 회전 | Controller 독립 Gaze, 1초 유예, Search 마지막 위치, 해제·제한·보간과 Rifle AnimBP 상체/목/고개 20/45/35% 연결. 사용자 확인에서 Bone Space가 위아래 까딱임을 만든 것을 확인해 세 노드를 Component Space로 교정·재저장. Build·자산 검증·집중 자동화 통과 | `Lvl_NPCSmartObjectGreybox`에서 좌우 Yaw·상하 Pitch·보간과 Rifle/MG/Cover 자세 수동 Pass |
 | AI-MG-03 | Drone / AI / MG / Assets | 기관총 전용 3분할 조준·임시 외형 | 범용 Station의 포탑 Component와 일체형 Mesh를 제거하고 `ADroneMGTurretStation`에만 `BaseMount → YawPivot → PitchPivot → Muzzle` 및 원기둥 Base/Body/Barrel 3개 구성. `BP_SO_MGTurret`만 전용 부모로 이관, 연속 조준·정렬 후 발사·구형 Attachment 복구와 통합 PIE 통과 | 임시 원기둥 Base 고정/Body Yaw/Barrel Pitch·손 위치 수동 Pass. 최종 에셋 도착 뒤 세 Static Mesh만 교체 |
 | AI-AUTO-TURRET-01 | Drone / AI / Combat / Assets | 설치형·차량형 무인 자동포탑 | `ADroneAutomaticTurret`가 Prototype Drone을 주기적으로 거리+Visibility 검사하고 유인 MG 3분할 조준·Projectile을 재사용한다. 설치형/차량형 Native Class와 BP 2개, 테스트 맵 각 1기, 차량 Carrier Attach, Build·집중 3/3·맵 PIE 1/1 통과 | `Lvl_NPCSmartObjectGreybox`에서 탐지 진입/이탈, Base 고정·Body Yaw·Barrel Pitch, 발사, 장애물 차단, 차량 Carrier 추종을 수동 확인. 진영/우선순위·체력/파괴·FX/SFX는 후속 |
@@ -94,10 +113,13 @@ Unreal 공유 기준선은 `main=origin/main=9de1ead`, 문서 공유 기준선�
 | ID | 태그 | 검증 결과 |
 |---|---|---|
 | WM-01 | 전체 관리 | 이 파일에 Inbox/Todo/Doing/Done과 일곱 분류 태그 사용 가능 |
+| GIT-LFS-AUDIT-01 | Git / Unreal / 협업 | 정확한 JSON Byte 기준 현재 Commit 5,550개·27.66GiB와 전체 로컬 Ref 고유 Object 6,137개·29.62GiB를 집계. 10~100MiB 21.34GiB와 외부 Vendor Root 22.16GiB가 핵심이며 70MiB Threshold도 25.67GiB를 일반 Git으로 이동시킴을 확인. Core/선택형 Asset 분리 계획을 문서화했고 저장소·Asset·이력 변경 없음 |
+| DOC-EXT-01 | Planning / Tooling | Ponytail·ECC·Archify·fmt·Matt Pocock Skills의 적용점과 위험을 검토하고 `docs/EXTERNAL_ENGINEERING_REFERENCES`에 공유용 Review·Playbook·도입 계획을 작성. Project Plugin/Hook/Library는 미도입, 개인 Codex에는 `diagnosing-bugs`, `tdd`만 최소 설치 |
+| UI-ROLE-LABEL-01 | Drone / UI / TestMap | 깨지는 World Text를 재현하는 TestMap 검사를 추가하고 Recon/Impact/Payload 표적과 Carryable 안내를 기본 숨김 처리. BP에서 다시 켤 수 있으며 짧은 `SCAN/IMPACT/DROP/PICKUP`만 사용. 수정 전 visible 3+1 Fail → 수정 후 0+0, Build·전용 테스트 1/1 통과 |
 | FLOW-00 | Drone / Front-end / Planning | 새 실행 흐름, 사람 Operator 폐기, Mission/Drone 데이터·UI 책임과 FLOW-01~08 검증 순서를 문서 기준선으로 확정 |
-| FLOW-01 | Drone / Front-end / Data | `UDroneGameFlowSubsystem`, 8개 상태, Mission/Drone Primary Data Asset, ID/Catalog/중복 요청 검증을 구현했다. 실제 `DA_Mission_Tutorial_Training`과 `DA_Drone_Scout_Greybox`를 생성해 새 프로세스 Validate 및 `Drone.Flow.Contract` 1/1 통과. 로컬 미커밋 |
-| FLOW-02 | Drone / Front-end / UI | `Lvl_DroneFrontEnd`, 전용 BP GameMode/Controller, `WBP_DroneFrontEndRoot`와 C++ 정적 대체 Layout을 구현했다. 새 실행 Opening→계속→Lobby, Root 1개, 중복 전환 0, 선택 전 Drone 0대를 PIE에서 확인. 로컬 미커밋 |
-| FLOW-03 | Drone / Front-end / UI | 등록 Mission ID 목록을 이름순으로 공급하고 첫 Training Mission 버튼·이름·설명·지역/난이도·하단 시작을 같은 Definition에 연결했다. 시작은 `MissionTrailer`까지만 전환하며 잘못된 ID·중복 확정을 거부한다. 최종 Flow 3/3 통과, 로컬 미커밋 |
+| FLOW-01 | Drone / Front-end / Data | `UDroneGameFlowSubsystem`, 8개 상태, Mission/Drone Primary Data Asset, ID/Catalog/중복 요청 검증을 구현했다. 실제 `DA_Mission_Tutorial_Training`과 `DA_Drone_Scout_Greybox`를 생성해 새 프로세스 Validate 및 `Drone.Flow.Contract` 1/1 통과. 현재 main에 포함 |
+| FLOW-02 | Drone / Front-end / UI | `Lvl_DroneFrontEnd`, 전용 BP GameMode/Controller, `WBP_DroneFrontEndRoot`와 C++ 정적 대체 Layout을 구현했다. 새 실행 Opening→계속→Lobby, Root 1개, 중복 전환 0, 선택 전 Drone 0대를 PIE에서 확인. 현재 main에 포함 |
+| FLOW-03 | Drone / Front-end / UI | 등록 Mission ID 목록을 이름순으로 공급하고 첫 Training Mission 버튼·이름·설명·지역/난이도·하단 시작을 같은 Definition에 연결했다. 시작은 `MissionTrailer`까지만 전환하며 잘못된 ID·중복 확정을 거부한다. 최종 Flow 3/3 통과. 현재 main에 포함 |
 | DR-TYPE-01 | Drone / Flight / Data | Figma 역할 6종 계약과 `Planned/ImplementedCapabilities`, 쉬운/실제 조작형 및 안정/균형/고기동 독립 전환을 구현. 정찰/FPV/드랍 Asset 3종, Editor Build, FlightProfiles 1/1·Flow 3/3 통과. 수동 체감은 별도 대기 |
 | DR-RECON-01 | Drone / Flight / Mission | 거리·화각·LOS 유지형 정찰 Scan, 취소·진행·1회 완료 Event와 Target Component 구현. 역할 기능 자동화 통과 |
 | DR-FPV-01 | Drone / Flight / Combat | 명시적 Arm, 최소 충돌 속도, 1회 Radial Damage와 기체 자폭을 구현. 역할 기능 자동화 통과 |
