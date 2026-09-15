@@ -121,7 +121,7 @@ Rifle Locomotion
 
 ## 7. 화면 확인
 
-`/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`에서 다음을 확인한다.
+`/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`에서 다음을 확인한다.
 
 1. Drone을 NPC 정면에서 왼쪽·오른쪽·위·아래 순서로 천천히 이동한다.
 2. 왼쪽/오른쪽 이동에는 고개·상체가 좌우로 돌고, 위/아래 이동에만 고개가 상하로 움직이는지 본다. 이전처럼 좌우 이동에도 까딱이기만 하면 실패다.

@@ -8,7 +8,7 @@
 
 - Native Class: `/Script/Drone.DroneGroundConformingVehicle`
 - Blueprint: `/Game/Drone/Vehicles/Blueprints/BP_GroundConformingVehicle_Greybox`
-- 시험 Map: `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`
+- 시험 Map: `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`
 - 배치 Actor: `AutoTurret_VehicleCarrier_Greybox`
 - 시험 노면: `VehicleRoughRoad_01`~`05`, 공통 Tag `DroneVehicleRoughRoad`
 - 차량 포탑: `AutoTurret_Vehicle_A`, 차량의 `TurretMount`에 Attach
@@ -113,7 +113,7 @@ Drone의 공용 `HealthComponent`에서 실제 피해가 적용될 때 본체와
 
 ### 차량
 
-1. `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`를 연다.
+1. `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`를 연다.
 2. PIE 또는 Standalone으로 실행한다.
 3. 맵의 `Y=-2200` 부근에서 차량이 다섯 개 굴곡 노면을 왕복하는지 본다.
 4. 차체가 노면 높이에 따라 위아래로 움직이고 Pitch·Roll이 갑자기 튀지 않는지 본다.

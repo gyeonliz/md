@@ -7,6 +7,7 @@
 - [`DRONE_PROJECT_PLANNING_BRIEF.md`](planning/DRONE_PROJECT_PLANNING_BRIEF.md): 전체 기획·개발 현황서
 - [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](planning/DRONE_FRONTEND_MISSION_FLOW_PLAN.md): 트레일러·로비·미션 선택·진입 흐름
 - [`DRONE_TUTORIAL_STORY_PLAN.md`](planning/DRONE_TUTORIAL_STORY_PLAN.md): Tutorial·Mission·Jamming 실행 순서
+- [`DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md`](planning/DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md): Figma 4개 Mission 요구와 현재 코드/남은 작업 대조
 - [`DRONE_PREASSET_FUNCTION_PLAN.md`](planning/DRONE_PREASSET_FUNCTION_PLAN.md): 구매 에셋 전 기능 계획
 - [`DRONE_MVP_GUIDE.md`](planning/DRONE_MVP_GUIDE.md): 전체 MVP 카드 참고
 - [`WORK_MANAGEMENT.md`](planning/WORK_MANAGEMENT.md): 보드 운영 원칙
@@ -32,6 +33,10 @@
 ## Gameplay·Physics
 
 - [`DRONE_TYPES_AND_CONTROL_MODES.md`](gameplay/DRONE_TYPES_AND_CONTROL_MODES.md): Drone 역할과 조작 모드
+- [`DRONE_WEATHER_WIND_RAIN_PLAN.md`](gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md): 구현된 Profile·지속풍/돌풍 Runtime·시험 맵과 남은 Niagara 최적화 계획
+- [`DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md`](gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md): 목표 Rule·Event·Blueprint 설정과 검증
+- [`DRONE_JAMMING_GREYBOX_GUIDE.md`](gameplay/DRONE_JAMMING_GREYBOX_GUIDE.md): 재밍 신호·비행·HUD·Mission Zone 배치와 PIE 시험
+- [`DRONE_TEST_MAP_GUIDE.md`](gameplay/DRONE_TEST_MAP_GUIDE.md): Tutorial·AI/Smart Object·Mission/Signal 시험 맵 위치와 수동/자동 검증
 - [`DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md`](gameplay/DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md): 4점 차량·Drone 기울기·피격 흔들림
 - [`DRONE_CHAOS_DATAFLOW_PLAN.md`](gameplay/DRONE_CHAOS_DATAFLOW_PLAN.md): 그물·파괴 Physics Spike
 

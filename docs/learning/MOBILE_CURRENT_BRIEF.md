@@ -83,7 +83,7 @@ ADroneNPCSpawnPoint 또는 직접 배치
          ├─ Hostile: EnemyPatrol / Guard / 선택적 MG
          └─ Friendly: FriendlyBasePatrol / Ambient
 
-Lvl_NPCSmartObjectGreybox
+TestMap/Lvl_NPCSmartObjectGreybox
 ├─ Hostile Rifle 1 + Hostile Shotgun 1 + Friendly 2
 ├─ Smart Object Station 12개 (기존 10 + Cover 2)
 ├─ ADroneNPCNavigationFloor + NavMeshBoundsVolume
@@ -238,7 +238,7 @@ Lvl_NPCSmartObjectGreybox
 12. Gate 크기·높이·간격·색 대비와 Keyboard/Gamepad 조종 체감을 메모한다.
 13. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가고 종료 후 즉시 멈추는지 기록한다.
 14. AI 기반 Merge 뒤 Editor를 재시작해 Smart Objects와 Gameplay Interactions Plugin을 확인한다.
-15. `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`을 열어 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 12개(기존 10 + Cover 2)의 위치·방향을 확인한다.
+15. `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`을 열어 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 12개(기존 10 + Cover 2)의 위치·방향을 확인한다.
 16. `P` 키로 네 NPC 시작점과 Station 사이의 녹색 NavMesh 연결을 확인한다.
 17. PIE에서 Hostile 2명이 EnemyPatrol 3개 사이를 반복 이동하고 같은 자리에만 머물지 않는지 확인한다.
 18. Friendly 2명이 FriendlyBasePatrol/Ambient 사이를 이동하고 같은 1-Slot에 동시에 머물지 않는지 눈으로 확인한다.

@@ -19,7 +19,7 @@ StationRoot
 
 - 설치형 BP: `/Game/Drone/AI/AutomaticTurrets/Blueprints/BP_AutoTurret_Emplaced`
 - 차량형 BP: `/Game/Drone/AI/AutomaticTurrets/Blueprints/BP_AutoTurret_Vehicle`
-- 시험 맵: `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`
+- 시험 맵: `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`
 - 설치형 배치: `AutoTurret_Emplaced_A`, 대략 `(2600, 1600, 0)`
 - 차량형 배치: `AutoTurret_Vehicle_A`, 대략 `(2700, -2200, 120)`
 - 차량 시험 부모: `AutoTurret_VehicleCarrier_Greybox` (`BP_GroundConformingVehicle_Greybox`)

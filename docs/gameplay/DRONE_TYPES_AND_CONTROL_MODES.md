@@ -1,6 +1,6 @@
 # 드론 역할·조작 방식·핸들링 프리셋
 
-기준일: 2026-09-08 (Asia/Seoul)
+기준일: 2026-09-16 (Asia/Seoul)
 
 ## 기획 자료 사용 원칙
 
@@ -16,10 +16,10 @@
 | 축 | 현재 값 | 의미 |
 |---|---|---|
 | 임무 역할 `EDroneMissionRole` | 정찰, 드랍, FPV 자폭, 광섬유, 지상 UGV, 장거리 타격 | 기체가 임무에서 맡는 기능 |
-| 조작 방식 `EDroneControlMode` | 쉬운 조작, 실제 조작형(그레이박스) | 입력 보조와 기체 자세가 이동에 반영되는 정도 |
+| 조작 방식 `EDroneControlMode` | 쉬운 조작, 실제 조작형(제한 자세), FPV Rate/Acro | 입력 보조와 기체 자세가 이동에 반영되는 정도 |
 | 핸들링 `EDroneHandlingPreset` | 안정, 균형, 고기동 | 같은 기체의 속도·가속·Yaw·최대 기울기 반응성 |
 
-따라서 `고기동 드론`을 별도 기체 종류로 만들지 않는다. 예를 들어 같은 정찰 드론에서 `쉬운 조작 + 안정`, `쉬운 조작 + 고기동`, `실제 조작형 + 균형` 조합을 모두 시험할 수 있다.
+따라서 `고기동 드론`을 별도 기체 종류로 만들지 않는다. 예를 들어 같은 정찰 드론에서도 `쉬운 조작 + 안정`, `쉬운 조작 + 고기동`, `FPV Rate/Acro + 균형` 조합을 시험할 수 있다. 현재 FPV 자폭 역할 Data Asset은 실제 FPV 체감 검증을 위해 `Rate/Acro + 고기동`을 기본값으로 사용한다.
 
 ## 기체 역할별 현재 상태
 
@@ -34,7 +34,7 @@
 
 `UDroneDefinition`은 `PlannedCapabilities`와 `ImplementedCapabilities`를 따로 가진다. 현재 3종 Data Asset은 각각 검증된 고유 기능 한 개를 두 목록에 모두 가진다. 광섬유·UGV·장거리 타격 후보는 아직 구현 목록에 넣지 않는다.
 
-## 두 조작 방식의 실제 차이
+## 세 조작 방식의 실제 차이
 
 ### 쉬운 조작
 
@@ -51,14 +51,39 @@
 - 입력 해제 또는 쉬운 조작 복귀 시 Root가 서서히 수평으로 돌아온다.
 - 아직 모터별 RPM, 중력-양력 평형, PID, 공기저항을 계산하는 실제 비행 물리 모델은 아니다.
 
+### FPV Rate/Acro(그레이박스)
+
+- Betaflight Rate/Acro와 같이 Pitch/Roll/Yaw 스틱을 이동 방향이 아닌 **기체 Body 각속도 명령**으로 해석한다.
+- 스틱을 중앙으로 돌려도 자동 수평 복귀하지 않고 현재 자세를 유지한다.
+- Pitch/Roll에 고정 각도 제한이 없어 Roll과 Loop가 가능하다.
+- Altitude 입력은 Mode 2 조종기의 Throttle 역할을 하며 기울어진 기체의 Local Up 방향으로 추진한다.
+- 오른쪽 스틱: Pitch/Roll, 왼쪽 세로: Throttle, 왼쪽 가로: Yaw라는 Mode 2 계약으로 연결한다.
+- 키보드·마우스는 개발용 대체 입력이며 실제 조종기 체감 검증은 Gamepad 또는 RC Controller 축으로 한다.
+- 현재 이동 기반은 여전히 `UFloatingPawnMovement`다. 모터별 RPM, 중력-양력 평형, PID, 프로펠러 추력, 기체 질량과 공기저항을 푼 완전한 비행 시뮬레이터는 아니다.
+
+## 공개 자료를 반영한 현재 FPV 기준값
+
+특정 군용 자폭 드론의 비공개 성능을 추정하지 않는다. 조작 의미는 Betaflight 공식 문서, 이동 성능 범위는 공개된 민간 FPV 제품 사양을 기준으로 잡았다.
+
+| 항목 | 현재 Greybox 값 | 근거와 해석 |
+|---|---:|---|
+| 수평 최대 속도 | 27 m/s | DJI Avata 2 Manual mode 공개 최대 수평 속도. `2160 cm/s × Agile 1.25 = 2700 cm/s` |
+| 상승/하강 World Z 제한 | 9 m/s | DJI Avata 2 Sport 공개 최대 상승·하강 속도 |
+| Pitch/Roll 최대 Rate | 650°/s | Betaflight 공식 Rate Calculator가 설명하는 Racing 예시 범위 550~650°/s의 상단 |
+| Yaw 최대 Rate | 400°/s | 플레이 테스트용 보수적 프로젝트 값. DJI의 공개 사양값으로 오해하지 않는다 |
+| Pitch/Roll 중앙 감도 | 180°/s | 조정 가능한 프로젝트 시작값 |
+| Pitch/Roll Expo | 0.30 | 조정 가능한 프로젝트 시작값 |
+
+DJI 공개값에는 무풍·해수면 등 측정 조건이 붙으며, 현재 프로젝트 값은 기체를 1:1 복제한다는 뜻이 아니다. 공식 참고: [DJI Avata 2 사양](https://www.dji.com/avata-2/specs), [Betaflight Modes](https://betaflight.com/docs/wiki/guides/current/Modes), [Betaflight Rate Calculator](https://betaflight.com/docs/wiki/guides/current/Rate-Calculator).
+
 ## Blueprint에서 바꾸는 방법
 
 대상은 `BP_DroneScoutIntegration`, `BP_DroneFPVIntegration`, `BP_DroneDropIntegration` 또는 `ADronePrototypePawn` 파생 Blueprint다.
 
 1. Pawn 참조에서 `Set Control Mode`를 호출한다.
-2. `Assisted Easy` 또는 `Manual Realistic Greybox`를 전달한다.
+2. `Assisted Easy`, `Manual Realistic Greybox`, `Acro Rate Realistic Greybox` 중 하나를 전달한다.
 3. 핸들링은 `Set Handling Preset`에 `Stable`, `Balanced`, `Agile` 중 하나를 전달한다.
-4. 두 조작 방식을 번갈아 시험할 때는 `Toggle Control Mode`를 사용한다.
+4. `Toggle Control Mode`는 쉬운 조작 → 제한 자세 → Rate/Acro → 쉬운 조작 순서로 순환한다.
 5. 안정→균형→고기동 순환 버튼은 `Cycle Handling Preset`을 사용한다.
 6. UI 문구 갱신은 `On Flight Control Settings Changed` Event에 바인딩한다.
 7. 시작값은 각 `DA_Drone_*_Greybox`의 `Flight Profile > Default Control Mode / Default Handling Preset`에서 설정한다.
@@ -71,9 +96,10 @@ Pawn Class Defaults에서 다음 Struct를 연다.
 
 - `Assisted Easy Tuning`: 가속·감속·Turning Boost·Yaw 배율
 - `Manual Realistic Greybox Tuning`: 위 배율, Local Up 사용, Collision Root 자세 사용
+- `Acro Rate Realistic Greybox Tuning`: Rate/Acro에서 사용할 가속·관성·Local Up·Root 자세 사용
 - `Stable / Balanced / Agile Handling Tuning`: 최대 속도·가속·Yaw·최대 자세각 배율
 
-각 기체의 절대 기준값은 Data Asset의 `Flight Profile`에 둔다. 모드 전환 시에는 기준값에서 다시 계산하므로 반복 전환해도 배율이 누적되지 않는다.
+각 기체의 절대 기준값은 Data Asset의 `Flight Profile`에 둔다. Rate/Acro의 중앙 감도·최대 Rate·Expo·수직 속도는 `Flight Profile > Acro Rate Settings`에서 조정한다. 모드 전환 시에는 기준값에서 다시 계산하므로 반복 전환해도 배율이 누적되지 않는다.
 
 ## Editor 확인 순서
 
@@ -84,6 +110,9 @@ Pawn Class Defaults에서 다음 Struct를 연다.
 5. 입력을 놓았을 때 쉬운 조작보다 관성이 길게 남는지 확인한다.
 6. Stable/Balanced/Agile을 차례로 바꾸며 속도·Yaw·기울기 한도가 즉시 달라지는지 확인한다.
 7. 쉬운 조작으로 돌아왔을 때 Root Pitch/Roll이 수평 복귀하는지 확인한다.
+8. FPV 기체를 골라 Rate/Acro에서 오른쪽 Stick을 놓아도 자세가 유지되는지 확인한다.
+9. Roll/Pitch 끝 입력으로 90도를 넘어 회전하고 Local Up Throttle로 바라보는 축에 추진되는지 확인한다.
+10. 회전이 너무 민감하면 기체 Data Asset의 `Acro Rate Settings`에서 중앙 감도와 Expo부터 조정하고 최대 Rate는 마지막에 바꾼다.
 
 자동 검증은 `Drone.Prototype.FlightProfiles`와 `Drone.Flow` 필터로 실행한다.
 

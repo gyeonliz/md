@@ -28,7 +28,7 @@ NPC 역할에 맞는 Activity Tag 설정
 
 | 목적 | 사용할 맵/폴더 | 규칙 |
 |---|---|---|
-| NPC·Smart Object·유인/무인 포탑 기능 시험 | `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox` | AI 전용 시험 맵. 기능 회귀와 배치 실험에 사용 |
+| NPC·Smart Object·유인/무인 포탑 기능 시험 | `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox` | AI 전용 시험 맵. 기능 회귀와 배치 실험에 사용 |
 | Tutorial Ring·HUD·Mission Rule 시험 | `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest` | 튜토리얼 시스템 전용. NPC 동선 시험을 섞지 않음 |
 | 실제 Tutorial 환경 제작 | `/Game/Drone/Maps/Lvl_DroneTraining` | 현재 팀원 담당 Production Map. 담당자 합의 없이 저장·복제·자동 배치하지 않음 |
 

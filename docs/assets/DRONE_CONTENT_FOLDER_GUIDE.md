@@ -1,6 +1,6 @@
 # Drone Content 폴더 정리 기준
 
-기준일: 2026-09-15
+기준일: 2026-09-16
 Drone 기준선: 로컬 추적 `main=origin/main=10da7ce`
 Unreal Engine: 5.8.1
 
@@ -22,13 +22,17 @@ Content/Drone/
 ├─ Maps/
 │  ├─ Lvl_DroneTraining.umap
 │  ├─ Lvl_DronePrototype.umap
-│  ├─ Lvl_NPCSmartObjectGreybox.umap
 │  ├─ Lvl_DronePackShowcase.umap
 │  ├─ Lvl_DronePackShowcase_BuiltData.uasset
 │  ├─ Lvl_Battlefield.umap
 │  ├─ Lvl_MilitaryCamp.umap
 │  ├─ Lvl_MilitaryBase.umap
-│  └─ Lvl_OilRig.umap
+│  ├─ Lvl_OilRig.umap
+│  └─ TestMap/
+│     ├─ Lvl_DroneTutorialSystemsTest.umap
+│     ├─ Lvl_NPCSmartObjectGreybox.umap
+│     ├─ Lvl_DroneMissionSystemsTest.umap
+│     └─ Lvl_DroneShotgunSystemsTest.umap
 ├─ Prototype/
 │  ├─ Blueprints/
 │  ├─ Input/
@@ -67,8 +71,10 @@ Map의 현재 용도는 다음과 같다.
 |---|---|---|
 | `Lvl_DroneTraining` | Tutorial Vertical Slice와 현재 기본 실행 Map | PIE 초기 화면·자동화 확인, 한 Lap 수동 확인 대기 |
 | `TestMap/Lvl_DroneTutorialSystemsTest` | 팀원 Training과 분리된 Ring·역할 표적·Carryable·HUD 기능 시험 | 경량 맵 생성, Build·Map Check 0/0·전용 자동화 1/1 통과, Editor 한/두 Lap 수동 확인 대기 |
+| `TestMap/Lvl_DroneMissionSystemsTest` | 재밍 약/강/겹침·귀환 Zone·역할 표적 기능 시험 | 경량 맵 생성, Map Check 0/0·전용 자동화 통과, 실제 Mission Flow PIE 대기 |
+| `TestMap/Lvl_DroneShotgunSystemsTest` | 추가 샷건 NPC의 감지·산탄 Projectile·탄약·LOS 시험 | 독립 사격장 생성, Map Check 0/0·Asset/PIE 2/2 통과, 화면 체감 확인 대기 |
 | `Lvl_DronePrototype` | Drone Pawn·입력·Camera·Telemetry 기능 시험 | 자동화 확인 |
-| `Lvl_NPCSmartObjectGreybox` | 적·아군 NPC와 Smart Object·NavMesh 기능 시험 | Hostile 2명 EnemyPatrol 반복 이동 검증 완료, Friendly 2명 이동은 미구현 |
+| `TestMap/Lvl_NPCSmartObjectGreybox` | 적·아군 NPC와 Smart Object·NavMesh·유인/무인 포탑·차량 시험 | AssetTools 이동 완료, Asset·PIE·감지/수색 자동화 통과, 화면 확인 대기 |
 | `Lvl_DronePackShowcase` | 공급사 DronePack 외형 6종 비교용 정리 Map | 기술 검증 완료, Editor 최종 시각 검토 대기 |
 | `Lvl_Battlefield` | 넓은 Battlefield 환경 후보 | 실제 로드·의존성 검증 완료, 공급 자산 Map Check 메시지 14건·시각 검토 대기 |
 | `Lvl_MilitaryCamp` | 군사 캠프 환경 후보 | 실제 로드·Map Check 0/0, 시각 검토 대기 |
@@ -131,7 +137,7 @@ Content Browser 기본 선택 경로는 `/Game/Drone`이다. 예전 `ThirdPerson
 
 사용자 확인에 따라 `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 실제 Tutorial 환경을 제작 중인 소유 Map이다. 링·역할 표적·HUD·미션 기능 시험 때문에 원본을 직접 저장하거나 복제·분할하지 않는다.
 
-2026-09-15에 `Lvl_DroneTutorialSystemsTest`는 실제 생성됐고 나머지 시험 맵 이동은 아직 수행하지 않았다. 현재/목표 혼합 구조는 다음과 같다.
+2026-09-16에 `Lvl_NPCSmartObjectGreybox` 이동과 `Lvl_DroneMissionSystemsTest` 생성을 완료했다. 아직 이동하지 않은 후보를 함께 표시하면 다음과 같다.
 
 ```text
 /Game/Drone/Maps/
@@ -143,10 +149,12 @@ Content Browser 기본 선택 경로는 `/Game/Drone`이다. 예전 `ThirdPerson
 ├─ Lvl_OilRig
 └─ TestMap/
    ├─ Lvl_DroneTutorialSystemsTest
-   ├─ Lvl_DronePrototype
    ├─ Lvl_NPCSmartObjectGreybox
-   ├─ Lvl_DronePackShowcase
-   └─ Lvl_MilitaryBase_Test
+   ├─ Lvl_DroneMissionSystemsTest
+   ├─ Lvl_DroneShotgunSystemsTest
+   ├─ Lvl_DronePrototype            # 이동 후보
+   ├─ Lvl_DronePackShowcase         # 이동 후보
+   └─ Lvl_MilitaryBase_Test         # 이동 후보
 ```
 
 `test1`과 `test2`는 이름만으로 용도를 확정할 수 없고 팀원 수정 이력이 있으므로 즉시 이동하지 않는다. 담당자와 실제 용도를 확인한 뒤 `Lvl_<기능>_Test` 형태로 개명해 `TestMap`에 넣는다.

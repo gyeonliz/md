@@ -315,7 +315,7 @@ Content/Drone/AI/StateTrees/
 ├─ ST_NPC_HostilePatrol.uasset
 └─ ST_NPC_FriendlyBaseRoutine.uasset
 
-Content/Drone/Maps/
+Content/Drone/Maps/TestMap/
 └─ Lvl_NPCSmartObjectGreybox.umap
 ```
 
@@ -338,9 +338,12 @@ Cooldown·사거리·빈 탄창으로 거절된 발사와 가득 찬 탄창의 R
 Content/Drone/Maps/
 ├─ Lvl_DroneTraining.umap
 ├─ Lvl_DronePrototype.umap
-├─ Lvl_NPCSmartObjectGreybox.umap
 ├─ Lvl_DronePackShowcase.umap
-└─ Lvl_DronePackShowcase_BuiltData.uasset
+├─ Lvl_DronePackShowcase_BuiltData.uasset
+└─ TestMap/
+   ├─ Lvl_DroneTutorialSystemsTest.umap
+   ├─ Lvl_NPCSmartObjectGreybox.umap
+   └─ Lvl_DroneMissionSystemsTest.umap
 ```
 
 ### Tutorial Asset
@@ -681,7 +684,7 @@ TUT-03의 원본 시간·거리·평균 속도와 TUT-04B의 이전 평균·Best
 16. 실제 스피커에서 Drone Loop가 한 겹으로 여러 반복 경계를 이어가며 PIE/Standalone 종료 즉시 멈추는지 확인한다.
 17. AI 기능이 병합된 뒤 Editor를 재시작하고 Smart Objects와 Gameplay Interactions Plugin 활성 상태를 확인한다.
 18. Content Browser에서 생성된 Definition·Station BP 6쌍과 MG Mesh 연결을 확인한다.
-19. `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`을 열고 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 12개(기존 10 + Cover 2)의 위치·방향이 알아보기 쉬운지 확인한다.
+19. `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`을 열고 Rifle 1명·Shotgun 1명·Friendly 2명과 Station 12개(기존 10 + Cover 2)의 위치·방향이 알아보기 쉬운지 확인한다.
 20. Editor에서 `P` 키를 눌러 네 NPC 시작점과 Station 사이에 녹색 NavMesh가 이어지는지 눈으로 확인한다.
 21. Manny/Unarmed 외형은 임시임을 전제로 PIE에서 Hostile 2명이 EnemyPatrol 3개 사이를 반복하는지, 서로 겹치거나 제자리만 다시 고르지 않는지 눈으로 확인한다.
 22. Friendly 2명이 FriendlyBasePatrol 3개와 Ambient 2개 사이를 이동하고 같은 지점에 동시에 머물지 않는지 눈으로 확인한다.
@@ -960,13 +963,17 @@ UDroneGameFlowSubsystem (GameInstance 수명)
 
 | 코드 | 현재 책임 |
 |---|---|
-| `Flow/DroneGameFlowSubsystem.*` | 맵을 넘어 유지되는 상태, Mission/Drone 선택, 중복 요청 거부 |
+| `Flow/DroneGameFlowSubsystem.*` | 맵을 넘어 유지되는 상태, Mission/Drone 선택, 성공 Story Fact와 중복 요청 거부 |
 | `Flow/DroneFrontEndPlayerController.*` | Front-end Root 1개 생성, 선택한 Map을 정확히 한 번 열기 |
 | `UI/DroneFrontEndRootWidget.*` | Opening·Lobby·정적 Briefing 표시와 버튼 입력 |
 | `Flow/DroneMissionGameMode.*` | 선택 전 비-Drone Spectator 사용, 자동 Drone Spawn 방지 |
 | `Flow/DroneMissionPlayerController.*` | 선택 UI, 선택 Definition 한 대 Spawn/Possess, Director·목표·결과 UI 수명주기 |
 | `UI/DroneSelectionWidget.*` | 정찰/FPV/드랍과 쉬운/실제 조작형·안정/균형/고기동 선택 |
-| `Mission/DroneMissionDirector.*` | 출격 뒤 목표 시작, Event Snapshot, 성공/실패 1회 확정 |
+| `Mission/DroneMissionObjectiveTypes.h`, `DroneMissionDefinition.*` | Objective ID·사건·수량·시간·대상 Tag·Story Fact 조건과 성공 Fact 데이터/검증, 기존 문구형 목표 fallback |
+| `Mission/DroneMissionDirector.*` | 출격 뒤 현재 Rule의 Scan/Delivery/Destroy/Lap/Return/Jamming Event·시간 제한·중복 Actor 관리, Snapshot과 성공/실패 1회 확정 |
+| `Mission/DroneMissionReturnZone.*` | BP/맵 배치형 귀환 Box Trigger. 실제 기지 위치·크기와 대상 Tag는 아직 미정 |
+| `Signal/DroneSignalTypes.h`, `DroneSignalComponent.*` | 재밍 Source 중 최대값·단계·신호율·비행 반응/영상 Noise와 Definition 기반 면역. Tick 없음 |
+| `Signal/DroneJammingVolume.*` | BP/맵 배치형 방해 Box와 이탈·명시적 Jammer 해제 Event. 실제 Zone 위치·무력화 방식은 미정 |
 | `Abilities/DroneReconScanComponent.*` | 거리·화각·LOS 유지형 정찰 Scan |
 | `Abilities/DroneImpactDetonationComponent.*` | Arm 뒤 유효 속도 충돌 시 1회 폭발·기체 파괴 |
 | `Abilities/DronePayloadDropComponent.*` | 상단 시점, 투하, 빈 상태의 근접 운반 화물 검색·실제 Actor 부착·재투하, 목표 접촉 결과와 재장전 |
@@ -974,7 +981,9 @@ UDroneGameFlowSubsystem (GameInstance 수명)
 | `UI/DroneMissionObjectiveWidget.*` | Director Event만 구독하는 측면 목표 패널; Tick/Actor 전체 검색 없음 |
 | `UI/DroneMissionResultWidget.*` | 성공/실패, 재도전, 로비 복귀 |
 
-Training Mission의 현재 Greybox 규칙은 `Gate 0→3 Lap 완료=성공`, `Drone Health 0=실패`다. 이는 Vertical Slice 시험 규칙이며 최종 Story Mission 규칙은 현재 미정이다.
+Training Mission의 현재 Greybox 규칙은 저장 Data Asset의 `Objective.TrainingLap` 1회 Lap 완료=성공, `Drone Health 0`=실패다. 이는 Vertical Slice 시험 규칙이며 새 Mission별 목표 수량·대상·귀환 기지와 최종 Story Mission 규칙은 현재 미정이다.
+
+2026-09-16 신호 Greybox는 Mission 후보에 재사용할 기능 기반으로만 추가됐다. Zone 강도에 따른 HUD 경고·강한 단계 기본 비행 속도/가속도 배율·이탈/해제 Rule Event가 코드/자동화 완료다. `VideoNoiseIntensity`와 Blueprint Event는 전달하지만 실제 영상 Noise Material·목표 정보 손실 화면과 새 Story Mission Data Asset/맵 배치는 아직 없다. [재밍 가이드](../gameplay/DRONE_JAMMING_GREYBOX_GUIDE.md)에서 담당 클래스와 Editor 시험을 본다.
 
 ### 현재 UI의 정확한 상태
 

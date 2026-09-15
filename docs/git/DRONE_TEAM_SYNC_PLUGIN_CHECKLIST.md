@@ -90,7 +90,7 @@ git lfs pull upstream main
 2. `Drone.uproject` 우클릭 → `Generate Visual Studio project files`를 실행한다.
 3. `DroneEditor Win64 Development`를 Build한다.
 4. `Drone.uproject`를 열고 Output Log에서 `Plugin failed`, `Failed to load /Script`, `Unknown Class`, `Failed to load package`를 검색한다.
-5. `Lvl_NPCSmartObjectGreybox`, `Lvl_DroneTraining`, `Lvl_MilitaryBase`를 각각 열어 Blueprint·Map 오류를 확인한다.
+5. `TestMap/Lvl_NPCSmartObjectGreybox`, `Lvl_DroneTraining`, `Lvl_MilitaryBase`를 각각 열어 Blueprint·Map 오류를 확인한다.
 
 `Binaries`, `Intermediate`, `Saved`, `DerivedDataCache`는 Git에 공유하지 않는 생성 폴더다. PC별로 내용이 다른 것이 정상이며, 소스 동기화 뒤 컴파일 문제가 있을 때만 Editor를 닫고 해당 생성물을 재생성한다. `Content`, `Config`, `Source`, `Drone.uproject`는 공유 대상이다.
 

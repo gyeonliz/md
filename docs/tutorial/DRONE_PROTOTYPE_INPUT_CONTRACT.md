@@ -1,6 +1,6 @@
 # Drone Prototype 입력 계약
 
-기준일: 2026-08-21 (Asia/Seoul)
+기준일: 2026-09-16 (Asia/Seoul)
 
 이 문서는 구매 에셋 없이 Flight 기능을 시험하기 위한 **확정된 v1 Prototype 조작 계약**이다. Camera 소유와 장치별 역할은 승인됐으며 감도·반전·최종 물리 수치만 Greybox 체감 결과에 따라 조정한다.
 
@@ -27,13 +27,26 @@
 
 전용 Mapping Context 이름은 `IMC_DronePrototype`이고 우선순위는 C++ 기본값 `1`을 사용한다. Keyboard/Mouse에는 별도 Trigger나 Dead Zone을 추가하지 않고 Gamepad Stick에는 기본 `0.2` Dead Zone을 적용한다.
 
+### FPV Rate/Acro의 Mode 2 재해석
+
+같은 Input Action Asset을 유지하되 `Acro Rate Realistic Greybox`에서만 Gamepad 축 의미를 다음처럼 바꾼다. 따라서 별도 Mapping Context가 겹치지 않는다.
+
+| 물리 축 | Acro 역할 | 내부 Action |
+|---|---|---|
+| 왼쪽 Stick Y | Local Up Throttle | `IA_DronePrototype_Move.Y` |
+| 왼쪽 Stick X | Yaw Rate | `IA_DronePrototype_Move.X` |
+| 오른쪽 Stick Y | Pitch Rate | `IA_DronePrototype_CameraPitchRate` |
+| 오른쪽 Stick X | Roll Rate | `IA_DronePrototype_Yaw` |
+
+`RT/LT` Altitude는 개발용 보조 Throttle로 남는다. 키보드·마우스는 전체 Mode 2를 재현하는 입력 장치가 아니므로 최종 FPV 체감 판정은 Gamepad/RC Controller로 한다.
+
 ## 2. 현재 C++과의 연결
 
-- Move의 Y는 `GetActorForwardVector()`, X는 `GetActorRightVector()`에 전달된다.
-- Altitude는 기체 기울기와 무관하게 `FVector::UpVector`에 전달된다.
-- Keyboard/Gamepad Yaw는 Delta Seconds와 `90°/s` 시험 Rate로 Pawn 자체를 회전한다.
+- 쉬운/제한 자세에서 Move의 Y는 `GetActorForwardVector()`, X는 `GetActorRightVector()`에 전달된다. Rate/Acro에서는 같은 축이 왼쪽 Stick Throttle/Yaw가 된다.
+- 쉬운 조작 Altitude는 `FVector::UpVector`, 제한 자세와 Rate/Acro는 `GetActorUpVector()`를 사용한다.
+- 쉬운/제한 자세의 Keyboard/Gamepad Yaw는 기존 Yaw Rate로 Pawn을 회전한다. Rate/Acro에서는 Gamepad 오른쪽 X가 Roll Rate가 된다.
 - Mouse X는 입력 Delta에 감도를 적용해 Pawn Yaw를 직접 회전한다.
-- Mouse Y와 Gamepad Right Y는 SpringArm의 상대 Pitch만 `-70°~20°` 범위에서 조정한다.
+- 쉬운/제한 자세의 Gamepad Right Y는 SpringArm Pitch, Rate/Acro에서는 Pitch Rate다. Mouse Y는 개발용 CameraBoom Pitch를 유지한다.
 - SpringArm은 Controller Rotation을 사용하지 않고 Drone Actor Yaw를 따라간다.
 - Blueprint Event Graph에서는 Mapping Context 추가나 동일 Action 재바인딩을 하지 않는다. `ADronePrototypePawn::PawnClientRestart()`가 자기 Context만 한 번 등록하고 수명주기에 맞춰 제거한다.
 
@@ -54,15 +67,15 @@ Editor lifecycle을 포함한 새 PIE 3회 자동화와 별도 수동 화면 확
 
 - 최종 키 배치와 사용자 재매핑
 - Mouse Y 반전 기본값과 Look 감도
-- Gamepad Stick 감도와 Response Curve
+- Gamepad/RC Controller의 Rate/Acro 중앙 감도·Expo 최종값
 - 범용 조종기 입력
 - 최종 비행 물리와 자동 수평 유지
 - 멀티플레이 입력·이동 권한 구조
 
 ## 6. 현재 검증 상태
 
-- 자산 재로드 검증에서 6개 Action의 Value Type과 IMC의 16개 Mapping·Modifier 순서, `ToggleView/P` 단일 연결을 확인했다.
-- Mouse X Drone Yaw, Mouse Y CameraBoom Pitch, Gamepad 6축과 P의 `Started` 단일 Binding을 포함한 lifecycle 자동화가 새 PIE 3회를 통과했다.
+- 현재 IMC는 역할 기능과 시점 전환을 포함해 21개 Mapping을 사용한다. Action Asset 자체는 모드 전환 때 교체하지 않는다.
+- Rate/Acro의 연속 축은 `Triggered + Completed + Canceled`를 묶어 Stick 해제 뒤 Pitch/Roll/Yaw 입력이 0으로 돌아가게 한다.
 - 최신 Prototype Automation Report는 5/5 성공이며 빈 시험 World의 기존 Recast 경고만 남는다.
 - 사전 부분 확인 두 번은 모두 전체 조건을 끝내지 않아 Pass로 산정하지 않았다.
 - PFN-06 자동화 3/3과 Standalone Keyboard·Mouse 수동 조작, 창 닫기 정상 종료가 통과해 Done이다. 실제 Gamepad 체감은 장치 연결 여부 미보고로 미확인이다. 정식 판정은 [`DRONE_PROTOTYPE_PIE_CHECKLIST.md`](DRONE_PROTOTYPE_PIE_CHECKLIST.md)를 따른다.

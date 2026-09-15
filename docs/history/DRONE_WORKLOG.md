@@ -1393,3 +1393,74 @@ HeadingValueText
 - 이동된 문서의 상대 링크를 새 위치에 맞게 일괄 보정했다. 전체 Markdown 51개를 검사한 결과 존재하지 않는 로컬 `.md` 링크는 0개다.
 - Unreal 저장소와 Asset은 변경하지 않았다. 문서 이동·요약·링크 수정만 문서 저장소의 로컬 변경으로 남기며 Commit과 Push는 사용자가 처리한다.
 - 이후 진행 보고는 새 Markdown 파일을 늘리지 않고 루트 `STATUS.md`, `WORKBOARD.md`와 이 Worklog에 갱신한다. 완료된 일회성 보고서만 `history`로 옮긴다.
+
+## 2026-09-15 — 이 PC 최신 빌드·Mission 목표 Rule Vertical Slice 준비
+
+- 원격 재조회 때 Unreal `8b9b2a8`, 문서 `3e89e43`의 `main=origin/main`을 확인했고 두 저장소에 Stash는 없었다. 이후 작업은 로컬 수정으로만 남기고 Commit·Push하지 않았다.
+- 첫 비파괴 TestMap Validate는 `RoleTest_PayloadTarget`이 없다는 메시지로 실패했다. 로그에는 역할 표적 Blueprint가 `/Script/Drone` C++ 부모를 못 읽는 경고가 있었고, 로컬 `UnrealEditor-Drone.dll`은 9월 8일 빌드라 최신 Source보다 오래됐다. 맵을 재구성하지 않고 최신 `DroneEditor`로 재빌드한 뒤 같은 Validate가 `rings=5/targets=3/carryable=1`, Map Check 오류·경고 0으로 성공했다.
+- `FDroneMissionObjectiveRule`에 목표 ID·설명·사건 종류·필요 수량·제한 시간·Actor Tag 대상 ID를 추가했다. 새 Rule 배열이 비어 있으면 기존 `InitialObjectives` 문구형 1회 목표를 사용하므로 레거시 Data Asset을 깨지 않는다. ID 중복·0 수량·음수/비정상 시간 값을 거부한다.
+- Director는 현재 Rule과 일치하는 Scan 완료, 의도된 Payload 적중, 맵 시작 시점 Health 대상 사망, Training Lap, 명시적 Return Event만 진행한다. 같은 Actor는 목표당 한 번만 세고, 목표별 제한 시간은 Tick 대신 TimerManager로 만료 시 Failure를 보고하며 전환·종료에 정리한다. 목표 Event·TargetId·수량·제한값이 Snapshot으로 HUD에 전달된다.
+- Blueprint 배치형 `DroneMissionReturnZone` Box Trigger를 추가했다. 플레이어가 실제 출격한 Drone의 Overlap만 Director에 Return Event로 보고한다. 최종 기지 위치·크기는 미정이므로 Production 맵과 TestMap 어디에도 자동 배치하지 않았다.
+- `ConfigureDroneTutorialMissionObjectiveRule.py`는 저장 `DA_Mission_Tutorial_Training`의 Mission ID와 기존 목표가 정확히 하나인지 확인한 뒤 같은 문구를 `Objective.TrainingLap` Rule로 이행했다. `DRONE_MISSION_RULE|SAVED`를 확인했고 해당 `.uasset`은 Git LFS 대상이다. 팀원 `/Game/Drone/Maps/Lvl_DroneTraining` `.umap`은 변경하지 않았다.
+- MSVC 14.51.36256 `DroneEditor Win64 Development` 두 번 모두 Build 성공. 새 `Drone.Mission.ObjectiveRules`는 잘못된 Event/Tag, Actor 중복, 두 Scan→Delivery→Return→Success, 종료 후 Event 거부와 귀환 Zone 기본 Box 계약을 검증한다. 최종 회귀에서 이 테스트와 `Drone.Flow.Contract`, `MissionEntryContract`, `TrainingGateSequence`, `TutorialSystemsTestMap`이 5/5 Success·Exit 0이었다.
+- 실제 역할 기능의 연쇄 PIE, 귀환 Zone의 맵 배치·Overlap, 제한 시간 만료 화면과 TestMap/AI 수동 화면 검증은 미완료다. 새 Data Asset/맵의 최종 목표 규칙을 임의로 확정하지 않는다. 설정과 문제 확인법은 [`DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md`](../gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md)에 기록했다.
+- 최종 로컬 Unreal·문서 `git diff --check`는 모두 종료 코드 0이다. 표출된 LF→CRLF 메시지는 줄바꿈 안내다. Unreal·문서 저장소의 HEAD는 각 `origin/main`과 같지만 작업 트리는 새 Source/Data Asset/가이드가 미커밋으로 남았다.
+
+## 2026-09-16 — 재밍 신호 Greybox·Mission 사건 연결
+
+- 로컬 기획의 첫 Story Mission은 구급품 전달·정찰·재밍 회피·적 기지 침투 후보로 확인했다. Figma 링크는 현재 읽기 연결이 없어서 실제 화면/최종 목표는 확인하지 못했다. Figma 연결 옵션을 제안했지만 설치·연결하거나 내용을 수정하지 않았다. 후보를 확정 Mission Data Asset으로 만들지 않았다.
+- `UDroneSignalComponent`와 `ADroneJammingVolume`을 추가했다. Overlap 기반 여러 방해 Source 중 최대 강도를 써 `None/Weak/Moderate/Strong` 신호 단계와 HUD 경고를 계산한다. Tick·무작위 입력 손실을 사용하지 않고 강한 단계에서 기본 비행 튜닝의 최대 속도/가속도에 0.70 Greybox 배율을 적용해 Zone 이탈·해제 뒤 복원한다.
+- Flight HUD에 신호율·단계 경고와 Blueprint `VideoNoiseIntensity` Snapshot Event를 추가했다. 실제 영상 Noise Material이나 목표 정보 일부 숨김은 아직 구현하지 않았다. `Jamming Exited`·`Jammer Disabled` Mission Rule 사건은 현재 목표/Actor Tag가 맞을 때만 진행한다.
+- 초기 재밍 회귀에서는 `Drone.Signal.StageContract`는 성공했으나 `Drone.Mission.ObjectiveRules`의 Jammer 해제 자동 진입이 실패했다. 사건을 Director에 직접 보고하면 통과하고 Blueprint Delegate 구독만 Editor World 자동화에서 호출되지 않는 것을 확인해, 게임 규칙 연결은 Zone의 C++ Native Event로 변경하고 BP Event는 연출용으로 유지했다. 진단용 수동 보고와 로그는 최종 코드에서 제거했다.
+- 최신 `DroneEditor Win64 Development` Build 성공, `Drone.Signal.StageContract`, `Drone.Mission.ObjectiveRules`, `Drone.UI.FlightHUDTelemetryBinding` 신호 경고/복원, Flow 2개, Tutorial 2개 묶음 7/7 `Success`·Exit 0. 비활성 Zone의 BeginPlay 사전 Overlap에서도 신호 Source를 제거하도록 방어했다. 실제 맵에 귀환/재밍 Zone을 배치한 PIE, Drone 비행 체감과 HUD 영상 표현은 아직 수동 확인 전이다. 팀원 Training과 TestMap `.umap`은 수정하지 않았고 Commit·Push도 하지 않았다.
+- 팀원 배치 절차·기본 수치·실제/미구현 경계는 [`DRONE_JAMMING_GREYBOX_GUIDE.md`](../gameplay/DRONE_JAMMING_GREYBOX_GUIDE.md)에 기록했다.
+
+## 2026-09-16 — Figma 4개 Mission 대조·양쪽 Story 분기·광섬유 면역
+
+- 새로 연결된 Figma `Project:Droner`의 node `1:3`, `46:3`, `49:2`, `53:10`, `273:73`, `282:105`, `283:136`을 읽기 전용으로 확인했다. 원본은 수정하지 않았다. `골든 타임`, `인터셉트`, `베일 브레이커`, `엔드게임`과 Drop/FPV/광섬유/UGV/장거리 타격 역할, Tutorial 요구를 현재 코드와 대조했다.
+- 같은 Figma 파일에서 차량은 미끼이고 오마르는 Mission 3에서 처리된다는 전체 설명과, Mission 2 차량에 탑승했다고 전제하고 Mission 3 시작 전에 이미 처리됐다는 개별 화면 문구가 충돌했다. 사용자 요청대로 한쪽을 삭제하지 않고 둘 다 데이터로 설정 가능하게 했다.
+- Mission Definition에 성공 시 추가/제거할 Story Fact, Objective Rule에 `Always/FactPresent/FactAbsent` 조건과 Fact ID를 추가했다. Game Flow Snapshot은 Fact를 GameInstance 동안 보존하며 성공 전환과 함께 한 번에 적용한다. Mission Director는 현재 Fact가 맞는 목표만 실행 목록에 포함한다.
+- `Story.TargetStillAtLarge` 분기는 Mission 3의 표적 처리 목표를 포함하고, `Story.TargetEliminated` 분기는 그 목표를 제외하고 이미 처리된 후속 목표를 포함하는 경로를 자동화에서 각각 실행했다. 동일 Fact 추가/제거, 빈/중복 ID와 잘못된 조건은 Definition 검증 경계로 관리한다. 실제 Mission 2/3 Data Asset 기본안은 사용자 결정 전 만들지 않았다.
+- Figma의 광섬유 Drone `재밍에 면역` 요구를 기존 `EDroneGameplayCapability::JammingImmunity`에 연결했다. Definition의 **Implemented** 목록에 들어간 기체만 활성 재밍 Source를 무시하고, 면역 해제 시 아직 겹친 Source의 가장 강한 단계가 즉시 돌아온다. 광섬유 Drone Definition/Pawn이 없으므로 기존 세 기체에는 면역을 부여하지 않았다.
+- `DroneEditor Win64 Development` 전체 Build 성공. `Drone.Mission.ObjectiveRules`, `Drone.Prototype.FlightProfiles`, `Drone.Signal.StageContract`, UI/Flow/Tutorial을 포함한 회귀 8/8 `Success`·Exit 0. 팀원 Training/TestMap `.umap`, Figma 원본, Git Commit/Push는 변경하지 않았다.
+- Figma 요구와 구현/미구현·충돌·순서를 [`DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md`](../planning/DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md)에 정리했다. 추가 Figma 상세 읽기는 연결에서 재인증을 요구해 중단했고, 이미 확인된 node 내용만 기록했다.
+
+## 2026-09-16 — AI 시험 맵 이동·Mission/Signal 통합 시험 맵
+
+- Unreal AssetTools로 `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`를 `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`로 이동했다. 이동 직후 같은 Python 프로세스에서 World를 다시 열어 Python 참조가 GC를 막는 실패가 한 번 발생했지만 실제 AssetTools 이동은 저장됐다. 이동 도구를 에셋 레지스트리 검증까지만 담당하도록 고쳐 재실행했고 정상 종료를 확인했다.
+- C++ 자동화와 자동포탑 배치 도구의 고정 맵 경로를 새 위치로 바꿨다. Production `Lvl_DroneTraining`, 용도 미확인 `test1`·`test2`, 나머지 이동 후보 맵은 변경하지 않았다.
+- `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest`를 새로 만들었다. 충돌 없는 위치 표식, 35%/80% 겹침 Jammer, `Test.Mission.ReturnZone` Tag의 Return Box, Recon/Impact/Payload 표적 각 1개, Carryable 1개와 Prototype GameMode를 배치했다.
+- 생성 도구는 기존 맵에서 Validate-only이고 명시적 `Rebuild` 때 `DroneMissionSystemsTest.Owned` Actor 14개만 다시 만든다. 저장 Map Check는 `0 errors / 0 warnings`다.
+- `DroneEditor Win64 Development` 빌드 성공. 이동된 AI 맵의 `NPCGreyboxAssets`, `NPCGreyboxPIE`, `NPCPerceptionSearchPIE`, 새 `MissionSystemsTestMap`, `ObjectiveRules`, `Signal.StageContract` 최종 회귀는 6/6 Success·경고 0이다. 자동포탑 배치 도구의 새 경로 Validate-only도 설치형/차량형 각 1기, 차량 Attach, 4점 Suspension, 노면 5개 계약으로 통과했다.
+- 새 맵을 바로 Play하면 비행·Signal HUD·역할 기능은 볼 수 있지만 Prototype GameMode이므로 Return/Jammer Mission 목표 완료까지는 실행하지 않는다. 다음은 Test Mission DA와 개발용 진입 경로를 추가해 실제 Mission Director 연쇄를 확인하는 작업이다.
+- 사용법과 다음 경계는 [`DRONE_TEST_MAP_GUIDE.md`](../gameplay/DRONE_TEST_MAP_GUIDE.md)에 정리했다. Commit·Push는 하지 않았다.
+
+## 2026-09-16 — 추가 Shotgun NPC·독립 사격 시험 맵
+
+- 기존 `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`에 NPC를 더 넣으면 순찰·MG/Cover 점유 경쟁과 기존 4-NPC 자동화 시간이 바뀌므로, 기존 Rifle 1·Shotgun 1·Friendly 2는 그대로 유지했다.
+- `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest`를 새로 만들고 `BP_NPC_Hostile_Shotgun` 1명을 추가 배치했다. 약 9m 정면 PlayerStart, 5/10/15m 표식, 독립 Navigation Floor/Bounds와 옆 LOS 차단벽을 두었다. Production `Lvl_DroneTraining`은 열거나 저장하지 않았다.
+- 역할 BP가 실제 Gun Mesh를 별도 Component로 쓰면서 부모의 교체용 `WeaponVisualComponent`를 비워 두어 Map Check 경고가 났다. 역할 BP 원본 구조를 바꾸지 않고 이 시험 맵 인스턴스에서만 보이지 않는 Engine Mesh를 채워 실제 Gun 외형을 유지했고, 최종 Map Check는 `0 errors / 0 warnings`다.
+- 기본 Projectile Shotgun에서도 8개 Pellet의 예상 비행선을 Cyan으로 표시한다. 실제 충돌·피해는 이동 Projectile이 담당한다. Blueprint에서 표시를 켜고 끄며 직전 Pellet 끝점 배열을 읽는 API도 추가했다.
+- `Drone.AI.ShotgunSystemsTestMap`과 `Drone.AI.ShotgunSystemsTestMapPIE`는 전용 NPC/Profile/GameMode/Nav 배치, 실제 감지, 8 Projectile 생성, Shell 소모, 6° 원뿔과 독립 방향을 검증했고 최종 `2/2 Success`, 경고 0이다. `WeaponContract`, `ShotgunTrace`, `ProjectileBallistics`까지 묶은 전체 샷건 계약은 `5/5 Success`, 실패 0이었다. `ShotgunTrace`는 탄창 비움과 명시적 재장전도 확인한다.
+- 기존 Smart Object 맵의 Rifle 1·Shotgun 1·Friendly 2와 Asset 계약은 별도 `Drone.AI.NPCGreyboxAssets` 재실행 `1/1 Success`, 경고 0으로 영향 없음을 확인했다.
+- 빌드와 생성/검증 도구 사용법은 [`DRONE_TEST_MAP_GUIDE.md`](../gameplay/DRONE_TEST_MAP_GUIDE.md)에 갱신했다. 기본값은 기능 검증용 Greybox이며 최종 밸런스가 아니다. Commit·Push는 하지 않았다.
+
+## 2026-09-16 — FPV Rate/Acro 조작과 바람·비 기획
+
+- 기존 `Assisted Easy`와 제한 자세 `Manual Realistic Greybox`를 유지한 채 세 번째 `Acro Rate Realistic Greybox`를 추가했다. 오른쪽 Stick Pitch/Roll과 Yaw 입력을 Betaflight Actual Rates 의미의 Body 각속도로 변환하며, Stick 중앙에서 자동 수평 복귀하지 않고 Root Local Rotation을 누적해 Roll/Loop가 가능하다.
+- FPV Definition만 갱신하는 안전한 Python 도구를 추가해 다른 Mission Data Asset을 다시 저장하지 않았다. FPV 기본값은 Rate/Acro+Agile이고 공개 민간 FPV 참고선으로 Runtime 수평 27m/s, World Z 9m/s, Pitch/Roll 650°/s, Yaw 400°/s를 적용했다. 특정 군용 기체의 성능이나 완전한 모터/PID 물리로 표현하지 않는다.
+- `FDroneAcroRateSettings`를 Flight Profile에 노출해 중앙 감도, 축별 최대 Rate, Expo, 수직 속도를 Data Asset/Blueprint에서 조정할 수 있게 했다. 조작 버튼은 쉬운 조작→제한 자세→Rate/Acro 순환으로 갱신했다.
+- MSVC 14.51.36256 `DroneEditor Win64 Development` Build 성공. `Drone.Prototype.FlightProfiles`, 3회 PIE 입력·Binding 수명주기의 `Drone.Prototype.PIEInputLifecycle`, `Drone.Flow.MissionEntryContract`, `Drone.Flow.MissionEntryPIE`, `Drone.Prototype.RoleAbilities` 모두 Success·Exit 0이다.
+- 바람 지속풍/돌풍/난류/고도 반응과 비 강도/시야/젖음/Splash/실내 감쇠 변수, Weather Subsystem/Volume 책임, Camera-follow GPU Niagara·Effect Type Scalability·저빈도 실내 Trace·MPC Wetness·비입자 Collision 제한을 [`DRONE_WEATHER_WIND_RAIN_PLAN.md`](../gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md)에 정리했다. 기상 Runtime과 Niagara Asset은 아직 구현하지 않았다.
+- Production `Lvl_DroneTraining`과 Figma 원본은 수정하지 않았고 Commit·Push하지 않았다.
+
+## 2026-09-16 — 기상 데이터 계약·지속풍/돌풍 Vertical Slice
+
+- `UDroneWeatherProfile`, `FDroneWeatherSnapshot`, `UDroneWeatherWorldSubsystem`을 추가했다. Profile 기본 10Hz Timer와 고정 Seed로 지속풍·돌풍·풍향 흔들림·수직 기류를 계산하고, 0~60초 Profile 전환을 하나의 World Snapshot으로 전달한다.
+- 배치형 `ADroneWeatherController`가 BeginPlay에 Profile을 적용한다. World 기상과 Level 연결을 분리해 Mission이나 TestMap이 같은 C++ 계약을 재사용한다.
+- 모든 `ADronePrototypePawn`에 `UDroneWeatherResponseComponent`를 기본 부착했다. 쉬운 조작 65%, 제한 자세 25%, Rate/Acro 0% 기본 보정 뒤 Sweep 위치 Drift를 적용하고 바람이 없으면 Component Tick을 끈다. 현재 `UFloatingPawnMovement` 위 Greybox이며 모터·PID·공기역학 최종 구현이 아니다.
+- `/Game/Drone/Data/Weather`에 `DA_Weather_Clear`, `DA_Weather_LightWind`, `DA_Weather_RainStorm_Greybox`를 만들었다. 폭우 Profile의 최대 수평풍 약 10.7m/s는 공개 민간 FPV 참고선이고 최종 내풍 한계가 아니다.
+- `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`를 새로 만들었다. `LightWind` Controller 1개, 35° 풍향 화살표, 바닥·PlayerStart·조명과 Prototype GameMode만 둔 독립 맵이며 Map Check `0 errors / 0 warnings`다. Production Training 맵은 열거나 저장하지 않았다.
+- `DroneEditor Win64 Development` Build가 성공했다. `Drone.Weather.ProfileAndWindContract`, `Drone.Weather.ProfileAssets`, `Drone.Weather.SystemsTestMap`은 3/3 Success·Exit 0이고 `Drone.Prototype.PawnDefaults` 회귀도 Success·Exit 0이다.
+- 비 강도·생성량·시야·화면 물방울·젖음·Splash·실내 감쇠·Audio 값은 Snapshot에 포함됐지만 Niagara/MPC/Audio 표현은 아직 없다. 비가 체력·신호·Mission 규칙을 자동으로 바꾸지 않는다. 다음 구현은 Camera-follow GPU Rain과 성능 측정이다.
+- Commit·Push는 하지 않았다.

@@ -133,12 +133,16 @@ Tutorial UI 표시 항목:
 
 Story Mission은 로비에서 직접 선택한다. 사람 조작과 NPC 대화 수령은 포함하지 않는다.
 
-첫 Mission 후보:
+2026-09-16 Figma 읽기 전용 확인 기준으로 Story Mission 화면은 `골든 타임`, `인터셉트`, `베일 브레이커`, `엔드게임` 4개다. 실제 저장 Mission Definition/Map은 아직 없으며, 같은 Figma 파일 안의 Mission 2→3 스토리 문구 충돌은 양쪽을 지원하는 데이터 분기로 남겼다.
 
-- 구급품 전달: 고립 지역 또는 마을의 지정 지점으로 보급품 운반
-- 정찰: 표적 지역에 접근해 정보 획득 후 귀환
-- 재밍 회피: 신호 방해 구역을 우회하거나 Jammer를 해제
-- 적 기지 침투: Patrol·Cover·Rifle/Shotgun·MG 대응을 피해 목표 달성
+| Figma Mission | 재사용 가능한 공통 기능 | 아직 필요한 결정·연결 |
+|---|---|---|
+| 1 골든 타임 | Payload 픽업·드랍, 의도된 표적 적중 `Payload Delivered`, Actor Tag·시간 제한·귀환 | 사막 마을 Map/DA, 부상 요원·구급품·정보 회수 대상, 그물/Line 실패 |
+| 2 인터셉트 | FPV Arm/충돌 자폭, 대상 파괴, 시간 제한, 차량·차량형 자동포탑 | 이동 차량/Route·기지 도착 실패, 잔해 Scan, Mission 2→3 기본 Story Fact 선택 |
+| 3 베일 브레이커 | 재밍 단계/HUD/강한 둔화, 광섬유 면역 Capability, Jammer 해제, AI/MG/자동포탑 | 광섬유/UGV Pawn, 한 Mission 내 기체 교대, 산악 기지 Map/DA, 방공망 대상 |
+| 4 엔드게임 | 순차 목표 Rule, Target Destroyed, AI·포탑 기반, 결과 Flow | 본진 Map/DA, 모든 기체 교대, 장거리 타격/엔딩 Sequence |
+
+현재 저장된 Mission Definition은 Training Vertical Slice 하나다. 상세 Figma node와 충돌·작업 순서는 [Figma Mission 구현 매트릭스](DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md), 코드·배치는 [Mission 목표 Rule 가이드](../gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md)와 [재밍 Greybox 가이드](../gameplay/DRONE_JAMMING_GREYBOX_GUIDE.md)를 본다.
 
 Mission 공통 상태 후보:
 
@@ -287,7 +291,8 @@ ADroneMissionDirector
 | `Lvl_DroneFrontEnd` | 게임 시작·정적 Opening·로비·Mission 선택·Briefing | FLOW-01~08 로컬 구현·새 실행 3회 자동 PIE 통과 |
 | `Lvl_DronePrototype` | 입력·Collision 단위 시험 | 구현됨 |
 | `Lvl_DroneTraining` | 첫 Tutorial Mission Vertical Slice | 구현됨·두 Lap 수동 확인 대기 |
-| `Lvl_NPCSmartObjectGreybox` | AI·Smart Object·전투 시험 | 구현됨·방향 수동 확인 대기 |
+| `TestMap/Lvl_NPCSmartObjectGreybox` | AI·Smart Object·전투 시험 | 이동·자동화 완료, 방향 수동 확인 대기 |
+| `TestMap/Lvl_DroneMissionSystemsTest` | 재밍·귀환·역할 Event 시험 | 배치·Map Check 완료, Mission Flow PIE 대기 |
 | `Lvl_MilitaryCamp` | 소규모 기지 침투/정찰 | 이식됨·채택 검토 대기 |
 | `Lvl_MilitaryBase` | 강·도로를 포함한 대형 기지 Mission | 이식됨·채택 검토 대기 |
 | `Lvl_Battlefield` | 전투·재밍 Mission 후보 | 이식됨·채택 검토 대기 |

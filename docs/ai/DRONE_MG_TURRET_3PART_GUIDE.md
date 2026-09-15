@@ -87,7 +87,7 @@ StationRoot
 
 ## 5. 수동 확인
 
-`/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`에서 다음 순서로 본다.
+`/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`에서 다음 순서로 본다.
 
 1. Rifle Hostile이 MG에 도착한 뒤 초록 Operator Anchor 위치에 붙는지 확인한다.
 2. 원기둥이 정확히 세 개이고 다른 Patrol·Ambient·Cover Station에는 원기둥 포탑이 생기지 않았는지 본다.

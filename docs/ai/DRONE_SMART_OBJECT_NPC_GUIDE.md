@@ -14,7 +14,7 @@ Smart Object는 하나의 파일만 고치는 기능이 아니다. **장소**, *
 
 | 바꾸려는 내용 | 수정 위치 | 조정 방법 |
 |---|---|---|
-| 지점의 월드 위치·방향 | `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox` 또는 적용할 실제 맵 | 배치된 `BP_SO_*` Actor를 이동·회전한다. Cyan 화살표 `+X`가 NPC 도착 방향이다 |
+| 지점의 월드 위치·방향 | `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox` 또는 적용할 실제 맵 | 배치된 `BP_SO_*` Actor를 이동·회전한다. Cyan 화살표 `+X`가 NPC 도착 방향이다 |
 | Mesh와 NPC 대기 위치 사이 Offset | `/Game/Drone/AI/SmartObjects/Blueprints/BP_SO_*` | Blueprint Viewport에서 상속된 `SmartObjectComponent`의 상대 Location·Rotation을 조정한다. `SlotFacingPreview`가 같이 움직인다 |
 | Slot 수·Activity Tag·Behavior | `/Game/Drone/AI/SmartObjects/Definitions/SO_Def_*` | Definition Editor의 Slots에서 수정한다. 현재 프로젝트 계약은 역할별 Slot 1개·Activity Tag 1개다 |
 | 역할·Definition·MG 외형 연결 | `/Game/Drone/AI/SmartObjects/Blueprints/BP_SO_*` | Class Defaults의 `Activity`, Smart Object Definition을 맞춘다. MG는 상속된 Base/Body/Barrel Static Mesh 3개의 Asset·Transform만 교체한다 |
@@ -132,6 +132,8 @@ Smart Object는 NPC를 생성하는 장치가 아니다.
 - `bCanUseMGTurret`: 적 NPC가 드론 발견 뒤 MG 후보를 검색할 수 있는지
 
 `UDroneNPCWeaponComponent`가 Rifle·Shotgun 공통 `CanFire/StartFire/StopFire/Reload`와 Target Actor·Aim Point를 관리한다. Controller의 `UsesRifle()`과 `UsesShotgun()`은 분류 API로 남기되, AI 발사 요청은 같은 경로를 사용한다. Rifle은 4,000cm·0.25초·발당 10 Damage·30발 탄창, Shotgun은 1,600cm·0.9초·8 Pellet·6도 반각·적중 Pellet당 8 Damage·8발 탄창을 Greybox 기본값으로 사용한다. Volley 한 번은 Pellet 수와 무관하게 Shell 한 발만 소모한다. 예비 탄약·재장전 시간과 최종 밸런스는 아직 미정이다.
+
+추가 Shotgun NPC의 사격만 빠르게 볼 때는 `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest`를 사용한다. 기존 Smart Object 맵의 Rifle 1·Shotgun 1·Friendly 2 구성은 유지된다. 전용 맵은 약 9m 정면에서 감지와 8개 이동 Projectile 생성을 시작하고 Cyan 선으로 직전 산탄 원뿔을 표시한다. `Set Shotgun Debug Trace Enabled`와 `Get Last Shotgun Pellet Endpoints`는 Blueprint 시험 HUD/장치에서도 사용할 수 있다. 상세 절차는 [`DRONE_TEST_MAP_GUIDE.md`](../gameplay/DRONE_TEST_MAP_GUIDE.md)를 따른다.
 
 ### Smart Object Activity
 
@@ -353,7 +355,7 @@ Controller의 엔진 자동 시작은 꺼져 있고 C++가 Profile에 맞는 Ass
 
 ### 현재 Greybox 맵
 
-전용 맵은 `/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox`다.
+전용 맵은 `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`다.
 
 - Hostile Rifle 1명, Hostile Shotgun 1명, Friendly Base 2명
 - EnemyPatrol 3개, Guard 1개, MGTurret 1개
