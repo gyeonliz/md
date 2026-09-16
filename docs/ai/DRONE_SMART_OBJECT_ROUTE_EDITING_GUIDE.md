@@ -126,6 +126,20 @@ StateTree를 열고 해당 Task를 선택하면 Details에서 `AcceptanceRadius`
 
 StateTree 구조를 바꾸면 저장만 하지 말고 Compile 성공과 자동화 검증까지 수행한다.
 
+### 상태가 빠르게 왕복할 때
+
+`ADroneNPCAIController`에는 공통 `Minimum Response State Duration Seconds`가 있고 기본값은 `1.0초`다. MG·Cover 이동/사용 중 예약이나 사격 시작이 한 프레임 실패하면 즉시 다른 상태로 넘어가지 않고, 이 시간 동안 현재 상태에서 다음을 다시 점검한다.
+
+- `DroneDetected`: 개인화기 사격이 꺼졌으면 다시 시작
+- `MoveToMGTurret`, `MoveToCover`: Drone 감지와 Slot 예약이 아직 유효한지 확인
+- `Hold/UseMGTurret`: 점유 시작 또는 포탑 조준·사격을 재시도
+- `UseCover`: Occupied 상태와 개인화기 사격을 재확인
+- `Search`: 마지막 감지 위치가 유효한지 확인
+
+최소시간이 지난 뒤에도 조건이 회복되지 않았을 때만 기존 StateTree 실패 Transition을 따른다. 사망, Drone 파괴, `DroneSightLossGracePeriod` 뒤 확정된 Lost는 자원 정리가 우선이므로 최소시간을 기다리지 않는다.
+
+이 값은 상태 왕복을 가리기 위해 크게 올리는 용도가 아니다. 기본 `1.0초`를 기준으로 먼저 NavMesh, Slot 예약, 탄약/표적 유효성 문제를 고치고, 필요할 때만 Controller Blueprint에서 `Drone > AI > State Stability`를 조정한다. `0`은 안정화 대기를 끈다.
+
 ## 8. Editor에서 빠르게 확인할 항목
 
 1. `P`: 녹색 NavMesh가 NPC 시작점과 모든 목적지에 이어지는가.

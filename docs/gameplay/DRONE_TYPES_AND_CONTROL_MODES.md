@@ -56,10 +56,10 @@
 - Betaflight Rate/Acro와 같이 Pitch/Roll/Yaw 스틱을 이동 방향이 아닌 **기체 Body 각속도 명령**으로 해석한다.
 - 스틱을 중앙으로 돌려도 자동 수평 복귀하지 않고 현재 자세를 유지한다.
 - Pitch/Roll에 고정 각도 제한이 없어 Roll과 Loop가 가능하다.
-- Altitude 입력은 Mode 2 조종기의 Throttle 역할을 하며 기울어진 기체의 Local Up 방향으로 추진한다.
+- Throttle 중립은 수평 자세에서 중력을 상쇄하는 호버, 위 입력은 추가 추력, 아래 입력은 추력 감소로 해석한다. 추력은 기울어진 기체의 Local Up 방향으로 적용되어 W로 기수를 숙이면 전진력이 생긴다.
 - 오른쪽 스틱: Pitch/Roll, 왼쪽 세로: Throttle, 왼쪽 가로: Yaw라는 Mode 2 계약으로 연결한다.
-- 키보드·마우스는 개발용 대체 입력이며 실제 조종기 체감 검증은 Gamepad 또는 RC Controller 축으로 한다.
-- 현재 이동 기반은 여전히 `UFloatingPawnMovement`다. 모터별 RPM, 중력-양력 평형, PID, 프로펠러 추력, 기체 질량과 공기저항을 푼 완전한 비행 시뮬레이터는 아니다.
+- 키보드도 네 Acro 축을 모두 제공하며, Gamepad/RC Controller는 표준 Mode 2 배치를 유지한다. 장치별 입력을 공용 Move Action에서 재해석하지 않고 전용 Axis1D Action 네 개로 분리한다.
+- 현재 v1은 World 중력, 호버 스로틀, Body Up 추력, 속도 비례 선형 항력, Body Rate 응답 시간을 계산한다. 이동 기반은 여전히 `UFloatingPawnMovement`이며 모터별 RPM, PID, 프로펠러 공력, 질량·관성 텐서를 푼 완전한 비행 시뮬레이터는 아니다.
 
 #### 현재 Rate/Acro 입력표
 
@@ -67,15 +67,15 @@ Rate/Acro는 Front-end Drone 선택 화면에서 FPV 기체를 고르면 기본 
 
 | 기능 | 키보드·마우스 | Gamepad Mode 2 | 비고 |
 |---|---|---|---|
-| Throttle / Local Up 추진 | `W/S`, 보조 `Space/Left Ctrl` | 왼쪽 Stick Y, 보조 RT/LT | 기체가 기울면 World Z가 아니라 기체 Up 방향으로 추진 |
-| Yaw | `A/D` | 왼쪽 Stick X | 왼쪽/오른쪽 선회 |
-| Roll | `Q/E` | 오른쪽 Stick X | 기체 좌/우 회전, 90° 제한 없음 |
-| Pitch | 키보드 전용 키 없음 | 오른쪽 Stick Y | Loop는 현재 Gamepad/RC Controller로 시험 |
+| Throttle / Local Up 추진 | `Space/Left Ctrl` | 왼쪽 Stick Y | 중립=호버, Space=추력 증가, Ctrl=추력 감소. 기울면 Body Up 방향으로 추진 |
+| Yaw | `Q/E` | 왼쪽 Stick X | 왼쪽/오른쪽 선회 |
+| Roll | `A/D` | 오른쪽 Stick X | 기체 좌/우 회전, 90° 제한 없음 |
+| Pitch | `W/S` | 오른쪽 Stick Y | W는 Nose-down/전진 방향 Pitch, S는 Nose-up/후진 방향 Pitch |
 | Mouse Look | Mouse X: 기체 Yaw, Mouse Y: Camera Pitch | 해당 없음 | Rate 스틱이 아닌 개발용 직접 회전/카메라 입력 |
 | 1인칭/3인칭 | `P` | Y/Triangle | 임시 시점 전환 |
 | 역할 Primary/Secondary | 좌/우 클릭 | RB/LB | 정찰·자폭·투하 역할 기능 |
 
-키보드만으로는 Body Pitch 축이 없어서 완전한 Acro Loop 시험이 불가능하다. 실제 Rate 체감은 Gamepad/RC Controller를 기준으로 하고, 키보드 Pitch가 필요하면 `IA_CameraPitchRate`에 별도 키를 추가하는 입력 작업이 필요하다.
+`IA_DronePrototype_AcroPitch/Roll/Yaw/Throttle` 네 Action은 Acro에서만 값을 사용한다. 쉬운/제한 자세용 Move·Altitude·Yaw와 같은 물리 키가 IMC에 함께 있어도 Pawn이 현재 모드에 맞는 Action만 소비하므로 W/S와 Space/Ctrl이 같은 축으로 겹치지 않는다.
 
 ## 공개 자료를 반영한 현재 FPV 기준값
 
@@ -89,6 +89,10 @@ Rate/Acro는 Front-end Drone 선택 화면에서 FPV 기체를 고르면 기본 
 | Yaw 최대 Rate | 400°/s | 플레이 테스트용 보수적 프로젝트 값. DJI의 공개 사양값으로 오해하지 않는다 |
 | Pitch/Roll 중앙 감도 | 180°/s | 조정 가능한 프로젝트 시작값 |
 | Pitch/Roll Expo | 0.30 | 조정 가능한 프로젝트 시작값 |
+| Hover Throttle | 0.50 | Stick 중립이 수평 자세에서 1g를 상쇄하는 추력 위치 |
+| Gravity | 980 cm/s² | World Down 가속도 시작값 |
+| Linear Drag | 0.12 /s | 고속 관성을 점진적으로 줄이는 Greybox 항력 |
+| Body Rate 응답 | 0.08 s | 목표 각속도로 수렴하는 시작 응답 시간 |
 
 DJI 공개값에는 무풍·해수면 등 측정 조건이 붙으며, 현재 프로젝트 값은 기체를 1:1 복제한다는 뜻이 아니다. 공식 참고: [DJI Avata 2 사양](https://www.dji.com/avata-2/specs), [Betaflight Modes](https://betaflight.com/docs/wiki/guides/current/Modes), [Betaflight Rate Calculator](https://betaflight.com/docs/wiki/guides/current/Rate-Calculator).
 
@@ -115,7 +119,7 @@ Pawn Class Defaults에서 다음 Struct를 연다.
 - `Acro Rate Realistic Greybox Tuning`: Rate/Acro에서 사용할 가속·관성·Local Up·Root 자세 사용
 - `Stable / Balanced / Agile Handling Tuning`: 최대 속도·가속·Yaw·최대 자세각 배율
 
-각 기체의 절대 기준값은 Data Asset의 `Flight Profile`에 둔다. Rate/Acro의 중앙 감도·최대 Rate·Expo·수직 속도는 `Flight Profile > Acro Rate Settings`에서 조정한다. 모드 전환 시에는 기준값에서 다시 계산하므로 반복 전환해도 배율이 누적되지 않는다.
+각 기체의 절대 기준값은 Data Asset의 `Flight Profile`에 둔다. Rate/Acro의 중앙 감도·최대 Rate·Expo·수직 속도·호버/중력/항력/Rate 응답은 `Flight Profile > Acro Rate Settings`에서 조정한다. 모드 전환 시에는 기준값에서 다시 계산하므로 반복 전환해도 배율이 누적되지 않는다.
 
 FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조정한다.
 
@@ -124,10 +128,14 @@ FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조�
 - `Pitch Roll Expo`: 중앙을 둔하게 하고 끝 입력을 유지하는 곡선. 현재 `0.30`.
 - `Yaw Center Sensitivity Degrees Per Second`, `Maximum Yaw Rate Degrees Per Second`, `Yaw Expo`: Yaw 전용 같은 항목.
 - `Maximum World Vertical Speed Centimeters Per Second`: World Z 상승·하강 속도 안전 제한. 현재 `900cm/s`.
-- Pawn Blueprint의 `Acro Rate Realistic Greybox Tuning`: 관성·가속 배율, Local Up, 충돌 Root 자세 적용 여부.
+- `Hover Throttle Normalized`: 입력 0에서 중력을 상쇄하는 0~1 추력 위치. 현재 `0.50`; 낮추면 최대 추력 여유가 커진다.
+- `Gravity Acceleration Centimeters Per Second Squared`: World Down 중력. 현재 `980cm/s²`.
+- `Linear Drag Per Second`: 속도 비례 항력. 현재 `0.12/s`; 높이면 고속 관성이 더 빨리 줄어든다.
+- `Body Rate Response Time Seconds`: 목표 Pitch/Roll/Yaw Rate까지 수렴하는 시간. 현재 `0.08s`; 낮추면 더 즉각적이다.
+- Pawn Blueprint의 `Acro Rate Realistic Greybox Tuning`: 이동 Component의 MaxSpeed/Acceleration 배율과 Root 자세 계약. Acro 자동 감속은 끄고 위 선형 항력을 사용한다.
 - Pawn Blueprint의 `Agile Handling Tuning`: Profile 최대 속도·가속·Yaw에 곱하는 고기동 배율.
 
-조정 순서는 `중앙 감도 → Expo → 최대 Rate → 이동 가속/관성`으로 잡는다. 최대 Rate부터 내리면 끝 입력만 아니라 전체 기동 폭도 줄어 원인을 구분하기 어렵다.
+조정 순서는 `호버 스로틀 → Body Rate 응답 → 중앙 감도 → Expo → 최대 Rate → 선형 항력/최대 속도`로 잡는다. 먼저 수평 호버와 Pitch 추진을 맞춘 뒤 회전 감도를 조정해야 상승감과 조향감을 혼동하지 않는다.
 
 ## Editor 확인 순서
 
@@ -139,8 +147,10 @@ FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조�
 6. Stable/Balanced/Agile을 차례로 바꾸며 속도·Yaw·기울기 한도가 즉시 달라지는지 확인한다.
 7. 쉬운 조작으로 돌아왔을 때 Root Pitch/Roll이 수평 복귀하는지 확인한다.
 8. FPV 기체를 골라 Rate/Acro에서 오른쪽 Stick을 놓아도 자세가 유지되는지 확인한다.
-9. Roll/Pitch 끝 입력으로 90도를 넘어 회전하고 Local Up Throttle로 바라보는 축에 추진되는지 확인한다.
-10. 회전이 너무 민감하면 기체 Data Asset의 `Acro Rate Settings`에서 중앙 감도와 Expo부터 조정하고 최대 Rate는 마지막에 바꾼다.
+9. 수평에서 키를 놓으면 중립 호버가 유지되고, Space는 상승하며 Ctrl은 추력을 줄여 하강하는지 확인한다.
+10. W로 Nose-down한 뒤 중립/상승 Throttle에서 기체 Up 축이 전진력으로 바뀌는지 확인한다.
+11. Roll/Pitch 끝 입력으로 90도를 넘어 회전하고 Local Up Throttle로 바라보는 축에 추진되는지 확인한다.
+12. 회전이 너무 민감하면 `Body Rate Response Time`, 중앙 감도와 Expo를 먼저 조정하고 최대 Rate는 마지막에 바꾼다.
 
 자동 검증은 `Drone.Prototype.FlightProfiles`와 `Drone.Flow` 필터로 실행한다.
 
@@ -154,7 +164,7 @@ FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조�
 6. FLOW-05 Mission 허용 3종 카드·설정·선택 Definition 1대 Spawn/Possess — 실제 PIE 완료
 7. FLOW-06~07 Mission Director·목표 패널·성공/실패·재도전·로비 복귀 — 실제 PIE 완료
 8. FLOW-08 새 실행 기준 전체 흐름 3회 반복 — 3/3 자동화 완료
-9. 공통 역할 입력 — 임시 좌클릭/RB 1차, 우클릭/LB 2차, `P`/패드 Y 시점 전환, IMC 21 Mapping과 Pawn Binding 자동화 완료
+9. 공통 역할 입력 — 임시 좌클릭/RB 1차, 우클릭/LB 2차, `P`/패드 Y 시점 전환, Acro 전용 12개를 포함한 IMC 33 Mapping과 Pawn Binding 자동화 완료
 10. Training Map 정찰/자폭/투하 Target·역할 상태 UI·역할별 제공 모델 — 구현 및 자동화 완료, 수동 화면 확인 대기
 
 현재 역할 입력은 다음처럼 동작한다.

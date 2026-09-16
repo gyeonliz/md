@@ -26,13 +26,14 @@
 | `... > Trace Start Height` | 160 cm | Trace 시작 높이 |
 | `... > Trace Length` | 420 cm | 아래 방향 탐색 길이 |
 | `... > Ride Height` | 72 cm | 접촉면 위 차체 중심 높이 |
-| `... > Wheel Radius` | 30 cm | 임시 바퀴 외형과 접지 보정 기준 |
+| `... > Wheel Radius` | Native Cylinder 30 cm / 현재 Tire BP 52 cm | 바퀴 구름 속도와 지면 접촉 중심 높이. 현재 `SM_SpikeStorm_Tire2_FR`에 맞춰 BP가 52cm로 Override |
 | `... > Maximum Ground Angle Degrees` | 28° | Pitch·Roll 최대 제한 |
 | `... > Height Interpolation Speed` | 10 | 높이 추종 속도 |
 | `... > Rotation Interpolation Speed` | 8 | 경사 회전 추종 속도 |
 | `Drone > Vehicle > Drive > Maximum Drive Speed` | 360 cm/s | 수동 Throttle 최대 속도 |
 | `... > Maximum Turn Rate Degrees Per Second` | 45°/s | 수동 Steering 최대 회전 속도 |
-| `... > Wheel Visual Spin Direction Multiplier` | +1 | 수동 화면 확인으로 확정한 현재 Greybox Cylinder의 전진 구름 방향. 최종 Wheel Mesh 축이 반대면 `-1`로 변경 |
+| `... > Wheel Visual Spin Direction Multiplier` | +1 | 차량 부모 공간 회전축에 적용하는 전진 구름 방향 부호 |
+| `... > Wheel Visual Spin Axis In Vehicle Space` | `(0,1,0)` | 차량 로컬 좌우 차축. Mesh 원본축과 무관하게 모든 바퀴를 같은 부모 공간 축으로 회전 |
 | `Drone > Vehicle > Greybox > Greybox Auto Drive Enabled` | Map 배치만 켬 | Controller 없이 시험 왕복 주행 |
 | `... > Greybox Auto Drive Speed` | 220 cm/s | 시험 주행 속도 |
 | `... > Greybox Auto Drive Distance` | 1050 cm | 시작점 기준 왕복 거리 |
@@ -47,8 +48,11 @@
 
 - `GetCurrentForwardSpeedCentimetersPerSecond`: 실제 전진축 속도, 후진은 음수
 - `GetCurrentWheelRotationDegrees`: 이동거리로 누적한 회전각, 전진 증가·후진 감소
-- 최종 Wheel Mesh 교체 시 `WheelRadius`를 실제 반지름으로 맞추고 회전축이 반대일 때만 `Wheel Visual Spin Direction Multiplier`를 `-1 ↔ 1`로 바꾼다.
-- 2026-09-04 첫 수동 화면 확인에서 기본 `-1` 방향이 반대로 굴러 `+1`로 수정했다. 동일 Greybox Mesh에서는 `+1`을 기준으로 사용한다.
+- 최종 Wheel Mesh 교체 시 `WheelRadius`를 실제 반지름으로 맞추고 구름 방향이 반대일 때만 `Wheel Visual Spin Direction Multiplier`를 `-1 ↔ 1`로 바꾼다.
+- `Wheel Radius`는 Blueprint에서 `1~500cm`, Details 슬라이더 권장 범위 `1~200cm`로 조정할 수 있다. 값이 시각 Mesh의 세로 반지름보다 작으면 바퀴가 지면에 잠기고, 지나치게 크면 떠 보인다.
+- `Wheel Visual Spin Axis In Vehicle Space`는 Mesh의 로컬 축이 아니다. 프로젝트 차량의 `+X` 전진에 직교하는 부모 공간 `+Y` 차축이며, 보통 바꾸지 않는다.
+- 2026-09-16 실제 `SM_SpikeStorm_Tire2_FR`은 얇은 원본축이 Y이고 좌우 장착 회전도 서로 달랐지만, 기존 코드는 Cylinder를 전제로 Mesh 로컬 Z축을 회전시켜 바퀴가 옆으로 빙글도는 문제가 있었다. 부모 공간 `+Y` 회전으로 바꿔 네 바퀴가 같은 차축에서 굴러가도록 수정했다.
+- 같은 Tire의 실제 세로 반지름은 약 50cm인데 저장 BP가 Native Cylinder 기본값 30cm를 유지해 약 20cm가 바닥 아래로 잠겼다. `BP_GroundConformingVehicle_Greybox`의 기본 `Wheel Radius`를 52cm로 교정하고 실제 Tire Bounds와 평면 접촉을 자동 검사한다.
 - 현재 Greybox는 네 바퀴에 같은 구름 회전각을 사용하며 조향각·좌우 차동속도는 아직 포함하지 않는다.
 
 ## 차량형 자동포탑 연결

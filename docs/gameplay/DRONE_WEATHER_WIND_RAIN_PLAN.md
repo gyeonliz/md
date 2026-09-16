@@ -4,7 +4,7 @@
 
 ## 현재 상태와 확정 경계
 
-- `WTH-01` Profile/Snapshot/World Subsystem과 `WTH-02` 지속풍·돌풍 Drone 응답은 2026-09-16 기준 구현됐다.
+- `WTH-01` Profile/Snapshot/World Subsystem, `WTH-02` 지속풍·돌풍 Drone 응답, `WTH-02B` Attack/Release와 표시 벡터 적분은 2026-09-16 기준 구현됐다.
 - `/Game/Drone/Data/Weather`에 `Clear`, `LightWind`, `RainStorm_Greybox` Profile이 있고, `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`는 `LightWind`를 즉시 적용한다.
 - 비 수치는 같은 Snapshot으로 전달되지만 Camera-follow Niagara, 젖음 Material, Audio, 실내 판정은 아직 구현 완료 기능이 아니다.
 - 최종 Mission별 날씨, 비가 신호·체력·배터리에 미치는 영향, 최종 성능 예산은 현재 미정이다.
@@ -32,6 +32,9 @@
 | `BaseWindSpeedMetersPerSecond` | float | 0~5 | 지속풍 |
 | `GustAdditionalSpeedMetersPerSecond` | float | 0~3 | 돌풍 추가량 |
 | `GustIntervalSeconds` | FVector2D | 2~8초 | 다음 돌풍 간격 범위 |
+| `GustAttackSeconds` | float | 0.45~0.80초 | 더 강한 돌풍 목표로 올라가는 응답 시간 |
+| `GustReleaseSeconds` | float | 1.2~1.8초 | 약한 돌풍 목표로 빠지는 응답 시간 |
+| `DirectionResponseSeconds` | float | 0.65~1.0초 | 풍향 목표를 최단각으로 따라가는 응답 시간 |
 | `Turbulence01` | float | 0~0.35 | 작은 방향·세기 흔들림 |
 | `VerticalGustMetersPerSecond` | float | 0~1 | 선택형 상승·하강 기류 |
 | `DroneWindResponseMultiplier` | float | 0~2 | 기체별 바람 영향 배율 |
@@ -54,7 +57,7 @@
 ## Runtime 책임
 
 1. `UDroneWeatherWorldSubsystem`은 현재/목표 Profile, 전환 Alpha, 결정적 Seed, 한 개의 `FDroneWeatherSnapshot`을 소유한다.
-2. 바람 Gameplay Snapshot은 Profile 기본 `10Hz` Timer로 계산하고 매 Frame·매 Particle마다 난수를 만들지 않는다.
+2. 바람 Gameplay Snapshot은 Profile 기본 `10Hz` Timer로 계산하고 매 Frame·매 Particle마다 난수를 만들지 않는다. 돌풍 세기는 Attack/Release, Yaw 편차는 최단각 Direction Response로 프레임 시간에 안정적인 지수 보간을 사용한다.
 3. `UDroneWeatherResponseComponent`는 Snapshot을 Event로 받아 필요할 때만 Tick하고, Sweep 이동으로 현재 Greybox Drone에 Drift를 적용한다.
 4. 기본 보정은 쉬운 조작 `65%`, 제한 자세 `25%`, Rate/Acro `0%`다. 모두 Blueprint 기본값에서 조정할 수 있으며 최종 밸런스가 아니다.
 5. 현재 외력은 `UFloatingPawnMovement` 위에 더하는 위치 Drift Greybox다. 모터·PID·공기역학 또는 최종 네트워크 물리 구현이 아니다.
@@ -68,10 +71,25 @@
 | Asset | 시작값 | 용도 |
 |---|---|---|
 | `DA_Weather_Clear` | 바람 0, 비 0 | 기상 해제·기준선 |
-| `DA_Weather_LightWind` | 지속풍 4m/s, 돌풍 +0~2m/s, 난류 0.2 | 기본 수동 비행 체감 |
-| `DA_Weather_RainStorm_Greybox` | 지속풍 8m/s, 돌풍 +0~2.7m/s, 비 0.8, 시야 180m | 비 표현과 강풍 후속 시험용 데이터 |
+| `DA_Weather_LightWind` | 지속풍 4m/s, 돌풍 +0~2m/s, Attack 0.8s / Release 1.8s / 방향 1.0s | 기본 수동 비행 체감 |
+| `DA_Weather_RainStorm_Greybox` | 지속풍 8m/s, 돌풍 +0~2.7m/s, Attack 0.45s / Release 1.2s / 방향 0.65s, 비 0.8 | 비 표현과 강풍 후속 시험용 데이터 |
 
 `Lvl_DroneWeatherSystemsTest`에는 `ADroneWeatherController` 한 개와 35° 풍향 바닥 화살표가 있다. 기본 Profile은 `LightWind`이며, `WeatherSystemsTest_Controller`의 `Weather Profile`을 바꾼 뒤 Play하면 같은 맵에서 다른 값을 비교할 수 있다. 폭우 Profile을 선택해도 아직 빗줄기가 보이지 않는 것이 현재 정상이다.
+
+## 자연스러운 바람 전환·표시 구현 결과
+
+기존 Debug Visualizer는 `BaseBeadLocation + 현재 풍향 × 누적 이동거리`를 매 Frame 다시 계산해 풍향 변경 시 과거 이동거리 전체를 새 방향으로 재투영했다. `WTH-02B`에서 이를 제거했다.
+
+구현된 계약은 다음과 같다.
+
+1. `GustAttackSeconds`, `GustReleaseSeconds`, `DirectionResponseSeconds`는 Weather Data Asset에서 각각 조정한다.
+2. 풍향 Yaw 편차는 `FindDeltaAngleDegrees`를 사용해 최단각으로 수렴한다.
+3. Visualizer는 표시 전용 `DisplayedWindVelocity`를 매 Frame 지수 보간하고 `Offset += LocalVelocity × DeltaSeconds × PlaybackScale`로 이동을 누적한다.
+4. 풍향이 X에서 Y로 바뀌어도 이전 X 이동을 보존한 채 Y 이동이 이어진다. 고정 풍속 적분은 Frame Step에 관계없이 같은 결과가 나도록 자동화했다.
+5. Sphere Bead는 보간된 Local Wind 방향으로 회전하고 풍속에 따라 길어지는 유선형 표시가 된다. 응답 시간·기준 풍속·최소/최대 길이·단면 배율은 BP/배치 인스턴스에서 조정한다.
+6. `Drone.Weather` 자동화 3/3이 통과했다. 35° 바닥 화살표와 실제 Drift 일치, Clear/RainStorm 전환의 화면 무점프 체감은 수동 확인이 남았다.
+
+이 작업은 TestMap 표현과 Snapshot 품질 개선이며 Niagara 비 구현과 분리한다. Bead 방식이 안정된 뒤 같은 `DisplayedWindVelocity`를 Camera-follow Niagara의 User Parameter로 전달한다.
 
 ## 비 최적화 방안
 
@@ -126,10 +144,11 @@
 
 1. `WTH-01` — 완료: `UDroneWeatherProfile`, Snapshot, World Subsystem, Validation 자동화
 2. `WTH-02` — 완료: 결정적 지속풍·돌풍 Timer, Drone별 응답 Component, Profile 3종
-3. `WTH-03` — 다음: Camera-follow Niagara Rain, MPC Wetness, Audio Layer
-4. `WTH-04` — 대기: 실내 감쇠 Trace/Volume, 근거리 Splash Service
-5. `WTH-05` — 일부 완료: 전용 TestMap·저장 계약 자동화 완료, Low~Epic Scalability와 GPU Profile은 비 표현 뒤 진행
-6. `WTH-06` — 대기: Mission Definition이 Weather Profile을 선택하고 필요할 때만 Weather Event를 목표 규칙에 연결
+3. `WTH-02B` — 완료: 돌풍 Attack/Release·풍향 최단각 보간, Debug Bead 표시 속도 벡터 적분과 방향/길이 보간, 자동화 3/3
+4. `WTH-03` — 후속: Camera-follow Niagara Rain, MPC Wetness, Audio Layer
+5. `WTH-04` — 대기: 실내 감쇠 Trace/Volume, 근거리 Splash Service
+6. `WTH-05` — 일부 완료: 전용 TestMap·저장 계약 자동화 완료, Low~Epic Scalability와 GPU Profile은 비 표현 뒤 진행
+7. `WTH-06` — 대기: Mission Definition이 Weather Profile을 선택하고 필요할 때만 Weather Event를 목표 규칙에 연결
 
 ## 사용자가 확인할 첫 체감 항목
 

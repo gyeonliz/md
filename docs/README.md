@@ -37,6 +37,7 @@
 - [`DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md`](gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md): 목표 Rule·Event·Blueprint 설정과 검증
 - [`DRONE_JAMMING_GREYBOX_GUIDE.md`](gameplay/DRONE_JAMMING_GREYBOX_GUIDE.md): 재밍 신호·비행·HUD·Mission Zone 배치와 PIE 시험
 - [`DRONE_TEST_MAP_GUIDE.md`](gameplay/DRONE_TEST_MAP_GUIDE.md): Tutorial·AI/Smart Object·Mission/Signal 시험 맵 위치와 수동/자동 검증
+- [`DRONE_TRUCK_AND_SMART_OBJECT_ROUTE_GUIDE.md`](gameplay/DRONE_TRUCK_AND_SMART_OBJECT_ROUTE_GUIDE.md): 팀원용 Truck 직선 시험·Spline Route 설계안과 Smart Object 점 동선 배치
 - [`DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md`](gameplay/DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md): 4점 차량·Drone 기울기·피격 흔들림
 - [`DRONE_CHAOS_DATAFLOW_PLAN.md`](gameplay/DRONE_CHAOS_DATAFLOW_PLAN.md): 그물·파괴 Physics Spike
 

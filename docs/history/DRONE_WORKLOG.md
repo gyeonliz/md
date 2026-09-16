@@ -1490,3 +1490,54 @@ HeadingValueText
 - 같은 PIE 회귀가 수정 뒤 성공했고, MSVC 14.51.36257 `DroneEditor Win64 Development` Build와 Shotgun Asset/PIE `2/2`가 성공했다. 실제 Pellet BP의 발광 Material·크기·Tracer와 1.9° 정면 안정화가 자동 계약에 포함됐다.
 - 영향 확인용 기존 `Drone.AI.NPCPerceptionSearchPIE` 단독 실행은 이번 Shotgun/Gaze 검증이 아니라 사수 사망 뒤 MG 재점유 제한시간에서 실패했다. 로그상 사망 NPC 정리는 성공했지만 생존 Shotgun NPC가 개인화기 상태에 머물러 MG를 다시 Claim하지 않았다. 최신 전체 AI 통과로 기록하지 않고 별도 재현·진단 항목으로 남겼다.
 - Rate/Acro 현재 키를 문서화했다. Gamepad Mode 2는 왼쪽 Y Throttle·왼쪽 X Yaw·오른쪽 Y Pitch·오른쪽 X Roll이다. 키보드는 W/S Throttle·A/D Yaw·Q/E Roll이고 Body Pitch 전용 키가 아직 없어 완전한 Loop 시험은 Gamepad/RC Controller가 필요하다. Commit·Push는 하지 않았다.
+
+## 2026-09-16 — Shotgun 실제 분리·공용 탄 시인성·시선 Hysteresis·UI 임시 프로토타입
+
+- 화면에는 Cyan 예상선 8개가 보이지만 실제 Pellet이 하나처럼 보인다는 보고를 생성 카운터만 확인하던 기존 테스트와 분리했다. 첫 Volley 후 80ms 시점의 살아 있는 Shotgun Projectile 수를 세는 회귀를 추가했고 수정 전 `6개 미만`으로 실패해 화면 문제가 실제 수명 문제임을 확인했다.
+- 같은 총구·같은 프레임에서 생성된 동일 소유자의 Pellet들이 `WorldDynamic`으로 서로 Block한 것이 원인이었다. Spawn 초기화에서 같은 발사자 Projectile끼리 양방향 Sweep Ignore를 등록해 상호 제거를 막았다. 테스트는 80ms 뒤 8개 전부 개별 비행으로 Green이다.
+- 실제 Hostile Shotgun BP와 전용 TestMap 인스턴스를 `8 Pellet / 원뿔 반각 12° / Pellet당 3 피해 / Cyan Debug 기본 Off`로 갱신했다. 전용 발광 비드/Tracer는 유지하고 안전한 적용·검증 도구 `ConfigureDroneShotgunCombatDefaults.py`를 추가했다.
+- Rifle·유인 MG·무인 포탑이 공유하는 Native Projectile의 기본 탄두를 `0.06`, Tracer를 `0.60 × 0.018`로 확대하고 Shotgun Glow Material을 공용 임시 발광 재질로 연결했다. Shotgun 전용 BP는 자체 작은 Scale을 계속 덮어쓴다.
+- 개인화기 몸 회전은 단일 3° 경계 대신 `3° 정지 + 3° Hysteresis = 6° 시작`으로 바꿨다. Bone Gaze는 작은 잔여 오차를 보간하고 경계에서 0도로 Snap하지 않는다. 머리 Socket Yaw/Pitch 변동까지 실제 PIE에서 검사한다.
+- 첨부 와이어프레임을 참고해 C++ fallback Front-end를 `작전 목록 / 선택 작전 / 작전 개요`, Drone Select를 `보유 기체 / 상세 / 조작 설정` 3열 임시 레이아웃으로 다시 구성했다. Flow·Mission/Drone Data Asset·Map 전환 책임은 바꾸지 않았다.
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. `Drone.AI.ShotgunSystemsTestMap` Asset/PIE 2/2, `Drone.AI.ProjectileBallistics`, `Drone.Flow.FrontEndPIE`, `Drone.Flow.MissionEntryPIE`가 모두 Success다. Production `Lvl_DroneTraining`은 열거나 저장하지 않았으며 화면 체감과 16:9 잘림 여부는 사용자 수동 확인이 남았다. Commit·Push는 하지 않았다.
+
+## 2026-09-16 — Acro 키보드/패드 축 분리와 바람 보간 후속 방향
+
+- 고기동 FPV에서 W가 전진 Pitch를 만들지 못하고 W/S와 Space/Ctrl이 모두 Throttle 역할을 하던 증상을 재현했다. 원인은 Acro에서 공용 `IA_Move`를 왼쪽 Stick Throttle/Yaw로 재해석해 같은 Action을 쓰는 키보드까지 함께 바뀌고, 키보드 Body Pitch가 사라진 구조였다.
+- 전용 Axis1D Action `AcroPitch/Roll/Yaw/Throttle` 네 개를 만들었다. 키보드는 `W/S Pitch`, `A/D Roll`, `Q/E Yaw`, `Space/Left Ctrl Throttle`, Gamepad는 오른쪽 Y Pitch·오른쪽 X Roll·왼쪽 X Yaw·왼쪽 Y Throttle의 Mode 2다. 쉬운/제한 자세 공용 Action과 Acro Action은 Pawn이 현재 모드별로 한쪽만 소비한다.
+- 자산이 없는 상태에서 `Drone.Prototype.AcroInputContract`가 네 Action 누락으로 의도한 Red를 냈다. 구현 후 IMC 33 Mapping, 음수 키 Negate, FPV Integration BP Action 연결과 Pawn Binding을 검사해 Green으로 전환했다.
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build와 `Drone.Prototype` 8/8이 성공했다. Production Training Map은 열거나 저장하지 않았고 Commit·Push하지 않았다. 키보드/패드 실제 체감은 수동 확인이 남았다.
+- 기상 코드를 대조한 결과 Gameplay Gust와 Drone Drift에는 이미 보간이 있으나 Debug Bead는 현재 풍향에 누적 이동거리 전체를 다시 곱해 방향 변화 때 튈 수 있다. 다음 `WTH-02B`는 돌풍 Attack/Release·풍향 최단각 보간, 표시 전용 순간 속도 적분, Bead/Arrow 방향·길이 보간을 테스트 우선으로 진행한다.
+
+## 2026-09-16 — Acro 추력·중력 비행 v1과 WTH-02B 구현
+
+- 기존 Rate/Acro는 Body 각속도로 Root만 회전하고 이동은 별도 `AddMovementInput`에 의존해 W Pitch로 기체를 숙여도 전진력이 생기지 않았다. `Drone.Prototype.FlightProfiles`에 `Nose-down Acro attitude creates forward thrust` 계약을 먼저 추가했고 기존 코드에서 의도대로 실패했다.
+- `FDroneAcroRateSettings`에 `HoverThrottleNormalized`, `GravityAccelerationCentimetersPerSecondSquared`, `LinearDragPerSecond`, `BodyRateResponseTimeSeconds`를 추가했다. 모두 `DA_Drone_* > Flight Profile > Acro Rate Settings`와 Blueprint에서 조정 가능하다.
+- Acro 스로틀은 `-1=무추력`, `0=수평 호버`, `+1=최대 추력`으로 변환한다. World Down 중력과 Body Up 추력을 합쳐 기체를 Pitch/Roll하면 추진 방향이 실제로 바뀌며, 속도 비례 지수 항력과 Rate 응답 지연을 적용한다. 기존 FloatingPawnMovement 자동 감속은 Acro에서 꺼 항력과 중복되지 않게 했다.
+- FPV 저장 기본값은 호버 `0.50`, 중력 `980cm/s²`, 선형 항력 `0.12/s`, Body Rate 응답 `0.08s`다. 기존 27m/s 전체 속도와 World Z 9m/s 제한, 650°/s Pitch/Roll, 400°/s Yaw는 유지한다. 모터별 RPM·PID·공력·질량/관성 모델은 아니며 물리 체감 v1이다.
+- Acro Throttle의 `Completed/Canceled` 입력 리셋을 추가하고 PIE Binding 수명주기 계약도 Triggered/Completed/Canceled 각 1개로 갱신했다. Editor Build 성공, 최종 `Drone.Prototype` 8/8 Success·실패 0이다.
+- `FDroneWindSettings`에 돌풍 Attack/Release와 풍향 Response 시간을 추가했다. 세기·수직 돌풍은 Attack/Release 지수 응답, Yaw 편차는 최단각 응답을 사용한다. LightWind는 `0.8/1.8/1.0s`, RainStorm은 `0.45/1.2/0.65s`를 저장했다.
+- Debug Visualizer의 스칼라 누적 거리 재투영을 제거하고 표시용 풍속을 매 Frame 보간한 뒤 Local 속도 벡터를 적분한다. 풍향 X→Y 전환 시 이전 X 이동을 유지하며, Bead는 풍향으로 회전하고 풍속에 따라 길이가 변한다. 응답 시간·기준 풍속·길이·단면은 BP/배치 인스턴스에서 조정한다.
+- `Drone.Weather` 3/3 Success·실패 0, 방향 전환 궤적 보존과 Frame Step 독립 적분 자동화가 통과했다. Production `Lvl_DroneTraining`은 열거나 저장하지 않았고 Commit·Push하지 않았다. Acro 체감과 Weather 화면 무점프 확인은 사용자 수동 항목으로 남겼다.
+
+## 2026-09-16 — Smart Object Greybox 차량 바퀴 회전축 교정
+
+- `Lvl_NPCSmartObjectGreybox`의 차량 바퀴가 진행 방향으로 구르지 않고 옆으로 회전한다는 화면 보고를 저장 Asset과 대조했다. 차량 BP와 맵 인스턴스는 기본 Cylinder가 아니라 `/Game/MillitaryBase/Meshes/SM_SpikeStorm_Tire2_FR`을 네 바퀴에 사용하며, Mesh Local Bounds의 얇은 축은 Y였다. 기존 코드는 Cylinder 전용 Local Z축 회전을 고정해 실제 Tire Mesh 장착 회전과 맞지 않았다.
+- 실제 저장 `BP_GroundConformingVehicle_Greybox`를 Spawn해 전진 한 프레임 뒤 각 바퀴 Rotation Delta 축을 검사하는 회귀를 추가했다. 수정 전 네 바퀴 모두 차량 좌우 차축 조건에 실패하는 Red를 확인했다.
+- 바퀴 회전은 Mesh 원본축이 아니라 `VehicleCollision` 부모 공간 `+Y`에 적용하도록 바꿨다. 좌우별 `Roll 0°/180°` 장착 회전은 Base Rotation으로 보존하며, 방향 부호는 기존 `+1`을 유지한다. `Wheel Visual Spin Axis In Vehicle Space`를 Blueprint에 노출해 다른 차량 좌표계도 조정할 수 있게 했다.
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공, `Drone.Vehicle.GroundConformingSuspension`은 동일 회귀를 포함해 Success로 전환했다. 자동포탑/차량 읽기 전용 검증도 차량 1·바퀴 4·차량 포탑 Attach·노면 5·Map Check 0/0으로 통과했다.
+- 전체 `Drone.AI.NPCGreyboxAssets`는 차량이 아니라 팀원이 교체한 `BP_NPC_Friendly_Base` Character Mesh가 오래된 역할 Mesh 기대값과 달라 실패했다. 이번 바퀴 수정과 분리해 기록하며 Friendly 자산을 되돌리지 않았다. 최종 바퀴 구름 방향은 Editor 화면 재확인이 남았다.
+- 회전축 교정 후 실제 Tire가 도로 두께만큼 잠긴다는 화면 보고를 독립 평면 회귀로 추가했다. `SM_SpikeStorm_Tire2_FR`의 세로 반지름은 약 50cm지만 저장 차량 BP의 `Wheel Radius`는 Native Cylinder용 30cm여서 네 바퀴 모두 약 20cm가 지면 아래에 있었다.
+- `Wheel Radius`의 Blueprint 범위를 `1~500cm`로 명시하고 현재 Tire BP 기본값을 52cm로 저장했다. BP 한 개만 갱신하는 `DRONE_VEHICLE_WHEEL_DEFAULTS_ONLY` 도구 모드를 추가해 팀원 NPC와 맵을 재저장하지 않았다. 수정 뒤 Tire Bounds·평면 접촉·회전축을 함께 검사하는 `GroundConformingSuspension`과 읽기 전용 차량/포탑 맵 Validate가 성공했다.
+
+## 2026-09-16 — 병사 StateTree 상태 전환 안정화
+
+- Cover/MG 태스크가 일시적인 예약·사격 실패를 바로 `Failed`로 반환하고, MG 사망 교대 Event가 0.75초마다 현재 Cover 상태를 끊을 수 있어 병사 상태와 시선이 왕복할 수 있는 경로를 확인했다.
+- 먼저 `SmartObjectFoundationDefaults`에 Blueprint 조정 가능한 최소 상태 유지시간 계약을 추가했고, 구현 전 Property가 없어 의도대로 Red가 되는 것을 확인했다.
+- `ADroneNPCAIController`가 모든 대응 상태 진입 시각을 한 곳에서 기록하고 기본 `Minimum Response State Duration Seconds=1.0`을 제공하도록 변경했다. 최소시간 동안 `DroneDetected`, MG/Cover 이동·점유·사격, Search의 현재 행동 조건을 재점검하고 시간이 지난 뒤에도 실패일 때만 기존 StateTree 실패 전환을 허용한다.
+- MG 재할당 대기 시작 시 개인화기 사격을 즉시 끄지 않고 실제 Event를 보낼 때만 정리하도록 바꿨다. Cover 점유 성공과 같은 프레임에 첫 사격 시작이 실패해도 점유 상태 자체를 실패 처리하지 않으며 `UseCover` Tick에서 다시 시작한다.
+- 사망, Drone 파괴, Sight Lost 유예 뒤 확정 정리는 즉시 처리해 위험한 상태를 억지로 유지하지 않는다. 값 `0`은 안정화 대기를 끄며 Controller Blueprint `Drone > AI > State Stability`에서 조정할 수 있다.
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. Red였던 `SmartObjectFoundationDefaults`와 `HostilePatrolStateTreeAsset`, 차량 `GroundConformingSuspension`은 Success다.
+- 실제 `NPCPerceptionSearchPIE`는 2회 모두 감지·사격·Cover·최초 MG 점유와 사망 정리까지 진행했지만, 생존 병사가 빈 MG를 각각 2회/3회 Claim한 뒤 Operator Anchor로 Nav 도착하지 못해 기존 재점유 제한시간 항목에서 실패했다. 상태 안정화 결과와 분리해 맵 경로/Collision 결함으로 계속 추적하며 Success로 기록하지 않는다.
+- 최종 Git 감사 중 원격 `72c964c`, Merge `4a3d4ba`가 추가됐고 변경 파일은 팀원 `Lvl_MilitaryBase.umap` 하나였다. 로컬 작업과 겹침이 없어 fast-forward했으며 Unreal 기준은 `main = origin/main = 4a3d4ba`다.
+- `stash@{0}: On main: !!GitHub_Desktop<main>` 1개가 남아 있다. Shotgun/Weather/Acro 시기 파일 49개를 포함한 자동 Stash라 현재 로컬 변경과 중복 가능성이 크지만, 사용자 작업 유실을 피하기 위해 이번에는 적용·삭제하지 않았다.

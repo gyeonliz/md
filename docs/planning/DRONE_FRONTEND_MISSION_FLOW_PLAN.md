@@ -221,6 +221,7 @@ Lvl_DroneTraining (?game=DroneMissionGameMode)
 - Data: `/Game/Drone/Data/Drones/DA_Drone_Scout_Greybox`, `/Game/Drone/Data/Missions/DA_Mission_Tutorial_Training`
 - Front-end: `/Game/Drone/FrontEnd/UI/WBP_DroneFrontEndRoot`, 두 전용 BP Class, `/Game/Drone/Maps/Lvl_DroneFrontEnd`
 - WBP Designer가 비어 있으면 C++ 정적 대체 Layout이 동작한다. 최종 외형은 동일 이름 Widget과 Blueprint 표현 Event를 유지하며 교체한다.
+- 2026-09-16 임시 표현은 와이어프레임을 따라 Lobby를 `작전 목록 / 선택 작전 / 작전 개요`, Drone Select를 `보유 기체 / 상세 / 조작 설정` 3열 구조로 재구성했다. 상태 전환·선택 판정·Data Asset 읽기는 기존 C++ 계약을 유지하며 Thumbnail·영상·최종 WBP 아트는 아직 미확정이다.
 - Mission Trailer Media 형식은 미정이다. 현재 정적 Briefing의 `FinishMissionBriefing()`이 실제 Map 진입 Callback이며 추후 영상 종료도 같은 함수를 호출한다.
 - Mission GameMode는 선택 전 비-Drone Spectator만 사용하고 Controller가 확정된 Integration Pawn을 한 대 Spawn/Possess한다. 최종 Drone Preview는 미구현이다.
 - Mission Director의 Training Lap 성공·Health 0 실패는 현재 Vertical Slice 규칙이며 최종 Story Mission 규칙 확정이 아니다.
