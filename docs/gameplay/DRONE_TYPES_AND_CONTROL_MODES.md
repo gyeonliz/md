@@ -61,6 +61,22 @@
 - 키보드·마우스는 개발용 대체 입력이며 실제 조종기 체감 검증은 Gamepad 또는 RC Controller 축으로 한다.
 - 현재 이동 기반은 여전히 `UFloatingPawnMovement`다. 모터별 RPM, 중력-양력 평형, PID, 프로펠러 추력, 기체 질량과 공기저항을 푼 완전한 비행 시뮬레이터는 아니다.
 
+#### 현재 Rate/Acro 입력표
+
+Rate/Acro는 Front-end Drone 선택 화면에서 FPV 기체를 고르면 기본 적용된다. 일반 플레이 중 모드를 바꾸는 확정 단축키는 아직 없고, Weather 시험 맵의 `1/2/3`은 그 맵 전용 비교 키다.
+
+| 기능 | 키보드·마우스 | Gamepad Mode 2 | 비고 |
+|---|---|---|---|
+| Throttle / Local Up 추진 | `W/S`, 보조 `Space/Left Ctrl` | 왼쪽 Stick Y, 보조 RT/LT | 기체가 기울면 World Z가 아니라 기체 Up 방향으로 추진 |
+| Yaw | `A/D` | 왼쪽 Stick X | 왼쪽/오른쪽 선회 |
+| Roll | `Q/E` | 오른쪽 Stick X | 기체 좌/우 회전, 90° 제한 없음 |
+| Pitch | 키보드 전용 키 없음 | 오른쪽 Stick Y | Loop는 현재 Gamepad/RC Controller로 시험 |
+| Mouse Look | Mouse X: 기체 Yaw, Mouse Y: Camera Pitch | 해당 없음 | Rate 스틱이 아닌 개발용 직접 회전/카메라 입력 |
+| 1인칭/3인칭 | `P` | Y/Triangle | 임시 시점 전환 |
+| 역할 Primary/Secondary | 좌/우 클릭 | RB/LB | 정찰·자폭·투하 역할 기능 |
+
+키보드만으로는 Body Pitch 축이 없어서 완전한 Acro Loop 시험이 불가능하다. 실제 Rate 체감은 Gamepad/RC Controller를 기준으로 하고, 키보드 Pitch가 필요하면 `IA_CameraPitchRate`에 별도 키를 추가하는 입력 작업이 필요하다.
+
 ## 공개 자료를 반영한 현재 FPV 기준값
 
 특정 군용 자폭 드론의 비공개 성능을 추정하지 않는다. 조작 의미는 Betaflight 공식 문서, 이동 성능 범위는 공개된 민간 FPV 제품 사양을 기준으로 잡았다.
@@ -100,6 +116,18 @@ Pawn Class Defaults에서 다음 Struct를 연다.
 - `Stable / Balanced / Agile Handling Tuning`: 최대 속도·가속·Yaw·최대 자세각 배율
 
 각 기체의 절대 기준값은 Data Asset의 `Flight Profile`에 둔다. Rate/Acro의 중앙 감도·최대 Rate·Expo·수직 속도는 `Flight Profile > Acro Rate Settings`에서 조정한다. 모드 전환 시에는 기준값에서 다시 계산하므로 반복 전환해도 배율이 누적되지 않는다.
+
+FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조정한다.
+
+- `Pitch Roll Center Sensitivity Degrees Per Second`: Stick 중앙 부근 민감도. 먼저 이 값을 낮춰 미세 조작을 맞춘다.
+- `Maximum Pitch Rate Degrees Per Second`, `Maximum Roll Rate Degrees Per Second`: Stick 끝의 Loop/Roll 최대 회전속도.
+- `Pitch Roll Expo`: 중앙을 둔하게 하고 끝 입력을 유지하는 곡선. 현재 `0.30`.
+- `Yaw Center Sensitivity Degrees Per Second`, `Maximum Yaw Rate Degrees Per Second`, `Yaw Expo`: Yaw 전용 같은 항목.
+- `Maximum World Vertical Speed Centimeters Per Second`: World Z 상승·하강 속도 안전 제한. 현재 `900cm/s`.
+- Pawn Blueprint의 `Acro Rate Realistic Greybox Tuning`: 관성·가속 배율, Local Up, 충돌 Root 자세 적용 여부.
+- Pawn Blueprint의 `Agile Handling Tuning`: Profile 최대 속도·가속·Yaw에 곱하는 고기동 배율.
+
+조정 순서는 `중앙 감도 → Expo → 최대 Rate → 이동 가속/관성`으로 잡는다. 최대 Rate부터 내리면 끝 입력만 아니라 전체 기동 폭도 줄어 원인을 구분하기 어렵다.
 
 ## Editor 확인 순서
 

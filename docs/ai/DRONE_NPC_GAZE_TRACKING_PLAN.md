@@ -2,7 +2,7 @@
 
 기준일: 2026-09-04 (Asia/Seoul)
 
-상태: C++·Rifle AnimBP Component Space 축 교정·자동화 완료, 수동 화면 재확인 대기
+상태: C++·Rifle AnimBP Component Space 축 교정·개인화기 3° 정면 데드존·자동화 완료, 수동 화면 재확인 대기
 
 이 문서는 적 NPC가 드론을 발견한 뒤 이동·엄폐·MG 사용 중에도 표적을 자연스럽게 바라보고, 시야가 잠깐 끊겨도 고개가 튀지 않게 만드는 기준이다. `ADroneNPCAIController`의 감지·1초 Sight 실종 유예·마지막 감지 위치·Search와 프로젝트 소유 Rifle AnimBP의 상체/목/고개 보정을 연결했다. 첫 화면 확인에서 좌우 회전 대신 위아래 까딱임이 발생해 Bone Space를 Component Space로 교정했으며, 교정 뒤 실제 축과 체감 속도를 다시 확인한다.
 
@@ -70,7 +70,8 @@ Greybox 시작값:
 ## 4. 몸 회전과 고개 회전 분리
 
 - AI Gameplay Focus는 사용하지 않는다. 이동 중 몸 방향은 CharacterMovement가 담당한다.
-- MG가 아닌 `DroneDetected`·`UseCover` 개인화기 교전은 Actor Yaw를 기본 `180°/s`로 Drone 방향에 돌린다. 한 프레임 순간 회전이 아니며, 몸 회전 뒤 남은 로컬 각도를 AnimBP Bone Gaze가 담당한다.
+- MG가 아닌 `DroneDetected`·`UseCover` 개인화기 교전은 Actor Yaw를 기본 `180°/s`로 Drone 방향에 돌린다. 한 프레임 순간 회전이 아니며, 몸 회전 뒤 남은 로컬 각도를 AnimBP Bone Gaze가 담당한다. 정면 `±3°` 안에서는 몸 회전과 Bone Yaw를 모두 0으로 두어 작은 표적 움직임을 몸·고개가 번갈아 추종하는 왕복 흔들림을 막는다.
+- `Personal Weapon Facing Turn Speed Degrees Per Second`와 `Personal Weapon Facing Dead Zone Degrees`는 Hostile Rifle/Shotgun Blueprint의 `NPCProfileComponent > Profile > NPC|Gaze`에서 역할별로 바꿀 수 있다.
 - MG 점유자는 `MGTurretYawPivot`의 자식인 `MGTurretOperatorAnchor`에 정렬된다. Yaw 몸체가 돌면 사수의 후방 위치·몸 방향도 직접 상속되며 별도 사수 회전값은 없다. 포탑은 `고정 BaseMount → Yaw 몸체 → Pitch 포신 → Muzzle` 계약으로 조준하고 NPC 고개만 Gaze를 보조하므로 Transform 책임이 겹치지 않는다. 자세한 연결은 [`DRONE_MG_TURRET_3PART_GUIDE.md`](DRONE_MG_TURRET_3PART_GUIDE.md)를 따른다.
 - 고개 제한각·몸 회전 시작 지연·Aim Offset의 세밀한 역할별 차이는 `AI-GAZE-02` 후속 튜닝으로 남긴다.
 
@@ -126,10 +127,11 @@ Rifle Locomotion
 1. Drone을 NPC 정면에서 왼쪽·오른쪽·위·아래 순서로 천천히 이동한다.
 2. 왼쪽/오른쪽 이동에는 고개·상체가 좌우로 돌고, 위/아래 이동에만 고개가 상하로 움직이는지 본다. 이전처럼 좌우 이동에도 까딱이기만 하면 실패다.
 3. 개인화기 병사가 발견 뒤 Drone 방향으로 몸을 부드럽게 돌리고 고개·상체가 남은 각도를 따라오는지 본다. 한 프레임에 몸이 꺾이거나 반대 방향으로 돌면 실패다.
-4. NPC가 MG 또는 Cover로 이동하는 중에도 시선이 끊기지 않는지 본다.
-5. 장애물에 0.5초 가렸다 다시 보여 고개가 정면으로 튀지 않는지 본다.
-6. 1초 이상 숨긴 뒤 마지막 위치를 바라보며 Search하고, Search 완료 후 정면으로 부드럽게 복귀하는지 본다.
-7. Rifle 연사·Reload 중 손과 총기 정렬, 목 관절, 어깨가 무너지지 않는지 확인한다.
+4. 정면에서 Drone을 1~2° 정도 좌우로 조금 움직였을 때 몸과 고개가 계속 왕복하지 않는지 보고, 3°를 넘겨 옮기면 다시 자연스럽게 추적하는지 본다.
+5. NPC가 MG 또는 Cover로 이동하는 중에도 시선이 끊기지 않는지 본다.
+6. 장애물에 0.5초 가렸다 다시 보여 고개가 정면으로 튀지 않는지 본다.
+7. 1초 이상 숨긴 뒤 마지막 위치를 바라보며 Search하고, Search 완료 후 정면으로 부드럽게 복귀하는지 본다.
+8. Rifle 연사·Reload 중 손과 총기 정렬, 목 관절, 어깨가 무너지지 않는지 확인한다.
 
 통과 기록 형식:
 

@@ -1,20 +1,20 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-09-16 — 기상 Profile·지속풍/돌풍 Runtime·전용 TestMap 완료
+마지막 갱신: 2026-09-16 — 실제 Shotgun 발광 Pellet/Tracer·개인화기 3° 시선 안정화 구현 및 자동 검증
 
 ## Now
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
 | MAP-TEST-01 | 경량 Tutorial Systems TestMap 수동 확인 | 맵·생성 도구·전용 자동화·Map Check 완료 | Gate/Ring/역할/HUD 한·두 Lap 화면 확인 |
-| AI-SO-TUNE-01 | Smart Object·유인 MG 화면 확인 | 맵을 TestMap으로 이동, Asset·PIE·감지/수색 자동화 통과 | 이동된 AI 시험 맵에서 방향·정렬·Gaze·재점유 확인 |
-| AI-SHOTGUN-PIE-01 | 추가 Shotgun NPC 사격 체감 확인 | 독립 사격장·추가 NPC·Asset/PIE 자동화·Map Check 완료 | Cyan Pellet 원뿔·회피·피해·사거리·LOS를 Editor 화면에서 확인 |
+| AI-SO-TUNE-01 | Smart Object·유인 MG 화면 확인 | 맵을 TestMap으로 이동. 과거 Asset·PIE·감지/수색 통과 뒤 최신 단독 `NPCPerceptionSearchPIE`에서 사수 사망 후 MG 재점유 시간제한 1회 실패 | 같은 조건 재현·원인 분리 후 자동화 Green, 이동된 AI 시험 맵에서 방향·정렬·Gaze·재점유 확인 |
+| AI-SHOTGUN-PIE-01 | 추가 Shotgun NPC 사격 체감 확인 | 실제 8 Projectile 유지, Pellet당 3 피해·실제 BP 발광 비드/Tracer·3° 몸/고개 데드존·Asset/PIE 자동화·Map Check 완료 | 발광 비드 8개 분리 가시성·Cyan 원뿔·회피·최대 24 피해·사거리·LOS·정면 시선 안정화를 Editor 화면에서 확인 |
 | MISSION-RULE-PIE-01 | 새 목표 Rule의 실제 맵 Vertical Slice | 귀환·Jammer·역할 Actor 시험 배치 완료, 직접 실행은 Prototype Flow | Test Mission DA/진입 경로에서 Scan/Delivery/Destroy/Return/Jamming Event·Tag·시간 규칙 확인 |
 | STY-03-PIE-01 | 재밍 신호·비행·HUD Vertical Slice | 35%/80% 겹침 Zone TestMap 배치·저장 계약 완료 | 실제 비행으로 Overlap·HUD·둔화/복원 확인. 영상 Noise WBP는 별도 표현 작업 |
 | STORY-BRANCH-01 | Mission 2→3 양쪽 스토리 분기 | Story Fact 저장·성공 적용·조건 목표 필터, 미끼/실제 탑승 양쪽 자동화 완료 | 사용자가 기본 스토리안을 정하면 실제 Mission DA에 Fact 설정 |
 | DRONE-FIBER-01 | 광섬유 Drone 기반 | `JammingImmunity` Capability→Signal 동작 연결·자동화 완료, 실제 Definition/Pawn 없음 | 프로젝트 소유 Definition/Integration Pawn과 Visual 연결 후 Zone PIE |
 | DR-FPV-ACRO-PIE-01 | 고기동 FPV 실제 조작 체감 | Rate/Acro 각속도·무수평복귀·속도 Data Asset·자동화 완료 | Gamepad/RC Mode 2로 Roll/Loop·Throttle·650°/s 체감 확인 후 Rate 조정 |
-| WTH-02-PIE-01 | 바람 Vertical Slice 체감 | Profile/Snapshot/Subsystem·Drone Response·전용 TestMap·자동화 완료 | 쉬운 조작/Rate-Acro Drift, 순풍·역풍·횡풍과 돌풍 세기 화면 확인 |
+| WTH-02-PIE-01 | 바람 Vertical Slice 체감 | 24개 이동 Bead·풍속/풍향/모드 Readout·1/2/3 모드 키·전용 TestMap 자동화 완료 | 표시 방향과 실제 Drift, 세 모드 보정 차이, 순풍·역풍·횡풍과 돌풍 세기 화면 확인 |
 | WTH-03 | 비 표현 Vertical Slice | Snapshot 비 값과 최적화·품질 계획 완료, 표현 자산 없음 | Camera-follow Niagara Rain·MPC Wetness·Audio를 붙이고 Low~Epic GPU 측정 |
 
 ### 사용자가 지금 확인할 맵
@@ -35,17 +35,17 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 
 - `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`: 순찰·감지·수색·MG·자동포탑·차량
 - `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest`: 재밍 약/강/겹침·Return Zone·역할 표적
-- `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest`: 추가 Shotgun NPC·산탄 Projectile·탄약·LOS 사격장
-- `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`: LightWind 지속풍·돌풍·조작 모드별 보정, 풍향 화살표
+- `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest`: 추가 Shotgun NPC·작은 Pellet 8개/Tracer·탄약·LOS 사격장
+- `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`: LightWind 지속풍·돌풍, 이동 Bead·풍속/풍향 표시, `1/2/3` 조작 모드별 보정
 
 ## Next
 
 1. 수동 확인에서 발견된 Gate/HUD/역할 결함 수정 후 TestMap 회귀
-2. Shotgun Systems 맵에서 Cyan 원뿔·회피 가능 탄속·피해·사거리·LOS를 수동 확인
+2. Shotgun Systems 맵에서 작은 Pellet/Tracer 8개가 분리되어 보이는지와 Cyan 원뿔·회피 가능 탄속·피해·사거리·LOS를 수동 확인
 3. 이동된 AI 시험 맵에서 MG 재점유·Smart Object 방향·NPC Gaze·무인 포탑 확인
 4. 새 Mission Systems 맵에서 재밍 HUD·둔화/복원·역할 기능·Return 크기 수동 확인
 5. FPV Rate/Acro를 Gamepad/RC Controller Mode 2로 수동 확인하고 중앙 감도·Expo·최대 Rate를 체감 조정
-6. Weather Systems 맵에서 쉬운 조작/Rate-Acro Drift와 LightWind 돌풍을 수동 확인
+6. Weather Systems 맵에서 이동 Bead·풍속/풍향 표시와 `1/2/3` 세 조작 모드 Drift·LightWind 돌풍을 수동 확인
 7. `WTH-03` Camera-follow Niagara Rain·MPC Wetness·Audio·품질 단계를 연결하고 GPU 측정
 8. Test Mission DA와 개발용 진입 경로를 추가해 Return/Jammer Mission Event를 실제 PIE로 확인
 9. Mission 1 검증용 DA/Map에서 Drop→요원 전달→선택적 정보 회수→시간/파괴 실패 Vertical Slice
@@ -98,6 +98,9 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 | Shotgun 가시성/API | Projectile 모드 Cyan Pellet 비행선, BP 표시 On/Off·직전 끝점 조회, 전체 계약 5/5 성공 |
 | FPV Rate/Acro | Mode 2+Actual Rates형 각속도, 자동 수평 복귀 없음, FPV DA 27m/s·650°/s 기준, Build·집중 회귀 5/5 성공 |
 | 기상 데이터·바람 Runtime | Profile/Snapshot/Subsystem·Controller·Drone Response, 저장 Profile 3종, TestMap·Map Check·기상 자동화 3/3 성공 |
+| Shotgun Pellet 가시화 | 실제 8발·6° 확산 유지, Pellet당 3 피해, 전용 BP의 주황 발광 `0.04` 비드와 `0.20 × 0.0125` Tracer, 집중 회귀 성공 |
+| 개인화기 정면 시선 안정화 | 몸 Yaw와 Bone Gaze 공통 3° 데드존, 1.9° 좌우 표적 왕복 회귀 Red→Green, Blueprint 역할별 조정 가능 |
+| Weather TestMap 가시화 | BP 조절형 Visualizer, 이동 Bead 24개, Profile/풍속/풍향/모드 Readout, 1/2/3 비교 키와 Map Check 0/0 |
 | 비 기획 | Camera-follow GPU Rain·Effect Type·젖음/실내/Splash 최적화 계획과 Snapshot 표현값. Niagara/MPC/Audio는 다음 작업 |
 
 시험 맵 사용법은 [`docs/gameplay/DRONE_TEST_MAP_GUIDE.md`](docs/gameplay/DRONE_TEST_MAP_GUIDE.md), FPV 조작은 [`docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md`](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md), 기상은 [`docs/gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md`](docs/gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md), Mission Rule 설정은 [`docs/gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md`](docs/gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md), 전체 순서는 [`docs/planning/DRONE_TUTORIAL_STORY_PLAN.md`](docs/planning/DRONE_TUTORIAL_STORY_PLAN.md)를 참고한다.

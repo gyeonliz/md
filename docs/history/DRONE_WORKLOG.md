@@ -1464,3 +1464,29 @@ HeadingValueText
 - `DroneEditor Win64 Development` Build가 성공했다. `Drone.Weather.ProfileAndWindContract`, `Drone.Weather.ProfileAssets`, `Drone.Weather.SystemsTestMap`은 3/3 Success·Exit 0이고 `Drone.Prototype.PawnDefaults` 회귀도 Success·Exit 0이다.
 - 비 강도·생성량·시야·화면 물방울·젖음·Splash·실내 감쇠·Audio 값은 Snapshot에 포함됐지만 Niagara/MPC/Audio 표현은 아직 없다. 비가 체력·신호·Mission 규칙을 자동으로 바꾸지 않는다. 다음 구현은 Camera-follow GPU Rain과 성능 측정이다.
 - Commit·Push는 하지 않았다.
+
+## 2026-09-16 — D 드라이브 작업 PC 원격 재동기화
+
+- `D:\JGY\project\drone`과 `D:\JGY\project\md`에서 `git fetch origin --prune`을 다시 실행해 원격 조회가 정상 동작함을 확인했다.
+- Unreal은 `main = origin/main = 962ff02`이고 Commit 제목은 `기상 시스템과 기능별 테스트맵 구현`이다. Mission Rule·재밍·Story Fact·FPV Rate/Acro·기상 Runtime, Weather/Mission/Shotgun TestMap과 AI 맵 이동이 모두 이 Push 기준선에 포함됐다.
+- 문서는 `main = origin/main = 3c28611`이고 위 구현에 대응하는 상태·가이드·Worklog가 Push 기준선에 포함됐다.
+- 확인 시작 시 두 저장소 모두 Clean, Stash 없음, `HEAD...origin/main` 차이 `0/0`이었다. 이전 문서의 C 드라이브 경로와 `로컬 미커밋` Git 표기는 다른 PC의 Push 전 기록이므로 현재 D 드라이브 경로와 최신 Commit으로 정정했다.
+- 이번 최신화는 `STATUS.md`, `WORKBOARD.md`, `CONTEXT.md`와 이 Worklog만 변경한다. Unreal 코드·자산·Map은 수정하지 않았으며 Commit과 Push는 사용자가 처리한다.
+
+## 2026-09-16 — Shotgun Pellet 가시화·피해 조정과 Weather TestMap 판독성 개선
+
+- Shotgun 사격장에서 한 탄두만 보인다는 보고를 기존 PIE 계측과 대조했다. 실제 발사 로직은 한 Volley마다 8개 이동 Projectile을 6° 원뿔 안의 독립 방향으로 생성하고 있었고, 전용 PIE도 8발 생성을 통과했다. 원인은 모든 발이 같은 총구에서 같은 프레임에 큰 공용 Sphere로 시작하고 별도 Tracer가 없어 겹쳐 보이는 표현 문제였다.
+- 먼저 회귀 계약을 `Pellet당 3 피해`, `작은 비드`, `짧은 Tracer`, `전용 Projectile BP`로 추가했다. 변경 전 `8 피해`, Tracer 없음, 큰 기본 Scale과 Weather Visualizer 0개로 의도한 실패를 확인했다.
+- `ADroneNPCProjectile`에 Blueprint 교체 가능한 `ProjectileVisual`과 `ProjectileTrailVisual` Getter를 추가하고 기본 Sphere Scale을 `0.025`, 뒤쪽 Cube Tracer를 `0.14 x 0.0075 x 0.0075`로 설정했다. `/Game/Drone/AI/Blueprints/Projectiles/BP_ShotgunPelletProjectile`을 만들고 `BP_NPC_Hostile_Shotgun`의 Projectile Class에 연결했다. Shotgun은 `8 Pellet`, `6°`, `3500cm/s`를 유지하고 Pellet당 피해를 `8→3`으로 낮춰 전탄 최대 24가 됐다.
+- `ADroneWeatherDebugVisualizer`와 `/Game/Drone/Weather/Blueprints/BP_DroneWeatherDebugVisualizer`를 추가했다. Weather TestMap에서 24개 Sphere Bead가 현재 Snapshot 풍향/풍속으로 이동하며 Profile·풍속·풍향·모드를 화면에 표시한다. `1/2/3`과 NumPad `1/2/3`은 Easy 65%/Manual 25%/Rate-Acro 0% 보정을 즉시 비교한다. Bead 수·범위·Scale·재생 배율·Mesh·Readout/Hotkey 사용은 BP/배치 인스턴스에서 조정한다.
+- Shotgun/Weather 맵을 도구 소유 Actor만 다시 생성했고 두 Map Check는 `0 errors / 0 warnings`다. MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공, Shotgun 전용 Asset/PIE 2/2, `NPCGreyboxAssets`, `WeaponContract`, `ProjectileBallistics`, `ShotgunTrace`, 강화한 `Drone.Weather.SystemsTestMap`이 모두 성공했다. `git diff --check`와 `git lfs fsck`도 통과했다.
+- 화면에서 Pellet 8개 분리 정도와 Tracer 길이·밝기, 한 Volley 최대 24 피해 체감, Weather Bead 가독성과 1/2/3 Drift 차이는 수동 확인이 남았다. RainStorm Profile은 값만 전달하며 Niagara/MPC/Audio 비 표현은 아직 없다. Commit·Push는 하지 않았다.
+
+## 2026-09-16 — 실제 Shotgun 탄 시인성 보강·개인화기 고개 흔들림 안정화
+
+- 작은 회색 Pellet/Tracer가 화면에서 너무 안 보인다는 재확인에 따라 TestMap 선이 아니라 실제 `/Game/Drone/AI/Blueprints/Projectiles/BP_ShotgunPelletProjectile`을 수정했다. `/Game/Drone/AI/Materials/M_ShotgunPelletGlow` 주황 Unlit Emissive 재질을 만들고 비드 Scale을 `0.04`, Tracer를 `0.20 x 0.0125 x 0.0125`로 올려 실제 샷건 NPC가 배치된 모든 맵에 적용했다.
+- 샷건 NPC가 표적 발견 뒤 정면에서도 몸/고개를 좌우 왕복한다는 보고를 실제 Controller Tick 경로의 PIE 회귀로 고정했다. NPC 9m 전방 표적을 좌우 30cm, 약 ±1.9°로 번갈아 이동하는 테스트는 수정 전 몸체 회전 한도를 넘어 실패했다.
+- `ADroneNPCAIController`의 개인화기 몸 Yaw와 Bone Gaze에 공통 `PersonalWeaponFacingDeadZoneDegrees = 3°`를 추가했다. 데드존 안에서는 정면 오차로 허용하고, 밖에서는 기존 초당 180° 몸 회전과 상체/목/머리 보간을 유지한다. 데드존과 몸 회전속도는 `FDroneNPCProfile`로 옮겨 Hostile Rifle/Shotgun Blueprint `NPCProfileComponent > Profile > NPC|Gaze`에서 역할별 조정할 수 있다.
+- 같은 PIE 회귀가 수정 뒤 성공했고, MSVC 14.51.36257 `DroneEditor Win64 Development` Build와 Shotgun Asset/PIE `2/2`가 성공했다. 실제 Pellet BP의 발광 Material·크기·Tracer와 1.9° 정면 안정화가 자동 계약에 포함됐다.
+- 영향 확인용 기존 `Drone.AI.NPCPerceptionSearchPIE` 단독 실행은 이번 Shotgun/Gaze 검증이 아니라 사수 사망 뒤 MG 재점유 제한시간에서 실패했다. 로그상 사망 NPC 정리는 성공했지만 생존 Shotgun NPC가 개인화기 상태에 머물러 MG를 다시 Claim하지 않았다. 최신 전체 AI 통과로 기록하지 않고 별도 재현·진단 항목으로 남겼다.
+- Rate/Acro 현재 키를 문서화했다. Gamepad Mode 2는 왼쪽 Y Throttle·왼쪽 X Yaw·오른쪽 Y Pitch·오른쪽 X Roll이다. 키보드는 W/S Throttle·A/D Yaw·Q/E Roll이고 Body Pitch 전용 키가 아직 없어 완전한 Loop 시험은 Gamepad/RC Controller가 필요하다. Commit·Push는 하지 않았다.

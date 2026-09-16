@@ -4,8 +4,8 @@
 
 ## 한눈에 보기
 
-- 현재 단계: AI/Mission/Signal/Shotgun TestMap, FPV Rate/Acro, 기상 Profile·지속풍/돌풍 Vertical Slice 구현 완료. 화면 체감 확인과 비 표현·실제 Mission Flow PIE·Story 맵 통합 대기
-- 바로 다음 개발: Weather TestMap 바람 체감 확인 → Camera-follow Niagara Rain/MPC/Audio → Test Mission DA/진입 경로로 Return·Jammer Event 실제 PIE
+- 현재 단계: AI/Mission/Signal/Shotgun TestMap, FPV Rate/Acro, 기상 Profile·지속풍/돌풍 Vertical Slice 구현 완료. 실제 Shotgun BP의 발광 Pellet/Tracer와 개인화기 3° 정면 시선 안정화, Weather TestMap 바람 시각화까지 구현했으며 화면 체감 확인 대기
+- 바로 다음 개발: Shotgun/Weather TestMap 화면 확인 → Camera-follow Niagara Rain/MPC/Audio → Test Mission DA/진입 경로로 Return·Jammer Event 실제 PIE
 - Unreal Editor: 마지막 확인 시 종료 상태
 - Production Training: 팀원이 실제 Tutorial 환경을 제작 중이므로 열람 외 저장·덮어쓰기·자동 재구성 금지
 
@@ -13,10 +13,10 @@
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal `C:\URproject\drone` | `main = origin/main = 8b9b2a8` | Mission Source·Training Mission Data Asset·시험 도구 로컬 수정, Stash 없음 |
-| 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` | `main = origin/main = 3e89e43` | 상태·보드·가이드 등 로컬 수정, Stash 없음 |
+| Unreal `D:\JGY\project\drone` | 기준 `main = origin/main = 962ff02` | Shotgun Pellet/Tracer·Weather 시각화 코드/자산/TestMap 로컬 변경, Stash 없음 |
+| 문서 `D:\JGY\project\md` | 기준 `main = origin/main = 3c28611` | 기준선 정정과 이번 Shotgun/Weather 기록 로컬 변경, Stash 없음 |
 
-2026-09-15 `origin` 재조회 기준으로 두 저장소의 HEAD는 원격과 일치했다. 그 후 아래 Mission·재밍·시험 맵 작업을 로컬에서 진행했으며 Commit·Push하지 않았다. 현재 원격 서버의 추가 변경은 다시 조회하지 않았다. 팀원 Training 맵은 변경하지 않았고 TestMap에는 AI 맵 이동본, Mission Systems 맵, Shotgun Systems 맵이 추가됐다. 이전 GitHub Desktop 자동 Stash 두 개는 이미 정리된 상태다.
+2026-09-16 D 드라이브 작업 PC에서 두 저장소를 `fetch --prune`으로 다시 확인했을 때 Mission Rule·재밍·Story Fact·FPV Rate/Acro·기상 Runtime과 기능별 TestMap은 Unreal `962ff02`, 대응 문서는 `3c28611`로 Push 완료됐고 원격 차이는 `0/0`이었다. 그 기준 위에 이번 Shotgun Pellet/Tracer와 Weather TestMap 시각화 작업을 로컬로 진행했다. Commit과 Push는 사용자가 처리한다.
 
 ## 최신 완료 항목
 
@@ -42,12 +42,15 @@
 - `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest` 생성. 35%/80% 겹침 Jammer, Return Zone, 역할 표적 3종, Carryable과 위치 표식 배치
 - `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest` 생성. 기존 AI 맵을 바꾸지 않고 추가 Hostile Shotgun NPC 1명, 약 9m 시작 거리, 5/10/15m 표식과 LOS 차단벽 배치
 - 기본 Projectile Shotgun에서도 Cyan 예상 비행선 8개를 표시하고 Blueprint에서 표시 On/Off와 직전 Pellet 끝점 배열을 조회할 수 있게 보강
+- Shotgun은 실제 8 Projectile·6° 독립 확산을 유지하면서 Pellet당 피해를 `8→3`으로 낮췄다. 실제 `/Game/Drone/AI/Blueprints/Projectiles/BP_ShotgunPelletProjectile`에 주황 Emissive Material, `0.04` 비드와 `0.20 × 0.0125` 짧은 Tracer를 적용했으며 Mesh/Material/Transform을 Blueprint에서 교체할 수 있다
+- Shotgun/Rifle 개인화기 교전의 몸 Yaw와 Bone Gaze에 기본 `3°` 정면 데드존을 추가했다. 1.9° 좌우 표적 흔들림 회귀가 수정 전 실패하고 수정 뒤 통과했으며 데드존과 기본 `180°/s` 몸 회전속도는 Hostile Blueprint `NPCProfileComponent > Profile > NPC|Gaze`에서 역할별 조정 가능하다
 - 세 번째 `FPV Rate/Acro` 조작 모드 추가. Pitch/Roll/Yaw를 Body 각속도로 해석하고 Stick 중앙에서 자동 수평 복귀하지 않아 Roll/Loop 가능
 - FPV Data Asset 기본값을 Rate/Acro+고기동으로 변경. 공개 민간 FPV 참고선으로 수평 27m/s, 수직 9m/s, Pitch/Roll 650°/s, Yaw 400°/s를 조정 가능하게 저장
 - `UDroneWeatherProfile`, `FDroneWeatherSnapshot`, `UDroneWeatherWorldSubsystem`, 배치형 `ADroneWeatherController` 구현. Profile 기본 10Hz로 결정적 지속풍·돌풍·전환값을 공급
 - 모든 Prototype Drone에 `UDroneWeatherResponseComponent`를 부착. 쉬운 조작 65%·제한 자세 25%·Rate/Acro 0% 기본 보정과 Sweep Drift 적용. 최종 물리가 아닌 `UFloatingPawnMovement` Greybox
 - `/Game/Drone/Data/Weather`에 `Clear`, `LightWind`, `RainStorm_Greybox` Profile 3종 생성
 - `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest` 생성. LightWind Controller 1개·35° 풍향 화살표·Prototype GameMode, Map Check 0/0
+- Weather TestMap에 `/Game/Drone/Weather/Blueprints/BP_DroneWeatherDebugVisualizer`를 배치했다. 24개 흐름 Bead, 현재 Profile/풍속/풍향/조작 모드 화면 표시와 `1 Easy / 2 Manual / 3 Rate-Acro` 비교 키를 제공한다
 - 비 Snapshot·최적화/품질 계획은 준비됐지만 Camera-follow Niagara, MPC Wetness, Audio, 실내 감쇠 표현은 아직 미구현
 
 ## 검증된 근거
@@ -57,7 +60,7 @@
 - `Drone.Tutorial.TrainingGateSequence` 1/1 성공
 - `Drone.Tutorial.TutorialSystemsTestMap` 1/1 성공
 - `Drone.AI.NPCPerceptionSearchPIE` 단독 새 PIE 3회 성공
-- 이전 9월 15일 작업 종료 시 Unreal·문서 `git diff --check`, Unreal `git lfs fsck` 통과. 이번 로컬 작업의 최종 검사 결과는 아래에 따로 기록
+- 이전 9월 15일 작업 종료 시 Unreal·문서 `git diff --check`, Unreal `git lfs fsck` 통과. 9월 16일 기능 변경의 최종 검사 결과는 아래에 따로 기록
 - 이 PC에서 최신 Source로 `DroneEditor Win64 Development` 재빌드 성공
 - TestMap Validate/Map Check `0 errors / 0 warnings`, rings=5/targets=3/carryable=1
 - 최종 단독 Commandline 회귀: `Drone.Mission.ObjectiveRules`, `Drone.Flow.Contract`, `Drone.Flow.MissionEntryContract`, `Drone.Tutorial.TrainingGateSequence`, `Drone.Tutorial.TutorialSystemsTestMap` 5/5 성공
@@ -65,13 +68,16 @@
 - 시험 맵 이동/추가 후 `DroneEditor Win64 Development` 재빌드 성공, Mission Systems Map Check `0 errors / 0 warnings`
 - 이동된 AI 맵 Asset·PIE·감지/수색, 새 Mission Systems 맵, Mission Rule, Signal Stage 최종 회귀 6/6 Success·경고 0
 - 자동포탑/지면 추종 차량 배치 도구를 새 AI 맵 경로에서 Validate-only 실행해 설치형 1·차량형 1·Attach·4점 Suspension·노면 5개 확인
-- Shotgun Systems 맵 Map Check `0 errors / 0 warnings`; 전용 Asset/PIE 자동화 `2/2 Success`, 경고 0
+- Shotgun Systems 맵 Map Check `0 errors / 0 warnings`; 발광 Material/실제 Pellet BP·정면 시선 안정화 포함 전용 Asset/PIE 자동화 `2/2 Success`
+- Shotgun 가시성 변경 전 자동화가 피해 8·Tracer 없음·큰 탄두를 의도대로 실패한 뒤, 변경 후 전용 Asset/PIE `2/2`와 `NPCGreyboxAssets`, `WeaponContract`, `ProjectileBallistics`, `ShotgunTrace` 집중 회귀가 모두 성공
 - 전체 샷건 묶음 `WeaponContract`, `ShotgunTrace`, `ProjectileBallistics`, 전용 Map/PIE `5/5 Success`, 실패 0. 기존 두 단위 테스트의 Recast 경고만 존재하며 샷건 기능 실패는 아님
+- 3° 시선 안정화 뒤 기존 `Drone.AI.NPCPerceptionSearchPIE`를 단독 재실행했을 때 샷건/Gaze가 아니라 사수 사망 후 생존 NPC가 MG를 제한시간 안에 재점유하지 못해 `0/1 Fail`이었다. 같은 로그에서 사망 정리 자체는 성공했으며, 최신 전체 AI 통과로 덮어쓰지 않고 MG 재점유 타이밍 회귀 재현·진단 대상으로 남긴다
 - 기존 Smart Object 맵의 NPC 수·역할이 유지되는지 `Drone.AI.NPCGreyboxAssets`를 별도 재실행해 `1/1 Success`, 경고 0 확인
 - FPV Rate/Acro 추가 후 `DroneEditor Win64 Development` Build 성공. `Drone.Prototype.FlightProfiles`, `Drone.Prototype.PIEInputLifecycle`, `Drone.Flow.MissionEntryContract`, `Drone.Flow.MissionEntryPIE`, `Drone.Prototype.RoleAbilities` 5/5 Success·Exit 0
 - 기상 Runtime 추가 후 `DroneEditor Win64 Development` Build 성공. `Drone.Weather.ProfileAndWindContract`, `Drone.Weather.ProfileAssets`, `Drone.Weather.SystemsTestMap` 3/3 Success·Exit 0
 - Weather TestMap Python 저장 검증과 Map Check `0 errors / 0 warnings`, `Drone.Prototype.PawnDefaults` 회귀 Success·Exit 0
-- 이번 로컬 작업의 Unreal·문서 `git diff --check` 모두 종료 코드 0. LF→CRLF 메시지는 줄바꿈 안내이며 공백 오류가 아니다
+- Weather 시각화 추가 전 저장 계약이 Visualizer `0개`로 의도대로 실패한 뒤, BP Visualizer 1개·Bead 24개·화면 Readout·모드 키 계약의 `Drone.Weather.SystemsTestMap` 성공
+- `962ff02`와 대응 문서 Push 전 Unreal·문서 `git diff --check` 모두 종료 코드 0. LF→CRLF 메시지는 줄바꿈 안내이며 공백 오류가 아니다
 
 ## 아직 확인하지 않은 항목
 
@@ -82,10 +88,10 @@
 - 이동된 AI 시험 맵의 MG 재점유·도착 방향·Gaze·자동포탑·차량 화면 확인
 - Drone Rotor 축·방향·속도, 비행 기울기, 실제 탄환 피격 흔들림 등 기존 수동 회귀
 - 새 TestMap의 귀환 Zone 위치/크기와 재밍 Zone Overlap·신호 경고·강한 단계 이동 체감 수동 확인
-- Shotgun Systems 맵의 Cyan Pellet 선, 이동 회피 체감, 여러 Pellet 피격 피해, 16m 사거리 경계와 LOS 차단 화면 확인
+- Shotgun Systems 맵의 발광 Pellet 8개와 짧은 Tracer 분리 가시성, Cyan 선, 이동 회피 체감, 최대 24 피해, 16m 사거리·LOS와 정면 3° 데드존 고개 안정화 화면 확인
 - FPV Rate/Acro에서 Gamepad/RC Controller Mode 2 축, Stick 중앙 자세 유지, 90° 이상 Roll/Loop, Local Up Throttle, 27m/s 체감 수동 확인
 - 현재 Rate/Acro는 `UFloatingPawnMovement` Greybox이므로 모터별 RPM·PID·중력/양력·공기저항 기반 완전 물리와 같은지 확인한 상태가 아님
-- Weather TestMap에서 쉬운 조작/Rate-Acro Drift 차이, 순풍·역풍·횡풍, 돌풍 세기 수동 확인
+- Weather TestMap에서 움직이는 Bead·화면 풍속/풍향이 실제 Drift와 맞는지, `1/2/3`으로 쉬운 조작/제한 자세/Rate-Acro 보정 차이가 구분되는지 수동 확인
 - Camera-follow Niagara Rain, 젖음 MPC, Audio, 실내 감쇠와 Low~Epic 성능 측정은 미구현
 - Test Mission DA/진입 경로에서 Return/Jammer Mission Event, 역할 Event 연쇄, 제한 시간 만료 화면 확인
 - 영상 노이즈 WBP 연출과 목표 정보 손실 표현 확인
