@@ -1,13 +1,13 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-09-16 — Acro 추력·중력 비행 v1과 자연스러운 돌풍/Bead 전환 구현·자동화 완료
+마지막 갱신: 2026-09-17 — 개인화기 추적·리시 포기·이동 회전 안정화와 AI 핵심 회귀 완료
 
 ## Now
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
 | MAP-TEST-01 | 경량 Tutorial Systems TestMap 수동 확인 | 맵·생성 도구·전용 자동화·Map Check 완료 | Gate/Ring/역할/HUD 한·두 Lap 화면 확인 |
-| AI-SO-TUNE-01 | Smart Object·유인 MG 화면 확인 | 공통 상태 최소 유지 1.0초와 유지 중 행동 재점검 구현. 기본/StateTree/차량 회귀 Green. 실제 PIE 2회는 사망 정리 후 생존 병사가 MG를 2회/3회 Claim했지만 Operator Anchor에 Nav 도착하지 못해 기존 재점유 항목 Fail | 생존 병사→MG Operator Anchor 경로/Collision 원인 수정 후 `NPCPerceptionSearchPIE` Green, 화면에서 상태 무왕복·방향·정렬·Gaze·재점유 확인 |
+| AI-SO-TUNE-01 | Smart Object·유인 MG·개인화기 추적 화면 확인 | 최소 상태 1.0초, 실제 3D 사거리 안 즉시 정지·사격/밖 0.2초 지속 시 Pursue, 3,000cm 리시·무진행 포기, 안정된 MoveTo, 추적 몸·Gaze의 이동 벡터 정렬과 다음 Tick StateTree 복귀 구현. 정책·Shotgun PIE·`NPCPerceptionSearchPIE` Green | 화면에서 Rifle/Shotgun 사거리 밖 연속 접근, 사거리 안 진입 즉시 정지, 몸·고개·이동 같은 방향, 리시 포기, MG 사망 후 재점유 확인 |
 | AI-SHOTGUN-PIE-01 | 추가 Shotgun NPC 사격 체감 확인 | 실제 8 Projectile·12° 반각, Pellet당 3 피해, 상호 충돌 방지, Cyan Debug 기본 Off, 발광 비드/Tracer·3°/6° 시선 Hysteresis·Asset/PIE 자동화 완료 | 발광 비드 8개 분리 가시성·Cyan 선 제거·회피·최대 24 피해·사거리·LOS·시선 안정화를 Editor 화면에서 확인 |
 | UI-FLOW-PROTOTYPE-01 | Mission/Drone 선택 임시 UI 확인 | 첨부 와이어프레임 기반 3열 C++ fallback 구현, `FrontEndPIE`·`MissionEntryPIE` 통과 | 16:9 화면에서 작전 목록/설명/시작과 기체 목록/상세/설정/출격이 잘리지 않는지 수동 확인 후 최종 WBP·Thumbnail 범위 결정 |
 | MISSION-RULE-PIE-01 | 새 목표 Rule의 실제 맵 Vertical Slice | 귀환·Jammer·역할 Actor 시험 배치 완료, 직접 실행은 Prototype Flow | Test Mission DA/진입 경로에서 Scan/Delivery/Destroy/Return/Jamming Event·Tag·시간 규칙 확인 |
@@ -46,7 +46,7 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 1. 수동 확인에서 발견된 Gate/HUD/역할 결함 수정 후 TestMap 회귀
 2. Shotgun Systems 맵에서 작은 Pellet/Tracer 8개가 분리되어 보이는지와 Cyan 선 제거·12° 확산·회피 가능 탄속·피해·사거리·LOS를 수동 확인
 3. Front-end와 Drone 선택 3열 UI의 해상도별 잘림·버튼 상태를 확인하고 최종 WBP Designer/Thumbnail 작업 범위를 확정
-4. 이동된 AI 시험 맵에서 병사 상태 최소 1초 유지·행동 재점검을 화면 확인하고, 생존 병사→MG Operator Anchor Nav 도착 실패를 수정한 뒤 재점유 회귀 Green
+4. 이동된 AI 시험 맵에서 Rifle/Shotgun의 사거리 밖 추적·이동 방향 Yaw·리시 포기/순찰 복귀와 병사 상태 최소 1초 유지, MG 사망 후 재점유를 화면 확인
 5. 새 Mission Systems 맵에서 재밍 HUD·둔화/복원·역할 기능·Return 크기 수동 확인
 6. FPV Rate/Acro 키보드 전용 축과 Gamepad/RC Mode 2로 호버·기울기 추진·무추력 하강·Roll/Loop를 수동 확인하고 호버 스로틀·항력·Rate 응답·감도·Expo를 체감 조정
 7. Weather Systems 맵에서 개선된 Bead의 방향 전환 무점프·풍속별 길이와 `1/2/3` 세 조작 모드 Drift·LightWind/RainStorm 돌풍을 수동 확인
@@ -104,9 +104,10 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 | Acro 입력 분리 | 키보드 W/S Pitch·A/D Roll·Q/E Yaw·Space/Ctrl Throttle, Gamepad Mode 2 전용 Action 4개와 IMC 33 Mapping, Prototype 8/8 성공 |
 | 기상 데이터·바람 Runtime | Profile/Snapshot/Subsystem·Controller·Drone Response, 저장 Profile 3종, TestMap·Map Check·기상 자동화 3/3 성공 |
 | 차량 바퀴 회전축·접지 교정 | 실제 Tire Mesh의 옆 회전을 부모 공간 +Y 차축으로 교체하고, 30cm 반지름 때문에 약 20cm 잠기던 BP를 52cm로 교정. 축·Bounds·평면 접지 Red→Green과 맵 Validate 통과, 화면 재확인 대기 |
-| Shotgun Pellet 가시화 | 실제 8발·6° 확산 유지, Pellet당 3 피해, 전용 BP의 주황 발광 `0.04` 비드와 `0.20 × 0.0125` Tracer, 집중 회귀 성공 |
+| Shotgun Pellet 가시화 | 실제 8발·12° 확산, Pellet당 3 피해, 전용 BP의 주황 발광 `0.04` 비드와 `0.20 × 0.0125` Tracer, 집중 회귀 성공 |
 | 개인화기 정면 시선 안정화 | 몸 Yaw와 Bone Gaze 공통 3° 데드존, 1.9° 좌우 표적 왕복 회귀 Red→Green, Blueprint 역할별 조정 가능 |
-| 병사 상태 전환 안정화 | 공통 최소 유지 1.0초, 유지 중 사격·점유·이동 조건 재점검, MG 재시도 Event 지연, 사망·파괴·Lost 확정 즉시 정리. 기본 계약 Green, 기존 MG 재점유 Nav 실패는 별도 추적 |
+| 병사 상태 전환 안정화 | 공통 최소 유지 1.0초, 유지 중 사격·점유·이동 조건 재점검, MG 재시도 Event 지연, 사망·파괴·Lost 확정 즉시 정리. 후속 추적 안정화 뒤 MG 재점유 포함 전체 PIE Green |
+| 개인화기 추적·포기 안정화 | Fire/Pursue/Disengage 정책, 실제 3D 사거리 안 즉시 정지·사격, 밖 판정 0.2초 확인 뒤 Pursue, Nav 투영, 같은 목적지 MoveTo 중복 방지, 3,000cm 리시·2.5초 무진행·복귀 Cooldown, 추적 몸·Gaze 이동 벡터 정렬, StateTree 다음 Tick 재시작. 집중 회귀 성공 |
 | Weather TestMap 가시화 | BP 조절형 Visualizer, 이동 Bead 24개, Profile/풍속/풍향/모드 Readout, 1/2/3 비교 키와 Map Check 0/0 |
 | 자연스러운 바람 전환 | Gust Attack/Release·풍향 최단각 응답, 표시 속도 벡터 적분, 풍속별 Bead 방향/길이, Weather 3/3 성공 |
 | 비 기획 | Camera-follow GPU Rain·Effect Type·젖음/실내/Splash 최적화 계획과 Snapshot 표현값. Niagara/MPC/Audio는 다음 작업 |

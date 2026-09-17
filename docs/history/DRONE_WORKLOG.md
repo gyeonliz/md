@@ -23,16 +23,30 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 | 구분 | 현재 상태 |
 |---|---|
 | 전체 단계 | 경량 Tutorial Systems Test Map 생성·기술 검증 완료. TestMap 수동 Vertical Slice 대기 |
-| Unreal 기준선 | 로컬 추적 `main=origin/main=10da7ce`; `.vsconfig` Git 추적 제외 유지 |
-| 자동 검증 | Editor Build 성공. Gate Sequence 1/1, Tutorial Systems Test Map 1/1. Pull 이후 Production Map 관련 알려진 실패는 아래 이력에 기록 |
+| Unreal 기준선 | 로컬 추적 `main=origin/main=dc655ac`; 개인화기 추적/AI 회귀 Source·Test는 로컬 미커밋 |
+| 자동 검증 | Editor Build 성공. 개인화기 정책·Smart Object 기본값·Shotgun PIE·NPC 감지/MG/Search PIE·NPC 역할 자산 5/5 성공 |
 | PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | 경량 TestMap의 Gate 4변 Frame·3상태 색·한/두 Lap 화면 확인. 팀원 Training은 무변경 |
-| 차단 조건 | Gate 17/Sequence 4, 역할 표적·Carryable 0, MG 사망 사수 정리/재점유 실패 |
-| 다음 행동 | TestMap Gate Frame·3색 화면 확인 → 한/두 Lap → 기존 시험 맵 참조 감사·AssetTools 이동 → AI 수동 회귀 |
+| 지금 작업 중 | 개인화기 추적·포기와 MG 사망 교대 자동화 완료. Smart Object 맵 화면 회귀 및 기존 TestMap 수동 확인 대기 |
+| 차단 조건 | 자동 차단 없음. 팀원 Production Training은 별도 제작 중이므로 수정 금지 |
+| 다음 행동 | AI 추적/리시/재점유 화면 확인 → TestMap Gate/HUD → Acro/Shotgun/Weather 체감 확인 |
 | 다음 기능 | `TUT-05 완료 → TUT-04 실제 두 Lap → Mission 목표 Rule 데이터화·Jamming` |
 | 이후 | Flight 실패 세부 규칙, AI/MG·Jamming과 실제 비주얼 통합 |
-| Git 처리 | 확인 시작 시 Unreal `10da7ce`, 문서 `27d002d`가 로컬 추적 기준이고 두 저장소 Clean. 이번 문서 갱신만 로컬 변경이며 Commit·Push하지 않음 |
+| Git 처리 | Unreal `dc655ac`, 문서 `8e4f1cf`가 각각 origin/main과 일치. Source/Test와 이번 문서는 로컬 변경이며 Commit·Push하지 않음 |
 | 협업 Git | 15:56 GitHub Desktop 자동 Stash에서 개발 파일만 선택 복구. Stash는 안전 확인 전까지 보존 |
+
+## 2026-09-17 — 개인화기 추적·리시 포기·NPC 회전 안정화 마감
+
+- 같은 Shotgun 병사만 제자리에서 Yaw가 왕복하던 화면 증상을 Rifle과 비교했다. Shotgun은 짧은 사거리 때문에 추적 상태에 들어갔고, 0.35초마다 거의 같은 목적지로 `MoveToLocation`을 다시 발행해 이동/회전을 계속 초기화하는 것이 핵심 원인이었다. 최소 상태 보장시간 자체가 원인은 아니었다.
+- `FDroneNPCEngagementPolicy`를 분리해 `Fire / Pursue / Disengage` 결정을 테스트 가능하게 만들었다. 개인화기 사거리 밖에서는 공중 표적을 NavMesh로 투영해 추적하고, 진행 중 목적지가 기본 150cm 이상 바뀐 경우에만 MoveTo를 갱신한다.
+- 후속 화면 확인에서 사거리 경계가 애매할 때 다시 왕복하는 증상을 재현했다. 1,590↔1,610cm 반복 입력에서 기존 단일 1,600cm 경계가 Fire/Pursue를 5회 뒤집는 Red를 만들었다. 공간 Hysteresis는 사거리 안에서도 계속 접근하거나 사거리 밖에서 멈추는 구간을 만들므로 최종 폐기했다. 무기 Component와 같은 3D 실제 사거리 안이면 즉시 정지·Fire, 밖 판정이 기본 0.2초 지속될 때만 Pursue한다. 짧은 경계 노이즈는 시간 확인으로 거르고 사거리 안 복귀는 지연하지 않는다.
+- 개인화기 교전 상태는 순간 `CanFire` 값이 아니라 거리 정책으로 정한다. 탄창이 비어도 근거리에서 추적 상태로 잘못 빠지지 않고 정지 교전 경로에서 재장전/발사를 다시 시도한다.
+- 전투 시작점 기준 기본 3,000cm 리시, 2.5초 무진행 한계, 3초 재감지 Cooldown과 85% 복귀 반경을 추가했다. 범위를 벗어나거나 접근 불가하면 사격·이동·예약을 정리하고 순찰로 복귀한다. 모든 값은 Controller Blueprint Class Defaults에서 조정 가능하다.
+- NPC Character는 역할 BP가 저장한 과거 설정과 무관하게 BeginPlay에서 이동 회전 계약을 복구한다. 추적 중에는 Controller가 실제 수평 속도 방향으로 몸 Yaw를 보간하고 Bone Gaze도 같은 이동 벡터를 보며, 정지 사격/엄폐에서만 Drone 방향 몸 Yaw를 사용한다. 이동 경로와 표적 직선 방향이 달라도 몸과 고개가 서로 반대로 선택하지 않는다.
+- 리시 포기 중 StateTree를 동기 `RestartLogic()`하던 경로에서 `Reentrant call to StartTree`를 재현했다. 순찰 재시작을 다음 Tick으로 예약해 현재 Task 종료와 분리했다.
+- 넓은 PIE 테스트는 수동 Sight 자극을 실제 Perception과 분리하고, 두 Hostile의 리시 안에 시험 Drone을 배치하며, 같은 맵의 무인 자동포탑 피해를 0으로 격리했다. Production Map/Asset은 수정하지 않았다.
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. `Drone.AI.PersonalWeaponEngagementPolicy`, `Drone.AI.SmartObjectFoundationDefaults`, 경계 흔들림·몸/시선 이동 정렬·사거리 진입 즉시 정지를 확장한 `Drone.AI.ShotgunSystemsTestMapPIE`, `Drone.AI.NPCPerceptionSearchPIE`, `Drone.AI.NPCGreyboxAssets`가 최종 `5/5 Success`다. 마지막 넓은 PIE는 감지·MG 경합·개인화기 대체·사수 사망 후 재점유·Lost/Search·순찰 복귀 전체를 통과했고 StateTree 재진입 오류도 0이다.
+- 팀원이 `BP_NPC_Friendly_Base` 역할 Mesh를 Manny에서 `/Game/QuantumCharacter/Mesh/SKM_QuantumCharacter`로 변경한 뒤 자산 회귀의 기대값만 옛 경로로 남아 있던 실패를 확인했다. Blueprint/Asset은 수정하지 않고 테스트 기대 경로만 현재 역할 Mesh로 갱신해 `NPCGreyboxAssets`를 Red→Green 전환했다.
+- 임시 `[DEBUG-AI-*]` 로그는 모두 제거했고 `git diff --check`는 공백 오류 없이 통과했다. Unreal Editor는 종료 상태이며 Commit·Push는 하지 않았다. 다음 확인은 `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`의 Rifle/Shotgun 추적 무떨림·리시 포기·MG 재점유 화면이다.
 
 ## 2026-09-15 — Gate 임시 16각 Ring을 Trigger 정합 4변 Frame으로 교체
 

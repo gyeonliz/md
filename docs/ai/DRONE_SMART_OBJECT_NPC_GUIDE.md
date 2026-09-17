@@ -1,12 +1,12 @@
 # Drone Smart Object NPC 준비·사용 가이드
 
-기준일: 2026-09-15 (Asia/Seoul)
+기준일: 2026-09-17 (Asia/Seoul)
 
 팀원이 맵에서 실제 지점과 동선을 수정할 때는 먼저 [`DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md`](DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md)를 따른다. 이 문서는 코드·Asset 계약과 전체 기능 설명을 담당한다.
 
 이 문서는 적군 순찰과 드론 발견 대응, 소총·샷건 분기, 기지 아군 NPC의 생활·순찰 이동, 한 명만 사용하는 MG Turret을 같은 기반 위에 구성하기 위한 실전 가이드다.
 
-현재 공유 기준선 `46f7f37`에는 **MG·체력·사망 교대·Cover·Drone 파괴 교전 종료·Rifle/Shotgun 탄창, Smart Object 도착 방향, 이동 Projectile·사격 분산과 프로젝트 소유 Rifle AnimBP**까지 반영돼 있다. 그 위 로컬 변경으로 Drone 감지·1초 유예·Search 마지막 위치를 잇는 상체/목/고개 Gaze, 개인화기 교전 중 Drone 방향 몸 Yaw, MG 전용 `고정 Base → Yaw 몸체 → Pitch 포신 → Muzzle`·임시 원기둥 Mesh 3개와 Yaw 몸체를 직접 따라가는 후방 Operator Anchor를 구현했다. `ST_NPC_HostilePatrol`은 MGTurret을 먼저 시도하고 실패한 Hostile은 Cover 1-Slot으로 이동해 개인 무기로 대응한다. 사수가 사망하면 Cover 병사가 자기 Slot을 놓고 빈 MG를 재Claim할 수 있다. Cover도 없으면 제자리 개인 무기로 대응하며, 실종 Event 뒤에는 모든 Slot을 정리하고 3초 Search 후 순찰로 복귀한다. Drone이 파괴되면 Search 없이 즉시 전투 자원을 정리하고 Patrol로 돌아간다. 예비 탄약·재장전 시간·FX·SFX와 최종 사망 연출은 완성 기능이 아니다.
+현재 Source에는 **MG·체력·사망 교대·Cover·Drone 파괴 교전 종료·Rifle/Shotgun 탄창, Smart Object 도착 방향, 이동 Projectile·사격 분산, Gaze와 개인화기 추적/포기**가 반영돼 있다. `ST_NPC_HostilePatrol`은 MGTurret을 먼저 시도하고 실패한 Hostile은 Cover 1-Slot 또는 개인 무기로 대응한다. 개인화기 사거리 밖에서는 전투 리시 안에서 NavMesh를 따라 추적하고, 리시/무진행 한계를 넘으면 표적을 포기해 Patrol로 돌아간다. 사수가 사망하면 다른 MG 가능 병사가 자기 Slot을 놓고 빈 MG를 재Claim한다. 실종 Event 뒤에는 모든 Slot을 정리하고 3초 Search 후 순찰로 복귀하며, Drone 파괴 시 Search 없이 즉시 전투 자원을 정리한다. 예비 탄약·재장전 시간·FX·SFX와 최종 사망 연출은 완성 기능이 아니다.
 
 ## 바로 찾는 수정 위치
 
@@ -21,6 +21,7 @@ Smart Object는 하나의 파일만 고치는 기능이 아니다. **장소**, *
 | MG 사거리·발사 간격·피해·총구·조준 속도 | `BP_SO_MGTurret` Class Defaults | `Drone > AI > MG`의 Range/Cooldown/Damage/Muzzle와 `Aim`의 Yaw/Pitch/보간/발사 허용각을 조정한다 |
 | AI의 Smart Object 검색 범위 | `Source/Drone/AI/DroneSmartObjectReservationComponent.h` | `SearchRadius`, `SearchHalfHeight` 기본값을 수정한다. 역할별 차이가 필요하면 Controller Blueprint 분리를 먼저 한다 |
 | 순찰 재선택 회피 거리 | `Source/Drone/AI/DroneNPCAIController.h` | `PatrolRepeatAvoidanceRadius`를 조정한다 |
+| 개인화기 추적·포기 수치 | Controller Blueprint Class Defaults | `Drone > AI > Engagement`의 Range Hysteresis, Combat Leash, Range Ratio, Repath Interval/Distance, No Progress Timeout/Tolerance, Nav Projection Extent, Disengage Cooldown/Return Ratio를 조정한다 |
 | 도착 허용 반경·대기·재시도 시간 | `/Game/Drone/AI/StateTrees/ST_NPC_HostilePatrol`, `ST_NPC_FriendlyBaseRoutine` | 해당 Native Task 노드의 `AcceptanceRadius`, `WaitDuration`, `RetryInterval`을 조정한다 |
 | MG/Cover 우선순위와 실패 분기 | `/Game/Drone/AI/StateTrees/ST_NPC_HostilePatrol` | State와 Transition을 조정한다. Native Task Struct 이름·순서는 검증 도구 계약과 같이 갱신한다 |
 | 검색·Claim·Occupied·Release 코드 | `DroneSmartObjectReservationComponent.*`, `DroneNPCAIController.*` | 예약 Handle은 Component 한 곳에서만 소유한다. Blueprint에 별도 Claim 로직을 중복하지 않는다 |
@@ -73,7 +74,10 @@ Enemy Patrol Smart Object 검색·예약
 → 현재 순찰 예약 해제
 → MG 사용 가능 여부 확인
    ├─ 빈 MG 있음: MG 예약 → 이동 → 점유 → 사격
-   └─ 빈 MG 없음: 장비에 따라 Rifle 또는 Shotgun 사격
+   └─ 빈 MG 없음: 장비에 따라 Rifle 또는 Shotgun 대응
+      ├─ 사격 구간 안: 정지·몸 정렬 → 사격
+      ├─ 리시 안/사격 구간 밖: NavMesh 표적 추적
+      └─ 리시 밖 또는 이동 정체: 표적 포기 → 순찰 복귀
 → 드론을 놓침
 → 수색
 → 순찰 복귀
@@ -131,9 +135,9 @@ Smart Object는 NPC를 생성하는 장치가 아니다.
 - Weapon Type: `Unarmed`, `Rifle`, `Shotgun`
 - `bCanUseMGTurret`: 적 NPC가 드론 발견 뒤 MG 후보를 검색할 수 있는지
 
-`UDroneNPCWeaponComponent`가 Rifle·Shotgun 공통 `CanFire/StartFire/StopFire/Reload`와 Target Actor·Aim Point를 관리한다. Controller의 `UsesRifle()`과 `UsesShotgun()`은 분류 API로 남기되, AI 발사 요청은 같은 경로를 사용한다. Rifle은 4,000cm·0.25초·발당 10 Damage·30발 탄창, Shotgun은 1,600cm·0.9초·8 Pellet·6도 반각·적중 Pellet당 8 Damage·8발 탄창을 Greybox 기본값으로 사용한다. Volley 한 번은 Pellet 수와 무관하게 Shell 한 발만 소모한다. 예비 탄약·재장전 시간과 최종 밸런스는 아직 미정이다.
+`UDroneNPCWeaponComponent`가 Rifle·Shotgun 공통 `CanFire/StartFire/StopFire/Reload`와 Target Actor·Aim Point를 관리한다. Controller의 `UsesRifle()`과 `UsesShotgun()`은 분류 API로 남기되, AI 발사 요청은 같은 경로를 사용한다. Rifle은 4,000cm·0.25초·발당 10 Damage·30발 탄창, Shotgun은 1,600cm·0.9초·8 Pellet·12도 반각·적중 Pellet당 3 Damage·8발 탄창을 현재 Greybox 기본값으로 사용한다. Volley 한 번은 Pellet 수와 무관하게 Shell 한 발만 소모한다. 예비 탄약·재장전 시간과 최종 밸런스는 아직 미정이다.
 
-추가 Shotgun NPC의 사격만 빠르게 볼 때는 `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest`를 사용한다. 기존 Smart Object 맵의 Rifle 1·Shotgun 1·Friendly 2 구성은 유지된다. 전용 맵은 약 9m 정면에서 감지와 8개 이동 Projectile 생성을 시작하고 Cyan 선으로 직전 산탄 원뿔을 표시한다. `Set Shotgun Debug Trace Enabled`와 `Get Last Shotgun Pellet Endpoints`는 Blueprint 시험 HUD/장치에서도 사용할 수 있다. 상세 절차는 [`DRONE_TEST_MAP_GUIDE.md`](../gameplay/DRONE_TEST_MAP_GUIDE.md)를 따른다.
+추가 Shotgun NPC의 사격만 빠르게 볼 때는 `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest`를 사용한다. 기존 Smart Object 맵의 Rifle 1·Shotgun 1·Friendly 2 구성은 유지된다. 전용 맵은 약 9m 정면에서 감지와 8개 이동 Projectile 생성을 시작한다. Cyan 예상선은 기본 Off이며 탄착 원뿔 진단이 필요할 때만 `Set Shotgun Debug Trace Enabled`로 켠다. `Get Last Shotgun Pellet Endpoints`는 Blueprint 시험 HUD/장치에서도 사용할 수 있다. 상세 절차는 [`DRONE_TEST_MAP_GUIDE.md`](../gameplay/DRONE_TEST_MAP_GUIDE.md)를 따른다.
 
 ### Smart Object Activity
 
@@ -175,6 +179,16 @@ NPC Profile은 아래 User Tag를 자동으로 만든다.
 이 값은 최종 난이도 수치가 아니다. Greybox 감지 시험용이며 맵 규모와 플레이 감각을 확인한 뒤 조정한다.
 
 Hostile Controller가 `ADronePrototypePawn`을 처음 감지하면 현재 Smart Object 예약을 해제하고 `DroneDetected` 이벤트를 보낸다. 시야를 잃으면 `DroneLost` 이벤트를 보낸다. Friendly와 Neutral은 같은 감지 결과로 전투 StateTree에 진입하지 않는다.
+
+### 개인화기 추적·전투 포기
+
+- `Fire`: 사격 구간 안에서는 이동을 멈추고 Drone 방향으로 몸을 보간하며 재장전/사격을 시도한다.
+- `PursueDrone`: 사격 구간 밖이면 공중 표적 위치를 NavMesh에 투영해 이동한다. 진행 중인 목적지가 기본 150cm 이내로 같으면 `MoveTo`를 다시 발행하지 않는다.
+- `Range Hysteresis`: 실제 무기 사거리를 벗어나면 즉시 추적한다. 한 번 추적을 시작하면 `사거리 - 100cm` 안으로 들어올 때까지 계속 접근한 뒤 사격으로 복귀한다. Shotgun 기본값은 `1,600cm 밖 Pursue / 1,500cm 안 Fire`라 사거리 밖에서 멈추지 않으면서 경계 왕복도 막는다.
+- `Disengage`: 최초 교전 위치 기준 기본 3,000cm 리시를 벗어나거나 기본 2.5초 동안 유효한 접근이 없으면 사격·이동·예약을 정리하고 순찰로 돌아간다.
+- 포기한 같은 Drone은 기본 3초 Cooldown과 리시의 85% 안쪽 복귀 조건을 만족하기 전까지 즉시 재감지하지 않아 Patrol/Pursue 왕복을 막는다.
+- 이동 상태의 몸 Yaw는 Character Movement가 이동 방향으로만 갱신한다. 정지 `DroneDetected`와 `UseCover`에서만 개인화기 Yaw 보간을 사용해 두 회전 로직이 경쟁하지 않는다.
+- 위 수치는 Controller Blueprint의 `Drone > AI > Engagement`에서 맵/난이도별로 조정한다. Blueprint Event Graph에 별도 추적 Tick이나 `MoveTo`를 중복 작성하지 않는다.
 
 ## 4. Content 폴더 권장 구조
 
@@ -498,7 +512,7 @@ Header/CPP 연결:
 
 - 새 NPC나 Drone C++ Actor에는 `CreateDefaultSubobject<UDroneHealthComponent>`로 Component 하나만 소유한다.
 - 외부 피해는 직접 체력을 빼지 말고 `UGameplayStatics::ApplyDamage(Target, Damage, Instigator, Causer, nullptr)`를 사용한다.
-- 현재 기본 피해는 Rifle 10, Shotgun 적중 Pellet당 8, MG 8이며 각 Component의 Greybox 설정 함수나 Class Defaults에서 바꿀 수 있다.
+- 현재 기본 피해는 Rifle 10, Shotgun 적중 Pellet당 3, MG 8이며 각 Component의 Greybox 설정 함수나 Class Defaults에서 바꿀 수 있다.
 
 Blueprint 설정:
 
@@ -521,6 +535,43 @@ Editor 테스트:
 - Drone은 `OnDroneDestroyed` Blueprint Event를 한 번 보내고, 감지 중이던 살아 있는 적은 개인 무기·MG·Cover를 정리한 뒤 Search 없이 순찰로 복귀한다.
 - 체력이 줄지 않으면 Target에 Health Component가 하나만 있는지, Capsule이 `WorldDynamic` Projectile을 Block하는지, 투사체가 실제 Target을 맞혔는지 확인한다.
 - MG 교대가 안 되면 두 번째 Hostile의 `bCanUseMGTurret`, MGTurret Activity User Tag, 빈 Slot 여부와 NavMesh를 확인한다.
+
+## 10.1 개인화기 감지·사격·추적 상태 흐름
+
+Rifle과 Shotgun은 같은 흐름을 사용하고 무기별 실제 3D 사거리만 다르다. 기본 사거리는 Rifle 4,000cm, Shotgun 1,600cm다.
+
+```mermaid
+flowchart TD
+    A[Drone 감지] --> B{전투 리시 안인가?}
+    B -- 아니오 --> H[사격·이동·예약 정리]
+    H --> I[재감지 Cooldown 뒤 순찰]
+    B -- 예 --> C{실제 3D 무기 사거리 안인가?}
+    C -- 예 --> D[MoveTo 즉시 정지]
+    D --> E[Drone 방향 몸 조준·사격]
+    C -- 아니오 --> F{밖 판정이 0.2초 지속됐는가?}
+    F -- 아니오 --> C
+    F -- 예 --> G[NavMesh 지상점으로 Pursue]
+    G --> J[몸 Yaw와 Bone Gaze를 실제 이동 벡터에 정렬]
+    J --> K{사거리 안 / 무진행 / 리시 밖?}
+    K -- 사거리 안 --> D
+    K -- 2.5초 무진행 또는 리시 밖 --> H
+    K -- 계속 추적 --> G
+```
+
+핵심 규칙:
+
+- 사거리 안쪽인데 더 가까이 붙기 위한 공간 Hysteresis는 없다. 사거리 안에 들어오면 같은 Tick의 교전 갱신에서 `StopMovement` 후 Fire로 돌아간다.
+- 1,590↔1,610cm처럼 경계가 짧게 흔들릴 때는 거리를 100cm 더 쫓아가게 하지 않고 `Personal Weapon Out Of Range Confirmation Seconds` 기본 0.2초로 전환만 거른다.
+- 추적 중 몸과 고개는 Drone 직선 방향이 아니라 현재 수평 이동 벡터를 함께 따른다. 장애물을 우회해도 몸·고개가 경로와 반대로 돌지 않는다.
+- 같은 투영 목적지로 이동 중이면 MoveTo를 다시 만들지 않는다. 목적지가 기본 150cm 이상 변했거나 기존 이동이 끝났을 때만 다시 요청한다.
+- `Personal Weapon Combat Leash Radius` 기본 3,000cm 밖이거나 `Personal Weapon Pursuit No Progress Timeout Seconds` 기본 2.5초 동안 접근하지 못하면 표적을 포기한다.
+
+Blueprint 조정 경계:
+
+- 값은 `ADroneNPCAIController`에 Blueprint 노출돼 있다. 다만 현재 역할 NPC는 C++ Controller Class를 직접 사용하므로 역할 BP 화면에서 이 값을 바로 편집할 수는 없다. 역할별 튜닝이 필요하면 `/Game/Drone/AI/Blueprints` 아래 프로젝트 소유 Controller BP를 만든 뒤 각 NPC의 `AI Controller Class`로 지정하는 작업을 먼저 한다.
+- 파생 Controller BP의 `Drone > AI > Engagement`에서 0.2초 확인시간, 리시, 재경로 거리·주기, 무진행 시간을 조정한다.
+- 추적 몸 회전 속도는 같은 Controller BP의 `Drone > AI > Gaze > Pursuit Facing Turn Speed Degrees Per Second`에서 조정한다. 기본 720°/s다.
+- Rifle/Shotgun 실제 사거리는 NPC의 `NPCWeaponComponent` Class Defaults가 기준이다. 교전 정책에 별도 사거리 숫자를 중복 입력하지 않는다.
 
 ## 11. 단계별 작업 카드
 
@@ -652,7 +703,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 - MG 전용 Station의 Base/Yaw/Pitch/Muzzle 계층, 원기둥 Base/Body/Barrel 3개와 Blueprint 사용/발사 Event·Greybox Projectile
 - 범용 Station은 MG 외형 Component 없이 Patrol·Ambient·Cover 공용 구조 유지
 - Hostile Rifle AnimBP 상체·목·고개 Component Space Gaze, 1초 유예와 Search 마지막 위치 추적
-- 최신 Game/Editor Build, 저장 Asset 새 프로세스 검증, Smart Object 6쌍 Validation과 Gaze/MG 집중 자동화 5/5 통과. 과거 전체 `Drone.` 27/27·Blueprint 0/0/0·LFS 검증 기준은 유지하되 이번 변경 뒤 전체 묶음은 미재실행
+- 최신 Editor Build와 `PersonalWeaponEngagementPolicy`, `SmartObjectFoundationDefaults`, `ShotgunSystemsTestMapPIE`, `NPCPerceptionSearchPIE`, `NPCGreyboxAssets` 집중 자동화 5/5 통과. 과거 Game Build·전체 `Drone.` 27/27·Blueprint 0/0/0·LFS 검증 기준은 유지하되 이번 변경 뒤 전체 묶음은 미재실행
 
 ### 아직 구현·수동 검증 필요
 

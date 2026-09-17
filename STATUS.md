@@ -1,11 +1,11 @@
 # 현재 작업 상태
 
-기준일: 2026-09-16 (Asia/Seoul)
+기준일: 2026-09-17 (Asia/Seoul)
 
 ## 한눈에 보기
 
-- 현재 단계: AI/Mission/Signal/Shotgun TestMap, FPV Rate/Acro 추력·중력 v1, 기상 Vertical Slice 구현 완료. Shotgun·공용 탄 시인성, 시선 Hysteresis, Front-end 3열 임시 UI, Acro 전용 축과 자연스러운 돌풍/Bead 전환까지 구현했으며 화면 체감 확인 대기
-- 바로 다음 개발: Acro 추력 체감·Front-end/Shotgun/Weather 화면 확인 → Camera-follow Niagara Rain/MPC/Audio → Test Mission DA/진입 경로
+- 현재 단계: 개인화기 적 AI의 사거리 밖 추적·리시 포기·순찰 복귀와 회전 떨림 방지를 구현했고, MG 사망 교대까지 포함한 AI 핵심 회귀가 Green이다. Mission/Signal/Shotgun/Acro/Weather는 기존 수동 화면 확인 대기 상태를 유지한다
+- 바로 다음 개발: Smart Object 맵에서 Rifle/Shotgun 추적·포기·재점유 화면 확인 → Acro/Front-end/Shotgun/Weather 체감 확인 → Camera-follow Niagara Rain/MPC/Audio → Test Mission DA/진입 경로
 - Unreal Editor: 마지막 확인 시 종료 상태
 - Production Training: 팀원이 실제 Tutorial 환경을 제작 중이므로 열람 외 저장·덮어쓰기·자동 재구성 금지
 
@@ -13,8 +13,8 @@
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal `D:\JGY\project\drone` | 기준 `main = origin/main = 4a3d4ba` | 팀원 `Lvl_MilitaryBase` 최신 Push를 충돌 없는 fast-forward로 반영. Shotgun/Weather/UI/Acro와 차량·AI 안정화 로컬 변경. GitHub Desktop 자동 Stash 1개는 삭제하지 않고 보존 |
-| 문서 `D:\JGY\project\md` | 기준 `main = origin/main = 3c28611` | 기준선·Shotgun/Weather/Acro 구현 기록 로컬 변경, Stash 없음 |
+| Unreal `D:\JGY\project\drone` | 기준 `main = origin/main = dc655ac` | 개인화기 추적/리시/회전 안정화 Source·Test 로컬 변경. Asset·Map 변경 없음. GitHub Desktop 자동 Stash 1개는 삭제하지 않고 보존 |
+| 문서 `D:\JGY\project\md` | 기준 `main = origin/main = 8e4f1cf` | 이번 AI 구현·검증 결과 문서만 로컬 변경, Stash 없음 |
 
 2026-09-16 D 드라이브 작업 PC에서 두 저장소를 `fetch --prune`으로 다시 확인했을 때 Mission Rule·재밍·Story Fact·FPV Rate/Acro·기상 Runtime과 기능별 TestMap은 Unreal `962ff02`, 대응 문서는 `3c28611`로 Push 완료됐고 원격 차이는 `0/0`이었다. 그 기준 위에 이번 Shotgun Pellet/Tracer와 Weather TestMap 시각화 작업을 로컬로 진행했다. Commit과 Push는 사용자가 처리한다.
 
@@ -30,6 +30,8 @@
 - 깨지는 역할 표적·Carryable World Text를 기본 숨김 처리하고 선택 표시 문구를 짧게 정리
 - 유인 MG 사수 사망 뒤 재할당 재시도, 이동 정체 감시, 재경로와 Greybox 도착 Snap 보강
 - 병사 전투 상태에 공통 `Minimum Response State Duration=1.0초`를 추가했다. MG·Cover 이동/사용 태스크가 한 프레임 실패해도 유지시간 동안 현재 예약·감지·사격 행동을 다시 점검하고, 시간이 지난 뒤에도 실패일 때만 다음 상태로 넘어간다. 사망·드론 파괴·Sight Lost 확정 정리는 지연하지 않는다
+- 개인화기는 실제 무기 사거리를 벗어나는 즉시 추적을 시작하고, 추적 상태에서는 사거리보다 100cm 안쪽으로 들어와야 사격으로 복귀한다. 따라서 사거리 밖에서 멈추지 않고 NavMesh에 투영한 표적을 계속 추적한다. 전투 시작점 기준 기본 3,000cm 리시 또는 기본 2.5초 무진행 한계를 넘으면 표적을 포기하고 순찰로 복귀하며, 같은 투영 목적지는 기본 150cm 이상 바뀔 때만 갱신한다
+- NPC 이동 중에는 Character Movement 한 곳만 몸 Yaw를 쓰고 정지 사격·Cover에서만 개인화기 Yaw 보간을 사용한다. 리시 포기 후 StateTree 재시작은 다음 Tick으로 예약해 `StartTree` 재진입을 막는다. 리시·재경로 거리/주기·무진행·Cooldown 값은 Controller Blueprint에서 조정 가능하다
 - Smart Object 동선·배치 팀 가이드, LFS 용량 계획, 외부 도구 검토와 추천도서 학습 계획 작성
 - Truck 직선 Greybox와 향후 Mission Spline Route, Smart Object 최근접 Slot 동선을 구분한 팀 설계·인계 가이드 작성. 현재 차량 Spline 추종과 목적지 Event는 문서화된 후속 구현이며 완료 기능으로 판정하지 않음
 - Smart Object Greybox 차량의 실제 `SM_SpikeStorm_Tire2_FR`이 Cylinder 가정의 Mesh 로컬 Z축으로 회전해 옆으로 빙글도는 결함을 재현하고, Mesh 장착 회전과 무관한 차량 부모 공간 `+Y` 차축 회전으로 교정. 축은 Blueprint `Wheel Visual Spin Axis In Vehicle Space`에서 조정 가능
@@ -83,8 +85,8 @@
 - Shotgun Systems 맵 Map Check `0 errors / 0 warnings`; 발광 Material/실제 Pellet BP·정면 시선 안정화 포함 전용 Asset/PIE 자동화 `2/2 Success`
 - Shotgun 가시성 변경 전 자동화가 피해 8·Tracer 없음·큰 탄두를 의도대로 실패한 뒤, 변경 후 전용 Asset/PIE `2/2`와 `NPCGreyboxAssets`, `WeaponContract`, `ProjectileBallistics`, `ShotgunTrace` 집중 회귀가 모두 성공
 - 전체 샷건 묶음 `WeaponContract`, `ShotgunTrace`, `ProjectileBallistics`, 전용 Map/PIE `5/5 Success`, 실패 0. 기존 두 단위 테스트의 Recast 경고만 존재하며 샷건 기능 실패는 아님
-- 3° 시선 안정화 뒤 기존 `Drone.AI.NPCPerceptionSearchPIE`를 단독 재실행했을 때 샷건/Gaze가 아니라 사수 사망 후 생존 NPC가 MG를 제한시간 안에 재점유하지 못해 `0/1 Fail`이었다. 같은 로그에서 사망 정리 자체는 성공했으며, 최신 전체 AI 통과로 덮어쓰지 않고 MG 재점유 타이밍 회귀 재현·진단 대상으로 남긴다
-- 상태 최소 유지시간 구현 뒤 같은 PIE를 2회 재실행했으며 두 번 모두 앞선 감지·사격·엄폐·최초 MG 점유와 사망 정리는 통과했지만, 생존 병사가 빈 MG를 2회/3회 Claim한 뒤 Nav 도착하지 못해 기존 재점유 제한시간 항목에서 실패했다. 상태 안정화 실패로 오인하거나 Success로 덮어쓰지 않고, 맵의 생존 병사→Operator Anchor Nav 경로 결함으로 계속 추적한다
+- 3° 시선/최소 상태 유지 구현 직후 `NPCPerceptionSearchPIE`에서 재점유 제한시간 실패가 재현됐던 이력은 보존한다. 2026-09-17 추적·테스트 격리와 StateTree 재진입 수정 뒤 같은 테스트가 감지→MG 경합→개인화기 대체→사수 사망 후 재점유→Lost/Search→순찰 복귀까지 `1/1 Success`로 전환됐다
+- 2026-09-17 후속 화면 피드백으로 `사거리 안인데도 계속 접근`과 추적 중 몸·고개가 이동과 반대로 도는 Red를 재현했다. 최종 규칙은 실제 무기와 같은 3D 사거리 안이면 즉시 정지·사격, 밖 판정이 0.2초 지속될 때만 Pursue다. 추적 몸 Yaw와 Bone Gaze는 실제 수평 이동 벡터를 함께 따르며, 역할 BP가 덮은 이동 회전 플래그도 BeginPlay에서 공통 계약으로 복구한다. Editor Build와 `PersonalWeaponEngagementPolicy`, `SmartObjectFoundationDefaults`, 경계 흔들림·이동/시선 정렬·사거리 진입 정지를 포함한 `ShotgunSystemsTestMapPIE`, `NPCPerceptionSearchPIE`, `NPCGreyboxAssets` 최종 `5/5 Success`
 - 기존 Smart Object 맵의 NPC 수·역할이 유지되는지 `Drone.AI.NPCGreyboxAssets`를 별도 재실행해 `1/1 Success`, 경고 0 확인
 - FPV Rate/Acro 추가 후 `DroneEditor Win64 Development` Build 성공. `Drone.Prototype.FlightProfiles`, `Drone.Prototype.PIEInputLifecycle`, `Drone.Flow.MissionEntryContract`, `Drone.Flow.MissionEntryPIE`, `Drone.Prototype.RoleAbilities` 5/5 Success·Exit 0
 - 기상 Runtime 추가 후 `DroneEditor Win64 Development` Build 성공. `Drone.Weather.ProfileAndWindContract`, `Drone.Weather.ProfileAssets`, `Drone.Weather.SystemsTestMap` 3/3 Success·Exit 0
@@ -102,6 +104,7 @@
 - 한 Lap HUD 갱신과 두 Lap 이전 평균·Best·증감값
 - 역할 표적 3종, Carryable 픽업·드랍과 숨긴 World Text
 - 이동된 AI 시험 맵의 MG 재점유·도착 방향·Gaze·자동포탑·차량 화면 확인
+- Rifle/Shotgun 병사가 사거리 밖에서 Drone을 자연스럽게 추적하고, 이동 중 좌우 떨림 없이 이동 방향을 보며, 리시 밖에서는 포기·순찰 복귀하는지 화면 확인
 - 병사 감지 후 최소 1초 안에 Cover/MG/개인화기 상태가 프레임 단위로 왕복하지 않고 현재 행동을 유지하는지 화면 확인
 - Drone Rotor 축·방향·속도, 비행 기울기, 실제 탄환 피격 흔들림 등 기존 수동 회귀
 - 새 TestMap의 귀환 Zone 위치/크기와 재밍 Zone Overlap·신호 경고·강한 단계 이동 체감 수동 확인
