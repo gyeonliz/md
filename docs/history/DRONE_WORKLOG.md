@@ -1627,3 +1627,12 @@ HeadingValueText
 - UI의 `안정/균형/고기동`은 `느림/보통/빠름`으로 바꿨다. 내부 Stable/Balanced/Agile 이름은 Asset 호환을 위해 유지하고 기본 프리셋은 MaxSpeed `0.80/1.00/1.25`만 변경하며 가속·Yaw·자세각 배율은 모두 1.0이다.
 - 입력 변경 후 `AcroInputContract`, `FlightProfiles`, 3회 새 PIE의 `PIEInputLifecycle`, `MissionEntryPIE`가 Success다. Lifecycle은 처음에 새 Action을 예상 목록에서 빼 `31/33` Red, 다음에는 Completed/Canceled Binding 분류 누락으로 Red가 났고 테스트 계약을 보완해 최종 Green으로 전환했다.
 - Production `Lvl_DroneTraining`은 열거나 저장하지 않았고 Commit·Push·원격 Pull도 수행하지 않았다.
+
+## 2026-09-18 — 첫 사격 조준 지연·Figma 재확인·CourseSpline 편집 확인
+
+- 사용자 화면에서 Shotgun/Rifle 이동·회전 수정이 정상임을 확인해 임시 이동 진단 로그 기본값을 Off로 전환했다.
+- 적이 Drone을 최초 감지한 뒤 Rifle/Shotgun 첫 발까지 기본 1.0초를 기다리는 `PersonalWeaponInitialAimDelaySeconds`를 Controller Blueprint 조절값으로 추가했다. Sight 감지 시각을 별도로 보존하므로 DroneDetected/Pursue/Cover 상태 전환이 지연을 재시작하지 않는다.
+- 다른 Drone으로 표적이 바뀔 때 기존 사격 Timer가 새 조준 지연을 우회하지 않도록 이전 개인화기 사격을 먼저 정리한다.
+- MSVC 14.51.36257 Editor Build, `SmartObjectFoundationDefaults`, `ShotgunSystemsTestMap`, `ShotgunSystemsTestMapPIE`, `NPCGreyboxPIE`가 Success다. Shotgun PIE는 조준 완료 전 Fire Event 0과 감지 관측 시각부터 첫 Volley까지의 시간도 검사한다.
+- Figma `Project:Droner` Page 1 최상위 148개를 읽기 전용으로 재확인했다. 최신 Mission 진입 흐름, Mission 선택 Greybox, 공중 Drone 공통 HUD, Racing UI/Restart/Quit/기록·감도·Ghost 요구를 문서 매트릭스에 반영했으며 Figma 원본은 수정하지 않았다.
+- CourseSpline 점 추가는 UE 5.8 기본 편집 기능으로 이미 제공된다. `CourseSpline`의 기존 점 선택 후 `Alt+이동 기즈모 드래그` 또는 선분 우클릭 `Add Spline Point Here`를 사용한다. Ring별 Spline Handle은 Gate 전용이므로 구분한다. 코드·Blueprint·맵은 수정하지 않았다.

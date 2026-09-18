@@ -1,13 +1,13 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-09-18 — Shotgun 순찰 회전의 Nav 방향·Gun 충돌 두 원인 수정, FPV 송신기 Mode 1/2와 느림/보통/빠름 적용, 수동 화면 확인 대기
+마지막 갱신: 2026-09-18 — Shotgun 순찰/충돌 화면 확인 완료, 감지 후 첫 사격 1초 조준 지연·Figma 최신 UX 재확인, CourseSpline 점 편집법 확정
 
 ## Now
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
 | MAP-TEST-01 | 경량 Tutorial Systems TestMap 수동 확인 | 맵·생성 도구·전용 자동화·Map Check 완료 | Gate/Ring/역할/HUD 한·두 Lap 화면 확인 |
-| AI-SO-TUNE-01 | Smart Object·유인 MG·개인화기 추적 확인 | 기존 Pursue 공전 수정에 더해 실제 맵의 느린 순찰 회전을 재현했다. 순찰 몸은 짧은 Nav Segment가 아니라 예약 최종 슬롯을 보며, Capsule 외 시각 Primitive는 Collision/Overlap/Nav를 끈다. 실제 로그에서 Shotgun `Gun`이 Rifle을 Block하던 `stuck` 원인을 확인했다. Build와 `NPCBaseRoutinesPIE`·`NPCGreyboxPIE`·`ShotgunSystemsTestMapPIE` Green | 실제 맵을 45~60초 실행해 Rifle/Shotgun 교차 무충돌, 이동 방향 보행, 제자리/주기 회전 없음, Pursue·사격·리시 복귀를 확인. 재발 시 `[NPC-STATE]`·`[NPC-MOVE]` 로그를 회수한 뒤 진단 로그 기본값을 끈다 |
+| AI-SO-TUNE-01 | Smart Object·유인 MG·개인화기 추적 확인 | 순찰 최종 슬롯 방향·Pursue 정지점·Capsule 외 VisualOnly 계약을 적용했고 사용자 화면에서 정상 이동을 확인했다. 진단 로그 기본값 Off | 새 `1.0초` 첫 사격 조준 대기를 실제 화면에서 확인. 재발 시 Blueprint에서 `[NPC-STATE]`·`[NPC-MOVE]` 진단을 켜 로그 회수 |
 | AI-SHOTGUN-PIE-01 | 추가 Shotgun NPC 사격 체감 확인 | 실제 8 Projectile·12° 반각, Pellet당 3 피해, 상호 충돌 방지, Cyan Debug 기본 Off, 발광 비드/Tracer·3°/6° 시선 Hysteresis·Asset/PIE 자동화 완료 | 발광 비드 8개 분리 가시성·Cyan 선 제거·회피·최대 24 피해·사거리·LOS·시선 안정화를 Editor 화면에서 확인 |
 | UI-FLOW-PROTOTYPE-01 | Mission/Drone 선택 임시 UI 확인 | 첨부 와이어프레임 기반 3열 C++ fallback 구현, `FrontEndPIE`·`MissionEntryPIE` 통과 | 16:9 화면에서 작전 목록/설명/시작과 기체 목록/상세/설정/출격이 잘리지 않는지 수동 확인 후 최종 WBP·Thumbnail 범위 결정 |
 | MISSION-RULE-PIE-01 | 새 목표 Rule의 실제 맵 Vertical Slice | 귀환·Jammer·역할 Actor 시험 배치 완료, 직접 실행은 Prototype Flow | Test Mission DA/진입 경로에서 Scan/Delivery/Destroy/Return/Jamming Event·Tag·시간 규칙 확인 |
@@ -46,7 +46,7 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 1. 수동 확인에서 발견된 Gate/HUD/역할 결함 수정 후 TestMap 회귀
 2. Shotgun Systems 맵에서 작은 Pellet/Tracer 8개가 분리되어 보이는지와 Cyan 선 제거·12° 확산·회피 가능 탄속·피해·사거리·LOS를 수동 확인
 3. Front-end와 Drone 선택 3열 UI의 해상도별 잘림·버튼 상태를 확인하고 최종 WBP Designer/Thumbnail 작업 범위를 확정
-4. 이동된 AI 시험 맵을 45~60초 실행해 Rifle/Shotgun이 교차할 때 `Gun`에 막히지 않고, 이동 방향과 몸이 일치하며 주기적으로 빙글 돌지 않는지 확인한다. 이어 사거리 밖 추적·리시 복귀·최소 상태 1초·MG 사망 후 재점유를 본다
+4. AI 시험 맵에서 Drone 감지 직후 병사가 약 1초간 표적을 조준한 뒤 첫 발을 쏘는지 확인한다. 순찰/추적 이동 수정은 사용자 화면 확인 완료
 5. 새 Mission Systems 맵에서 재밍 HUD·둔화/복원·역할 기능·Return 크기 수동 확인
 6. FPV Rate/Acro 키보드 전용 축과 Gamepad/RC Mode 1·Mode 2를 각각 확인한다. 두 모드의 Pitch/Throttle 세로축이 표대로 바뀌는지, 느림/보통/빠름이 속도만 바꾸는지 확인한 뒤 호버·항력·Rate 응답·감도·Expo를 조정한다
 7. Weather Systems 맵에서 개선된 Bead의 방향 전환 무점프·풍속별 길이와 `1/2/3/4` 네 조작 모드 Drift·LightWind/RainStorm 돌풍을 수동 확인
@@ -103,6 +103,8 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 | FPV Rate/Acro | 송신기 Mode 1·Mode 2, Actual Rates형 각속도, 자동 수평 복귀 없음, 중력·호버·Body Up 추력·항력·Rate 응답 v1, FPV DA 27m/s·650°/s 기준 |
 | Acro 입력 분리 | 키보드 W/S Pitch·A/D Roll·Q/E Yaw·Space/Ctrl Throttle 유지, Gamepad Mode별 세로축 Action 2개 추가, IMC 33 Mapping·3회 PIE 성공 |
 | AI 순찰 회전·부착물 충돌 차단 | 예약 최종 슬롯 기준 Patrol 몸 방향, 300°/100cm 회전 회귀, Capsule 외 Primitive VisualOnly 강제. 실제 Shotgun `Gun`→Rifle stuck 로그 재현 후 AI 핵심 PIE 3종 성공 |
+| 개인화기 첫 사격 조준 지연 | 최초 Sight 뒤 기본 1.0초, Blueprint 조절 가능, StateTree 전환과 독립, 표적 교체 시 이전 사격 정리. Build·기본 계약·Shotgun Map/PIE·NPC Greybox PIE 성공 |
+| Figma 2026-09-18 재확인 | Page 1 최상위 148개 읽기 전용 감사. 타이틀→미션 선택/설명→로비/드론 선택→인게임, 공중 HUD, Racing UI 최신 요구 확인. 원본 미수정 |
 | 속도 프리셋 정리 | 기존 저장 호환 Stable/Balanced/Agile 내부 이름은 유지하고 UI를 느림/보통/빠름으로 변경. 기본값은 MaxSpeed 0.80/1.00/1.25만 변경 |
 | 기상 데이터·바람 Runtime | Profile/Snapshot/Subsystem·Controller·Drone Response, 저장 Profile 3종, TestMap·Map Check·기상 자동화 3/3 성공 |
 | 차량 바퀴 회전축·접지 교정 | 실제 Tire Mesh의 옆 회전을 부모 공간 +Y 차축으로 교체하고, 30cm 반지름 때문에 약 20cm 잠기던 BP를 52cm로 교정. 축·Bounds·평면 접지 Red→Green과 맵 Validate 통과, 화면 재확인 대기 |

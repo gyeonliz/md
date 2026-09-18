@@ -1,6 +1,6 @@
 # Drone Training 게이트·루트 배치 가이드
 
-기준일: 2026-09-11 (Asia/Seoul)
+기준일: 2026-09-18 (Asia/Seoul)
 
 이 문서는 `D:\JGY\project\drone`의 현재 구현과 `/Game/Drone/Maps/Lvl_DroneTraining` 저장 상태를 기준으로 한다. 코스 제작은 `BP_DroneTrainingCourse` 한 개에서 관리한다. 권장 자동 편집 방식은 Course Spline과 분리된 `Ring별 Spline Handle`이며, Handle 배열 순서가 곧 Gate 통과 순서다. 생성된 빛나는 선 Component, 자동 Gate Child Actor와 GateIndex를 직접 관리하지 않는다.
 
@@ -20,12 +20,16 @@
 1. `Lvl_DroneTraining`을 열고 World Outliner에서 `BP_DroneTrainingCourse`를 선택한다.
 2. Components에서 `CourseSpline`을 선택한다.
 3. Viewport의 Spline 위 원하는 위치를 우클릭하고 `Add Spline Point Here`를 선택한다.
+   - 또는 기존 Spline 점 하나를 선택하고 `W` 이동 모드에서 `Alt`를 누른 채 이동 기즈모 화살표를 좌클릭 드래그하면 그 점이 복제되어 새 Spline 점이 된다.
+   - `Alt+좌클릭`만 누르는 동작이 아니라 반드시 선택한 점의 **이동 기즈모를 드래그**해야 한다.
 4. 새 점을 이동·회전하고, Point Type을 `Curve` 또는 급격한 꺾임을 줄이는 `Curve Clamped`로 둔다.
 5. 점의 Tangent Handle을 드래그해 진입·이탈 곡률을 조정한다. 점 위치만 옮기고 Tangent가 너무 짧으면 S자 구간도 급하게 꺾여 보일 수 있다.
 6. 닫힌 순환 코스가 필요하지 않으면 `Closed Loop`를 켜지 않는다. 현재 기록 규칙은 열린 코스의 Gate 0에서 시작해 마지막 Gate에서 끝난다.
 7. 맵을 저장하기 전에 코스 Actor의 `Synchronize Gate Definitions` 버튼을 한 번 실행하고 BP·Map을 저장한다. Construction과 BeginPlay에서도 같은 동기화가 자동 실행된다.
 
 Spline 제어점은 코스 곡선만 만든다. Ring 수와 위치는 별도의 `Ring별 Spline Handle` 배열이 담당하므로 제어점을 움직이지 않고 Ring만 옮길 수 있다. Handle을 움직이면 가장 가까운 Spline 위치로 투영되고, Handle 항목을 추가·삭제하면 Ring도 하나씩 추가·삭제된다.
+
+점 추가가 Actor 복제로 동작하면 `BP_DroneTrainingCourse` Actor만 선택한 상태다. Components의 `CourseSpline`과 Viewport의 실제 Spline 점을 다시 선택한다. `Ring별 Spline Handle`의 3D Widget은 Gate 전용 점이며 CourseSpline 점 추가 대상이 아니다.
 
 ## 3. 빛나는 코스가 각져 보였던 이유와 현재 규칙
 

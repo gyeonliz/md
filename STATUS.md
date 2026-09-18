@@ -4,21 +4,21 @@
 
 ## 한눈에 보기
 
-- 현재 단계: 실제 Smart Object 맵의 Shotgun 회전에 두 원인이 있음을 로그로 분리했다. 순찰 Nav의 짧은 즉시 경로점에 몸이 끌려가던 문제는 최종 예약 슬롯 방향을 보도록 고쳤고, 팀원 Shotgun BP의 추가 `Gun` 컴포넌트가 `QueryAndPhysics + Overlap + Navigation`으로 Rifle을 막던 문제는 NPC Capsule 외 모든 시각 Primitive를 런타임 VisualOnly로 강제해 차단했다. 같은 실제 맵 회귀와 Shotgun 전용 PIE는 Green이며 최종 화면 확인이 남았다
+- 현재 단계: 실제 Smart Object 맵의 Shotgun 순찰 회전·부착물 충돌 수정은 사용자 화면 확인까지 통과했다. 후속으로 Drone 최초 감지 뒤 Rifle/Shotgun 첫 발 전 `1.0초` 조준 지연을 공통 Controller에 추가했고, 상태 전환과 분리된 감지 시각을 사용한다
 - 조작 단계: 기존 쉬운 조작·제한 자세에 FPV Rate/Acro 송신기 Mode 1·Mode 2를 분리했다. 키보드는 W/S Pitch·Space/Ctrl Throttle을 유지하고 패드 세로축만 실제 Mode에 따라 바뀐다. 핸들링 UI는 느림/보통/빠름으로 바꾸고 현재는 최대 속도만 변경한다
-- 바로 다음 개발: 사용자 화면에서 Rifle/Shotgun 순찰 교차 시 무충돌·무회전 확인과 Mode 1/2 패드 체감 확인 → Weather 정식 Niagara/MPC/Audio → Test Mission DA/진입 경로
+- 바로 다음 개발: 첫 사격 전 약 1초 조준 체감 확인과 Mode 1/2 패드 체감 확인 → Weather 정식 Niagara/MPC/Audio → Test Mission DA/진입 경로
 - 검증 운영: 외부 OpenCode 모델 호출은 종료했다. 프로젝트 전용 Agent·모델 설정은 제거했으며 이후 구현과 검증은 Unreal 자동화와 사용자 수동 화면 확인으로 진행한다
-- Unreal Editor: 2026-09-18 최종 빌드·자동화 뒤 `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`를 수동 화면 확인용으로 연 상태
+- Unreal Editor: 2026-09-18 최종 빌드·자동화 뒤 종료 상태
 - Production Training: 팀원이 실제 Tutorial 환경을 제작 중이므로 열람 외 저장·덮어쓰기·자동 재구성 금지
 
 ## Git 기준
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal `D:\JGY\project\drone` | 로컬 `main=9f58b51`, `origin/main=9a94f06` | 로컬이 팀원 `260918` Content 커밋 1개 뒤. AI 순찰/추적·시각 컴포넌트 충돌 차단·진단 회귀와 FPV Mode 1/2 C++/입력 Asset이 로컬 변경이다. Build, AI 핵심 PIE 3종, Acro 계약·프로필, 3회 입력 lifecycle, MissionEntryPIE 성공 |
-| 문서 `D:\JGY\project\md` | `main = origin/main = 6960648` | `fetch --prune` 뒤 원격 차이 `0/0`; 이번 최신화 문서가 로컬 변경으로 남음 |
+| Unreal `D:\JGY\project\drone` | `main = origin/main = 5e4c727` | 사용자 Push 기준 동기화. 새 표적 전환 시 이전 사격 정리와 강화된 조준 지연 회귀 2개 C++ 파일이 로컬 변경 |
+| 문서 `D:\JGY\project\md` | `main = origin/main = 1cd87e9` | 이번 상태·Figma·Spline 가이드 최신화가 로컬 변경 |
 
-2026-09-18 `fetch --prune` 기준 Unreal 원격에는 팀원의 `9a94f06 260918`이 새로 올라와 있다. 이 커밋은 Content 1,412개만 바꾸며 Source·Config·Plugins와 현재 AI C++ 5개 파일, Shotgun/Smart Object 시험 맵은 겹치지 않는다. 다만 Training과 Tutorial Systems TestMap을 포함한 대용량 LFS 변경이라 현재 더러운 작업 트리에 자동 Pull하지 않았다. 아래 AI 검증은 로컬 `9f58b51` 기준이며, 팀원 Content를 통합한 뒤 Build와 AI 집중 회귀를 한 번 더 실행한다. 다른 PC 경로와 과거 Commit은 Worklog 이력으로만 본다. 외부 모델 검증은 실제 호출 단계에서 종료했으며 프로젝트 저장소에 OpenCode 설정을 남기지 않는다.
+2026-09-18 현재 Unreal과 문서 기준 커밋은 각각 원격과 일치한다. 사용자가 Unreal 변경을 `5e4c727`로 Push한 뒤 이번 후속 수정만 로컬에 남겼다. 과거 `9a94f06` 통합 대기 기록은 Worklog 이력으로만 보며 현재 차이로 해석하지 않는다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 설정을 남기지 않는다.
 
 ## 최신 완료 항목
 
@@ -93,8 +93,13 @@
 - 2026-09-17 후속 화면 피드백으로 `사거리 안인데도 계속 접근`과 추적 중 몸·고개가 이동과 반대로 도는 Red를 재현했다. 최종 규칙은 실제 무기와 같은 3D 사거리 안이면 즉시 정지·사격, 밖 판정이 0.2초 지속될 때만 Pursue다. Bone Gaze는 수평 이동을 따르고, Pursue 몸 Yaw는 Character Movement가 단독 소유한다. 역할 BP가 덮은 이동 회전 플래그도 BeginPlay에서 공통 계약으로 복구한다. Editor Build와 `PersonalWeaponEngagementPolicy`, `SmartObjectFoundationDefaults`, 경계 흔들림·이동/시선 정렬·사거리 진입 정지를 포함한 `ShotgunSystemsTestMapPIE`, `NPCPerceptionSearchPIE`, `NPCGreyboxAssets` 최종 `5/5 Success`
 - 2026-09-18 MSVC 14.51.36257 `DroneEditor Win64 Development` 최종 링크 Build 성공. `PersonalWeaponEngagementPolicy`, `PersonalWeaponMaintenanceTiming`, `ShotgunSystemsTestMapPIE`, `NPCGreyboxAssets`, `NPCPerceptionSearchPIE` 5개가 모두 `Success`, 실패 0이다. Maintenance 단위 테스트의 Skeletal Mesh 미지정 경고 7건은 예상 경고다
 - 실제 `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`의 `NPCBaseRoutinesPIE`를 `-TestLoops=4`로 반복해 4/4 Success, 오류·경고 0을 확인했다. 각 실행은 Rifle/Shotgun 순찰 2회·서로 다른 슬롯 방문과 0.35초 초과 역방향 몸/속도 불일치를 함께 검증한다
+- 사용자 실제 화면에서 Rifle/Shotgun 이동과 회전 수정이 정상임을 확인했다. 저빈도 `[NPC-STATE]`·`[NPC-MOVE]` 진단은 Blueprint에서 다시 켤 수 있게 유지하되 기본값은 Off로 전환했다
+- 개인화기 Controller에 Blueprint 조절형 `PersonalWeaponInitialAimDelaySeconds=1.0`을 추가했다. 최초 Sight 성공 시각부터 계산하므로 DroneDetected/Pursue/Cover 상태 왕복이 시간을 초기화하지 않으며, 지연 중 행동을 정상 유지해 StateTree 실패로 처리하지 않는다. 다른 Drone으로 표적이 바뀌면 이전 사격을 먼저 정리한다
+- Figma `Project:Droner` Page 1의 최상위 148개 항목을 읽기 전용으로 재확인했다. 최신 기준은 Slide 52~53의 타이틀→미션 선택/설명→로비→드론 선택→인게임 흐름, Slide 55의 공중 Drone 공통 HUD, Slide 57~58의 Racing UI/Restart/Quit/기록·감도·리플레이 요구다. Figma 원본은 수정하지 않았다
+- `BP_DroneTrainingCourse`의 CourseSpline 점 추가는 UE 5.8 기본 Visualizer가 이미 지원함을 엔진 소스와 프로젝트 구현으로 확인했다. 기존 점 선택 뒤 `Alt+이동 기즈모 드래그` 또는 선분 우클릭 `Add Spline Point Here`를 사용하며 Ring별 Spline Handle과 구분한다. 별도 코드·맵 변경은 하지 않았다
 - 2026-09-18 후속 화면 보고의 Shotgun 전신 회전을 전용 교전 PIE에서 `PursueDrone` 상태의 같은 방향 누적 몸 Yaw `301~304°`로 반복 재현했다. 진단 결과 Nav 가속과 RVO는 이미 꺼져 있었지만 `bRequestedMoveUseAcceleration`은 켜져 있었고, Drone 위치에 큰 도착 반경을 둔 MoveTo가 가까운 경로 Segment를 가속으로 지나치며 몸과 시선이 짧은 코너를 계속 쫓았다. 실제 사거리 정지점·75cm 도착 반경·Pursue 전용 직접 요청 속도·몸/시선 공통 최종 목표로 수정했다. 전용 테스트에는 같은 상태에서 연속 300° 초과 회전 실패 조건, 실제 맵에는 정지 회전과 역방향 보행 실패 조건을 추가했다. 중간에 요청 가속을 전 상태에서 끄자 순찰 역방향 `0.614초`가 회귀로 잡혀 Pursue에만 한정했다. 최종 Editor Build, 완전 새 Editor 프로세스 Shotgun 3/3, 실제 Smart Object 맵 3/3과 관련 5개 테스트가 모두 성공했다. `PersonalWeaponMaintenanceTiming`의 Skeletal Mesh 없는 최소 시험 Actor 경고 7건은 예상 경고다
 - 2026-09-18 실제 사용자 PIE 로그에서 `BP_NPC_Hostile_Rifle_C_0 is stuck`의 충돌 상대가 `BP_NPC_Hostile_Shotgun_C_0 Component:Gun`임을 확인했다. 런타임에 해당 `Gun`이 `collision=3 overlap=1 nav=1`인 것도 자동 계측으로 재현했고, Capsule 외 Primitive를 VisualOnly로 강제한 뒤 `NPCBaseRoutinesPIE`, `NPCGreyboxPIE`, `ShotgunSystemsTestMapPIE`가 모두 Success이며 `stuck` 로그가 없다
+- 2026-09-18 첫 사격 조준 지연 추가 뒤 MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. `SmartObjectFoundationDefaults`, `ShotgunSystemsTestMap`, `ShotgunSystemsTestMapPIE`, `NPCGreyboxPIE`가 Success다. Shotgun PIE는 조준 지연 완료 전 Fire Event 0과 감지 관측 시점부터 첫 Volley까지 1초 이상을 함께 검사한다
 - FPV Mode 1/2 변경 후 입력 Asset 생성 로그 `mappings=33`, MSVC 14.51.36257 Editor Build 성공, `AcroInputContract`, `FlightProfiles`, 수정된 3회 `PIEInputLifecycle`, `MissionEntryPIE`가 Success다. 첫 lifecycle 실행은 새 두 Action을 기존 예상 목록에서 누락해 `31/33` Red, 두 번째는 release-binding 분류 누락으로 Red였고 테스트 계약을 고친 뒤 3/3 Green으로 전환했다
 - 최종 검증 뒤 `fetch --prune`에서 팀원 `9a94f06 260918` Content 커밋을 확인했다. 변경 1,412개는 Source·Config·Plugins를 건드리지 않고 현재 AI 소스와 Shotgun/Smart Object 시험 맵에도 겹치지 않지만, `Lvl_DroneTraining`과 `Lvl_DroneTutorialSystemsTest`를 포함해 자동 Pull은 보류했다
 - 기존 Smart Object 맵의 NPC 수·역할이 유지되는지 `Drone.AI.NPCGreyboxAssets`를 별도 재실행해 `1/1 Success`, 경고 0 확인
