@@ -1,6 +1,6 @@
 # 드론 역할·조작 방식·핸들링 프리셋
 
-기준일: 2026-09-16 (Asia/Seoul)
+기준일: 2026-09-18 (Asia/Seoul)
 
 ## 기획 자료 사용 원칙
 
@@ -16,10 +16,10 @@
 | 축 | 현재 값 | 의미 |
 |---|---|---|
 | 임무 역할 `EDroneMissionRole` | 정찰, 드랍, FPV 자폭, 광섬유, 지상 UGV, 장거리 타격 | 기체가 임무에서 맡는 기능 |
-| 조작 방식 `EDroneControlMode` | 쉬운 조작, 실제 조작형(제한 자세), FPV Rate/Acro | 입력 보조와 기체 자세가 이동에 반영되는 정도 |
-| 핸들링 `EDroneHandlingPreset` | 안정, 균형, 고기동 | 같은 기체의 속도·가속·Yaw·최대 기울기 반응성 |
+| 조작 방식 `EDroneControlMode` | 쉬운 조작, 실제 조작형(제한 자세), FPV Rate/Acro Mode 1, FPV Rate/Acro Mode 2 | 입력 보조와 RC 송신기 스틱 배치 |
+| 속도 단계 `EDroneHandlingPreset` | 느림, 보통, 빠름 | 같은 기체의 최대 이동 속도 |
 
-따라서 `고기동 드론`을 별도 기체 종류로 만들지 않는다. 예를 들어 같은 정찰 드론에서도 `쉬운 조작 + 안정`, `쉬운 조작 + 고기동`, `FPV Rate/Acro + 균형` 조합을 시험할 수 있다. 현재 FPV 자폭 역할 Data Asset은 실제 FPV 체감 검증을 위해 `Rate/Acro + 고기동`을 기본값으로 사용한다.
+따라서 `고기동 드론`을 별도 기체 종류로 만들지 않는다. 같은 기체에서 조작 방식과 속도를 따로 고른다. 기존 열거형 내부 이름 `Stable/Balanced/Agile`은 저장 Asset 호환을 위해 유지하지만 UI와 기획 의미는 `느림/보통/빠름`이며, 현재는 최대 속도 배율만 바꾼다. FPV 자폭 역할 Data Asset은 `Rate/Acro Mode 2 + 빠름`을 기본값으로 사용한다.
 
 ## 기체 역할별 현재 상태
 
@@ -34,7 +34,7 @@
 
 `UDroneDefinition`은 `PlannedCapabilities`와 `ImplementedCapabilities`를 따로 가진다. 현재 3종 Data Asset은 각각 검증된 고유 기능 한 개를 두 목록에 모두 가진다. 광섬유·UGV·장거리 타격 후보는 아직 구현 목록에 넣지 않는다.
 
-## 세 조작 방식의 실제 차이
+## 네 조작 방식의 실제 차이
 
 ### 쉬운 조작
 
@@ -51,31 +51,32 @@
 - 입력 해제 또는 쉬운 조작 복귀 시 Root가 서서히 수평으로 돌아온다.
 - 아직 모터별 RPM, 중력-양력 평형, PID, 공기저항을 계산하는 실제 비행 물리 모델은 아니다.
 
-### FPV Rate/Acro(그레이박스)
+### FPV Rate/Acro Mode 1·2(그레이박스)
 
 - Betaflight Rate/Acro와 같이 Pitch/Roll/Yaw 스틱을 이동 방향이 아닌 **기체 Body 각속도 명령**으로 해석한다.
 - 스틱을 중앙으로 돌려도 자동 수평 복귀하지 않고 현재 자세를 유지한다.
 - Pitch/Roll에 고정 각도 제한이 없어 Roll과 Loop가 가능하다.
 - Throttle 중립은 수평 자세에서 중력을 상쇄하는 호버, 위 입력은 추가 추력, 아래 입력은 추력 감소로 해석한다. 추력은 기울어진 기체의 Local Up 방향으로 적용되어 W로 기수를 숙이면 전진력이 생긴다.
-- 오른쪽 스틱: Pitch/Roll, 왼쪽 세로: Throttle, 왼쪽 가로: Yaw라는 Mode 2 계약으로 연결한다.
-- 키보드도 네 Acro 축을 모두 제공하며, Gamepad/RC Controller는 표준 Mode 2 배치를 유지한다. 장치별 입력을 공용 Move Action에서 재해석하지 않고 전용 Axis1D Action 네 개로 분리한다.
+- Mode 1은 왼쪽 스틱 `Yaw/Pitch`, 오른쪽 스틱 `Roll/Throttle`을 사용한다.
+- Mode 2는 왼쪽 스틱 `Yaw/Throttle`, 오른쪽 스틱 `Roll/Pitch`를 사용한다.
+- 키보드는 Mode 1·2 모두 같은 직관적 배치를 유지한다. 장치별 입력을 공용 Move Action에서 재해석하지 않고 Acro 의미축 4개와 패드 세로 원시축 2개로 분리한다.
 - 현재 v1은 World 중력, 호버 스로틀, Body Up 추력, 속도 비례 선형 항력, Body Rate 응답 시간을 계산한다. 이동 기반은 여전히 `UFloatingPawnMovement`이며 모터별 RPM, PID, 프로펠러 공력, 질량·관성 텐서를 푼 완전한 비행 시뮬레이터는 아니다.
 
 #### 현재 Rate/Acro 입력표
 
-Rate/Acro는 Front-end Drone 선택 화면에서 FPV 기체를 고르면 기본 적용된다. 일반 플레이 중 모드를 바꾸는 확정 단축키는 아직 없고, Weather 시험 맵의 `1/2/3`은 그 맵 전용 비교 키다.
+Rate/Acro는 Front-end Drone 선택 화면에서 FPV 기체를 고르면 기본 Mode 2로 적용된다. 일반 플레이 중 모드를 바꾸는 확정 단축키는 아직 없고, UI의 조작 설정 순환은 `쉬운 조작 → 제한 자세 → Mode 1 → Mode 2` 순서다.
 
-| 기능 | 키보드·마우스 | Gamepad Mode 2 | 비고 |
-|---|---|---|---|
-| Throttle / Local Up 추진 | `Space/Left Ctrl` | 왼쪽 Stick Y | 중립=호버, Space=추력 증가, Ctrl=추력 감소. 기울면 Body Up 방향으로 추진 |
-| Yaw | `Q/E` | 왼쪽 Stick X | 왼쪽/오른쪽 선회 |
-| Roll | `A/D` | 오른쪽 Stick X | 기체 좌/우 회전, 90° 제한 없음 |
-| Pitch | `W/S` | 오른쪽 Stick Y | W는 Nose-down/전진 방향 Pitch, S는 Nose-up/후진 방향 Pitch |
-| Mouse Look | Mouse X: 기체 Yaw, Mouse Y: Camera Pitch | 해당 없음 | Rate 스틱이 아닌 개발용 직접 회전/카메라 입력 |
-| 1인칭/3인칭 | `P` | Y/Triangle | 임시 시점 전환 |
-| 역할 Primary/Secondary | 좌/우 클릭 | RB/LB | 정찰·자폭·투하 역할 기능 |
+| 기능 | 키보드·마우스 | Gamepad Mode 1 | Gamepad Mode 2 | 비고 |
+|---|---|---|---|---|
+| Throttle / Local Up 추진 | `Space/Left Ctrl` | 오른쪽 Stick Y | 왼쪽 Stick Y | 중립=호버, Space=추력 증가, Ctrl=추력 감소. 기울면 Body Up 방향으로 추진 |
+| Yaw | `Q/E` | 왼쪽 Stick X | 왼쪽 Stick X | 왼쪽/오른쪽 선회 |
+| Roll | `A/D` | 오른쪽 Stick X | 오른쪽 Stick X | 기체 좌/우 회전, 90° 제한 없음 |
+| Pitch | `W/S` | 왼쪽 Stick Y | 오른쪽 Stick Y | W는 Nose-down/전진 방향 Pitch, S는 Nose-up/후진 방향 Pitch |
+| Mouse Look | Mouse X: 기체 Yaw, Mouse Y: Camera Pitch | 해당 없음 | 해당 없음 | Rate 스틱이 아닌 개발용 직접 회전/카메라 입력 |
+| 1인칭/3인칭 | `P` | Y/Triangle | Y/Triangle | 임시 시점 전환 |
+| 역할 Primary/Secondary | 좌/우 클릭 | RB/LB | RB/LB | 정찰·자폭·투하 역할 기능 |
 
-`IA_DronePrototype_AcroPitch/Roll/Yaw/Throttle` 네 Action은 Acro에서만 값을 사용한다. 쉬운/제한 자세용 Move·Altitude·Yaw와 같은 물리 키가 IMC에 함께 있어도 Pawn이 현재 모드에 맞는 Action만 소비하므로 W/S와 Space/Ctrl이 같은 축으로 겹치지 않는다.
+`IA_DronePrototype_AcroPitch/Roll/Yaw/Throttle` 네 Action과 `AcroGamepadLeftVertical/RightVertical` 두 Action은 Acro에서만 값을 사용한다. 쉬운/제한 자세용 Move·Altitude·Yaw와 같은 물리 키가 IMC에 함께 있어도 Pawn이 현재 모드에 맞는 Action만 소비하므로 W/S와 Space/Ctrl이 같은 축으로 겹치지 않는다. Mode 1·2 배치는 Spektrum의 공식 송신기 설명과 DX5e 매뉴얼의 채널 배치를 기준으로 했다: [Mode 1 vs Mode 2](https://my.spektrumrc.com/Articles/Article.aspx?ArticleID=2105), [DX5e Manual](https://spektrumrc.com/ProdInfo/Files/SPMR5510-Manual_EN.pdf).
 
 ## 공개 자료를 반영한 현재 FPV 기준값
 
@@ -101,10 +102,10 @@ DJI 공개값에는 무풍·해수면 등 측정 조건이 붙으며, 현재 프
 대상은 `BP_DroneScoutIntegration`, `BP_DroneFPVIntegration`, `BP_DroneDropIntegration` 또는 `ADronePrototypePawn` 파생 Blueprint다.
 
 1. Pawn 참조에서 `Set Control Mode`를 호출한다.
-2. `Assisted Easy`, `Manual Realistic Greybox`, `Acro Rate Realistic Greybox` 중 하나를 전달한다.
+2. `Assisted Easy`, `Manual Realistic Greybox`, `Acro Rate Mode 1 Greybox`, `Acro Rate Realistic Greybox` 중 하나를 전달한다. 마지막 기존 이름은 Asset 호환을 위해 유지한 Mode 2다.
 3. 핸들링은 `Set Handling Preset`에 `Stable`, `Balanced`, `Agile` 중 하나를 전달한다.
-4. `Toggle Control Mode`는 쉬운 조작 → 제한 자세 → Rate/Acro → 쉬운 조작 순서로 순환한다.
-5. 안정→균형→고기동 순환 버튼은 `Cycle Handling Preset`을 사용한다.
+4. `Toggle Control Mode`는 쉬운 조작 → 제한 자세 → Mode 1 → Mode 2 → 쉬운 조작 순서로 순환한다.
+5. 느림→보통→빠름 순환 버튼은 `Cycle Handling Preset`을 사용한다.
 6. UI 문구 갱신은 `On Flight Control Settings Changed` Event에 바인딩한다.
 7. 시작값은 각 `DA_Drone_*_Greybox`의 `Flight Profile > Default Control Mode / Default Handling Preset`에서 설정한다.
 
@@ -117,7 +118,7 @@ Pawn Class Defaults에서 다음 Struct를 연다.
 - `Assisted Easy Tuning`: 가속·감속·Turning Boost·Yaw 배율
 - `Manual Realistic Greybox Tuning`: 위 배율, Local Up 사용, Collision Root 자세 사용
 - `Acro Rate Realistic Greybox Tuning`: Rate/Acro에서 사용할 가속·관성·Local Up·Root 자세 사용
-- `Stable / Balanced / Agile Handling Tuning`: 최대 속도·가속·Yaw·최대 자세각 배율
+- `Stable / Balanced / Agile Handling Tuning`: Asset 호환 내부 이름. 현재 `느림/보통/빠름` 최대 속도 배율만 사용하고 나머지 배율은 1.0 유지
 
 각 기체의 절대 기준값은 Data Asset의 `Flight Profile`에 둔다. Rate/Acro의 중앙 감도·최대 Rate·Expo·수직 속도·호버/중력/항력/Rate 응답은 `Flight Profile > Acro Rate Settings`에서 조정한다. 모드 전환 시에는 기준값에서 다시 계산하므로 반복 전환해도 배율이 누적되지 않는다.
 
@@ -133,20 +134,20 @@ FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조�
 - `Linear Drag Per Second`: 속도 비례 항력. 현재 `0.12/s`; 높이면 고속 관성이 더 빨리 줄어든다.
 - `Body Rate Response Time Seconds`: 목표 Pitch/Roll/Yaw Rate까지 수렴하는 시간. 현재 `0.08s`; 낮추면 더 즉각적이다.
 - Pawn Blueprint의 `Acro Rate Realistic Greybox Tuning`: 이동 Component의 MaxSpeed/Acceleration 배율과 Root 자세 계약. Acro 자동 감속은 끄고 위 선형 항력을 사용한다.
-- Pawn Blueprint의 `Agile Handling Tuning`: Profile 최대 속도·가속·Yaw에 곱하는 고기동 배율.
+- Pawn Blueprint의 `Stable/Balanced/Agile Handling Tuning`: 각각 느림/보통/빠름에 대응한다. 현재 기본값은 MaxSpeed `0.80/1.00/1.25`, 가속·Yaw·자세각 배율은 모두 `1.0`이다.
 
 조정 순서는 `호버 스로틀 → Body Rate 응답 → 중앙 감도 → Expo → 최대 Rate → 선형 항력/최대 속도`로 잡는다. 먼저 수평 호버와 Pitch 추진을 맞춘 뒤 회전 감도를 조정해야 상승감과 조향감을 혼동하지 않는다.
 
 ## Editor 확인 순서
 
 1. `Lvl_DroneTraining` 또는 Prototype Map을 연다.
-2. 정찰 Data Asset 기본값인 `쉬운 조작 + 균형`으로 전후·좌우·고도를 확인한다.
+2. 정찰 Data Asset 기본값인 `쉬운 조작 + 보통`으로 전후·좌우·고도를 확인한다.
 3. `Set Control Mode(ManualRealisticGreybox)`를 임시 Widget/Button에서 호출한다.
 4. 전진 입력에서 Root와 FPV Camera가 Pitch되고, 고도 입력이 기체 Local Up을 따르는지 확인한다.
 5. 입력을 놓았을 때 쉬운 조작보다 관성이 길게 남는지 확인한다.
-6. Stable/Balanced/Agile을 차례로 바꾸며 속도·Yaw·기울기 한도가 즉시 달라지는지 확인한다.
+6. 느림/보통/빠름을 차례로 바꾸며 최대 이동 속도만 달라지고 조향감이 몰래 바뀌지 않는지 확인한다.
 7. 쉬운 조작으로 돌아왔을 때 Root Pitch/Roll이 수평 복귀하는지 확인한다.
-8. FPV 기체를 골라 Rate/Acro에서 오른쪽 Stick을 놓아도 자세가 유지되는지 확인한다.
+8. FPV 기체를 골라 Mode 1과 Mode 2에서 각 Pitch/Throttle 세로축이 표대로 바뀌고 스틱을 놓아도 자세가 유지되는지 확인한다.
 9. 수평에서 키를 놓으면 중립 호버가 유지되고, Space는 상승하며 Ctrl은 추력을 줄여 하강하는지 확인한다.
 10. W로 Nose-down한 뒤 중립/상승 Throttle에서 기체 Up 축이 전진력으로 바뀌는지 확인한다.
 11. Roll/Pitch 끝 입력으로 90도를 넘어 회전하고 Local Up Throttle로 바라보는 축에 추진되는지 확인한다.
@@ -164,7 +165,7 @@ FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조�
 6. FLOW-05 Mission 허용 3종 카드·설정·선택 Definition 1대 Spawn/Possess — 실제 PIE 완료
 7. FLOW-06~07 Mission Director·목표 패널·성공/실패·재도전·로비 복귀 — 실제 PIE 완료
 8. FLOW-08 새 실행 기준 전체 흐름 3회 반복 — 3/3 자동화 완료
-9. 공통 역할 입력 — 임시 좌클릭/RB 1차, 우클릭/LB 2차, `P`/패드 Y 시점 전환, Acro 전용 12개를 포함한 IMC 33 Mapping과 Pawn Binding 자동화 완료
+9. 공통 역할 입력 — 임시 좌클릭/RB 1차, 우클릭/LB 2차, `P`/패드 Y 시점 전환, Mode 1·2 세로축을 포함한 Acro 전용 12개 Mapping, 전체 IMC 33 Mapping과 Pawn Binding 자동화 완료
 10. Training Map 정찰/자폭/투하 Target·역할 상태 UI·역할별 제공 모델 — 구현 및 자동화 완료, 수동 화면 확인 대기
 
 현재 역할 입력은 다음처럼 동작한다.

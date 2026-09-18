@@ -4,7 +4,7 @@
 
 ### 9/17 무저장 시험 진입 경로
 
-기존 Weather TestMap의 native DebugVisualizer에 숫자열 `7 Clear / 8 LightWind / 9 RainStorm` 및 Rain/Spawn/Wet Readout을 추가했다. `ApplyTestWeatherPreset(0/1/2)`는 전용 맵에서만 즉시 Snapshot을 바꾸며 자산/맵을 저장하지 않는다. RainStorm은 Snapshot 강도·spawn scale을 받아 최대 80개, 5Hz의 제한된 DrawDebug 선분 프리뷰를 만든다. 비가 0이면 새 선분 생성을 멈추고 남은 선분은 약 0.3초 내 사라진다. 이는 Niagara/젖음/Audio 구현 또는 GPU 성능 검증이 아니다. 기존 1/2/3 조작 모드 키는 유지한다. 성능 비교 절차·품질 후보는 Unreal repo `Tools/AssetMigration/README_NPC_WEATHER_TEST.md`를 참고한다. Low~Epic preset 적용 또는 GPU 측정 결과로 간주하지 않는다.
+기존 Weather TestMap의 native DebugVisualizer에 숫자열 `7 Clear / 8 LightWind / 9 RainStorm` 및 Rain/Spawn/Wet Readout을 추가했다. `ApplyTestWeatherPreset(0/1/2)`는 전용 맵에서만 즉시 Snapshot을 바꾸며 자산/맵을 저장하지 않는다. RainStorm은 Snapshot 강도·spawn scale을 받아 최대 80개, 5Hz의 제한된 DrawDebug 선분 프리뷰를 만든다. 비가 0이면 새 선분 생성을 멈추고 남은 선분은 약 0.3초 내 사라진다. 이는 Niagara/젖음/Audio 구현 또는 GPU 성능 검증이 아니다. 조작 비교 키는 `1 Easy / 2 Manual / 3 Acro Mode 1 / 4 Acro Mode 2`다. 성능 비교 절차·품질 후보는 Unreal repo `Tools/AssetMigration/README_NPC_WEATHER_TEST.md`를 참고한다. Low~Epic preset 적용 또는 GPU 측정 결과로 간주하지 않는다.
 
 ## 현재 상태와 확정 경계
 

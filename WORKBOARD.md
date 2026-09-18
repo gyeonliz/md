@@ -1,22 +1,22 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-09-17 — NPC 타이밍 회귀 수정·빌드, 집중 회귀 2/3 성공·Shotgun PIE MoveTo 요청 검사 1건 실패; Weather TestMap 강우 디버그 프리뷰 추가·검증 1/1
+마지막 갱신: 2026-09-18 — Shotgun 순찰 회전의 Nav 방향·Gun 충돌 두 원인 수정, FPV 송신기 Mode 1/2와 느림/보통/빠름 적용, 수동 화면 확인 대기
 
 ## Now
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
 | MAP-TEST-01 | 경량 Tutorial Systems TestMap 수동 확인 | 맵·생성 도구·전용 자동화·Map Check 완료 | Gate/Ring/역할/HUD 한·두 Lap 화면 확인 |
-| AI-SO-TUNE-01 | Smart Object·유인 MG·개인화기 추적 확인 | 정책·기준선 AI 3/3·Shotgun 2/2는 과거 통과. 9/17에는 한 Tick 중 교전 타이머 중복 누적 수정 후 Build 성공, 타이밍 회귀와 `NPCPerceptionSearchPIE` 통과. 같은 집중 필터의 `ShotgunSystemsTestMapPIE`는 정지 pursuit 목표의 MoveTo 요청 수 기대 2/실제 3으로 실패; 요청 종료 원인 미확정. 화면 떨림 미재현 | 실패 원인을 PathFollowing/RequestID 계측으로 구분하고 Shotgun PIE 재검증. 이후 화면에서 Rifle/Shotgun 추적·정지사격·Gaze·리시 포기·MG 재점유 및 실제 애니메이션 떨림 확인 |
+| AI-SO-TUNE-01 | Smart Object·유인 MG·개인화기 추적 확인 | 기존 Pursue 공전 수정에 더해 실제 맵의 느린 순찰 회전을 재현했다. 순찰 몸은 짧은 Nav Segment가 아니라 예약 최종 슬롯을 보며, Capsule 외 시각 Primitive는 Collision/Overlap/Nav를 끈다. 실제 로그에서 Shotgun `Gun`이 Rifle을 Block하던 `stuck` 원인을 확인했다. Build와 `NPCBaseRoutinesPIE`·`NPCGreyboxPIE`·`ShotgunSystemsTestMapPIE` Green | 실제 맵을 45~60초 실행해 Rifle/Shotgun 교차 무충돌, 이동 방향 보행, 제자리/주기 회전 없음, Pursue·사격·리시 복귀를 확인. 재발 시 `[NPC-STATE]`·`[NPC-MOVE]` 로그를 회수한 뒤 진단 로그 기본값을 끈다 |
 | AI-SHOTGUN-PIE-01 | 추가 Shotgun NPC 사격 체감 확인 | 실제 8 Projectile·12° 반각, Pellet당 3 피해, 상호 충돌 방지, Cyan Debug 기본 Off, 발광 비드/Tracer·3°/6° 시선 Hysteresis·Asset/PIE 자동화 완료 | 발광 비드 8개 분리 가시성·Cyan 선 제거·회피·최대 24 피해·사거리·LOS·시선 안정화를 Editor 화면에서 확인 |
 | UI-FLOW-PROTOTYPE-01 | Mission/Drone 선택 임시 UI 확인 | 첨부 와이어프레임 기반 3열 C++ fallback 구현, `FrontEndPIE`·`MissionEntryPIE` 통과 | 16:9 화면에서 작전 목록/설명/시작과 기체 목록/상세/설정/출격이 잘리지 않는지 수동 확인 후 최종 WBP·Thumbnail 범위 결정 |
 | MISSION-RULE-PIE-01 | 새 목표 Rule의 실제 맵 Vertical Slice | 귀환·Jammer·역할 Actor 시험 배치 완료, 직접 실행은 Prototype Flow | Test Mission DA/진입 경로에서 Scan/Delivery/Destroy/Return/Jamming Event·Tag·시간 규칙 확인 |
 | STY-03-PIE-01 | 재밍 신호·비행·HUD Vertical Slice | 35%/80% 겹침 Zone TestMap 배치·저장 계약 완료 | 실제 비행으로 Overlap·HUD·둔화/복원 확인. 영상 Noise WBP는 별도 표현 작업 |
 | STORY-BRANCH-01 | Mission 2→3 양쪽 스토리 분기 | Story Fact 저장·성공 적용·조건 목표 필터, 미끼/실제 탑승 양쪽 자동화 완료 | 사용자가 기본 스토리안을 정하면 실제 Mission DA에 Fact 설정 |
 | DRONE-FIBER-01 | 광섬유 Drone 기반 | `JammingImmunity` Capability→Signal 동작 연결·자동화 완료, 실제 Definition/Pawn 없음 | 프로젝트 소유 Definition/Integration Pawn과 Visual 연결 후 Zone PIE |
-| DR-FPV-ACRO-PIE-01 | 고기동 FPV 실제 조작 체감 | Rate/Acro 각속도·무수평복귀에 중력·호버·Body Up 추력·선형 항력·Rate 응답 v1 연결, FPV Data Asset·Prototype 8/8 완료 | 키보드/패드로 Nose-down 전진력, 호버·상승·무추력 하강, Roll/Loop와 650°/s 체감 확인 후 수치 조정 |
-| DR-FPV-ACRO-INPUT-02 | Acro 키보드·패드 축 분리 | 전용 Action 4개, IMC 33 Mapping, Pawn 분기, Editor Build와 Prototype 8/8 완료 | 키보드 W/S Pitch·A/D Roll·Q/E Yaw·Space/Ctrl Throttle와 패드 Mode 2를 화면에서 확인 |
-| WTH-02-PIE-01 | 바람 Vertical Slice 체감 | 24개 이동 Bead·풍속/풍향/모드 Readout·1/2/3 모드 키·전용 TestMap 자동화 완료 | 표시 방향과 실제 Drift, 세 모드 보정 차이, 순풍·역풍·횡풍과 돌풍 세기 화면 확인 |
+| DR-FPV-ACRO-PIE-01 | FPV Rate/Acro 실제 조작 체감 | 각속도·무수평복귀에 중력·호버·Body Up 추력·선형 항력·Rate 응답 v1 연결. 속도 단계는 느림/보통/빠름으로 단순화하고 현재 MaxSpeed만 변경 | 키보드/패드로 Nose-down 전진력, 호버·상승·무추력 하강, Roll/Loop와 650°/s 체감 및 세 속도 단계 확인 후 수치 조정 |
+| DR-FPV-ACRO-INPUT-02 | Acro 키보드·패드 Mode 1/2 | 의미축 Action 4개+패드 세로 원시축 2개, IMC 33 Mapping, Pawn/UI 분기, Editor Build·계약·프로필·3회 PIE·MissionEntryPIE 성공 | 키보드 W/S Pitch·A/D Roll·Q/E Yaw·Space/Ctrl Throttle 유지, 패드 Mode 1 LeftY Pitch/RightY Throttle와 Mode 2 반대 배치를 화면에서 확인 |
+| WTH-02-PIE-01 | 바람 Vertical Slice 체감 | 24개 이동 Bead·풍속/풍향/모드 Readout·1/2/3/4 모드 키·전용 TestMap 자동화 완료 | 표시 방향과 실제 Drift, 네 모드 보정 차이, 순풍·역풍·횡풍과 돌풍 세기 화면 확인 |
 | WTH-02B | 자연스러운 바람 전환·표시 | 돌풍 Attack/Release·풍향 최단각 응답, 표시 속도 보간·벡터 적분, Bead 방향/길이 변화 구현. Weather 3/3 완료 | Weather TestMap에서 방향 전환 무점프·속도/길이 변화와 LightWind/RainStorm 체감 확인 |
 | WTH-03 | 비 표현 Vertical Slice | `7/8/9`로 Snapshot 전환, TestMap 전용 최대 80개·5Hz DrawDebug 비 선분 프리뷰 추가, 비 0이면 생성 중단·충돌 trace 없음. 새 회귀 1/1·UE 5.8.2 Build 통과. Niagara·Wetness MPC consumer·Audio는 미연결이며 GPU 측정 전 | TestMap에서 프리뷰 수동 확인 후 정식 camera-follow Niagara·MPC·Audio와 실제 Low~Epic 성능 측정 |
 
@@ -39,17 +39,17 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 - `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`: 순찰·감지·수색·MG·자동포탑·차량
 - `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest`: 재밍 약/강/겹침·Return Zone·역할 표적
 - `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest`: 추가 Shotgun NPC·작은 Pellet 8개/Tracer·탄약·LOS 사격장
-- `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`: `1/2/3` 조작 모드, `7/8/9` 날씨 전환, LightWind 지속풍·돌풍, Snapshot 기반 디버그 강우 선분(정식 Niagara 아님)
+- `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`: `1/2/3/4` 쉬운/제한/Acro Mode 1/Mode 2, `7/8/9` 날씨 전환, LightWind 지속풍·돌풍, Snapshot 기반 디버그 강우 선분(정식 Niagara 아님)
 
 ## Next
 
 1. 수동 확인에서 발견된 Gate/HUD/역할 결함 수정 후 TestMap 회귀
 2. Shotgun Systems 맵에서 작은 Pellet/Tracer 8개가 분리되어 보이는지와 Cyan 선 제거·12° 확산·회피 가능 탄속·피해·사거리·LOS를 수동 확인
 3. Front-end와 Drone 선택 3열 UI의 해상도별 잘림·버튼 상태를 확인하고 최종 WBP Designer/Thumbnail 작업 범위를 확정
-4. 이동된 AI 시험 맵에서 Rifle/Shotgun의 사거리 밖 추적·이동 방향 Yaw·리시 포기/순찰 복귀와 병사 상태 최소 1초 유지, MG 사망 후 재점유를 화면 확인
+4. 이동된 AI 시험 맵을 45~60초 실행해 Rifle/Shotgun이 교차할 때 `Gun`에 막히지 않고, 이동 방향과 몸이 일치하며 주기적으로 빙글 돌지 않는지 확인한다. 이어 사거리 밖 추적·리시 복귀·최소 상태 1초·MG 사망 후 재점유를 본다
 5. 새 Mission Systems 맵에서 재밍 HUD·둔화/복원·역할 기능·Return 크기 수동 확인
-6. FPV Rate/Acro 키보드 전용 축과 Gamepad/RC Mode 2로 호버·기울기 추진·무추력 하강·Roll/Loop를 수동 확인하고 호버 스로틀·항력·Rate 응답·감도·Expo를 체감 조정
-7. Weather Systems 맵에서 개선된 Bead의 방향 전환 무점프·풍속별 길이와 `1/2/3` 세 조작 모드 Drift·LightWind/RainStorm 돌풍을 수동 확인
+6. FPV Rate/Acro 키보드 전용 축과 Gamepad/RC Mode 1·Mode 2를 각각 확인한다. 두 모드의 Pitch/Throttle 세로축이 표대로 바뀌는지, 느림/보통/빠름이 속도만 바꾸는지 확인한 뒤 호버·항력·Rate 응답·감도·Expo를 조정한다
+7. Weather Systems 맵에서 개선된 Bead의 방향 전환 무점프·풍속별 길이와 `1/2/3/4` 네 조작 모드 Drift·LightWind/RainStorm 돌풍을 수동 확인
 8. Weather TestMap에서 7/8/9 강우 디버그 프리뷰를 수동 확인한 뒤 `WTH-03` 정식 Niagara Rain·MPC Wetness·Audio·품질 단계를 연결하고 GPU 측정
 9. Test Mission DA와 개발용 진입 경로를 추가해 Return/Jammer Mission Event를 실제 PIE로 확인
 10. Mission 1 검증용 DA/Map에서 Drop→요원 전달→선택적 정보 회수→시간/파괴 실패 Vertical Slice
@@ -100,15 +100,17 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 | Mission Systems TestMap | Jammer 2·겹침 1·Return 1·역할 표적 3·Carryable 1, Map Check 0/0·회귀 통과 |
 | Shotgun Systems TestMap | 기존 AI 맵 유지, 추가 Shotgun NPC 1·거리 표식 3·LOS 벽 1, Map Check 0/0·전용 회귀 2/2 |
 | Shotgun 가시성/API | Projectile 모드 Cyan Pellet 비행선, BP 표시 On/Off·직전 끝점 조회, 전체 계약 5/5 성공 |
-| FPV Rate/Acro | Mode 2+Actual Rates형 각속도, 자동 수평 복귀 없음, 중력·호버·Body Up 추력·항력·Rate 응답 v1, FPV DA 27m/s·650°/s 기준, Prototype 8/8 성공 |
-| Acro 입력 분리 | 키보드 W/S Pitch·A/D Roll·Q/E Yaw·Space/Ctrl Throttle, Gamepad Mode 2 전용 Action 4개와 IMC 33 Mapping, Prototype 8/8 성공 |
+| FPV Rate/Acro | 송신기 Mode 1·Mode 2, Actual Rates형 각속도, 자동 수평 복귀 없음, 중력·호버·Body Up 추력·항력·Rate 응답 v1, FPV DA 27m/s·650°/s 기준 |
+| Acro 입력 분리 | 키보드 W/S Pitch·A/D Roll·Q/E Yaw·Space/Ctrl Throttle 유지, Gamepad Mode별 세로축 Action 2개 추가, IMC 33 Mapping·3회 PIE 성공 |
+| AI 순찰 회전·부착물 충돌 차단 | 예약 최종 슬롯 기준 Patrol 몸 방향, 300°/100cm 회전 회귀, Capsule 외 Primitive VisualOnly 강제. 실제 Shotgun `Gun`→Rifle stuck 로그 재현 후 AI 핵심 PIE 3종 성공 |
+| 속도 프리셋 정리 | 기존 저장 호환 Stable/Balanced/Agile 내부 이름은 유지하고 UI를 느림/보통/빠름으로 변경. 기본값은 MaxSpeed 0.80/1.00/1.25만 변경 |
 | 기상 데이터·바람 Runtime | Profile/Snapshot/Subsystem·Controller·Drone Response, 저장 Profile 3종, TestMap·Map Check·기상 자동화 3/3 성공 |
 | 차량 바퀴 회전축·접지 교정 | 실제 Tire Mesh의 옆 회전을 부모 공간 +Y 차축으로 교체하고, 30cm 반지름 때문에 약 20cm 잠기던 BP를 52cm로 교정. 축·Bounds·평면 접지 Red→Green과 맵 Validate 통과, 화면 재확인 대기 |
 | Shotgun Pellet 가시화 | 실제 8발·12° 확산, Pellet당 3 피해, 전용 BP의 주황 발광 `0.04` 비드와 `0.20 × 0.0125` Tracer, 집중 회귀 성공 |
 | 개인화기 정면 시선 안정화 | 몸 Yaw와 Bone Gaze 공통 3° 데드존, 1.9° 좌우 표적 왕복 회귀 Red→Green, Blueprint 역할별 조정 가능 |
 | 병사 상태 전환 안정화 | 공통 최소 유지 1.0초, 유지 중 사격·점유·이동 조건 재점검, MG 재시도 Event 지연, 사망·파괴·Lost 확정 즉시 정리. 후속 추적 안정화 뒤 MG 재점유 포함 전체 PIE Green |
 | 개인화기 추적·포기 안정화 | Fire/Pursue/Disengage 정책, 실제 3D 사거리 안 즉시 정지·사격, 밖 판정 0.2초 확인 뒤 Pursue, Nav 투영, 같은 목적지 MoveTo 중복 방지, 3,000cm 리시·2.5초 무진행·복귀 Cooldown, 추적 몸·Gaze 이동 벡터 정렬, StateTree 다음 Tick 재시작. 집중 회귀 성공 |
-| Weather TestMap 가시화 | BP 조절형 Visualizer, 이동 Bead 24개, Profile/풍속/풍향/모드 Readout, 1/2/3 비교 키와 Map Check 0/0 |
+| Weather TestMap 가시화 | BP 조절형 Visualizer, 이동 Bead 24개, Profile/풍속/풍향/모드 Readout, 1/2/3/4 비교 키와 Map Check 0/0 |
 | 자연스러운 바람 전환 | Gust Attack/Release·풍향 최단각 응답, 표시 속도 벡터 적분, 풍속별 Bead 방향/길이, Weather 3/3 성공 |
 | 강우 Snapshot 디버그 프리뷰 | 전용 Weather TestMap 7/8/9 프로파일 전환, 최대 80개 DrawDebug 선분/5Hz/비 0일 때 비활성, 회귀 1/1. 정식 Niagara·Wetness·Audio 및 화면 확인은 미완료 |
 | 비 기획 | Camera-follow GPU Rain·Effect Type·젖음/실내/Splash 최적화 계획과 Snapshot 표현값. Niagara/MPC/Audio는 다음 작업 |

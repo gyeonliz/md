@@ -1586,3 +1586,44 @@ HeadingValueText
 - 실제 `NPCPerceptionSearchPIE`는 2회 모두 감지·사격·Cover·최초 MG 점유와 사망 정리까지 진행했지만, 생존 병사가 빈 MG를 각각 2회/3회 Claim한 뒤 Operator Anchor로 Nav 도착하지 못해 기존 재점유 제한시간 항목에서 실패했다. 상태 안정화 결과와 분리해 맵 경로/Collision 결함으로 계속 추적하며 Success로 기록하지 않는다.
 - 최종 Git 감사 중 원격 `72c964c`, Merge `4a3d4ba`가 추가됐고 변경 파일은 팀원 `Lvl_MilitaryBase.umap` 하나였다. 로컬 작업과 겹침이 없어 fast-forward했으며 Unreal 기준은 `main = origin/main = 4a3d4ba`다.
 - `stash@{0}: On main: !!GitHub_Desktop<main>` 1개가 남아 있다. Shotgun/Weather/Acro 시기 파일 49개를 포함한 자동 Stash라 현재 로컬 변경과 중복 가능성이 크지만, 사용자 작업 유실을 피하기 위해 이번에는 적용·삭제하지 않았다.
+
+## 2026-09-18 — D 드라이브 기준 재동기화와 NPC 순찰 재현
+
+- `fetch --prune` 뒤 Unreal `D:\JGY\project\drone`은 `main = origin/main = 9f58b51`, 문서 `D:\JGY\project\md`는 `main = origin/main = 6960648`이며 두 저장소 모두 원격 차이 `0/0`임을 확인했다. 문서 최신화 시작 전 두 작업 트리는 clean이었다.
+- 최신 Unreal Commit과 사용자 화면 보고를 대조해 Shotgun NPC 뒤로 걷기/문워크는 해결 완료가 아니라 진행 중 결함으로 다시 분류했다. 기존 Actor 전방 정렬 자동화는 Skeletal Mesh 포즈, AnimBP의 Speed/Direction, 실제 BlendSpace 선택을 검증하지 못한다.
+- 격리된 `Drone.AI.ShotgunSystemsTestMapPIE`는 경계 흔들림·추적 진전·몸/시선 정렬·사거리 진입 정지·리시 포기 후 순찰 복귀를 모두 통과했다.
+- 실제 `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`의 `NPCBaseRoutinesPIE`는 최초 묶음 실패, 단독 재실행 성공 뒤 4회 반복에서 3회 실패해 높은 재현율의 순찰 플래키로 확정했다. `NPCPerceptionSearchPIE`는 같은 기준에서 성공했다.
+- 순찰과 개인화기 추적 양쪽에서 `EPathFollowingStatus::Paused`를 정상 진행으로 취급해 재요청과 정체 제한을 우회하던 분기를 확인했다. `Moving`만 실제 진행으로 인정하고 `Paused`는 기존 재요청·2초 정체 처리로 회복하도록 1차 수정했다.
+- 실패 시 Rifle/Shotgun 역할, ResponseState, MoveStatus, 완료/방문 횟수, 위치·속도를 보고하도록 실제 맵 자동화 진단을 보강했다. Editor가 열려 있어 Build와 수정 후 반복 검증은 대기 중이다.
+- 외부 OpenCode 모델 검증은 실제 호출이 정상 보고서로 이어지지 않아 사용을 종료했다. 이번에 만든 프로젝트 Agent·모델 설정과 문서 가이드는 제거했으며 이후 외부 모델 호출을 작업 기준에 포함하지 않는다.
+- Production Training 맵과 Asset은 수정하지 않았고 Commit·Push도 수행하지 않았다.
+- 실제 보행 증상을 직접 잡도록 `NPCBaseRoutinesPIE`에 Actor 전방과 실제 수평 속도의 내적을 샘플링하고, 역방향 상태가 0.35초를 넘으면 실패하는 회귀를 추가했다. 수정 전 Shotgun은 3/3 실패했고 `worstDot=-1.000`, 최대 연속 역방향 1.56~3.95초가 기록됐다.
+- 순찰·수색·추적 등 실제 이동 중에는 상태명이 아니라 속도 벡터를 몸 Yaw의 단일 기준으로 사용하도록 수정했다. 같은 회귀를 포함한 실제 맵 순찰은 수정 빌드에서 4/4 성공했다.
+- 묶음 회귀의 `ShotgunSystemsTestMapPIE`에서 고정 표적에 MoveTo가 1회에서 2회로 늘어나는 Red를 추가로 추적했다. 첫 감지를 Perception과 StateTree가 중복 진입해 경로를 취소할 수 있는 흐름, 순찰 Task의 늦은 종료가 전투 MoveTo를 취소하는 소유권 충돌을 막았다.
+- 마지막으로 첫 MoveTo가 `Success`로 끝났어도 부분 경로/허용 반경 때문에 실제 사거리 밖일 수 있고, 기존 코드는 같은 투영 목적지를 즉시 재요청함을 확인했다. 성공 완료한 동일 목적지는 정착 상태로 유지하고 표적이 재경로 거리 이상 이동할 때만 새 경로를 만들며, 계속 사거리 밖이면 기존 무진전 제한으로 포기·순찰 복귀하도록 수정했다.
+- 임시 `[DEBUG-MOVE-COMPLETE]`, `[DEBUG-PURSUIT-REPATH]` 계측은 제거했다. Editor 종료 뒤 MSVC 14.51.36257 `DroneEditor Win64 Development` 최종 링크 Build가 성공했다.
+- 전용 Shotgun PIE의 Pursuit 표적은 시험 맵 NavMesh 안의 실제 사거리 밖 지점으로 옮겨 부분 경로 Success와 정상 추적을 혼동하지 않게 했다. 단독 `ShotgunSystemsTestMapPIE`가 Success이고, `PersonalWeaponEngagementPolicy`, `PersonalWeaponMaintenanceTiming`, `ShotgunSystemsTestMapPIE`, `NPCGreyboxAssets`, `NPCPerceptionSearchPIE` 묶음 5개도 전부 Success·실패 0이다.
+- 실제 Smart Object 맵 `NPCBaseRoutinesPIE`를 `-TestLoops=4`로 실행해 4/4 Success, 오류·경고 0을 확인했다. 수정 전 4회 중 3회 실패 및 몸/속도 역방향 3/3 Red였던 피드백 루프가 최종 Green으로 바뀌었다. 맵·Asset은 저장하지 않았고 Commit·Push도 수행하지 않았다.
+
+## 2026-09-18 — Shotgun Pursue 전신 회전 후속 수정
+
+- 사용자 화면 보고의 Shotgun 빙글빙글 회전을 `Drone.AI.ShotgunSystemsTestMapPIE`에 같은 대응 상태 안에서의 연속 몸 Yaw 회귀로 재현했다. 수정 전 `PursueDrone`에서 3초 안에 같은 방향 누적 `301~304°`를 반복해 넘겼고 최근 Yaw·속도 표본을 확보했다. 상태가 바뀌면 누적값을 초기화해 서로 다른 행동의 정상 회전은 합산하지 않는다.
+- 진단 계측에서 Nav 가속과 RVO는 이미 꺼져 있었지만 `UCharacterMovementComponent::bRequestedMoveUseAcceleration`은 켜져 있었다. Drone 위치에 무기 사거리 크기의 큰 도착 반경을 둔 MoveTo가 가까운 부분 경로 Segment를 가속으로 지나치고, 몸과 Bone Gaze가 약 40~120cm 거리의 즉시 경로 코너를 계속 따라가며 공전하는 흐름을 확인했다.
+- Drone에서 `PersonalWeaponPursuitRangeRatio`만큼 떨어진 실제 지상 사거리 정지점을 NavMesh에 투영하고 기본 75cm 도착 반경으로 이동하도록 바꿨다. Pursue에만 요청 가속을 기본 해제하고, Controller가 안정된 최종 정지점을 향해 몸 Yaw를 보간하며 Bone Gaze도 같은 목표를 공유한다. 순찰·수색의 실제 속도 방향 보정과 정지 사격 조준은 유지했다.
+- 요청 가속을 전 상태에서 끈 첫 시도는 실제 맵 회귀가 순찰 역방향 `0.614초`를 검출했다. 이를 Pursue에만 한정하고 일반 순찰은 요청 가속을 유지하도록 수정한 뒤 다시 검증했다.
+- 전용 Shotgun PIE에는 같은 상태에서 연속 300° 초과 몸 회전 실패 조건을, 실제 Smart Object 맵 회귀에는 정지 회전과 0.35초 초과 역방향 보행 실패 조건을 유지·추가했다.
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. 완전히 새 Editor 프로세스에서 Shotgun 교전 3/3, 실제 Smart Object 맵 순찰 3/3이 성공했다. `NPCGreyboxAssets`, `NPCPerceptionSearchPIE`, `PersonalWeaponEngagementPolicy`, `PersonalWeaponMaintenanceTiming`, `ShotgunSystemsTestMapPIE` 관련 묶음 5개도 모두 Success다. Maintenance의 Skeletal Mesh 없는 최소 시험 Actor 경고 7건은 예상 경고다. 맵·Asset·Production Training은 수정하지 않았고 Commit·Push도 수행하지 않았다.
+- 종료 정리 중 `fetch --prune`에서 `origin/main=9a94f06 260918`을 새로 확인해 로컬 `main=9f58b51`이 1개 뒤가 됐다. 원격 커밋은 Content 1,412개만 변경하고 Source·Config·Plugins·현재 AI 소스·Shotgun/Smart Object 시험 맵과 겹치지 않는다. `Lvl_DroneTraining`과 `Lvl_DroneTutorialSystemsTest` 및 대용량 LFS 에셋을 포함하므로 더러운 작업 트리에 자동 Pull하지 않았으며, 위 검증은 로컬 기준이다.
+
+## 2026-09-18 — Shotgun 순찰 충돌 2차 원인과 FPV Mode 1/2
+
+- 사용자가 실제 `Lvl_NPCSmartObjectGreybox`를 다시 실행했을 때 Shotgun의 회전 주기만 줄어든 채 증상이 남았다. 이 실행의 `Drone.log`에서 Rifle이 Shotgun BP의 추가 `Gun` 컴포넌트에 침투·충돌해 `stuck and failed to move`가 되는 정확한 상대를 확인했다.
+- 자동 PIE에서도 Shotgun `Gun`이 `QueryAndPhysics`, Overlap On, Navigation On으로 재현됐다. NPC Character는 이동 Capsule만 충돌을 소유하고, Construction/BeginPlay에서 나머지 Primitive를 `NoCollision`, Overlap Off, Nav Off로 강제하도록 변경했다. 역할 BP에 팀원이 별도 Gun/Mesh를 추가해도 같은 계약을 적용한다.
+- 순찰 시작 구간에서 Shotgun이 100cm 진행하기 전에 누적 300도를 도는 Red도 추가했다. Nav의 50~100cm 즉시 경로점을 몸 방향으로 계속 쓰던 흐름을 분리하고, Patrol 몸은 예약된 최종 Smart Object 슬롯 방향을 유지하도록 했다.
+- 수동 재현 후 바로 원인을 읽을 수 있도록 개발 빌드에 `[NPC-STATE]`, `[NPC-MOVE]`, `[NPC-COLLISION-FIX]`를 추가했다. 이동 로그는 적 NPC당 기본 0.5초 간격이며, 화면 해결 확인 뒤 기본 비활성화할 임시 진단 단계다.
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. `NPCBaseRoutinesPIE`, `NPCGreyboxPIE`, `ShotgunSystemsTestMapPIE`가 모두 Success이고 수정 뒤 `stuck` 로그가 없다. 실제 렌더 화면에서 45~60초 순찰 교차·추적·복귀 확인은 사용자 수동 항목으로 남겼다.
+- FPV 조작은 기존 Easy·제한 자세에 RC 송신기 Mode 1과 Mode 2를 별도 모드로 추가했다. Mode 1은 왼쪽 Y Pitch/오른쪽 Y Throttle, Mode 2는 왼쪽 Y Throttle/오른쪽 Y Pitch이며 두 모드 모두 왼쪽 X Yaw/오른쪽 X Roll이다. 키보드는 W/S Pitch, A/D Roll, Q/E Yaw, Space/Ctrl Throttle을 공통 유지한다.
+- 새 패드 세로축 Input Action 2개와 IMC 전체 33 Mapping을 저장하고 FPV Pawn BP에 연결했다. 기존 `AcroRateRealisticGreybox` 이름은 Asset 직렬화 호환을 위해 Mode 2 의미로 유지했다.
+- UI의 `안정/균형/고기동`은 `느림/보통/빠름`으로 바꿨다. 내부 Stable/Balanced/Agile 이름은 Asset 호환을 위해 유지하고 기본 프리셋은 MaxSpeed `0.80/1.00/1.25`만 변경하며 가속·Yaw·자세각 배율은 모두 1.0이다.
+- 입력 변경 후 `AcroInputContract`, `FlightProfiles`, 3회 새 PIE의 `PIEInputLifecycle`, `MissionEntryPIE`가 Success다. Lifecycle은 처음에 새 Action을 예상 목록에서 빼 `31/33` Red, 다음에는 Completed/Canceled Binding 분류 누락으로 Red가 났고 테스트 계약을 보완해 최종 Green으로 전환했다.
+- Production `Lvl_DroneTraining`은 열거나 저장하지 않았고 Commit·Push·원격 Pull도 수행하지 않았다.
