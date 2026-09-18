@@ -1544,6 +1544,37 @@ HeadingValueText
 - 회전축 교정 후 실제 Tire가 도로 두께만큼 잠긴다는 화면 보고를 독립 평면 회귀로 추가했다. `SM_SpikeStorm_Tire2_FR`의 세로 반지름은 약 50cm지만 저장 차량 BP의 `Wheel Radius`는 Native Cylinder용 30cm여서 네 바퀴 모두 약 20cm가 지면 아래에 있었다.
 - `Wheel Radius`의 Blueprint 범위를 `1~500cm`로 명시하고 현재 Tire BP 기본값을 52cm로 저장했다. BP 한 개만 갱신하는 `DRONE_VEHICLE_WHEEL_DEFAULTS_ONLY` 도구 모드를 추가해 팀원 NPC와 맵을 재저장하지 않았다. 수정 뒤 Tire Bounds·평면 접촉·회전축을 함께 검사하는 `GroundConformingSuspension`과 읽기 전용 차량/포탑 맵 Validate가 성공했다.
 
+## 2026-09-17 — 적 AI 재검증 및 Weather TestMap 디버그 강우 프리뷰
+
+- 문서 저장소 Markdown 57개를 목록화하고 최신 README/CONTEXT/STATUS/WORKBOARD, AI·Smart Object·MG·Gaze, 날씨/시험 맵 계획, Project Audit, 최신 Worklog 항목을 대조했다. 서로 충돌하는 과거 기준은 현재 Source와 최신 STATUS/WORKBOARD를 우선했다.
+- 사용자 체감 적 NPC 떨림/애니메이션 중첩은 Headless 자동화만으로 화면 재현되지 않았다. `Drone.AI.NPCGreyboxAssets`, `NPCPerceptionSearchPIE`, `PersonalWeaponEngagementPolicy` 3/3과 Shotgun Asset/PIE 2/2는 통과했으나, AnimBP 포즈 중첩·실제 화면 떨림이 해결됐다는 뜻은 아니다. AI 소스와 Production 맵은 수정하지 않았고 수동 PIE 재현이 남아 있다.
+- 기존 `ADroneWeatherDebugVisualizer`에 `7 Clear / 8 LightWind / 9 RainStorm` 진입점을 추가했다. 지정된 `Lvl_DroneWeatherSystemsTest`에서만 프로파일 Snapshot을 즉시 교체하며 다른 맵과 잘못된 인덱스는 거부한다. 기존 1/2/3 조작 모드 키는 유지했다.
+- Rain Snapshot 강도×SpawnScale로 최대 80개 선분을 0.2초 간격으로 생성하는 DebugDraw 프리뷰를 전용 TestMap에만 연결했다. 비가 0이면 추가 Draw 호출을 멈추고 잔여 선분은 짧은 수명 뒤 사라진다. 파티클별 Trace·새 Niagara/Material/맵 저장은 없다. 이 프리뷰는 정식 Niagara 효과나 GPU 성능 측정이 아니다.
+- UE 5.8.2 `DroneEditor Win64 Development` Build 성공, `Drone.Weather.DebugPresetEntry` 1/1 Success. 기존 기상 회귀 3/3도 성공했다. Rain VFX Niagara, Wetness MPC consumer, Rain Audio, 품질별 GPU 측정은 미완성이다. MCP 서버는 설정돼 있지 않아 별도 연결/설치는 하지 않았다.
+- Drone Source/Test/가이드와 문서 STATUS/WORKBOARD/기상·시험 맵 안내를 로컬 수정했다. Unreal 시작 기준 `3449766`, 문서 시작 기준 `8b3b7b1`; Commit·Push하지 않았고 실제 맵/기존 자산을 저장하지 않았다.
+
+## 2026-09-17 — NPC 행동 로직 추가 감사 및 타이밍 수정
+
+- 사용자 요청에 따라 OpenCode `openrouter/stealth/union-alpha`에 NPC 행동 로직 점검·문제 수정 업무를 위임했다. 제공된 키는 프로세스 입력으로만 사용했으며 문서/명령 출력에 다시 기록하지 않았다. 완료된 뒤 별도 모델 실행은 남아 있지 않다.
+- `ADroneNPCAIController`에서 MG 재할당 유지 처리와 일반 Controller Tick이 같은 프레임에 `UpdatePersonalWeaponEngagement`를 중복 호출해 사거리 이탈·무진행·재경로 타이머가 두 배 진행될 수 있음을 확인했다. 유지 분기는 유효성 확인만 하고, 한 프레임의 시간/발사/이동 갱신은 Controller Tick 한 곳이 담당하도록 수정했다. `Drone.AI.PersonalWeaponMaintenanceTiming` 회귀를 추가했다.
+- UE 5.8.2 `DroneEditor Win64 Development` Build 1회 성공. 한 번 실행한 집중 필터에서 `PersonalWeaponMaintenanceTiming` 성공(로그 경고 7건), `NPCPerceptionSearchPIE` 성공, `ShotgunSystemsTestMapPIE` 실패(정지 pursuit 목표에서 MoveTo 요청 수 기대 2/실제 3). 프로세스 종료 코드 0은 전체 자동화 성공을 뜻하지 않는다.
+- 추가 요청이 이미 끝난 경로의 정상 복구인지 중복 제출인지는 PathFollowing 상태·이전 RequestID·완료/중단 사유 로그가 없어 판단하지 못했다. 추측성 가드/테스트 기대값 변경은 하지 않았다. 사용자 보고 몸/머리 떨림은 Headless에서 재현되지 않았으며 저장 AnimBP 전체 그래프/실제 포즈도 이번 확인 범위가 아니다.
+- 추가 실행은 사용량을 아끼도록 실패한 Shotgun PIE 한 건만 대상으로 호출 전후 PathFollowing 상태, RequestID, 목표 편차, 완료/Abort 결과를 계측해 원인을 분리한다. 화면 떨림은 PIE에서 관찰할 때 AnimBP Debug Filter와 StateTree 실제 활성 노드를 함께 기록해야 한다.
+
+## 2026-09-17 — Smart Object 맵 종료 후 최종 재검증
+
+- Unreal Editor 종료를 확인한 뒤 최신 `DroneEditor Win64 Development` 빌드를 다시 성공시켰다.
+- 실제 스마트 오브젝트 맵 `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`만 대상으로 `NPCBaseRoutinesPIE`, `NPCGreyboxPIE`, `NPCPerceptionSearchPIE`를 실행해 3/3 Success, 실패 0, 미실행 0을 확인했다.
+- 앞선 연속 실행에서 보였던 MG 재할당 실패는 최종 재실행에서 재현되지 않았다. 다만 해당 자동화의 수동 감지 주입·런타임 프로필 변경 한계 때문에 화면상의 도리도리/옆구리 사격/뒤로 걷기 해결을 자동화만으로 확정하지 않는다.
+- 진단용 `SOAudit` 로그 코드는 제거하고 기능 수정만 남겼다. 커밋·푸시는 하지 않았다.
+
+## 2026-09-17 — 순찰 중 NPC 충돌 정지 수정
+
+- 순찰 중 Shotgun NPC가 고개를 돌리며 뒤로 걷고 이동을 반복 중단하는 현상을 `PatrolProjectileFixAudit` 로그로 대조했다. `BP_ShotgunPelletProjectile`이 `ECC_Pawn`을 Block해 NPC를 이동 장애물로 막는 것이 직접 원인이었다.
+- `DroneNPCProjectile`이 의도한 표적이 아닌 `ADroneNPCCharacter`를 Sweep Ignore하도록 수정했다. 감지 진입/Search 종료의 잔여 속도 제거와 Patrol 중 Combat Gaze 차단도 함께 적용했다.
+- 최신 Editor Build 성공. `NPCPerceptionSearchPIE`와 `NPCBaseRoutinesPIE`가 각각 Success로 통과했고 수정 후 `stuck` 로그가 없었다. 커밋·푸시는 하지 않았다.
+- 감사 세부사항과 저장 금지 수동 PIE 절차는 [`../ai/DRONE_NPC_BEHAVIOR_AUDIT_2026-09-17.md`](../ai/DRONE_NPC_BEHAVIOR_AUDIT_2026-09-17.md)에 있다. 추가 빌드/테스트, 맵/에셋 저장, Production Training 접근, commit/push는 하지 않았다.
+
 ## 2026-09-16 — 병사 StateTree 상태 전환 안정화
 
 - Cover/MG 태스크가 일시적인 예약·사격 실패를 바로 `Failed`로 반환하고, MG 사망 교대 Event가 0.75초마다 현재 Cover 상태를 끊을 수 있어 병사 상태와 시선이 왕복할 수 있는 경로를 확인했다.

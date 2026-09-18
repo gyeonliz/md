@@ -1,13 +1,13 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-09-17 — 개인화기 추적·리시 포기·이동 회전 안정화와 AI 핵심 회귀 완료
+마지막 갱신: 2026-09-17 — NPC 타이밍 회귀 수정·빌드, 집중 회귀 2/3 성공·Shotgun PIE MoveTo 요청 검사 1건 실패; Weather TestMap 강우 디버그 프리뷰 추가·검증 1/1
 
 ## Now
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
 | MAP-TEST-01 | 경량 Tutorial Systems TestMap 수동 확인 | 맵·생성 도구·전용 자동화·Map Check 완료 | Gate/Ring/역할/HUD 한·두 Lap 화면 확인 |
-| AI-SO-TUNE-01 | Smart Object·유인 MG·개인화기 추적 화면 확인 | 최소 상태 1.0초, 실제 3D 사거리 안 즉시 정지·사격/밖 0.2초 지속 시 Pursue, 3,000cm 리시·무진행 포기, 안정된 MoveTo, 추적 몸·Gaze의 이동 벡터 정렬과 다음 Tick StateTree 복귀 구현. 정책·Shotgun PIE·`NPCPerceptionSearchPIE` Green | 화면에서 Rifle/Shotgun 사거리 밖 연속 접근, 사거리 안 진입 즉시 정지, 몸·고개·이동 같은 방향, 리시 포기, MG 사망 후 재점유 확인 |
+| AI-SO-TUNE-01 | Smart Object·유인 MG·개인화기 추적 확인 | 정책·기준선 AI 3/3·Shotgun 2/2는 과거 통과. 9/17에는 한 Tick 중 교전 타이머 중복 누적 수정 후 Build 성공, 타이밍 회귀와 `NPCPerceptionSearchPIE` 통과. 같은 집중 필터의 `ShotgunSystemsTestMapPIE`는 정지 pursuit 목표의 MoveTo 요청 수 기대 2/실제 3으로 실패; 요청 종료 원인 미확정. 화면 떨림 미재현 | 실패 원인을 PathFollowing/RequestID 계측으로 구분하고 Shotgun PIE 재검증. 이후 화면에서 Rifle/Shotgun 추적·정지사격·Gaze·리시 포기·MG 재점유 및 실제 애니메이션 떨림 확인 |
 | AI-SHOTGUN-PIE-01 | 추가 Shotgun NPC 사격 체감 확인 | 실제 8 Projectile·12° 반각, Pellet당 3 피해, 상호 충돌 방지, Cyan Debug 기본 Off, 발광 비드/Tracer·3°/6° 시선 Hysteresis·Asset/PIE 자동화 완료 | 발광 비드 8개 분리 가시성·Cyan 선 제거·회피·최대 24 피해·사거리·LOS·시선 안정화를 Editor 화면에서 확인 |
 | UI-FLOW-PROTOTYPE-01 | Mission/Drone 선택 임시 UI 확인 | 첨부 와이어프레임 기반 3열 C++ fallback 구현, `FrontEndPIE`·`MissionEntryPIE` 통과 | 16:9 화면에서 작전 목록/설명/시작과 기체 목록/상세/설정/출격이 잘리지 않는지 수동 확인 후 최종 WBP·Thumbnail 범위 결정 |
 | MISSION-RULE-PIE-01 | 새 목표 Rule의 실제 맵 Vertical Slice | 귀환·Jammer·역할 Actor 시험 배치 완료, 직접 실행은 Prototype Flow | Test Mission DA/진입 경로에서 Scan/Delivery/Destroy/Return/Jamming Event·Tag·시간 규칙 확인 |
@@ -18,7 +18,7 @@
 | DR-FPV-ACRO-INPUT-02 | Acro 키보드·패드 축 분리 | 전용 Action 4개, IMC 33 Mapping, Pawn 분기, Editor Build와 Prototype 8/8 완료 | 키보드 W/S Pitch·A/D Roll·Q/E Yaw·Space/Ctrl Throttle와 패드 Mode 2를 화면에서 확인 |
 | WTH-02-PIE-01 | 바람 Vertical Slice 체감 | 24개 이동 Bead·풍속/풍향/모드 Readout·1/2/3 모드 키·전용 TestMap 자동화 완료 | 표시 방향과 실제 Drift, 세 모드 보정 차이, 순풍·역풍·횡풍과 돌풍 세기 화면 확인 |
 | WTH-02B | 자연스러운 바람 전환·표시 | 돌풍 Attack/Release·풍향 최단각 응답, 표시 속도 보간·벡터 적분, Bead 방향/길이 변화 구현. Weather 3/3 완료 | Weather TestMap에서 방향 전환 무점프·속도/길이 변화와 LightWind/RainStorm 체감 확인 |
-| WTH-03 | 비 표현 Vertical Slice | Snapshot 비 값과 최적화·품질 계획 완료, 표현 자산 없음 | Camera-follow Niagara Rain·MPC Wetness·Audio를 붙이고 Low~Epic GPU 측정 |
+| WTH-03 | 비 표현 Vertical Slice | `7/8/9`로 Snapshot 전환, TestMap 전용 최대 80개·5Hz DrawDebug 비 선분 프리뷰 추가, 비 0이면 생성 중단·충돌 trace 없음. 새 회귀 1/1·UE 5.8.2 Build 통과. Niagara·Wetness MPC consumer·Audio는 미연결이며 GPU 측정 전 | TestMap에서 프리뷰 수동 확인 후 정식 camera-follow Niagara·MPC·Audio와 실제 Low~Epic 성능 측정 |
 
 ### 사용자가 지금 확인할 맵
 
@@ -39,7 +39,7 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 - `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`: 순찰·감지·수색·MG·자동포탑·차량
 - `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest`: 재밍 약/강/겹침·Return Zone·역할 표적
 - `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest`: 추가 Shotgun NPC·작은 Pellet 8개/Tracer·탄약·LOS 사격장
-- `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`: LightWind 지속풍·돌풍, 이동 Bead·풍속/풍향 표시, `1/2/3` 조작 모드별 보정
+- `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`: `1/2/3` 조작 모드, `7/8/9` 날씨 전환, LightWind 지속풍·돌풍, Snapshot 기반 디버그 강우 선분(정식 Niagara 아님)
 
 ## Next
 
@@ -50,7 +50,7 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 5. 새 Mission Systems 맵에서 재밍 HUD·둔화/복원·역할 기능·Return 크기 수동 확인
 6. FPV Rate/Acro 키보드 전용 축과 Gamepad/RC Mode 2로 호버·기울기 추진·무추력 하강·Roll/Loop를 수동 확인하고 호버 스로틀·항력·Rate 응답·감도·Expo를 체감 조정
 7. Weather Systems 맵에서 개선된 Bead의 방향 전환 무점프·풍속별 길이와 `1/2/3` 세 조작 모드 Drift·LightWind/RainStorm 돌풍을 수동 확인
-8. `WTH-03` Camera-follow Niagara Rain·MPC Wetness·Audio·품질 단계를 연결하고 GPU 측정
+8. Weather TestMap에서 7/8/9 강우 디버그 프리뷰를 수동 확인한 뒤 `WTH-03` 정식 Niagara Rain·MPC Wetness·Audio·품질 단계를 연결하고 GPU 측정
 9. Test Mission DA와 개발용 진입 경로를 추가해 Return/Jammer Mission Event를 실제 PIE로 확인
 10. Mission 1 검증용 DA/Map에서 Drop→요원 전달→선택적 정보 회수→시간/파괴 실패 Vertical Slice
 11. 이동 차량 목적지 실패 Trigger와 Mission 2 FPV 격파/Story Fact 적용 Vertical Slice
@@ -110,6 +110,7 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 | 개인화기 추적·포기 안정화 | Fire/Pursue/Disengage 정책, 실제 3D 사거리 안 즉시 정지·사격, 밖 판정 0.2초 확인 뒤 Pursue, Nav 투영, 같은 목적지 MoveTo 중복 방지, 3,000cm 리시·2.5초 무진행·복귀 Cooldown, 추적 몸·Gaze 이동 벡터 정렬, StateTree 다음 Tick 재시작. 집중 회귀 성공 |
 | Weather TestMap 가시화 | BP 조절형 Visualizer, 이동 Bead 24개, Profile/풍속/풍향/모드 Readout, 1/2/3 비교 키와 Map Check 0/0 |
 | 자연스러운 바람 전환 | Gust Attack/Release·풍향 최단각 응답, 표시 속도 벡터 적분, 풍속별 Bead 방향/길이, Weather 3/3 성공 |
+| 강우 Snapshot 디버그 프리뷰 | 전용 Weather TestMap 7/8/9 프로파일 전환, 최대 80개 DrawDebug 선분/5Hz/비 0일 때 비활성, 회귀 1/1. 정식 Niagara·Wetness·Audio 및 화면 확인은 미완료 |
 | 비 기획 | Camera-follow GPU Rain·Effect Type·젖음/실내/Splash 최적화 계획과 Snapshot 표현값. Niagara/MPC/Audio는 다음 작업 |
 
 시험 맵 사용법은 [`docs/gameplay/DRONE_TEST_MAP_GUIDE.md`](docs/gameplay/DRONE_TEST_MAP_GUIDE.md), FPV 조작은 [`docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md`](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md), 기상은 [`docs/gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md`](docs/gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md), Mission Rule 설정은 [`docs/gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md`](docs/gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md), 전체 순서는 [`docs/planning/DRONE_TUTORIAL_STORY_PLAN.md`](docs/planning/DRONE_TUTORIAL_STORY_PLAN.md)를 참고한다.

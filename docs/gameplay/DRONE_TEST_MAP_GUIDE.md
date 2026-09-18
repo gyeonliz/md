@@ -1,6 +1,14 @@
 # Drone 기능 시험 맵 가이드
 
-기준일: 2026-09-16
+기준일: 2026-09-17
+
+## 9/17 안전 감사 추가
+
+최신 Source와 STATUS/WORKBOARD를 우선한다. 기존 본문의 샷건 `6°`/Cyan 기본 표시/공통 3° 데드존 설명은 과거 기록이며, 현재는 **12° 반각, Cyan 기본 Off, 몸 3° stop/6° start Hysteresis + Bone Gaze 잔여 보간**이다. 사거리 안 즉시 사격/밖 0.2초 확인 후 추적이 현재 계약이다.
+
+Weather TestMap은 최신 Editor 빌드 후 Play에서 숫자열 **7 Clear / 8 LightWind / 9 RainStorm**으로 맵 저장 없이 Snapshot을 즉시 전환한다. RainStorm에서는 강우 값에 반응하는 최대 80개의 저빈도 디버그 선분 프리뷰를 확인할 수 있다. 이는 실제 Niagara 효과나 GPU 최적화 완료를 의미하지 않는다. Wetness consumer·Audio는 여전히 후속 작업이다. 기존 1/2/3 조작 모드 키는 유지한다.
+
+정확한 명령, 무저장 경계, NPC 재현 항목, 미구현 품질 preset 후보 및 `stat unit/gpu/niagara` 비교 절차는 Unreal repo `Tools/AssetMigration/README_NPC_WEATHER_TEST.md`를 따른다. 이 PC 설치 엔진은 Build.version상 **5.8.2**이며 5.8.1 검증으로 표기하지 않는다. 기존 Weather Validate 도구는 자산 생성 fallback이 있어 이번 읽기 전용 감사에는 사용하지 않았다.
 
 ## 맵 구성
 
@@ -10,7 +18,7 @@
 | `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox` | 적·아군 NPC, Smart Object, 유인 MG, 자동포탑, 지면 추종 차량 | 기존 맵을 AssetTools로 이동, Asset·PIE·감지/수색 회귀 통과 |
 | `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest` | 재밍 강도/겹침, 귀환 Zone, 정찰·파괴·투하 대상 | 신규 경량 맵 생성, Map Check 0/0·저장 계약 자동화 통과 |
 | `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest` | 샷건 NPC 감지·산탄 분포·투사체·탄약·정면 시선 안정화 검증 | 발광 Pellet 8개+짧은 Tracer 실제 BP, 몸/고개 3° 데드존, Map Check 0/0·Asset/PIE 자동화 2/2 통과 |
-| `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest` | 지속풍·돌풍과 조작 모드별 Drone 보정 체감 | 이동 Bead 24개·풍속/풍향/모드 Readout·1/2/3 비교 키, Map Check 0/0·저장 계약 자동화 통과 |
+| `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest` | 지속풍·돌풍, 조작 모드별 Drone 보정, 강우 데이터/디버그 프리뷰 체감 | 이동 Bead 24개·풍속/풍향/모드 Readout·1/2/3 키·7/8/9 날씨 키. 비 선분은 TestMap 전용 DrawDebug 프리뷰이며 Niagara가 아님 |
 
 Production `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 제작 중인 실제 Tutorial 맵이다. 시험 Actor 추가, 자동 재구성, 저장 대상으로 사용하지 않는다.
 

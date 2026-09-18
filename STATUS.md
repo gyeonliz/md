@@ -4,8 +4,8 @@
 
 ## 한눈에 보기
 
-- 현재 단계: 개인화기 적 AI의 사거리 밖 추적·리시 포기·순찰 복귀와 회전 떨림 방지를 구현했고, MG 사망 교대까지 포함한 AI 핵심 회귀가 Green이다. Mission/Signal/Shotgun/Acro/Weather는 기존 수동 화면 확인 대기 상태를 유지한다
-- 바로 다음 개발: Smart Object 맵에서 Rifle/Shotgun 추적·포기·재점유 화면 확인 → Acro/Front-end/Shotgun/Weather 체감 확인 → Camera-follow Niagara Rain/MPC/Audio → Test Mission DA/진입 경로
+- 현재 단계: 기존 AI 3/3·Shotgun 2/2 기준선은 통과했으나, 9/17 후속 집중 회귀는 새 타이밍 테스트와 `NPCPerceptionSearchPIE` 성공, Shotgun PIE의 안정된 MoveTo 요청 수 검사 실패로 부분 통과다. 개인화기 교전 타이머의 한 Tick 중복 누적 경로를 수정했다. 사용자 체감 애니메이션 떨림은 화면에서 아직 재현/해결 확인되지 않았다. Weather TestMap의 디버그 빗줄기 프리뷰는 정식 Niagara 비가 아니다
+- 바로 다음 개발: Weather TestMap에서 7/8/9 비 프리뷰와 적 NPC 애니메이션 떨림을 직접 화면 확인 → 정식 camera-follow Niagara/MPC/Audio·품질 단계 → Test Mission DA/진입 경로
 - Unreal Editor: 마지막 확인 시 종료 상태
 - Production Training: 팀원이 실제 Tutorial 환경을 제작 중이므로 열람 외 저장·덮어쓰기·자동 재구성 금지
 
@@ -13,12 +13,18 @@
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal `D:\JGY\project\drone` | 기준 `main = origin/main = dc655ac` | 개인화기 추적/리시/회전 안정화 Source·Test 로컬 변경. Asset·Map 변경 없음. GitHub Desktop 자동 Stash 1개는 삭제하지 않고 보존 |
-| 문서 `D:\JGY\project\md` | 기준 `main = origin/main = 8e4f1cf` | 이번 AI 구현·검증 결과 문서만 로컬 변경, Stash 없음 |
+| Unreal `C:\URproject\drone` | 기준 `main = origin/main = 3449766` | 9/17 로컬 변경: Weather TestMap 비 디버그 프리뷰와 AI 교전 타이머 중복 누적 수정, 테스트/가이드. Commit·Push 안 함 |
+| 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` | 기준 `main = origin/main = 8b3b7b1` | 확인 뒤 WTH-03/AI 감사 결과 반영으로 `STATUS.md`, `WORKBOARD.md`, Worklog 및 NPC 감사 문서 로컬 수정; Commit·Push 안 함 |
+
+2026-09-17 작업컴 재확인: 확인 시 Unreal `3449766`, 문서 `8b3b7b1`이 각각 `origin/main`과 일치하고 두 작업 트리가 clean이었다. 이번 확인 이후 문서 저장소에는 `STATUS.md`와 `WORKBOARD.md`만 로컬 수정되어 있다. 수동 PIE 화면 확인은 아직 완료로 간주하지 않는다. OpenCode CLI `v2.0.5`를 사용자 제공 키로 `openrouter/stealth/union-alpha`에 연결해 WTH-03 범위를 점검했다. OilRig Rain 텍스처/Material Function은 있으나 Niagara Rain 시스템, 재질에서 실제 소비하는 Wetness MPC, Rain Audio 연결은 없어 추측성 C++ 연결을 추가하지 않았다. `DroneEditor Win64 Development` 빌드와 `Drone.Weather.ProfileAssets` 1/1이 통과했고, Unreal 작업 트리는 clean이며 Commit·Push는 하지 않았다. 제공 키는 채팅/파일에 재출력·저장하지 않고 해당 실행 프로세스에서만 사용했다.
+
+같은 날 후속 작업: Union Alpha 위임 검토는 사용량 증가를 줄이기 위해 중단하고 남은 확인은 로컬로 진행했다. 사용자 체감 NPC 떨림은 Headless 회귀에서 원인이 재현되지 않아 AI 코드는 수정하지 않았다. Baseline AI 3/3, Shotgun Asset/PIE 2/2, Weather 기존 3/3이 통과했다. 별도 Weather TestMap에서만 `7 Clear / 8 LightWind / 9 RainStorm`을 바꾸고 Snapshot 강도·spawn·wind에 반응하는 최대 80개/5Hz의 DrawDebug 선분 프리뷰를 표시한다. Rain preview 회귀 1/1 통과, `DroneEditor Win64 Development` 빌드 성공(이 PC UE 5.8.2). 이는 Niagara·젖음 Material·Audio 구현 또는 GPU 최적화 성능 측정이 아니다. 수동 PIE 화면 확인과 정식 VFX는 남아 있으며 Unreal 변경은 로컬, commit/push 안 했다.
 
 2026-09-16 D 드라이브 작업 PC에서 두 저장소를 `fetch --prune`으로 다시 확인했을 때 Mission Rule·재밍·Story Fact·FPV Rate/Acro·기상 Runtime과 기능별 TestMap은 Unreal `962ff02`, 대응 문서는 `3c28611`로 Push 완료됐고 원격 차이는 `0/0`이었다. 그 기준 위에 이번 Shotgun Pellet/Tracer와 Weather TestMap 시각화 작업을 로컬로 진행했다. Commit과 Push는 사용자가 처리한다.
 
 후속 점검에서 Unreal 원격의 `72c964c`, `4a3d4ba`가 추가된 것을 확인했다. 들어오는 변경은 `Content/Drone/Maps/Lvl_MilitaryBase.umap` 하나였고 로컬 수정과 겹치지 않아 `git pull --ff-only`로 `4a3d4ba`까지 반영했다.
+
+같은 날 NPC 전용 후속 감사: 사용자 위임으로 OpenCode `openrouter/stealth/union-alpha`에 NPC 행동 로직 점검/수정을 한 번 요청했다. 관련 코드에서 개인화기 교전 타이머가 MG 재할당 유지 분기와 일반 Controller Tick에서 같은 프레임에 두 번 누적될 수 있는 경로를 찾아, 유지 분기에서 중복 갱신을 제거하고 단위 회귀를 추가했다. 이후 `1초` 유지시간이 매초 행동을 새로 선택하는 구조인지 다시 확인했고, StateTree를 매 Tick/매초 재시작하는 경로는 확인되지 않았다. UE 5.8.2 Editor Build 성공. 집중 자동화 3건 중 타이밍 회귀와 `NPCPerceptionSearchPIE`는 성공했으나 `ShotgunSystemsTestMapPIE`는 정지 pursuit 목표의 MoveTo 요청 수가 예상 2회/실제 3회로 실패했다. 후속으로 실제 활성 `Moving/Paused` 경로일 때만 중복 요청 검사를 적용하도록 진단 getter와 테스트 보강을 추가했으며, 이 보강 뒤 빌드는 성공했지만 Shotgun PIE 재실행은 아직 하지 않았다. 요청 종료 사유를 기록하지 않아 정상 경로 복구인지 중복인지 미확정이며, 임의로 가드를 추가하거나 테스트 기대값을 낮추지 않았다. 사용자 보고 떨림은 화면 재현되지 않아 해결 판정하지 않았고, 저장 AnimBP 전체 그래프/실제 포즈도 확인되지 않았다. 자세한 관측 및 수동 PIE 절차는 [`DRONE_NPC_BEHAVIOR_AUDIT_2026-09-17.md`](docs/ai/DRONE_NPC_BEHAVIOR_AUDIT_2026-09-17.md)에 기록했다. 추가 실행과 커밋/푸시는 하지 않았다.
 
 ## 최신 완료 항목
 

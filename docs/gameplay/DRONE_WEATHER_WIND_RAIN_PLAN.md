@@ -1,12 +1,16 @@
 # 드론 기상 변수·바람·비 구현 계획
 
-기준일: 2026-09-16 (Asia/Seoul)
+기준일: 2026-09-17 (Asia/Seoul)
+
+### 9/17 무저장 시험 진입 경로
+
+기존 Weather TestMap의 native DebugVisualizer에 숫자열 `7 Clear / 8 LightWind / 9 RainStorm` 및 Rain/Spawn/Wet Readout을 추가했다. `ApplyTestWeatherPreset(0/1/2)`는 전용 맵에서만 즉시 Snapshot을 바꾸며 자산/맵을 저장하지 않는다. RainStorm은 Snapshot 강도·spawn scale을 받아 최대 80개, 5Hz의 제한된 DrawDebug 선분 프리뷰를 만든다. 비가 0이면 새 선분 생성을 멈추고 남은 선분은 약 0.3초 내 사라진다. 이는 Niagara/젖음/Audio 구현 또는 GPU 성능 검증이 아니다. 기존 1/2/3 조작 모드 키는 유지한다. 성능 비교 절차·품질 후보는 Unreal repo `Tools/AssetMigration/README_NPC_WEATHER_TEST.md`를 참고한다. Low~Epic preset 적용 또는 GPU 측정 결과로 간주하지 않는다.
 
 ## 현재 상태와 확정 경계
 
 - `WTH-01` Profile/Snapshot/World Subsystem, `WTH-02` 지속풍·돌풍 Drone 응답, `WTH-02B` Attack/Release와 표시 벡터 적분은 2026-09-16 기준 구현됐다.
 - `/Game/Drone/Data/Weather`에 `Clear`, `LightWind`, `RainStorm_Greybox` Profile이 있고, `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`는 `LightWind`를 즉시 적용한다.
-- 비 수치는 같은 Snapshot으로 전달되지만 Camera-follow Niagara, 젖음 Material, Audio, 실내 판정은 아직 구현 완료 기능이 아니다.
+- 비 Snapshot은 전용 Weather TestMap의 제한형 DrawDebug 선분 프리뷰에서만 소비한다. Camera-follow Niagara, 젖음 Material/MPC consumer, Audio, 실내 판정은 아직 구현 완료 기능이 아니다.
 - 최종 Mission별 날씨, 비가 신호·체력·배터리에 미치는 영향, 최종 성능 예산은 현재 미정이다.
 - 1차 Vertical Slice에서는 바람이 비행에 미치는 영향과 비의 시야·연출만 분리해 검증한다.
 - 비를 맞는다고 Drone 체력 감소, 통신 두절, Mission 실패를 자동으로 넣지 않는다. 필요하면 별도 Mission Rule로 명시한다.
