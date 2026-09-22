@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-09-18 — Shotgun 순찰/충돌 화면 확인 완료, 감지 후 첫 사격 1초 조준 지연·Figma 최신 UX 재확인, CourseSpline 점 편집법 확정
+마지막 갱신: 2026-09-22 — 야외 AI BP 수치 분리, 차량 Spline Route v1, 8방향+무풍 Random Weather Manager·Cardinal/m/s HUD 구현 및 자동 검증
 
 ## Now
 
@@ -8,6 +8,7 @@
 |---|---|---|---|
 | MAP-TEST-01 | 경량 Tutorial Systems TestMap 수동 확인 | 맵·생성 도구·전용 자동화·Map Check 완료 | Gate/Ring/역할/HUD 한·두 Lap 화면 확인 |
 | AI-SO-TUNE-01 | Smart Object·유인 MG·개인화기 추적 확인 | 순찰 최종 슬롯 방향·Pursue 정지점·Capsule 외 VisualOnly 계약을 적용했고 사용자 화면에서 정상 이동을 확인했다. 진단 로그 기본값 Off | 새 `1.0초` 첫 사격 조준 대기를 실제 화면에서 확인. 재발 시 Blueprint에서 `[NPC-STATE]`·`[NPC-MOVE]` 진단을 켜 로그 회수 |
+| AI-OUTDOOR-TUNE-01 | 야외 감지·Smart Object 검색 범위 | Outdoor Controller BP를 Rifle/Shotgun에 연결. Sight 60m/Lose 70m/Search 80m×±10m/직전 회피 15m, BP 조절 가능 | 넓은 야외 맵 화면에서 과도한 원거리 점유·감지 끊김 여부를 확인하고 역할별 수치 확정 |
 | AI-SHOTGUN-PIE-01 | 추가 Shotgun NPC 사격 체감 확인 | 실제 8 Projectile·12° 반각, Pellet당 3 피해, 상호 충돌 방지, Cyan Debug 기본 Off, 발광 비드/Tracer·3°/6° 시선 Hysteresis·Asset/PIE 자동화 완료 | 발광 비드 8개 분리 가시성·Cyan 선 제거·회피·최대 24 피해·사거리·LOS·시선 안정화를 Editor 화면에서 확인 |
 | UI-FLOW-PROTOTYPE-01 | Mission/Drone 선택 임시 UI 확인 | 첨부 와이어프레임 기반 3열 C++ fallback 구현, `FrontEndPIE`·`MissionEntryPIE` 통과 | 16:9 화면에서 작전 목록/설명/시작과 기체 목록/상세/설정/출격이 잘리지 않는지 수동 확인 후 최종 WBP·Thumbnail 범위 결정 |
 | MISSION-RULE-PIE-01 | 새 목표 Rule의 실제 맵 Vertical Slice | 귀환·Jammer·역할 Actor 시험 배치 완료, 직접 실행은 Prototype Flow | Test Mission DA/진입 경로에서 Scan/Delivery/Destroy/Return/Jamming Event·Tag·시간 규칙 확인 |
@@ -18,6 +19,8 @@
 | DR-FPV-ACRO-INPUT-02 | Acro 키보드·패드 Mode 1/2 | 의미축 Action 4개+패드 세로 원시축 2개, IMC 33 Mapping, Pawn/UI 분기, Editor Build·계약·프로필·3회 PIE·MissionEntryPIE 성공 | 키보드 W/S Pitch·A/D Roll·Q/E Yaw·Space/Ctrl Throttle 유지, 패드 Mode 1 LeftY Pitch/RightY Throttle와 Mode 2 반대 배치를 화면에서 확인 |
 | WTH-02-PIE-01 | 바람 Vertical Slice 체감 | 24개 이동 Bead·풍속/풍향/모드 Readout·1/2/3/4 모드 키·전용 TestMap 자동화 완료 | 표시 방향과 실제 Drift, 네 모드 보정 차이, 순풍·역풍·횡풍과 돌풍 세기 화면 확인 |
 | WTH-02B | 자연스러운 바람 전환·표시 | 돌풍 Attack/Release·풍향 최단각 응답, 표시 속도 보간·벡터 적분, Bead 방향/길이 변화 구현. Weather 3/3 완료 | Weather TestMap에서 방향 전환 무점프·속도/길이 변화와 LightWind/RainStorm 체감 확인 |
+| WTH-02C | 배치형 Random Weather Manager | 8방향+무풍, 방향/세기 독립 주기·풍속 범위·보간 BP 조절, Cardinal/m/s HUD, Editor 전용 원뿔·무충돌 구현. 핵심 자동화 6/6 | TestMap에서 원뿔 Play 숨김/무충돌, 20~40초 방향·세기·CALM 전환과 HUD 일치 화면 확인 |
+| VEH-ROUTE-01 | 차량 Spline Route v1 | Route BP와 차량 Route 참조·속도·반전/Loop·도착 Event, Spline XY/Yaw+4점 지면 Z/Pitch/Roll 구현. 단위 자동화 완료 | 안전한 TestMap에서 곡선·경사·바퀴·차량 포탑 화면 확인 후 곡률 감속/Look Ahead 범위 결정 |
 | WTH-03 | 비 표현 Vertical Slice | `7/8/9`로 Snapshot 전환, TestMap 전용 최대 80개·5Hz DrawDebug 비 선분 프리뷰 추가, 비 0이면 생성 중단·충돌 trace 없음. 새 회귀 1/1·UE 5.8.2 Build 통과. Niagara·Wetness MPC consumer·Audio는 미연결이며 GPU 측정 전 | TestMap에서 프리뷰 수동 확인 후 정식 camera-follow Niagara·MPC·Audio와 실제 Low~Epic 성능 측정 |
 
 ### 사용자가 지금 확인할 맵
@@ -49,15 +52,16 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 4. AI 시험 맵에서 Drone 감지 직후 병사가 약 1초간 표적을 조준한 뒤 첫 발을 쏘는지 확인한다. 순찰/추적 이동 수정은 사용자 화면 확인 완료
 5. 새 Mission Systems 맵에서 재밍 HUD·둔화/복원·역할 기능·Return 크기 수동 확인
 6. FPV Rate/Acro 키보드 전용 축과 Gamepad/RC Mode 1·Mode 2를 각각 확인한다. 두 모드의 Pitch/Throttle 세로축이 표대로 바뀌는지, 느림/보통/빠름이 속도만 바꾸는지 확인한 뒤 호버·항력·Rate 응답·감도·Expo를 조정한다
-7. Weather Systems 맵에서 개선된 Bead의 방향 전환 무점프·풍속별 길이와 `1/2/3/4` 네 조작 모드 Drift·LightWind/RainStorm 돌풍을 수동 확인
-8. Weather TestMap에서 7/8/9 강우 디버그 프리뷰를 수동 확인한 뒤 `WTH-03` 정식 Niagara Rain·MPC Wetness·Audio·품질 단계를 연결하고 GPU 측정
-9. Test Mission DA와 개발용 진입 경로를 추가해 Return/Jammer Mission Event를 실제 PIE로 확인
-10. Mission 1 검증용 DA/Map에서 Drop→요원 전달→선택적 정보 회수→시간/파괴 실패 Vertical Slice
-11. 이동 차량 목적지 실패 Trigger와 Mission 2 FPV 격파/Story Fact 적용 Vertical Slice
-12. 광섬유 Drone·UGV 프로젝트 소유 Definition/Pawn 기반과 Mission 중 기체 교대 계약 구현. 외부 에셋은 Visual만 연결
-13. 중간/강한 재밍의 실제 영상 Noise WBP와 목표 정보 손실 규칙 구현. 현재 `VideoNoiseIntensity` Snapshot·BP Event까지만 있음
-14. 나머지 시험 맵은 소유권·참조 감사 후 AssetTools로 이동. `test1`·`test2`는 용도 확인 전 유지
-15. Mission 2의 미끼/실제 탑승 중 기본 스토리안 확정 후 Story Mission DA에 반영. 코드는 양쪽 지원
+7. Weather Systems 맵에서 Manager 원뿔 Play 숨김·무충돌, 8방향/CALM·Cardinal/m/s HUD와 Bead 일치, `1/2/3/4` 네 조작 모드 Drift를 수동 확인
+8. 별도 안전 TestMap에 `BP_DroneVehicleSplineRoute`를 배치하고 차량에 연결해 곡선·경사 Spline Follow와 4점 접지·바퀴·차량 포탑을 확인
+9. Weather TestMap에서 7/8/9 강우 디버그 프리뷰를 수동 확인한 뒤 `WTH-03` 정식 Niagara Rain·MPC Wetness·Audio·품질 단계를 연결하고 GPU 측정
+10. Test Mission DA와 개발용 진입 경로를 추가해 Return/Jammer Mission Event를 실제 PIE로 확인
+11. Mission 1 검증용 DA/Map에서 Drop→요원 전달→선택적 정보 회수→시간/파괴 실패 Vertical Slice
+12. 이동 차량 목적지 실패 Trigger와 Mission 2 FPV 격파/Story Fact 적용 Vertical Slice
+13. 광섬유 Drone·UGV 프로젝트 소유 Definition/Pawn 기반과 Mission 중 기체 교대 계약 구현. 외부 에셋은 Visual만 연결
+14. 중간/강한 재밍의 실제 영상 Noise WBP와 목표 정보 손실 규칙 구현. 현재 `VideoNoiseIntensity` Snapshot·BP Event까지만 있음
+15. 나머지 시험 맵은 소유권·참조 감사 후 AssetTools로 이동. `test1`·`test2`는 용도 확인 전 유지
+16. Mission 2의 미끼/실제 탑승 중 기본 스토리안 확정 후 Story Mission DA에 반영. 코드는 양쪽 지원
 
 ## 이동 후보 맵
 
@@ -114,6 +118,9 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 | 개인화기 추적·포기 안정화 | Fire/Pursue/Disengage 정책, 실제 3D 사거리 안 즉시 정지·사격, 밖 판정 0.2초 확인 뒤 Pursue, Nav 투영, 같은 목적지 MoveTo 중복 방지, 3,000cm 리시·2.5초 무진행·복귀 Cooldown, 추적 몸·Gaze 이동 벡터 정렬, StateTree 다음 Tick 재시작. 집중 회귀 성공 |
 | Weather TestMap 가시화 | BP 조절형 Visualizer, 이동 Bead 24개, Profile/풍속/풍향/모드 Readout, 1/2/3/4 비교 키와 Map Check 0/0 |
 | 자연스러운 바람 전환 | Gust Attack/Release·풍향 최단각 응답, 표시 속도 벡터 적분, 풍속별 Bead 방향/길이, Weather 3/3 성공 |
+| 야외 AI Blueprint 튜닝 | Outdoor Controller BP에 60/70m Sight, 80m Search, 15m 직전 지점 회피를 분리하고 Rifle/Shotgun 연결 |
+| 차량 Spline Route v1 | Route BP·차량 참조/속도/Reverse/Loop/도착 Event, Spline XY/Yaw와 4점 지면 Z/Pitch/Roll 결합 |
+| Random Weather Manager | 8방향+무풍, 독립 변경 주기·풍속 범위·보간, Cardinal/m/s HUD, Editor 전용 무충돌 원뿔, Map Check 0/0·핵심 회귀 6/6 |
 | 강우 Snapshot 디버그 프리뷰 | 전용 Weather TestMap 7/8/9 프로파일 전환, 최대 80개 DrawDebug 선분/5Hz/비 0일 때 비활성, 회귀 1/1. 정식 Niagara·Wetness·Audio 및 화면 확인은 미완료 |
 | 비 기획 | Camera-follow GPU Rain·Effect Type·젖음/실내/Splash 최적화 계획과 Snapshot 표현값. Niagara/MPC/Audio는 다음 작업 |
 

@@ -6,7 +6,7 @@
 
 최신 Source와 STATUS/WORKBOARD를 우선한다. 기존 본문의 샷건 `6°`/Cyan 기본 표시/공통 3° 데드존 설명은 과거 기록이며, 현재는 **12° 반각, Cyan 기본 Off, 몸 3° stop/6° start Hysteresis + Bone Gaze 잔여 보간**이다. 사거리 안 즉시 사격/밖 0.2초 확인 후 추적이 현재 계약이다.
 
-Weather TestMap은 최신 Editor 빌드 후 Play에서 숫자열 **7 Clear / 8 LightWind / 9 RainStorm**으로 맵 저장 없이 Snapshot을 즉시 전환한다. RainStorm에서는 강우 값에 반응하는 최대 80개의 저빈도 디버그 선분 프리뷰를 확인할 수 있다. 이는 실제 Niagara 효과나 GPU 최적화 완료를 의미하지 않는다. Wetness consumer·Audio는 여전히 후속 작업이다. 기존 1/2/3 조작 모드 키는 유지한다.
+Weather TestMap은 최신 Editor 빌드 후 Play에서 숫자열 **7 Clear / 8 LightWind / 9 RainStorm**으로 맵 저장 없이 Snapshot을 즉시 전환한다. 배치된 Random Weather Manager는 8방향+무풍을 사용하며 Flight HUD와 Visualizer에 Cardinal/m/s로 표시한다. RainStorm에서는 강우 값에 반응하는 최대 80개의 저빈도 디버그 선분 프리뷰를 확인할 수 있다. 이는 실제 Niagara 효과나 GPU 최적화 완료를 의미하지 않는다. Wetness consumer·Audio는 여전히 후속 작업이다. 조작 비교 키는 `1/2/3/4`다.
 
 정확한 명령, 무저장 경계, NPC 재현 항목, 미구현 품질 preset 후보 및 `stat unit/gpu/niagara` 비교 절차는 Unreal repo `Tools/AssetMigration/README_NPC_WEATHER_TEST.md`를 따른다. 이 PC 설치 엔진은 Build.version상 **5.8.2**이며 5.8.1 검증으로 표기하지 않는다. 기존 Weather Validate 도구는 자산 생성 fallback이 있어 이번 읽기 전용 감사에는 사용하지 않았다.
 
@@ -18,7 +18,7 @@ Weather TestMap은 최신 Editor 빌드 후 Play에서 숫자열 **7 Clear / 8 L
 | `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox` | 적·아군 NPC, Smart Object, 유인 MG, 자동포탑, 지면 추종 차량 | 기존 맵을 AssetTools로 이동, Asset·PIE·감지/수색 회귀 통과 |
 | `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest` | 재밍 강도/겹침, 귀환 Zone, 정찰·파괴·투하 대상 | 신규 경량 맵 생성, Map Check 0/0·저장 계약 자동화 통과 |
 | `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest` | 샷건 NPC 감지·산탄 분포·투사체·탄약·정면 시선 안정화 검증 | 발광 Pellet 8개+짧은 Tracer 실제 BP, 몸/고개 3° 데드존, Map Check 0/0·Asset/PIE 자동화 2/2 통과 |
-| `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest` | 지속풍·돌풍, 조작 모드별 Drone 보정, 강우 데이터/디버그 프리뷰 체감 | 이동 Bead 24개·풍속/풍향/모드 Readout·1/2/3 키·7/8/9 날씨 키. 비 선분은 TestMap 전용 DrawDebug 프리뷰이며 Niagara가 아님 |
+| `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest` | 8방향+무풍 Random Weather, 조작 모드별 Drone 보정, 강우 데이터/디버그 프리뷰 체감 | Manager 원뿔 Editor 전용·무충돌, 이동 Bead 24개·Cardinal/m/s Readout·1/2/3/4 키·7/8/9 날씨 키. 비 선분은 TestMap 전용 DrawDebug 프리뷰이며 Niagara가 아님 |
 
 Production `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 제작 중인 실제 Tutorial 맵이다. 시험 Actor 추가, 자동 재구성, 저장 대상으로 사용하지 않는다.
 
@@ -54,10 +54,11 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 제작 중인 실�
 
 ## Weather Systems 시험 맵 배치
 
-- `WeatherSystemsTest_Controller` 한 개가 `DA_Weather_LightWind`를 BeginPlay에 즉시 적용한다.
+- `WeatherSystemsTest_Controller`는 `/Game/Drone/Weather/Blueprints/BP_DroneRandomWeatherController`다. `DA_Weather_LightWind`를 BeginPlay에 적용하고 기본 8방향+무풍, 방향 8~18초, 세기 5~12초, 1~9m/s를 사용한다.
+- Manager는 에디터에서 원뿔로 보이지만 Play/Package에는 표시되지 않고 Collision·Overlap·Navigation 영향이 없다.
 - 시작값은 지속풍 `4m/s`, 돌풍 `+0~2m/s`, 풍향 `35°`, 난류 `0.2`다. 최종 밸런스가 아니다.
 - 바닥의 큰 Cube 화살표는 35° 풍향을 가리키며 충돌하지 않는다.
-- `WeatherSystemsTest_Visualizer`는 현재 Snapshot 풍향으로 24개 Bead를 움직이고 화면에 Profile·풍속·풍향·현재 조작 모드를 표시한다.
+- `WeatherSystemsTest_Visualizer`는 현재 Snapshot 풍향으로 24개 Bead를 움직이고 화면에 Profile·Cardinal 풍향·m/s·현재 조작 모드를 표시한다.
 - 쉬운 조작은 기본 65%, 제한 자세는 25%, Rate/Acro는 0% 보정을 사용한다. `WeatherResponseComponent` 기본값에서 바꿀 수 있다.
 - Play 중 숫자 `1/2/3` 또는 NumPad `1/2/3`으로 Easy/Manual/Rate-Acro를 즉시 바꿔 같은 바람에서 Drift를 비교한다.
 - Bead 수·범위·크기·재생 속도와 표시/키 사용 여부는 `/Game/Drone/Weather/Blueprints/BP_DroneWeatherDebugVisualizer` 또는 배치 인스턴스에서 조정한다.
@@ -97,11 +98,12 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 제작 중인 실�
 ### Weather Systems
 
 1. `Lvl_DroneWeatherSystemsTest`를 열고 Play한다.
-2. 화면의 Profile·풍속·풍향 수치와 움직이는 Bead 방향이 바닥 화살표 및 실제 Drift와 일치하는지 본다.
-3. 입력을 놓고 `1 Easy / 2 Manual / 3 Rate-Acro`를 눌러 같은 바람에서 보정률과 Drift 차이가 구분되는지 본다.
-4. 화살표를 기준으로 순풍·역풍·횡풍을 비행해 조작을 빼앗는 느낌이 과한지 확인한다.
-5. `WeatherSystemsTest_Controller`의 Profile을 `Clear`로 바꿨을 때 Drift가 사라지는지 확인한다.
-6. `RainStorm_Greybox`의 최대 수평풍 약 10.7m/s는 강풍 시험 참고선이다. 모든 기체의 최종 내풍 한계로 확정하지 않는다.
+2. 에디터에 있던 Manager 원뿔이 Play에서 사라지고 Drone과 접촉하지 않는지 본다.
+3. 20~40초 동안 `E/NE/N/NW/W/SW/S/SE/CALM`과 m/s가 바뀌며 움직이는 Bead·실제 Drift와 일치하는지 본다.
+4. 입력을 놓고 `1 Easy / 2 Manual / 3 Acro Mode 1 / 4 Acro Mode 2`를 눌러 같은 바람에서 보정률과 Drift 차이가 구분되는지 본다.
+5. 방향·세기 변경 때 Bead와 Drift가 순간이동하지 않고 설정한 Blend 시간에 맞게 부드럽게 변하는지 본다.
+6. 숫자열 `7/8/9`로 Clear/LightWind/RainStorm 디버그 Preset과 강우 선분을 비교한다. Random Wind를 완전히 끈 Profile 고정 시험은 Manager의 `Enable Random Wind`를 꺼서 수행한다.
+7. `RainStorm_Greybox`의 최대 수평풍 약 10.7m/s는 강풍 시험 참고선이다. 모든 기체의 최종 내풍 한계로 확정하지 않는다.
 
 ## 생성·검증 도구
 
@@ -146,7 +148,7 @@ Unreal Editor를 닫은 상태에서 프로젝트 루트에서 실행한다.
 - `Drone.AI.ShotgunTrace`: 즉시 Trace 비교 모드의 피해·차단·탄창 비움·명시적 재장전 확인
 - `Drone.Weather.ProfileAndWindContract`: Profile Validation, World Snapshot 단위 변환, 쉬운 조작/Rate-Acro 보정 차이 확인
 - `Drone.Weather.ProfileAssets`: Clear/LightWind/RainStorm 저장 Asset과 핵심 값 확인
-- `Drone.Weather.SystemsTestMap`: Weather Controller 1개, LightWind 연결, Prototype GameMode, Visualizer 1개·Bead 24개·Readout/모드 키와 도구 소유 Actor 9개 확인
+- `Drone.Weather.SystemsTestMap`: Random Weather Controller 1개, LightWind·8방향+무풍 설정, Prototype GameMode, Visualizer 1개·Bead 24개·Readout/모드 키와 도구 소유 Actor 확인
 - 위 항목과 Mission Rule·Signal Stage를 묶은 최종 회귀 `6/6 Success`
 - 샷건 전용 최종 회귀 `2/2 Success`, 경고 0. 전체 샷건 계약 묶음 `5/5 Success`, 실패 0
 

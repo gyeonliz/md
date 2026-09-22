@@ -1,6 +1,6 @@
 # 드론 기상 변수·바람·비 구현 계획
 
-기준일: 2026-09-17 (Asia/Seoul)
+기준일: 2026-09-22 (Asia/Seoul)
 
 ### 9/17 무저장 시험 진입 경로
 
@@ -9,11 +9,35 @@
 ## 현재 상태와 확정 경계
 
 - `WTH-01` Profile/Snapshot/World Subsystem, `WTH-02` 지속풍·돌풍 Drone 응답, `WTH-02B` Attack/Release와 표시 벡터 적분은 2026-09-16 기준 구현됐다.
+- `BP_DroneRandomWeatherController`를 맵에 한 개 배치하는 Weather Manager 방식이 구현됐다. 8방향과 무풍을 무작위 선택하고 방향·세기 변경 주기와 풍속 범위를 Blueprint에서 조정한다.
 - `/Game/Drone/Data/Weather`에 `Clear`, `LightWind`, `RainStorm_Greybox` Profile이 있고, `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`는 `LightWind`를 즉시 적용한다.
 - 비 Snapshot은 전용 Weather TestMap의 제한형 DrawDebug 선분 프리뷰에서만 소비한다. Camera-follow Niagara, 젖음 Material/MPC consumer, Audio, 실내 판정은 아직 구현 완료 기능이 아니다.
 - 최종 Mission별 날씨, 비가 신호·체력·배터리에 미치는 영향, 최종 성능 예산은 현재 미정이다.
 - 1차 Vertical Slice에서는 바람이 비행에 미치는 영향과 비의 시야·연출만 분리해 검증한다.
 - 비를 맞는다고 Drone 체력 감소, 통신 두절, Mission 실패를 자동으로 넣지 않는다. 필요하면 별도 Mission Rule로 명시한다.
+
+## 배치형 Weather Manager 사용법
+
+Asset: `/Game/Drone/Weather/Blueprints/BP_DroneRandomWeatherController`
+
+1. 날씨가 필요한 맵에 이 Blueprint를 한 개 배치한다.
+2. 에디터에서는 위치를 쉽게 찾도록 원뿔 Mesh가 보인다. 이 원뿔은 Editor 전용이며 Play/Package에는 존재하지 않는다.
+3. Actor 전체 Collision, 원뿔 Collision·Overlap·Navigation 영향은 꺼져 있다.
+4. `Weather Profile`에 기본 날씨 Profile을 지정하고 `Apply Instantly`를 켠다.
+5. `Enable Random Wind`를 켜고 필요하면 `Include Calm`으로 무풍을 포함한다.
+
+`Drone > Weather > RandomWind`에서 다음 값을 조정한다.
+
+| Blueprint 값 | 현재 시작값 | 의미 |
+|---|---:|---|
+| `Minimum/Maximum Direction Change Interval Seconds` | 8 / 18초 | 풍향 목표를 새로 뽑는 최소·최대 시간 |
+| `Minimum/Maximum Speed Change Interval Seconds` | 5 / 12초 | 풍속 목표를 새로 뽑는 최소·최대 시간 |
+| `Minimum/Maximum Wind Speed Meters Per Second` | 1 / 9m/s | 무풍이 아닌 경우의 풍속 범위 |
+| `Direction Blend Seconds` | 1.5초 | 새 풍향으로 부드럽게 도는 시간 |
+| `Speed Blend Seconds` | 1.0초 | 새 풍속·무풍으로 부드럽게 변하는 시간 |
+| `Random Wind Seed` | 260922 | 같은 순서를 재현할 Seed |
+
+풍향 후보는 `E / NE / N / NW / W / SW / S / SE / CALM`이다. 프로젝트 좌표 기준 `+X=E`, `+Y=N`으로 표기한다. Flight HUD에는 `풍향 NE | 풍속 5.2 m/s` 형식으로 표시되며, Debug Visualizer도 같은 Cardinal 표기와 m/s를 사용한다.
 
 ## 구현된 데이터 구조
 
@@ -65,7 +89,7 @@
 3. `UDroneWeatherResponseComponent`는 Snapshot을 Event로 받아 필요할 때만 Tick하고, Sweep 이동으로 현재 Greybox Drone에 Drift를 적용한다.
 4. 기본 보정은 쉬운 조작 `65%`, 제한 자세 `25%`, Rate/Acro `0%`다. 모두 Blueprint 기본값에서 조정할 수 있으며 최종 밸런스가 아니다.
 5. 현재 외력은 `UFloatingPawnMovement` 위에 더하는 위치 Drift Greybox다. 모터·PID·공기역학 또는 최종 네트워크 물리 구현이 아니다.
-6. `ADroneWeatherController`를 Level에 하나 배치하고 Profile을 지정하면 BeginPlay에 적용한다.
+6. `BP_DroneRandomWeatherController`를 Level에 하나 배치하면 BeginPlay에 Profile을 적용하고, Random Wind가 켜진 경우 8방향+무풍 Runtime Override를 시작한다.
 7. `ADroneWeatherVolume`은 협곡·건물 입구용 후속 후보다. 현재는 구현되지 않았다.
 8. Niagara는 Snapshot을 읽어 표현만 담당한다. Particle 위치로 Gameplay 비행력을 계산하지 않는다.
 9. 멀티플레이를 추가하면 서버는 Profile ID·Seed·전환 시작 시각만 복제하고, 빗방울 Simulation은 각 Client가 수행한다.
@@ -78,7 +102,7 @@
 | `DA_Weather_LightWind` | 지속풍 4m/s, 돌풍 +0~2m/s, Attack 0.8s / Release 1.8s / 방향 1.0s | 기본 수동 비행 체감 |
 | `DA_Weather_RainStorm_Greybox` | 지속풍 8m/s, 돌풍 +0~2.7m/s, Attack 0.45s / Release 1.2s / 방향 0.65s, 비 0.8 | 비 표현과 강풍 후속 시험용 데이터 |
 
-`Lvl_DroneWeatherSystemsTest`에는 `ADroneWeatherController` 한 개와 35° 풍향 바닥 화살표가 있다. 기본 Profile은 `LightWind`이며, `WeatherSystemsTest_Controller`의 `Weather Profile`을 바꾼 뒤 Play하면 같은 맵에서 다른 값을 비교할 수 있다. 폭우 Profile을 선택해도 아직 빗줄기가 보이지 않는 것이 현재 정상이다.
+`Lvl_DroneWeatherSystemsTest`에는 `BP_DroneRandomWeatherController` 한 개와 풍향 표시, 24개 Bead Visualizer가 있다. 기본 Profile은 `LightWind`, Random Wind는 8방향+무풍, 방향 주기 8~18초, 세기 주기 5~12초, 풍속 1~9m/s다. Manager 원뿔은 에디터에서만 보이고 Play에서는 숨겨지며 접촉 판정이 없다. Flight HUD와 Visualizer에서 `E/NE/N/NW/W/SW/S/SE/CALM` 및 m/s를 확인한다.
 
 ## 자연스러운 바람 전환·표시 구현 결과
 
@@ -149,16 +173,18 @@
 1. `WTH-01` — 완료: `UDroneWeatherProfile`, Snapshot, World Subsystem, Validation 자동화
 2. `WTH-02` — 완료: 결정적 지속풍·돌풍 Timer, Drone별 응답 Component, Profile 3종
 3. `WTH-02B` — 완료: 돌풍 Attack/Release·풍향 최단각 보간, Debug Bead 표시 속도 벡터 적분과 방향/길이 보간, 자동화 3/3
-4. `WTH-03` — 후속: Camera-follow Niagara Rain, MPC Wetness, Audio Layer
-5. `WTH-04` — 대기: 실내 감쇠 Trace/Volume, 근거리 Splash Service
-6. `WTH-05` — 일부 완료: 전용 TestMap·저장 계약 자동화 완료, Low~Epic Scalability와 GPU Profile은 비 표현 뒤 진행
-7. `WTH-06` — 대기: Mission Definition이 Weather Profile을 선택하고 필요할 때만 Weather Event를 목표 규칙에 연결
+4. `WTH-02C` — 구현·수동 확인 대기: 배치형 Random Weather Manager, 8방향+무풍, 방향/세기 독립 주기, Cardinal/m/s HUD, Editor 전용 무충돌 원뿔
+5. `WTH-03` — 후속: Camera-follow Niagara Rain, MPC Wetness, Audio Layer
+6. `WTH-04` — 대기: 실내 감쇠 Trace/Volume, 근거리 Splash Service
+7. `WTH-05` — 일부 완료: 전용 TestMap·저장 계약 자동화 완료, Low~Epic Scalability와 GPU Profile은 비 표현 뒤 진행
+8. `WTH-06` — 대기: Mission Definition이 Weather Profile을 선택하고 필요할 때만 Weather Event를 목표 규칙에 연결
 
 ## 사용자가 확인할 첫 체감 항목
 
-1. `Lvl_DroneWeatherSystemsTest`에서 Rate/Acro FPV로 바닥 화살표 기준 순풍·역풍·횡풍을 각각 비행한다.
-2. 쉬운 조작의 보정과 Rate/Acro의 보정 없음이 구분되는지 확인한다.
-3. 돌풍이 입력을 빼앗는 느낌이 아니라 예측 가능한 외력으로 느껴지는지 확인한다.
-4. 폭우에서 표적을 찾을 수는 있으나 시야 난도가 올라가는지 확인한다.
-5. 실내 진입 때 비·Splash·Audio가 튀지 않고 0.2~1초 사이에 자연스럽게 줄어드는지 확인한다.
-6. Low~Epic 전환 시 Mission 판정과 바람 Gameplay가 달라지지 않는지 확인한다.
+1. `Lvl_DroneWeatherSystemsTest`에서 Manager 원뿔이 에디터에서 보이고 Play에서는 사라지며 Drone과 충돌하지 않는지 확인한다.
+2. 20~40초 Play하면서 풍향이 8방향/CALM 중 바뀌고 HUD의 Cardinal·m/s가 실제 Bead와 일치하는지 확인한다.
+3. 쉬운 조작의 보정과 Rate/Acro의 보정 없음이 구분되는지 확인한다.
+4. 돌풍이 입력을 빼앗는 느낌이 아니라 예측 가능한 외력으로 느껴지는지 확인한다.
+5. 폭우에서 표적을 찾을 수는 있으나 시야 난도가 올라가는지 확인한다.
+6. 실내 진입 때 비·Splash·Audio가 튀지 않고 0.2~1초 사이에 자연스럽게 줄어드는지 확인한다.
+7. Low~Epic 전환 시 Mission 판정과 바람 Gameplay가 달라지지 않는지 확인한다.

@@ -1636,3 +1636,14 @@ HeadingValueText
 - MSVC 14.51.36257 Editor Build, `SmartObjectFoundationDefaults`, `ShotgunSystemsTestMap`, `ShotgunSystemsTestMapPIE`, `NPCGreyboxPIE`가 Success다. Shotgun PIE는 조준 완료 전 Fire Event 0과 감지 관측 시각부터 첫 Volley까지의 시간도 검사한다.
 - Figma `Project:Droner` Page 1 최상위 148개를 읽기 전용으로 재확인했다. 최신 Mission 진입 흐름, Mission 선택 Greybox, 공중 Drone 공통 HUD, Racing UI/Restart/Quit/기록·감도·Ghost 요구를 문서 매트릭스에 반영했으며 Figma 원본은 수정하지 않았다.
 - CourseSpline 점 추가는 UE 5.8 기본 편집 기능으로 이미 제공된다. `CourseSpline`의 기존 점 선택 후 `Alt+이동 기즈모 드래그` 또는 선분 우클릭 `Add Spline Point Here`를 사용한다. Ring별 Spline Handle은 Gate 전용이므로 구분한다. 코드·Blueprint·맵은 수정하지 않았다.
+
+## 2026-09-22 — 야외 AI·차량 Spline Route·Random Weather Manager
+
+- Native AI 기본값을 유지하면서 `/Game/Drone/AI/Blueprints/BP_DroneNPCAIController_Outdoor`를 추가했다. Hostile Rifle/Shotgun은 이 BP를 사용하며 Sight 60m, Lose Sight 70m, Smart Object 검색 반경 80m·Half Height 10m, 직전 완료 지점 회피 15m를 Blueprint에서 조정한다.
+- `/Game/Drone/Vehicles/Blueprints/BP_DroneVehicleSplineRoute`와 `ADroneVehicleSplineRoute`를 추가했다. 차량은 Instance에서 Route를 지정하고 Follow, 속도, 끝 반전/Loop를 조정한다. XY/Yaw는 Spline 위치·접선, Z/Pitch/Roll은 기존 4점 지면 Trace가 담당하며 종점 Event를 노출한다.
+- `/Game/Drone/Weather/Blueprints/BP_DroneRandomWeatherController`를 배치형 Weather Manager로 추가했다. E/NE/N/NW/W/SW/S/SE와 CALM, 방향 8~18초·세기 5~12초·풍속 1~9m/s 시작값, 방향/속도 보간과 재현 Seed를 Blueprint Class Defaults에서 조정한다.
+- Manager는 에디터에서 위치 확인용 원뿔 Mesh를 보이지만 Editor 전용 Component라 Play/Package에는 존재하지 않는다. Actor·원뿔 Collision, Overlap, Navigation 영향은 모두 끈다.
+- Runtime Wind Override를 World Subsystem에 추가해 Random Manager가 Profile의 비·가시거리 등은 유지하면서 수평 바람만 갱신한다. CALM은 Gust까지 억제해 실제 0m/s가 된다.
+- 풍향 표기는 프로젝트 좌표 `+X=E`, `+Y=N` 기준 Cardinal로 통일했다. Flight HUD는 `풍향 NE | 풍속 5.2 m/s`, Debug Visualizer는 같은 방향과 m/s를 표시한다.
+- 팀원이 수정 중인 `Lvl_DroneShotgunSystemsTest`, `Lvl_NPCSmartObjectGreybox`는 덮어쓰지 않았다. 차량 Route는 안전한 TestMap에서 맵 담당자가 직접 배치·연결하도록 남겼다. Production `Lvl_DroneTraining`도 수정하지 않았다.
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. Weather TestMap 재생성 Map Check 0/0, `SmartObjectFoundationDefaults`, HUD 2종, `GroundConformingSuspension`, Weather 2종 최종 6/6 Success·경고 0이다. Commit·Push는 수행하지 않았다.

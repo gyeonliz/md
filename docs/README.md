@@ -64,6 +64,10 @@
 - [`UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md`](learning/UNREAL_PROJECT_EXPERIENCE_DESCRIPTION.md): 지원서 경험 기술 예시
 - [`MOBILE_CURRENT_BRIEF.md`](learning/MOBILE_CURRENT_BRIEF.md): 과거 이동용 통합 요약. 현재 상태는 루트 문서를 우선한다.
 
+## Applications
+
+- [`PROJECT_EXPERIENCE_PLAN_HWP_GUIDE.md`](applications/PROJECT_EXPERIENCE_PLAN_HWP_GUIDE.md): 프로젝트형 일경험 수행계획서의 회색 예시 교체안·8주 일정·역할·예산 작성 가이드
+
 ## History
 
 - [`DRONE_WORKLOG.md`](history/DRONE_WORKLOG.md): 날짜별 개발 기록

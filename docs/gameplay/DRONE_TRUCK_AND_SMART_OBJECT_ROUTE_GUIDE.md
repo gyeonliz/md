@@ -1,6 +1,6 @@
 # Truck·Smart Object 동선 설계 가이드
 
-기준일: 2026-09-16 (Asia/Seoul)
+기준일: 2026-09-22 (Asia/Seoul)
 
 이 문서는 팀원이 맵에서 차량과 NPC 동선을 설계할 때 사용하는 진입 문서다. 차량 동선과 Smart Object 동선은 서로 다른 시스템이며, 같은 Spline이나 번호 규칙을 공유하지 않는다.
 
@@ -8,7 +8,8 @@
 
 | 구분 | 현재 동작 | 아직 없는 것 |
 |---|---|---|
-| Truck Greybox | 4점 지면 Trace, Z·Pitch·Roll 추종, 전후 이동, Steering, 바퀴 회전, 차량형 포탑 부모 추종 | Spline/Waypoint 추종, 목적지 도착 Event, 장애물 회피, Chaos Vehicle |
+| Truck Greybox | 4점 지면 Trace, Z·Pitch·Roll 추종, 전후 이동, Steering, 바퀴 회전, 차량형 포탑 부모 추종 | 장애물 회피, Chaos Vehicle |
+| Vehicle Spline Route v1 | 별도 Route BP의 Spline 거리·접선을 따라 XY/Yaw 이동, 기존 4점 Trace가 Z·Pitch·Roll 유지, 끝 도착 Event·정지/반전/Loop | 곡률 감속, Look Ahead 조향, Mission Director 목적지 실패 연결 |
 | Greybox Auto Drive | 배치 시작 위치와 Yaw를 기준으로 한 직선 구간 왕복 | 커브 주행, 교차로, 정류, Mission 목적지 판정 |
 | Smart Object NPC | 역할 Tag에 맞는 최근접 빈 Slot을 Claim하고 NavMesh로 이동 | `1→2→3` 고정 순서, Spline Patrol, Route ID 기반 분기 |
 
@@ -43,12 +44,15 @@
 - 차량의 최대 지면각 기본값은 `28°`지만, Mission용 도로는 시각 안정성을 위해 `15°` 안쪽 경사를 우선한다.
 - 현재 이동은 장애물을 Sweep하지 않으므로 벽이나 NPC를 통과할 수 있다. 장애물 회피 검증에는 사용하지 않는다.
 
-## 4. Mission용 Truck Spline 동선 설계안
+## 4. Vehicle Spline Route v1 배치법
 
-아래는 다음 구현에서 사용할 계약이다. 아직 프로젝트에 `BP_TruckRoute` Asset이 존재한다고 가정하지 않는다.
+현재 다음 두 Blueprint가 준비돼 있다.
+
+- Route: `/Game/Drone/Vehicles/Blueprints/BP_DroneVehicleSplineRoute`
+- Vehicle: `/Game/Drone/Vehicles/Blueprints/BP_GroundConformingVehicle_Greybox`
 
 ```text
-BP_TruckRoute
+BP_DroneVehicleSplineRoute
 └─ RouteSpline
    ├─ 출발점
    ├─ 커브/경유점
@@ -56,27 +60,37 @@ BP_TruckRoute
 
 BP_GroundConformingVehicle_Greybox
 → RouteSpline의 현재 진행거리 추적
-→ 전방 Look Ahead 지점으로 Steering 계산
-→ 곡률·목적지 거리에 따라 Throttle 조절
+→ 현재 거리의 위치와 접선으로 XY·Yaw 계산
 → 기존 4점 Trace가 Z·Pitch·Roll 담당
-→ 목적지 도착 시 Mission Event 보고
+→ 끝 도착 시 On Spline Route Reached End Event 발생
 ```
 
-### Route Blueprint에 노출할 권장값
+### 맵에서 연결하는 순서
+
+1. 안전한 TestMap에 `BP_DroneVehicleSplineRoute`를 배치한다.
+2. Route Actor를 선택하고 `RouteSpline`을 선택한다.
+3. 기존 Point를 선택한 뒤 `Alt+이동 기즈모 드래그`로 새 Point를 만들거나, 선분 우클릭 `Add Spline Point Here`를 사용한다.
+4. 도로 중심선에 맞추고 일반 커브는 Point Type을 `Curve` 또는 `Curve Clamped`로 둔다.
+5. `BP_GroundConformingVehicle_Greybox`를 배치하고 Details의 `Drone > Vehicle > SplineRoute`에서 `Spline Route`에 방금 Route Actor를 지정한다.
+6. `Follow Spline Route`를 켜고 `Spline Follow Speed`를 조정한다.
+7. 끝에서 왕복하려면 `Reverse At Spline End`, 처음으로 순간 이동해 반복하려면 `Loop Open Spline`을 사용한다. 둘 다 끄면 끝에서 정지한다.
+8. PIE에서 XY/Yaw가 Spline을 따르는 동안 차체 Z/Pitch/Roll과 바퀴 접지가 지면을 따르는지 확인한다.
+
+현재 팀원이 수정 중인 `Lvl_NPCSmartObjectGreybox`에는 자동 배치하지 않았다. 같은 Binary Map을 덮어쓰지 말고 맵 담당자가 직접 Route를 배치·연결한다.
+
+### 현재 Blueprint에 노출된 값
 
 | 값 | 용도 |
 |---|---|
-| `RouteId` | Mission Data와 맵 Actor 연결용 ID |
 | `RouteSpline` | 맵에서 직접 편집하는 차량 중심선 |
-| `CruiseSpeed` | 직선 기본 속도 |
-| `CurveSpeed` | 큰 Yaw 변화 구간 제한 속도 |
-| `LookAheadDistance` | 차량이 바라볼 Spline 앞 지점 거리 |
-| `ArrivalDistance` | 마지막 지점 도착 허용 반경 |
-| `StartDelaySeconds` | Mission 시작 후 출발 지연 |
-| `EndBehavior` | `Stop`, `Loop`, `Reverse`, `Despawn` 중 선택 |
-| `bDrawRouteDebug` | Editor/PIE 경로·Look Ahead·도착 반경 표시 |
+| `Spline Route` | Vehicle Instance가 따라갈 Route Actor 참조 |
+| `Follow Spline Route` | Spline 추종 On/Off |
+| `Spline Follow Speed` | 진행 속도, 기본 `300cm/s` |
+| `Reverse At Spline End` | 끝과 시작에서 진행 방향을 뒤집어 왕복 |
+| `Loop Open Spline` | 열린 Spline 끝에서 시작 거리로 Loop |
+| `On Spline Route Reached End` | 종점 도달 시 Blueprint에서 받는 Event |
 
-차량 쪽에는 `Route Actor`, `Auto Follow Route`, 가속·감속, 최대 Steering 입력을 Blueprint에서 바꿀 수 있게 둔다. Mission 2에서는 `EndBehavior=Stop`을 기본으로 하고, 목표 차량이 목적지에 먼저 도착하면 Mission 실패 Event를 Director로 보낸다.
+`RouteId`, 곡률별 속도, Look Ahead, 출발 지연, Mission Director 목적지 실패 보고는 아직 후속이다. 현재 v1은 배치와 지면 굴곡 추종을 먼저 확인하는 Greybox이며 장애물 회피용 경로 탐색이 아니다.
 
 ### Spline을 그리는 기준
 
@@ -89,14 +103,12 @@ BP_GroundConformingVehicle_Greybox
 7. 마지막 Point 직전에 충분한 감속 거리를 둔다. 마지막 Point를 벽·문·낭떠러지에 바로 붙이지 않는다.
 8. 목적지 실패 Trigger는 차량 Actor 전체가 들어갈 크기로 두고 `RouteId` 또는 Actor Tag로 대상 차량을 제한한다.
 
-### 구현 뒤 필요한 자동화
+### 검증 상태와 후속 자동화
 
-- 직선 Route에서 차량이 진행거리 순서대로 전진한다.
-- 곡선 Route에서 Steering 부호와 Yaw가 접선 방향을 따른다.
-- Frame Rate가 달라도 같은 시간의 진행거리가 허용 오차 안에 든다.
-- 지면 경사 추종과 Route Yaw가 서로 Pitch·Roll을 덮어쓰지 않는다.
-- 목적지 Event가 한 번만 발생하고, 파괴된 차량은 도착 Event를 보내지 않는다.
-- 차량형 자동포탑은 Route 주행 중에도 부모 Transform을 따르며 로컬 Yaw/Pitch 조준을 유지한다.
+- 완료: Spline Actor 기본점, 진행거리, Follow On/Off, Reverse/Loop 설정, 도착 Event 계약 자동화.
+- 완료: `Drone.Vehicle.GroundConformingSuspension`에서 Route Follow 계약과 기존 4점 지면 추종 회귀 통과.
+- 수동 대기: 곡선·경사 도로에서 차체·바퀴·차량형 자동포탑 화면 확인.
+- 후속: Frame Rate별 진행거리, Mission 목적지 Event 1회성, 파괴 차량 중단, 곡률 감속·장애물 정책.
 
 ## 5. Smart Object 동선 설계법
 
@@ -173,9 +185,9 @@ Smart Object는 차량 Spline과 달리 `점들의 망`이다.
 
 ## 8. 다음 구현 순서
 
-1. `BP_TruckRoute`와 C++/Blueprint Route Follow 계약 추가
-2. TestMap에 직선·곡선·경사 Route 각 1개 구성
-3. 목적지 도착 Event와 Mission 2 시간/실패 규칙 연결
+1. 맵 담당자가 안전한 TestMap에 Route와 Vehicle을 배치하고 곡선·경사 화면 확인
+2. 곡률 감속·Look Ahead 조향과 장애물 정책 결정
+3. 목적지 도착 Event를 Mission 2 시간/실패 규칙에 연결
 4. 차량 파괴 시 Route 중단과 Story Fact 적용
 5. 필요한 경우에만 Smart Object 고정 순서 Route를 별도 카드로 구현
 

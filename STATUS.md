@@ -1,26 +1,31 @@
 # 현재 작업 상태
 
-기준일: 2026-09-18 (Asia/Seoul)
+기준일: 2026-09-22 (Asia/Seoul)
 
 ## 한눈에 보기
 
-- 현재 단계: 실제 Smart Object 맵의 Shotgun 순찰 회전·부착물 충돌 수정은 사용자 화면 확인까지 통과했다. 후속으로 Drone 최초 감지 뒤 Rifle/Shotgun 첫 발 전 `1.0초` 조준 지연을 공통 Controller에 추가했고, 상태 전환과 분리된 감지 시각을 사용한다
+- 현재 단계: 야외 AI 감지·Smart Object 검색 수치를 전용 Controller BP로 분리했고, 차량 Spline Route v1과 배치형 Random Weather Manager를 구현했다. Weather는 8방향+무풍, 독립 방향/세기 주기, Cardinal/m/s HUD와 Editor 전용 무충돌 원뿔 표식을 제공한다
 - 조작 단계: 기존 쉬운 조작·제한 자세에 FPV Rate/Acro 송신기 Mode 1·Mode 2를 분리했다. 키보드는 W/S Pitch·Space/Ctrl Throttle을 유지하고 패드 세로축만 실제 Mode에 따라 바뀐다. 핸들링 UI는 느림/보통/빠름으로 바꾸고 현재는 최대 속도만 변경한다
-- 바로 다음 개발: 첫 사격 전 약 1초 조준 체감 확인과 Mode 1/2 패드 체감 확인 → Weather 정식 Niagara/MPC/Audio → Test Mission DA/진입 경로
+- 바로 다음 개발: Weather Manager·차량 곡선 Route 화면 확인 → 첫 사격 전 약 1초 조준 체감과 Mode 1/2 패드 체감 확인 → Weather 정식 Niagara/MPC/Audio → Test Mission DA/진입 경로
 - 검증 운영: 외부 OpenCode 모델 호출은 종료했다. 프로젝트 전용 Agent·모델 설정은 제거했으며 이후 구현과 검증은 Unreal 자동화와 사용자 수동 화면 확인으로 진행한다
-- Unreal Editor: 2026-09-18 최종 빌드·자동화 뒤 종료 상태
+- Unreal Editor: 2026-09-22 최종 빌드·자동화 뒤 종료 상태
 - Production Training: 팀원이 실제 Tutorial 환경을 제작 중이므로 열람 외 저장·덮어쓰기·자동 재구성 금지
 
 ## Git 기준
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal `D:\JGY\project\drone` | `main = origin/main = 5e4c727` | 사용자 Push 기준 동기화. 새 표적 전환 시 이전 사격 정리와 강화된 조준 지연 회귀 2개 C++ 파일이 로컬 변경 |
-| 문서 `D:\JGY\project\md` | `main = origin/main = 1cd87e9` | 이번 상태·Figma·Spline 가이드 최신화가 로컬 변경 |
+| Unreal `D:\JGY\project\drone` | `main = origin/main = 07ed573` | AI 야외 BP·차량 Route·Random Weather/HUD Source와 Asset이 로컬 변경. 사용자 수정 TestMap 2개는 보존 |
+| 문서 `D:\JGY\project\md` | `main = origin/main = 6ed8bb9` | 기존 신청서 문서 변경과 이번 상태·AI·차량·Weather 가이드 최신화가 로컬 변경 |
 
-2026-09-18 현재 Unreal과 문서 기준 커밋은 각각 원격과 일치한다. 사용자가 Unreal 변경을 `5e4c727`로 Push한 뒤 이번 후속 수정만 로컬에 남겼다. 과거 `9a94f06` 통합 대기 기록은 Worklog 이력으로만 보며 현재 차이로 해석하지 않는다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 설정을 남기지 않는다.
+2026-09-22 현재 두 저장소의 HEAD와 `origin/main`은 각각 일치하며 새 작업은 아직 커밋하지 않았다. `Lvl_DroneShotgunSystemsTest`, `Lvl_NPCSmartObjectGreybox`의 기존 사용자 변경은 이번 자동 작업으로 덮어쓰지 않았다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 설정을 남기지 않는다.
 
 ## 최신 완료 항목
+
+- `/Game/Drone/AI/Blueprints/BP_DroneNPCAIController_Outdoor` 추가. Hostile Rifle/Shotgun에 Sight 60m, Lose Sight 70m, Smart Object 검색 반경 80m·높이 10m, 직전 지점 회피 15m를 적용하고 Blueprint Class Defaults에서 조정 가능하게 했다
+- `/Game/Drone/Vehicles/Blueprints/BP_DroneVehicleSplineRoute`와 차량 Spline Follow v1 추가. Vehicle Instance에서 Route 참조·On/Off·속도·끝 반전/Loop를 조정하며 XY/Yaw는 Spline, Z/Pitch/Roll은 기존 4점 지면 Trace가 담당한다
+- `/Game/Drone/Weather/Blueprints/BP_DroneRandomWeatherController` 추가. 8방향+무풍, 방향 8~18초·세기 5~12초·1~9m/s 시작값과 보간값을 BP에서 조정한다. 에디터에서는 원뿔 표식이 보이고 Play/Package에서는 제거되며 Actor/표식 Collision·Overlap·Navigation 영향은 없다
+- 바람 UI를 `E/NE/N/NW/W/SW/S/SE/CALM`과 m/s로 통일하고 Flight HUD에 `풍향 … | 풍속 … m/s`를 추가했다
 
 - `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest` 경량 시험 맵 생성
 - 곡선 Course, CourseSpline과 분리된 Ring Handle 5개, Gate/Sequence 5개 구성
@@ -72,6 +77,10 @@
 
 ## 검증된 근거
 
+- 2026-09-22 MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공
+- Random Weather TestMap 재생성 및 Map Check `0 errors / 0 warnings`, Production Training 수정 0
+- `SmartObjectFoundationDefaults`, `FlightHUDBlueprintAsset`, `FlightHUDTelemetryBinding`, `GroundConformingSuspension`, `ProfileAndWindContract`, `SystemsTestMap` 최종 `6/6 Success`, 경고·실패 0
+
 - MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공
 - TestMap Map Check `0 errors / 0 warnings`
 - `Drone.Tutorial.TrainingGateSequence` 1/1 성공
@@ -113,6 +122,9 @@
 - `962ff02`와 대응 문서 Push 전 Unreal·문서 `git diff --check` 모두 종료 코드 0. LF→CRLF 메시지는 줄바꿈 안내이며 공백 오류가 아니다
 
 ## 아직 확인하지 않은 항목
+
+- Weather TestMap에서 Weather Manager 원뿔이 Play 시 사라지고 접촉하지 않는지, 8방향/CALM 및 Cardinal·m/s HUD가 20~40초 동안 자연스럽게 바뀌는지 화면 확인
+- 안전한 TestMap에 Vehicle Route BP를 배치·연결해 곡선/경사에서 XY/Yaw Spline 추종과 Z/Pitch/Roll 4점 지면 추종·바퀴·차량 포탑이 함께 유지되는지 화면 확인
 
 - TestMap Gate Frame 외형과 Trigger 정합, 3상태 색
 - Ring Handle 개별 이동과 Spline 투영 체감
