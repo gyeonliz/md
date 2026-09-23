@@ -1,6 +1,6 @@
 # 드론 역할·조작 방식·핸들링 프리셋
 
-기준일: 2026-09-18 (Asia/Seoul)
+기준일: 2026-09-23 (Asia/Seoul)
 
 ## 기획 자료 사용 원칙
 
@@ -28,11 +28,11 @@
 | 정찰 드론 | `BP_DroneScoutIntegration`; DroneSpy 본체·카메라·로터 4 | 거리·화각·LOS 유지형 Scan과 Training 표적 구현 | 모델 스케일/방향·Scan 체감, 최종 UI/FX |
 | FPV 자폭 드론 | `BP_DroneFPVIntegration`; FPV 본체·로터 4, FPV 기본 시점 | 명시적 Arm·최소 속도 충돌·1회 폭발, 제공 Niagara/Cue 연결 | 폭발 크기/청감·Mission별 Damage 조정 |
 | 드랍 드론 | `BP_DroneDropIntegration`; Delivery 본체·카메라·로터 6·크레이트 선적재 화물 | 탑뷰·투하·착지 후 잔류·가장 가까운 목표 자동 선택·맵 크레이트 근접 적재·실제 Actor 재투하 구현 | 부착 위치/크기 체감, FX와 Mission별 투하 규칙 |
-| 광섬유 드론 | 미구현 | 재밍 면역 미구현 | FPV 공통 기능 뒤 별도 Data Asset과 재밍 규칙 |
-| 지상 드론 UGV | 공중 Pawn으로 처리하지 않음 | 주행·무장·연료 미구현 | 별도 Ground Pawn/Movement로 구현 |
+| 광섬유 드론 | `BP_DroneFiberOpticIntegration`; Sting Interceptor Visual, 빈 통 Static Mesh 슬롯, 1인칭 기본 | `JammingImmunity + ImpactDetonation`, 통 출구→지나온 지면 Spline과 처진 마지막 구간 구현 | 제작 통 Mesh·출구 Offset·케이블 굵기 화면 조정, 충돌 자폭·재밍 Zone 면역 확인, Mission 3 교대 연결 |
+| 지상 드론 UGV | `BP_DroneGroundUGVIntegration`; GC Drone 1 Skeletal Visual | W/S 전후·A/D 조향·Q/E 제자리 회전, 최초 장거리 지면 획득, 4점 지면 높이/Pitch/Roll 추종, 공중 바람 Drift 차단 | 높은 Spawn→접지·Mesh 위치·스케일·경사/단차 추종 화면 확인, 무장·연료와 Mission 3 교대는 후속 |
 | 장거리 타격 드론 | 플레이 기체 미등록 | 출격/타격 연출 미구현 | 플레이 가능 여부 확정 뒤 Sequencer 또는 Pawn 결정 |
 
-`UDroneDefinition`은 `PlannedCapabilities`와 `ImplementedCapabilities`를 따로 가진다. 현재 3종 Data Asset은 각각 검증된 고유 기능 한 개를 두 목록에 모두 가진다. 광섬유·UGV·장거리 타격 후보는 아직 구현 목록에 넣지 않는다.
+`UDroneDefinition`은 `PlannedCapabilities`와 `ImplementedCapabilities`를 따로 가진다. 현재 Catalog에는 Scout/FPV/Drop/Fiber/Ground 5종 Data Asset이 등록돼 있고 자동화가 순서와 역할 Capability를 검사한다. 장거리 타격 후보는 아직 구현 목록에 넣지 않는다.
 
 ## 네 조작 방식의 실제 차이
 
@@ -99,7 +99,7 @@ DJI 공개값에는 무풍·해수면 등 측정 조건이 붙으며, 현재 프
 
 ## Blueprint에서 바꾸는 방법
 
-대상은 `BP_DroneScoutIntegration`, `BP_DroneFPVIntegration`, `BP_DroneDropIntegration` 또는 `ADronePrototypePawn` 파생 Blueprint다.
+대상은 `BP_DroneScoutIntegration`, `BP_DroneFPVIntegration`, `BP_DroneDropIntegration`, `BP_DroneFiberOpticIntegration`, `BP_DroneGroundUGVIntegration` 또는 `ADronePrototypePawn` 파생 Blueprint다.
 
 1. Pawn 참조에서 `Set Control Mode`를 호출한다.
 2. `Assisted Easy`, `Manual Realistic Greybox`, `Acro Rate Mode 1 Greybox`, `Acro Rate Realistic Greybox` 중 하나를 전달한다. 마지막 기존 이름은 Asset 호환을 위해 유지한 Mode 2다.
@@ -121,6 +121,10 @@ Pawn Class Defaults에서 다음 Struct를 연다.
 - `Stable / Balanced / Agile Handling Tuning`: Asset 호환 내부 이름. 현재 `느림/보통/빠름` 최대 속도 배율만 사용하고 나머지 배율은 1.0 유지
 
 각 기체의 절대 기준값은 Data Asset의 `Flight Profile`에 둔다. Rate/Acro의 중앙 감도·최대 Rate·Expo·수직 속도·호버/중력/항력/Rate 응답은 `Flight Profile > Acro Rate Settings`에서 조정한다. 모드 전환 시에는 기준값에서 다시 계산하므로 반복 전환해도 배율이 누적되지 않는다.
+
+Ground UGV는 `BP_DroneGroundUGVIntegration` Class Defaults에서 `GroundSteeringRateDegreesPerSecond`, 앞뒤·좌우 4점 간격, Clearance, `GroundInitialAcquireDistanceCentimeters`, 일반 Trace 시작 높이/거리/채널, 높이·회전 보간 속도를 조정한다. 시작 시 최대 10,000cm 아래 지면을 한 번 획득하고 이후 4점 Suspension Trace를 사용한다. GroundDrive 기체는 Assisted 모드로 고정되고 고도 입력과 Weather Drift를 사용하지 않는다. W/S 이동 벡터의 Z도 제거해 비행하지 않으며 `Q/E`는 차체 제자리 회전 보조다. 최종 궤도/바퀴 물리 구현은 아니다.
+
+광섬유 통은 `BP_DroneFiberOpticIntegration > Components > FiberSpoolMeshComponent`의 `Static Mesh` 칸에 넣는다. 현재 칸은 의도적으로 비어 있고 기본 Relative Location은 `X -32 / Y 0 / Z -18cm`다. 통에서 선이 나오는 위치는 Class Defaults의 `FiberSpoolExitOffset`, 지면 점 간격은 `FiberPointSpacingCentimeters`, 처짐은 `FiberSagDepthCentimeters`, 굵기는 `FiberCableThicknessScale`, 보존 길이는 `FiberMaximumLaidPoints`에서 조정한다. Spline은 이동 경로 아래의 지면 점을 누적하고 마지막 지면점에서 현재 통 출구까지 한 점을 내려 처지게 연결한다. Collision·Overlap·Navigation은 사용하지 않는다.
 
 FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조정한다.
 

@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-09-22 — 야외 AI BP 수치 분리, 차량 Spline Route v1, 8방향+무풍 Random Weather Manager·Cardinal/m/s HUD 구현 및 자동 검증
+마지막 갱신: 2026-09-23 — Random Weather·차량 Spline 화면 확인 완료 반영, 비 On/Off·실내 감쇠·광섬유/지상 Drone·5종 선택 Flow 구현 및 자동 검증
 
 ## Now
 
@@ -14,14 +14,11 @@
 | MISSION-RULE-PIE-01 | 새 목표 Rule의 실제 맵 Vertical Slice | 귀환·Jammer·역할 Actor 시험 배치 완료, 직접 실행은 Prototype Flow | Test Mission DA/진입 경로에서 Scan/Delivery/Destroy/Return/Jamming Event·Tag·시간 규칙 확인 |
 | STY-03-PIE-01 | 재밍 신호·비행·HUD Vertical Slice | 35%/80% 겹침 Zone TestMap 배치·저장 계약 완료 | 실제 비행으로 Overlap·HUD·둔화/복원 확인. 영상 Noise WBP는 별도 표현 작업 |
 | STORY-BRANCH-01 | Mission 2→3 양쪽 스토리 분기 | Story Fact 저장·성공 적용·조건 목표 필터, 미끼/실제 탑승 양쪽 자동화 완료 | 사용자가 기본 스토리안을 정하면 실제 Mission DA에 Fact 설정 |
-| DRONE-FIBER-01 | 광섬유 Drone 기반 | `JammingImmunity` Capability→Signal 동작 연결·자동화 완료, 실제 Definition/Pawn 없음 | 프로젝트 소유 Definition/Integration Pawn과 Visual 연결 후 Zone PIE |
+| DRONE-FIBER-01 | 광섬유 Drone 기반 | Sting Visual, `JammingImmunity + ImpactDetonation`, 1인칭 기본값. 빈 `FiberSpoolMeshComponent`와 통 출구→누적 지면→현재 기체를 잇는 처짐 Spline/Spline Mesh 추가. 자동화 완료 | 제작 통 Mesh를 슬롯에 지정하고 위치·출구 Offset·굵기·점 간격을 화면 조정. 조작·자폭·재밍 면역 확인 |
+| DRONE-GROUND-01 | 지상 UGV 기반 | GC Drone 1 Visual, 전후/조향/제자리 회전, 최초 10,000cm 지면 획득, 4점 지면 추종, 바람 Drift·수직 입력 차단과 자동화 완료 | 높은 Spawn→접지, Mesh 위치·스케일·조향·경사/단차 추종을 화면 확인 후 수치 조정 |
 | DR-FPV-ACRO-PIE-01 | FPV Rate/Acro 실제 조작 체감 | 각속도·무수평복귀에 중력·호버·Body Up 추력·선형 항력·Rate 응답 v1 연결. 속도 단계는 느림/보통/빠름으로 단순화하고 현재 MaxSpeed만 변경 | 키보드/패드로 Nose-down 전진력, 호버·상승·무추력 하강, Roll/Loop와 650°/s 체감 및 세 속도 단계 확인 후 수치 조정 |
 | DR-FPV-ACRO-INPUT-02 | Acro 키보드·패드 Mode 1/2 | 의미축 Action 4개+패드 세로 원시축 2개, IMC 33 Mapping, Pawn/UI 분기, Editor Build·계약·프로필·3회 PIE·MissionEntryPIE 성공 | 키보드 W/S Pitch·A/D Roll·Q/E Yaw·Space/Ctrl Throttle 유지, 패드 Mode 1 LeftY Pitch/RightY Throttle와 Mode 2 반대 배치를 화면에서 확인 |
-| WTH-02-PIE-01 | 바람 Vertical Slice 체감 | 24개 이동 Bead·풍속/풍향/모드 Readout·1/2/3/4 모드 키·전용 TestMap 자동화 완료 | 표시 방향과 실제 Drift, 네 모드 보정 차이, 순풍·역풍·횡풍과 돌풍 세기 화면 확인 |
-| WTH-02B | 자연스러운 바람 전환·표시 | 돌풍 Attack/Release·풍향 최단각 응답, 표시 속도 보간·벡터 적분, Bead 방향/길이 변화 구현. Weather 3/3 완료 | Weather TestMap에서 방향 전환 무점프·속도/길이 변화와 LightWind/RainStorm 체감 확인 |
-| WTH-02C | 배치형 Random Weather Manager | 8방향+무풍, 방향/세기 독립 주기·풍속 범위·보간 BP 조절, Cardinal/m/s HUD, Editor 전용 원뿔·무충돌 구현. 핵심 자동화 6/6 | TestMap에서 원뿔 Play 숨김/무충돌, 20~40초 방향·세기·CALM 전환과 HUD 일치 화면 확인 |
-| VEH-ROUTE-01 | 차량 Spline Route v1 | Route BP와 차량 Route 참조·속도·반전/Loop·도착 Event, Spline XY/Yaw+4점 지면 Z/Pitch/Roll 구현. 단위 자동화 완료 | 안전한 TestMap에서 곡선·경사·바퀴·차량 포탑 화면 확인 후 곡률 감속/Look Ahead 범위 결정 |
-| WTH-03 | 비 표현 Vertical Slice | `7/8/9`로 Snapshot 전환, TestMap 전용 최대 80개·5Hz DrawDebug 비 선분 프리뷰 추가, 비 0이면 생성 중단·충돌 trace 없음. 새 회귀 1/1·UE 5.8.2 Build 통과. Niagara·Wetness MPC consumer·Audio는 미연결이며 GPU 측정 전 | TestMap에서 프리뷰 수동 확인 후 정식 camera-follow Niagara·MPC·Audio와 실제 Low~Epic 성능 측정 |
+| WTH-03 | 비 표현 Vertical Slice | OilRig `T_rain_Mask` 참조 전용 Material, 최대 112개 짧은 Plane 빗줄기, 파란 Debug 기본 Off, 표면별 천장/지면 차단·0.35초 실내 감쇠 구현. Weather 4/4·Map Check 0/0 | 실외→지붕 아래→실외, 긴 잔상 감소·천장 침투 차단, RainStorm→Clear/비 Off 화면 확인 후 Niagara·MPC·Audio·품질 단계 범위 결정 |
 
 ### 사용자가 지금 확인할 맵
 
@@ -42,7 +39,7 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 - `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`: 순찰·감지·수색·MG·자동포탑·차량
 - `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest`: 재밍 약/강/겹침·Return Zone·역할 표적
 - `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest`: 추가 Shotgun NPC·작은 Pellet 8개/Tracer·탄약·LOS 사격장
-- `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`: `1/2/3/4` 쉬운/제한/Acro Mode 1/Mode 2, `7/8/9` 날씨 전환, LightWind 지속풍·돌풍, Snapshot 기반 디버그 강우 선분(정식 Niagara 아님)
+- `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`: 기존 `1/2/3/4` 조작·`7/8/9` 날씨·바람 확인에 더해 `BP_DroneRainVisual`의 카메라 추종 Instanced Mesh 비와 지붕 감쇠를 확인한다. 정식 Niagara는 아니다
 
 ## Next
 
@@ -52,13 +49,13 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 4. AI 시험 맵에서 Drone 감지 직후 병사가 약 1초간 표적을 조준한 뒤 첫 발을 쏘는지 확인한다. 순찰/추적 이동 수정은 사용자 화면 확인 완료
 5. 새 Mission Systems 맵에서 재밍 HUD·둔화/복원·역할 기능·Return 크기 수동 확인
 6. FPV Rate/Acro 키보드 전용 축과 Gamepad/RC Mode 1·Mode 2를 각각 확인한다. 두 모드의 Pitch/Throttle 세로축이 표대로 바뀌는지, 느림/보통/빠름이 속도만 바꾸는지 확인한 뒤 호버·항력·Rate 응답·감도·Expo를 조정한다
-7. Weather Systems 맵에서 Manager 원뿔 Play 숨김·무충돌, 8방향/CALM·Cardinal/m/s HUD와 Bead 일치, `1/2/3/4` 네 조작 모드 Drift를 수동 확인
-8. 별도 안전 TestMap에 `BP_DroneVehicleSplineRoute`를 배치하고 차량에 연결해 곡선·경사 Spline Follow와 4점 접지·바퀴·차량 포탑을 확인
-9. Weather TestMap에서 7/8/9 강우 디버그 프리뷰를 수동 확인한 뒤 `WTH-03` 정식 Niagara Rain·MPC Wetness·Audio·품질 단계를 연결하고 GPU 측정
+7. Weather Systems 맵에서 RainStorm의 Instanced Mesh 비, Clear/비 Off, 실외→지붕 아래→실외 감쇠·복원을 수동 확인
+8. 광섬유 Drone의 빈 통 슬롯에 제작 Mesh를 지정하고 케이블의 지면 누적·마지막 구간 처짐, Sting 외형·1인칭·ImpactDetonation·재밍 면역을 확인. Ground UGV는 높은 Spawn에서 접지 후 조향·제자리 회전·4점 경사 추종을 수동 확인
+9. 강우 화면 확인 결과를 기준으로 `WTH-03` 정식 Niagara Rain·MPC Wetness·Audio·품질 단계를 연결하고 GPU 측정
 10. Test Mission DA와 개발용 진입 경로를 추가해 Return/Jammer Mission Event를 실제 PIE로 확인
 11. Mission 1 검증용 DA/Map에서 Drop→요원 전달→선택적 정보 회수→시간/파괴 실패 Vertical Slice
 12. 이동 차량 목적지 실패 Trigger와 Mission 2 FPV 격파/Story Fact 적용 Vertical Slice
-13. 광섬유 Drone·UGV 프로젝트 소유 Definition/Pawn 기반과 Mission 중 기체 교대 계약 구현. 외부 에셋은 Visual만 연결
+13. 구현된 광섬유 Drone·UGV를 Mission 3 검증용 기체 목록에 연결하고 Mission 중 기체 교대 계약 구현. 외부 에셋은 계속 Visual만 참조
 14. 중간/강한 재밍의 실제 영상 Noise WBP와 목표 정보 손실 규칙 구현. 현재 `VideoNoiseIntensity` Snapshot·BP Event까지만 있음
 15. 나머지 시험 맵은 소유권·참조 감사 후 AssetTools로 이동. `test1`·`test2`는 용도 확인 전 유지
 16. Mission 2의 미끼/실제 탑승 중 기본 스토리안 확정 후 Story Mission DA에 반영. 코드는 양쪽 지원
@@ -121,7 +118,11 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 | 야외 AI Blueprint 튜닝 | Outdoor Controller BP에 60/70m Sight, 80m Search, 15m 직전 지점 회피를 분리하고 Rifle/Shotgun 연결 |
 | 차량 Spline Route v1 | Route BP·차량 참조/속도/Reverse/Loop/도착 Event, Spline XY/Yaw와 4점 지면 Z/Pitch/Roll 결합 |
 | Random Weather Manager | 8방향+무풍, 독립 변경 주기·풍속 범위·보간, Cardinal/m/s HUD, Editor 전용 무충돌 원뿔, Map Check 0/0·핵심 회귀 6/6 |
-| 강우 Snapshot 디버그 프리뷰 | 전용 Weather TestMap 7/8/9 프로파일 전환, 최대 80개 DrawDebug 선분/5Hz/비 0일 때 비활성, 회귀 1/1. 정식 Niagara·Wetness·Audio 및 화면 확인은 미완료 |
+| Random Weather 수동 확인 | 사용자가 Weather 화면 확인 완료를 보고함. 원뿔 Play 숨김·무충돌과 Random Wind 판독을 재작업 대상으로 두지 않음 |
+| 차량 Spline Route 시험 | 사용자가 별도 시험 맵 제작과 화면 확인 완료를 보고함. 후속은 실제 Mission Route/곡률 감속 요구가 생길 때 진행 |
+| 광섬유·지상 Drone 기반 | 프로젝트 소유 Definition/Integration BP, Sting·GC Drone 1 Visual, 빈 통 Mesh 슬롯·처짐 Spline 케이블, 면역/자폭, 최초 장거리 지면 획득·GroundDrive/4점 접지, 5종 선택 Flow. ExtendedRole 1/1·Prototype 8/8 성공 |
+| 강우·실내 감쇠 Greybox | OilRig Mask 기반 Plane 최대 112개, 기본 65×2.4cm·Opacity 0.22·개별 크기 편차, 위쪽/표면 Trace·0.35초 실내 감쇠, Weather 4/4·Map Check 0/0. 화면 확인 대기 |
+| 강우 Snapshot 디버그 프리뷰 | 전용 Weather TestMap 7/8/9 프로파일 전환은 유지하되 구형 파란 DrawDebug 선분은 기본 `Off/0개`다. Rain Visual과 겹치지 않으며 진단할 때만 수동 활성화 |
 | 비 기획 | Camera-follow GPU Rain·Effect Type·젖음/실내/Splash 최적화 계획과 Snapshot 표현값. Niagara/MPC/Audio는 다음 작업 |
 
 시험 맵 사용법은 [`docs/gameplay/DRONE_TEST_MAP_GUIDE.md`](docs/gameplay/DRONE_TEST_MAP_GUIDE.md), FPV 조작은 [`docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md`](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md), 기상은 [`docs/gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md`](docs/gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md), Mission Rule 설정은 [`docs/gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md`](docs/gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md), 전체 순서는 [`docs/planning/DRONE_TUTORIAL_STORY_PLAN.md`](docs/planning/DRONE_TUTORIAL_STORY_PLAN.md)를 참고한다.

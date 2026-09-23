@@ -1,6 +1,6 @@
 # Drone Tutorial·Mission 구현 계획
 
-기준일: 2026-09-11 (Asia/Seoul)
+기준일: 2026-09-23 (Asia/Seoul)
 
 ## 1. 목표와 우선순위
 
@@ -193,14 +193,14 @@ TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경
 
 현재 공통 Mission Flow와 Training Mission의 Lap 성공·Drone 사망 실패 연결이 구현돼 있다. 2026-09-15~16 로컬 작업에서 아래 1번의 Rule 자료형/검증/Director Timer, 2번의 기본 Event와 Blueprint 배치형 귀환 Zone, 3번의 재밍 이탈/해제 Rule 연결을 추가했고 Training Data Asset의 한 Lap 목표를 새 Rule로 이행했다. 실제 새 Mission Map의 Actor Tag·귀환/재밍 Zone 배치와 여러 목표를 연쇄 실행하는 화면 검증은 아직 미완료다. 상세 설정은 [`DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md`](../gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md)를 따른다.
 
-2026-09-16 Figma에서 `골든 타임/인터셉트/베일 브레이커/엔드게임` 4개 Story 화면과 Drop/FPV/광섬유/UGV/장거리 타격 역할을 확인했다. Mission 2→3 표적 처리 시점은 같은 파일 안에서 두 문맥이 충돌한다. 코드는 성공 Story Fact와 조건부 목표로 미끼/실제 탑승 양쪽을 지원하고 저장 기본안은 확정하지 않았다. 상세 대조는 [`DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md`](DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md)를 본다.
+2026-09-16 Figma에서 `골든 타임/인터셉트/베일 브레이커/엔드게임` 4개 Story 화면과 Drop/FPV/광섬유/UGV/장거리 타격 역할을 확인했다. Mission 2→3 표적 처리 시점은 같은 파일 안에서 두 문맥이 충돌한다. 코드는 성공 Story Fact와 조건부 목표로 미끼/실제 탑승 양쪽을 지원하고 저장 기본안은 확정하지 않았다. 2026-09-23 광섬유·UGV 프로젝트 소유 Definition/Integration Pawn과 5종 선택 Catalog까지 구현했으며 실제 Mission 중 교대는 남았다. 상세 대조는 [`DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md`](DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md)를 본다.
 
 1. 목표 종류와 필요 수량·제한 시간·대상 ID를 데이터로 정의 — 기반 구현 완료, 실제 새 Mission별 값은 미정
 2. 정찰 Scan, Payload 투하, 지정 대상 파괴와 귀환 Event를 목표 진행값에 연결 — Director 코드 완료, 맵 배치·PIE 수동 확인 대기
 3. Jamming Volume과 이탈/해제를 Mission Rule로 연결 — 코드/자동화 완료, 실제 Zone 배치·무력화 상호작용 방식은 미정
 4. 목표별 성공·실패·선택 목표 및 결과 평가값 확장
 5. MilitaryCamp·MilitaryBase·Battlefield 후보 맵마다 Mission Definition을 분리
-6. 한 Mission에서 광섬유 Drone→UGV/다른 Drone으로 이어지는 기체 교대 수명주기 구현 — Figma Mission 3·4에 필요, 현재 미구현
+6. 한 Mission에서 광섬유 Drone→UGV/다른 Drone으로 이어지는 기체 교대 수명주기 구현 — 기체 Definition/Pawn과 5종 선택 Catalog는 완료, Mission 중 교대·상태 인계는 미구현
 
 ### Jamming
 

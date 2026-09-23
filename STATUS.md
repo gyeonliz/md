@@ -1,26 +1,32 @@
 # 현재 작업 상태
 
-기준일: 2026-09-22 (Asia/Seoul)
+기준일: 2026-09-23 (Asia/Seoul)
 
 ## 한눈에 보기
 
-- 현재 단계: 야외 AI 감지·Smart Object 검색 수치를 전용 Controller BP로 분리했고, 차량 Spline Route v1과 배치형 Random Weather Manager를 구현했다. Weather는 8방향+무풍, 독립 방향/세기 주기, Cardinal/m/s HUD와 Editor 전용 무충돌 원뿔 표식을 제공한다
+- 현재 단계: Random Weather와 차량 Spline Route의 사용자 화면 확인·시험 맵 작업은 완료 보고를 받았다. Weather Manager 비 On/Off, 카메라 추종 강우 Greybox·실내 지붕 감쇠, 광섬유 자폭 드론의 빈 통 Mesh 슬롯·지면 추종 Spline 케이블, 최초 장거리 지면 획득을 포함한 UGV와 5종 선택 Flow를 구현했다
 - 조작 단계: 기존 쉬운 조작·제한 자세에 FPV Rate/Acro 송신기 Mode 1·Mode 2를 분리했다. 키보드는 W/S Pitch·Space/Ctrl Throttle을 유지하고 패드 세로축만 실제 Mode에 따라 바뀐다. 핸들링 UI는 느림/보통/빠름으로 바꾸고 현재는 최대 속도만 변경한다
-- 바로 다음 개발: Weather Manager·차량 곡선 Route 화면 확인 → 첫 사격 전 약 1초 조준 체감과 Mode 1/2 패드 체감 확인 → Weather 정식 Niagara/MPC/Audio → Test Mission DA/진입 경로
+- 바로 다음 개발: 새 강우 실외→실내 화면 확인과 광섬유/UGV 조작·스케일 확인 → 첫 사격 전 약 1초 조준 체감과 Mode 1/2 패드 체감 확인 → Niagara/MPC/Audio·Mission 중 기체 교대 → Test Mission DA/진입 경로
 - 검증 운영: 외부 OpenCode 모델 호출은 종료했다. 프로젝트 전용 Agent·모델 설정은 제거했으며 이후 구현과 검증은 Unreal 자동화와 사용자 수동 화면 확인으로 진행한다
-- Unreal Editor: 2026-09-22 최종 빌드·자동화 뒤 종료 상태
+- Unreal Editor: 2026-09-23 확장 역할·강우 빌드와 자동화 뒤 종료 상태
 - Production Training: 팀원이 실제 Tutorial 환경을 제작 중이므로 열람 외 저장·덮어쓰기·자동 재구성 금지
 
 ## Git 기준
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal `D:\JGY\project\drone` | `main = origin/main = 07ed573` | AI 야외 BP·차량 Route·Random Weather/HUD Source와 Asset이 로컬 변경. 사용자 수정 TestMap 2개는 보존 |
-| 문서 `D:\JGY\project\md` | `main = origin/main = 6ed8bb9` | 기존 신청서 문서 변경과 이번 상태·AI·차량·Weather 가이드 최신화가 로컬 변경 |
+| Unreal `D:\JGY\project\drone` | 작업 시작 기준 `main = origin/main = de81c19` | 비/실내 감쇠·광섬유/UGV·5종 선택 Source와 프로젝트 소유 Asset이 로컬 변경. 사용자 수정 Skeleton 3개는 보존 |
+| 문서 `D:\JGY\project\md` | 작업 시작 기준 `main = origin/main = 6527d7b` | 이번 상태·역할·Weather 가이드 최신화가 로컬 변경 |
 
-2026-09-22 현재 두 저장소의 HEAD와 `origin/main`은 각각 일치하며 새 작업은 아직 커밋하지 않았다. `Lvl_DroneShotgunSystemsTest`, `Lvl_NPCSmartObjectGreybox`의 기존 사용자 변경은 이번 자동 작업으로 덮어쓰지 않았다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 설정을 남기지 않는다.
+2026-09-23 작업 시작 시 두 저장소의 HEAD와 `origin/main`은 각각 일치했다. 이번 변경은 아직 커밋하지 않았고, 기존 `MG_Turret/GC_Drone_2/GC_Drone_3 Skeleton` 사용자 변경을 되돌리거나 저장하지 않았다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 설정을 남기지 않는다.
 
 ## 최신 완료 항목
+
+- Weather Manager에 `Enable Rain`, 자동 강우 Visual 생성 Class를 추가했다. 비 Off는 바람/Profile ID를 유지하고 Rain Snapshot 표현값만 0으로 만들며 Blueprint에서 런타임 전환 가능하다
+- `/Game/Drone/Weather/Blueprints/BP_DroneRainVisual`과 `/Game/Drone/Weather/Materials/M_DroneRainStreak_OilRigMask` 추가. OilRig 원본 `T_rain_Mask`를 참조하는 최대 112개 짧은 Plane 빗줄기(기본 65×2.4cm, 불투명도 0.22)를 재사용한다. 구형 파란 DrawDebug 선은 기본 Off/0개다. 카메라 위쪽 Trace·0.35초 실내 보간과 빗줄기별 WorldStatic/WorldDynamic 표면 Trace로 지붕·지면 아래 표시를 막으며 맵 전체 Weather Snapshot은 바꾸지 않는다
+- `/Game/Drone/Integrations/RoleDrones/BP_DroneFiberOpticIntegration`과 `DA_Drone_FiberOptic_Greybox` 추가. Sting Interceptor Visual, `JammingImmunity + ImpactDetonation`, 1인칭 기본 시점을 사용한다. `FiberSpoolMeshComponent`는 제작 예정 통을 넣는 빈 Static Mesh 슬롯이며 기본 위치 `(-32,0,-18)cm`만 잡았다. 통 출구부터 지나온 지면까지 Spline과 Cylinder Spline Mesh가 이어지고 마지막 구간은 아래로 처진다
+- `/Game/Drone/Integrations/RoleDrones/BP_DroneGroundUGVIntegration`과 `DA_Drone_GroundUGV_Greybox` 추가. GC Drone 1 Skeletal Mesh를 참조하고 `W/S` 전후·`A/D` 조향·`Q/E` 제자리 회전, 고도 입력 차단, 네 지점 지면 높이/Pitch/Roll 추종과 바람 Drift 비활성화를 적용한다. 높은 PlayerStart에서도 최대 10,000cm 아래 지면을 최초 획득해 즉시 접지한 뒤 4점 추종으로 전환하며, Visibility를 막지 않는 지형은 WorldStatic/WorldDynamic 보조 Trace로 찾는다. 거리·조향·Clearance·Trace·보간 수치는 BP에서 조정한다
+- Tutorial Mission과 GameFlow/선택 UI를 기존 3종에서 Scout/FPV/Drop/Fiber/Ground 5종으로 확장했다. 외부 공급 Skeleton은 수정하지 않고 Integration BP가 Visual만 참조한다
 
 - `/Game/Drone/AI/Blueprints/BP_DroneNPCAIController_Outdoor` 추가. Hostile Rifle/Shotgun에 Sight 60m, Lose Sight 70m, Smart Object 검색 반경 80m·높이 10m, 직전 지점 회피 15m를 적용하고 Blueprint Class Defaults에서 조정 가능하게 했다
 - `/Game/Drone/Vehicles/Blueprints/BP_DroneVehicleSplineRoute`와 차량 Spline Follow v1 추가. Vehicle Instance에서 Route 참조·On/Off·속도·끝 반전/Loop를 조정하며 XY/Yaw는 Spline, Z/Pitch/Roll은 기존 4점 지면 Trace가 담당한다
@@ -73,10 +79,14 @@
 - `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest` 생성. LightWind Controller 1개·35° 풍향 화살표·Prototype GameMode, Map Check 0/0
 - Weather TestMap에 `/Game/Drone/Weather/Blueprints/BP_DroneWeatherDebugVisualizer`를 배치했다. 24개 흐름 Bead, 현재 Profile/풍속/풍향/조작 모드 화면 표시와 `1 Easy / 2 Manual / 3 Acro Mode 1 / 4 Acro Mode 2` 비교 키를 제공한다
 - 돌풍에 Attack/Release/풍향 응답 시간을 분리하고 최단각 풍향 보간을 적용했다. Debug Bead는 표시 속도를 부드럽게 따라간 뒤 벡터 적분하므로 풍향 변경 때 과거 누적 거리를 새 방향으로 재투영하지 않으며, 풍속에 따라 방향과 길이가 바뀐다
-- 비 Snapshot·최적화/품질 계획은 준비됐지만 Camera-follow Niagara, MPC Wetness, Audio, 실내 감쇠 표현은 아직 미구현
+- OilRig Mask 기반 Camera-follow Plane 강우 Greybox, 실내 지붕 감쇠와 표면 아래 Streak 차단은 구현됐다. 정식 Niagara GPU Rain, MPC Wetness, Splash·Audio, 품질 단계와 GPU 측정은 아직 미구현
 
 ## 검증된 근거
 
+- 2026-09-23 MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공
+- `Drone.Weather` `4/4`, 통 슬롯·표시 Spline·고공 Spawn 접지를 검사하는 `Drone.Integration.ExtendedRoleDrones` `1/1`, Pawn 전체 회귀 `Drone.Prototype` `8/8`, 5종 Catalog를 검사하는 `Drone.Flow.Contract` `1/1`, 5종 선택 UI의 `Drone.Flow.FrontEndContract`·`FrontEndPIE` 각 `1/1` Success·실패 0
+- Weather 생성 도구 Validate와 Map Check `0 errors / 0 warnings`. Production `Lvl_DroneTraining`은 열거나 저장하지 않았다
+- 사용자가 Random Weather 화면 확인과 차량 Spline Route 시험 맵 제작·화면 확인을 완료했다고 보고했다
 - 2026-09-22 MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공
 - Random Weather TestMap 재생성 및 Map Check `0 errors / 0 warnings`, Production Training 수정 0
 - `SmartObjectFoundationDefaults`, `FlightHUDBlueprintAsset`, `FlightHUDTelemetryBinding`, `GroundConformingSuspension`, `ProfileAndWindContract`, `SystemsTestMap` 최종 `6/6 Success`, 경고·실패 0
@@ -123,8 +133,8 @@
 
 ## 아직 확인하지 않은 항목
 
-- Weather TestMap에서 Weather Manager 원뿔이 Play 시 사라지고 접촉하지 않는지, 8방향/CALM 및 Cardinal·m/s HUD가 20~40초 동안 자연스럽게 바뀌는지 화면 확인
-- 안전한 TestMap에 Vehicle Route BP를 배치·연결해 곡선/경사에서 XY/Yaw Spline 추종과 Z/Pitch/Roll 4점 지면 추종·바퀴·차량 포탑이 함께 유지되는지 화면 확인
+- `BP_DroneRainVisual`이 RainStorm에서 파란 선 없이 짧고 부드러운 Mask 빗방울로 보이는지, Clear/비 Off에서 사라지는지, 지붕 아래에서 침투하지 않고 기본 0.35초 보간으로 줄며 밖에서 복원되는지 화면 확인
+- 광섬유 Drone의 Sting 외형·1인칭·ImpactDetonation·재밍 면역, 빈 `FiberSpoolMeshComponent`에 제작 통을 넣은 뒤 통 끝 케이블의 지면 누적·처짐을 화면 확인. Ground UGV는 높은 시작점에서 지면으로 내려와 W/S/A/D/Q/E와 4점 경사 추종을 유지하는지 확인
 
 - TestMap Gate Frame 외형과 Trigger 정합, 3상태 색
 - Ring Handle 개별 이동과 Spline 투영 체감
@@ -139,14 +149,12 @@
 - `Lvl_DroneFrontEnd`의 새 3열 Mission UI와 Training 진입 뒤 3열 Drone 선택 UI가 해상도에서 잘리지 않는지 수동 확인
 - FPV Rate/Acro에서 키보드 `W/S Pitch`, `A/D Roll`, `Q/E Yaw`, `Space/Ctrl Throttle` 중복 없음과 Gamepad/RC Mode 1·2, Stick 중앙 자세 유지, Roll/Loop·27m/s 체감 수동 확인
 - 현재 Rate/Acro는 중력·호버 추력·기체 Up 추진·선형 항력·Rate 응답을 계산하지만 `UFloatingPawnMovement` 기반 v1이다. 모터별 RPM·PID·질량/관성 텐서·프로펠러 공력 기반 완전 물리와 같은지 확인한 상태는 아님
-- Weather TestMap에서 움직이는 Bead·화면 풍속/풍향이 실제 Drift와 맞는지, `1/2/3/4`로 쉬운 조작/제한 자세/Acro Mode 1/Mode 2 보정 차이가 구분되는지 수동 확인
-- 개선된 Debug Bead의 풍향 전환 궤적·길이 변화와 LightWind/RainStorm Attack·Release 체감은 자동화만 완료했고 실제 화면 확인이 남았다
-- Camera-follow Niagara Rain, 젖음 MPC, Audio, 실내 감쇠와 Low~Epic 성능 측정은 미구현
+- Camera-follow Instanced Mesh 강우와 카메라 위쪽 Trace 기반 실내 감쇠는 구현했으나 화면 확인 전이다. 정식 Niagara GPU Rain, 젖음 MPC, Splash·Audio, 품질 단계와 Low~Epic GPU 측정은 미구현
 - Test Mission DA/진입 경로에서 Return/Jammer Mission Event, 역할 Event 연쇄, 제한 시간 만료 화면 확인
 - 영상 노이즈 WBP 연출과 목표 정보 손실 표현 확인
 - Figma에서 `골든 타임/인터셉트/베일 브레이커/엔드게임`과 큰 목표는 확인했지만 실제 Story Mission DA/Map은 아직 없음
 - 같은 Figma 파일에서 Mission 2 차량이 미끼라는 전체 설명과 탑승 차량으로 전제한 개별 화면, Mission 3에서 오마르를 처리하는 설명과 이미 처리됐다는 대사가 충돌함. 코드는 양쪽을 지원하며 저장 기본안은 사용자 결정 대기
-- 광섬유 Drone·UGV·장거리 타격 Drone의 플레이 Definition/Pawn, Mission 중 기체 교대, 차량 목적지 실패 Trigger, 최종 Cinematic 연결은 미구현
+- 광섬유 Drone·UGV의 프로젝트 소유 Definition/Integration Pawn은 구현했다. 두 외형의 스케일·조작 화면 확인, Mission 중 기체 교대, 장거리 타격 Drone, 차량 목적지 실패 Trigger와 최종 Cinematic 연결은 미구현
 
 ## 알려진 실패와 경계
 

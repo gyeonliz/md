@@ -1,6 +1,6 @@
 # Drone 재밍 Greybox 구현·배치 가이드
 
-기준: 2026-09-16 로컬 코드. 이 기능은 미션 후보인 `재밍 회피`에 재사용할 공통 시스템이지, 최종 미션 규칙이나 실제 전파 모델이 아니다. 커밋·푸시하지 않았으므로 다른 PC에는 아직 자동 전달되지 않는다.
+기준: 2026-09-23 로컬 코드. 이 기능은 미션 후보인 `재밍 회피`에 재사용할 공통 시스템이지, 최종 미션 규칙이나 실제 전파 모델이 아니다. 이번 광섬유/UGV 확장 변경은 아직 커밋·푸시하지 않았으므로 다른 PC에는 자동 전달되지 않는다.
 
 ## 왜 필요한가
 
@@ -33,7 +33,7 @@
 
 현재 가장 강한 Zone 강도를 쓰므로 여러 Zone의 세기를 더하지 않는다. `SignalQuality = 1 - MaxJammingStrength`다. 강한 단계에서는 최대 속도와 가속도를 기본 튜닝의 70%로 적용하고 Zone을 떠나면 기본값으로 돌아간다. Yaw·Altitude나 입력 자체는 끊지 않는다.
 
-Figma에서 확인한 광섬유 Drone은 예외다. 해당 Drone Definition의 `ImplementedCapabilities`에 `JammingImmunity`가 들어간 경우에만 Signal Component가 활성 Source의 영향을 무시한다. 면역을 껐을 때도 아직 Box 안이면 즉시 원래 방해 단계로 돌아간다. 현재 광섬유 Definition/Pawn Asset은 없어서 기존 Scout·FPV·Drop에는 이 Capability를 넣지 않았다.
+Figma에서 확인한 광섬유 Drone은 예외다. 해당 Drone Definition의 `ImplementedCapabilities`에 `JammingImmunity`가 들어간 경우에만 Signal Component가 활성 Source의 영향을 무시한다. 면역을 껐을 때도 아직 Box 안이면 즉시 원래 방해 단계로 돌아간다. 현재 `/Game/Drone/Data/Drones/DA_Drone_FiberOptic_Greybox`와 `/Game/Drone/Integrations/RoleDrones/BP_DroneFiberOpticIntegration`이 이 Capability와 `ImpactDetonation`을 구현한다. 기존 Scout·FPV·Drop에는 면역을 임의로 넣지 않았다.
 
 ## Blueprint와 Mission Data Asset 설정
 
@@ -50,6 +50,7 @@ Figma에서 확인한 광섬유 Drone은 예외다. 해당 Drone Definition의 `
 3. Zone 밖으로 나가면 신호 100%, 원래 최대 속도/가속도로 복원되는지 본다. 두 Zone이 겹치면 강한 쪽이 우선이고 강한 Zone만 나가면 남은 Zone 단계로 돌아간다.
 4. `Jamming Exited` 또는 `Jammer Disabled` Rule이 활성일 때 같은 Tag Zone에서 해당 사건을 발생시켜 HUD 목표 진행값을 확인한다. `DisableJammer()` 두 번째 호출은 `false`이며 Mission 진행도 중복되지 않아야 한다.
 5. Commandline 자동화 `Drone.Signal.StageContract`는 단계·겹침·복원·면역 on/off·무효 강도·한 번만 해제 계약을, `Drone.Mission.ObjectiveRules`는 재밍/Story 분기를, `Drone.UI.FlightHUDTelemetryBinding`는 강한 경고·노이즈 강도 전달·이탈 뒤 표시 복원을 확인한다. 2026-09-16 관련 회귀 8/8 Success. 실제 화면·맵 배치 PIE는 아직 미확인이다.
+6. 광섬유 Drone을 선택해 0.85 Zone 안에서도 신호가 `100% | 정상`을 유지하는지, 같은 위치에서 Scout/FPV/Drop은 강한 방해를 받는지 비교한다. 2026-09-23 `Drone.Integration.ExtendedRoleDrones` 자동화는 Definition·Capability·Visual 계약을 통과했으며 실제 Zone 화면 비교는 남았다.
 
 ## 문제가 생기면
 

@@ -1,6 +1,6 @@
 # Figma Mission 기획 ↔ 현재 구현 매트릭스
 
-기준일: 2026-09-18. Figma `Project:Droner` Page 1의 최상위 148개 항목을 읽기 전용으로 다시 확인했다. Figma 원본은 수정하지 않았다.
+기준일: 2026-09-23. Figma `Project:Droner` Page 1의 최상위 148개 항목을 읽기 전용으로 확인한 2026-09-18 기준을 유지하고, 이후 코드 구현 상태만 갱신했다. Figma 원본은 수정하지 않았다.
 
 ## 읽은 기준과 충돌 처리
 
@@ -30,7 +30,7 @@ Figma에서 확인한 큰 구조는 `튜토리얼 + Story Mission 4개 / 환경 
 | Tutorial | 기본 비행, 자폭, 드랍, UGV/포탑 훈련 | Flight Profile, Easy/Manual, Stable/Balanced/Agile, Gate/Lap, Recon/FPV/Drop, HUD | 호버링 범위 Rule, 세분화된 브리핑/완료 WBP, UGV 훈련 |
 | Mission 1 | `골든 타임`: 드랍 드론으로 부상 요원에게 구급품 전달, 정보 회수 | Payload 픽업/드랍, `Payload Delivered`, 시간 제한, Actor Tag, Drone 사망 실패 | 사막 마을 Mission Map/DA, 요원·구급품·정보 회수 대상, Line/그물 실패 Rule |
 | Mission 2 | `인터셉트`: 이동 차량을 FPV로 기지 도착 전 격파 | FPV Arm/충돌 자폭, Target Destroyed, 시간 제한, 차량/자동포탑 기반 | 목표 차량 Mission Actor/Route, 도착 실패 Trigger, 잔해 Scan/스토리 분기 DA |
-| Mission 3 | `베일 브레이커`: 광섬유 Drone으로 Jammer 무력화 후 UGV·다른 Drone으로 거점/예비 방공망 무력화 | Jamming Zone, 면역 Capability, Jammer Disabled, AI/MG/자동포탑, 목표 Rule | 광섬유/UGV 플레이 Pawn, 한 Mission 내 Drone 교대, 산악 기지 Map/DA, 방공망 Actor |
+| Mission 3 | `베일 브레이커`: 광섬유 Drone으로 Jammer 무력화 후 UGV·다른 Drone으로 거점/예비 방공망 무력화 | Jamming Zone, 면역 Capability, Jammer Disabled, AI/MG/자동포탑, 목표 Rule, 광섬유·UGV Definition/Integration Pawn | 한 Mission 내 Drone 교대, 산악 기지 Map/DA, 방공망 Actor, 두 새 기체 화면·밸런스 확인 |
 | Mission 4 | `엔드게임`: 본진 방어 체계와 방공망을 무력화 후 장거리 타격/엔딩 | 순차 목표 Rule, Target Destroyed, AI·포탑 기반, 결과 Flow | 모든 Drone/UGV 교대, 본진 Map/DA, 장거리 타격 Sequence, 엔딩 Cinematic |
 
 현재 저장된 Mission Definition은 Training 하나다. 표의 Story Mission 이름·목표는 Figma에서 확인했지만, 실제 Mission Asset/맵은 아직 만들지 않았으므로 플레이 가능한 것으로 기록하지 않는다.
@@ -60,15 +60,16 @@ Figma node `53:10`에는 광섬유 Drone의 `재밍에 면역` 요구가 있다.
 - 선택된 Drone Definition의 `ImplementedCapabilities`에 `JammingImmunity`가 있을 때만 `UDroneSignalComponent`가 활성 방해 Source를 무시한다.
 - 면역 상태에서도 Source 목록은 유지하므로 능력을 끄면 현재 겹친 가장 강한 재밍 단계가 즉시 복원된다.
 - 일반 Drone은 기존처럼 약함/중간/강함 경고와 강한 단계 비행 둔화를 받는다.
-- 아직 광섬유 Drone Definition/Integration Pawn Asset은 없으므로 기존 Scout/FPV/Drop을 면역 Drone으로 잘못 표시하지 않았다.
+- `/Game/Drone/Data/Drones/DA_Drone_FiberOptic_Greybox`와 `/Game/Drone/Integrations/RoleDrones/BP_DroneFiberOpticIntegration`을 추가했다. Sting Visual, `JammingImmunity + ImpactDetonation`, 1인칭 기본값을 사용하며 기존 Scout/FPV/Drop에는 면역을 부여하지 않았다.
+- `/Game/Drone/Data/Drones/DA_Drone_GroundUGV_Greybox`와 `/Game/Drone/Integrations/RoleDrones/BP_DroneGroundUGVIntegration`도 추가해 Mission 3 교대 대상으로 사용할 기반을 준비했다. Catalog/선택 Flow는 5종으로 확장됐지만 Mission 도중 실제 교대는 아직 없다.
 
 ## 구현 순서
 
 1. 사용자 결정으로 Mission 2 스토리 Fact 기본값을 확정한다.
-2. 광섬유 Drone과 UGV의 프로젝트 소유 Definition/Pawn 기반을 구현하고 자동화한다. 외부 에셋은 Visual만 연결한다.
+2. 완료: 광섬유 Drone과 UGV의 프로젝트 소유 Definition/Pawn 기반, 외부 Visual 참조, 5종 선택 Catalog와 자동화를 구현했다.
 3. Mission 1 Vertical Slice를 먼저 만든다: Drop 출격 → 요원 Tag 대상 전달 → 선택적 정보 회수 → 시간/파괴 실패 → 결과.
 4. 이동 차량과 도착 실패 Trigger를 만든 뒤 Mission 2 Vertical Slice를 구성한다.
-5. 검증용 산악 기지 맵에서 광섬유 Drone → Jammer 해제 → 다른 Drone/UGV 교대 기능을 먼저 검증하고 Mission 3에 연결한다.
+5. 검증용 산악 기지 맵에서 구현된 광섬유 Drone → Jammer 해제 → 다른 Drone/UGV 교대 기능을 먼저 검증하고 Mission 3에 연결한다.
 6. Mission 4는 1~3에서 검증한 교대·파괴·AI·포탑·Cinematic Event를 조합한다.
 
 새 Story Map/Definition의 최종 이름·대상 수량·제한 시간·영상은 아직 저장값으로 확정하지 않는다. 팀원 Production Training Map은 이 작업에 사용하지 않는다.

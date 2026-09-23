@@ -17,7 +17,7 @@
 - `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`: NPC·Smart Object·유인/무인 포탑·차량 전용 시험 맵이다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest`: 재밍·귀환·역할 Event 배치 전용 시험 맵이다. 직접 실행은 Prototype Flow이므로 Mission 완료 판정은 후속 Test Mission 진입에서 확인한다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest`: 기존 AI 맵의 순찰·MG 경합을 건드리지 않고 추가 Shotgun NPC의 감지·실제 8개 산탄 Projectile·탄약을 보는 독립 시험 맵이다. 작은 탄두/Tracer 교체 지점은 `/Game/Drone/AI/Blueprints/Projectiles/BP_ShotgunPelletProjectile`이다.
-- `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`: LightWind 지속풍·돌풍과 조작 모드별 보정 체감 전용 맵이다. 이동 Bead/화면 수치/1·2·3 모드 키는 TestMap 판독용이고, 비 시각 효과가 구현된 맵으로 표현하지 않는다.
+- `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`: LightWind 지속풍·돌풍, 조작 모드별 보정, RainStorm과 실내 감쇠 전용 맵이다. 이동 Bead·화면 수치·조작 키와 DrawDebug 비 선분은 TestMap 판독용이고, `BP_DroneRainVisual`은 카메라 추종 Instanced Mesh Greybox다. 정식 Niagara GPU Rain으로 표현하지 않는다.
 - `test1`, `test2`: 용도를 확인하기 전 이동하거나 이름을 바꾸지 않는다.
 - 자산 이동은 파일 탐색기가 아니라 Unreal AssetTools로 수행하고 Redirector·Soft Reference·하드코딩 경로를 검증한다.
 
@@ -43,7 +43,7 @@
 - FPV Data Asset은 Rate/Acro+고기동을 기본으로 쓰며 중력·호버·Body Up 추력·선형 항력·Body Rate 응답 v1을 적용한다. 기반은 `UFloatingPawnMovement`이고 모터/PID/프로펠러 공력·질량/관성을 1:1 재현했다고 표현하지 않는다.
 - Rate/Acro Mode 2 축은 오른쪽 Stick Pitch/Roll, 왼쪽 세로 Throttle, 왼쪽 가로 Yaw다. 키보드는 `W/S Pitch`, `A/D Roll`, `Q/E Yaw`, `Space/Left Ctrl Throttle`로 각 축을 한 역할에만 연결한다. 공용 Move/Altitude/Yaw Action을 Acro에서 재해석하지 않으며 Mouse X/Y는 Rate 축이 아닌 직접 Yaw/Camera Pitch 개발 입력이다.
 - 쉬운/제한 자세에서 카메라·Collision과 외형 기울기를 구분하고, Rate/Acro에서는 Root 자세가 Camera와 Local Up 추진을 함께 결정한다.
-- 역할은 정찰 Scan, FPV Arm/자폭, Payload 픽업·드랍의 프로젝트 소유 기능을 사용한다.
+- 역할은 정찰 Scan, FPV Arm/자폭, Payload 픽업·드랍, Fiber의 재밍 면역+충돌 자폭, Ground UGV의 지상 주행을 프로젝트 소유 기능으로 사용한다. 현재 Catalog는 Scout/FPV/Drop/Fiber/Ground 5종이다.
 - 현재 속도·감도·Collision·Greybox Mesh는 최종값이 아니다.
 
 ## 기상 기준
@@ -51,7 +51,7 @@
 - World 기상 원본은 `UDroneWeatherProfile`과 `UDroneWeatherWorldSubsystem`, Level 연결은 `ADroneWeatherController`가 담당한다.
 - Prototype Drone은 `UDroneWeatherResponseComponent`로 Snapshot 바람을 받는다. 현재 방식은 Sweep 위치 Drift Greybox이며 모터·PID·공기역학 1:1 구현이 아니다.
 - 저장 Profile은 `Clear`, `LightWind`, `RainStorm_Greybox` 3종이다. 강풍 약 10.7m/s는 공개 민간 FPV 참고선이지 최종 내풍 한계가 아니다.
-- 비 Gameplay 값과 최적화 계획은 준비됐지만 Niagara, 젖음 Material, Audio, 실내 감쇠는 아직 구현되지 않았다. 비가 체력·신호·Mission 판정을 자동 변경하지 않는다.
+- 비 On/Off와 Snapshot Override, 카메라 추종 Instanced Mesh 빗줄기, 카메라 위쪽 Visibility Trace 기반 로컬 실내 감쇠는 구현됐다. 정식 Niagara GPU Rain, 젖음 Material/MPC, Splash·Audio와 품질 단계는 아직 구현되지 않았다. 비가 체력·신호·Mission 판정을 자동 변경하지 않는다.
 - Weather 시험 표현은 `/Game/Drone/Weather/Blueprints/BP_DroneWeatherDebugVisualizer`에서 Bead 수·범위·크기·속도 배율·Mesh와 Readout/Hotkey 사용 여부를 조정한다. Gameplay 바람 계산과 분리한다.
 - 자연스러운 바람 개선은 Gameplay Snapshot의 저빈도 결정성을 유지한 채 `지속풍 전환`, `돌풍 Attack/Release`, `표시용 보간`을 분리했다. Debug Bead는 풍향 변경 때 누적 이동거리 전체를 새 방향으로 재투영하지 않고, 보간된 순간 속도를 매 Frame 벡터 적분한다.
 

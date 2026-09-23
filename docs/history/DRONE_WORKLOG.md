@@ -1647,3 +1647,29 @@ HeadingValueText
 - 풍향 표기는 프로젝트 좌표 `+X=E`, `+Y=N` 기준 Cardinal로 통일했다. Flight HUD는 `풍향 NE | 풍속 5.2 m/s`, Debug Visualizer는 같은 방향과 m/s를 표시한다.
 - 팀원이 수정 중인 `Lvl_DroneShotgunSystemsTest`, `Lvl_NPCSmartObjectGreybox`는 덮어쓰지 않았다. 차량 Route는 안전한 TestMap에서 맵 담당자가 직접 배치·연결하도록 남겼다. Production `Lvl_DroneTraining`도 수정하지 않았다.
 - MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. Weather TestMap 재생성 Map Check 0/0, `SmartObjectFoundationDefaults`, HUD 2종, `GroundConformingSuspension`, Weather 2종 최종 6/6 Success·경고 0이다. Commit·Push는 수행하지 않았다.
+
+## 2026-09-23 — 강우·실내 감쇠와 광섬유/지상 Drone 기반
+
+- 사용자가 Random Weather의 수동 화면 확인과 차량 Spline Route 시험 맵 제작·화면 확인을 완료했다고 보고했다. 두 항목은 재작업 목록에서 제외하고 최근 완료로 이동했다.
+- Weather World Subsystem에 비 Runtime Override를 추가했다. Manager의 `Enable Rain`을 끄면 Rain 표현값만 0이 되고 현재 Profile ID와 바람은 유지되며, Manager 종료 시 Override를 정리한다.
+- `/Game/Drone/Weather/Blueprints/BP_DroneRainVisual`을 추가했다. 로컬 카메라 주변 최대 160개 Instanced Mesh 빗줄기를 재사용하고 Collision·Navigation·Shadow를 끈다. 카메라 위쪽 Visibility Trace를 기본 0.2초마다 한 번 수행하고 기본 0.35초로 실내 감쇠를 보간하므로 Particle별 Trace나 World Snapshot 변경은 없다.
+- `/Game/Drone/Integrations/RoleDrones/BP_DroneFiberOpticIntegration`과 `DA_Drone_FiberOptic_Greybox`를 추가했다. 외부 Sting Interceptor Visual만 참조하며 프로젝트 코드의 `JammingImmunity + ImpactDetonation`, 1인칭 기본값을 사용한다.
+- `/Game/Drone/Integrations/RoleDrones/BP_DroneGroundUGVIntegration`과 `DA_Drone_GroundUGV_Greybox`를 추가했다. 외부 GC Drone 1 Skeletal Visual만 참조하며 W/S 전후·A/D 조향·Q/E 제자리 회전, 고도 입력 차단, 네 지점 Trace의 높이/Pitch/Roll 추종과 Weather Drift 비활성화를 적용했다. 지면 간격·Clearance·Trace·보간·조향값은 Blueprint에서 조정한다.
+- Tutorial Mission과 선택 Catalog/UI를 Scout/FPV/Drop/Fiber/Ground 5종으로 확장했다. 공급 Asset의 Skeleton은 수정하지 않고 Integration BP에서 Visual로만 참조한다.
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. `Drone.Weather` 4/4, `Drone.Integration.ExtendedRoleDrones` 1/1, 5종 `Drone.Flow.Contract`, `Drone.Flow.FrontEndContract`, `Drone.Flow.FrontEndPIE`가 각각 1/1 Success이며 Weather Validate/Map Check는 0 errors / 0 warnings다.
+- 작업 시작 기준 Unreal `main = origin/main = de81c19`, 문서 `main = origin/main = 6527d7b`였다. 기존 사용자 변경 `MG_Turret`, `GC_Drone_2`, `GC_Drone_3` Skeleton 3개는 되돌리거나 저장하지 않았고 Production `Lvl_DroneTraining`은 열거나 저장하지 않았다. Commit·Push는 수행하지 않았다.
+
+## 2026-09-23 — 광섬유 통 슬롯·처짐 케이블과 UGV 고공 Spawn 접지
+
+- 사용자 요구에 따라 광섬유 통은 임의 에셋을 넣지 않았다. `BP_DroneFiberOpticIntegration`에 상속되는 빈 `FiberSpoolMeshComponent`를 만들고 기본 위치 `(-32,0,-18)cm`, 통 출구 Offset `(-14,0,-3)cm`만 설정했다. 제작 통은 이 Static Mesh 칸에 넣고 Transform을 BP에서 조정한다.
+- 광섬유 역할이 활성화되면 통 출구 아래 지면을 찾고, 이동 경로 아래에 기본 160cm 간격으로 지면 점을 누적한다. `FiberOpticSplineComponent`가 누적 지면점과 현재 통 출구를 연결하고 마지막 구간에는 기본 45cm 처짐점을 추가한다. Engine Cylinder 단면의 Spline Mesh와 OilRig Cable Material을 사용하되 Collision·Overlap·Navigation·Shadow는 끈다.
+- 지상 UGV가 높은 PlayerStart에서 360cm 일반 Trace 범위 밖 지면을 못 찾아 공중에 남는 회귀를 자동화로 재현했다. 최초 최대 10,000cm 장거리 Trace로 지면을 획득해 접지한 뒤 기존 4점 높이/Pitch/Roll 추종으로 전환한다. Visibility를 막지 않는 지형은 WorldStatic/WorldDynamic Object Trace가 보조하며 W/S 이동 벡터에서 World Z를 제거했다.
+- 수정 전 `Drone.Integration.ExtendedRoleDrones`는 통 슬롯·Spline·표시 Segment·고공 Spawn 접지 4개 조건으로 실패했다. 수정 후 같은 테스트 `1/1`, 전체 `Drone.Prototype` `8/8`이 Success이고 `DroneEditor Win64 Development` Build도 성공했다. 첫 Prototype 전체 회귀에서 빈 통 슬롯까지 외형 개수로 세던 `VisualBank` 계약 1건을 실제 Mesh 보유 Component만 세도록 보정한 뒤 8/8 Green을 확인했다.
+- 공급사 Skeleton과 Production `Lvl_DroneTraining`은 열거나 저장하지 않았고 Commit·Push도 수행하지 않았다.
+
+## 2026-09-23 — OilRig Mask 강우와 천장 침투 차단
+
+- Weather TestMap의 파란 선은 실제 비가 아니라 `ADroneWeatherDebugVisualizer`의 구형 DrawDebug 프리뷰였고, 흰 긴 선은 Cube Instanced Mesh를 늘인 Greybox였다. 구형 프리뷰를 기본 `Off/0개`로 바꾸고 화면 Readout에서도 Debug streak 수를 제거했다.
+- OilRig 원본은 수정하지 않고 `/Game/Drone/ThirdParty/OilRig/Rain/Texture/T_rain_Mask`만 참조하는 프로젝트 소유 Translucent Unlit Material `M_DroneRainStreak_OilRigMask`를 생성했다. 빗줄기는 카메라를 향하는 Plane으로 바꾸고 최대 112개, 기본 길이 65cm·폭 2.4cm·Opacity 0.22·개별 크기 편차·낙하 2,600cm/s로 긴 균일 잔상을 줄였다.
+- 카메라 위쪽 실내 판정 외에 각 활성 빗줄기 열을 프레임당 기본 8개씩 분산 Trace한다. Visibility가 안 막히는 Marketplace 지붕도 WorldStatic/WorldDynamic Object Trace로 보조 검출하고, Streak 하단이 표면에 닿기 전에 숨겨 천장과 지면 아래 선을 막는다.
+- `DroneEditor Win64 Development` Build, Weather 생성 도구 Validate, Map Check `0 errors / 0 warnings`, `Drone.Weather` `4/4`가 모두 성공했다. Material/Blueprint 생성은 TestMap Validate로 수행했으며 Production Training은 열거나 저장하지 않았다. 최종 비 길이·농도·천장 전환은 렌더 화면 수동 확인이 남았다.
