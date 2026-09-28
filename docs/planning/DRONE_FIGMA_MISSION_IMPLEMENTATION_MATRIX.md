@@ -1,6 +1,6 @@
 # Figma Mission 기획 ↔ 현재 구현 매트릭스
 
-기준일: 2026-09-23. Figma `Project:Droner` Page 1의 최상위 148개 항목을 읽기 전용으로 확인한 2026-09-18 기준을 유지하고, 이후 코드 구현 상태만 갱신했다. Figma 원본은 수정하지 않았다.
+기준일: 2026-09-24. Figma `Project:Droner` Page 1을 브라우저에서 다시 읽기 전용으로 확인하고, Tutorial 상세 흐름과 현재 Test Map을 재대조했다. Figma 원본은 수정하지 않았다.
 
 ## 읽은 기준과 충돌 처리
 
@@ -9,6 +9,7 @@
 - Drone 기능 메모: `53:10`
 - 최신형 Mission 선택 화면: Mission 1 `195:533`, Mission 2 `273:73`, Mission 3 `282:105`, Mission 4 `283:136`
 - 최신 공통 흐름/화면: Title~Mission 진입 Flow `363:4`, Mission 선택 Greybox `366:523`, 공중 Drone 공통 UX `403:72`, Racing UI 참고 `406:2`, `406:45`
+- Tutorial 상세: 설계 제목 `310:3`, 8개 훈련 흐름 본문 `318:20`, Warehouse 환경 메모 `353:2`
 - 동일 파일 안에서도 초기 메모와 최신형 화면, Mission 2와 Mission 3 대사 사이에 내용 차이가 있다. 구현은 둘 중 하나를 하드코딩하지 않고 Story Fact 분기로 지원한다. 최종 문구·순서는 사용자 결정 뒤 Data Asset으로 저장한다.
 - 실제 국가명은 확정하지 않는다는 Figma 문구와 기존 사용자 기준을 유지한다. J3C를 실제 발주처·협력사로 표현하지 않는다.
 
@@ -25,15 +26,34 @@ Figma에서 확인한 큰 구조는 `튜토리얼 + Story Mission 4개 / 환경 
 - 추가 후보는 카운트다운, 배터리 HUD, Replay, 이전 기록 Ghost다. `한 맵에 여러 코스가 나타나는 방식`과 현재 Tutorial Course 데이터 구조를 고려해 트랙 선택 UI는 그대로 복제하지 않고 재해석한다.
 - 적 NPC 메모에는 감지 후 공격까지의 Delay를 조절 가능하게 하라는 요구가 있다. Controller의 `PersonalWeaponInitialAimDelaySeconds` 기본 1.0초가 이 계약을 담당한다.
 
+## 2026-09-24 Tutorial 상세 재대조
+
+Figma `318:20`의 Tutorial은 로비에서 훈련 시작을 고른 뒤 각 단계마다 `조작키·목표 브리핑 → 시작 → 플레이 → 클리어 타임 오버레이`를 반복하는 구조다. 전체 순서는 다음 8개다.
+
+| 순서 | Figma 훈련 | 현재 구현 상태 |
+|---|---|---|
+| 1-1 | 호버링 | `DA_Mission_Tutorial_Hover`와 Hover Zone으로 실제 Mission Flow 플레이 가능 |
+| 1-2 | 전진 | 비행 입력은 있으나 독립 목표·Definition·맵 Station·클리어 UI는 없음 |
+| 1-3 | 회전 | Yaw 입력은 있으나 독립 목표·Definition·맵 Station·클리어 UI는 없음 |
+| 1-4 | 게이트 자유 비행 | Gate/Lap 기반과 별도 `Lvl_DroneTutorialSystemsTest`는 있으나 새 Mission 시험 맵의 독립 수업으로 연결되지 않음 |
+| 2 | 자폭 드론 | `DA_Mission_Tutorial_FPV`로 Arm·충돌 파괴 플레이 가능 |
+| 3 | 드랍 드론 | `DA_Mission_Tutorial_Payload`로 표적 투하·귀환 플레이 가능 |
+| 4-1 | UGV 적 NPC 처치 | UGV 이동·상부 조준 기반과 적 NPC는 있으나 UGV 총·유탄과 Tutorial Definition은 없음 |
+| 4-2 | 적 고정형 포탑 처치 | 고정형 자동포탑·100 HP Damage Target 기반은 있으나 UGV 공격과 Tutorial Definition은 없음 |
+
+Figma 안에도 4-1과 4-2를 합칠지는 아직 상의가 필요하다고 적혀 있으므로, 두 수업을 한 Mission으로 합쳐 확정하지 않는다. `353:2`에는 Tutorial 환경으로 Warehouse 사용 메모가 있다. 현재 `Lvl_DroneTutorialMissionTest`는 평면 Greybox 기능 시험장이므로 최종 Warehouse 환경을 구현한 것으로 보지 않는다.
+
+현재 공통 Mission HUD·결과 Flow는 동작하지만, Figma가 요구한 수업별 브리핑 WBP, 클리어 타임 오버레이, 8개 전체 완료 UI와 완료 진행 저장은 아직 별도 작업이다. Production `Lvl_DroneTraining`은 팀원 작업 보호 대상으로 유지하고, 전체 8개 Station 검증은 별도 Test Map에서 먼저 만든다.
+
 | 구분 | Figma 내용 | 현재 코드 기반 | 남은 실제 콘텐츠 |
 |---|---|---|---|
-| Tutorial | 기본 비행, 자폭, 드랍, UGV/포탑 훈련 | Flight Profile, Easy/Manual, Stable/Balanced/Agile, Gate/Lap, Recon/FPV/Drop, HUD | 호버링 범위 Rule, 세분화된 브리핑/완료 WBP, UGV 훈련 |
+| Tutorial | 기본 비행, 자폭, 드랍, UGV/포탑 훈련 | Flight Profile, Easy/Manual, Gate/Lap, Recon/FPV/Drop, 호버 3초 Rule/Zone, 역할별 Tutorial Mission 3개·공용 Test Map·HUD | 실제 화면 수치 조정, 세분화된 브리핑/완료 WBP, UGV 훈련 |
 | Mission 1 | `골든 타임`: 드랍 드론으로 부상 요원에게 구급품 전달, 정보 회수 | Payload 픽업/드랍, `Payload Delivered`, 시간 제한, Actor Tag, Drone 사망 실패 | 사막 마을 Mission Map/DA, 요원·구급품·정보 회수 대상, Line/그물 실패 Rule |
 | Mission 2 | `인터셉트`: 이동 차량을 FPV로 기지 도착 전 격파 | FPV Arm/충돌 자폭, Target Destroyed, 시간 제한, 차량/자동포탑 기반 | 목표 차량 Mission Actor/Route, 도착 실패 Trigger, 잔해 Scan/스토리 분기 DA |
 | Mission 3 | `베일 브레이커`: 광섬유 Drone으로 Jammer 무력화 후 UGV·다른 Drone으로 거점/예비 방공망 무력화 | Jamming Zone, 면역 Capability, Jammer Disabled, AI/MG/자동포탑, 목표 Rule, 광섬유·UGV Definition/Integration Pawn | 한 Mission 내 Drone 교대, 산악 기지 Map/DA, 방공망 Actor, 두 새 기체 화면·밸런스 확인 |
 | Mission 4 | `엔드게임`: 본진 방어 체계와 방공망을 무력화 후 장거리 타격/엔딩 | 순차 목표 Rule, Target Destroyed, AI·포탑 기반, 결과 Flow | 모든 Drone/UGV 교대, 본진 Map/DA, 장거리 타격 Sequence, 엔딩 Cinematic |
 
-현재 저장된 Mission Definition은 Training 하나다. 표의 Story Mission 이름·목표는 Figma에서 확인했지만, 실제 Mission Asset/맵은 아직 만들지 않았으므로 플레이 가능한 것으로 기록하지 않는다.
+현재 저장 Mission Definition은 Production Training 하나와 별도 Test Tutorial 3개다. 표의 Story Mission 이름·목표는 Figma에서 확인했지만, 실제 Story Mission Asset/맵은 아직 만들지 않았으므로 플레이 가능한 것으로 기록하지 않는다.
 
 ## Mission 2 → 3 두 스토리안 지원
 
@@ -60,16 +80,17 @@ Figma node `53:10`에는 광섬유 Drone의 `재밍에 면역` 요구가 있다.
 - 선택된 Drone Definition의 `ImplementedCapabilities`에 `JammingImmunity`가 있을 때만 `UDroneSignalComponent`가 활성 방해 Source를 무시한다.
 - 면역 상태에서도 Source 목록은 유지하므로 능력을 끄면 현재 겹친 가장 강한 재밍 단계가 즉시 복원된다.
 - 일반 Drone은 기존처럼 약함/중간/강함 경고와 강한 단계 비행 둔화를 받는다.
-- `/Game/Drone/Data/Drones/DA_Drone_FiberOptic_Greybox`와 `/Game/Drone/Integrations/RoleDrones/BP_DroneFiberOpticIntegration`을 추가했다. Sting Visual, `JammingImmunity + ImpactDetonation`, 1인칭 기본값을 사용하며 기존 Scout/FPV/Drop에는 면역을 부여하지 않았다.
+- `/Game/Drone/Data/Drones/DA_Drone_FiberOptic_Greybox`와 `/Game/Drone/Integrations/RoleDrones/BP_DroneFiberOpticIntegration`을 추가했다. 현재 FPV 자폭 드론과 같은 Body·Rotor 4개 Visual, `JammingImmunity + ImpactDetonation`, 1인칭 기본값과 곡선형 Fiber Spline을 사용하며 기존 Scout/FPV/Drop에는 면역을 부여하지 않았다.
 - `/Game/Drone/Data/Drones/DA_Drone_GroundUGV_Greybox`와 `/Game/Drone/Integrations/RoleDrones/BP_DroneGroundUGVIntegration`도 추가해 Mission 3 교대 대상으로 사용할 기반을 준비했다. Catalog/선택 Flow는 5종으로 확장됐지만 Mission 도중 실제 교대는 아직 없다.
 
 ## 구현 순서
 
-1. 사용자 결정으로 Mission 2 스토리 Fact 기본값을 확정한다.
-2. 완료: 광섬유 Drone과 UGV의 프로젝트 소유 Definition/Pawn 기반, 외부 Visual 참조, 5종 선택 Catalog와 자동화를 구현했다.
-3. Mission 1 Vertical Slice를 먼저 만든다: Drop 출격 → 요원 Tag 대상 전달 → 선택적 정보 회수 → 시간/파괴 실패 → 결과.
-4. 이동 차량과 도착 실패 Trigger를 만든 뒤 Mission 2 Vertical Slice를 구성한다.
-5. 검증용 산악 기지 맵에서 구현된 광섬유 Drone → Jammer 해제 → 다른 Drone/UGV 교대 기능을 먼저 검증하고 Mission 3에 연결한다.
-6. Mission 4는 1~3에서 검증한 교대·파괴·AI·포탑·Cinematic Event를 조합한다.
+1. 완료: `/Game/Drone/Mission`에 Manager/GameMode/Controller, 목표·실패·귀환 Trigger, 체력 100 Damage Target 재사용 BP 기반을 만들었다.
+2. Mission 1 Vertical Slice를 먼저 만든다: Drop 출격 → 요원 Tag 대상 전달 → 선택적 정보 회수 → 시간/파괴 실패 → 귀환/결과.
+3. 완료: 광섬유 Drone과 UGV의 프로젝트 소유 Definition/Pawn 기반, 외부 Visual 참조, 5종 선택 Catalog와 자동화를 구현했다.
+4. 준비 완료: 이동 차량 목적지용 실패 Trigger가 있다. 실제 차량 Route/Tag와 Mission 2 Definition을 연결한다.
+5. 사용자 결정으로 Mission 2 스토리 Fact 기본값을 확정한다.
+6. 검증용 산악 기지 맵에서 구현된 광섬유 Drone → Jammer 해제 → 다른 Drone/UGV 교대 기능을 먼저 검증하고 Mission 3에 연결한다.
+7. Mission 4는 1~3에서 검증한 교대·파괴·AI·포탑·Cinematic Event를 조합한다.
 
 새 Story Map/Definition의 최종 이름·대상 수량·제한 시간·영상은 아직 저장값으로 확정하지 않는다. 팀원 Production Training Map은 이 작업에 사용하지 않는다.

@@ -1,11 +1,17 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-09-23 — Random Weather·차량 Spline 화면 확인 완료 반영, 비 On/Off·실내 감쇠·광섬유/지상 Drone·5종 선택 Flow 구현 및 자동 검증
+마지막 갱신: 2026-09-29 — Tutorial 8개 독립 Mission과 공유 시험장, 회전 판정, UGV 총·유탄 구현·검증
 
 ## Now
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
+| SYNC-WORKPC-01 | 작업컴 즉시 재개 인계 | `WORK_PC_START_HERE.md`와 Git/LFS/Engine/필수 Asset/Build/Map Validate 점검 스크립트 작성. Windows PowerShell 5.1 전체 실행에서 Build·Map Check 0/0·`WORKSTATION_READY` 확인. 두 저장소는 아직 로컬 미커밋 | 사용자가 Unreal→문서 순서로 Commit·Push하고 작업컴 Pull·LFS 뒤 같은 명령으로 `WORKSTATION_READY` 확인 |
+| MISSION-FRAMEWORK-01 | Mission 통합 Blueprint 기반 | Manager/GameMode/Controller, 목표·실패·귀환 Trigger, 체력 100 파괴 표적을 `/Game/Drone/Mission`에 추가. Build와 Mission 자동화 3/3 성공 | Mission 1 Test Map/Definition에서 Delivery→선택 목표→Return과 시간/파괴 실패를 실제 Flow로 확인 |
+| TUTORIAL-MISSION-01 | Figma Tutorial 8개 독립 Mission | 공용 Test Map에 Hover/Forward/Heading/Gate/FPV/Payload/UGV NPC/UGV Turret Station과 DA 8개 구성. Build·Map Check 0/0·집중 회귀 9/9 성공 | 사용자가 FrontEnd에서 8개 수업을 손 조작해 위치·크기·시간·탄속·낙차·결과 화면 확인 |
+| TUTORIAL-FIGMA-02 | Figma 8개 훈련 ↔ Test Map 대조 | 8개 기능 판정과 독립 재시도 구현. 단계별 클리어 타임·연속 진행·전체 완료 UI와 Warehouse 환경은 미구현 | 수동 확인 뒤 Tutorial 진행 UI와 Warehouse Greybox 추가 |
+| TUTORIAL-GUIDE-03 | 8개 수업 구현·테스트 기준 | 클래스 책임, DA/Tag, 수업별 구현법, Build→Asset→Map→PIE→성능 검증과 문제 확인 순서를 문서화 | 팀원이 문서만 보고 호버/FPV/Payload를 재현하고 Forward 수업을 추가 가능 |
+| AI-LOCOMOTION-01 | 적·아군 NPC 걷기 모션 | Hostile Rifle/Shotgun은 프로젝트 Rifle Idle/Walk/Run, Friendly는 프로젝트 Unarmed Idle/Walk/Run AnimBP/BlendSpace 연결. 생성·저장 검증 성공 | Smart Object 맵에서 정지/보행/달리기 전환과 발 미끄러짐을 화면 확인. 낡은 NPC 맵 개수 고정 자동화 갱신 |
 | MAP-TEST-01 | 경량 Tutorial Systems TestMap 수동 확인 | 맵·생성 도구·전용 자동화·Map Check 완료 | Gate/Ring/역할/HUD 한·두 Lap 화면 확인 |
 | AI-SO-TUNE-01 | Smart Object·유인 MG·개인화기 추적 확인 | 순찰 최종 슬롯 방향·Pursue 정지점·Capsule 외 VisualOnly 계약을 적용했고 사용자 화면에서 정상 이동을 확인했다. 진단 로그 기본값 Off | 새 `1.0초` 첫 사격 조준 대기를 실제 화면에서 확인. 재발 시 Blueprint에서 `[NPC-STATE]`·`[NPC-MOVE]` 진단을 켜 로그 회수 |
 | AI-OUTDOOR-TUNE-01 | 야외 감지·Smart Object 검색 범위 | Outdoor Controller BP를 Rifle/Shotgun에 연결. Sight 60m/Lose 70m/Search 80m×±10m/직전 회피 15m, BP 조절 가능 | 넓은 야외 맵 화면에서 과도한 원거리 점유·감지 끊김 여부를 확인하고 역할별 수치 확정 |
@@ -14,8 +20,8 @@
 | MISSION-RULE-PIE-01 | 새 목표 Rule의 실제 맵 Vertical Slice | 귀환·Jammer·역할 Actor 시험 배치 완료, 직접 실행은 Prototype Flow | Test Mission DA/진입 경로에서 Scan/Delivery/Destroy/Return/Jamming Event·Tag·시간 규칙 확인 |
 | STY-03-PIE-01 | 재밍 신호·비행·HUD Vertical Slice | 35%/80% 겹침 Zone TestMap 배치·저장 계약 완료 | 실제 비행으로 Overlap·HUD·둔화/복원 확인. 영상 Noise WBP는 별도 표현 작업 |
 | STORY-BRANCH-01 | Mission 2→3 양쪽 스토리 분기 | Story Fact 저장·성공 적용·조건 목표 필터, 미끼/실제 탑승 양쪽 자동화 완료 | 사용자가 기본 스토리안을 정하면 실제 Mission DA에 Fact 설정 |
-| DRONE-FIBER-01 | 광섬유 Drone 기반 | Sting Visual, `JammingImmunity + ImpactDetonation`, 1인칭 기본값. 빈 `FiberSpoolMeshComponent`와 통 출구→누적 지면→현재 기체를 잇는 처짐 Spline/Spline Mesh 추가. 자동화 완료 | 제작 통 Mesh를 슬롯에 지정하고 위치·출구 Offset·굵기·점 간격을 화면 조정. 조작·자폭·재밍 면역 확인 |
-| DRONE-GROUND-01 | 지상 UGV 기반 | GC Drone 1 Visual, 전후/조향/제자리 회전, 최초 10,000cm 지면 획득, 4점 지면 추종, 바람 Drift·수직 입력 차단과 자동화 완료 | 높은 Spawn→접지, Mesh 위치·스케일·조향·경사/단차 추종을 화면 확인 후 수치 조정 |
+| DRONE-FIBER-01 | 광섬유 Drone 기반 | FPV 자폭 드론과 동일한 Body·Rotor A~D, `JammingImmunity + ImpactDetonation`, 1인칭 기본값. 빈 `FiberSpoolMeshComponent`와 통 출구→누적 지면→현재 기체를 잇는 다점 포물선/Hermite Spline Mesh 추가. 자동화 완료 | 제작 통 Mesh를 슬롯에 지정하고 위치·출구 Offset·굵기·점 간격·곡선 분할/Tangent를 화면 조정. 조작·자폭·재밍 면역 확인 |
+| DRONE-GROUND-01 | 지상 UGV 기반 | 기존 주행·4점 접지·상부 독립 조준에 `UDroneGroundWeaponComponent` 연결. 좌클릭 직사 총탄 25 피해, 우클릭 중력 유탄 100 반경 피해, 수명/쿨다운 적용 | 시험맵에서 상부 방향과 실제 탄도·4발 처치·유탄 낙차/반경을 수동 확인하고 수치 조정 |
 | DR-FPV-ACRO-PIE-01 | FPV Rate/Acro 실제 조작 체감 | 각속도·무수평복귀에 중력·호버·Body Up 추력·선형 항력·Rate 응답 v1 연결. 속도 단계는 느림/보통/빠름으로 단순화하고 현재 MaxSpeed만 변경 | 키보드/패드로 Nose-down 전진력, 호버·상승·무추력 하강, Roll/Loop와 650°/s 체감 및 세 속도 단계 확인 후 수치 조정 |
 | DR-FPV-ACRO-INPUT-02 | Acro 키보드·패드 Mode 1/2 | 의미축 Action 4개+패드 세로 원시축 2개, IMC 33 Mapping, Pawn/UI 분기, Editor Build·계약·프로필·3회 PIE·MissionEntryPIE 성공 | 키보드 W/S Pitch·A/D Roll·Q/E Yaw·Space/Ctrl Throttle 유지, 패드 Mode 1 LeftY Pitch/RightY Throttle와 Mode 2 반대 배치를 화면에서 확인 |
 | WTH-03 | 비 표현 Vertical Slice | OilRig `T_rain_Mask` 참조 전용 Material, 최대 112개 짧은 Plane 빗줄기, 파란 Debug 기본 Off, 표면별 천장/지면 차단·0.35초 실내 감쇠 구현. Weather 4/4·Map Check 0/0 | 실외→지붕 아래→실외, 긴 잔상 감소·천장 침투 차단, RainStorm→Clear/비 Off 화면 확인 후 Niagara·MPC·Audio·품질 단계 범위 결정 |
@@ -36,6 +42,7 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 
 추가 확인 맵:
 
+- `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`: Figma Tutorial 8개 독립 Mission Station과 귀환
 - `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`: 순찰·감지·수색·MG·자동포탑·차량
 - `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest`: 재밍 약/강/겹침·Return Zone·역할 표적
 - `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest`: 추가 Shotgun NPC·작은 Pellet 8개/Tracer·탄약·LOS 사격장
@@ -43,22 +50,23 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 
 ## Next
 
-1. 수동 확인에서 발견된 Gate/HUD/역할 결함 수정 후 TestMap 회귀
-2. Shotgun Systems 맵에서 작은 Pellet/Tracer 8개가 분리되어 보이는지와 Cyan 선 제거·12° 확산·회피 가능 탄속·피해·사거리·LOS를 수동 확인
-3. Front-end와 Drone 선택 3열 UI의 해상도별 잘림·버튼 상태를 확인하고 최종 WBP Designer/Thumbnail 작업 범위를 확정
-4. AI 시험 맵에서 Drone 감지 직후 병사가 약 1초간 표적을 조준한 뒤 첫 발을 쏘는지 확인한다. 순찰/추적 이동 수정은 사용자 화면 확인 완료
-5. 새 Mission Systems 맵에서 재밍 HUD·둔화/복원·역할 기능·Return 크기 수동 확인
-6. FPV Rate/Acro 키보드 전용 축과 Gamepad/RC Mode 1·Mode 2를 각각 확인한다. 두 모드의 Pitch/Throttle 세로축이 표대로 바뀌는지, 느림/보통/빠름이 속도만 바꾸는지 확인한 뒤 호버·항력·Rate 응답·감도·Expo를 조정한다
-7. Weather Systems 맵에서 RainStorm의 Instanced Mesh 비, Clear/비 Off, 실외→지붕 아래→실외 감쇠·복원을 수동 확인
-8. 광섬유 Drone의 빈 통 슬롯에 제작 Mesh를 지정하고 케이블의 지면 누적·마지막 구간 처짐, Sting 외형·1인칭·ImpactDetonation·재밍 면역을 확인. Ground UGV는 높은 Spawn에서 접지 후 조향·제자리 회전·4점 경사 추종을 수동 확인
-9. 강우 화면 확인 결과를 기준으로 `WTH-03` 정식 Niagara Rain·MPC Wetness·Audio·품질 단계를 연결하고 GPU 측정
-10. Test Mission DA와 개발용 진입 경로를 추가해 Return/Jammer Mission Event를 실제 PIE로 확인
-11. Mission 1 검증용 DA/Map에서 Drop→요원 전달→선택적 정보 회수→시간/파괴 실패 Vertical Slice
-12. 이동 차량 목적지 실패 Trigger와 Mission 2 FPV 격파/Story Fact 적용 Vertical Slice
-13. 구현된 광섬유 Drone·UGV를 Mission 3 검증용 기체 목록에 연결하고 Mission 중 기체 교대 계약 구현. 외부 에셋은 계속 Visual만 참조
-14. 중간/강한 재밍의 실제 영상 Noise WBP와 목표 정보 손실 규칙 구현. 현재 `VideoNoiseIntensity` Snapshot·BP Event까지만 있음
-15. 나머지 시험 맵은 소유권·참조 감사 후 AssetTools로 이동. `test1`·`test2`는 용도 확인 전 유지
-16. Mission 2의 미끼/실제 탑승 중 기본 스토리안 확정 후 Story Mission DA에 반영. 코드는 양쪽 지원
+1. 메인컴 GitHub Desktop에서 Unreal 저장소와 문서 저장소를 사용자 검토 후 Commit·Push한다. 작업컴에서는 Pull·LFS 뒤 `tools/work-pc/Test-DroneWorkstation.ps1`의 `WORKSTATION_READY`를 확인한다
+2. FrontEnd에서 Tutorial 8개를 실제 조작하고 Trigger/Gate/표적 위치와 탄속·낙차를 조정한다
+3. 수동 확인에서 발견된 Gate/HUD/역할 결함 수정 후 TestMap 회귀
+4. Shotgun Systems 맵에서 작은 Pellet/Tracer 8개가 분리되어 보이는지와 Cyan 선 제거·12° 확산·회피 가능 탄속·피해·사거리·LOS를 수동 확인
+5. Front-end와 Drone 선택 3열 UI의 해상도별 잘림·버튼 상태를 확인하고 최종 WBP Designer/Thumbnail 작업 범위를 확정
+6. AI 시험 맵에서 Drone 감지 직후 병사가 약 1초간 표적을 조준한 뒤 첫 발을 쏘는지 확인한다. 순찰/추적 이동 수정은 사용자 화면 확인 완료
+7. 새 Mission Systems 맵에서 재밍 HUD·둔화/복원·역할 기능·Return 크기 수동 확인
+8. FPV Rate/Acro 키보드 전용 축과 Gamepad/RC Mode 1·Mode 2를 각각 확인한다. 두 모드의 Pitch/Throttle 세로축이 표대로 바뀌는지, 느림/보통/빠름이 속도만 바꾸는지 확인한 뒤 호버·항력·Rate 응답·감도·Expo를 조정한다
+9. Weather Systems 맵에서 RainStorm의 Instanced Mesh 비, Clear/비 Off, 실외→지붕 아래→실외 감쇠·복원을 확인하고 이후 Niagara Rain·MPC Wetness·Audio·품질 단계 범위와 GPU 측정을 결정한다
+10. 광섬유 Drone의 빈 통 슬롯에 제작 Mesh를 지정하고 케이블 곡률·자폭·재밍 면역을 확인한다. Ground UGV는 접지·조향·상부 독립 회전과 총·유탄 탄도를 확인한다
+11. 단계별 브리핑·클리어 타임, 8개 연속 진행과 Tutorial 전체 완료 UI를 만든다
+12. Warehouse Greybox 코스를 입히기 전 팀원 맵 소유권을 확인한다
+13. Tutorial 수동 확인 뒤 Mission 1 검증용 DA/Map에서 Drop→요원 전달→선택적 정보 회수→시간/파괴 실패 Vertical Slice를 만든다. 최종 Story 수치·이름은 아직 확정하지 않는다
+14. 이동 차량 목적지 실패 Trigger와 Mission 2 FPV 격파/Story Fact 적용, Mission 3 광섬유 Drone·UGV와 기체 교대 계약을 순서대로 검증한다
+15. 중간/강한 재밍의 실제 영상 Noise WBP와 목표 정보 손실 규칙을 구현한다. 현재 `VideoNoiseIntensity` Snapshot·BP Event까지만 있다
+16. 나머지 시험 맵은 소유권·참조 감사 후 AssetTools로 이동한다. `test1`·`test2`는 용도 확인 전 유지한다
+17. Mission 2의 미끼/실제 탑승 중 기본 스토리안을 사용자가 확정하면 Story Mission DA에 반영한다. 코드는 양쪽을 지원한다
 
 ## 이동 후보 맵
 
@@ -120,9 +128,9 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`에서는 위 시험을 위해 Ac
 | Random Weather Manager | 8방향+무풍, 독립 변경 주기·풍속 범위·보간, Cardinal/m/s HUD, Editor 전용 무충돌 원뿔, Map Check 0/0·핵심 회귀 6/6 |
 | Random Weather 수동 확인 | 사용자가 Weather 화면 확인 완료를 보고함. 원뿔 Play 숨김·무충돌과 Random Wind 판독을 재작업 대상으로 두지 않음 |
 | 차량 Spline Route 시험 | 사용자가 별도 시험 맵 제작과 화면 확인 완료를 보고함. 후속은 실제 Mission Route/곡률 감속 요구가 생길 때 진행 |
-| 광섬유·지상 Drone 기반 | 프로젝트 소유 Definition/Integration BP, Sting·GC Drone 1 Visual, 빈 통 Mesh 슬롯·처짐 Spline 케이블, 면역/자폭, 최초 장거리 지면 획득·GroundDrive/4점 접지, 5종 선택 Flow. ExtendedRole 1/1·Prototype 8/8 성공 |
+| 광섬유·지상 Drone 기반 | 프로젝트 소유 Definition/Integration BP, FPV Body+Rotor 4·GC Drone 1 Poseable Visual, 빈 통 Mesh 슬롯·다점 곡선 Spline 케이블, 면역/자폭, 최초 장거리 지면 획득·GroundDrive/4점 접지, 차체 독립 Turret/Camera 조준과 총·유탄 Anchor, 5종 선택 Flow. ExtendedRole 1/1·FPVAsset 1/1·Prototype+Flow 13/13 성공 |
 | 강우·실내 감쇠 Greybox | OilRig Mask 기반 Plane 최대 112개, 기본 65×2.4cm·Opacity 0.22·개별 크기 편차, 위쪽/표면 Trace·0.35초 실내 감쇠, Weather 4/4·Map Check 0/0. 화면 확인 대기 |
 | 강우 Snapshot 디버그 프리뷰 | 전용 Weather TestMap 7/8/9 프로파일 전환은 유지하되 구형 파란 DrawDebug 선분은 기본 `Off/0개`다. Rain Visual과 겹치지 않으며 진단할 때만 수동 활성화 |
 | 비 기획 | Camera-follow GPU Rain·Effect Type·젖음/실내/Splash 최적화 계획과 Snapshot 표현값. Niagara/MPC/Audio는 다음 작업 |
 
-시험 맵 사용법은 [`docs/gameplay/DRONE_TEST_MAP_GUIDE.md`](docs/gameplay/DRONE_TEST_MAP_GUIDE.md), FPV 조작은 [`docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md`](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md), 기상은 [`docs/gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md`](docs/gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md), Mission Rule 설정은 [`docs/gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md`](docs/gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md), 전체 순서는 [`docs/planning/DRONE_TUTORIAL_STORY_PLAN.md`](docs/planning/DRONE_TUTORIAL_STORY_PLAN.md)를 참고한다.
+시험 맵 사용법은 [`docs/gameplay/DRONE_TEST_MAP_GUIDE.md`](docs/gameplay/DRONE_TEST_MAP_GUIDE.md), Mission BP 배치는 [`docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md`](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md), FPV 조작은 [`docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md`](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md), 기상은 [`docs/gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md`](docs/gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md), Mission Rule 설정은 [`docs/gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md`](docs/gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md), 전체 순서는 [`docs/planning/DRONE_TUTORIAL_STORY_PLAN.md`](docs/planning/DRONE_TUTORIAL_STORY_PLAN.md)를 참고한다.

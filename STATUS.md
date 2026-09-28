@@ -1,31 +1,44 @@
 # 현재 작업 상태
 
-기준일: 2026-09-23 (Asia/Seoul)
+기준일: 2026-09-29 (Asia/Seoul)
 
 ## 한눈에 보기
 
-- 현재 단계: Random Weather와 차량 Spline Route의 사용자 화면 확인·시험 맵 작업은 완료 보고를 받았다. Weather Manager 비 On/Off, 카메라 추종 강우 Greybox·실내 지붕 감쇠, 광섬유 자폭 드론의 빈 통 Mesh 슬롯·지면 추종 Spline 케이블, 최초 장거리 지면 획득을 포함한 UGV와 5종 선택 Flow를 구현했다
+- 현재 단계: `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`에 Figma Tutorial 8개 수업의 독립 Station과 Mission Definition을 구성했다. 전진 Trigger, 회전 Heading Zone, Gate Course, 기존 FPV/Payload, UGV 총·유탄과 NPC/고정포탑 표적을 로비에서 각각 선택할 수 있다. 단계별 클리어 타임·연속 진행·전체 완료 UI와 Story Mission Map은 아직 만들지 않았다
 - 조작 단계: 기존 쉬운 조작·제한 자세에 FPV Rate/Acro 송신기 Mode 1·Mode 2를 분리했다. 키보드는 W/S Pitch·Space/Ctrl Throttle을 유지하고 패드 세로축만 실제 Mode에 따라 바뀐다. 핸들링 UI는 느림/보통/빠름으로 바꾸고 현재는 최대 속도만 변경한다
-- 바로 다음 개발: 새 강우 실외→실내 화면 확인과 광섬유/UGV 조작·스케일 확인 → 첫 사격 전 약 1초 조준 체감과 Mode 1/2 패드 체감 확인 → Niagara/MPC/Audio·Mission 중 기체 교대 → Test Mission DA/진입 경로
+- 바로 다음 개발: FrontEnd에서 8개 Tutorial을 실제 손 조작해 판정·위치·탄속·낙차·결과 화면 확인 → 클리어 타임/연속 진행/전체 완료 UI → Warehouse Greybox → Mission 1 검증용 Story Map/Definition Vertical Slice
 - 검증 운영: 외부 OpenCode 모델 호출은 종료했다. 프로젝트 전용 Agent·모델 설정은 제거했으며 이후 구현과 검증은 Unreal 자동화와 사용자 수동 화면 확인으로 진행한다
-- Unreal Editor: 2026-09-23 확장 역할·강우 빌드와 자동화 뒤 종료 상태
+- Unreal Editor: 2026-09-29 Tutorial 8개 시험맵 Rebuild/Validate와 자동화 뒤 종료 상태
 - Production Training: 팀원이 실제 Tutorial 환경을 제작 중이므로 열람 외 저장·덮어쓰기·자동 재구성 금지
+- 작업컴 인계: `WORK_PC_START_HERE.md`와 `tools/work-pc/Test-DroneWorkstation.ps1` 준비 완료. Windows PowerShell 5.1에서 Git·LFS·필수 Asset·Build·Tutorial Validate 전체 경로가 `WORKSTATION_READY`로 통과했다. 현재 두 저장소 변경은 로컬 미커밋이므로 사용자가 Commit·Push해야 작업컴 Pull에 나타난다
 
 ## Git 기준
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal `D:\JGY\project\drone` | 작업 시작 기준 `main = origin/main = de81c19` | 비/실내 감쇠·광섬유/UGV·5종 선택 Source와 프로젝트 소유 Asset이 로컬 변경. 사용자 수정 Skeleton 3개는 보존 |
-| 문서 `D:\JGY\project\md` | 작업 시작 기준 `main = origin/main = 6527d7b` | 이번 상태·역할·Weather 가이드 최신화가 로컬 변경 |
+| Unreal 현재 확인 복제본 `C:\URproject\drone` | `main = origin/main = 19c8669` | 광섬유 FPV 외형·곡선 케이블·UGV 상부 조준 분리를 로컬 구현·검증. 커밋·푸시하지 않은 변경 존재 |
+| 문서 현재 작업 복제본 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` | `main = origin/main = e34ef4f` | Mission 프레임워크 가이드와 상태·보드·Mission 매트릭스 로컬 최신화. 커밋·푸시 전 |
 
-2026-09-23 작업 시작 시 두 저장소의 HEAD와 `origin/main`은 각각 일치했다. 이번 변경은 아직 커밋하지 않았고, 기존 `MG_Turret/GC_Drone_2/GC_Drone_3 Skeleton` 사용자 변경을 되돌리거나 저장하지 않았다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 설정을 남기지 않는다.
+2026-09-23 원격 Fetch 재확인 당시 두 저장소 모두 `HEAD...origin/main = 0/0`으로 일치했다. 이후 광섬유 FPV 외형·곡선 케이블·UGV 상부 조준 분리와 Mission 프레임워크/NPC 이동 Source·Asset·문서를 로컬에서 추가했다. 이번 작업에서도 새 커밋·푸시는 수행하지 않았다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 인증/설정을 남기지 않는다.
 
 ## 최신 완료 항목
 
+- 2026-09-29 `Lvl_DroneTutorialMissionTest`를 8개 수업 Station으로 확장했다. `DA_Mission_Tutorial_Forward/Heading/GateFlight/UGV_NPC/UGV_Turret`을 추가하고 로비 Catalog는 기존 Training 포함 9개 Mission을 노출한다
+- `ADroneTutorialHeadingZone`은 World Yaw 최단 각도, 기본 90°±8°·1초 유지와 Overlap 중 0.1초 Timer로 `HeadingAligned`를 한 번 보고한다
+- `UDroneGroundWeaponComponent`와 `ADronePlayerProjectile`을 추가했다. GroundWeapons Capability에서만 활성화하고 상부 Muzzle 기준 좌클릭 총 25 피해·우클릭 유탄 100 반경 피해를 사용한다
+- Tutorial 시험맵 Rebuild/Validate Map Check `0 errors / 0 warnings`, Build 성공, 새 Mission 집중 회귀 9/9 성공. 전체 `Drone.*`는 51개 성공과 기존 기준선 실패 7개이며 실패는 NPC 맵 고정 Actor 수, Shotgun PIE 감지, 보호 중 Production Training 코스 기대값이다
+- `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`에 Hover/Forward/Heading/Gate/FPV/Payload/UGV NPC/UGV Turret Station과 공용 Return Zone을 배치했다. Map Check 오류·경고 0
+- Tutorial 독립 Mission Definition 8개는 각 수업에 맞는 목표 순서와 허용 기체 한 종류를 가진다
+- `Hover Maintained` Mission Event와 `BP_TutorialHoverZone`을 추가했다. 기본 3초·75cm/s·수직 40cm/s·15°이며 Overlap 중 0.1초 Timer만 사용하고 Blueprint 조정 가능하다
+- Game Flow 기본 Catalog를 기존 Training과 Tutorial 독립 Mission 8개, 총 9개로 확장하고 C++ fallback 로비가 등록된 Mission 버튼을 모두 생성하도록 바꿨다
+- `/Game/Drone/Mission/Blueprints`에 Mission Manager·PlayerController·GameMode, 목표/실패/귀환 Trigger, 체력 100 Damage Target, Hover/Heading Zone 등 재사용 Blueprint를 생성했다. Manager는 출격 시 Controller가 자동 생성하므로 맵에 수동 배치하지 않는다
+- 공용 `DroneMissionTrigger`는 Active Player Drone/Actor Tag/Any Actor 정책, 목표 Event/실패 Action, 일회 실행과 명시 호출을 지원한다. `DroneMissionDamageTarget`은 표준 Damage·Health·파괴 연출 Event를 제공하고 Mission 중 동적 Spawn 대상도 Director에 등록한다
+- `/Game/Drone/AI/Animation`에 적 Rifle과 Friendly Unarmed용 프로젝트 전용 Idle/Walk/Run AnimBP·BlendSpace를 저장하고 Hostile Rifle/Shotgun·Friendly BP에 연결했다
+
 - Weather Manager에 `Enable Rain`, 자동 강우 Visual 생성 Class를 추가했다. 비 Off는 바람/Profile ID를 유지하고 Rain Snapshot 표현값만 0으로 만들며 Blueprint에서 런타임 전환 가능하다
 - `/Game/Drone/Weather/Blueprints/BP_DroneRainVisual`과 `/Game/Drone/Weather/Materials/M_DroneRainStreak_OilRigMask` 추가. OilRig 원본 `T_rain_Mask`를 참조하는 최대 112개 짧은 Plane 빗줄기(기본 65×2.4cm, 불투명도 0.22)를 재사용한다. 구형 파란 DrawDebug 선은 기본 Off/0개다. 카메라 위쪽 Trace·0.35초 실내 보간과 빗줄기별 WorldStatic/WorldDynamic 표면 Trace로 지붕·지면 아래 표시를 막으며 맵 전체 Weather Snapshot은 바꾸지 않는다
-- `/Game/Drone/Integrations/RoleDrones/BP_DroneFiberOpticIntegration`과 `DA_Drone_FiberOptic_Greybox` 추가. Sting Interceptor Visual, `JammingImmunity + ImpactDetonation`, 1인칭 기본 시점을 사용한다. `FiberSpoolMeshComponent`는 제작 예정 통을 넣는 빈 Static Mesh 슬롯이며 기본 위치 `(-32,0,-18)cm`만 잡았다. 통 출구부터 지나온 지면까지 Spline과 Cylinder Spline Mesh가 이어지고 마지막 구간은 아래로 처진다
-- `/Game/Drone/Integrations/RoleDrones/BP_DroneGroundUGVIntegration`과 `DA_Drone_GroundUGV_Greybox` 추가. GC Drone 1 Skeletal Mesh를 참조하고 `W/S` 전후·`A/D` 조향·`Q/E` 제자리 회전, 고도 입력 차단, 네 지점 지면 높이/Pitch/Roll 추종과 바람 Drift 비활성화를 적용한다. 높은 PlayerStart에서도 최대 10,000cm 아래 지면을 최초 획득해 즉시 접지한 뒤 4점 추종으로 전환하며, Visibility를 막지 않는 지형은 WorldStatic/WorldDynamic 보조 Trace로 찾는다. 거리·조향·Clearance·Trace·보간 수치는 BP에서 조정한다
+- `/Game/Drone/Integrations/RoleDrones/BP_DroneFiberOpticIntegration`과 `DA_Drone_FiberOptic_Greybox`는 FPV 자폭 드론과 동일한 본체·Rotor A~D Visual, `JammingImmunity + ImpactDetonation`, 1인칭 기본 시점을 사용한다. `FiberSpoolMeshComponent`는 제작 예정 통을 넣는 빈 Static Mesh 슬롯이며 기본 위치 `(-32,0,-18)cm`만 잡았다. 통 출구부터 지나온 지면까지 Spline과 Cylinder Spline Mesh가 이어지고, 마지막 지면점→통 구간은 기본 내부점 4개·포물선 처짐·이웃점 Hermite Tangent로 자연스럽게 휜다
+- `/Game/Drone/Integrations/RoleDrones/BP_DroneGroundUGVIntegration`과 `DA_Drone_GroundUGV_Greybox`는 GC Drone 1 Poseable Mesh를 참조한다. `W/S` 전후·`A/D` 조향·`Q/E` 제자리 회전은 하부 차체를 움직이지만 마우스/패드 시점은 `Turret` Yaw와 `Turret_Swivel` Pitch만 움직여 차체를 돌리지 않는다. Camera와 총·유탄 Muzzle Anchor도 같은 상부 Yaw/Pitch Pivot을 따른다. 고도 입력 차단, 네 지점 지면 높이/Pitch/Roll 추종, 바람 Drift 비활성화와 최초 10,000cm 지면 획득은 유지한다. 좌클릭 직사 총탄과 우클릭 중력 유탄 발사·피해 기능이 연결됐으며 정식 무기 Mesh는 아직 미정이다
 - Tutorial Mission과 GameFlow/선택 UI를 기존 3종에서 Scout/FPV/Drop/Fiber/Ground 5종으로 확장했다. 외부 공급 Skeleton은 수정하지 않고 Integration BP가 Visual만 참조한다
 
 - `/Game/Drone/AI/Blueprints/BP_DroneNPCAIController_Outdoor` 추가. Hostile Rifle/Shotgun에 Sight 60m, Lose Sight 70m, Smart Object 검색 반경 80m·높이 10m, 직전 지점 회피 15m를 적용하고 Blueprint Class Defaults에서 조정 가능하게 했다
@@ -55,6 +68,8 @@
 - Flight HUD 신호율·단계 경고, Blueprint 영상 노이즈 강도 Event 추가. 실제 화면 Noise Material·목표 정보 숨김은 미구현
 - Director에 `Jamming Exited`, `Jammer Disabled` Rule Event 연결. 자동화 Editor World에서 BP Delegate 구독이 진행되지 않아 게임 규칙 연결은 C++ Event로 분리하고 BP Delegate는 연출용으로 유지
 - Figma `Project:Droner`를 읽기 전용으로 확인해 Tutorial + 4개 Story Mission, 역할 Drone과 UI 흐름을 현재 코드에 대조. 원본은 미수정
+- 2026-09-24 Figma Tutorial 상세를 읽기 전용으로 재확인했다. `310:3`/`318:20`/`353:2` 기준 8개 수업, 단계별 브리핑·클리어 타임, 전체 완료 UI, Warehouse 환경 메모를 확인했다. 당시 공용 Mission 시험 맵은 3개 수업만 있었고, 2026-09-29에 8개 독립 Station으로 확장했다
+- 2026-09-28 `DRONE_TUTORIAL_IMPLEMENTATION_TEST_GUIDE.md`로 구현·검증 계약을 먼저 고정했고, 2026-09-29 전진·회전·Gate·UGV 총/유탄·NPC/포탑 처치까지 구현 상태로 갱신했다
 - Mission 성공이 남기는 `StoryFactsGrantedOnSuccess/RemovedOnSuccess`와 목표의 `Always/FactPresent/FactAbsent` 조건 추가. 미끼 차량→Mission 3 표적 처리와 실제 탑승 차량→Mission 3 처리 생략을 모두 데이터로 선택 가능
 - `JammingImmunity`가 실제 구현 Capability인 Drone만 활성 Zone의 재밍 영향을 무시하도록 Signal/Pawn 연결. 기존 세 Drone에는 면역을 임의 부여하지 않음
 - `Lvl_NPCSmartObjectGreybox`를 Unreal AssetTools로 `/Game/Drone/Maps/TestMap` 아래 이동하고 코드·생성 도구의 고정 경로 갱신
@@ -83,8 +98,14 @@
 
 ## 검증된 근거
 
-- 2026-09-23 MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공
-- `Drone.Weather` `4/4`, 통 슬롯·표시 Spline·고공 Spawn 접지를 검사하는 `Drone.Integration.ExtendedRoleDrones` `1/1`, Pawn 전체 회귀 `Drone.Prototype` `8/8`, 5종 Catalog를 검사하는 `Drone.Flow.Contract` `1/1`, 5종 선택 UI의 `Drone.Flow.FrontEndContract`·`FrontEndPIE` 각 `1/1` Success·실패 0
+- 2026-09-24 Tutorial Mission 추가 뒤 `DroneEditor Win64 Development` Build 성공. Test Map Rebuild/Validate와 Map Check `0 errors / 0 warnings`
+- `Drone.Tutorial.MissionLessonsTestMap`, `Drone.Mission.FrameworkAssets`, `Drone.Mission.ObjectiveRules`, `Drone.Flow.Contract`, `Drone.Flow.FrontEndContract`, `Drone.Flow.FrontEndPIE` 최종 `6/6 Success`, 오류·경고 0
+- 2026-09-24 MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. Mission Blueprint 7개 생성/컴파일/저장 검증과 적 Rifle·아군 Unarmed Idle/Walk/Run 자산 생성/검증 성공
+- `Drone.Mission.FrameworkAssets`, `Drone.Mission.ObjectiveRules`, `Drone.Mission.MissionSystemsTestMap` 최종 `3/3 Success`. 기존 `Drone.AI.NPCGreyboxAssets`는 AnimBP 연결 검사를 지난 뒤 Smart Object 맵의 낡은 정확한 Actor 수 기대값과 Ground Vehicle Auto Drive 설정에서 실패했으며 새 애니메이션 자산 생성 실패는 아니다
+- 2026-09-23 MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. 광섬유/UGV 변경 뒤 증분 Build도 성공
+- FPV 동일 본체·Rotor 4개, 광섬유 다점 곡선/Tangent, UGV Poseable Mesh의 `Turret`·`Turret_Swivel`, 차체 불변 상부 조준, 총·유탄 Anchor를 검사하는 `Drone.Integration.ExtendedRoleDrones` `1/1`과 `Drone.Integration.FPVAsset` `1/1` 성공
+- 변경 뒤 `Drone.Prototype + Drone.Flow` 전체 회귀 `13/13 Success`, 실패 0. `MissionEntryPIE`의 인터넷 연결 확인 요청 시간초과만 경고 1건이며 게임 로직 오류는 아니다
+- 기존 기준선 `Drone.Weather` `4/4`, 5종 Catalog를 검사하는 `Drone.Flow.Contract` `1/1`, 5종 선택 UI의 `Drone.Flow.FrontEndContract`·`FrontEndPIE` 각 `1/1` Success·실패 0
 - Weather 생성 도구 Validate와 Map Check `0 errors / 0 warnings`. Production `Lvl_DroneTraining`은 열거나 저장하지 않았다
 - 사용자가 Random Weather 화면 확인과 차량 Spline Route 시험 맵 제작·화면 확인을 완료했다고 보고했다
 - 2026-09-22 MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공
@@ -134,7 +155,7 @@
 ## 아직 확인하지 않은 항목
 
 - `BP_DroneRainVisual`이 RainStorm에서 파란 선 없이 짧고 부드러운 Mask 빗방울로 보이는지, Clear/비 Off에서 사라지는지, 지붕 아래에서 침투하지 않고 기본 0.35초 보간으로 줄며 밖에서 복원되는지 화면 확인
-- 광섬유 Drone의 Sting 외형·1인칭·ImpactDetonation·재밍 면역, 빈 `FiberSpoolMeshComponent`에 제작 통을 넣은 뒤 통 끝 케이블의 지면 누적·처짐을 화면 확인. Ground UGV는 높은 시작점에서 지면으로 내려와 W/S/A/D/Q/E와 4점 경사 추종을 유지하는지 확인
+- 광섬유 Drone이 FPV 자폭 드론과 같은 외형·Rotor 회전을 쓰는지, 1인칭·ImpactDetonation·재밍 면역과 빈 `FiberSpoolMeshComponent`에 제작 통을 넣은 뒤 케이블 지면 누적·곡률이 자연스러운지 화면 확인. Ground UGV는 높은 시작점에서 지면으로 내려와 W/S/A/D/Q/E와 4점 경사 추종을 유지하고, 마우스/패드 시점에서 차체는 고정된 채 상부 `Turret`/`Turret_Swivel`만 올바른 축으로 도는지 확인
 
 - TestMap Gate Frame 외형과 Trigger 정합, 3상태 색
 - Ring Handle 개별 이동과 Spline 투영 체감

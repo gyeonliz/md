@@ -14,6 +14,7 @@
 
 - `/Game/Drone/Maps/Lvl_DroneTraining`: 팀원이 실제 Tutorial 환경을 제작하는 Production 맵이다. 합의 전 저장·덮어쓰기·자동 재구성·분할·이동을 금지한다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`: Course, Gate, 역할 기능과 HUD를 자유롭게 검증하는 경량 시험 맵이다.
+- `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`: Hover/Forward/Heading/Gate/FPV/Payload/UGV NPC/UGV Turret 8개 독립 Mission이 공유하는 평면 Greybox 시험장이다. FrontEnd에서 Mission을 선택해 진입하며 `DroneTutorialMissionTest.Owned` Tag Actor만 생성 도구가 관리한다.
 - `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`: NPC·Smart Object·유인/무인 포탑·차량 전용 시험 맵이다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest`: 재밍·귀환·역할 Event 배치 전용 시험 맵이다. 직접 실행은 Prototype Flow이므로 Mission 완료 판정은 후속 Test Mission 진입에서 확인한다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest`: 기존 AI 맵의 순찰·MG 경합을 건드리지 않고 추가 Shotgun NPC의 감지·실제 8개 산탄 Projectile·탄약을 보는 독립 시험 맵이다. 작은 탄두/Tracer 교체 지점은 `/Game/Drone/AI/Blueprints/Projectiles/BP_ShotgunPelletProjectile`이다.
@@ -43,7 +44,8 @@
 - FPV Data Asset은 Rate/Acro+고기동을 기본으로 쓰며 중력·호버·Body Up 추력·선형 항력·Body Rate 응답 v1을 적용한다. 기반은 `UFloatingPawnMovement`이고 모터/PID/프로펠러 공력·질량/관성을 1:1 재현했다고 표현하지 않는다.
 - Rate/Acro Mode 2 축은 오른쪽 Stick Pitch/Roll, 왼쪽 세로 Throttle, 왼쪽 가로 Yaw다. 키보드는 `W/S Pitch`, `A/D Roll`, `Q/E Yaw`, `Space/Left Ctrl Throttle`로 각 축을 한 역할에만 연결한다. 공용 Move/Altitude/Yaw Action을 Acro에서 재해석하지 않으며 Mouse X/Y는 Rate 축이 아닌 직접 Yaw/Camera Pitch 개발 입력이다.
 - 쉬운/제한 자세에서 카메라·Collision과 외형 기울기를 구분하고, Rate/Acro에서는 Root 자세가 Camera와 Local Up 추진을 함께 결정한다.
-- 역할은 정찰 Scan, FPV Arm/자폭, Payload 픽업·드랍, Fiber의 재밍 면역+충돌 자폭, Ground UGV의 지상 주행을 프로젝트 소유 기능으로 사용한다. 현재 Catalog는 Scout/FPV/Drop/Fiber/Ground 5종이다.
+- 역할은 정찰 Scan, FPV Arm/자폭, Payload 픽업·드랍, Fiber의 재밍 면역+충돌 자폭, Ground UGV의 지상 주행과 상부 총·유탄을 프로젝트 소유 기능으로 사용한다. 현재 Catalog는 Scout/FPV/Drop/Fiber/Ground 5종이다.
+- Ground UGV 무장은 `GroundWeapons` Capability가 있을 때만 활성화한다. 좌클릭은 상부 총구 기준 직사 총탄, 우클릭은 중력·반경 피해 유탄이며 다른 Drone의 Primary/Secondary 역할 입력과 섞지 않는다.
 - 현재 속도·감도·Collision·Greybox Mesh는 최종값이 아니다.
 
 ## 기상 기준
@@ -72,6 +74,7 @@
 - 모든 `.uasset`, `.umap`은 크기와 무관하게 Git LFS로 관리한다.
 - LFS 비용 문제를 Threshold 변경으로 일반 Git에 옮기지 않는다. Core와 선택형 Asset Depot 분리를 별도로 검토한다.
 - Commit과 Push는 별도 지시가 없으면 사용자가 수행한다.
+- 작업컴 인계 전에는 두 저장소의 로컬 변경이 Commit·Push됐는지 사용자가 GitHub Desktop에서 확인한다. 원격과 HEAD가 같아도 작업 트리가 Dirty면 다른 PC에는 전달되지 않은 상태다.
 
 ## 문서 갱신 규칙
 

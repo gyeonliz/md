@@ -122,9 +122,11 @@ Pawn Class Defaults에서 다음 Struct를 연다.
 
 각 기체의 절대 기준값은 Data Asset의 `Flight Profile`에 둔다. Rate/Acro의 중앙 감도·최대 Rate·Expo·수직 속도·호버/중력/항력/Rate 응답은 `Flight Profile > Acro Rate Settings`에서 조정한다. 모드 전환 시에는 기준값에서 다시 계산하므로 반복 전환해도 배율이 누적되지 않는다.
 
-Ground UGV는 `BP_DroneGroundUGVIntegration` Class Defaults에서 `GroundSteeringRateDegreesPerSecond`, 앞뒤·좌우 4점 간격, Clearance, `GroundInitialAcquireDistanceCentimeters`, 일반 Trace 시작 높이/거리/채널, 높이·회전 보간 속도를 조정한다. 시작 시 최대 10,000cm 아래 지면을 한 번 획득하고 이후 4점 Suspension Trace를 사용한다. GroundDrive 기체는 Assisted 모드로 고정되고 고도 입력과 Weather Drift를 사용하지 않는다. W/S 이동 벡터의 Z도 제거해 비행하지 않으며 `Q/E`는 차체 제자리 회전 보조다. 최종 궤도/바퀴 물리 구현은 아니다.
+Ground UGV는 `BP_DroneGroundUGVIntegration` Class Defaults에서 `GroundSteeringRateDegreesPerSecond`, 앞뒤·좌우 4점 간격, Clearance, `GroundInitialAcquireDistanceCentimeters`, 일반 Trace 시작 높이/거리/채널, 높이·회전 보간 속도를 조정한다. 시작 시 최대 10,000cm 아래 지면을 한 번 획득하고 이후 4점 Suspension Trace를 사용한다. GroundDrive 기체는 Assisted 모드로 고정되고 고도 입력과 Weather Drift를 사용하지 않는다. W/S 이동 벡터의 Z도 제거해 비행하지 않으며 `A/D`는 주행 조향, `Q/E`는 차체 제자리 회전 보조다. 최종 궤도/바퀴 물리 구현은 아니다.
 
-광섬유 통은 `BP_DroneFiberOpticIntegration > Components > FiberSpoolMeshComponent`의 `Static Mesh` 칸에 넣는다. 현재 칸은 의도적으로 비어 있고 기본 Relative Location은 `X -32 / Y 0 / Z -18cm`다. 통에서 선이 나오는 위치는 Class Defaults의 `FiberSpoolExitOffset`, 지면 점 간격은 `FiberPointSpacingCentimeters`, 처짐은 `FiberSagDepthCentimeters`, 굵기는 `FiberCableThicknessScale`, 보존 길이는 `FiberMaximumLaidPoints`에서 조정한다. Spline은 이동 경로 아래의 지면 점을 누적하고 마지막 지면점에서 현재 통 출구까지 한 점을 내려 처지게 연결한다. Collision·Overlap·Navigation은 사용하지 않는다.
+UGV의 마우스/패드 시점 입력은 차체 Actor Yaw를 바꾸지 않는다. 프로젝트 소유 `UPoseableMeshComponent`가 공급 Mesh의 `Turret` Bone을 좌우로, `Turret_Swivel` Bone을 상하로 움직인다. Camera Boom은 `GroundUpperYawPivot → GroundWeaponPitchPivot` 아래에 붙어 같은 방향을 본다. 기본 한계는 Yaw `-160~160°`, Pitch `-18~38°`이고 Class Defaults에서 변경할 수 있다. `GroundGunMuzzleAnchor`와 `GroundGrenadeMuzzleAnchor`도 Pitch Pivot 아래에 준비돼 있어 나중에 총/유탄 Mesh·Projectile·반동을 연결할 기준점으로 사용한다. 현재는 Anchor와 조준 구조까지만 구현됐으며 무장 외형·발사 기능은 미구현이다. 공급사 Skeleton 자체는 수정하지 않는다.
+
+광섬유 드론 외형은 현재 FPV 자폭 드론과 동일한 `SM_DroneFPVBody + SM_RotorA~D`를 사용한다. 광섬유 통은 `BP_DroneFiberOpticIntegration > Components > FiberSpoolMeshComponent`의 `Static Mesh` 칸에 넣는다. 현재 칸은 의도적으로 비어 있고 기본 Relative Location은 `X -32 / Y 0 / Z -18cm`다. 통에서 선이 나오는 위치는 Class Defaults의 `FiberSpoolExitOffset`, 지면 점 간격은 `FiberPointSpacingCentimeters`, 처짐은 `FiberSagDepthCentimeters`, 굵기는 `FiberCableThicknessScale`, 보존 길이는 `FiberMaximumLaidPoints`에서 조정한다. 마지막 지면점→통 출구 구간은 `FiberHangingCurveSubdivisionCount`개의 내부점(기본 4)과 포물선 처짐을 만들고, 전체 점에는 `FiberSplineTangentScale`(기본 0.75)의 이웃점 기반 Hermite Tangent를 적용해 꺾인 V자 대신 완만한 곡선을 만든다. Collision·Overlap·Navigation은 사용하지 않는다.
 
 FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조정한다.
 

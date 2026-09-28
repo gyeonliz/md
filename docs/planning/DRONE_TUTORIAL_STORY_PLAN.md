@@ -1,12 +1,12 @@
 # Drone Tutorial·Mission 구현 계획
 
-기준일: 2026-09-23 (Asia/Seoul)
+기준일: 2026-09-24 (Asia/Seoul)
 
 ## 1. 목표와 우선순위
 
 현재 Drone Prototype을 다음 두 플레이 모드의 공통 기반으로 확장한다.
 
-1. **Tutorial**: 표시용 비충돌 경로와 순서형 Ring Gate를 따라 비행하고, 속도·고도·Lap/구간 기록을 비교하는 훈련 모드
+1. **Tutorial**: 호버링·전진·회전·게이트 자유비행과 역할별 자폭/드랍/UGV 전투를 단계적으로 익히고, 각 단계의 클리어 시간을 확인하는 훈련 모드
 2. **Mission**: 로비에서 임무를 선택하고 브리핑 트레일러 뒤 미션 맵으로 진입해 Drone을 선택한 다음 정찰·재밍·전투 방해 요소를 해결하는 모드
 
 2026-09-03 기획 변경으로 사람 Operator 직접 조작, NPC에게 걸어가 대화해 임무를 받는 흐름, Operator↔Drone 실시간 전환은 폐기했다. 새 프런트엔드·미션 진입 구조의 상세 기준은 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)가 우선한다.
@@ -80,6 +80,14 @@ Flight·Control·Mission 상태는 후속 카드다. 신호 세기·Jamming 단�
 Widget에서 매 프레임 Pawn을 검색하거나 Property Binding으로 계산하지 않는다. C++ Telemetry가 Multicast Event를 보내고 native 또는 후속 Blueprint Widget은 표시만 담당한다.
 
 ## 4. Tutorial Vertical Slice
+
+### Figma 전체 훈련 기준
+
+2026-09-24 Figma `Project:Droner`를 읽기 전용으로 재확인한 전체 순서는 `1-1 호버링 → 1-2 전진 → 1-3 회전 → 1-4 게이트 자유비행 → 2 자폭 드론 → 3 드랍 드론 → 4-1 UGV 적 NPC 처치 → 4-2 고정형 포탑 처치`다. 4-1과 4-2를 합칠지는 Figma에도 미정으로 남아 있다.
+
+각 단계는 `조작키·목표 브리핑 → 시작 → 플레이 → 클리어 타임 오버레이`를 반복하고, 마지막에 Tutorial 전체 완료 UI를 표시한다. 환경 메모는 Warehouse지만 최종 맵 확정으로 보지는 않는다.
+
+현재 `Lvl_DroneTutorialMissionTest`에서 Mission Flow까지 연결된 단계는 호버링·자폭·드랍 3개다. Gate/Lap은 별도 `Lvl_DroneTutorialSystemsTest` 기반이 있고, 전진·회전 독립 판정, UGV 총·유탄, 적 NPC/고정포탑 처치 수업, 단계별 브리핑·완료 UI와 전체 진행 저장은 남았다. Production `Lvl_DroneTraining`은 팀원 작업 보호 대상으로 유지하며 전체 8개 Station은 별도 Test Map에서 먼저 검증한다. 상세 대응표는 [`DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md`](DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md)를 따른다.
 
 현재 구현 경계는 다음과 같다.
 

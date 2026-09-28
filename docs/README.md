@@ -33,6 +33,9 @@
 ## Gameplay·Physics
 
 - [`DRONE_TYPES_AND_CONTROL_MODES.md`](gameplay/DRONE_TYPES_AND_CONTROL_MODES.md): Drone 역할과 조작 모드
+- [`DRONE_MISSION_FRAMEWORK_GUIDE.md`](gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md): Mission Manager·GameMode·목표/실패/귀환 Trigger·파괴 표적 BP와 NPC 이동 애니메이션 사용법
+- [`DRONE_TUTORIAL_IMPLEMENTATION_TEST_GUIDE.md`](gameplay/DRONE_TUTORIAL_IMPLEMENTATION_TEST_GUIDE.md): Figma 8개 Tutorial의 C++·Blueprint·Data Asset 구현 순서와 자동/수동 테스트 절차
+- [`DRONE_CODE_STRUCTURE_AUDIT_2026-09-29.md`](gameplay/DRONE_CODE_STRUCTURE_AUDIT_2026-09-29.md): 현재 코드 책임 구조, Tutorial 8개 시험장 구현 결과, 자동화 통과와 기존 회귀 실패 구분
 - [`DRONE_WEATHER_WIND_RAIN_PLAN.md`](gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md): 구현된 Profile·지속풍/돌풍 Runtime·시험 맵과 남은 Niagara 최적화 계획
 - [`DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md`](gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md): 목표 Rule·Event·Blueprint 설정과 검증
 - [`DRONE_JAMMING_GREYBOX_GUIDE.md`](gameplay/DRONE_JAMMING_GREYBOX_GUIDE.md): 재밍 신호·비행·HUD·Mission Zone 배치와 PIE 시험
@@ -49,6 +52,7 @@
 
 ## Git·협업·도구
 
+- [`../WORK_PC_START_HERE.md`](../WORK_PC_START_HERE.md): 작업컴에서 Pull·LFS·Build·Tutorial 검증 후 Codex 작업을 즉시 재개하는 시작 문서
 - [`GIT_UNREAL_GUIDE.md`](git/GIT_UNREAL_GUIDE.md): Unreal Git/GitHub 실전 절차
 - [`DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md`](git/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md): 팀원 Pull·LFS·Plugin 점검
 - [`DRONE_GIT_LFS_CAPACITY_PLAN.md`](git/DRONE_GIT_LFS_CAPACITY_PLAN.md): LFS 용량·비용 절감 계획
@@ -67,6 +71,7 @@
 ## Applications
 
 - [`PROJECT_EXPERIENCE_PLAN_HWP_GUIDE.md`](applications/PROJECT_EXPERIENCE_PLAN_HWP_GUIDE.md): 프로젝트형 일경험 수행계획서의 회색 예시 교체안·8주 일정·역할·예산 작성 가이드
+- [`PROJECT_EXPERIENCE_PLAN_COPY_PASTE_REPLACEMENTS.md`](applications/PROJECT_EXPERIENCE_PLAN_COPY_PASTE_REPLACEMENTS.md): 원본 HWP를 건드리지 않고 한글에서 항목별로 붙여넣는 제출용 최종 교체 문구
 
 ## History
 

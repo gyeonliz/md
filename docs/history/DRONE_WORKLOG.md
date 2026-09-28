@@ -1,6 +1,6 @@
 # Drone 개발 진행 기록
 
-기준일: 2026-09-15 (Asia/Seoul)
+기준일: 2026-09-29 (Asia/Seoul)
 
 이 문서는 Drone 개발의 **진행 이력**을 시간순으로 남긴다. 가장 최신의 현재 상태는 [`../WORKBOARD.md`](../../WORKBOARD.md), 확정 구현 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](../planning/DRONE_TUTORIAL_STORY_PLAN.md)를 따른다.
 
@@ -18,21 +18,31 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 ## 현재 스냅샷
 
-마지막 갱신: 2026-09-15 — Gate 4변 Frame과 통과 판정 정합화
+마지막 갱신: 2026-09-29 — Tutorial 8개 Mission 시험장과 작업컴 즉시 재개 인계
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | 경량 Tutorial Systems Test Map 생성·기술 검증 완료. TestMap 수동 Vertical Slice 대기 |
-| Unreal 기준선 | 로컬 추적 `main=origin/main=dc655ac`; 개인화기 추적/AI 회귀 Source·Test는 로컬 미커밋 |
-| 자동 검증 | Editor Build 성공. 개인화기 정책·Smart Object 기본값·Shotgun PIE·NPC 감지/MG/Search PIE·NPC 역할 자산 5/5 성공 |
-| PFN-06 진행도 | 필수 게이트 5/5 Pass, Done |
-| 지금 작업 중 | 개인화기 추적·포기와 MG 사망 교대 자동화 완료. Smart Object 맵 화면 회귀 및 기존 TestMap 수동 확인 대기 |
-| 차단 조건 | 자동 차단 없음. 팀원 Production Training은 별도 제작 중이므로 수정 금지 |
-| 다음 행동 | AI 추적/리시/재점유 화면 확인 → TestMap Gate/HUD → Acro/Shotgun/Weather 체감 확인 |
-| 다음 기능 | `TUT-05 완료 → TUT-04 실제 두 Lap → Mission 목표 Rule 데이터화·Jamming` |
-| 이후 | Flight 실패 세부 규칙, AI/MG·Jamming과 실제 비주얼 통합 |
-| Git 처리 | Unreal `dc655ac`, 문서 `8e4f1cf`가 각각 origin/main과 일치. Source/Test와 이번 문서는 로컬 변경이며 Commit·Push하지 않음 |
-| 협업 Git | 15:56 GitHub Desktop 자동 Stash에서 개발 파일만 선택 복구. Stash는 안전 확인 전까지 보존 |
+| 전체 단계 | Tutorial 8개 독립 Mission과 공유 TestMap 구현·자동 검증 완료. FrontEnd 수동 플레이 대기 |
+| Unreal 기준선 | `main=origin/main=19c86692`; Tutorial Mission Source·Asset·Test는 로컬 미커밋 |
+| 자동 검증 | Editor Build, Map Check 0/0, 신규 집중 회귀 9/9 성공. 전체 `Drone.*` 51개 성공·별도 기준선 7개 실패 |
+| 지금 작업 중 | 작업컴 즉시 재개 문서·점검 스크립트 마감. Tutorial 8개 화면 체감 확인 대기 |
+| 차단 조건 | 두 저장소를 사용자가 Commit·Push하기 전에는 작업컴 Pull로 현재 변경을 받을 수 없음 |
+| 다음 행동 | 메인컴 Push → 작업컴 Pull/LFS/`WORKSTATION_READY` → FrontEnd에서 Tutorial 8개 수동 검증 |
+| 다음 기능 | 단계별 클리어 타임·8개 연속 진행·전체 완료 UI → Warehouse Greybox |
+| 이후 | Mission 1 Story Vertical Slice, Mission 2/3 Story Fact·기체 교대, 정식 Rain 표현 |
+| Git 처리 | Unreal `19c86692`, 문서 `e34ef4f`가 각각 origin/main과 일치하지만 두 작업 트리에 로컬 변경이 있음. Codex는 Commit·Push하지 않음 |
+
+## 2026-09-29 — Tutorial 8개 Mission 시험장과 작업컴 인계 마감
+
+- `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`에 Hover, Forward, Heading, Gate Flight, FPV, Payload, UGV NPC, UGV Turret Station과 공용 Return Zone을 구성했다. 각 수업은 독립 Mission Definition과 허용 기체를 사용한다.
+- `ADroneTutorialHeadingZone`은 목표 World Yaw의 최단 각도 차이와 유지 시간을 검사하고 Overlap 중 0.1초 Timer만 사용한다. 기본은 동쪽 90°±8°, 1초 유지다.
+- Ground UGV에 별도 `GroundWeapons` Capability, `UDroneGroundWeaponComponent`, 직사/반경 모드 `ADronePlayerProjectile`을 연결했다. 좌클릭 총은 25 피해, 우클릭 유탄은 100 반경 피해의 Greybox 기본값이다.
+- FrontEnd 기본 Catalog는 기존 Training과 독립 Tutorial 8개, 총 9개 Mission을 노출한다. Production `/Game/Drone/Maps/Lvl_DroneTraining`은 열거나 저장하지 않았다.
+- `DroneEditor Win64 Development` Build, Tutorial TestMap Rebuild/Validate와 Map Check 0/0, 신규 집중 회귀 9/9를 통과했다. 전체 `Drone.*`는 51개 성공과 기존 맵 개수·Shotgun 표적 감지·보호 중 Training 기대값 관련 7개 실패다.
+- `WORK_PC_START_HERE.md`와 `tools/work-pc/Test-DroneWorkstation.ps1`을 추가했다. 작업컴에서 두 저장소 동기화, LFS 본문, UE 5.8 경로, 필수 Mission Asset, 선택적 LFS fsck·Build·Map Validate를 한 명령으로 확인한다.
+- Windows PowerShell 5.1이 UTF-8 BOM 없는 Tutorial 검증 래퍼의 한글 정규식을 잘못 읽는 문제를 실제 전체 실행에서 발견했다. Map Check 요약의 지역화 단어를 Unicode 코드 포인트로 구성하는 ASCII 안전 파서로 교체했고, 같은 `powershell.exe -ExecutionPolicy Bypass` 경로에서 Build 성공·LFS fsck·Map Check 0/0·8개 Mission 검증과 최종 `WORKSTATION_READY`를 확인했다.
+- 새 `.uasset`·`.umap` 20개는 모두 `.gitattributes`의 `filter=lfs` 적용을 확인했다. 두 저장소 `git diff --check`도 공백 오류 없이 통과했고 Unreal Editor/명령줄 Editor 프로세스는 종료 상태다.
+- 현재 두 저장소 변경은 로컬 미커밋이다. 사용자 요청에 따라 Codex는 Commit·Push하지 않았으며, 작업컴 이동 전 사용자가 GitHub Desktop에서 Unreal→문서 순서로 Commit·Push해야 한다.
 
 ## 2026-09-17 — 개인화기 추적·리시 포기·NPC 회전 안정화 마감
 

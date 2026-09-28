@@ -1,6 +1,6 @@
 # Drone 기능 시험 맵 가이드
 
-기준일: 2026-09-17
+기준일: 2026-09-29
 
 ## 9/17 안전 감사 추가
 
@@ -17,6 +17,7 @@ Weather TestMap은 최신 Editor 빌드 후 Play에서 숫자열 **7 Clear / 8 L
 | `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest` | 비행 Ring, 역할 표적, Carryable, HUD | 저장 계약·Map Check·자동화 완료, 화면 확인 대기 |
 | `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox` | 적·아군 NPC, Smart Object, 유인 MG, 자동포탑, 지면 추종 차량 | 기존 맵을 AssetTools로 이동, Asset·PIE·감지/수색 회귀 통과 |
 | `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest` | 재밍 강도/겹침, 귀환 Zone, 정찰·파괴·투하 대상 | 신규 경량 맵 생성, Map Check 0/0·저장 계약 자동화 통과 |
+| `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest` | 실제 Mission GameMode에서 Figma Tutorial 8개 수업을 각각 선택해 시험 | Mission Definition 8개, Map Check 0/0·집중 회귀 9/9 통과 |
 | `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest` | 샷건 NPC 감지·산탄 분포·투사체·탄약·정면 시선 안정화 검증 | 발광 Pellet 8개+짧은 Tracer 실제 BP, 몸/고개 3° 데드존, Map Check 0/0·Asset/PIE 자동화 2/2 통과 |
 | `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest` | 8방향+무풍 Random Weather, 조작 모드별 Drone 보정, 강우 데이터/디버그 프리뷰 체감 | Manager 원뿔 Editor 전용·무충돌, 이동 Bead 24개·Cardinal/m/s Readout·1/2/3/4 키·7/8/9 날씨 키. 비 선분은 TestMap 전용 DrawDebug 프리뷰이며 Niagara가 아님 |
 
@@ -34,6 +35,50 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 제작 중인 실�
 옆 공간에는 Recon, Impact, Payload 역할 표적 각 1개와 Carryable 1개를 배치했다. 바닥의 얇은 Cube 세 개는 구역 위치를 찾기 위한 Greybox 표식이며 충돌하지 않는다.
 
 이 맵의 기본 GameMode는 `BP_DronePrototypeGameMode`다. 맵을 바로 Play하면 Drone 조종·Signal HUD·역할 기능을 빠르게 확인할 수 있다. 다만 이 직접 실행은 Mission Flow를 통과하지 않으므로 Return Zone에 들어가도 Mission 완료 화면은 뜨지 않는다. Return 목표까지 확인하려면 후속 Test Mission Data Asset과 Mission 진입 경로가 필요하다.
+
+## Tutorial Mission 시험 맵 배치
+
+`Lvl_DroneTutorialMissionTest`는 `BP_DroneMissionGameMode`를 사용하며 로비에서 선택한 다음 8개 Definition이 같은 맵을 공유한다.
+
+- `DA_Mission_Tutorial_Hover`: Scout, Hover Zone 3초 → Return Zone
+- `DA_Mission_Tutorial_Forward`: Scout, 전방 Trigger 통과 → Return Zone
+- `DA_Mission_Tutorial_Heading`: Scout, 동쪽 90° ±8°를 1초 유지 → Return Zone
+- `DA_Mission_Tutorial_GateFlight`: Scout, Gate 4개를 순서·정방향으로 통과
+- `DA_Mission_Tutorial_FPV`: FPV Strike, Arm 뒤 체력 100 표적 파괴
+- `DA_Mission_Tutorial_Payload`: Drop, Payload Target 적중 → Return Zone
+- `DA_Mission_Tutorial_UGV_NPC`: Ground UGV, 체력 100의 정지 적 NPC 처치
+- `DA_Mission_Tutorial_UGV_Turret`: Ground UGV, 체력 100 고정 포탑 Greybox 파괴
+
+맵 직접 Play보다 `/Game/Drone/Maps/Lvl_DroneFrontEnd` 로비에서 Mission을 선택해 들어가야 Director·목표 HUD·성공/실패 화면까지 확인할 수 있다. 배치 재생성은 다음 명령만 사용한다.
+
+```powershell
+cd C:\URproject\drone
+.\Tools\AssetMigration\Invoke-DroneTutorialMissionTest.ps1 -Mode Validate
+.\Tools\AssetMigration\Invoke-DroneTutorialMissionTest.ps1 -Mode Rebuild
+```
+
+`Rebuild`는 `DroneTutorialMissionTest.Owned` Tag를 가진 전용 Actor만 다시 만든다. Production Training 맵은 대상이 아니다.
+
+### Figma Tutorial과의 대응 범위
+
+2026-09-24 Figma `Project:Droner`의 Tutorial 상세를 읽기 전용으로 다시 확인했다. 기획상 전체 수업은 `호버링 → 전진 → 회전 → 게이트 자유비행 → 자폭 드론 → 드랍 드론 → UGV 적 NPC 처치 → 고정형 포탑 처치`의 8개다. 각 수업은 조작키·목표 브리핑, 시작, 플레이, 클리어 타임 UI를 반복하고 마지막에 전체 완료 UI가 나온다.
+
+현재 `Lvl_DroneTutorialMissionTest`에는 8개 수업의 독립 Mission Flow와 Station이 모두 있다. 회전은 `BP_TutorialHeadingZone`, 게이트는 `BP_DroneTrainingCourse`, UGV는 상부 조준 Pivot을 따르는 총·유탄 Projectile을 사용한다. UGV 총은 좌클릭/패드 Right Shoulder, 유탄은 우클릭/패드 Left Shoulder다.
+
+기능 판정과 독립 재시도는 구현됐지만 단계별 클리어 타임·8개 연속 진행·전체 완료 UI는 아직 없다. Figma의 Warehouse 사용 메모도 반영하지 않은 평면 Greybox다. 이 시험장에서 수동 체감을 확인한 뒤 검증된 Station만 팀원 Tutorial 환경에 수동 이식한다.
+
+### 8개 수업 수동 확인
+
+항상 `/Game/Drone/Maps/Lvl_DroneFrontEnd`에서 Play하고 로비의 해당 수업을 선택한다. 맵을 직접 Play하면 선택 Mission이 없어 Director 전체 흐름을 확인할 수 없다.
+
+1. 호버링: Zone 안에서 속도와 자세를 안정시키고 3초 유지한 뒤 Return Zone으로 돌아간다.
+2. 전진: 시작점 앞 `TutorialMissionTest_ForwardGoal` Box를 통과한 뒤 Return Zone으로 돌아간다.
+3. 회전: Heading Zone 안에서 Yaw를 동쪽 90°로 맞춰 1초 유지한 뒤 Return Zone으로 돌아간다.
+4. 게이트: 네 Ring을 번호 순서와 Ring 로컬 `+X` 방향으로 통과한다.
+5. FPV: 좌클릭으로 Arm하고 충분한 속도로 `TutorialMissionTest_FPVTarget`에 충돌한다.
+6. 드랍: 좌클릭으로 화물을 투하해 Payload Target에 맞힌 뒤 Return Zone으로 돌아간다.
+7. UGV NPC: 차체는 이동 입력으로, 상부는 시점 입력으로 조준하고 좌클릭 총 4발 이상을 적중시킨다.
+8. UGV 포탑: 좌클릭 총 또는 우클릭 유탄으로 고정 표적을 파괴한다. 유탄은 중력 낙차가 있으므로 포신을 위로 보정한다.
 
 ## Shotgun Systems 시험 맵 배치
 
@@ -135,11 +180,14 @@ Unreal Editor를 닫은 상태에서 프로젝트 루트에서 실행한다.
 .\Tools\AssetMigration\Invoke-DroneWeatherTestMap.ps1 -Mode Rebuild
 ```
 
-각 `Rebuild`는 각각 `DroneMissionSystemsTest.Owned`, `DroneShotgunSystemsTest.Owned`, `DroneWeatherSystemsTest.Owned` Tag가 있는 Actor만 제거·재생성한다. 팀원이 수동 추가한 Actor는 이 Tag를 임의로 붙이지 않는다.
+각 `Rebuild`는 각각 `DroneMissionSystemsTest.Owned`, `DroneTutorialMissionTest.Owned`, `DroneShotgunSystemsTest.Owned`, `DroneWeatherSystemsTest.Owned` Tag가 있는 Actor만 제거·재생성한다. 팀원이 수동 추가한 Actor는 이 Tag를 임의로 붙이지 않는다.
 
 ## 자동화 근거
 
 - `Drone.Mission.MissionSystemsTestMap`: 두 Jammer 강도·겹침, Return Tag/Trigger, Actor 14개, Prototype GameMode 확인
+- `Drone.Tutorial.MissionLessonsTestMap`: 8개 Station, Mission GameMode, 8개 Definition의 기체 제한·목표 Event/Tag 순서 확인
+- `Drone.Tutorial.HeadingZone`: 최단 Yaw 각도와 기본 판정 수치 확인
+- `Drone.Weapons.GroundUGV`: 총·유탄 Component, 투사체 모드·피해 기본값과 Muzzle 연결 확인
 - `Drone.AI.NPCGreyboxAssets`: 이동된 Smart Object 맵의 저장 Asset 계약 확인
 - `Drone.AI.NPCGreyboxPIE`: 이동된 맵의 NPC·Station·Nav/PIE 기본 동작 확인
 - `Drone.AI.NPCPerceptionSearchPIE`: Drone 감지·수색·복귀 경로 확인
@@ -155,7 +203,7 @@ Unreal Editor를 닫은 상태에서 프로젝트 루트에서 실행한다.
 ## 다음 구현 경계
 
 1. 샷건 사격장의 산탄 가시성·피하기 체감·피격 피해를 Editor 화면에서 확인한다.
-2. Test Mission Data Asset과 개발용 진입 경로를 만들어 Return/Jammer Mission Event를 실제 PIE에서 진행한다.
+2. Tutorial 8개를 FrontEnd에서 손 조작해 위치·크기·각도·탄속·낙차를 확정한다.
 3. Camera-follow Niagara Rain·젖음 MPC·Audio를 Weather Snapshot에 연결하고 TestMap에서 성능을 측정한다.
 4. 중간/강한 재밍의 영상 Noise Material과 목표 정보 손실 표현을 붙인다.
 5. Mission 1 전용 Map/DA Vertical Slice를 만든다.

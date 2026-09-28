@@ -17,6 +17,8 @@
 | `DroneMissionObjectiveWidget.cpp` | 현재 목표와 `진행 n/m`, 제한 시간이 있으면 설정된 `제한 n초` 표시 |
 | `DroneMissionPlayerController.cpp` | 기존 문구 또는 새 Rule 중 하나라도 있으면 Drone 출격 가능 |
 | `DroneMissionReturnZone.h/.cpp` | 플레이어 Drone의 Box Overlap을 `Return To Base` 사건으로 보고하는 배치형 Trigger |
+| `DroneMissionTrigger.h/.cpp` | 목표 진행과 실패를 같은 Actor 정책으로 배치하는 공용 Box Trigger |
+| `DroneMissionDamageTarget.h/.cpp` | 체력 100 Greybox, 표준 Damage·파괴 Event와 동적 Mission Target 등록 |
 
 헤더에는 데이터 필드·공개 `ReportObjectiveEvent()`·남은 시간 getter·Event Handler를 선언하고, CPP에는 초기 목표 생성·Event 구독·타이머 시작/정리·진행/종료를 구현했다. UI는 Actor를 매 프레임 검색하지 않고 Director의 Snapshot 변경 Delegate를 받는다. 남은 시간의 초 단위 실시간 표시는 아직 기본 HUD에 없다. 필요하면 BP에서 `GetCurrentObjectiveTimeRemainingSeconds()`를 표시할 수 있다.
 
@@ -37,7 +39,7 @@
 | `StoryFactCondition` | `Fact Present` | 이전 성공 결과의 Fact가 있을 때만 이 목표를 실행 목록에 넣는다 |
 | `StoryFactId` | `Story.TargetStillAtLarge` | 조건이 `Always`가 아닐 때 검사할 GameInstance 수명 ID |
 
-드론이 정상 Scan을 완료하면 Director가 자동으로 `Recon Scan` 사건을 받는다. Payload는 **의도된 투하 표적에 적중한** `OnPayloadResolved`만 `Payload Delivered`로 센다. `UDroneHealthComponent`가 붙은 맵 시작 시점 Actor의 사망은 `Target Destroyed`로 받는다. Mission 시작 뒤 새로 Spawn되는 파괴 대상은 현재 자동 사망 구독 대상이 아니므로 그 Actor BP의 `OnDeath`에서 Director의 `ReportObjectiveEvent(Target Destroyed, DeadActor)`를 연결한다.
+드론이 정상 Scan을 완료하면 Director가 자동으로 `Recon Scan` 사건을 받는다. Payload는 **의도된 투하 표적에 적중한** `OnPayloadResolved`만 `Payload Delivered`로 센다. `UDroneHealthComponent`가 붙은 맵 시작 시점 Actor의 사망은 `Target Destroyed`로 받는다. Mission 시작 뒤 Spawn한 `BP_MissionDamageTarget`은 자신을 자동 등록한다. 다른 동적 Health Actor는 Director의 `RegisterObjectiveTarget()`을 Spawn 직후 호출하고 제거 전 `UnregisterObjectiveTarget()`을 호출한다.
 
 귀환의 최종 기지 위치는 미정이다. 현재는 `DroneMissionReturnZone`의 `ReturnTrigger` Box를 필요한 Mission Map에 배치하고 크기를 BP/Instance에서 조정하면 된다. 플레이어가 출격한 Drone만 Overlap Event를 보고하고, 현재 Rule이 `Return To Base`여야 진행한다. Rule의 `TargetId`를 쓴다면 Zone Actor Tags도 같아야 한다. 현재 어떤 Production 맵에도 Zone을 자동 배치하지 않았다. 별도 연출/조건이 필요한 귀환 Actor BP는 `Get Player Controller → Cast to DroneMissionPlayerController → Get Mission Director → ReportObjectiveEvent(Return To Base, 귀환 Actor)` 경계를 사용할 수 있다.
 
@@ -71,7 +73,7 @@ Figma Mission 2→3의 두 안은 다음처럼 둘 다 설정할 수 있다.
 ## 이상할 때 확인
 
 - 진행 0: `Event`가 현재 목표와 같은지, 표적 `Actor Tags`와 `TargetId` 철자가 같은지, Scan이 실제 완료됐는지, Payload가 intended target에 맞았는지 본다.
-- 파괴 목표 미진행: 대상에 `UDroneHealthComponent`가 있는지, Mission 시작 전에 맵에 있었는지 확인한다. 동적 Spawn 대상은 BP `OnDeath` 연결이 필요하다.
+- 파괴 목표 미진행: 대상에 `UDroneHealthComponent`가 있는지, 동적 Actor라면 Director에 등록했는지, 공격이 실제 `Apply Damage`를 호출하는지 확인한다.
 - 귀환 미진행: Overlap Actor가 드론인지, 해당 PlayerController가 Mission Director를 소유하는지, 귀환 Actor를 EventActor로 전달했는지 확인한다.
 - 재밍 목표 미진행: Zone이 Mission 시작 전에 맵에 있었는지, 현재 Event와 Zone Tags가 맞는지, 실제 출격 Drone이 이탈했는지, 해제는 `DisableJammer()`를 호출했는지 확인한다.
 - 출격 거부: `ObjectiveRules`가 모두 비어 있고 사용 가능한 `InitialObjectives`도 없는지, 중복 Objective ID·0 수량·음수 시간 제한이 있는지 확인한다.

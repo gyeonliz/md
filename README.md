@@ -6,6 +6,7 @@
 
 | 문서 | 용도 |
 |---|---|
+| [`WORK_PC_START_HERE.md`](WORK_PC_START_HERE.md) | 작업컴 Pull·LFS·Build·Tutorial 검증과 Codex 재개 단일 절차 |
 | [`STATUS.md`](STATUS.md) | 지금 실제로 확인된 구현·Git·검증 상태 |
 | [`WORKBOARD.md`](WORKBOARD.md) | 현재 작업, 사용자 확인 항목, 바로 다음 개발 |
 | [`CONTEXT.md`](CONTEXT.md) | 경로·맵 소유권·코드/Blueprint 책임 등 변경 금지 기준 |
@@ -21,7 +22,8 @@
 - Production 코드: `Source/Drone`
 - 프로젝트 소유 자산: `/Game/Drone`
 - 팀원 Tutorial 맵: `/Game/Drone/Maps/Lvl_DroneTraining`
-- 기능 시험 맵: `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`
+- Tutorial Mission 시험 맵: `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`
+- 기능·Course 시험 맵: `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`
 
 ## 문서 관리 규칙
 
