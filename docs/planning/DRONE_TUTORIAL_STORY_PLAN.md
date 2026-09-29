@@ -1,6 +1,6 @@
 # Drone Tutorial·Mission 구현 계획
 
-기준일: 2026-09-24 (Asia/Seoul)
+기준일: 2026-09-29 (Asia/Seoul)
 
 ## 1. 목표와 우선순위
 
@@ -14,15 +14,15 @@
 구현 순서는 아래와 같이 고정한다.
 
 ```text
-카메라·Mouse·Gamepad 조작 기준선
-→ Telemetry·공용 HUD 기반
-→ Tutorial 코스·Gate·Timing Vertical Slice
-→ Take Off·Landing·Crash Flight 상태
-→ 시작 트레일러·로비·미션 선택
-→ 미션 트레일러·맵 진입·Drone 선택
-→ Mission Director·목표 UI
-→ Enemy AI·MG·Jamming Mission
-→ 통합 Greybox와 외부 Drone 에셋 적용
+Tutorial 8개 FrontEnd 수동 검증
+→ 조건별 Best Lap SaveGame
+→ 단계별 결과·8개 진행·전체 완료 UI
+→ Warehouse Tutorial Greybox
+→ Story Mission별 격리 Greybox 4개 수동 확인·목표 고도화
+→ Mission 2 차량 Route·목적지 실패
+→ Mission 3 재밍·광섬유·UGV 교대
+→ Physics Sandbox의 벽 반발·4점 그물 Greybox를 실제 Dataflow/Chaos 자산과 비교
+→ Mission 4·정식 표현·통합 Greybox
 ```
 
 Tutorial을 먼저 완성해 조작감, 카메라, HUD, 비행 기록 계산을 검증한 뒤 Story에 재사용한다.
@@ -87,7 +87,7 @@ Widget에서 매 프레임 Pawn을 검색하거나 Property Binding으로 계산
 
 각 단계는 `조작키·목표 브리핑 → 시작 → 플레이 → 클리어 타임 오버레이`를 반복하고, 마지막에 Tutorial 전체 완료 UI를 표시한다. 환경 메모는 Warehouse지만 최종 맵 확정으로 보지는 않는다.
 
-현재 `Lvl_DroneTutorialMissionTest`에서 Mission Flow까지 연결된 단계는 호버링·자폭·드랍 3개다. Gate/Lap은 별도 `Lvl_DroneTutorialSystemsTest` 기반이 있고, 전진·회전 독립 판정, UGV 총·유탄, 적 NPC/고정포탑 처치 수업, 단계별 브리핑·완료 UI와 전체 진행 저장은 남았다. Production `Lvl_DroneTraining`은 팀원 작업 보호 대상으로 유지하며 전체 8개 Station은 별도 Test Map에서 먼저 검증한다. 상세 대응표는 [`DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md`](DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md)를 따른다.
+현재 `Lvl_DroneTutorialMissionTest`에는 호버링·전진·회전·게이트·자폭·드랍·UGV NPC·UGV 포탑 8개 독립 Mission Flow와 Station이 모두 연결됐다. Gate/Lap 세부 HUD는 별도 `Lvl_DroneTutorialSystemsTest`에도 유지한다. 남은 핵심은 FrontEnd 수동 체감, Best Lap 영구 저장, 단계별 브리핑·클리어 UI, 8개 연속 진행·전체 완료와 Warehouse 환경이다. Production `Lvl_DroneTraining`은 팀원 작업 보호 대상으로 유지하며 검증된 Station만 수동 이식한다. 상세 대응표는 [`DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md`](DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md)를 따른다.
 
 현재 구현 경계는 다음과 같다.
 
@@ -144,6 +144,16 @@ TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경
 - HUD는 이전 완주 평균, Best, 시간 Delta, 속도 Delta를 표시하며 비교 계산을 다시 구현하지 않는다.
 - 현재 실행 중 History만 사용한다. `USaveGame`은 아직 미구현이다.
 
+### TUT-04C — Best Lap 영구 저장 (다음 구현)
+
+- 첫 버전은 모든 시도 내역을 쌓지 않고 **유효한 Best Lap 한 건**만 저장한다. 실패·중단·0초 기록은 저장하지 않는다.
+- 기록 키는 `CourseId + DroneId + ControlMode + HandlingPreset`으로 만든다. 속도·조작 조건이 다른 기록을 하나의 순위로 섞지 않는다.
+- `UDroneTrainingRecordSaveGame`과 버전이 있는 저장 Struct를 프로젝트 코드에 두고 기본 Slot은 `DroneTrainingRecords_v1`, User Index는 0으로 고정한다.
+- 저장값은 Best Lap Time, 평균 속도, Segment 결과와 갱신 시각이다. 실행 중 전체 History와 이전 평균은 계속 Recorder가 소유하고 저장 파일을 무한히 키우지 않는다.
+- 맵 진입 시 저장 없음·구버전·손상 값을 안전하게 무시하고, 완주 시 기존 Best보다 빠를 때만 저장한다. 같은 기록은 중복 쓰지 않는다.
+- HUD는 `이번 실행 평균`과 `저장 최고 기록`을 구분해 표시한다. 저장 실패가 Mission 완료를 막아서는 안 되며 한 번의 명확한 로그만 남긴다.
+- 자동화는 첫 저장, 느린 기록 미갱신, 빠른 기록 갱신, 키 분리, 재로드 복원, 잘못된 값 무시를 검증한다. 수동 검증은 Editor를 완전히 종료·재실행해 Best가 남는지 확인한다.
+
 표시 예시는 다음과 같다.
 
 ```text
@@ -165,7 +175,7 @@ TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경
 - 잘못된 Gate: `다음 Gate를 통과하세요` 안내만 표시하고 기록은 변경하지 않음
 - Restart: 현재 시도를 폐기하고 Gate 0 상태로 초기화
 
-기록은 현재 실행 동안만 유지한다. TUT-04 비교·표시 계산을 검증한 뒤에만 `USaveGame`으로 Course별 Attempt Count, 평균, Best 기록을 영속화한다.
+이전 평균과 전체 History는 현재 실행 동안만 유지한다. 영구 데이터는 `TUT-04C`에서 조건별 Best Lap만 최소 범위로 시작하고, Attempt Count·전체 평균·온라인 순위는 후속 요구가 생길 때 추가한다.
 
 ### TUT-05 — Spline 기반 Ring 자동 배치 (코드 단위 검증 완료·Map 적용 대기)
 
@@ -201,7 +211,7 @@ TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경
 
 현재 공통 Mission Flow와 Training Mission의 Lap 성공·Drone 사망 실패 연결이 구현돼 있다. 2026-09-15~16 로컬 작업에서 아래 1번의 Rule 자료형/검증/Director Timer, 2번의 기본 Event와 Blueprint 배치형 귀환 Zone, 3번의 재밍 이탈/해제 Rule 연결을 추가했고 Training Data Asset의 한 Lap 목표를 새 Rule로 이행했다. 실제 새 Mission Map의 Actor Tag·귀환/재밍 Zone 배치와 여러 목표를 연쇄 실행하는 화면 검증은 아직 미완료다. 상세 설정은 [`DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md`](../gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md)를 따른다.
 
-2026-09-16 Figma에서 `골든 타임/인터셉트/베일 브레이커/엔드게임` 4개 Story 화면과 Drop/FPV/광섬유/UGV/장거리 타격 역할을 확인했다. Mission 2→3 표적 처리 시점은 같은 파일 안에서 두 문맥이 충돌한다. 코드는 성공 Story Fact와 조건부 목표로 미끼/실제 탑승 양쪽을 지원하고 저장 기본안은 확정하지 않았다. 2026-09-23 광섬유·UGV 프로젝트 소유 Definition/Integration Pawn과 5종 선택 Catalog까지 구현했으며 실제 Mission 중 교대는 남았다. 상세 대조는 [`DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md`](DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md)를 본다.
+2026-09-16 Figma에서 `골든 타임/인터셉트/베일 브레이커/엔드게임` 4개 Story 화면과 Drop/FPV/광섬유/UGV/장거리 타격 역할을 확인했다. Mission 2→3 표적 처리 시점은 같은 파일 안에서 두 문맥이 충돌한다. 코드는 성공 Story Fact와 조건부 목표로 미끼/실제 탑승 양쪽을 지원하고 저장 기본안은 확정하지 않았다. 2026-09-29 각 Story를 별도 TestMap/Definition으로 구성해 기존 Event가 실제 맵에서 이어지는 최소 Greybox를 만들었다. M1 선택 정보, M2 잔해 분기, M3 Jammer 해제·기체 교대, M4 장거리 타격·엔딩은 아직 남았다. 상세 대조는 [`DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md`](DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md)를 본다.
 
 1. 목표 종류와 필요 수량·제한 시간·대상 ID를 데이터로 정의 — 기반 구현 완료, 실제 새 Mission별 값은 미정
 2. 정찰 Scan, Payload 투하, 지정 대상 파괴와 귀환 Event를 목표 진행값에 연결 — Director 코드 완료, 맵 배치·PIE 수동 확인 대기
@@ -209,6 +219,24 @@ TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경
 4. 목표별 성공·실패·선택 목표 및 결과 평가값 확장
 5. MilitaryCamp·MilitaryBase·Battlefield 후보 맵마다 Mission Definition을 분리
 6. 한 Mission에서 광섬유 Drone→UGV/다른 Drone으로 이어지는 기체 교대 수명주기 구현 — 기체 Definition/Pawn과 5종 선택 Catalog는 완료, Mission 중 교대·상태 인계는 미구현
+
+### Story Vertical Slice 실행 순서
+
+2026-09-29 최소 시험판은 아래 네 맵으로 분리됐다.
+
+- `Lvl_DroneStory01_GoldenTimeTest`: Drop 물자 전달 → Return
+- `Lvl_DroneStory02_InterceptTest`: Spline 차량 핵심 표적 파괴. 차량이 목적지 Trigger에 먼저 도착하면 실패
+- `Lvl_DroneStory03_VeilBreakerTest`: 광섬유 Drone으로 재밍 구역 이탈 → Return
+- `Lvl_DroneStory04_EndgameTest`: Ground UGV로 지휘 표적 3개 파괴 → Return
+
+네 맵은 기능 연결용 Greybox이며 아래 항목은 각 단계의 고도화 조건이다.
+
+1. **Mission 1 골든 타임**: 별도 Test Story Map과 Definition에서 Drop Drone 물자 전달 → 선택적 정보 회수 → Return을 연결한다. 제한 시간 만료와 화물/필수 대상 파괴를 실패로 처리하고 기존 Trigger·Damage Target·Result UI만 재사용한다.
+2. **Mission 2 인터셉트**: 구현된 차량 Spline Route가 연속 주행을 담당하고 Smart Object는 정차·주차·도착 Slot만 담당한다. 목표 차량 Tag와 목적지 Trigger를 붙여 Intercept에서는 도착 실패, 후속 호송 Mission에서는 도착 성공으로 재사용한다. 목적지 전 FPV 격파, 잔해 정보 회수와 Story Fact 분기를 각각 검증한다.
+3. **Mission 3 베일 브레이커**: 광섬유 Drone 재밍 면역으로 진입 → Jammer 해제/파괴 → Ground UGV로 교대 → AI·무인 포탑 돌파를 작은 구간으로 연결한다. 기체 교대 시 Mission Director와 목표 진행을 유지한다.
+4. **Mission 4 엔드게임**: 장거리 타격 기능·본진 환경·엔딩 연출이 필요하므로 Mission 1~3 공통 흐름이 안정된 뒤 시작한다.
+
+각 Mission은 기능 TestMap에서 Event와 실패 규칙을 먼저 검증하고, 실제 MilitaryCamp/MilitaryBase/Battlefield 환경 이식은 마지막에 수행한다. Story 수치·고유명·영상은 사용자 확정 전 임의로 고정하지 않는다.
 
 ### Jamming
 
@@ -297,11 +325,20 @@ TUT-04B의 이전 성공 평균·Best 집계와 HUD 결과 행은 구현·자동
 
 자산 인수와 로드 검증을 완료하고 Commit `5a052c8`을 기능 Branch에 Push한 뒤 Merge Commit `fb1d7ad`로 `origin/main`에도 반영했다. `AST-02A`의 최소 이식·main 공유는 완료했지만 실제 Host/Wrapper 화면 연결은 후속 작업이다. 이 작업은 `TUT-04`의 이전 평균·Best 결과 UI와 별개다.
 
-## 10. Dataflow·Chaos 물리 환경 확장 (2026-08-26)
+## 10. 벽면 충돌·Dataflow/Chaos 물리 환경 확장 (2026-09-29)
+
+### Drone 벽면·날개 충돌 반응
+
+- 충돌 판정의 단일 기준은 계속 Collision Root다. Rotor/날개 Visual마다 독립 Physics Body를 활성화하지 않는다.
+- Hit Normal과 충돌 직전 속도로 반대 방향 분리 속도, 접선 감쇠, 회전 Kick, 피해와 짧은 조작 불능 후보를 계산한다.
+- `MinimumImpactSpeed`, `Restitution`, `TangentialDamping`, `AngularKick`, `DamageThreshold`, `RecoverySeconds`는 Blueprint에서 조정한다.
+- 정면·비스듬한 벽·모서리·저속 스침을 별도 자동화하고, 반복 충돌에서 벽 안으로 파고들거나 무한 진동하지 않는지 수동 확인한다.
 
 - 일부가 고정된 그물·위장망은 Chaos Cloth Asset과 Dataflow Weight Map/Kinematic Selection으로 제작한다.
-- 그물 변형은 물리 표현이고 Drone 포획·감속·Crash 판정은 별도 프로젝트 Trigger/상태가 소유한다.
+- 그물 배치는 첫 Spike에서 Blueprint의 네 모서리 Handle을 Viewport에서 직접 움직이고 폭·높이·처짐 Preview를 확인하는 방식으로 검증한다. 임의 다각형·Spline Surface는 필요성이 확인된 뒤 확장한다.
+- 그물은 날개·Rotor가 엉켜 감속·추력 저하·Roll/Yaw 교란을 일으키는 장애물이다. 그물 변형은 물리 표현이고 Drone의 탈출·Snared/Entangled·Crash 판정은 별도 Contact Probe/Interaction Volume과 프로젝트 상태가 소유한다.
+- 그물 파괴는 Cloth 자체 Runtime Tearing을 전제로 고정하지 않는다. 실제 5.8 Sandbox에서 `Cloth 절단 가능성`과 `분할된 그물 조각+파괴 가능한 연결부`를 비교해 결정한다.
 - 선택형 벽·출입구·Jammer 설비는 Dataflow로 만든 Geometry Collection, Anchor/World Support, Damage Threshold와 Strain Field를 사용한다.
 - 맵 전체 파괴는 범위에서 제외하고 명시적으로 지정한 대상만 파괴 가능하게 한다.
-- 첫 Sandbox는 `TUT-04` 이후 또는 사용자가 우선순위를 명시적으로 변경했을 때 시작한다. 실제 그물 충돌은 Flight Collision, 파괴 Mission은 Damage/Crash와 Mission Shell 뒤에 연결한다.
-- Plugin 활성화·자산 생성은 아직 하지 않았다. 상세 카드는 [`DRONE_CHAOS_DATAFLOW_PLAN.md`](../gameplay/DRONE_CHAOS_DATAFLOW_PLAN.md)를 따른다.
+- 사용자 우선순위 변경으로 `/Game/Drone/Maps/TestMap/Lvl_DronePhysicsSandbox`를 먼저 생성했다. 현재는 전용 Pawn에서만 켜지는 Hit Normal 반발, 벽 2개와 Blueprint 4 Corner/줄 수/처짐/굵기/피해 임계값을 조절하는 6×3m 절차형 Cube Strand 그물이다.
+- 현재 국소 충돌은 주변 Strand를 제거하고 일부를 물리 조각으로 떨어뜨리는 진단 기준이다. 실제 날개 걸림·잔존 Cloth 변형·감속/자세 교란/포획은 미구현이며, 일반 비행 Drone의 모든 벽 반발과 함께 다음 Physics 작업으로 확장한다.

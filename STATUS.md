@@ -4,24 +4,37 @@
 
 ## 한눈에 보기
 
-- 현재 단계: `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`에 Figma Tutorial 8개 수업의 독립 Station과 Mission Definition을 구성했다. 전진 Trigger, 회전 Heading Zone, Gate Course, 기존 FPV/Payload, UGV 총·유탄과 NPC/고정포탑 표적을 로비에서 각각 선택할 수 있다. 단계별 클리어 타임·연속 진행·전체 완료 UI와 Story Mission Map은 아직 만들지 않았다
+- 현재 단계: Tutorial 8개 독립 Station, Story Mission별 TestMap 4개, Training 4-Route 선택 시험맵과 함께 물리 Sandbox를 국소 절단 그물·조각 파괴 벽까지 확장했다. 로비 Catalog는 Tutorial 9항목과 Story Test 4항목, 총 13개를 노출한다. Route/Physics 시험맵은 로비가 아닌 직접 Play한다
 - 조작 단계: 기존 쉬운 조작·제한 자세에 FPV Rate/Acro 송신기 Mode 1·Mode 2를 분리했다. 키보드는 W/S Pitch·Space/Ctrl Throttle을 유지하고 패드 세로축만 실제 Mode에 따라 바뀐다. 핸들링 UI는 느림/보통/빠름으로 바꾸고 현재는 최대 속도만 변경한다
-- 바로 다음 개발: FrontEnd에서 8개 Tutorial을 실제 손 조작해 판정·위치·탄속·낙차·결과 화면 확인 → 클리어 타임/연속 진행/전체 완료 UI → Warehouse Greybox → Mission 1 검증용 Story Map/Definition Vertical Slice
+- 바로 다음 개발: 축소·충돌 전달 수정본 Physics Sandbox 수동 확인 → 실제 Chaos Cloth/Geometry Collection 비교 Spike → Best Lap SaveGame → Tutorial 진행/완료 UI → Story 1~4 목표·실패 규칙 고도화 순서다
 - 검증 운영: 외부 OpenCode 모델 호출은 종료했다. 프로젝트 전용 Agent·모델 설정은 제거했으며 이후 구현과 검증은 Unreal 자동화와 사용자 수동 화면 확인으로 진행한다
-- Unreal Editor: 2026-09-29 Tutorial 8개 시험맵 Rebuild/Validate와 자동화 뒤 종료 상태
+- Unreal Editor: 2026-09-29 Physics Sandbox 재생성·Map Check와 자동화 뒤 종료 상태
 - Production Training: 팀원이 실제 Tutorial 환경을 제작 중이므로 열람 외 저장·덮어쓰기·자동 재구성 금지
-- 작업컴 인계: `WORK_PC_START_HERE.md`와 `tools/work-pc/Test-DroneWorkstation.ps1` 준비 완료. Windows PowerShell 5.1에서 Git·LFS·필수 Asset·Build·Tutorial Validate 전체 경로가 `WORKSTATION_READY`로 통과했다. 현재 두 저장소 변경은 로컬 미커밋이므로 사용자가 Commit·Push해야 작업컴 Pull에 나타난다
+- 작업컴 인계: `WORK_PC_START_HERE.md`와 `tools/work-pc/Test-DroneWorkstation.ps1` 준비 완료. Windows PowerShell 5.1에서 Git·LFS·필수 Asset·Build·Tutorial Validate 전체 경로가 `WORKSTATION_READY`로 통과했다. 2026-09-29 구현과 문서는 원격 `main`에 반영됐으며 작업컴에서는 Pull·LFS 후 같은 점검만 다시 수행하면 된다
 
 ## Git 기준
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal 현재 확인 복제본 `C:\URproject\drone` | `main = origin/main = 19c8669` | 광섬유 FPV 외형·곡선 케이블·UGV 상부 조준 분리를 로컬 구현·검증. 커밋·푸시하지 않은 변경 존재 |
-| 문서 현재 작업 복제본 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` | `main = origin/main = e34ef4f` | Mission 프레임워크 가이드와 상태·보드·Mission 매트릭스 로컬 최신화. 커밋·푸시 전 |
+| Unreal `D:\JGY\project\drone` | 기준 `main = origin/main = 7ad9a23` | Physics/Story·Training Route TestMap·코드·Tutorial Hover 표식이 로컬 미커밋 변경으로 남아 있음 |
+| 문서 `D:\JGY\project\md` | `main = origin/main = 578304f` | Physics/Story·Route·이번 국소 파괴 최신화가 로컬 미커밋 변경으로 남아 있음 |
 
-2026-09-23 원격 Fetch 재확인 당시 두 저장소 모두 `HEAD...origin/main = 0/0`으로 일치했다. 이후 광섬유 FPV 외형·곡선 케이블·UGV 상부 조준 분리와 Mission 프레임워크/NPC 이동 Source·Asset·문서를 로컬에서 추가했다. 이번 작업에서도 새 커밋·푸시는 수행하지 않았다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 인증/설정을 남기지 않는다.
+2026-09-29 원격 Fetch 재확인에서 두 저장소 모두 `HEAD...origin/main = 0/0`이었다. Unreal `7ad9a23`에는 Tutorial 8개 Mission·공유 시험맵·UGV 무장·Mission Framework가, 문서 `578304f`에는 대응 가이드와 상태 기록이 포함돼 있다. 보조 원격 `yook34/main=c845430`은 현재 중앙 `main`보다 57 Commit 뒤이며 고유 Commit은 0개다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 인증/설정을 남기지 않는다.
 
 ## 최신 완료 항목
+
+- 2026-09-29 `/Game/Drone/Maps/TestMap/Lvl_DroneTrainingRouteSelectionTest`에 직선·좌곡선·우곡선·상승 슬라럼 Course 4개와 Route Selector를 추가했다. `1~4`는 고정 선택, `5`는 현재 Route를 제외한 무작위 선택이며 전환 시 이전 Gate/Lap을 초기화하고 HUD 기록 Source도 활성 Course로 바꾼다
+- Route 맵 Map Check 0/0, `Drone.Tutorial.TrainingRouteSelector`, `TrainingRouteSelectionTestMap`, 실제 입력 `TrainingRouteSelectionPIE`, 기존 `TrainingCourse`, `TrainingGateSequence`, `TrainingLapRecorder`가 모두 Success다
+- 2026-09-29 `/Game/Drone/Maps/TestMap/Lvl_DronePhysicsSandbox`와 Story Mission별 `Lvl_DroneStory01_GoldenTimeTest`, `02_InterceptTest`, `03_VeilBreakerTest`, `04_EndgameTest`를 생성했다. 5개 맵 모두 Map Check `0 errors / 0 warnings`다
+- Physics Sandbox에 기존 Drone에는 영향을 주지 않는 시험용 벽 충돌 반발 Component와 전용 Pawn/GameMode를 추가했다. Hit Normal 기준 반사·최소 분리 속도·반발 계수·최대 속도는 Blueprint 조절값이며 정면/비스듬한 반사 계산 자동화가 통과했다
+- 첫 화면 확인에서 그물 약 13×12m와 벽 약 12.8×9.2m가 시험 Drone 대비 지나치게 컸고, Drone의 `OnActorHit`가 반발만 처리하고 맞은 Actor에 Point Damage를 전달하지 않아 그물·벽이 실제 충돌로 깨지지 않는 결함을 확인했다. 그물 기본값을 6×3m, 파괴 벽을 약 5.55×3.69m로 축소하고 최소 충돌 속도를 2.5m/s로 낮췄으며, 충돌 위치·방향을 그대로 Point Damage로 전달하도록 수정했다
+- `BP_DroneNetPlacementRig`는 네 Corner, 가로/세로 줄 수, 분할 수, 중심 처짐, 줄 굵기, 충돌, 파괴 반경·최소 속도를 Blueprint에서 조정한다. 충돌/Point Damage 위치 주변 Segment를 원본 격자에서 제거하고 최대 16개를 중력·충격량이 적용된 물리 조각으로 5초간 떨어뜨리며 Reset에서 격자와 파편을 함께 복구한다
+- `BP_DroneBreakableWallPanel`은 온전한 벽을 ISM 격자로 유지하고 맞은 반경의 조각만 물리 Component로 바꾼다. Columns·Rows·조각 크기·간격·반경·Impulse·최소 속도를 Blueprint에서 조정한다
+- `Dataflow`, `GeometryCollectionPlugin`, `ChaosClothAsset`, Editor 전용 `ChaosClothAssetEditorCore`를 프로젝트에 명시 활성화했다. 실제 Chaos Cloth/Geometry Collection 생산 자산은 아직 0개다
+- 최종 Physics 의도를 정정했다. 그물은 단순 절단물이 아니라 날개·Rotor가 엉켜 감속·추력 저하·자세 교란·포획/추락을 만드는 장애물이며, 현재 절단/낙하 조각은 진단용이다. 벽 반발은 특정 Sandbox 벽이 아니라 일반 Flight Pawn이 모든 유효 Blocking 벽·기둥·구조물에 닿을 때 파고듦·비비기를 막는 공통 규칙으로 확장해야 한다. 두 최종 규칙은 아직 미구현이다
+- Story Test Mission 4개를 로비 Catalog에 추가했다. M1은 Drop 전달→귀환, M2는 Spline 차량 핵심 표적 파괴와 목적지 도착 실패, M3는 광섬유 Drone 재밍 구역 이탈→귀환, M4는 UGV 지휘 표적 3개 파괴→귀환을 시험한다
+- `Drone.Tutorial.HoverMissionPIE`를 추가해 FrontEnd 선택부터 Scout Spawn, Hover Zone 진입, 안정 자세 3초 유지와 `ReturnToBase` 목표 전환까지 실제 PIE로 검증했다. 결과는 Success이며 Tutorial TestMap의 보이지 않던 Hover Box에는 충돌 없는 모서리 표식 4개를 추가했다
+- 2026-09-29 최종 회귀에서 `Drone.Physics.Breakables`, `Drone.Physics.CollisionResponse` 2/2와 `Drone.Mission.StoryPhysicsTestMaps` 1/1이 오류·경고 없이 Success다. `Drone.Tutorial.MissionLessonsTestMap`, `Drone.Flow.Contract`, `Drone.Flow.FrontEndContract`, `Drone.Flow.FrontEndPIE`의 기존 성공 기준도 유지한다. FrontEnd는 등록 Mission 13개와 버튼 13개를 확인했다
 
 - 2026-09-29 `Lvl_DroneTutorialMissionTest`를 8개 수업 Station으로 확장했다. `DA_Mission_Tutorial_Forward/Heading/GateFlight/UGV_NPC/UGV_Turret`을 추가하고 로비 Catalog는 기존 Training 포함 9개 Mission을 노출한다
 - `ADroneTutorialHeadingZone`은 World Yaw 최단 각도, 기본 90°±8°·1초 유지와 Overlap 중 0.1초 Timer로 `HeadingAligned`를 한 번 보고한다

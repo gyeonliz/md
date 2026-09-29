@@ -15,6 +15,7 @@ Weather TestMap은 최신 Editor 빌드 후 Play에서 숫자열 **7 Clear / 8 L
 | 맵 | 담당 기능 | 현재 상태 |
 |---|---|---|
 | `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest` | 비행 Ring, 역할 표적, Carryable, HUD | 저장 계약·Map Check·자동화 완료, 화면 확인 대기 |
+| `/Game/Drone/Maps/TestMap/Lvl_DroneTrainingRouteSelectionTest` | 편집 가능한 Training Route 4개와 고정/무작위 선택 | `1~4` 고정·`5` 무작위, 각 Gate 5개, Map Check 0/0·실제 키 PIE 통과 |
 | `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox` | 적·아군 NPC, Smart Object, 유인 MG, 자동포탑, 지면 추종 차량 | 기존 맵을 AssetTools로 이동, Asset·PIE·감지/수색 회귀 통과 |
 | `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest` | 재밍 강도/겹침, 귀환 Zone, 정찰·파괴·투하 대상 | 신규 경량 맵 생성, Map Check 0/0·저장 계약 자동화 통과 |
 | `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest` | 실제 Mission GameMode에서 Figma Tutorial 8개 수업을 각각 선택해 시험 | Mission Definition 8개, Map Check 0/0·집중 회귀 9/9 통과 |

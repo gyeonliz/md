@@ -14,6 +14,7 @@
 
 - `/Game/Drone/Maps/Lvl_DroneTraining`: 팀원이 실제 Tutorial 환경을 제작하는 Production 맵이다. 합의 전 저장·덮어쓰기·자동 재구성·분할·이동을 금지한다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`: Course, Gate, 역할 기능과 HUD를 자유롭게 검증하는 경량 시험 맵이다.
+- `/Game/Drone/Maps/TestMap/Lvl_DroneTrainingRouteSelectionTest`: Route 4개를 편집하고 Play 중 `1~4` 고정 선택·`5` 무작위 선택을 검증하는 독립 시험 맵이다. Production Training과 분리한다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`: Hover/Forward/Heading/Gate/FPV/Payload/UGV NPC/UGV Turret 8개 독립 Mission이 공유하는 평면 Greybox 시험장이다. FrontEnd에서 Mission을 선택해 진입하며 `DroneTutorialMissionTest.Owned` Tag Actor만 생성 도구가 관리한다.
 - `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`: NPC·Smart Object·유인/무인 포탑·차량 전용 시험 맵이다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest`: 재밍·귀환·역할 Event 배치 전용 시험 맵이다. 직접 실행은 Prototype Flow이므로 Mission 완료 판정은 후속 Test Mission 진입에서 확인한다.
@@ -47,6 +48,15 @@
 - 역할은 정찰 Scan, FPV Arm/자폭, Payload 픽업·드랍, Fiber의 재밍 면역+충돌 자폭, Ground UGV의 지상 주행과 상부 총·유탄을 프로젝트 소유 기능으로 사용한다. 현재 Catalog는 Scout/FPV/Drop/Fiber/Ground 5종이다.
 - Ground UGV 무장은 `GroundWeapons` Capability가 있을 때만 활성화한다. 좌클릭은 상부 총구 기준 직사 총탄, 우클릭은 중력·반경 피해 유탄이며 다른 Drone의 Primary/Secondary 역할 입력과 섞지 않는다.
 - 현재 속도·감도·Collision·Greybox Mesh는 최종값이 아니다.
+
+## 비행 충돌·그물 장애물 기준
+
+- 벽 반발은 `PhysicsSandbox_Wall` 같은 특정 시험 Actor의 전용 기능이 아니다. 비행 Drone의 Collision Root가 일반적인 Blocking 벽·기둥·구조물에 닿으면 표면 안으로 파고들거나 계속 비비지 않고, 충돌 법선 바깥쪽으로 분리·반발하는 공통 비행 규칙이어야 한다.
+- 바닥 착륙, 천장, 얇은 장애물과 고속 충돌은 같은 결과로 뭉개지 않는다. 표면 법선·접근 속도·Flight 상태로 `착륙 가능 접촉 / 일반 반발 / 강한 충돌·Crash`를 구분하고, 현재 시험 수치는 최종값으로 확정하지 않는다.
+- 그물의 주 역할은 파괴물이 아니라 Rotor·날개가 걸려 조종을 방해하는 물리 장애물이다. 접촉 시 Cloth가 휘고 감기며, 기체는 감속·추력 저하·Roll/Yaw 교란을 받고 일정 조건을 넘으면 `Snared/Entangled` 또는 Crash·Mission 실패로 이어져야 한다.
+- 복잡한 Visual Rotor마다 독립 강체를 두지는 않는다. 단일 Collision Root 원칙은 유지하되 가벼운 Wing/Rotor Contact Probe 또는 별도 Net Interaction Volume으로 “날개가 걸렸다”는 판정을 보강한다.
+- Chaos Cloth 변형은 화면 표현을 담당한다. 포획·탈출·추락 판정의 단일 기준은 Frame Rate와 Cloth Solver 결과에 직접 의존하지 않는 프로젝트 C++ 상태와 접촉 누적값이 소유한다.
+- 현재 Cube Strand 국소 절단·물리 낙하 기능은 Hit 위치와 물리 반응을 확인하기 위한 Runtime 진단용이다. 최종 그물 장애물의 핵심 완료 조건으로 보지 않으며, 절단 가능 여부는 Mission/도구 요구가 있을 때 별도 옵션으로 판단한다.
 
 ## 기상 기준
 

@@ -21,6 +21,7 @@
 - [`DRONE_PROTOTYPE_IMPLEMENTATION.md`](tutorial/DRONE_PROTOTYPE_IMPLEMENTATION.md): Prototype Pawn 구현
 - [`DRONE_PROTOTYPE_INPUT_CONTRACT.md`](tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md): 입력 계약
 - [`DRONE_PROTOTYPE_PIE_CHECKLIST.md`](tutorial/DRONE_PROTOTYPE_PIE_CHECKLIST.md): 입력 수동·자동 검증
+- [`DRONE_TRAINING_ROUTE_SELECTION_TEST_GUIDE.md`](tutorial/DRONE_TRAINING_ROUTE_SELECTION_TEST_GUIDE.md): Route 4개 Spline 편집과 `1~4` 고정·`5` 무작위 선택 시험
 
 ## AI·Smart Object·Turret
 
@@ -43,6 +44,7 @@
 - [`DRONE_TRUCK_AND_SMART_OBJECT_ROUTE_GUIDE.md`](gameplay/DRONE_TRUCK_AND_SMART_OBJECT_ROUTE_GUIDE.md): 팀원용 Truck 직선 시험·Spline Route 설계안과 Smart Object 점 동선 배치
 - [`DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md`](gameplay/DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md): 4점 차량·Drone 기울기·피격 흔들림
 - [`DRONE_CHAOS_DATAFLOW_PLAN.md`](gameplay/DRONE_CHAOS_DATAFLOW_PLAN.md): 그물·파괴 Physics Spike
+- [`DRONE_STORY_PHYSICS_TEST_MAP_GUIDE.md`](gameplay/DRONE_STORY_PHYSICS_TEST_MAP_GUIDE.md): Physics Sandbox·Story 4개 격리 TestMap 진입법, 수동 확인과 현재 Greybox 한계
 
 ## Assets
 

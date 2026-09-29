@@ -6,14 +6,14 @@
 
 ## 1. 현재 인계 상태
 
-- 인계 준비 시점 Unreal 원격 기준: `main = origin/main = 19c86692f904914a3e913ed4483d1e83ec2eb87d`
-- 인계 준비 시점 문서 원격 기준: `main = origin/main = e34ef4f30f46b785477573e6d3193303272bd94c`
-- 위 Commit 이후 Tutorial 8개 Mission, 공유 시험맵, Heading 판정, UGV 총·유탄, NPC 걷기 자산, FrontEnd Mission 목록과 문서 변경을 메인컴 로컬에서 준비했다.
-- 이 인계 문서를 작성할 때 Codex는 Commit·Push하지 않았다. 사용자가 이후 두 저장소를 Push해야 작업컴이 같은 상태를 받을 수 있다.
+- 최신 확인 Unreal 원격 기준: `main = origin/main = 7ad9a236109b81772005f2ec392372ebbfc245d3`
+- 최신 확인 문서 원격 기준: `main = origin/main = 578304f52737fcb7abc047f7a9b98aa2724f1e5c`
+- Tutorial 8개 Mission, 공유 시험맵, Heading 판정, UGV 총·유탄, NPC 걷기 자산은 위 원격 기준에 포함됐다. 현재 작업컴에는 여기에 Physics Sandbox 1개·Story TestMap 4개·Hover 실제 PIE가 로컬 미커밋 변경으로 추가돼 있다.
+- 2026-09-29 `git fetch --all --prune`에서 두 저장소의 `HEAD...origin/main = 0/0`과 Clean 상태를 확인했다. 별도 Commit·Push 선행 없이 작업컴에서 Pull·LFS를 진행하면 된다.
 - 이미 작업컴에서 이 문서를 Pull해 읽고 있다면 4절 점검 결과를 우선한다. 두 저장소가 원격과 일치하고 필수 Asset 검사가 통과하면 전달이 완료된 상태다.
 - Codex 원시 세션 폴더, `auth.json`, API Key, 토큰은 복사하지 않는다.
 
-## 2. 메인컴을 떠나기 전 사용자 작업
+## 2. 새 변경을 메인컴에서 만든 경우의 사용자 작업
 
 Unreal Editor와 실행 중인 명령줄 Editor를 모두 종료한다. 그다음 GitHub Desktop에서 아래 순서로 처리한다.
 
@@ -32,7 +32,7 @@ Unreal Editor와 실행 중인 명령줄 Editor를 모두 종료한다. 그다�
 3. Commit 제목 예시: `작업컴 인계 문서와 튜토리얼 가이드 최신화`
 4. Commit 후 `Push origin`을 누른다.
 
-사용자가 Commit·Push하기 전까지 Codex는 현재 변경을 작업컴으로 전달할 수 없다. `git lfs push`만으로는 Commit이 GitHub 이력에 올라가지 않으므로 GitHub Desktop의 `Push origin`까지 성공해야 한다.
+원격의 2026-09-29 기준선은 이미 Push됐지만, Physics·Story·Hover 후속 변경은 아직 로컬 미커밋 상태다. `git lfs push`만으로는 Commit이 GitHub 이력에 올라가지 않으므로 검토 후 Commit과 GitHub Desktop의 `Push origin`까지 성공해야 한다.
 
 ## 3. 작업컴에서 받는 순서
 
@@ -95,7 +95,7 @@ D:\JGY\project\md\WORKBOARD.md를 먼저 읽고 현재 Git 상태와 대조해.
 Production /Game/Drone/Maps/Lvl_DroneTraining은 저장하거나 재구성하지 말고,
 테스트는 /Game/Drone/Maps/TestMap에서 진행해.
 커밋과 푸시는 내가 요청하기 전에는 하지 마.
-우선 FrontEnd에서 Tutorial 8개 수동 검증 준비부터 이어가.
+우선 docs/gameplay/DRONE_STORY_PHYSICS_TEST_MAP_GUIDE.md에 따라 Physics·Story 5개 맵과 Tutorial Hover 수동 검증부터 이어가.
 ```
 
 과거 대화 전체를 다시 설명할 필요는 없다. 위 네 문서와 실제 저장소 상태가 현재 기준이다.
@@ -123,6 +123,9 @@ UGV는 `W/S` 전후, `A/D` 조향, `Q/E` 제자리 회전이며 마우스/패드
 - Tutorial Mission TestMap Rebuild/Validate Map Check `0 errors / 0 warnings`
 - 새 Mission 집중 회귀 9/9 성공
 - 전체 `Drone.*`는 51개 성공, 별도 기준선 7개 실패
+- 로컬 후속 작업은 새 Physics/Story 5개 맵 Map Check `0 errors / 0 warnings`
+- `Drone.Physics.CollisionResponse`, `Drone.Mission.StoryPhysicsTestMaps`, `Drone.Tutorial.HoverMissionPIE` 성공
+- FrontEnd Contract/PIE가 Tutorial+Story Test 총 13개 Mission과 버튼 13개를 확인
 
 7개 실패는 새 Tutorial 기능 실패로 묶지 않는다.
 
@@ -136,12 +139,13 @@ Production 맵을 자동 재구성해서 테스트를 억지로 통과시키지 
 
 우선순위는 다음과 같다.
 
-1. FrontEnd에서 Tutorial 8개를 손으로 플레이하고 Trigger 위치·Heading 허용각·Gate 방향·총탄 속도·유탄 낙차를 기록한다.
-2. 발견된 수치 문제만 Blueprint 또는 노출된 기본값에서 조정하고 8개 독립 Mission 계약은 유지한다.
-3. 단계별 브리핑·클리어 타임 UI를 추가한다.
-4. 8개 연속 진행과 전체 완료 UI를 연결한다.
-5. 팀원 맵 소유권을 확인한 뒤 Warehouse Greybox 환경을 별도로 구성한다.
-6. Tutorial 확인 뒤 Mission 1 Story Vertical Slice를 만든다.
+1. [`DRONE_STORY_PHYSICS_TEST_MAP_GUIDE.md`](docs/gameplay/DRONE_STORY_PHYSICS_TEST_MAP_GUIDE.md)에 따라 Physics Sandbox와 Story 4개 맵을 수동 확인한다.
+2. FrontEnd Tutorial Hover를 모서리 표식 안에서 3초 유지해 귀환 목표 전환과 가독성을 확인한다.
+3. 발견된 수치 문제만 Blueprint 또는 노출된 기본값에서 조정하고 독립 Mission 계약은 유지한다.
+4. Best Lap SaveGame과 단계별 브리핑·클리어 타임 UI를 추가한다.
+5. Tutorial 8개 연속 진행과 전체 완료 UI를 연결한다.
+6. Story Mission 1~4의 선택 목표·실패·기체 교대·장거리 타격을 순서대로 고도화한다.
+7. Physics Greybox와 실제 Dataflow/Chaos Cloth·Geometry Collection Spike를 비교한다.
 
 아직 최종값으로 확정하지 않은 항목은 `STATUS.md`와 `WORKBOARD.md`에서 계속 미정으로 유지한다.
 
