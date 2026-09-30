@@ -41,22 +41,34 @@
 
 ## 현재 조작·역할 기준
 
-- `Assisted Easy`는 Actor-relative 수평 이동·World Up 고도, `Manual Realistic Greybox`는 제한 자세·Local Up, `Acro Rate Realistic Greybox`는 Pitch/Roll/Yaw Body 각속도·자동 수평 복귀 없음으로 분리한다.
-- FPV Data Asset은 Rate/Acro+고기동을 기본으로 쓰며 중력·호버·Body Up 추력·선형 항력·Body Rate 응답 v1을 적용한다. 기반은 `UFloatingPawnMovement`이고 모터/PID/프로펠러 공력·질량/관성을 1:1 재현했다고 표현하지 않는다.
+- `Assisted Easy`는 Actor-relative 수평 이동·World Up 고도, `Manual Realistic Greybox`는 제한 자세·Local Up, Rate/Acro Mode 1·2는 Pitch/Roll/Yaw Body 각속도·자동 수평 복귀 없음으로 분리한다.
+- 느림/보통/빠름 속도 선택은 제거한다. 각 기체의 기존 빠름 수준을 단일 무적재 기준으로 사용하고 Legacy `Stable/Balanced/Agile` 이름은 Asset 직렬화 호환용으로만 유지한다.
+- Mode 1/2는 RC 송신기 축 배치만 다르며 같은 Dry Mass·합산 최대 추력·모터 응답·중력·Body Up 추력·선형/제곱 항력·Body Rate 응답을 사용한다. 기반은 `UFloatingPawnMovement`이고 비행 컨트롤러 PID·모터 믹싱·프로펠러 유동·관성 텐서를 1:1 해석한다고 표현하지 않는다.
+- Drop Drone은 내장 화물 또는 실제 부착 Payload Actor의 kg 질량을 총질량에 더한다. 적재 시 최고속도·가속·감속·Yaw·추력 대비 중량 여유가 줄고, 투하하면 즉시 무적재 성능으로 복구한다. 질량과 기체 물리값은 Blueprint/Data Asset에서 조정한다.
 - Rate/Acro Mode 2 축은 오른쪽 Stick Pitch/Roll, 왼쪽 세로 Throttle, 왼쪽 가로 Yaw다. 키보드는 `W/S Pitch`, `A/D Roll`, `Q/E Yaw`, `Space/Left Ctrl Throttle`로 각 축을 한 역할에만 연결한다. 공용 Move/Altitude/Yaw Action을 Acro에서 재해석하지 않으며 Mouse X/Y는 Rate 축이 아닌 직접 Yaw/Camera Pitch 개발 입력이다.
 - 쉬운/제한 자세에서 카메라·Collision과 외형 기울기를 구분하고, Rate/Acro에서는 Root 자세가 Camera와 Local Up 추진을 함께 결정한다.
 - 역할은 정찰 Scan, FPV Arm/자폭, Payload 픽업·드랍, Fiber의 재밍 면역+충돌 자폭, Ground UGV의 지상 주행과 상부 총·유탄을 프로젝트 소유 기능으로 사용한다. 현재 Catalog는 Scout/FPV/Drop/Fiber/Ground 5종이다.
 - Ground UGV 무장은 `GroundWeapons` Capability가 있을 때만 활성화한다. 좌클릭은 상부 총구 기준 직사 총탄, 우클릭은 중력·반경 피해 유탄이며 다른 Drone의 Primary/Secondary 역할 입력과 섞지 않는다.
-- 현재 속도·감도·Collision·Greybox Mesh는 최종값이 아니다.
+- 현재 무적재 속도·질량·추력·감도·Collision·Greybox Mesh는 실제 기체별 계측 전 시작값이며 최종값이 아니다.
 
 ## 비행 충돌·그물 장애물 기준
 
+- 벽·그물 접촉과 총알 피격 화면 효과를 구분한다. 벽/그물의 외형 기울기는 카메라에서 분리하고 이동은 보간하지만, 총알 피격의 기존 Camera Additive Shake·체력·본체 피드백은 유지한다. 기체의 실제 이동과 의도한 FPV 자세/마우스 회전까지 고정시키는 것은 아니다.
 - 벽 반발은 `PhysicsSandbox_Wall` 같은 특정 시험 Actor의 전용 기능이 아니다. 비행 Drone의 Collision Root가 일반적인 Blocking 벽·기둥·구조물에 닿으면 표면 안으로 파고들거나 계속 비비지 않고, 충돌 법선 바깥쪽으로 분리·반발하는 공통 비행 규칙이어야 한다.
 - 바닥 착륙, 천장, 얇은 장애물과 고속 충돌은 같은 결과로 뭉개지 않는다. 표면 법선·접근 속도·Flight 상태로 `착륙 가능 접촉 / 일반 반발 / 강한 충돌·Crash`를 구분하고, 현재 시험 수치는 최종값으로 확정하지 않는다.
 - 그물의 주 역할은 파괴물이 아니라 Rotor·날개가 걸려 조종을 방해하는 물리 장애물이다. 접촉 시 Cloth가 휘고 감기며, 기체는 감속·추력 저하·Roll/Yaw 교란을 받고 일정 조건을 넘으면 `Snared/Entangled` 또는 Crash·Mission 실패로 이어져야 한다.
 - 복잡한 Visual Rotor마다 독립 강체를 두지는 않는다. 단일 Collision Root 원칙은 유지하되 가벼운 Wing/Rotor Contact Probe 또는 별도 Net Interaction Volume으로 “날개가 걸렸다”는 판정을 보강한다.
 - Chaos Cloth 변형은 화면 표현을 담당한다. 포획·탈출·추락 판정의 단일 기준은 Frame Rate와 Cloth Solver 결과에 직접 의존하지 않는 프로젝트 C++ 상태와 접촉 누적값이 소유한다.
-- 현재 Cube Strand 국소 절단·물리 낙하 기능은 Hit 위치와 물리 반응을 확인하기 위한 Runtime 진단용이다. 최종 그물 장애물의 핵심 완료 조건으로 보지 않으며, 절단 가능 여부는 Mission/도구 요구가 있을 때 별도 옵션으로 판단한다.
+- 현재 Cube Strand 국소 절단·물리 낙하 기능은 Hit 위치와 물리 반응을 확인하기 위한 Runtime 진단용이다. 일반 Drone 충돌에서는 절단이 기본 Off이고 C++ 얽힘 상태가 감속·조종/추력 저하·완만한 외형 기울기·하강·포획을 결정한다. 접촉 때 피격 Shake를 호출하거나 Root를 반복 회전시키지 않는다. Collision Root 바깥의 네 Wing/Rotor Probe가 벽과 그물 접촉 위치를 보강하며, 실제 Chaos Cloth 변형과 탈출·Crash/Mission 실패 연결은 후속이다.
+- 일반 비행 `ADronePrototypePawn`은 수평에 가까운 Blocking 벽·기둥·구조물 접촉에 공통 반발과 표면 분리를 적용한다. 저속 접촉도 버리지 않고 작은 속도·작은 거리로 밀려나며 충돌 속도가 커질수록 반발·분리·자세 Kick이 연속적으로 커져야 한다. 바닥·천장·Ground UGV는 제외하며, 강한 Crash/Damage 우선순위와 얇은 벽 CCD는 아직 별도 검증 항목이다.
+
+## Training Gate 편집 기준
+
+- 자동 Gate의 기준 선은 안쪽 하단에서 전체 통과 높이의 `1/6` 지점을 지난다. Spline 제어점·빛나는 선을 바꾸지 않고 Gate 중심을 올리며, 확대 후에도 같은 비율을 유지한다. 수동 `OrderedGates` 위치는 임의로 바꾸지 않는다.
+- Gate 크기는 Course의 `게이트 전용 스케일`/`게이트별 추가 스케일`로 조절한다. Course Actor/Spline Scale을 Gate 크기 조절에 사용하지 않는다.
+- 정상 순서·정방향 통과 승인에만 BP `통과 음성 / 사운드` 슬롯을 1회 출력한다. 슬롯 기본값은 None이며 임의 음원을 연결하지 않는다. Reset/중복/역방향/오순서에는 무음이다.
+- 세 상태 색상과 별개로 `통과 전 머티리얼`/`현재 목표 머티리얼`/`통과 후 머티리얼`을 지정한다. 완성형 Static Mesh는 `GateAssetMesh`에 연결하고 적용할 Material Slot Index를 선택한다. 메시와 Trigger를 계속 분리한다.
+- 구체적인 BP 항목과 팀원 설정법은 [`docs/tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md`](docs/tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md)를 따른다.
 
 ## 기상 기준
 

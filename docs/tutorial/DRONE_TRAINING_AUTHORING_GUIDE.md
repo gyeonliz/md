@@ -1,8 +1,8 @@
 # Drone Training 게이트·루트 배치 가이드
 
-기준일: 2026-09-18 (Asia/Seoul)
+기준일: 2026-09-30 (Asia/Seoul)
 
-이 문서는 `D:\JGY\project\drone`의 현재 구현과 `/Game/Drone/Maps/Lvl_DroneTraining` 저장 상태를 기준으로 한다. 코스 제작은 `BP_DroneTrainingCourse` 한 개에서 관리한다. 권장 자동 편집 방식은 Course Spline과 분리된 `Ring별 Spline Handle`이며, Handle 배열 순서가 곧 Gate 통과 순서다. 생성된 빛나는 선 Component, 자동 Gate Child Actor와 GateIndex를 직접 관리하지 않는다.
+이 문서는 `D:\JGY\project\drone`의 현재 코드 기준으로 작성한다. 코스 제작은 `BP_DroneTrainingCourse`에서 관리한다. 권장 자동 편집 방식은 Course Spline과 분리된 `Ring별 Spline Handle`이며, Handle 배열 순서가 곧 Gate 통과 순서다. 생성된 빛나는 선 Component, 자동 Gate Child Actor와 GateIndex를 직접 관리하지 않는다. Production `Lvl_DroneTraining`은 팀원 소유이므로 이번 기능 작업에서 저장·덮어쓰지 않았다. 검증은 `/Game/Drone/Maps/TestMap/Lvl_DroneTrainingRouteSelectionTest`에서 한다.
 
 ## 1. 현재 맵과 자산 위치
 
@@ -13,7 +13,7 @@
 /Game/Drone/Tutorial/Materials/M_DroneTrainingGuide
 ```
 
-현재 `9de1ead` 기준 맵 감사 결과는 Gate Actor 17개, Course Sequence 4개, 역할 표적 3종과 Carryable Payload 0개다. 이 맵은 원격 LFS 파일과 같은 Clean 상태라 이번 코드 작업에서 저장하거나 덮어쓰지 않았다. 17개 링의 의도와 배치 위치를 화면에서 확인한 뒤 독립 Handle 방식으로 변환해야 한다.
+과거 `9de1ead` 기준 Production 맵 감사 결과는 Gate Actor 17개, Course Sequence 4개였다. 현재 맵 배치 개수의 증거로 재사용하지 않는다. 수동 배치 Gate를 자동 Handle 방식으로 전환하는 작업은 맵 담당 팀원이 진행한다.
 
 ## 2. 루트 만들기와 Spline 점 추가
 
@@ -117,6 +117,69 @@ Ring 사이 간격을 완전히 직접 지정하려면 `Automatic Gate Spline Di
 - `통과 후 색상`: 정상 통과를 마친 Ring
 
 미션이나 Blueprint 연출 중 색을 바꾸려면 Gate 참조에서 `Set Gate State Colors`를 호출한다. 입력 순서는 `Before Pass`, `Current Target`, `After Pass`이며 호출 즉시 현재 상태 Material에도 반영된다.
+
+### Spline을 게이트 중앙 하단 1/6 지점에 두기
+
+Course Actor의 `Tutorial > Course > Automatic Gates`에서 다음 값을 조정한다.
+
+| Details 표시 이름 | 내부 속성 이름 | 설정 |
+|---|---|---|
+| 게이트 안쪽 Spline 높이 비율 | `AutomaticGateSplineHeightFraction` | 기본 `0.166667` = 안쪽 하단에서 전체 통과 높이의 1/6. `0.5`는 중앙, `0`은 하단 |
+| 게이트 공통 위치 보정 (cm) | `AutomaticGateLocalOffset` | 전체 Gate의 추가 X/Y/Z 보정. 기본 `(0,0,0)` |
+| 게이트별 위치 보정 (cm) | `AutomaticGateLocalOffsets` | 특정 Gate만 추가 보정. 배열 Index가 Gate 순서 |
+
+스플라인의 곡선·제어점·안내선은 움직이지 않고 **게이트 중심만 위로 옮겨** 선이 중앙 하단을 지나게 한다. 기본 통과 높이 350cm에서는 Gate 중심이 선보다 약 116.67cm 위다. Gate를 확대해도 1/6 비율이 유지된다. 공통/개별 위치 보정을 추가하면 그만큼 선과의 상대 위치도 바뀐다. 정확한 1/6 정렬이 목적이면 보정 Z는 0으로 둔다.
+
+자동 Gate는 Construction과 Play 시작 때 새 배치 규칙을 적용한다. 과거에 중심에 저장된 Child도 Play 때 재배치하므로 맵을 다시 생성할 필요가 없다. **수동 `OrderedGates`는 자동으로 이동시키지 않는다.** 수동 Gate는 팀원이 위치를 조절하거나 합의 후 자동 배치로 전환한다.
+
+### 코스 선과 별개로 Gate 크기 조절
+
+- `게이트 전용 스케일` (`AutomaticGateScale`): Gate Visual과 통과 Trigger만 함께 확대한다. 예: `(1,1.5,1.5)`는 앞뒤 깊이를 유지하고 폭/높이를 1.5배로 만든다.
+- `게이트별 추가 스케일` (`AutomaticGateScales`): 공통 스케일에 Index별 배율을 곱한다. 없는 항목은 `(1,1,1)`이다.
+- Course Actor의 Transform Scale이나 `CourseSpline` Scale을 키우면 **코스 전체가 커진다.** Gate만 키울 때는 위 전용 항목을 사용한다.
+- 선 폭/두께는 기존 `CourseLineWidthCentimeters` / `CourseLineThicknessCentimeters`로만 조절한다.
+- 수동 Gate는 Gate Actor 자체의 Scale을 조절한다. Course Actor의 Scale은 건드리지 않는다.
+
+런타임 BP에서도 Course의 `Configure Automatic Gate Presentation`으로 공통 위치·Gate 스케일·높이 비율·개별 스케일을 지정할 수 있다. 이 호출은 Gate를 재구성하고 진행을 초기화하므로 Lap 도중 매 프레임 호출하지 않는다.
+
+### 통과 음성 / 사운드 슬롯
+
+1. `/Game/Drone/Tutorial/Blueprints/BP_DroneTrainingGate`를 연다.
+2. `Class Defaults > Tutorial > Gate > Audio`의 **통과 음성 / 사운드** (`GatePassSound`)에 `SoundWave` 또는 `SoundCue`를 넣는다. 녹음 음성도 같은 슬롯을 사용한다.
+3. 기본은 **통과음 2D 재생** On, 볼륨 1.0, 피치 1.0이다. 2D는 빠르게 지나가도 안내 음성이 거리 때문에 작아지지 않는다. 공간음이 필요하면 2D를 끈다.
+4. Compile·Save 후 Course의 `AutomaticGateClass`가 이 BP인지 확인하고 `Rebuild Automatic Gates`로 Editor 미리보기를 갱신한다.
+
+**현재 목표를 정방향으로 정상 통과했을 때만 1회 출력**한다. 오순서·역방향·중복 통과·Reset·Construction·색 변경에서는 출력하지 않는다. 새 Lap에서 다시 정상 통과하면 다시 출력한다. 슬롯이 None이면 무음이며 임의 음원을 자동으로 연결하지 않는다.
+
+Gate BP의 `On Gate Passed` 이벤트에 자막/연출을 붙일 수 있다. 사운드는 C++에서 이미 출력하므로 이 이벤트에 같은 Play Sound를 또 연결하면 두 번 들린다. 통과 판정/다음 Gate 진행 로직은 Sequence에서만 처리한다. 음성 겹침 제어가 필요하면 Sound 자산의 Concurrency로 제한한다.
+
+### 상태별 머티리얼 지정과 완성형 Gate 자산 교체
+
+기존 세 상태 **색상**과 별개로, `BP_DroneTrainingGate > Class Defaults > Tutorial > Gate > Visual`에 다음 **머티리얼 지정 슬롯**이 있다.
+
+| 슬롯 | 적용 시점 |
+|---|---|
+| 통과 전 머티리얼 (`InactiveMaterial`) | 아직 순서가 오지 않은 Gate |
+| 현재 목표 머티리얼 (`CurrentMaterial`) | 지금 통과할 Gate |
+| 통과 후 머티리얼 (`CompletedMaterial`) | 정상 통과한 Gate |
+
+빈 상태 슬롯은 공통 `RingMaterial`을 사용한다. 런타임 BP는 `Set Gate State Materials`로 세 재질을 지정할 수 있다. 임의 Material도 **재질 교체 자체**는 동작한다. 색상까지 조정하려면 `상태 색상 파라미터 이름`(기본 `Color`)과 실제 Material의 Vector Parameter 이름을 맞추고 Base Color 또는 Emissive에 연결한다. 파라미터가 없는 Material에 색상 값만 넣어도 색이 바뀌지는 않는다.
+
+완성형 링/사각 Gate 에셋을 받을 때:
+
+1. `Tutorial > Gate > Asset > 완성형 게이트 메시` (`GateAssetMesh`)에 **전체 Gate Static Mesh 하나**를 지정한다. `RingSegmentMesh`는 임시 네 변에 반복 사용하는 구형 슬롯이므로 전체 Gate를 넣지 않는다.
+2. `게이트 메시 로컬 보정`으로 Pivot 위치·회전·크기를 조절한다. Gate 판정의 정방향은 Actor 로컬 `+X`, 통과 평면은 `YZ`다. 메시는 이 평면과 통과 Box에 맞춘다.
+3. `상태 재질 적용 슬롯` (`GateAssetStateMaterialSlots`)에 상태를 바꿀 Material Index를 넣는다. 기본 `[0]`, 빈 배열은 전체 슬롯이다. 금속 기둥 재질을 보존하려면 발광/링 부분 슬롯만 지정한다.
+4. 세 상태 머티리얼과 색을 설정한다. 선택한 슬롯에는 상태 재질을 적용하고, 선택하지 않은 슬롯에는 메시의 원래 재질을 유지한다. 상태 재질과 공통 `RingMaterial`을 모두 비우면 메시 원본 재질을 사용하며 대응 Color Parameter만 갱신한다.
+5. 전체 Gate 메시를 지정하면 Greybox 네 변은 숨겨진다. 슬롯을 None으로 비우면 Greybox로 복구된다. **교체 Mesh는 비충돌**이고 기존 Box Trigger가 판정을 담당한다.
+
+메시 보정 Scale은 외형만 바꾸므로 통과 영역 크기는 자동으로 추측하지 않는다. BP의 `통과 영역 반쪽 크기`를 실제 Mesh 안쪽 크기에 맞춘 뒤 Course의 Gate 전용 스케일로 외형과 판정을 함께 키운다. 원형 메시도 현재 판정은 정사각형 Box/aperture이므로 원형 모서리 판정이 꼭 필요하면 별도 요구사항으로 처리한다.
+
+### 이 변경의 수동 확인
+
+2026-09-30 Editor Build와 관련 회귀 8/8(오류·경고 0), 실제 Gate/Course BP Compile 각각 0/0을 통과했다. Test World 종료 경고도 최종 재실행에서 0건이다. Production 맵/Asset 저장 없이 검증했다.
+
+`Lvl_DroneTrainingRouteSelectionTest`에서 Gate 음원과 교체 메시를 지정한 BP로 확인한다. (1) 선이 중앙 하단 1/6 위치를 지나는지, (2) Gate Scale을 키워도 선 두께/코스 크기는 유지되는지, (3) 순서대로 정방향 통과하면 음성이 한 번씩 나오는지, (4) 세 상태 머티리얼이 바뀌고 미지정 슬롯은 그대로인지 확인한다. 음원·최종 Gate Mesh는 사용자가 지정하므로 실제 가청성·최종 외형은 자동화 성공과 별도로 확인한다.
 
 ## 5. 수동 Gate 설치와 순서 지정
 

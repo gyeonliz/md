@@ -1,14 +1,17 @@
 # 현재 작업 상태
 
-기준일: 2026-09-29 (Asia/Seoul)
+기준일: 2026-09-30 (Asia/Seoul)
 
 ## 한눈에 보기
 
-- 현재 단계: Tutorial 8개 독립 Station, Story Mission별 TestMap 4개, Training 4-Route 선택 시험맵과 함께 물리 Sandbox를 국소 절단 그물·조각 파괴 벽까지 확장했다. 로비 Catalog는 Tutorial 9항목과 Story Test 4항목, 총 13개를 노출한다. Route/Physics 시험맵은 로비가 아닌 직접 Play한다
-- 조작 단계: 기존 쉬운 조작·제한 자세에 FPV Rate/Acro 송신기 Mode 1·Mode 2를 분리했다. 키보드는 W/S Pitch·Space/Ctrl Throttle을 유지하고 패드 세로축만 실제 Mode에 따라 바뀐다. 핸들링 UI는 느림/보통/빠름으로 바꾸고 현재는 최대 속도만 변경한다
-- 바로 다음 개발: 축소·충돌 전달 수정본 Physics Sandbox 수동 확인 → 실제 Chaos Cloth/Geometry Collection 비교 Spike → Best Lap SaveGame → Tutorial 진행/완료 UI → Story 1~4 목표·실패 규칙 고도화 순서다
+- 광섬유 GSU 적용: 공급 `GSU.fbx`가 전체 Drone이 아닌 광섬유 통임을 확인했다. 기체는 사용자 지정에 따라 DroneSpy Body·분리 Rotor 4개를 사용하고, 통은 전용 `FiberSpoolMeshComponent`에 약 28cm 높이로 하부 장착해 BaseColor·Normal·ORM·Emissive Material과 통 상단 케이블 출구를 연결했다. Editor Build 및 `ExtendedRoleDrones` 1/1 성공이며 화면 위치·크기 확인이 남아 있다.
+- 접촉 카메라 교정: 사용자 확인 범위는 벽·그물만이며 총알 피격 화면 흔들림은 유지한다. 그물의 피격 Shake 호출·반복 급감속, 벽 순간 이격/Root 회전과 연속 재충격을 제거하고 외형 접촉 기울기를 FPV 카메라와 분리했다. 그물은 Pawn을 계속 막지만 Camera 채널은 기본 Ignore다. 빌드 성공, Physics 4/4·Prototype 8/8·Story 저장 계약 1/1 성공(총 13, 자동화 오류/경고 0), 관련 BP 6개 Compile 0/0. 렌더 체감은 수동 확인 대기다.
+- Gate 편집: 정상 통과 음성/사운드 BP 슬롯, 하단 1/6 Spline 배치, 코스 선과 독립적인 공통/개별 Gate 스케일, 완성형 Gate Mesh 슬롯, 세 상태별 머티리얼 지정과 적용 슬롯 선택을 구현했다. 음원·최종 Mesh는 미지정이고 가청성/최종 외형 수동 확인은 남아 있다. Production Training과 Content 자산은 저장하지 않았다.
+- 현재 단계: Tutorial 8개 독립 Station, Story Mission별 TestMap 4개, Training 4-Route 선택 시험맵과 함께 물리 Sandbox를 속도 비례 벽면 반발·Wing/Rotor Probe v2, 그물 얽힘/포획 v1, 조각 파괴 벽까지 확장했다. 로비 Catalog는 Tutorial 9항목과 Story Test 4항목, 총 13개를 노출한다. Route/Physics 시험맵은 로비가 아닌 직접 Play한다
+- 조작 단계: 느림/보통/빠름 선택을 제거하고 각 기체의 기존 빠름 기준을 단일 무적재 성능으로 사용한다. FPV Rate/Acro Mode 1·Mode 2는 송신기 세로축 배치만 다르고 같은 질량·최대 추력·모터 응답·선형/제곱 항력 모델을 공유한다. Drop Drone은 내장/실제 부착 화물의 kg 질량이 총질량에 더해져 최고속도·가속·감속·Yaw·호버 추력 여유가 감소한다
+- 바로 다음 확인: Physics Sandbox에서 벽/그물 접촉 카메라 안정성·부드러운 밀림과 Shotgun/NPC TestMap에서 총알 피격 화면 Shake 유지 여부를 확인한다. Gate BP 음원·최종 Mesh·상태 재질과 Route 확인도 유지한다. 이후 실제 Chaos Cloth/Geometry Collection 비교 Spike → Best Lap SaveGame → Tutorial 진행/완료 UI → Story 1~4 목표·실패 규칙 고도화로 진행한다
 - 검증 운영: 외부 OpenCode 모델 호출은 종료했다. 프로젝트 전용 Agent·모델 설정은 제거했으며 이후 구현과 검증은 Unreal 자동화와 사용자 수동 화면 확인으로 진행한다
-- Unreal Editor: 2026-09-29 Physics Sandbox 재생성·Map Check와 자동화 뒤 종료 상태
+- Unreal Editor: 2026-09-30 Editor Build와 Physics/Prototype 자동화 뒤 종료 상태
 - Production Training: 팀원이 실제 Tutorial 환경을 제작 중이므로 열람 외 저장·덮어쓰기·자동 재구성 금지
 - 작업컴 인계: `WORK_PC_START_HERE.md`와 `tools/work-pc/Test-DroneWorkstation.ps1` 준비 완료. Windows PowerShell 5.1에서 Git·LFS·필수 Asset·Build·Tutorial Validate 전체 경로가 `WORKSTATION_READY`로 통과했다. 2026-09-29 구현과 문서는 원격 `main`에 반영됐으며 작업컴에서는 Pull·LFS 후 같은 점검만 다시 수행하면 된다
 
@@ -16,12 +19,30 @@
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal `D:\JGY\project\drone` | 기준 `main = origin/main = 7ad9a23` | Physics/Story·Training Route TestMap·코드·Tutorial Hover 표식이 로컬 미커밋 변경으로 남아 있음 |
-| 문서 `D:\JGY\project\md` | `main = origin/main = 578304f` | Physics/Story·Route·이번 국소 파괴 최신화가 로컬 미커밋 변경으로 남아 있음 |
+| Unreal `D:\JGY\project\drone` | 작업 시작 기준 `main = origin/main = 494dde2` | 벽 반발·그물 얽힘과 단일 고속·Payload 하중·Acro 물리 v2 코드/회귀가 로컬 미커밋 변경으로 남아 있음 |
+| 문서 `D:\JGY\project\md` | 작업 시작 기준 `main = origin/main = 44662f9` | 2026-09-30 충돌/그물 및 비행 물리 구현·수동 검증 기준 최신화가 로컬 미커밋 변경으로 남아 있음 |
 
-2026-09-29 원격 Fetch 재확인에서 두 저장소 모두 `HEAD...origin/main = 0/0`이었다. Unreal `7ad9a23`에는 Tutorial 8개 Mission·공유 시험맵·UGV 무장·Mission Framework가, 문서 `578304f`에는 대응 가이드와 상태 기록이 포함돼 있다. 보조 원격 `yook34/main=c845430`은 현재 중앙 `main`보다 57 Commit 뒤이며 고유 Commit은 0개다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 인증/설정을 남기지 않는다.
+2026-09-30 작업 시작 확인에서 두 저장소 모두 `HEAD...origin/main = 0/0`이고 Clean이었다. 이후 충돌/그물 물리, 단일 고속·Payload 하중·Acro 물리 v2와 문서만 수정했으며 Commit·Push는 수행하지 않는다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 인증/설정을 남기지 않는다.
 
 ## 최신 완료 항목
+
+- 2026-09-30 `/Game/Drone/ThirdParty/FiberOpticGSU`에 공급 GSU Mesh·Material·Texture 4개를 이식했다. `BP_DroneFiberOpticIntegration`은 DroneSpy Body·분리 Rotor 4개와 회전을 사용하고 재밍 면역·충돌 자폭·케이블 로직은 유지하며 GSU를 전용 통 Component에 장착했다. 통 상단이 Spline 시작점이며 재생성 도구도 동일 설정으로 갱신했다. MSVC 14.51.36257 Editor Build와 `Drone.Integration.ExtendedRoleDrones` 1/1이 오류·경고 없이 성공했다.
+- 2026-09-30 벽/그물 접촉 화면 교정 최종: MSVC 14.51.36257 `DroneEditor Win64 Development` 성공. `Drone.Physics` 4/4(`ContactSmoothing`, `ContactSmoothingBlueprint` 추가), `Drone.Prototype` 8/8(기존 `DamageShake` 그대로 통과), `Drone.Mission.StoryPhysicsTestMaps` 1/1 Success. 관련 BP 6개 메모리 Compile 오류·경고 0. 보고서 `drone/Saved/Automation/ContactCameraIsolation/index.json`(2026-09-30 03:26:32 UTC). 기존 엔진 헤더의 Deprecated API/비선호 MSVC 경고는 Build에 남아 있으며 신규 프로젝트 컴파일 오류는 없다. 패키지/맵 저장·Commit·Push 없음.
+- 접촉 회귀는 순간 이격/Root 회전·그물의 피해 Shake 호출을 Red로 재현한 뒤 Green을 확인했다. 지속 접촉 12회에서 새 충격 중복 없음, 접촉 해제 뒤 재충격 허용, Camera 채널만 Ignore/Pawn Block 유지, FPV 접촉 회전 차단과 실제 피해 Camera Shake 유지, 저장 Pawn BP의 새 Camera Pivot 상속을 검사한다.
+- Gate 최종 검증: MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. `TrainingCourse`, `TrainingGateBlueprint`, `TrainingGatePresentation`, `TrainingGateSequence`, `TrainingLapRecorder`, `TrainingRouteSelector`, `TrainingRouteSelectionTestMap`, `TrainingRouteSelectionPIE` 8/8 Success(자동화 이벤트 오류·경고 0). 실제 Gate/Course BP 메모리 Compile도 각각 0 errors / 0 warnings다. 보고서: `drone/Saved/Automation/GatePresentation/index.json` (2026-09-30 02:42:54 UTC). 패키지 저장·Production Training 변경 없음.
+- 2026-09-30 Gate 통과음은 Sequence가 정방향·순서를 승인한 뒤에만 재생한다. `GatePassSound`는 음성 SoundWave/SoundCue를 받고 볼륨·피치·2D/공간 재생을 BP에서 조절한다. `OnGatePassed` 이벤트는 자막/연출 확장용이며 같은 소리를 BP에서 중복 재생하지 않는다.
+- 자동 Gate는 `AutomaticGateSplineHeightFraction=1/6`을 기본으로 하고, `AutomaticGateScale × AutomaticGateScales[Index]`로 Visual/Trigger만 조절한다. 이전 중심 배치 Child도 BeginPlay 때 파괴/재생성 없이 최신 위치로 갱신한다. 수동 Gate와 Course Spline 제어점·선 폭/두께는 변경하지 않는다.
+- Gate Visual에 전체 메시용 `GateAssetMesh`/로컬 Transform과 상태 적용 슬롯 배열을 추가했다. 기존 16개 Component 이름은 보존하며 전체 메시가 있을 때 네 임시 Frame만 숨긴다. 상태별 `InactiveMaterial/CurrentMaterial/CompletedMaterial` 지정 슬롯을 추가했고 비어 있는 상태는 `RingMaterial`로 fallback한다. 선택하지 않은 슬롯은 Mesh 원본 Material을 보존한다.
+- 2026-09-30 기체 선택 화면의 느림/보통/빠름 버튼을 폐기했다. 기존 `EDroneHandlingPreset`·함수·WBP 이름은 직렬화 호환용으로만 남고 모든 요청을 `Balanced` 단일 기준으로 정규화한다. 무적재 최고속도는 각 Definition의 기존 Base Speed × `UnloadedMaximumSpeedMultiplier=1.25`를 사용하므로 기존 빠름 수준을 유지한다
+- `FDronePhysicalFlightSettings`를 Flight Profile에 추가해 Dry Mass, 합산 최대 추력, 모터 응답 시간, 제곱 항력, 적재 시 속도 하한을 Data Asset/Blueprint에서 조정할 수 있다. Mode 1/2는 이 Struct와 Acro Rate 설정을 그대로 공유하며 입력 축 배치만 다르다
+- Carryable Payload에 `PayloadMassKilograms`를 노출했다. 기본 내장 화물은 `DronePayloadDropComponent > DefaultInventoryPayloadMassKilograms`, 맵 배치 화물은 Payload BP/인스턴스의 질량을 사용한다. 적재/투하와 운반 중 질량 변경 직후 비행 수치가 즉시 재계산된다
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. `Drone.Prototype` 8/8, `Drone.Physics` 2/2, `Drone.Flow` 5/5가 Success다. Mode 1/2의 실제 패드 축, 무적재 고속 체감, Drop 적재 전후 가속·호버 차이는 렌더 화면 수동 확인이 남았다
+
+- 2026-09-30 `UDroneCollisionResponseComponent`를 시험 Pawn 전용에서 일반 비행 `ADronePrototypePawn` 공통 규칙으로 전환했다. 후속 교정에서 `120cm/s` 미만 무반응, 고정 `90cm/s` Kick, 고정 `6cm` 순간 이격을 제거했다. 저속 접촉부터 반발 속도·분리 거리·자세 Kick이 연속 비례하고, 직전 비행속도를 보존해 이동 Component가 충돌 직후 속도를 줄여도 반발이 사라지지 않는다. 바닥·천장과 Ground UGV는 제외한다
+- Collision Root 밖 네 모서리 기본 `±95cm` Wing/Rotor Probe가 벽과 그물을 Sphere Sweep한다. Probe Offset·Radius·Trace Channel, 최대 회전 Kick·기준 속도·Lever Arm과 모든 반발 수치는 Pawn Blueprint의 `CollisionResponseComponent`에서 조정할 수 있다
+- 그물은 일반 Drone 충돌에서 기본적으로 절단되지 않는다. `ADroneNetPlacementRig`가 `UFloatingPawnMovement` 실제 속도를 읽어 `UDroneCollisionResponseComponent`에 전달하고, 속도·반복 접촉에 따라 감속·조종/추력 저하·자세 교란·하강을 누적하며 임계값 이상은 포획 상태로 올린다. 현재 기본 자동 해제는 4초 계열 시험값이고 모든 수치는 Pawn/Net Blueprint Component Defaults에서 조절 가능하다
+- 폭발·탄환 Point Damage에 의한 국소 절단과 떨어지는 Segment 진단 기능은 유지한다. Drone 충돌 절단은 `Break On Impact`를 명시적으로 켤 때만 동작한다
+- MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. 속도 비례 Red→Green을 포함한 `Drone.Physics` 2/2, 변경 영향 `Drone.Prototype` 8/8, `Drone.Mission.StoryPhysicsTestMaps` 1/1이 Success다. 실제 렌더 화면에서 저속 밀림·고속 반발·날개 끝 회전 방향, 그물 포획 체감·자동 해제 후 조작 복구는 수동 확인이 남았다
 
 - 2026-09-29 `/Game/Drone/Maps/TestMap/Lvl_DroneTrainingRouteSelectionTest`에 직선·좌곡선·우곡선·상승 슬라럼 Course 4개와 Route Selector를 추가했다. `1~4`는 고정 선택, `5`는 현재 Route를 제외한 무작위 선택이며 전환 시 이전 Gate/Lap을 초기화하고 HUD 기록 Source도 활성 Course로 바꾼다
 - Route 맵 Map Check 0/0, `Drone.Tutorial.TrainingRouteSelector`, `TrainingRouteSelectionTestMap`, 실제 입력 `TrainingRouteSelectionPIE`, 기존 `TrainingCourse`, `TrainingGateSequence`, `TrainingLapRecorder`가 모두 Success다
@@ -31,7 +52,7 @@
 - `BP_DroneNetPlacementRig`는 네 Corner, 가로/세로 줄 수, 분할 수, 중심 처짐, 줄 굵기, 충돌, 파괴 반경·최소 속도를 Blueprint에서 조정한다. 충돌/Point Damage 위치 주변 Segment를 원본 격자에서 제거하고 최대 16개를 중력·충격량이 적용된 물리 조각으로 5초간 떨어뜨리며 Reset에서 격자와 파편을 함께 복구한다
 - `BP_DroneBreakableWallPanel`은 온전한 벽을 ISM 격자로 유지하고 맞은 반경의 조각만 물리 Component로 바꾼다. Columns·Rows·조각 크기·간격·반경·Impulse·최소 속도를 Blueprint에서 조정한다
 - `Dataflow`, `GeometryCollectionPlugin`, `ChaosClothAsset`, Editor 전용 `ChaosClothAssetEditorCore`를 프로젝트에 명시 활성화했다. 실제 Chaos Cloth/Geometry Collection 생산 자산은 아직 0개다
-- 최종 Physics 의도를 정정했다. 그물은 단순 절단물이 아니라 날개·Rotor가 엉켜 감속·추력 저하·자세 교란·포획/추락을 만드는 장애물이며, 현재 절단/낙하 조각은 진단용이다. 벽 반발은 특정 Sandbox 벽이 아니라 일반 Flight Pawn이 모든 유효 Blocking 벽·기둥·구조물에 닿을 때 파고듦·비비기를 막는 공통 규칙으로 확장해야 한다. 두 최종 규칙은 아직 미구현이다
+- 최종 Physics 의도에 맞춰 C++ 게임 규칙을 구현했다. 그물 감속·추력 저하·자세 교란·포획/하강, 일반 Flight Pawn의 벽·기둥·구조물 속도 비례 반발, Wing/Rotor Probe v1은 구현됐고, 실제 Chaos Cloth 변형·탈출 입력 판정·강한 Crash/Damage 우선순위·얇은 벽 CCD는 후속이다
 - Story Test Mission 4개를 로비 Catalog에 추가했다. M1은 Drop 전달→귀환, M2는 Spline 차량 핵심 표적 파괴와 목적지 도착 실패, M3는 광섬유 Drone 재밍 구역 이탈→귀환, M4는 UGV 지휘 표적 3개 파괴→귀환을 시험한다
 - `Drone.Tutorial.HoverMissionPIE`를 추가해 FrontEnd 선택부터 Scout Spawn, Hover Zone 진입, 안정 자세 3초 유지와 `ReturnToBase` 목표 전환까지 실제 PIE로 검증했다. 결과는 Success이며 Tutorial TestMap의 보이지 않던 Hover Box에는 충돌 없는 모서리 표식 4개를 추가했다
 - 2026-09-29 최종 회귀에서 `Drone.Physics.Breakables`, `Drone.Physics.CollisionResponse` 2/2와 `Drone.Mission.StoryPhysicsTestMaps` 1/1이 오류·경고 없이 Success다. `Drone.Tutorial.MissionLessonsTestMap`, `Drone.Flow.Contract`, `Drone.Flow.FrontEndContract`, `Drone.Flow.FrontEndPIE`의 기존 성공 기준도 유지한다. FrontEnd는 등록 Mission 13개와 버튼 13개를 확인했다
@@ -50,7 +71,7 @@
 
 - Weather Manager에 `Enable Rain`, 자동 강우 Visual 생성 Class를 추가했다. 비 Off는 바람/Profile ID를 유지하고 Rain Snapshot 표현값만 0으로 만들며 Blueprint에서 런타임 전환 가능하다
 - `/Game/Drone/Weather/Blueprints/BP_DroneRainVisual`과 `/Game/Drone/Weather/Materials/M_DroneRainStreak_OilRigMask` 추가. OilRig 원본 `T_rain_Mask`를 참조하는 최대 112개 짧은 Plane 빗줄기(기본 65×2.4cm, 불투명도 0.22)를 재사용한다. 구형 파란 DrawDebug 선은 기본 Off/0개다. 카메라 위쪽 Trace·0.35초 실내 보간과 빗줄기별 WorldStatic/WorldDynamic 표면 Trace로 지붕·지면 아래 표시를 막으며 맵 전체 Weather Snapshot은 바꾸지 않는다
-- `/Game/Drone/Integrations/RoleDrones/BP_DroneFiberOpticIntegration`과 `DA_Drone_FiberOptic_Greybox`는 FPV 자폭 드론과 동일한 본체·Rotor A~D Visual, `JammingImmunity + ImpactDetonation`, 1인칭 기본 시점을 사용한다. `FiberSpoolMeshComponent`는 제작 예정 통을 넣는 빈 Static Mesh 슬롯이며 기본 위치 `(-32,0,-18)cm`만 잡았다. 통 출구부터 지나온 지면까지 Spline과 Cylinder Spline Mesh가 이어지고, 마지막 지면점→통 구간은 기본 내부점 4개·포물선 처짐·이웃점 Hermite Tangent로 자연스럽게 휜다
+- `/Game/Drone/Integrations/RoleDrones/BP_DroneFiberOpticIntegration`과 `DA_Drone_FiberOptic_Greybox`는 DroneSpy Body·분리 Rotor 4개 Visual, `JammingImmunity + ImpactDetonation`, 1인칭 기본 시점을 사용한다. `FiberSpoolMeshComponent`에는 공급 GSU 통을 약 28cm 높이로 하부 장착했고 통 상단 출구부터 지나온 지면까지 Spline과 Cylinder Spline Mesh가 이어진다. 마지막 지면점→통 구간은 기본 내부점 4개·포물선 처짐·이웃점 Hermite Tangent로 자연스럽게 휜다
 - `/Game/Drone/Integrations/RoleDrones/BP_DroneGroundUGVIntegration`과 `DA_Drone_GroundUGV_Greybox`는 GC Drone 1 Poseable Mesh를 참조한다. `W/S` 전후·`A/D` 조향·`Q/E` 제자리 회전은 하부 차체를 움직이지만 마우스/패드 시점은 `Turret` Yaw와 `Turret_Swivel` Pitch만 움직여 차체를 돌리지 않는다. Camera와 총·유탄 Muzzle Anchor도 같은 상부 Yaw/Pitch Pivot을 따른다. 고도 입력 차단, 네 지점 지면 높이/Pitch/Roll 추종, 바람 Drift 비활성화와 최초 10,000cm 지면 획득은 유지한다. 좌클릭 직사 총탄과 우클릭 중력 유탄 발사·피해 기능이 연결됐으며 정식 무기 Mesh는 아직 미정이다
 - Tutorial Mission과 GameFlow/선택 UI를 기존 3종에서 Scout/FPV/Drop/Fiber/Ground 5종으로 확장했다. 외부 공급 Skeleton은 수정하지 않고 Integration BP가 Visual만 참조한다
 
@@ -96,7 +117,7 @@
 - 세 번째 `FPV Rate/Acro` 조작 모드 추가. Pitch/Roll/Yaw를 Body 각속도로 해석하고 Stick 중앙에서 자동 수평 복귀하지 않아 Roll/Loop 가능
 - Rate/Acro의 공용 Action 재해석을 제거하고 전용 Axis1D Action 4개를 추가했다. 키보드는 `W/S Pitch`, `A/D Roll`, `Q/E Yaw`, `Space/Ctrl Throttle`, Gamepad는 기존 Mode 2를 유지해 W/S와 고도 입력 중복 및 키보드 Pitch 누락을 해소했다
 - FPV Rate/Acro를 송신기 Mode 1과 Mode 2로 분리했다. 키보드는 두 모드 모두 같은 의미축을 유지하고, Gamepad는 Mode 1 `Left Y=Pitch/Right Y=Throttle`, Mode 2 `Left Y=Throttle/Right Y=Pitch`를 사용한다. 기존 `AcroRateRealisticGreybox` 열거형 이름은 저장 Asset 호환을 위해 Mode 2 의미로 유지했다
-- 기존 `안정/균형/고기동` UI를 `느림/보통/빠름`으로 바꿨다. 저장 호환을 위해 내부 Stable/Balanced/Agile 이름은 유지하며, 현재 기본 프리셋은 MaxSpeed `0.80/1.00/1.25`만 변경하고 가속·Yaw·자세각 배율은 1.0이다
+- 과거 `안정/균형/고기동`→`느림/보통/빠름` UI 단계는 2026-09-30 폐기했다. 저장 호환을 위해 내부 Stable/Balanced/Agile 이름만 유지하며 런타임에서는 모두 단일 `Balanced` 기준과 기체별 Physical Flight Settings를 사용한다
 - `Lvl_NPCSmartObjectGreybox` 실제 실행 로그에서 Rifle이 Shotgun의 `Gun` 컴포넌트에 걸려 `stuck`되는 정확한 충돌 상대를 확인했다. NPC Character는 Capsule 외 모든 Primitive를 Collision/Overlap/Nav 비활성 VisualOnly로 복구하며, 자동화가 각 런타임 컴포넌트를 검사한다
 - 순찰 중 몸이 50~100cm 단위의 Nav 즉시 경로점을 따라 원을 그리지 않도록 Patrol 몸 방향은 예약된 최종 Smart Object 슬롯을 기준으로 유지한다. 3초/100cm 전에 300° 이상 누적 회전하면 실패하는 실제 맵 회귀를 추가했다
 - FPV Data Asset 기본값을 Rate/Acro+고기동으로 변경. 공개 민간 FPV 참고선으로 수평 27m/s, 수직 9m/s, Pitch/Roll 650°/s, Yaw 400°/s를 조정 가능하게 저장
@@ -168,7 +189,7 @@
 ## 아직 확인하지 않은 항목
 
 - `BP_DroneRainVisual`이 RainStorm에서 파란 선 없이 짧고 부드러운 Mask 빗방울로 보이는지, Clear/비 Off에서 사라지는지, 지붕 아래에서 침투하지 않고 기본 0.35초 보간으로 줄며 밖에서 복원되는지 화면 확인
-- 광섬유 Drone이 FPV 자폭 드론과 같은 외형·Rotor 회전을 쓰는지, 1인칭·ImpactDetonation·재밍 면역과 빈 `FiberSpoolMeshComponent`에 제작 통을 넣은 뒤 케이블 지면 누적·곡률이 자연스러운지 화면 확인. Ground UGV는 높은 시작점에서 지면으로 내려와 W/S/A/D/Q/E와 4점 경사 추종을 유지하고, 마우스/패드 시점에서 차체는 고정된 채 상부 `Turret`/`Turret_Swivel`만 올바른 축으로 도는지 확인
+- 광섬유 Drone의 DroneSpy Body·분리 Rotor 4개 배치와 회전, 1인칭·ImpactDetonation·재밍 면역, 장착된 GSU 통의 위치·크기와 통 상단에서 시작하는 케이블 지면 누적·곡률이 자연스러운지 화면 확인. Ground UGV는 높은 시작점에서 지면으로 내려와 W/S/A/D/Q/E와 4점 경사 추종을 유지하고, 마우스/패드 시점에서 차체는 고정된 채 상부 `Turret`/`Turret_Swivel`만 올바른 축으로 도는지 확인
 
 - TestMap Gate Frame 외형과 Trigger 정합, 3상태 색
 - Ring Handle 개별 이동과 Spline 투영 체감
@@ -182,7 +203,7 @@
 - Shotgun Systems 맵의 발광 Pellet 8개와 짧은 Tracer 분리 가시성, Cyan 선이 보이지 않는지, 이동 회피 체감, 최대 24 피해, 16m 사거리·LOS와 Hysteresis 고개 안정화 화면 확인
 - `Lvl_DroneFrontEnd`의 새 3열 Mission UI와 Training 진입 뒤 3열 Drone 선택 UI가 해상도에서 잘리지 않는지 수동 확인
 - FPV Rate/Acro에서 키보드 `W/S Pitch`, `A/D Roll`, `Q/E Yaw`, `Space/Ctrl Throttle` 중복 없음과 Gamepad/RC Mode 1·2, Stick 중앙 자세 유지, Roll/Loop·27m/s 체감 수동 확인
-- 현재 Rate/Acro는 중력·호버 추력·기체 Up 추진·선형 항력·Rate 응답을 계산하지만 `UFloatingPawnMovement` 기반 v1이다. 모터별 RPM·PID·질량/관성 텐서·프로펠러 공력 기반 완전 물리와 같은지 확인한 상태는 아님
+- 현재 Rate/Acro v2는 Dry Mass+Payload Mass, 합산 최대 추력, 총질량 호버점, 모터 응답, 기체 Up 추진, 선형/제곱 항력과 Body Rate 응답을 계산한다. 다만 `UFloatingPawnMovement` 기반 게임용 모델이며 모터별 RPM·PID·관성 텐서·프로펠러 공력 기반 완전 물리와 같다고 판정하지 않는다
 - Camera-follow Instanced Mesh 강우와 카메라 위쪽 Trace 기반 실내 감쇠는 구현했으나 화면 확인 전이다. 정식 Niagara GPU Rain, 젖음 MPC, Splash·Audio, 품질 단계와 Low~Epic GPU 측정은 미구현
 - Test Mission DA/진입 경로에서 Return/Jammer Mission Event, 역할 Event 연쇄, 제한 시간 만료 화면 확인
 - 영상 노이즈 WBP 연출과 목표 정보 손실 표현 확인

@@ -78,6 +78,7 @@
 ## History
 
 - [`DRONE_WORKLOG.md`](history/DRONE_WORKLOG.md): 날짜별 개발 기록
+- [`DRONE_PROGRESS_REPORT_2026-09-17_TO_2026-09-30.md`](history/DRONE_PROGRESS_REPORT_2026-09-17_TO_2026-09-30.md): 9월 17일 이후 작업·현재 상태·다음 계획을 교수님·팀원 공유용으로 정리한 보고서
 - [`DRONE_TRELLO_BOARD_2026-09-09.md`](history/DRONE_TRELLO_BOARD_2026-09-09.md): 2026-09-09 Trello 입력본
 - [`DRONE_PROJECT_AUDIT.md`](history/DRONE_PROJECT_AUDIT.md): Prototype 구현 전 감사
 - [`snapshots/2026-09-15`](history/snapshots/2026-09-15): 정리 전 장문 루트 문서 원본

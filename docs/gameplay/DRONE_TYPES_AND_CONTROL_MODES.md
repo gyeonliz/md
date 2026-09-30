@@ -1,6 +1,6 @@
-# 드론 역할·조작 방식·핸들링 프리셋
+# 드론 역할·조작 방식·물리 비행 기준
 
-기준일: 2026-09-23 (Asia/Seoul)
+기준일: 2026-09-30 (Asia/Seoul)
 
 ## 기획 자료 사용 원칙
 
@@ -11,15 +11,15 @@
 
 ## 세 축을 분리한다
 
-기체 역할, 조작 보조 수준, 반응성은 서로 다른 값이다.
+기체 역할, 조작 보조 수준, 기체별 물리 성능은 서로 다른 값이다.
 
 | 축 | 현재 값 | 의미 |
 |---|---|---|
 | 임무 역할 `EDroneMissionRole` | 정찰, 드랍, FPV 자폭, 광섬유, 지상 UGV, 장거리 타격 | 기체가 임무에서 맡는 기능 |
 | 조작 방식 `EDroneControlMode` | 쉬운 조작, 실제 조작형(제한 자세), FPV Rate/Acro Mode 1, FPV Rate/Acro Mode 2 | 입력 보조와 RC 송신기 스틱 배치 |
-| 속도 단계 `EDroneHandlingPreset` | 느림, 보통, 빠름 | 같은 기체의 최대 이동 속도 |
+| 물리 성능 `FDronePhysicalFlightSettings` | 무적재 최고속도 배율, Dry Mass, 합산 최대 추력, 모터 응답, 제곱 항력, 적재 속도 하한 | 기체 고유 성능과 Payload 하중 |
 
-따라서 `고기동 드론`을 별도 기체 종류로 만들지 않는다. 같은 기체에서 조작 방식과 속도를 따로 고른다. 기존 열거형 내부 이름 `Stable/Balanced/Agile`은 저장 Asset 호환을 위해 유지하지만 UI와 기획 의미는 `느림/보통/빠름`이며, 현재는 최대 속도 배율만 바꾼다. FPV 자폭 역할 Data Asset은 `Rate/Acro Mode 2 + 빠름`을 기본값으로 사용한다.
+느림/보통/빠름 사용자 선택은 폐기했다. 각 기체는 Data Asset에 기록된 기준 속도에 `UnloadedMaximumSpeedMultiplier`를 곱한 단일 무적재 성능을 사용한다. 현재 기본 배율 `1.25`는 기존 빠름 수준을 승격한 값이다. `EDroneHandlingPreset`과 `Stable/Balanced/Agile` 이름은 저장 Asset·Blueprint 함수 호환용으로만 남고 모든 런타임 요청을 `Balanced`로 정규화한다. FPV 자폭 역할은 Rate/Acro Mode 2를 기본으로 쓰되 Mode 1과 같은 물리 성능을 가진다.
 
 ## 기체 역할별 현재 상태
 
@@ -28,7 +28,7 @@
 | 정찰 드론 | `BP_DroneScoutIntegration`; DroneSpy 본체·카메라·로터 4 | 거리·화각·LOS 유지형 Scan과 Training 표적 구현 | 모델 스케일/방향·Scan 체감, 최종 UI/FX |
 | FPV 자폭 드론 | `BP_DroneFPVIntegration`; FPV 본체·로터 4, FPV 기본 시점 | 명시적 Arm·최소 속도 충돌·1회 폭발, 제공 Niagara/Cue 연결 | 폭발 크기/청감·Mission별 Damage 조정 |
 | 드랍 드론 | `BP_DroneDropIntegration`; Delivery 본체·카메라·로터 6·크레이트 선적재 화물 | 탑뷰·투하·착지 후 잔류·가장 가까운 목표 자동 선택·맵 크레이트 근접 적재·실제 Actor 재투하 구현 | 부착 위치/크기 체감, FX와 Mission별 투하 규칙 |
-| 광섬유 드론 | `BP_DroneFiberOpticIntegration`; Sting Interceptor Visual, 빈 통 Static Mesh 슬롯, 1인칭 기본 | `JammingImmunity + ImpactDetonation`, 통 출구→지나온 지면 Spline과 처진 마지막 구간 구현 | 제작 통 Mesh·출구 Offset·케이블 굵기 화면 조정, 충돌 자폭·재밍 Zone 면역 확인, Mission 3 교대 연결 |
+| 광섬유 드론 | `BP_DroneFiberOpticIntegration`; DroneSpy Body·분리 Rotor 4개, 공급 GSU 통, 1인칭 기본 | `JammingImmunity + ImpactDetonation`, 통 상단→지나온 지면 Spline과 처진 마지막 구간 구현 | Spy 본체와 GSU 위치·크기·케이블 굵기 화면 조정, 충돌 자폭·재밍 Zone 면역 확인, Mission 3 교대 연결 |
 | 지상 드론 UGV | `BP_DroneGroundUGVIntegration`; GC Drone 1 Skeletal Visual | W/S 전후·A/D 조향·Q/E 제자리 회전, 최초 장거리 지면 획득, 4점 지면 높이/Pitch/Roll 추종, 공중 바람 Drift 차단 | 높은 Spawn→접지·Mesh 위치·스케일·경사/단차 추종 화면 확인, 무장·연료와 Mission 3 교대는 후속 |
 | 장거리 타격 드론 | 플레이 기체 미등록 | 출격/타격 연출 미구현 | 플레이 가능 여부 확정 뒤 Sequencer 또는 Pawn 결정 |
 
@@ -51,16 +51,17 @@
 - 입력 해제 또는 쉬운 조작 복귀 시 Root가 서서히 수평으로 돌아온다.
 - 아직 모터별 RPM, 중력-양력 평형, PID, 공기저항을 계산하는 실제 비행 물리 모델은 아니다.
 
-### FPV Rate/Acro Mode 1·2(그레이박스)
+### FPV Rate/Acro Mode 1·2(물리 기반 Greybox v2)
 
 - Betaflight Rate/Acro와 같이 Pitch/Roll/Yaw 스틱을 이동 방향이 아닌 **기체 Body 각속도 명령**으로 해석한다.
 - 스틱을 중앙으로 돌려도 자동 수평 복귀하지 않고 현재 자세를 유지한다.
 - Pitch/Roll에 고정 각도 제한이 없어 Roll과 Loop가 가능하다.
-- Throttle 중립은 수평 자세에서 중력을 상쇄하는 호버, 위 입력은 추가 추력, 아래 입력은 추력 감소로 해석한다. 추력은 기울어진 기체의 Local Up 방향으로 적용되어 W로 기수를 숙이면 전진력이 생긴다.
+- Throttle 중립은 현재 총질량에서 중력을 상쇄하는 호버, 위 입력은 추가 추력, 아래 입력은 추력 감소로 해석한다. 추력은 기울어진 기체의 Local Up 방향으로 적용되어 W로 기수를 숙이면 전진력이 생긴다.
 - Mode 1은 왼쪽 스틱 `Yaw/Pitch`, 오른쪽 스틱 `Roll/Throttle`을 사용한다.
 - Mode 2는 왼쪽 스틱 `Yaw/Throttle`, 오른쪽 스틱 `Roll/Pitch`를 사용한다.
 - 키보드는 Mode 1·2 모두 같은 직관적 배치를 유지한다. 장치별 입력을 공용 Move Action에서 재해석하지 않고 Acro 의미축 4개와 패드 세로 원시축 2개로 분리한다.
-- 현재 v1은 World 중력, 호버 스로틀, Body Up 추력, 속도 비례 선형 항력, Body Rate 응답 시간을 계산한다. 이동 기반은 여전히 `UFloatingPawnMovement`이며 모터별 RPM, PID, 프로펠러 공력, 질량·관성 텐서를 푼 완전한 비행 시뮬레이터는 아니다.
+- 현재 v2는 Dry Mass+Payload Mass, Newton 단위 합산 최대 추력, 총질량 기반 호버점, 모터 1차 응답 지연, World 중력, Body Up 추력, 선형+속도 제곱 항력, Body Rate 응답 시간을 계산한다. Mode 1/2는 이 값을 완전히 공유하고 송신기 세로축 배치만 다르다.
+- 이동 기반은 여전히 `UFloatingPawnMovement`다. 실제 Flight Controller PID, 모터별 믹싱/RPM, 프로펠러 유동, 배터리 전압 강하, 관성 텐서와 지면 효과를 1:1 푸는 공학 시뮬레이터는 아니다. 따라서 “현실 조작과 하중 반응을 반영한 게임용 물리 Greybox”로 부른다.
 
 #### 현재 Rate/Acro 입력표
 
@@ -84,15 +85,18 @@ Rate/Acro는 Front-end Drone 선택 화면에서 FPV 기체를 고르면 기본 
 
 | 항목 | 현재 Greybox 값 | 근거와 해석 |
 |---|---:|---|
-| 수평 최대 속도 | 27 m/s | DJI Avata 2 Manual mode 공개 최대 수평 속도. `2160 cm/s × Agile 1.25 = 2700 cm/s` |
+| 무적재 수평 최대 속도 | 27 m/s | DJI Avata 2 Manual mode 공개 최대 수평 속도. FPV 기준 `2160 cm/s × Unloaded 1.25 = 2700 cm/s` |
 | 상승/하강 World Z 제한 | 9 m/s | DJI Avata 2 Sport 공개 최대 상승·하강 속도 |
 | Pitch/Roll 최대 Rate | 650°/s | Betaflight 공식 Rate Calculator가 설명하는 Racing 예시 범위 550~650°/s의 상단 |
 | Yaw 최대 Rate | 400°/s | 플레이 테스트용 보수적 프로젝트 값. DJI의 공개 사양값으로 오해하지 않는다 |
 | Pitch/Roll 중앙 감도 | 180°/s | 조정 가능한 프로젝트 시작값 |
 | Pitch/Roll Expo | 0.30 | 조정 가능한 프로젝트 시작값 |
-| Hover Throttle | 0.50 | Stick 중립이 수평 자세에서 1g를 상쇄하는 추력 위치 |
+| Dry Mass | 2.0 kg | 기체별 계측 전 공통 시작값. Payload 제외 |
+| 합산 최대 추력 | 40 N | 현재 총질량에서 가속도와 호버점을 계산하는 시작값 |
+| Motor Response | 0.055 s | 스로틀 명령이 실제 합산 추력에 도달하는 1차 지연 |
 | Gravity | 980 cm/s² | World Down 가속도 시작값 |
 | Linear Drag | 0.12 /s | 고속 관성을 점진적으로 줄이는 Greybox 항력 |
+| Quadratic Drag | 0.00004 /cm | 속도 제곱에 비례하는 고속 항력 시작값 |
 | Body Rate 응답 | 0.08 s | 목표 각속도로 수렴하는 시작 응답 시간 |
 
 DJI 공개값에는 무풍·해수면 등 측정 조건이 붙으며, 현재 프로젝트 값은 기체를 1:1 복제한다는 뜻이 아니다. 공식 참고: [DJI Avata 2 사양](https://www.dji.com/avata-2/specs), [Betaflight Modes](https://betaflight.com/docs/wiki/guides/current/Modes), [Betaflight Rate Calculator](https://betaflight.com/docs/wiki/guides/current/Rate-Calculator).
@@ -103,11 +107,10 @@ DJI 공개값에는 무풍·해수면 등 측정 조건이 붙으며, 현재 프
 
 1. Pawn 참조에서 `Set Control Mode`를 호출한다.
 2. `Assisted Easy`, `Manual Realistic Greybox`, `Acro Rate Mode 1 Greybox`, `Acro Rate Realistic Greybox` 중 하나를 전달한다. 마지막 기존 이름은 Asset 호환을 위해 유지한 Mode 2다.
-3. 핸들링은 `Set Handling Preset`에 `Stable`, `Balanced`, `Agile` 중 하나를 전달한다.
-4. `Toggle Control Mode`는 쉬운 조작 → 제한 자세 → Mode 1 → Mode 2 → 쉬운 조작 순서로 순환한다.
-5. 느림→보통→빠름 순환 버튼은 `Cycle Handling Preset`을 사용한다.
-6. UI 문구 갱신은 `On Flight Control Settings Changed` Event에 바인딩한다.
-7. 시작값은 각 `DA_Drone_*_Greybox`의 `Flight Profile > Default Control Mode / Default Handling Preset`에서 설정한다.
+3. `Toggle Control Mode`는 쉬운 조작 → 제한 자세 → Mode 1 → Mode 2 → 쉬운 조작 순서로 순환한다.
+4. 과거 `Set/Cycle Handling Preset` 호출은 호환을 위해 남아 있지만 항상 단일 `Balanced` 기준으로 정규화되며 속도를 바꾸지 않는다.
+5. UI 문구 갱신은 `On Flight Control Settings Changed` Event에 바인딩한다.
+6. 시작 조작은 각 `DA_Drone_*_Greybox`의 `Flight Profile > Default Control Mode`에서 설정한다.
 
 키 바인딩은 아직 확정하지 않았다. FLOW-05 Drone 선택 화면의 `조작`·`반응성` 버튼이 값을 고르고, Controller가 Spawn Pawn에 같은 API로 적용한다.
 
@@ -118,15 +121,17 @@ Pawn Class Defaults에서 다음 Struct를 연다.
 - `Assisted Easy Tuning`: 가속·감속·Turning Boost·Yaw 배율
 - `Manual Realistic Greybox Tuning`: 위 배율, Local Up 사용, Collision Root 자세 사용
 - `Acro Rate Realistic Greybox Tuning`: Rate/Acro에서 사용할 가속·관성·Local Up·Root 자세 사용
-- `Stable / Balanced / Agile Handling Tuning`: Asset 호환 내부 이름. 현재 `느림/보통/빠름` 최대 속도 배율만 사용하고 나머지 배율은 1.0 유지
+- `Stable / Balanced / Agile Handling Tuning`: Asset 호환 내부 이름. 새 런타임 비행 계산에서는 사용하지 않는다
 
-각 기체의 절대 기준값은 Data Asset의 `Flight Profile`에 둔다. Rate/Acro의 중앙 감도·최대 Rate·Expo·수직 속도·호버/중력/항력/Rate 응답은 `Flight Profile > Acro Rate Settings`에서 조정한다. 모드 전환 시에는 기준값에서 다시 계산하므로 반복 전환해도 배율이 누적되지 않는다.
+각 기체의 절대 기준값은 Data Asset의 `Flight Profile`에 둔다. `Physical Flight Settings`에서 무적재 속도 배율·Dry Mass·합산 최대 추력·모터 응답·제곱 항력·적재 속도 하한을, `Acro Rate Settings`에서 중앙 감도·최대 Rate·Expo·수직 속도·중력·선형 항력·Rate 응답을 조정한다. 모드/적재 상태가 바뀔 때마다 원본 기준값에서 다시 계산하므로 배율이 누적되지 않는다.
+
+Drop Drone의 내장 화물 질량은 Pawn의 `DronePayloadDropComponent > Default Inventory Payload Mass Kilograms`, 맵 배치 화물은 `BP_DroneCarryablePayload` 파생 BP 또는 배치 Instance의 `Payload Mass Kilograms`에서 조정한다. 적재하면 `sqrt(DryMass / TotalMass)` 기반 최고속도·Yaw 배율과 `DryMass / TotalMass` 기반 가속·감속 배율이 적용된다. Acro에서는 같은 총질량으로 `MaximumTotalThrustNewtons / TotalMass`를 계산해 호버점과 남는 상승 추력이 실제로 바뀐다.
 
 Ground UGV는 `BP_DroneGroundUGVIntegration` Class Defaults에서 `GroundSteeringRateDegreesPerSecond`, 앞뒤·좌우 4점 간격, Clearance, `GroundInitialAcquireDistanceCentimeters`, 일반 Trace 시작 높이/거리/채널, 높이·회전 보간 속도를 조정한다. 시작 시 최대 10,000cm 아래 지면을 한 번 획득하고 이후 4점 Suspension Trace를 사용한다. GroundDrive 기체는 Assisted 모드로 고정되고 고도 입력과 Weather Drift를 사용하지 않는다. W/S 이동 벡터의 Z도 제거해 비행하지 않으며 `A/D`는 주행 조향, `Q/E`는 차체 제자리 회전 보조다. 최종 궤도/바퀴 물리 구현은 아니다.
 
 UGV의 마우스/패드 시점 입력은 차체 Actor Yaw를 바꾸지 않는다. 프로젝트 소유 `UPoseableMeshComponent`가 공급 Mesh의 `Turret` Bone을 좌우로, `Turret_Swivel` Bone을 상하로 움직인다. Camera Boom은 `GroundUpperYawPivot → GroundWeaponPitchPivot` 아래에 붙어 같은 방향을 본다. 기본 한계는 Yaw `-160~160°`, Pitch `-18~38°`이고 Class Defaults에서 변경할 수 있다. `GroundGunMuzzleAnchor`와 `GroundGrenadeMuzzleAnchor`도 Pitch Pivot 아래에 준비돼 있어 나중에 총/유탄 Mesh·Projectile·반동을 연결할 기준점으로 사용한다. 현재는 Anchor와 조준 구조까지만 구현됐으며 무장 외형·발사 기능은 미구현이다. 공급사 Skeleton 자체는 수정하지 않는다.
 
-광섬유 드론 외형은 현재 FPV 자폭 드론과 동일한 `SM_DroneFPVBody + SM_RotorA~D`를 사용한다. 광섬유 통은 `BP_DroneFiberOpticIntegration > Components > FiberSpoolMeshComponent`의 `Static Mesh` 칸에 넣는다. 현재 칸은 의도적으로 비어 있고 기본 Relative Location은 `X -32 / Y 0 / Z -18cm`다. 통에서 선이 나오는 위치는 Class Defaults의 `FiberSpoolExitOffset`, 지면 점 간격은 `FiberPointSpacingCentimeters`, 처짐은 `FiberSagDepthCentimeters`, 굵기는 `FiberCableThicknessScale`, 보존 길이는 `FiberMaximumLaidPoints`에서 조정한다. 마지막 지면점→통 출구 구간은 `FiberHangingCurveSubdivisionCount`개의 내부점(기본 4)과 포물선 처짐을 만들고, 전체 점에는 `FiberSplineTangentScale`(기본 0.75)의 이웃점 기반 Hermite Tangent를 적용해 꺾인 V자 대신 완만한 곡선을 만든다. Collision·Overlap·Navigation은 사용하지 않는다.
+광섬유 드론 외형은 `SM_Drone01Body + SM_Drone01_r1~r4` DroneSpy 세트를 사용하며 Scout에서 검증한 본체·Rotor 배치값과 Rotor 회전 로직을 재사용한다. 공급 `GSU.fbx`는 전체 Drone이 아니라 광섬유 통/카트리지로 확인했으며 `/Game/Drone/ThirdParty/FiberOpticGSU/SM_FiberOpticGSU`로 가져와 `BP_DroneFiberOpticIntegration > Components > FiberSpoolMeshComponent`에 장착했다. 통은 약 28cm 높이, 기체 하부 중심 `X -24 / Y 0 / Z -16cm` 부근이며 실제 Component Location은 Mesh Pivot 보정 때문에 약 `X -24 / Y 0 / Z -20.17cm`다. 위치와 크기는 해당 Component의 Transform에서 조정한다. 통 상단에서 선이 나오는 위치는 Class Defaults의 `FiberSpoolExitOffset`, 지면 점 간격은 `FiberPointSpacingCentimeters`, 처짐은 `FiberSagDepthCentimeters`, 굵기는 `FiberCableThicknessScale`, 보존 길이는 `FiberMaximumLaidPoints`에서 조정한다. 마지막 지면점→통 출구 구간은 `FiberHangingCurveSubdivisionCount`개의 내부점(기본 4)과 포물선 처짐을 만들고, 전체 점에는 `FiberSplineTangentScale`(기본 0.75)의 이웃점 기반 Hermite Tangent를 적용해 꺾인 V자 대신 완만한 곡선을 만든다. 통과 케이블은 Collision·Overlap·Navigation을 사용하지 않는다.
 
 FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조정한다.
 
@@ -135,35 +140,38 @@ FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조�
 - `Pitch Roll Expo`: 중앙을 둔하게 하고 끝 입력을 유지하는 곡선. 현재 `0.30`.
 - `Yaw Center Sensitivity Degrees Per Second`, `Maximum Yaw Rate Degrees Per Second`, `Yaw Expo`: Yaw 전용 같은 항목.
 - `Maximum World Vertical Speed Centimeters Per Second`: World Z 상승·하강 속도 안전 제한. 현재 `900cm/s`.
-- `Hover Throttle Normalized`: 입력 0에서 중력을 상쇄하는 0~1 추력 위치. 현재 `0.50`; 낮추면 최대 추력 여유가 커진다.
+- `Hover Throttle Normalized`: Legacy Profile 호환값이다. v2 런타임 호버점은 `총질량 × 중력 / 합산 최대 추력`으로 계산한다.
 - `Gravity Acceleration Centimeters Per Second Squared`: World Down 중력. 현재 `980cm/s²`.
 - `Linear Drag Per Second`: 속도 비례 항력. 현재 `0.12/s`; 높이면 고속 관성이 더 빨리 줄어든다.
 - `Body Rate Response Time Seconds`: 목표 Pitch/Roll/Yaw Rate까지 수렴하는 시간. 현재 `0.08s`; 낮추면 더 즉각적이다.
 - Pawn Blueprint의 `Acro Rate Realistic Greybox Tuning`: 이동 Component의 MaxSpeed/Acceleration 배율과 Root 자세 계약. Acro 자동 감속은 끄고 위 선형 항력을 사용한다.
-- Pawn Blueprint의 `Stable/Balanced/Agile Handling Tuning`: 각각 느림/보통/빠름에 대응한다. 현재 기본값은 MaxSpeed `0.80/1.00/1.25`, 가속·Yaw·자세각 배율은 모두 `1.0`이다.
+- `Physical Flight Settings > Dry Mass Kilograms / Maximum Total Thrust Newtons / Motor Response Time Seconds / Quadratic Drag Per Centimeter`: 두 Acro Mode가 공유하는 핵심 물리값이다.
+- `Physical Flight Settings > Unloaded Maximum Speed Multiplier`: 현재 기본 `1.25`; 기존 빠름 수준을 단일 무적재 기준으로 사용한다.
+- `Physical Flight Settings > Minimum Loaded Speed Multiplier`: 과도하게 무거운 시험 Payload에서도 조작 가능한 최고속도 배율 하한이다. 추력 부족으로 하강하는 현상은 막지 않는다.
 
-조정 순서는 `호버 스로틀 → Body Rate 응답 → 중앙 감도 → Expo → 최대 Rate → 선형 항력/최대 속도`로 잡는다. 먼저 수평 호버와 Pitch 추진을 맞춘 뒤 회전 감도를 조정해야 상승감과 조향감을 혼동하지 않는다.
+조정 순서는 `Dry Mass/최대 추력 → Motor Response → 선형·제곱 항력/최대 속도 → Body Rate 응답 → 중앙 감도 → Expo → 최대 Rate`로 잡는다. 먼저 무적재/적재 호버와 Pitch 추진을 맞춘 뒤 회전 감도를 조정해야 상승감과 조향감을 혼동하지 않는다.
 
 ## Editor 확인 순서
 
 1. `Lvl_DroneTraining` 또는 Prototype Map을 연다.
-2. 정찰 Data Asset 기본값인 `쉬운 조작 + 보통`으로 전후·좌우·고도를 확인한다.
+2. 정찰 Data Asset의 단일 무적재 기준으로 전후·좌우·고도를 확인한다.
 3. `Set Control Mode(ManualRealisticGreybox)`를 임시 Widget/Button에서 호출한다.
 4. 전진 입력에서 Root와 FPV Camera가 Pitch되고, 고도 입력이 기체 Local Up을 따르는지 확인한다.
 5. 입력을 놓았을 때 쉬운 조작보다 관성이 길게 남는지 확인한다.
-6. 느림/보통/빠름을 차례로 바꾸며 최대 이동 속도만 달라지고 조향감이 몰래 바뀌지 않는지 확인한다.
-7. 쉬운 조작으로 돌아왔을 때 Root Pitch/Roll이 수평 복귀하는지 확인한다.
-8. FPV 기체를 골라 Mode 1과 Mode 2에서 각 Pitch/Throttle 세로축이 표대로 바뀌고 스틱을 놓아도 자세가 유지되는지 확인한다.
-9. 수평에서 키를 놓으면 중립 호버가 유지되고, Space는 상승하며 Ctrl은 추력을 줄여 하강하는지 확인한다.
-10. W로 Nose-down한 뒤 중립/상승 Throttle에서 기체 Up 축이 전진력으로 바뀌는지 확인한다.
-11. Roll/Pitch 끝 입력으로 90도를 넘어 회전하고 Local Up Throttle로 바라보는 축에 추진되는지 확인한다.
-12. 회전이 너무 민감하면 `Body Rate Response Time`, 중앙 감도와 Expo를 먼저 조정하고 최대 Rate는 마지막에 바꾼다.
+6. 쉬운 조작으로 돌아왔을 때 Root Pitch/Roll이 수평 복귀하는지 확인한다.
+7. FPV 기체를 골라 Mode 1과 Mode 2에서 Pitch/Throttle 세로축만 표대로 바뀌고 속도·호버·Rate는 같은지 확인한다.
+8. 수평에서 키를 놓으면 중립 호버가 유지되고, Space는 모터 응답 지연 뒤 상승하며 Ctrl은 추력을 줄여 하강하는지 확인한다.
+9. W로 Nose-down한 뒤 중립/상승 Throttle에서 기체 Up 축이 전진력으로 바뀌는지 확인한다.
+10. Roll/Pitch 끝 입력으로 90도를 넘어 회전하고 Local Up Throttle로 바라보는 축에 추진되는지 확인한다.
+11. Drop Drone에서 기본 화물을 투하하기 전후 최고속도·가속·Yaw가 회복되는지 확인한다.
+12. 0.75kg과 1.25kg Carryable을 각각 적재해 무거운 화물일수록 호버 Throttle이 높고 상승·가속 여유가 낮은지 확인한다.
+13. 회전이 너무 민감하면 `Body Rate Response Time`, 중앙 감도와 Expo를 먼저 조정하고 최대 Rate는 마지막에 바꾼다.
 
 자동 검증은 `Drone.Prototype.FlightProfiles`와 `Drone.Flow` 필터로 실행한다.
 
 ## 역할·선택 FLOW 구현 결과와 다음 순서
 
-1. `DR-TYPE-01` 역할/조작/핸들링 데이터 계약 — 구현·Build·자동화 완료, 수동 체감 확인 대기
+1. `DR-TYPE-01` 역할/조작/기체 물리 데이터 계약 — 구현·Build·자동화 완료, 수동 체감 확인 대기
 2. `DR-RECON-01` 정찰 스캔 Greybox — 구현·역할 기능 자동화 완료
 3. `DR-FPV-01` FPV 충돌 자폭 Greybox — 구현·역할 기능 자동화 완료
 4. `DR-DROP-01` 드랍 탑뷰·Payload Greybox — 구현·역할 기능 자동화 완료
