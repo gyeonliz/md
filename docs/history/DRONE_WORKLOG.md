@@ -1805,3 +1805,22 @@ HeadingValueText
 - `ADroneDroppedPayload`에 인스턴스/BP 조절 가능한 `PayloadMassKilograms` 기본 0.75kg을 추가했다. Drop Drone의 내장 화물도 Component 기본 질량을 가지며 적재/투하/운반 중 질량 변경 즉시 최고속도·가속·감속·Yaw와 Acro 추력 대비 중량이 다시 계산된다.
 - MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. `Drone.Prototype` 8/8, `Drone.Physics` 2/2, `Drone.Flow` 5/5가 Success다. Production `Lvl_DroneTraining`과 Content Asset은 수정하지 않았고 Commit·Push도 수행하지 않았다.
 - 이 구현은 실제 조작 축과 하중 반응을 반영한 게임용 물리 Greybox v2다. 모터별 RPM/PID/프로펠러 유동/관성 텐서/배터리 전압을 푸는 공학 시뮬레이터로 판정하지 않으며, 실제 기체별 질량·추력 자료가 정해지면 Definition마다 교정한다.
+
+## 2026-09-30 — Bangkok City 실맵 이식·OilRig Overview 재확인
+
+- `D:\JGY\project\BangkokCity`는 독립 `.uproject`가 아닌 `/Game/BangkokCity` Content 루트임을 확인했다. `Maps/Overview`는 전시 맵이고 실제 환경 `Maps/BangkokCity`를 이식 대상으로 선택했다.
+- 원본을 수정하지 않고 일회용 UE 5.8 스테이징에서 `/Game/Drone/Maps/Lvl_BangkokCity`를 만들고 GameMode Override를 비웠다. 의존 자산 987개를 `/Game/Drone/ThirdParty/BangkokCity`로 이동했다.
+- 첫 저장은 `/Game/Drone` 전체를 저장해 기존 스테이징 팩 재빌드와 로컬 DDC 507을 유발했다. 저장 범위를 대상 ThirdParty 폴더와 Seed Map으로 좁혔고, 남은 360개 참조가 전부 ObjectRedirector임을 확인한 뒤 `ResavePackages -FixupRedirects`로 중앙 맵을 재저장했다.
+- 최종 스테이징과 본 프로젝트 감사 모두 Map load 성공, 자산 987개, 의존성 988개, 외부 `/Game` 0, 누락 0, `default_game_mode=None`, Map Check 0 errors / 0 warnings다.
+- 신규 파일은 맵 포함 988개, 12,309,059,738 bytes(약 11.46GiB)이며 모두 Git LFS 대상이다. Commit·Push는 수행하지 않았다.
+- `D:\JGY\project\Unreal_260821\OilRigLiope_Tr`의 기존 중앙 맵은 이미 `/Game/Liope_Tr/Maps/Overview` 복제본이다. `PrepareOilRigMap.py`와 과거 감사에서 Preview 체인 제외, Vendor GameMode 제거, Sample Door 8개 제거가 확인돼 재이식하지 않았다.
+- 자동 Gate 하단 1/6 배치는 기존 구현을 재확인했다. `AutomaticGateSplineHeightFraction=1/6`이고 Gate 중심을 `ApertureHalfSize × ScaleZ × (1 - 2 × Fraction)`만큼 올려 Spline/안내선은 그대로 둔다. 공통·개별 Gate Scale 뒤에도 같은 비율을 유지하며 수동 `OrderedGates`는 이동시키지 않는다.
+
+## 2026-09-30 — OilRig 실제 Preview 별도 이식
+
+- 사용자 정정에 따라 기존 Overview 기반 `/Game/Drone/Maps/Lvl_OilRig`을 덮지 않고 실제 장면 `/Game/Liope_Tr/Maps/Preview`를 `/Game/Drone/Maps/Lvl_OilRigPreview`로 별도 이식했다.
+- 원본은 수정하지 않고 전용 `OilRigPreviewStage`에서 처리했다. 맵의 Vendor GameMode를 제거하고 재귀 의존 자산 614개를 `/Game/Drone/ThirdParty/OilRigPreview`로 이동했다.
+- 문 Blueprint 32개가 구형 FirstPerson Character·Input·Arms를 끌어오는 경로를 확인했다. 문/문틀 Static Mesh Component 64개는 World Transform과 Material을 보존한 일반 StaticMeshActor로 바꾸고 상호작용 Wrapper만 제거했다.
+- 빈 StaticMeshActor 14개와 메시·Transform이 완전히 동일한 중복 1개를 제거했다. 같은 위치에 서로 다른 구조 메시를 조립한 공급사 배치는 유지했다.
+- 본 프로젝트 최종 감사에서 Map load 성공, 자산 614개, dependency closure 615, 외부 `/Game` 0, 누락 0, `default_game_mode=None`, Map Check `0 errors / 0 warnings`를 확인했다.
+- 신규 맵과 자산은 4,082,822,021 bytes(약 3.80GiB)이며 Git LFS 대상이다. Commit·Push는 수행하지 않았다.

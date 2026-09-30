@@ -1,11 +1,13 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-09-30 — 공급 광섬유 통 GSU 적용
+마지막 갱신: 2026-09-30 — Bangkok City·OilRig Preview 실맵 이식
 
 ## Now
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
+| ASSET-BANGKOK-01 | Bangkok City 환경 이식 | 실제 `Maps/BangkokCity`를 `/Game/Drone/Maps/Lvl_BangkokCity`, 의존 자산 987개를 `/Game/Drone/ThirdParty/BangkokCity`로 이식. 본 프로젝트 Map load·외부/누락 0/0·GameMode None·Map Check 0/0 통과 | Editor에서 재질·조명·충돌·스케일·첫 로드와 FPS 확인. 약 11.46GiB 신규 LFS를 기존 사용자 변경과 분리 확인한 뒤 사용자 Commit/Push |
+| ASSET-OILRIG-PREVIEW-01 | OilRig 실제 Preview 환경 이식 | 기존 Overview `Lvl_OilRig` 보존. 실제 `Maps/Preview`를 `Lvl_OilRigPreview`, 의존 자산 614개를 `ThirdParty/OilRigPreview`로 이식. Door BP 32개는 외형 64개를 정적화하고 Sample FirstPerson 로직만 제거. 빈 Actor 14개·완전 중복 1개 정리. Map load·외부/누락 0/0·GameMode None·Map Check 0/0 통과 | Editor에서 문/문틀 위치, 재질·조명·충돌·오션·비·첫 로드와 FPS를 수동 확인. 약 3.80GiB 신규 LFS를 기존 사용자 변경과 분리 확인한 뒤 사용자 Commit/Push |
 | PHY-CAMERA-01 | 벽·그물 접촉 화면 안정화 | 접촉 피격 Shake 호출·급감속과 벽 순간 이격/Root 회전을 제거. 연속 접촉은 재충격 대신 제약으로 처리하며 외형 기울기와 FPV 카메라를 분리. Camera 위치 보간·그물 Camera Ignore 추가. 총알 피격 화면 Shake는 기존 동작 유지. Editor Build·Physics 4/4·Prototype 8/8·Story 저장 계약 1/1 성공(오류/경고 0), 관련 BP 6개 Compile 0/0 | Physics Sandbox에서 1/3인칭 저속/고속/지속 벽 접촉·그물 감속/포획 때 화면 떨림 감소와 충돌 유지 확인. NPC 맵에서 총알 피격 화면 흔들림이 남는지 확인. 자동화만으로 체감 Pass 처리하지 않음 |
 | TUT-GATE-PRESENTATION-01 | Gate 통과음·위치·크기·자산 재질 | 정상 통과 음성/Sound 슬롯과 BP 연출 Event, 하단 1/6 배치·기존 저장 Child 시작 위치 복구, 공통/개별 Gate 전용 Scale, 전체 Mesh와 상태별 Material 슬롯 구현. 최종 Editor Build·관련 회귀 8/8 성공(오류/경고 0), Gate/Course BP Compile 0/0 | 실제 음원·최종 Gate Mesh를 BP에 지정한 뒤 TestMap에서 가청성, 1/6 위치, 확대해도 선 크기 불변, 상태별 재질·미지정 슬롯 보존을 수동 확인. 팀원 Production 맵은 직접 저장하지 않음 |
 | SYNC-WORKPC-01 | 작업컴 즉시 재개 인계 | 2026-09-29 Unreal `7ad9a23`, 문서 `578304f`가 각각 `origin/main`과 일치하고 Clean임을 확인. 인계 문서와 점검 스크립트의 Build·Map Check 0/0·`WORKSTATION_READY` 검증 완료 | 작업컴에서 두 저장소 Pull·LFS 후 같은 명령으로 `WORKSTATION_READY` 재확인 |

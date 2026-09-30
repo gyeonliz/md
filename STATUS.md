@@ -4,6 +4,8 @@
 
 ## 한눈에 보기
 
+- Bangkok City 이식: 공급 `D:\JGY\project\BangkokCity`의 실제 도시 맵 `Maps/BangkokCity`를 프로젝트 소유 `/Game/Drone/Maps/Lvl_BangkokCity`와 `/Game/Drone/ThirdParty/BangkokCity` 987개 의존 자산으로 이식했다. 본 프로젝트에서 맵 로드, 외부/누락 참조 0/0, GameMode Override 없음, Map Check 0 errors / 0 warnings를 확인했다. 약 11.46GiB의 신규 LFS 대상이므로 화면·성능 확인 후 별도 Commit/Push가 필요하다.
+- OilRig Preview 이식: 기존 Overview 기반 `/Game/Drone/Maps/Lvl_OilRig`은 보존하고 실제 장면 `Maps/Preview`를 `/Game/Drone/Maps/Lvl_OilRigPreview`로 별도 이식했다. 문 BP 32개의 외형 64개는 정적 메시로 보존하고 FirstPerson Sample 로직만 제거했다. 의존 자산 614개, 외부/누락 0/0, GameMode Override 없음, Map Check 0/0이며 약 3.80GiB 신규 LFS 대상이다.
 - 광섬유 GSU 적용: 공급 `GSU.fbx`가 전체 Drone이 아닌 광섬유 통임을 확인했다. 기체는 사용자 지정에 따라 DroneSpy Body·분리 Rotor 4개를 사용하고, 통은 전용 `FiberSpoolMeshComponent`에 약 28cm 높이로 하부 장착해 BaseColor·Normal·ORM·Emissive Material과 통 상단 케이블 출구를 연결했다. Editor Build 및 `ExtendedRoleDrones` 1/1 성공이며 화면 위치·크기 확인이 남아 있다.
 - 접촉 카메라 교정: 사용자 확인 범위는 벽·그물만이며 총알 피격 화면 흔들림은 유지한다. 그물의 피격 Shake 호출·반복 급감속, 벽 순간 이격/Root 회전과 연속 재충격을 제거하고 외형 접촉 기울기를 FPV 카메라와 분리했다. 그물은 Pawn을 계속 막지만 Camera 채널은 기본 Ignore다. 빌드 성공, Physics 4/4·Prototype 8/8·Story 저장 계약 1/1 성공(총 13, 자동화 오류/경고 0), 관련 BP 6개 Compile 0/0. 렌더 체감은 수동 확인 대기다.
 - Gate 편집: 정상 통과 음성/사운드 BP 슬롯, 하단 1/6 Spline 배치, 코스 선과 독립적인 공통/개별 Gate 스케일, 완성형 Gate Mesh 슬롯, 세 상태별 머티리얼 지정과 적용 슬롯 선택을 구현했다. 음원·최종 Mesh는 미지정이고 가청성/최종 외형 수동 확인은 남아 있다. Production Training과 Content 자산은 저장하지 않았다.
@@ -19,13 +21,15 @@
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal `D:\JGY\project\drone` | 작업 시작 기준 `main = origin/main = 494dde2` | 벽 반발·그물 얽힘과 단일 고속·Payload 하중·Acro 물리 v2 코드/회귀가 로컬 미커밋 변경으로 남아 있음 |
-| 문서 `D:\JGY\project\md` | 작업 시작 기준 `main = origin/main = 44662f9` | 2026-09-30 충돌/그물 및 비행 물리 구현·수동 검증 기준 최신화가 로컬 미커밋 변경으로 남아 있음 |
+| Unreal `D:\JGY\project\drone` | 현재 확인 `main = origin/main = 3e4d1ae` | Bangkok City와 OilRig Preview 맵·ThirdParty 자산·이식/감사 도구가 로컬 미커밋. 기존 Tutorial TestMap·MetroMaintenanceStation 변경은 사용자 작업으로 보존 |
+| 문서 `D:\JGY\project\md` | 현재 확인 `main = origin/main = cecf47a` | Bangkok/OilRig Preview 이식 결과와 수동 확인 기준을 2026-09-30 로컬 문서 변경으로 추가 |
 
-2026-09-30 작업 시작 확인에서 두 저장소 모두 `HEAD...origin/main = 0/0`이고 Clean이었다. 이후 충돌/그물 물리, 단일 고속·Payload 하중·Acro 물리 v2와 문서만 수정했으며 Commit·Push는 수행하지 않는다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 인증/설정을 남기지 않는다.
+2026-09-30 현재 두 저장소 모두 `HEAD...origin/main = 0/0`이다. Unreal 작업 트리에는 Bangkok 신규 이식물과 기존 사용자 Content 변경이 함께 있으므로 Commit 전 선택 범위를 확인한다. Commit·Push는 사용자가 수행한다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 인증/설정을 남기지 않는다.
 
 ## 최신 완료 항목
 
+- 2026-09-30 `D:\JGY\project\BangkokCity` 원본을 수정하지 않고 일회용 UE 5.8 스테이징에서 `Maps/BangkokCity`를 `/Game/Drone/Maps/Lvl_BangkokCity`로 복제했다. 실제 의존성 987개를 `/Game/Drone/ThirdParty/BangkokCity`로 이동하고 Redirector 참조를 재저장했다. 본 프로젝트 감사 결과 Map load 성공, dependency closure 988, 외부 `/Game` 0, 누락 0, `default_game_mode=None`, Map Check 0/0이다. `Overview`는 자산 전시 맵이라 이식하지 않았다.
+- `/Game/Drone/Maps/Lvl_OilRig`은 공급 `Overview` 기반 기존 맵으로 보존했다. 실제 환경 `Preview`는 별도 `/Game/Drone/Maps/Lvl_OilRigPreview`와 `/Game/Drone/ThirdParty/OilRigPreview` 614개 자산으로 이식했다. 본 프로젝트 감사 결과 dependency closure 615, 외부/누락 0/0, `default_game_mode=None`, Map Check 0/0이다. 빈 Mesh Actor 14개와 완전 중복 1개만 정리했으며 문/문틀 64개 외형은 보존했다.
 - 2026-09-30 `/Game/Drone/ThirdParty/FiberOpticGSU`에 공급 GSU Mesh·Material·Texture 4개를 이식했다. `BP_DroneFiberOpticIntegration`은 DroneSpy Body·분리 Rotor 4개와 회전을 사용하고 재밍 면역·충돌 자폭·케이블 로직은 유지하며 GSU를 전용 통 Component에 장착했다. 통 상단이 Spline 시작점이며 재생성 도구도 동일 설정으로 갱신했다. MSVC 14.51.36257 Editor Build와 `Drone.Integration.ExtendedRoleDrones` 1/1이 오류·경고 없이 성공했다.
 - 2026-09-30 벽/그물 접촉 화면 교정 최종: MSVC 14.51.36257 `DroneEditor Win64 Development` 성공. `Drone.Physics` 4/4(`ContactSmoothing`, `ContactSmoothingBlueprint` 추가), `Drone.Prototype` 8/8(기존 `DamageShake` 그대로 통과), `Drone.Mission.StoryPhysicsTestMaps` 1/1 Success. 관련 BP 6개 메모리 Compile 오류·경고 0. 보고서 `drone/Saved/Automation/ContactCameraIsolation/index.json`(2026-09-30 03:26:32 UTC). 기존 엔진 헤더의 Deprecated API/비선호 MSVC 경고는 Build에 남아 있으며 신규 프로젝트 컴파일 오류는 없다. 패키지/맵 저장·Commit·Push 없음.
 - 접촉 회귀는 순간 이격/Root 회전·그물의 피해 Shake 호출을 Red로 재현한 뒤 Green을 확인했다. 지속 접촉 12회에서 새 충격 중복 없음, 접촉 해제 뒤 재충격 허용, Camera 채널만 Ignore/Pawn Block 유지, FPV 접촉 회전 차단과 실제 피해 Camera Shake 유지, 저장 Pawn BP의 새 Camera Pivot 상속을 검사한다.
