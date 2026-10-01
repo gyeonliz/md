@@ -2,6 +2,41 @@
 
 기준일: 2026-10-01 (Asia/Seoul)
 
+## 2026-10-01 후속 — 로비 목록 튐 진단(실제 UI 미수정)
+
+- 사용자 요청은 원인 확인으로 한정했다. Editor 종료 상태에서 실제 FrontEnd BP를 렌더 PIE로 실행하고 진입/선택 후 첫 6프레임의 Widget Geometry를 측정했다. NullRHI는 Geometry를 얻지 못해 불충분으로 제외했다.
+- 훈련 진입→Hover 선택 두 단계로 최소 재현했다. 목록 내부 아래 항목이 선택 시 최대 67.508px 이동하며 목록 높이는 50.232px 증가했다(1920×1080 설계 좌표). 선택 간 세 바깥 열은 0px 이동. Story 진입 측정은 0.278px로 큰 튐을 재현하지 못했다.
+- 선택 Snapshot마다 `RebuildNativeMissionButtons → ClearChildren`으로 모든 버튼/AutoWrap Label을 재생성한다. 엔진 `STextBlock`의 AutoWrap은 최소 한 프레임 늦게 계산되며, transient PIE Label에만 명시적 폭을 주는 비교에서 0px로 안정화됐다. 스크롤바 공간 확보를 추가해도 0px로 같았다.
+- 진단 보고서 `Saved/Automation/LobbyLayoutDiagnosticWrapProbe/index.json`(2026-10-01 02:31:18 UTC): 원래 UI 단계가 실패하므로 전체 Result는 Fail이다. 비교 단계 0px를 실제 수정/전체 Pass로 표기하지 않는다. 진단 테스트는 `Source/Drone/Flow/Tests/Diagnostics/DroneLobbyLayoutStabilityTest.cpp`에 보존하며 로그/Wrap 실험은 해당 검사 안에서만 동작한다.
+- 다음 수정안: 같은 목록은 버튼을 재사용해 선택 강조만 변경하고 초기 줄바꿈 폭을 안정화한다. 실제 UI·Content·Production Training·Figma 수정/저장과 Commit/Push는 하지 않았다. MD·Drone Space 현황/테스트에 확인 결과를 반영했다.
+
+## 2026-10-01 후속 — UI 기획안·훈련 분리·설정 추가
+
+- 사용자 첨부 UI 시안을 참고해 기존 이미지 6개·미션 DA·맵을 유지하면서 `시작 → Story 4`, `훈련 → Tutorial 9 / Racing 1`로 분리했다. 로비는 목록/카드/설명 3열, 브리핑은 이미지/목표와 하단 시작, 기체 선택은 상단 상세/역할 도식·하단 가로 카드다. 실제 Mesh 렌더 Preview는 미구현이다.
+- Flow의 마지막 로비 Mission ID를 기억해 출격 전 Back·결과 로비 복귀에서 분류를 복원한다. 명시적으로 시작을 누르면 Story 목록으로 전환하며 기존 상태 전환과 Catalog는 유지한다.
+- `UDroneSettingsWidget`과 `UDroneAudioSettingsSubsystem`을 추가했다. Master 음량 미리보기/SaveGame, 화면 모드/해상도, 그래픽 품질·VSync·FPS와 적용/기본값/뒤로 취소를 구현했다. PIE/Designer 창·해상도 변경은 차단한다. 설정을 열기만 해서는 저장/덮어쓰기하지 않는다. 음악/SFX/음성 분리는 실제 SoundClass 연결 후속이다.
+- 현재 작업컴 MSVC 14.51.36257 Editor Build 성공, UI 집중 `FrontEndContract / BackNavigationContract / MissionEntryContract / SettingsContract / FrontEndPIE` 최종 5/5·자동화 이벤트 오류/경고 0. `Saved/Automation/TrainingLobbySettings/index.json`(02:03:48 UTC)에 저장했다. 엔진 Deprecated API/비선호 컴파일러 Build 경고는 남아 있다. 분류·숨은 선택 거절·Back/결과 복원·음량 범위/NaN·SaveGame 메모리 직렬화와 실제 FrontEnd PIE, Settings 자식 컨트롤 생성·슬라이더/Back Delegate·미리보기 취소를 확인했다.
+- NullRHI/NoSound 검사여서 새 화면·실제 가청성·Standalone 창/해상도·디스크 저장 후 재실행·패드 체감은 수동 대기다. 이전 PC 화면 Pass를 새 UI에 적용하지 않는다. Content/맵 저장·Production Training 재생성·Figma 수정·Commit/Push 없음. 관련 MD와 기존 Drone Space Page를 함께 갱신한다.
+- 다음은 새 UI/설정 수동 확인 → Best Lap 영구 저장 → Tutorial 진행/재시도/완료 UI → Story 고도화다. Lap SaveGame은 아직 없으며 신규 음량 SaveGame과 구분한다.
+
+## 2026-10-01 Spaces 연동과 Trello 대조
+
+- `Drone 프로젝트` Space를 생성하고 안내·진행/다음 작업·테스트 맵·기획 기준·Blueprint 팀원 가이드 5개 Page에 최신 MD/코드 요약을 저장했다. 중복 진행 파일을 만들지 않고 현재 Page를 갱신하도록 연결했다.
+- 사용자 Trello 보드는 API 인증 제한 뒤 기존 Chrome 로그인 세션으로 주요 목록/카드를 읽었다. 담당자별 현재 표시 카드 74개, Gate 4항목 완료 표기와 랩 저장·미션 목표·Chaos·차량 도착·벽/그물·레이싱 3·2·1 후속을 코드 근거와 구분해 진행 Page에 반영했다. 보드/카드를 수정하지 않았다.
+- md/drone 저장소 및 현재 대화 폴더에 AGENTS.md를 추가하고 [연동 규칙](../git/DRONE_SPACES_SYNC.md)에 Page ID/링크·갱신 시점·접근 실패 처리·검증 출처·권한 경계를 기록했다. 상시 감시·예약 자동화·Cloud Controller는 활성화하지 않았다.
+- Space 루트의 본문/네이티브 Agent Instructions 삽입은 도구 schema 거부로 미적용. 같은 Space의 안내 Page와 로컬 지침으로 대체했고 루트/기존 문서를 삭제하거나 재생성하지 않았다. 실제 Page 본문/부모 배치 확인과 문서 diff 검증만 수행하며 화면 렌더·Build·PIE 재검증으로 주장하지 않는다.
+- 코드/자산 변경과 Commit/Push 없음. 새 연결 설정 AGENTS.md와 MD는 로컬 미커밋이며 다른 PC 공유 시 사용자가 함께 Commit/Push한다.
+
+## 2026-10-01 작업컴 최신화 — 원격 수신·검증 출처 정리
+
+- 현재 작업 위치는 Unreal `D:\JGY\project\drone`, 문서 `D:\JGY\project\md`다. 아래 다른 PC의 구현 시점 기록은 수정하지 않고 보존한다.
+- Unreal `83b33c1bccf5e9524579001a7688df57e972426b`(09:29:57 KST, `10월스타트 로비랑 ui 전체적정비`), 문서 `aecb6ece1cb7b369a84499e3645098c0cbb8a801`(09:29:39 KST, `10`)을 확인했다. `git ls-remote`로 실제 원격 main과 대조했고 점검 시작 두 Clean·0/0이었다. Unreal은 09:34:51 KST Fast-forward Pull 이력이 있다.
+- 최신 커밋의 변경 바이너리 패키지 32개는 모두 존재하며 LFS 포인터가 아닌 본문이다. LFS 업로드 대기·Stash·실행 중인 Editor 없음. 전체 LFS 해시 무결성 검사나 엔진 재빌드의 대체 검사는 아니다.
+- `Test-DroneWorkstation.ps1 -RequireClean` 기본 점검은 0 failure / 0 warning, `WORKSTATION_READY`. Build/Validate/PIE/화면/성능은 재실행하지 않았다. Oct 1 `GameReadiness`/`TitleLobbyOrbit` 원시 보고서는 현재 D 드라이브 Saved에 없다.
+- 코드 확인: Title PNG 6개·9/1/4 탭·출격 전 Back·독립 Tutorial 8 + Story 4 + Racing 1 기본 Entry·원형 9 Gate 수업·비 Trace 예산/맑은 날 생략이 현재 커밋에 포함됐다. Best Lap은 실행 메모리만 사용하고 영구 저장은 미구현이다.
+- STATUS/WORKBOARD/작업컴 시작 가이드·CONTEXT·UI/통합 점검 가이드의 오래된 PC 경로·커밋·미커밋 주장, 공유/독립 맵 진입 설명, Story/차량 미구현 주장과 고정 27m/s 기준을 교정했다. 이전 Build 32/32·Back 33개 실패 0·14맵 점검은 다른 PC의 인계 증거로 명시했다.
+- 다음 순서를 FrontEnd/독립 미션 수동 완주·패드 → Best Lap SaveGame → Tutorial 진행 UI → Story 고도화로 통일했다. Gate/Physics/AI/기상 회귀와 Chaos 비교 Spike는 별도 미확인으로 유지한다. Production Training·코드·자산 수정 없이 문서만 갱신하며 Commit/Push는 사용자 담당이다.
+
 ## 2026-10-01 후속 — 출격 전 뒤로가기
 
 - Acro의 자세 제한 없는 롤/루프·추력 방향 가속·하강 지원과 실제 기체 응답 검증의 차이를 설명했다. 비행 수치/물리는 이번에 변경하지 않았다.

@@ -19,7 +19,7 @@
 - `/Game/Drone/Maps/Lvl_DroneTraining`: 팀원이 실제 Tutorial 환경을 제작하는 Production 맵이다. 합의 전 저장·덮어쓰기·자동 재구성·분할·이동을 금지한다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`: Course, Gate, 역할 기능과 HUD를 자유롭게 검증하는 경량 시험 맵이다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneTrainingRouteSelectionTest`: Route 4개를 편집하고 Play 중 `1~4` 고정 선택·`5` 무작위 선택을 검증하는 독립 시험 맵이다. Production Training과 분리한다.
-- `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`: Hover/Forward/Orbit/Gate/FPV/Payload/UGV NPC/UGV Turret 8개 독립 Mission이 공유하는 평면 Greybox 시험장이다. Orbit은 원형 코스 한 바퀴이며 기존 Heading DA ID만 호환용으로 유지한다. FrontEnd에서 Mission을 선택해 진입하며 `DroneTutorialMissionTest.Owned` Tag Actor만 생성 도구가 관리한다.
+- `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`: 초기 8개 Station을 보존한 평면 종합 Greybox 시험장이다. 현재 수업별 DA 진입은 위 `TestMap/Tutorial` 독립 맵이며 이 공유 맵과 구분한다. Orbit은 원형 코스 한 바퀴이고 Heading DA ID만 호환용으로 유지한다. 공유 맵 생성 도구는 `DroneTutorialMissionTest.Owned` Tag Actor만 관리한다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneRacingTest`: 로비 Racing 탭의 독립 원형 완주/시간 기록 시험맵. 정식 경기 규칙·Best Lap 영구 저장은 아직 없음. 튜토리얼 수업별 시험맵은 사용자 후속 요청으로 분리 완료했으며 Production 맵 분할과는 구분한다.
 - `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`: NPC·Smart Object·유인/무인 포탑·차량 전용 시험 맵이다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest`: 재밍·귀환·역할 Event 배치 전용 시험 맵이다. 직접 실행은 Prototype Flow이므로 Mission 완료 판정은 후속 Test Mission 진입에서 확인한다.
@@ -32,11 +32,11 @@
 
 확정 흐름은 `게임 실행 → 시작 트레일러 → 로비 → 미션 선택/설명 → 시작 → 미션 트레일러 → 맵 진입 → 드론 선택 → 미션 시작/목표 UI`다.
 
-2026-10-01 사용자 제공 `Title_Asset`으로 시작 화면을 구성하고 로비를 Tutorial/Racing/Mission 탭으로 구분한다. WBP Class Defaults의 Artwork와 DA Thumbnail에서 이미지를 교체한다. 사용자의 회전 수업 정의는 특정 방향 바라보기가 아니라 원형 코스 비행이다. 스틱 Mode 1/2와 Easy/Acro 비행 제어 및 물리 모델을 서로 혼동하지 않는다.
+2026-10-01 후속 UI 기획안: 시작 화면의 `시작`은 Story Mission 목록, `훈련`은 Tutorial/Racing 내부 탭으로 분리한다. 기존 `Title_Asset` 이미지와 DA/맵을 보존하며 목록/선택 카드/설명·하단 시작, 기체 상단 상세/하단 가로 카드 임시 화면을 사용한다. WBP Artwork와 DA Thumbnail에서 이미지를 교체한다. Settings는 Master 음량·화면·품질·VSync·FPS를 적용/저장하고 미적용 변경은 취소한다. PIE에서 창/해상도 변경은 금지한다. 최종 영상·3D 기체 Preview·개별 음원 라우팅은 별도다. 사용자의 회전 수업 정의는 특정 방향 바라보기가 아니라 원형 코스 비행이며 스틱 Mode 1/2와 비행 제어/물리 모델을 혼동하지 않는다.
 
 사람 Operator 직접 조작, NPC 대화로 임무 수령, 플레이어와 Drone 간 실시간 화면 전환 기획은 폐기했다. NPC·Smart Object·전투 기능은 Mission 내부 요소로 유지한다.
 
-2026-09-16 Figma 읽기 전용 확인 기준 Story 화면은 `골든 타임/인터셉트/베일 브레이커/엔드게임` 4개다. 실제 Mission별 수치·맵 Actor·기체 교대·영상은 아직 Asset으로 구현되지 않았다. Mission 2 차량이 미끼인지 실제 표적 탑승인지 Figma 내부 문구가 충돌하므로 코드는 양쪽 Story Fact를 지원하고 기본안은 사용자 결정 전 확정하지 않는다. Figma 원본은 수정하지 않는다. Android 개발은 현재 범위가 아니다.
+2026-09-16 Figma 읽기 전용 확인 기준 Story 화면은 `골든 타임/인터셉트/베일 브레이커/엔드게임` 4개다. 이후 Story DA·독립 TestMap 4개와 전달/차량 요격·목적지 실패/재밍 이탈/UGV 표적·귀환 시험을 구현했다. 최종 제작 맵·선택 목표·미션 중 기체 교대·장거리 타격·영상은 후속이며 시험 구현을 스토리 완성으로 판정하지 않는다. Mission 2 차량이 미끼인지 실제 표적 탑승인지 Figma 내부 문구가 충돌하므로 코드는 양쪽 Story Fact를 지원하고 기본안은 사용자 결정 전 확정하지 않는다. Figma 원본은 수정하지 않는다. Android 개발은 현재 범위가 아니다.
 
 ## 구현 책임
 

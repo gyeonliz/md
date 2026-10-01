@@ -4,13 +4,15 @@
 
 ## 한눈에 보기
 
-- 2026-10-01 뒤로가기 후속: 설정 닫기·로비→시작·설명→로비·기체 선택→FrontEnd 설명을 버튼/Esc/패드 Back 경계로 추가. 미션/해당 탭 유지, 시작 복귀 시 선택 초기화, 키 반복 방지, 로딩/비행/결과의 잘못된 Back 거절을 적용했다. Build 성공, 집중 회귀 33개 실패 0(외부 LogHttp 시간 초과 경고 동반 성공 1건). 실제 1280 화면에서 설명/기체 Back와 Esc 연속 복귀·레이싱 선택 복원을 확인했다. 이번에도 Commit/Push하지 않았다.
-
-- 이번 후속 최종 검증: Editor Build 성공, 집중 회귀 **32/32 Success·테스트 오류/경고 0**, Tutorial/Story/Racing/비 비교 14개 시험맵 Map Check 0/0. 독립 Hover 맵의 직접 Play→출격→3초 유지도 통과했다. 1280 UI 버튼/탭·목록과 1920 제목/Exit를 실제 화면에서 확인했다. 전체 미션 수동 완주·음원/전환 애니메이션·실기체 물리 교정은 남아 있다. `-game`의 엔진 Experimental Toolset Python 오류는 별도 환경 이슈로 가이드에 기록했다. 아래 14/14는 앞선 검증 기록이다.
-
-- 2026-10-01 후속: 비행 물리를 코드와 실제 FPV DA로 감사했다. Acro는 현실 요소를 반영한 근사 모델, 바람은 위치 Drift 방식이며 실기체 검증 완료는 아니다. OilRig 원본 비는 CPU Emitter 50개(시스템 25개) 구성, Effect Type 없음/동적 Bounds. 실제 1280×720 고정 시점 비교에서 평균 원본 약 20.56ms, 비 끔 9.67ms, 근거리 8개 제한 10.65ms, 프로젝트 비 9.65ms였다(화질 동등/전체 맵 결과 아님). Tutorial 8개 독립 맵과 Story 4/Racing 1 직접 Play Entry를 설치했고 Title 시안·Setting·버튼 슬롯 및 비 추적 예산/맑은 날 작업 생략을 보완했다. 후속 최종 회귀 결과는 [통합 점검 가이드](docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md)를 우선한다. 이번 변경은 미커밋/미푸시다.
-
-- 2026-10-01 최신 로컬 작업: 제공 Title_Asset PNG 6개를 시작 화면 WBP Artwork 슬롯에 연결했다. 로비는 Tutorial 9 / Racing 1 / Mission 4개 탭 필터·스크롤·썸네일을 사용하며 총 Catalog는 14개다. 회전 수업은 기존 Heading ID를 유지한 원형 9개 Gate 완주→귀환으로 정정했다. 독립 `Lvl_DroneRacingTest`를 추가하고 Course Tag 기반 Director/HUD 연결도 수정했다. Editor Build·두 시험맵 Map Check 0/0·집중 회귀 14/14 성공(테스트 오류/경고 0). 최종 화면/조작 체감은 사용자 확인 대기다. [설정·테스트 가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)
+- UI 목록 튐 진단(2026-10-01): 렌더 PIE에서 훈련 진입과 Tutorial 선택의 목록 재배치를 재현했다. 선택 시 세 열의 바깥 배치는 유지되지만 새 목록의 자동 줄바꿈이 다음 프레임에 계산돼 아래 항목이 최대 약 67.5 설계 px 이동한다. 진단용 명시적 줄바꿈 폭 비교에서는 0px였다. 실제 UI 수정은 아직 하지 않았으며 기존 기능 자동화 5/5와 시각 안정성 실패를 구분한다. Story 진입의 큰 튐은 이번 측정에서 재현되지 않았다. [원인·근거·수정안](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#10-목록-튐-진단-수정-전)
+- Spaces 연동: [Drone 프로젝트 안내](https://chatgpt.com/space/page_75732d3acd6481919ba26bf5b0b972cd)와 4개 주제 Page에 현황·계획·테스트·팀원 가이드를 저장했다. Trello 주요 카드도 코드 근거와 대조했고 작업 마무리/최신화 때 함께 갱신하도록 저장소 AGENTS.md에 지침을 추가했다. 상시/예약 자동화와 Trello 수정은 하지 않았다. [연동 규칙과 범위](docs/git/DRONE_SPACES_SYNC.md)
+- 2026-10-01 작업컴 최신화: 수신 기준 Unreal `83b33c1`, 문서 `aecb6ec`는 원격 `main`과 일치했다. 이후 첨부 UI 기획안과 설정 추가 요청을 구현해 C++/테스트·MD 변경을 로컬 미커밋으로 남겼다. Commit/Push는 사용자 담당이다.
+- 최신 UI: 기존 Title 이미지 6개를 유지하고 `시작 → Story 미션 4개`, `훈련 → 튜토리얼 9개 / 레이싱 1개`로 분리했다. 로비는 목록/선택 카드/설명 3열, 브리핑은 이미지/목표와 하단 시작, 기체 선택은 상단 상세·역할 도식과 하단 가로 카드다. 결과에서 복귀해도 마지막 분류를 복원한다. 실제 모델 3D Preview·최종 영상/연출은 미구현이다. [UI·원형 코스 가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)
+- 설정 추가: 전체 음량 미리보기·저장, 창/테두리 없는 창/전체화면, 해상도, 그래픽 품질, VSync, FPS 제한과 적용/기본값/뒤로가기를 구현했다. 미적용 변경은 뒤로갈 때 취소하며 PIE는 창 모드·해상도를 변경하지 않는다. Master 음량은 `DroneAudioSettings` SaveGame, 그래픽은 `GameUserSettings`에 저장한다. 음악/효과음/음성 개별 SoundClass 라우팅과 실제 재실행·가청성 확인은 후속이다. Best Lap 저장과는 별개다.
+- 독립 시험 구성: Tutorial 8개 수업별 맵 + Story 4개 + Racing 1개에 직접 Play용 기본 Mission Entry가 있다. Heading ID는 원형 9 Gate 완주→귀환 수업으로 사용한다. 공유 Tutorial 시험장은 보존하며 Production Training은 변경하지 않는다. Racing은 단일 코스 기록 시험이고 정식 경기 규칙·Best Lap 영구 저장은 아직 없다.
+- 현재 PC UI 검증: MSVC 14.51.36257 `DroneEditor Win64 Development` Build 성공. `FrontEndContract / BackNavigationContract / MissionEntryContract / SettingsContract / FrontEndPIE` **5/5 Success**, 자동화 이벤트 오류/경고 0. 최종 보고서 `drone/Saved/Automation/TrainingLobbySettings/index.json`(2026-10-01 02:03:48 UTC). 실제 Settings 자식의 컨트롤·슬라이더 Delegate·Back 닫기/미리보기 취소도 확인했다. Engine 헤더의 Deprecated API/비선호 컴파일러 경고는 Build에 남는다. NullRHI·NoSound 검사여서 화면 배치·음량·실제 해상도·재실행 복원·패드 체감 Pass는 아니다. Content/맵 저장·재생성 없음.
+- 이전 검증 출처: 다른 PC의 Oct 1 Build → 32/32·14맵 Map Check 0/0 → Back 33개 실패 0(HTTP 경고 동반 성공 1건), Hover 3초·1280 UI 일부/1920 제목·Exit 기록은 보존한다. 이전 `GameReadiness`/`TitleLobbyOrbit` 원시 보고서는 현재 PC에 없다. 오늘 기본 준비 `WORKSTATION_READY` 0/0·변경 패키지 32개 본문 확인은 별도이며 전체 미션/성능 재검증을 대신하지 않는다. [인계 검증 범위](docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md)
+- 물리·비 현황: Acro는 질량·추력·모터 응답을 반영한 게임용 근사 모델이며 실기체 교정 완료가 아니다. 비의 초기 천장 Trace 예산·맑은 날 갱신 생략·배치 갱신과 OilRig 4모드 비교 맵은 구현됐다. 다른 PC의 고정 시점 측정은 평균 원본 약 20.56ms / 비 끔 9.67ms / 근거리 원본 10.65ms / 프로젝트 비 9.65ms이며, 화질 동등·전체 맵·현재 PC 성능 결과로 해석하지 않는다.
 
 - Bangkok City 이식: 공급 `D:\JGY\project\BangkokCity`의 실제 도시 맵 `Maps/BangkokCity`를 프로젝트 소유 `/Game/Drone/Maps/Lvl_BangkokCity`와 `/Game/Drone/ThirdParty/BangkokCity` 987개 의존 자산으로 이식했다. 본 프로젝트에서 맵 로드, 외부/누락 참조 0/0, GameMode Override 없음, Map Check 0 errors / 0 warnings를 확인했다. 약 11.46GiB의 LFS 자산과 맵은 2026-09-30 원격 `main`에 반영됐고 화면·성능 확인만 남아 있다.
 - OilRig Preview 이식: 기존 Overview 기반 `/Game/Drone/Maps/Lvl_OilRig`은 보존하고 실제 장면 `Maps/Preview`를 `/Game/Drone/Maps/Lvl_OilRigPreview`로 별도 이식했다. 문 BP 32개의 외형 64개는 정적 메시로 보존하고 FirstPerson Sample 로직만 제거했다. 의존 자산 614개, 외부/누락 0/0, GameMode Override 없음, Map Check 0/0이다. 약 3.80GiB의 LFS 자산과 맵도 2026-09-30 원격 `main`에 반영됐고 화면·성능 확인만 남아 있다.
@@ -19,20 +21,20 @@
 - Gate 편집: 정상 통과 음성/사운드 BP 슬롯, 하단 1/6 Spline 배치, 코스 선과 독립적인 공통/개별 Gate 스케일, 완성형 Gate Mesh 슬롯, 세 상태별 머티리얼 지정과 적용 슬롯 선택을 구현했다. 음원·최종 Mesh는 미지정이고 가청성/최종 외형 수동 확인은 남아 있다. Production Training과 Content 자산은 저장하지 않았다.
 - 현재 단계: Tutorial 8개 독립 Station, Story Mission별 TestMap 4개, 별도 Racing 시험맵과 Training 4-Route 시험맵, Physics Sandbox를 유지한다. 로비 Catalog는 Tutorial 9 / Racing 1 / Story Test 4, 총 14개다. Route/Physics 시험맵은 로비가 아닌 직접 Play한다
 - 조작 단계: 느림/보통/빠름 선택을 제거하고 각 기체의 기존 빠름 기준을 단일 무적재 성능으로 사용한다. FPV Rate/Acro Mode 1·Mode 2는 송신기 세로축 배치만 다르고 같은 질량·최대 추력·모터 응답·선형/제곱 항력 모델을 공유한다. Drop Drone은 내장/실제 부착 화물의 kg 질량이 총질량에 더해져 최고속도·가속·감속·Yaw·호버 추력 여유가 감소한다
-- 바로 다음 확인: Physics Sandbox에서 벽/그물 접촉 카메라 안정성·부드러운 밀림과 Shotgun/NPC TestMap에서 총알 피격 화면 Shake 유지 여부를 확인한다. Gate BP 음원·최종 Mesh·상태 재질과 Route 확인도 유지한다. 이후 실제 Chaos Cloth/Geometry Collection 비교 Spike → Best Lap SaveGame → Tutorial 진행/완료 UI → Story 1~4 목표·실패 규칙 고도화로 진행한다
+- 다음 순서: 새 FrontEnd 레이아웃·훈련 분류·설정 적용/취소/재실행·음량 및 독립 Tutorial/Orbit/Racing·Story 4개 수동 완주·패드 확인 → Best Lap SaveGame → Tutorial 브리핑/기록/재시도/다음 수업/전체 완료 UI → Story 1~4 고도화. Gate 최종 음원·Mesh·재질, Physics 접촉/그물·피격 Shake, 비·광섬유·UGV는 관련 단계의 수동 회귀로 유지한다. 실제 Chaos Cloth/Geometry Collection 비교는 별도 Spike다
 - 검증 운영: 외부 OpenCode 모델 호출은 종료했다. 프로젝트 전용 Agent·모델 설정은 제거했으며 이후 구현과 검증은 Unreal 자동화와 사용자 수동 화면 확인으로 진행한다
-- Unreal Editor: 2026-10-01 Title/Orbit Asset 설정과 집중 회귀 완료 뒤 종료 상태
+- Unreal Editor: 전체 Build 전 종료 상태를 확인했고 UI 검사용 명령줄 Editor도 정상 종료했다. 사용자는 최신 바이너리로 다시 열어 수동 확인한다
 - Production Training: 팀원이 실제 Tutorial 환경을 제작 중이므로 열람 외 저장·덮어쓰기·자동 재구성 금지
-- 작업컴 인계: `WORK_PC_START_HERE.md`와 `tools/work-pc/Test-DroneWorkstation.ps1` 준비 완료. Windows PowerShell 5.1에서 Git·LFS·필수 Asset·Build·Tutorial Validate 전체 경로가 `WORKSTATION_READY`로 통과했다. 2026-10-01 Fetch 기준 Unreal `3b77aef`, 문서 `1ffe3b2`까지 원격 `main`과 일치한다. 작업컴에서는 Pull·LFS 후 같은 점검만 다시 수행하면 된다
+- 작업컴 인계: [시작 가이드](WORK_PC_START_HERE.md)와 기본 점검 도구 준비 완료. 오늘은 Build/Validate 옵션 없이 실행해 Git·LFS·필수 Tutorial 자산·Engine/Plugin 설정을 확인했다. 기본 준비 통과와 런타임 재검증 완료를 구분한다
 
 ## Git 기준
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal 현재 확인 복제본 `C:\URproject\drone` | `main = origin/main = 3b77aef` | Fetch 직후 Clean이었고 현재 Title/탭/Orbit/Racing 코드·자산이 로컬 변경. Bangkok City·OilRig까지는 원격 반영 완료 |
-| 문서 현재 확인 복제본 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` | 점검 시작 시 `main = origin/main = 1ffe3b2` | 2026-10-01 Fetch 후 원격 일치. 이번 최신화 문서만 로컬 변경 |
+| Unreal 현재 작업컴 `D:\JGY\project\drone` | `main = origin/main = 83b33c1` | UI/Flow/Settings C++와 테스트·새 Spaces 지침 `AGENTS.md`가 로컬 미커밋. Content 자산/맵 변경 없음. Commit/Push는 사용자 담당 |
+| 문서 현재 작업컴 `D:\JGY\project\md` | 점검 시작 시 `main = origin/main = aecb6ec` | 실제 원격 `main`과 일치했고 Clean. 현재 최신화 MD·Spaces 연동 가이드·AGENTS.md가 미커밋 |
 
-2026-10-01 Fetch 결과 두 저장소 모두 `HEAD...origin/main = 0/0`이었다. 이후 Unreal Title/탭/Orbit/Racing 코드·자산과 관련 Markdown을 로컬 수정했으므로 현재 작업 트리는 Clean이 아니다. 새 작업은 아직 원격에 없고 Commit·Push는 사용자가 수행한다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 인증/설정을 남기지 않는다.
+2026-10-01 작업컴에서 `git ls-remote origin refs/heads/main`으로 수신 기준을 대조했고 `HEAD...origin/main = 0/0`을 확인했다. Unreal은 09:34:51 KST Fast-forward Pull 이력이 있다. 과거 `C:\URproject\drone`의 구현은 `83b33c1`에 반영됐지만 오늘 후속 UI·설정 변경은 아직 로컬이다. 상세 Worklog의 당시 기록은 보존하며 Commit·Push는 사용자가 수행한다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 인증/설정을 남기지 않는다.
 
 ## 최신 완료 항목
 
@@ -103,7 +105,7 @@
 - 개인화기는 실제 3D 무기 사거리 안이면 즉시 정지·사격하고, 사거리 밖 판정이 기본 0.2초 지속될 때 추적을 시작한다. 사거리 밖에서는 NavMesh에 투영한 표적을 추적하며 전투 시작점 기준 기본 3,000cm 리시 또는 기본 2.5초 무진행 한계를 넘으면 표적을 포기하고 순찰로 복귀한다. 같은 투영 목적지는 기본 150cm 이상 바뀔 때만 갱신한다
 - 개인화기 Pursue는 Drone 자체를 큰 허용 반경으로 쫓지 않고 `PersonalWeaponPursuitRangeRatio`로 계산한 지상 사거리 정지점을 작은 `PersonalWeaponPursuitDestinationAcceptanceRadius`로 추적한다. Pursue 동안에는 Controller 한 곳이 그 안정된 최종 목표를 향해 몸 Yaw를 보간하고 Bone Gaze도 같은 목표를 사용한다. `bUseAccelerationForPersonalWeaponPursuitMoves=false`가 기본이라 짧은 경로점을 가속으로 지나쳐 공전하지 않으며, 이 설정은 Pursue에만 적용되어 일반 순찰의 가속 이동은 유지된다. 리시 포기 후 StateTree 재시작은 다음 Tick으로 예약해 `StartTree` 재진입을 막는다. 사거리 비율·도착 반경·Pursue 가속 사용 여부·회전속도·리시·재경로 거리/주기·무진행·Cooldown 값은 Controller Blueprint에서 조정 가능하다
 - Smart Object 동선·배치 팀 가이드, LFS 용량 계획, 외부 도구 검토와 추천도서 학습 계획 작성
-- Truck 직선 Greybox와 향후 Mission Spline Route, Smart Object 최근접 Slot 동선을 구분한 팀 설계·인계 가이드 작성. 현재 차량 Spline 추종과 목적지 Event는 문서화된 후속 구현이며 완료 기능으로 판정하지 않음
+- Truck Spline Route v1은 차량 참조·속도·Reverse/Loop·목적지 Event와 4점 지면 추종을 구현했다. Story Intercept 시험맵은 차량의 목적지 도착을 실패 조건으로 사용한다. Smart Object 최근접 Slot 동선과 구분하며 제작 맵의 최종 동선·난이도는 수동 조정 대상이다
 - Smart Object Greybox 차량의 실제 `SM_SpikeStorm_Tire2_FR`이 Cylinder 가정의 Mesh 로컬 Z축으로 회전해 옆으로 빙글도는 결함을 재현하고, Mesh 장착 회전과 무관한 차량 부모 공간 `+Y` 차축 회전으로 교정. 축은 Blueprint `Wheel Visual Spin Axis In Vehicle Space`에서 조정 가능
 - 같은 실제 Tire의 약 50cm 시각 반지름에 `Wheel Radius=30cm`를 사용해 바닥 아래로 약 20cm 잠기던 결함을 독립 평면에서 재현. 차량 BP 기본값을 52cm로 올리고 Blueprint 허용 범위를 1~500cm로 확장, Tire Bounds·지면 접촉 Red→Green과 맵 Validate 통과
 - Mission Definition에 순서형 목표 Rule(사건 종류·필요 수량·선택적 제한 시간·Actor Tag 대상 ID) 추가. 기존 문구형 목표는 fallback 유지
@@ -132,7 +134,7 @@
 - 과거 `안정/균형/고기동`→`느림/보통/빠름` UI 단계는 2026-09-30 폐기했다. 저장 호환을 위해 내부 Stable/Balanced/Agile 이름만 유지하며 런타임에서는 모두 단일 `Balanced` 기준과 기체별 Physical Flight Settings를 사용한다
 - `Lvl_NPCSmartObjectGreybox` 실제 실행 로그에서 Rifle이 Shotgun의 `Gun` 컴포넌트에 걸려 `stuck`되는 정확한 충돌 상대를 확인했다. NPC Character는 Capsule 외 모든 Primitive를 Collision/Overlap/Nav 비활성 VisualOnly로 복구하며, 자동화가 각 런타임 컴포넌트를 검사한다
 - 순찰 중 몸이 50~100cm 단위의 Nav 즉시 경로점을 따라 원을 그리지 않도록 Patrol 몸 방향은 예약된 최종 Smart Object 슬롯을 기준으로 유지한다. 3초/100cm 전에 300° 이상 누적 회전하면 실패하는 실제 맵 회귀를 추가했다
-- FPV Data Asset 기본값을 Rate/Acro+고기동으로 변경. 공개 민간 FPV 참고선으로 수평 27m/s, 수직 9m/s, Pitch/Roll 650°/s, Yaw 400°/s를 조정 가능하게 저장
+- 초기 FPV 참고값은 수평 27m/s·수직 9m/s·Pitch/Roll 650°/s·Yaw 400°/s였다. 이후 단일 고속·질량/추력 변경이 적용됐으므로 27m/s는 현재 고정 기준이 아니다. 현재 FPV DA 수평 Base 4,500cm/s × 무적재 배율 1.25 = 56.25m/s이며 실제 적용값은 Definition/Profile/Pawn BP Override와 적재 상태를 함께 확인한다
 - Rate/Acro에 중력, 중립 호버, 기체 Up 방향 추력, 속도 비례 항력, Body Rate 응답 시간을 연결했다. `Space/Ctrl`은 호버 기준 추력 증감이고 W/S Pitch로 기울인 Up 축이 실제 전후 추진력을 만든다. 호버 스로틀·중력·항력·Rate 응답은 FPV Data Asset/Blueprint에서 조정 가능하다
 - `UDroneWeatherProfile`, `FDroneWeatherSnapshot`, `UDroneWeatherWorldSubsystem`, 배치형 `ADroneWeatherController` 구현. Profile 기본 10Hz로 결정적 지속풍·돌풍·전환값을 공급
 - 모든 Prototype Drone에 `UDroneWeatherResponseComponent`를 부착. 쉬운 조작 65%·제한 자세 25%·Rate/Acro 0% 기본 보정과 Sweep Drift 적용. 최종 물리가 아닌 `UFloatingPawnMovement` Greybox
@@ -214,14 +216,14 @@
 - 새 TestMap의 귀환 Zone 위치/크기와 재밍 Zone Overlap·신호 경고·강한 단계 이동 체감 수동 확인
 - Shotgun Systems 맵의 발광 Pellet 8개와 짧은 Tracer 분리 가시성, Cyan 선이 보이지 않는지, 이동 회피 체감, 최대 24 피해, 16m 사거리·LOS와 Hysteresis 고개 안정화 화면 확인
 - `Lvl_DroneFrontEnd`의 새 3열 Mission UI와 Training 진입 뒤 3열 Drone 선택 UI가 해상도에서 잘리지 않는지 수동 확인
-- FPV Rate/Acro에서 키보드 `W/S Pitch`, `A/D Roll`, `Q/E Yaw`, `Space/Ctrl Throttle` 중복 없음과 Gamepad/RC Mode 1·2, Stick 중앙 자세 유지, Roll/Loop·27m/s 체감 수동 확인
+- FPV Rate/Acro에서 키보드 `W/S Pitch`, `A/D Roll`, `Q/E Yaw`, `Space/Ctrl Throttle` 중복 없음과 Gamepad/RC Mode 1·2, Stick 중앙 자세 유지, Roll/Loop와 현재 DA/BP의 단일 고속·적재 전후 체감 수동 확인
 - 현재 Rate/Acro v2는 Dry Mass+Payload Mass, 합산 최대 추력, 총질량 호버점, 모터 응답, 기체 Up 추진, 선형/제곱 항력과 Body Rate 응답을 계산한다. 다만 `UFloatingPawnMovement` 기반 게임용 모델이며 모터별 RPM·PID·관성 텐서·프로펠러 공력 기반 완전 물리와 같다고 판정하지 않는다
 - Camera-follow Instanced Mesh 강우와 카메라 위쪽 Trace 기반 실내 감쇠는 구현했으나 화면 확인 전이다. 정식 Niagara GPU Rain, 젖음 MPC, Splash·Audio, 품질 단계와 Low~Epic GPU 측정은 미구현
 - Test Mission DA/진입 경로에서 Return/Jammer Mission Event, 역할 Event 연쇄, 제한 시간 만료 화면 확인
 - 영상 노이즈 WBP 연출과 목표 정보 손실 표현 확인
-- Figma에서 `골든 타임/인터셉트/베일 브레이커/엔드게임`과 큰 목표는 확인했지만 실제 Story Mission DA/Map은 아직 없음
+- `골든 타임/인터셉트/베일 브레이커/엔드게임` Story DA와 독립 TestMap 4개는 구현됐다. 제작용 맵·선택 목표·기체 교대·장거리 타격·연출의 완성은 별도이며 각 시험맵 전체 수동 완주는 남아 있다
 - 같은 Figma 파일에서 Mission 2 차량이 미끼라는 전체 설명과 탑승 차량으로 전제한 개별 화면, Mission 3에서 오마르를 처리하는 설명과 이미 처리됐다는 대사가 충돌함. 코드는 양쪽을 지원하며 저장 기본안은 사용자 결정 대기
-- 광섬유 Drone·UGV의 프로젝트 소유 Definition/Integration Pawn은 구현했다. 두 외형의 스케일·조작 화면 확인, Mission 중 기체 교대, 장거리 타격 Drone, 차량 목적지 실패 Trigger와 최종 Cinematic 연결은 미구현
+- 광섬유 Drone·UGV의 프로젝트 소유 Definition/Integration Pawn과 차량 목적지 도착 실패는 구현했다. 두 외형의 스케일·조작 화면 확인은 남아 있고 Mission 중 기체 교대·장거리 타격 Drone·최종 Cinematic 연결은 미구현이다
 
 ## 알려진 실패와 경계
 

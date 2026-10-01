@@ -59,6 +59,7 @@
 
 ## Git·협업·도구
 
+- [`DRONE_SPACES_SYNC.md`](git/DRONE_SPACES_SYNC.md): Drone Space 연결 페이지, 작업 마무리 갱신 규칙, Trello 대조와 동기화 한계
 - [`../WORK_PC_START_HERE.md`](../WORK_PC_START_HERE.md): 작업컴에서 Pull·LFS·Build·Tutorial 검증 후 Codex 작업을 즉시 재개하는 시작 문서
 - [`GIT_UNREAL_GUIDE.md`](git/GIT_UNREAL_GUIDE.md): Unreal Git/GitHub 실전 절차
 - [`DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md`](git/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md): 팀원 Pull·LFS·Plugin 점검

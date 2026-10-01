@@ -22,12 +22,14 @@
 - Production 코드: `Source/Drone`
 - 프로젝트 소유 자산: `/Game/Drone`
 - 팀원 Tutorial 맵: `/Game/Drone/Maps/Lvl_DroneTraining`
-- Tutorial Mission 시험 맵: `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`
+- Tutorial 수업별 시험 맵: `/Game/Drone/Maps/TestMap/Tutorial/Lvl_Tutorial_*_Test` (8개, 기본 Mission Entry로 직접 Play 가능)
+- 보존된 Tutorial 종합 시험장: `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`
 - 기능·Course 시험 맵: `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`
 
 ## 문서 관리 규칙
 
 - 진행 상황은 새 파일을 만들지 않고 `STATUS.md`, `WORKBOARD.md`, `DRONE_WORKLOG.md`에 반영한다.
+- 관련 작업 마무리·최신화 때 [Drone Space 안내](https://chatgpt.com/space/page_75732d3acd6481919ba26bf5b0b972cd)도 함께 갱신한다. 대상과 절차는 [Spaces 연동 규칙](docs/git/DRONE_SPACES_SYNC.md)을 따른다. 상시/예약 자동화는 아니다.
 - 기능 설명이 장기적으로 반복 사용될 때만 주제별 상세 문서를 추가한다.
 - 완료된 일회성 보고서는 `docs/history`로 옮긴다.
 - 상세 문서와 현재 상태가 충돌하면 실제 Git·코드·실행 로그와 `STATUS.md`를 우선한다.

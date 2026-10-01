@@ -1,6 +1,6 @@
 # 비행 물리 · OilRig 비 · UI · 독립 미션 점검
 
-기준일: 2026-10-01. 로컬 구현이며 Commit/Push하지 않는다. 지급 PNG와 Figma 원본은 수정하지 않는다.
+기준일: 2026-10-01. 기존 기능은 Unreal `83b33c1`로 수신됐고 이후 UI 시안·Settings C++/테스트 변경은 현재 D 드라이브 로컬 미커밋이다. 지급 PNG·Content·Figma 원본은 수정하지 않는다.
 
 ## 1. 현실과 비슷한 물리인가?
 
@@ -72,12 +72,13 @@ Preview 원본 비는 `NS_sky_Rain` 6개, `NS_Rain_Fast` 14개, `NS_Rain_Slow` 5
 
 소스 6장(배경·오버레이·로고·Normal/Hover/Pressed)을 조합한다. 완성 참고이미지 자체를 클릭 배경으로 쓰지 않는다. 원본 1920×1080 오버레이 크기, 로고 734×429, 메뉴 위치/글자 크기를 시안 기준으로 보완했다. `Start / Training / Setting / Exit`를 유지하고 레이싱은 로비 탭에서 선택한다.
 
-- Start: 로비로 이동. Training: 튜토리얼 탭으로 이동. Setting: 그래픽 품질 낮음/중간/높음과 돌아가기. Exit: 게임 종료 요청.
-- 로비: 튜토리얼 9/레이싱 1/미션 4, 실제 필터·선택·브리핑·맵 진입. 탭 이동 후 숨은 선택으로 시작할 수 없다.
+- Start: Story Mission 4개 목록. Training: 내부 Tutorial 9/Racing 1 탭. Setting: 전체 음량·화면 모드/해상도·품질·VSync·FPS와 적용/기본값/취소. Exit: 게임 종료 요청.
+- 후속 시안은 목록/선택 카드/설명 3열 로비, 이미지/목표 브리핑·하단 시작, 상단 상세/역할 도식·하단 가로 기체 카드다. 기존 DA·목표·맵은 보존했고 숨은 분류 미션 시작은 차단한다. 실제 Mesh Preview는 아직 아니다.
+- 설정 Master 음량은 `DroneAudioSettings` SaveGame으로 저장하고 그래픽은 `GameUserSettings`를 사용한다. 미적용 음량 미리보기는 Back/Esc에서 취소하고 PIE 창/해상도는 차단한다. 개별 음악/SFX/음성 라우팅·실제 음량/재실행/창 적용은 수동 대기다. [상세 UI·설정 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)
 - Hover/Pressed PNG는 연결되어 있다. 텍스트와 이미지에는 HitTest 방해가 없도록 배치한다. 제공 `Select`와 `Click` 그림이 같으면 클릭 시 별도 그림 차이는 없고 Pressed Padding으로 눌림을 표현한다.
 - WBP `Button Hover Sound / Button Click Sound` 슬롯은 구현했다. 지급 음원이 없어 **기본 무음**이다. 클릭 특수 애니메이션·영상·최종 썸네일/음악까지 배정 완료라고 말하지 않는다.
 
-화면 점검에는 computer-use 스킬로 실제 1280×720 게임 창을 관찰하고 Setting→돌아가기, Training→로비, Racing 탭→목록 선택·썸네일·시작 활성화를 클릭했다. 1920×1080 제목 화면과 Exit 반응도 확인했다. 스킬의 관찰 기준을 적용해 코드 계약 통과와 실제 화면 점검을 분리했다. 각 품질 단계의 비용, 전체 미션 수동 완주·음원/전환 애니메이션은 별도로 확인한다.
+이전 PC의 이전 레이아웃 화면 점검은 1280×720 Setting→돌아가기·Training/Racing 일부 클릭과 1920×1080 제목/Exit다. 오늘 후속 UI는 MSVC 14.51.36257 Build·집중 5/5(자동화 오류/경고 0)로 확인했으며 보고서는 `Saved/Automation/TrainingLobbySettings/index.json`이다. NullRHI/NoSound이므로 새 렌더 화면·음량·창 모드·저장 재실행·패드 체감은 수동 대기다. 이전 화면 확인을 새 레이아웃 Pass로 옮기지 않는다.
 - `Title Background/Overlay/Logo Texture`, `Button Normal/Hovered/Pressed Texture`, DA `Thumbnail`에서 이미지를 교체한다. 런타임 교체는 `RefreshArtwork`를 호출한다.
 - 기본은 C++ 생성 레이아웃이다. WBP Designer의 최종 모든 노드를 수작업 완성한 구조는 아니며 기존 BindWidget 이름/설정 API를 사용해 확장한다.
 - 브리핑에 `ObjectiveRules`의 목표 순서와 제한 시간을 표시하도록 보완했다.
@@ -139,13 +140,15 @@ BP 확장: FrontEnd WBP는 `LobbyBackButton / BriefingBackButton`, 기체 선택
 
 ## 6. 실제 검증 결과
 
-최종 Editor Development Build 성공. 집중 회귀 **32/32 Success, 테스트 오류/경고 0**이다. 범위는 Flow/FrontEnd/Map Travel, Mission 목표·원형 코스, Prototype·Physics, Tutorial 저장 맵·Gate·기록, Weather/Rain 예산이다. 로비 진입 Hover PIE와 독립 Hover 맵 직접 Play PIE 모두 실제 출격→3초 유지→다음 목표 전환을 통과했다. 직접 진입 시 기본 카탈로그에 이미 등록된 DA를 중복 등록하던 문제도 수정했다. 이것은 모든 미션을 손으로 완주했다는 뜻이 아니다.
+아래는 다른 PC `C:\URproject\drone`에서 수행해 Oct 1 문서로 인계된 기록이다. 현재 `D:\JGY\project\drone`에서는 Git/자산/도구 기본 점검만 수행했으며 Build·PIE·화면·성능을 재측정하지 않았다. 이 PC에 `Saved/Automation/GameReadiness`·`TitleLobbyOrbit` 원시 보고서가 없으므로 보고서 경로는 당시 PC 기준이다.
+
+당시 Editor Development Build 성공. 집중 회귀 **32/32 Success, 테스트 오류/경고 0**이다. 범위는 Flow/FrontEnd/Map Travel, Mission 목표·원형 코스, Prototype·Physics, Tutorial 저장 맵·Gate·기록, Weather/Rain 예산이다. 로비 진입 Hover PIE와 독립 Hover 맵 직접 Play PIE 모두 실제 출격→3초 유지→다음 목표 전환을 통과했다. 직접 진입 시 기본 카탈로그에 이미 등록된 DA를 중복 등록하던 문제도 수정했다. 이것은 모든 미션을 손으로 완주했다는 뜻이 아니다. 이후 Back 후속 회귀 33개 실패 0(HTTP 경고 동반 성공 1건)과 일부 버튼/Esc 복귀·선택 복원 기록도 있으며 전체 패드 입력·모든 미션 완주는 미확인이다.
 
 Tutorial 8 + Story 4 + Racing 1 + 비 비교 1, **14개 시험맵 Map Check 오류/경고 0**. Title WBP Compile 성공. 보고서는 `Saved/Automation/GameReadiness/Tests/index.json`, 로그는 `Saved/Automation/GameReadinessTests.log`다. MSVC 14.51은 엔진 권장 14.50보다 새 버전이라는 빌드 도구 경고가 있지만 빌드는 성공했다.
 
 환경 로그의 별도 주의: Editor 실행파일의 `-game`에서는 Experimental Toolset의 Python 시작 스크립트가 `ToolsetDefinition / PythonTestRunner`를 찾지 못하는 오류가 나온다. Editor 전용 API가 게임 실행 컨텍스트에 없는 문제로 보이며, 로비 실행/위 테스트 성공과 구분한다. 전체 로그까지 오류 0이라고 표현하지 않는다. 엔진 파일이나 기존 MCP 플러그인을 임의 수정하지 않았으며 정식 패키징 실행에서도 발생하는지 후속 확인한다.
 
-성능 실측: 이 PC의 **UE 5.8.2**, RTX 3080, Editor 실행파일의 `-game` Development, 1280×720·고정 카메라·VSync/FPS 제한 해제. 다른 실행 중 앱은 강제로 종료하지 않았다. 각 모드는 10초 안정화+10초 표본, 정순/역순 2회다. 올바른 카메라 방향으로 최종 재측정했다.
+성능 실측 환경: 당시 측정 PC의 **UE 5.8.2**, RTX 3080, Editor 실행파일의 `-game` Development, 1280×720·고정 카메라·VSync/FPS 제한 해제. 현재 D 드라이브 PC의 사양/성능 측정으로 해석하지 않는다. 당시 다른 실행 중 앱은 강제로 종료하지 않았다. 각 모드는 10초 안정화+10초 표본, 정순/역순 2회이며 올바른 카메라 방향으로 재측정한 기록이다.
 
 | 모드 | 평균 프레임(ms), 2회 | p95(ms), 2회 | 평균 간격에서 환산한 FPS |
 |---|---|---|---:|
