@@ -2,18 +2,20 @@
 
 기준일: 2026-10-01 (Asia/Seoul)
 
-이 문서는 작업컴 `D:\JGY\project\md`와 `D:\JGY\project\drone`에서 현재 Drone 작업을 바로 이어가기 위한 단일 시작점이다. 최신 구현 사실은 `STATUS.md`, 다음 작업은 `WORKBOARD.md`, 변경 금지 경계는 `CONTEXT.md`를 우선한다.
+최신 상태는 STATUS·WORKBOARD(2026-10-01 저녁 `ec2e88f`)가 기준이며 아래 일부 문단은 당시 기록이다. 아래 D 경로 명령은 **D PC 예시**다. Build·PIE·자동화 테스트는 Claude 담당이다.
+
+이 문서는 PC를 옮겨 Drone 작업을 이어가기 위한 단일 시작점이다. 현재 C 드라이브 PC는 Unreal `C:\URproject\drone`, 문서는 이 작업 폴더이며 이전 D 드라이브 작업컴 경로는 `D:\JGY\project\md`/`drone`다. 아래 D 경로 명령은 해당 작업컴용 예시이므로 다른 PC에서는 실제 경로로 바꾼다. 최신 사실은 `STATUS.md`, 다음 작업은 `WORKBOARD.md`, 경계는 `CONTEXT.md`를 우선한다.
 
 ## 1. 현재 인계 상태
 
-2026-10-01 작업컴 수신 확인: 출격 전 뒤로가기(기체 선택→설명→로비→시작), 설정 닫기·Esc/패드 Back·선택 복원, Tutorial 8개 독립 시험맵·Story/Racing 직접 Play Entry, Title 이미지/탭·Setting, 비 CPU 예산 개선·OilRig 비교 맵은 이미 현재 체크아웃과 원격에 반영됐다. [기능·인계 검증 범위](docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md)
+2026-10-01 현재 C PC 수신 확인: 후속 로비·설정 코드, 출격 전 Back·선택 복원, Tutorial 8개 독립 시험맵·Story/Racing 직접 Play Entry, 비 CPU 예산 개선·OilRig 비교 맵이 체크아웃에 있다. 소스 수신은 현재 로컬 바이너리/플레이 완료를 뜻하지 않는다. [기능·인계 검증 범위](docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md)
 
-- 최신 확인 Unreal: `D:\JGY\project\drone`, `main = origin/main = 83b33c1bccf5e9524579001a7688df57e972426b`
-- 최신 확인 문서: `D:\JGY\project\md`, 점검 시작 시 `main = origin/main = aecb6ece1cb7b369a84499e3645098c0cbb8a801`
+- 최신 확인 Unreal: `C:\URproject\drone`, `main = origin/main = 9f67706bbecb85499bfc62f82dd96b77e09a56df`
+- 최신 확인 문서: `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6`, 점검 시작 `main = origin/main = ff69c11cc997874ddad890bf2c36ac94d406e2ea`
 - Physics Sandbox, Story 4맵, Training Route, 광섬유 GSU, Bangkok City·OilRig Preview도 포함됐다.
-- `git ls-remote origin refs/heads/main`으로 실제 원격과 대조했다. 점검 시작 두 Clean·앞섬/뒤처짐 0/0, Unreal LFS 업로드 대기·Stash 없음. 최신 커밋의 변경 바이너리 패키지 32개가 포인터 아닌 본문이며 전체 LFS 해시 무결성 검사를 대신하지는 않는다.
-- 오늘 기본 준비는 `WORKSTATION_READY`(실패/경고 0). 후속 UI 요청으로 Editor Build와 집중 5개 자동화도 성공했다(`Saved/Automation/TrainingLobbySettings`). 전체 Tutorial/성능과 렌더 화면·음량은 재검증하지 않았다. 이전 PC의 Oct 1 원시 보고서는 현재 Saved에 없어 인계 결과로 구분한다.
-- 후속 로컬 변경: 기존 이미지 유지, 시작→Story4/훈련→Tutorial9·Racing1, 로비/브리핑·기체 카드 레이아웃, 사운드/화면/성능 설정. C++/테스트·MD는 아직 미커밋이고 Content/맵은 변경하지 않았다. Commit/Push는 사용자 담당이다.
+- `git ls-remote origin refs/heads/main`으로 실제 원격과 대조했다. 점검 시작 두 Clean·앞섬/뒤처짐 0/0. 이전 D PC의 LFS/32개 패키지 본문·기본 준비 0/0 기록은 보존하지만 이번에는 LFS 전체 무결성·기본 준비 도구를 재실행하지 않았다.
+- 이전 D PC의 Build/UI 5/5(NullRHI/NoSound)·렌더 목록 튐 Fail 보고서는 현재 C PC에 없다. 현재 C Saved의 GameReadiness 32·Back 33개 실패 0·TitleLobbyOrbit 14 성공 보고서는 이전 UI 검사이며 최신 화면 Pass가 아니다. 이번 Build/PIE·소리/해상도/패드 확인은 실행하지 않았다.
+- 기존 이미지 유지, 시작→Story4/훈련→Tutorial9·Racing1, 로비/브리핑·기체 카드, 사운드/화면/성능 설정 코드는 수신됐다. 목록 튐은 미수정이며 패드 Back과 전체 패드 선택을 구분한다. 이번 변경은 MD·Space만이며 Commit/Push는 사용자 담당이다.
 - 이미 작업컴에서 이 문서를 Pull해 읽고 있다면 4절 점검 결과를 우선한다. 두 저장소가 원격과 일치하고 필수 Asset 검사가 통과하면 전달이 완료된 상태다.
 - Codex 원시 세션 폴더, `auth.json`, API Key, 토큰은 복사하지 않는다.
 
@@ -24,8 +26,8 @@ Unreal Editor와 실행 중인 명령줄 Editor를 모두 종료한다. 그다�
 ### 2-1. Unreal 저장소
 
 1. 저장소 `gyeonliz/drone`을 선택한다.
-2. 오늘 변경은 `Source/Drone/UI`·`Source/Drone/Flow`와 테스트·`AGENTS.md`다. 자산/맵 재이식은 필요 없다. `Saved` 보고서는 Git 제외이므로 필요한 증거는 별도 전달하거나 문서 결과를 참고한다.
-3. Commit 제목 예시: `훈련 메뉴와 UI 시안 반영 및 사운드 화면 설정`
+2. 실제 새 코드/자산 변경이 있는 경우에만 검토한다. 현재 UI·설정은 `9f67706`으로 공유돼 있으며 이번 최신화에는 Unreal 변경이 없다. `Saved` 보고서는 Git 제외이므로 필요한 증거는 민감 정보를 제외한 결과로 별도 전달하거나 문서 기록을 참고한다.
+3. 향후 UI 수정 Commit 제목 예시: `로비 목록 안정화와 패드 선택 보강`(이번에는 구현하지 않음)
 4. Commit 후 `Push origin`을 누른다.
 5. Git LFS 업로드가 끝날 때까지 GitHub Desktop을 닫지 않는다.
 
@@ -36,7 +38,7 @@ Unreal Editor와 실행 중인 명령줄 Editor를 모두 종료한다. 그다�
 3. Commit 제목 예시: `작업컴 인계 문서와 튜토리얼 가이드 최신화`
 4. Commit 후 `Push origin`을 누른다.
 
-기존 독립 맵/대형 환경 이식은 이미 원격에 있으므로 다시 구현/Commit하지 않는다. 오늘 후속 UI·Settings와 MD 변경만 새 공유 대상이다. `git lfs push`만으로는 Commit 이력이 올라가지 않으므로 사용자가 검토 후 Commit과 `Push origin`을 수행한다.
+기존 독립 맵/대형 환경과 UI·Settings는 수신 기준에 있으므로 다시 구현/Commit하지 않는다. 이번 새 공유 대상은 최신화 MD이며 Space 페이지는 별도 반영한다. `git lfs push`만으로는 Commit 이력이 올라가지 않으므로 실제 새 변경이 있을 때 사용자가 검토 후 Commit과 `Push origin`을 수행한다.
 
 ## 3. 작업컴에서 받는 순서
 

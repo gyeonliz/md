@@ -58,6 +58,10 @@
 - [`DRONE_BANGKOK_OILRIG_MIGRATION_2026-09-30.md`](assets/DRONE_BANGKOK_OILRIG_MIGRATION_2026-09-30.md): Bangkok 실맵과 OilRig Preview 분리 이식 결과, 검증·Git LFS 주의
 
 ## Git·협업·도구
+- [`CLAUDE_CODEX_SETUP.md`](git/CLAUDE_CODEX_SETUP.md): 다른 PC 협업 세팅·공유 경계
+- [`CLAUDE_CODEX_COLLABORATION.md`](git/CLAUDE_CODEX_COLLABORATION.md): Claude↔Codex 역할·위임·검증 규칙
+- [`USER_RULES.md`](git/USER_RULES.md): 사용자 공통 작업 규칙 공유 원본
+
 
 - [`DRONE_SPACES_SYNC.md`](git/DRONE_SPACES_SYNC.md): Drone Space 연결 페이지, 작업 마무리 갱신 규칙, Trello 대조와 동기화 한계
 - [`../WORK_PC_START_HERE.md`](../WORK_PC_START_HERE.md): 작업컴에서 Pull·LFS·Build·Tutorial 검증 후 Codex 작업을 즉시 재개하는 시작 문서

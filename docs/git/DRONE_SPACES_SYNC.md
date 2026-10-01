@@ -60,3 +60,25 @@
 ## 2026-10-01 연결 결과
 
 Unreal 수신 `83b33c1`, 문서 수신 `aecb6ec` 기준을 반영했다. Title/로비/독립 Tutorial 8·Story 4·Racing 1, Gate/물리/AI/날씨·환경 이식을 요약하고 미완료와 검증 출처를 분리했다. Trello 주요 카드 링크와 대조를 같은 진행 Page에 반영했다. 두 저장소의 기존 Clean은 연결 설정 이전 확인이며 이후 MD 변경과 새 AGENTS.md는 로컬 미커밋 상태다. Commit/Push·Trello 수정·권한 변경은 하지 않았다.
+
+### 같은 날 후속 — 현재 C PC 기준 갱신
+
+현재 Unreal `C:\URproject\drone`의 `9f67706`, 문서 작업 폴더의 `ff69c11`과 실제 원격 main을 대조했다. 점검 시작 두 Clean/0/0이며 이번 MD 변경만 로컬 미커밋이다. 위 D PC의 수신·연결 결과는 당시 기록으로 보존한다.
+
+기존 안내·진행/다음 작업·테스트·Blueprint 가이드 4개 Page의 갱신 연산 13건 모두 `applied`를 확인했다. 진행 Page의 구현 표/다음 작업 본문도 다시 읽어 기대 내용과 일치를 확인했으며 Trello 카드 링크를 보존했다. 현재 PC/Git·검증 출처, 목록 안정화 → 패드 선택 보강 → 수동 확인 → Best Lap → Tutorial 진행 → Story 순서를 반영했다. 기획 Page는 변경하지 않았고 새 Page는 만들지 않았다.
+
+D PC의 UI 5/5와 목록 튐 Fail 원시 보고서는 현재 C PC에 없으므로 이전 문서 근거로 표시했다. C PC의 기존 보고서는 읽었으나 이번 Build/PIE·수동 Pass는 없다. Trello 재조회/수정·권한 변경·예약/외부 모델 호출·Commit/Push 없이 로컬 MD와 해당 Space만 갱신했다. GitHub MD 링크의 새 본문 반영은 사용자가 이번 로컬 변경을 Commit/Push한 뒤다.
+
+### 같은 날 저녁 — Claude 결과 반영·저장 도구 차단
+
+2026-10-01 저녁 Space 반영 실패: 두 기존 페이지의 본문·편집 권한은 읽었으나 저장 도구가 "MCP tool call requires approval, but approval policy is never"로 차단했다. 이번 편집은 적용되지 않았다. 진행상황과 다음 작업의 UI 자동 검증/75개 판정/Shotgun 회귀/Figma 새 항목, 테스트 맵과 확인 가이드의 1280/1920·Story 상시 스크롤바 칸 수동 확인 항목이 미반영이다. 기획과 개발 기준은 변경하지 않았다. 새 Page·공유 권한 변경·예약 자동화는 없다.
+
+로컬 STATUS·WORKBOARD·DRONE_WORKLOG에는 Claude 작성 C PC `ec2e88f` 기준과 자동 검증/수동 대기 구분을 반영했다. Codex는 Unreal 쓰기·Build/PIE/맵 생성·Commit/Push·Trello/Figma 수정을 하지 않았다.
+
+### 같은 날 저녁 후속 — 협업 체계 반영·Space 저장 재시도 성공
+
+작업 도구 Claude, 문서·Space 반영 Codex. C PC Unreal HEAD `ec2e88f`와 지정 미커밋/미추적 목록을 읽기 전용 Git 조회로 확인했다. 협업 규칙·SETUP·브리지는 Unreal 저장소 `.claude/codex-bridge/`에 있으며 공유 설정과 Git 제외 PC 전용 설정을 분리했다.
+
+이번에는 진행상황과 다음 작업 6개 연산, 테스트 맵과 확인 가이드 1개, 프로젝트 안내와 갱신 규칙 1개가 적용됐다(총 8개, 모두 적용/거부 없음). 세 페이지를 저장 후 다시 읽어 기대 본문과 일치를 확인했다. 진행 Page에 UI 직전 160 버전 자동 검증·후속3건 Build 대기·75개 판정·Shotgun 회귀·NPC 개수 테스트·Figma 요구와 스토리/레이싱 현재 미정, 테스트 Page에 1280/1920·Story 상시 스크롤바 칸 수동 확인, 안내 Page에 역할 분담과 Codex 앱 코드 요청의 WORKBOARD 카드 인계를 반영했다.
+
+앞선 `approval policy is never` 실패는 당시 기록으로 보존하며 이번 대상 미반영은 없다. 기획과 개발 기준·Blueprint 조정과 팀원 가이드는 변경하지 않았다. 새 Page·공유 권한 변경·예약 자동화·Commit/Push·Trello/Figma 수정·Unreal 쓰기/Build/PIE/맵 생성은 하지 않았다. Space 루트 네이티브 지침 미등록은 기존 한계로 남아 있다.

@@ -7,3 +7,4 @@
 - Spaces에 접근할 수 없으면 로컬 갱신을 유지하고 미반영 범위를 보고한다. 동기화 완료·Build·수동 Pass를 추정하지 않는다.
 - 사람의 기획/디자인, 날짜별 기록, 팀원 Production Training 맵을 보존한다. 대용량 에셋·비밀 키·개인 로그를 업로드하지 않는다.
 - Commit/Push, 공유 권한 변경, 예약 자동화는 별도 사용자 지시 없이 하지 않는다. 문서 최신화만으로 엔진 Build나 맵 재생성을 실행하지 않는다.
+- 이 문서 저장소와 Drone Space는 Codex 담당, Unreal 코드는 Claude Code 담당. 코드 변경 요청을 받으면 WORKBOARD 카드로 남긴다. 협업 절차는 [Claude↔Codex 협업 규칙](docs/git/CLAUDE_CODEX_COLLABORATION.md)을 따른다.

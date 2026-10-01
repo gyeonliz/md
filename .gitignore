@@ -21,3 +21,6 @@ secrets.*
 *.tmp
 Thumbs.db
 Desktop.ini
+
+# PC-specific Claude paths
+.claude/settings.local.json

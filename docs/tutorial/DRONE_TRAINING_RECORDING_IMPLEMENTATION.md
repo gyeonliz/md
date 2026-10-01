@@ -1,10 +1,27 @@
 # TUT-03 Training Lap·Segment 기록 구현 가이드
 
-기준일: 2026-08-27 (Asia/Seoul)
+최신 반영일: 2026-10-02 (Asia/Seoul). 아래 TUT-03/TUT-04B 설명은 2026-08-27 당시 원본 계층 기록이며 영속화 최신 상태는 Best Lap 절을 따른다.
 
 Unreal 구현 기준: `551e287e8a5de7fa33f28d1911f8a7a957bd66fa` (`feat: record tutorial lap timing and distance`)
 
 이 문서는 TUT-03에서 실제 구현한 Lap·Segment 원본 기록 계층을 설명한다. 2026-08-26에는 이 원본을 기존 Flight HUD에 연결했고, 2026-08-27에는 TUT-04B로 현재 시도를 제외한 이전 성공 평균·Best·Delta와 Segment 비교를 추가했다. `USaveGame` 영속화와 점수는 아직 만들지 않았다.
+
+## Best Lap 영구 저장 (2026-10-02 새벽, C PC)
+
+작업 도구 Claude, 문서 반영 Codex. `DroneTrainingRecordSubsystem`이 **유효한 완주만** `CourseId|DroneId|ControlMode` 키로 최고 기록을 저장한다(HandlingPreset 제외). 기존 구간 기록·평균은 실행 History를 유지한다.
+
+- 실제 파일: `C:\URproject\drone\Saved\SaveGames\DroneTrainingBestLaps.json`(프로젝트 상대 경로 `Saved/SaveGames/DroneTrainingBestLaps.json`).
+- 자동화 파일: `DroneTrainingBestLaps_Automation.json`. 실제 사용자 기록을 보호하는 별도 슬롯이다.
+- 파일 없음은 NoSave. 다른 버전·손상은 백업 후 새로 시작한다. 손상 백업 이름은 `<슬롯>_Corrupt_<시각>.json`.
+- USaveGame 바이너리는 손상 로드 시 FName 길이 Assert로 엔진이 정지하는 문제가 발견되어 JSON 텍스트로 변경했다. 음량 SaveGame과는 별개다.
+- `BestElapsedSeconds`는 실행 History와 저장 기록 중 빠른 쪽이다. `bHasSavedBest / SavedBestElapsedSeconds / bIsNewSavedBest`로 저장 기록과 갱신 여부를 구분한다.
+- HUD는 첫 완주 전에도 “최고 완주 기록 nn.nn초 (저장)”을 표시한다.
+
+초기화하려면 게임/Editor를 종료하고 실제 `DroneTrainingBestLaps.json` 파일을 삭제한 뒤 다시 실행한다. 모든 코스·기체·조작의 저장 최고 기록이 초기화된다. 백업을 보존하려면 삭제 전에 다른 이름으로 복사한다. 이번 문서 작업에서는 파일을 삭제하지 않았다.
+
+수동 확인: 같은 코스·기체·ControlMode로 유효 완주 → 종료 → 같은 조건으로 두 번째 실행 → 첫 완주 전 HUD 저장 최고 기록 확인 → 더 빠른 유효 완주 후 저장 갱신 확인. HandlingPreset 변경은 같은 키, DroneId/ControlMode 변경은 다른 키다.
+
+C PC Claude NullRHI `Drone.Tutorial.*` + `BestLapPersistence`: BestLapPersistence 및 나머지 튜토리얼 Success, 기존 Production Training `TrainingAssets / TrainingPIESmoke` 2건 Fail, 원본 맵 미수정. 근거 `C:\URproject\drone\Saved\Automation\ClaudeBestLap\test2.log`. 실제 랩 재실행 복원은 수동 확인 대기이며 정식 레이싱 방식은 현재 미정이다.
 
 ## 1. 왜 필요한가
 

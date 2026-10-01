@@ -45,7 +45,7 @@ OpenAI의 [인증 문서](https://learn.chatgpt.com/docs/auth)는 파일 기반 
 ## 보내는 PC의 작업 종료 절차
 
 1. Git 작업 절차에 맞게 Unreal Editor 내용을 저장하고 필요하면 Editor를 종료한다.
-2. `drone` 프로젝트 변경 사항을 검토하고, 의도한 Branch에 Commit한 뒤 Push한다.
+2. `drone` 프로젝트 변경 사항을 검토하고, 의도한 Branch에 Commit한 뒤 Push한다 — 사용자가 요청한 경우에만(기본은 사용자가 GitHub Desktop으로 처리).
 3. `md` workspace의 `CONTEXT.md`, `STATUS.md`, `WORKBOARD.md`를 다음 내용으로 갱신한다.
    - 현재 목표
    - 완료하고 테스트한 작업
@@ -53,7 +53,7 @@ OpenAI의 [인증 문서](https://learn.chatgpt.com/docs/auth)는 파일 기반 
    - 정확한 다음 행동
    - 결정 사항과 제약 조건
    - 미해결 질문과 알려진 문제
-4. 변경된 Markdown과 도구 범위를 검토하고 `md` 저장소에 Commit·Push한다.
+4. 변경된 Markdown과 도구 범위를 검토하고 `md` 저장소에 Commit·Push한다 — 사용자가 요청한 경우에만(기본은 사용자가 GitHub Desktop으로 처리).
 5. 단일 인계본이 필요한 경우에만 별도의 인계 패키지를 Export한다.
 6. 생성된 `handoff.md`를 열어 모든 줄을 검토한 뒤 신뢰할 수 있는 전달 수단으로 두 파일짜리 패키지만 옮긴다.
 
@@ -132,9 +132,9 @@ Import 스크립트는 복사 전에 패키지 구조와 해시를 확인한다.
 
 처음에는 명시적인 두 명령과 사람의 검토 절차로 운영한다. 작업 흐름이 안정된 다음 Wrapper Script로 아래 단계를 연결할 수 있다.
 
-1. `drone` Git Status/Commit/Push 결과 확인
+1. `drone` Git Status/Commit/Push 결과 확인 — Commit/Push는 사용자가 요청한 경우에만(기본은 사용자가 GitHub Desktop으로 처리)
 2. `md`의 `CONTEXT.md`, `STATUS.md`, `WORKBOARD.md` 갱신
-3. `md` Status/Commit/Push 결과 확인
+3. `md` Status/Commit/Push 결과 확인 — Commit/Push는 사용자가 요청한 경우에만(기본은 사용자가 GitHub Desktop으로 처리)
 4. 선택적으로 `Export-WorkContext.ps1` 실행
 5. 다른 PC에서 `drone` Pull/LFS와 `md` Pull 확인
 6. 패키지를 사용한 경우에만 `Import-WorkContext.ps1` 실행
@@ -142,3 +142,60 @@ Import 스크립트는 복사 전에 패키지 구조와 해시를 확인한다.
 자동화 이후에도 데이터 분리와 안전 경계는 그대로 유지한다. Codex Profile을 몰래 검색하거나 원시 Session/Credential을 복사하거나 환경변수를 덤프하면 안 된다. Git Push의 종료 코드를 확인하지 않고 성공했다고 추측해서도 안 된다.
 
 스크립트별 사용법과 매개변수는 [`../tools/context-sync/README.md`](../../tools/context-sync/README.md)를 참고한다.
+
+## 2026-10-01 Codex → Claude 설정·대화 이관
+
+작업 도구를 Codex(ChatGPT)에서 Claude Code로 옮기면서, 같은 PC의 Codex 설치본에서 설정값과 대화 기록을 읽어 Claude 쪽에 이관했다. Codex 설치본(`C:\Users\jkw11\.codex`)은 지우지 않고 원본 근거로 남긴다. 이 절은 PC 간 전달 규칙을 바꾸지 않는다. 자격 증명과 원시 세션 상태를 옮기지 않는다는 위 금지 목록은 그대로 유효하다.
+
+### 읽은 원본
+
+| 원본 | 내용 |
+| --- | --- |
+| `~/.codex/config.toml` | `model = gpt-6.1-sol`, `model_reasoning_effort = xhigh`, `approval_policy = never`, `sandbox_mode = danger-full-access`, `mcp_servers.node_repl`, 플러그인 11개, `notify`(turn-ended 알림) |
+| `~/.codex/rules/default.rules` | 세션에서 승인했던 명령 Prefix 허용 목록(PowerShell 조회, UnrealEditor-Cmd Python 탐침, `winget` 등) |
+| `~/.codex/state_5.sqlite`, `thread_history_1.sqlite` | 전체 171 스레드 중 드론 관련 58 스레드, 사용자 메시지 187건(2026-08-12 ~ 2026-10-01) |
+
+### Claude 쪽 반영 위치
+
+| Codex | Claude |
+| --- | --- |
+| 모델·추론 강도 | `C:\Users\jkw11\.claude\settings.json`의 `"model": "opus"` |
+| `approval_policy = never` + `danger-full-access` | `permissions.defaultMode: acceptEdits` + 조회 명령 `allow`. Commit/Push·`reset`·`clean`·`stash`와 Production Training 맵 수정은 승인 요청으로 유지 |
+| 샌드박스 쓰기 루트(문서 저장소) | 각 프로젝트의 Git 제외 `.claude/settings.local.json`의 `permissions.additionalDirectories`로 PC별 경로 등록(공유 `.claude/settings.json`과 분리) |
+| `default.rules` 허용 목록 | 자주 쓰는 Git 조회 명령만 `allow`로 옮겼다. 1회성 PowerShell 조회문은 옮기지 않았다 |
+| 플러그인(chrome·browser·visualize·documents/pdf/spreadsheets/presentations·computer-use) | Claude 내장 브라우저·문서 스킬로 대체 |
+| `mcp_servers.node_repl` | Codex 전용 런타임이라 이관하지 않음 |
+| Unreal MCP(`http://127.0.0.1:8000/mcp`) | `drone` 저장소 루트 `.mcp.json`. Editor 쪽 서버가 켜져 있을 때만 연결 |
+| `auth.json`, API Key, 세션 DB, 브라우저 프로필 | 이관하지 않음 |
+| `notify`(turn-ended 실행 파일) | 이관하지 않음. 필요하면 Claude Hook으로 따로 설정 |
+
+### 대화에서 추출한 상시 지침
+
+두 저장소의 `CLAUDE.md`와 이 PC의 Claude 프로젝트 메모리에 반영했다.
+
+- 한국어 응답, 한국어 Commit 메시지.
+- 정확성 우선. 미확정은 "현재 미정"으로 구분하고, 군/국가 설정·적군 국적·J3C 실제 협력 관계·최종 드론 종류·게임 규칙·멀티플레이·세부 입력·최종 물리를 임의로 확정하지 않는다.
+- 사용량 절약. 전체 문서 재독·반복 동기화 금지(2026-09-02 지적).
+- 기능 단위 완성 후 다음 단계. 작업은 1~3시간 크기.
+- 새 시스템 설명 8단계: 왜 → 담당 클래스 → 헤더 → CPP → Blueprint → Editor 테스트 → 정상 결과 → 문제 시 확인 항목.
+- 코드·Blueprint 주석과 조정 수치 노출(사격 산포, 체력, 기상 세기 등).
+- Commit/Push는 요청 시에만. Figma `Project Droner`와 Trello는 읽기 전용.
+
+### 한계와 후속
+
+- 이관은 대화에서 확인된 지침·사실의 요약이다. Codex 원시 스레드 본문을 저장소에 복사하지 않았다.
+- 2026-09-17 대화에 OpenRouter API 키가 평문으로 남아 있다. 저장소에 옮기지 않았고 폐기·교체가 필요하다.
+- Drone Space(ChatGPT Pages)는 Claude에서 접근할 수 없어 이번 이관 내용은 Space에 반영되지 않았다.
+- Commit/Push는 하지 않았다. 이 변경은 로컬 미커밋 상태다.
+
+### 역할 분담과 브리지
+
+코드(`Source/Drone`·Build·자동화 테스트)는 Claude, md·Drone Space·Figma/Trello 대조·보고서·교차 리뷰는 Codex가 담당한다. Claude는 `C:\URproject\drone\.claude\codex-bridge\Invoke-CodexTask.ps1`의 역할 `docs`/`review`/`research`로 Codex를 비대화형 호출한다. 샌드박스상 Codex는 Unreal 저장소를 쓸 수 없다. 2026-10-01 연결 시험 종료 코드 0(Claude 지시서 근거).
+
+2026-10-01 저녁 후속(C PC): 사람용 문서는 md 저장소 `docs/git/`의 [협업 규칙](CLAUDE_CODEX_COLLABORATION.md)·[다른 PC 세팅](CLAUDE_CODEX_SETUP.md)·[사용자 공통 규칙](USER_RULES.md)으로 이동했다. 지시서 틀 `BRIEF_TEMPLATE.md`, 스크립트 `Invoke-CodexTask.ps1`·`Test-CollabSetup.ps1`·`BridgeCommon.ps1`, 역할 파일은 Unreal 저장소 `.claude/codex-bridge/`에 남는다. `Invoke-CodexTask.ps1`은 PC별 경로 자동 탐색과 docs 역할의 `--approve-for-me`를 지원한다. 작업 도구 Claude, 문서 반영 Codex.
+
+공유 대상은 두 저장소의 지침·가이드·브리지 스크립트·역할·공유 `.claude/settings.json`이다. PC 전용 경로는 Git 제외 `.claude/settings.local.json`과 브리지 `local.json`에 두며 `runs/`·`briefs/`도 제외한다. md의 `permissions.additionalDirectories`는 공유 설정에서 로컬 설정으로 옮겼다. 인증 파일과 사용자 홈 설정·원시 세션은 전달하지 않는다.
+
+Claude 지시서 기준 C PC `Test-CollabSetup.ps1 -WriteLocalConfig`는 `COLLAB_READY`(FAIL 0), WARN은 공유 파일 Git 미추적·Editor 실행 중이다. 공유 파일은 미커밋이며 다른 PC 실제 세팅은 미구현이다. 사용자가 drone·md Commit/Push → 다른 PC Pull → 같은 점검의 COLLAB_READY → 첫 docs 위임의 Space 저장 확인 순서로 완료한다. Codex는 점검/Build/PIE를 실행하지 않았다.
+
+사용자 공통 규칙 공유 원본은 md `docs/git/USER_RULES.md`이며 C PC ~/.claude/CLAUDE.md에 가져오도록 설치했다(2026-10-01 저녁 후속, Claude 지시서: COLLAB_READY·사용자 공통 규칙 설치됨). 다른 PC는 Pull 후 `Test-CollabSetup.ps1 -WriteLocalConfig -InstallUserRules`로 설치한다. 진행 요청 끝까지 직접 수행·실제 연결된 맵 검증·패드/뒤로가기/성능 확인의 드론 전용 추가 규칙은 Unreal CLAUDE.md에 있다.

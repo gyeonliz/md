@@ -12,7 +12,7 @@
 - 로비·브리핑·기체 선택은 1920×1080 설계를 비율 유지해 축소하고 긴 설명은 스크롤한다. 1280×720·1920×1080 실제 화면 가독성은 수동 확인 대기다.
 - Setting의 임시 품질 3버튼을 전체 음량·창 모드·해상도·품질·수직 동기화·프레임 제한과 적용/기본값/뒤로가기 화면으로 교체했다. 저장과 미적용 취소 기준은 아래 9절을 따른다.
 - 회전 수업을 **방향 맞추기가 아닌 원형 코스를 한 바퀴 도는 비행**으로 수정했다.
-- 독립 레이싱 시험맵을 추가했다. 정식 경기 규칙, 순위, Best Lap 영구 저장까지 완료한 것은 아니다.
+- 독립 레이싱 시험맵을 추가했다. Best Lap JSON 영구 저장은 2026-10-02 구현·자동 검증 완료·실기 재실행 확인 대기다. 정식 경기 규칙·순위는 미완료다.
 
 ## 2. 어디를 열고 테스트하나
 
@@ -173,3 +173,57 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 권장 수정은 같은 목록의 버튼을 재사용하고 선택 강조/상세만 갱신하는 것, 첫 Paint 전에 Label의 줄바꿈 폭을 실제 가용 폭과 여백에서 결정하는 것이다. 스크롤 위치·포커스도 보존한다. 진단 비교의 `160px`는 원인 분리용 시험값이지 최종 UI 폭이 아니다.
 
 진단 테스트: `Source/Drone/Flow/Tests/Diagnostics/DroneLobbyLayoutStabilityTest.cpp`, 이름 `Drone.Flow.Diagnostic.LobbyLayoutStabilityPIE`. `RenderOffscreen`으로 실행하고 `LobbyLayoutHoverOnly`로 최소 재현, `LobbyLayoutWrapProbe`로 transient Widget 비교를 추가한다. NullRHI는 이 Geometry 검사에 사용할 수 없다. 보고서는 `Saved/Automation/LobbyLayoutDiagnosticWrapProbe/index.json`(2026-10-01 02:31:18 UTC)이며 원래 UI가 실패하므로 전체 Result는 **Fail**이다. 실제 수정 이후 동일 검사와 1280/1920 화면 확인을 다시 통과해야 완료다.
+
+## 11. 패드 UI 확인 범위
+
+2026-10-01 C 드라이브 PC의 소스 `9f67706`을 확인했다. Root/기체 선택의 `NativeOnPreviewKeyDown`은 Esc·패드 Face Button Right·Virtual Back을 처리한다. Root의 화면 전환은 `SetUserFocus`로 Root 자신에 포커스를 주며 첫 활성 버튼을 선택하는 코드가 아니다. 네이티브 UI의 화면별 명시 탐색 설정·포커스 강조와 패드만으로 전 화면을 완주하는 검사도 확인되지 않았다. 기본 UMG 포커스 이동이 가능한 경우와 완전한 패드 지원을 구분한다.
+
+다음 구현 범위는 시작/로비/브리핑/기체 선택/설정/결과의 초기 활성 버튼 포커스, 방향 탐색·확인/취소, 포커스 강조, 숨김/비활성 항목 제외, 목록 변경·Back 뒤 선택/스크롤 복원이다. 설정 Slider/ComboBox도 포함한다. 목록 전체 재생성 문제를 먼저 수정해 포커스가 붙은 버튼이 선택할 때마다 사라지지 않게 한다.
+
+완료 조건은 키 입력 자동화와 실제 패드 수동 확인을 분리한다. 마우스를 쓰지 않고 메뉴 진입→탭/미션 선택→브리핑→기체 선택→출격, 설정 조절/적용/취소, 결과→재시도/로비를 확인하고 `PC / 패드 / 화면 / 입력 / 기대 / 결과`를 기록한다. 기존 Back 계약 성공이나 NullRHI 5/5를 이 전체 Pass로 사용하지 않는다. 이번 최신화에서는 코드·BP 변경과 새 검증을 실행하지 않았다.
+
+### 패드 조작 — 2026-10-01 밤 후속
+
+C PC Unreal `ec2e88f` + 로컬 미커밋, 작업 도구 Claude·문서 반영 Codex. UI-PAD-01은 구현됨·자동 검증 완료·실제 PS4 패드 수동 확인 대기다. 위 `9f67706`의 보강 전 기록은 당시 범위다.
+
+| 입력 | 동작 |
+|---|---|
+| 방향 입력 / A / B | UE 기본 방향 탐색·확인 / 각 화면의 기존 Back |
+| 훈련 로비 LB / RB | 튜토리얼 / 레이싱 탭 전환 |
+| 로비 미션 목록 → / 출격 ← | 출격 버튼 / 고른 미션 |
+| 기체 카드 ↑ / 출격·조작 모드 ↓ | 출격 / 고른 카드 |
+| 결과 다시 하기 ↓ | 로비로 |
+| 설정 음량 슬라이더 A → 좌우 | A로 잠근 뒤 UE 기본 좌우 조정 |
+
+| 화면 | 첫 포커스/복귀 |
+|---|---|
+| 타이틀 | 마지막으로 쓴 버튼 → 없으면 시작 |
+| 로비 | 고르던 미션 → 미션 종료 복귀 시 방금 한 미션(`LastLobbyMissionId`) → 첫 미션 |
+| 브리핑 | 출격 버튼 |
+| 설정 | 음량 슬라이더, 닫으면 타이틀 설정 버튼 |
+| 기체 선택 | 고른 기체 → 첫 기체 |
+| 결과 | 실패면 다시 하기, 성공이면 로비로 |
+
+공통 `FDroneGamepadFocus`는 첫 조작 가능한 위젯에 포커스를 주고 새로 보인 위젯이 배치될 때까지 최대 30프레임 재시도한다. 강조는 RenderScale(기본 1.06)·버튼 글자색이며 그리기 변환만 바꿔 레이아웃을 유지한다. 각 UI 위젯(FrontEndRoot·Settings·Selection·MissionResult)의 Class Defaults `GamepadFocusScale`·`GamepadFocusTint`에서 조정한다. 목록의 `ScrollWhenFocusChanges`로 포커스를 따라 스크롤한다. 기체 선택의 출격은 기체 선택 전 비활성이므로 카드에서 A로 먼저 고른 뒤 ↑를 누른다.
+
+자동 검증(C PC, Claude, RenderOffScreen 1920×1080): `GamepadNavigationPIE` 11단계·`GamepadMissionFlowPIE` 16단계 Success, `LobbyLayoutStabilityPIE` Success(최대 0.255px). 근거 `C:\URproject\drone\Saved\Automation\ClaudePad\render6.log`. 전체 NullRHI의 패드 2개는 렌더링 필요 경고로 건너뛰어 별도 렌더 검사와 구분한다. 실제 PS4 패드 검증은 아니다.
+
+수동 확인 순서: 마우스 없이 타이틀 포커스→훈련→Hover 선택→→출격→브리핑→카드 A 선택→↑출격→↓카드 복귀→↑출격을 확인한다. 훈련 LB/RB 탭·선택 복원·B 타이틀 복귀, 설정 A 슬라이더 잠금/좌우·적용/취소/B 설정 버튼 복귀, 결과 다시 하기↓로비로·미션 선택 복원과 강조 가독성을 확인한다. 실패 재출격 DA를 쓰는 튜토리얼에서 추락 시 현재는 결과 화면 대신 첫 출격 위치에서 재출격하는 체감도 확인한다. 자동 결과 화면 탐색 검사는 재출격 수동 확인과 구분한다. `PC / PS4 패드 / 화면 / 입력 / 기대 / 결과`를 남기고 수동 Pass를 추정하지 않는다.
+
+## 배터리·신호 대역·HUD 조정 (2026-10-02 새벽, C PC)
+
+작업 도구 Claude, 문서 반영 Codex. 기존 풍향 N/E/…·풍속은 구현되어 있으며 바람 아래 오른쪽 위 패널에 기체명과 신호 대역, 배터리 줄을 추가했다.
+
+| 위치 | 조정값 | 의미 |
+|---|---|---|
+| `/Game/Drone/Data/Drones/DA_Drone_*`의 비행 프로필 | BatteryLifeSeconds | 플레이어 조종 중 소모할 용량(초). 0=배터리 끔·HUD 배터리 줄 숨김 |
+| 같은 기체 Definition의 FlightProfile | SignalBandLabel | 신호 대역 표시 문자열. 5.8GHz는 시험 예시 |
+| 기체 Pawn BP Class Defaults의 DroneBatteryComponent | LowBatteryFraction | 기본 0.2 이하 부족 경고 |
+| 같은 Battery Component | DepletedResponse | 기본 WarnOnly(경고만), 선택 FailMission(미션 실패 처리, 미션이 재출격 설정이면 재출격) |
+| FrontEnd Root Class Defaults | BriefingSecondsPerCharacter / BriefingMinLineSeconds / BriefingMaxLineSeconds | 브리핑 자동 시간 기본 0.075초/글자·2.5~9초. 줄별 DurationSeconds는 Mission DA에서 조정 |
+
+모든 기체에 DroneBatteryComponent가 기본 부착된다. HUD는 “기체명 | 신호 대역” / “BATTERY nn% (mm:ss)”, 부족 시 빨간색·“부족”, 소진 시 “방전”을 표시한다. **현재 기체별 BatteryLifeSeconds는 모두 0, SignalBandLabel은 빈 값이다.** 배터리 시간·소진 처리·신호 대역 최종값은 현재 미정이다.
+
+시험용 기체 Definition에 양수 BatteryLifeSeconds와 시험 신호 문자열을 넣어 출격한 뒤 시작 100%·조종 중 소모·부족·방전을 확인한다. 기체 선택 대기/AI 조종 중에는 소모되지 않아야 한다. FailMission은 미션 FailureResponse에 따라 실패 결과 또는 새 기체 재출격이 되어야 한다. 시험 값은 최종 기획값으로 남기지 않는다. Production Training을 시험용으로 덮어쓰지 않는다.
+
+2026-10-02 C PC Claude NullRHI BatteryHUDPIE + HUD 2개 + CheckpointRestart **4/4 Success**, 근거 `C:\URproject\drone\Saved\Automation\ClaudeHUD\test.log`. 패널 위치·가독성 수동 확인 대기다. 브리핑 대사 DA 입력법은 [Mission 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md)를 따른다.

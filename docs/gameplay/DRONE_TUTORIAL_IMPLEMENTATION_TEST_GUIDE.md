@@ -1,6 +1,6 @@
 # Drone Tutorial 구현·테스트 가이드
 
-기준일: 2026-10-01. Figma의 Tutorial 8개 훈련과 사용자의 회전=원형 코스 비행 정정을 반영했다. Figma 원본은 수정하지 않았다. 시작 화면·탭·원형 코스 상세는 [별도 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)를 따른다.
+기준일: 2026-10-02 새벽 후속(C PC, Unreal ec2e88f + 로컬 미커밋). 작업 도구 Claude·문서/Space 반영 Codex. TUT-PROGRESS-01 구현·렌더 자동 검증·수동 확인 대기 반영. Figma의 Tutorial 8개 훈련과 사용자의 회전=원형 코스 비행 정정을 반영했다. Figma 원본은 수정하지 않았다. 시작 화면·탭·원형 코스 상세는 [별도 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)를 따른다.
 
 ## 1. 목표와 안전 경계
 
@@ -40,7 +40,7 @@
 | UGV 무장 | `UDroneGroundWeaponComponent`, 직사 총탄과 중력·반경 피해 유탄 구현 |
 | 적 NPC/고정포탑 | 체력 100 NPC, 자동포탑과 공용 Damage Target 기반은 있음 |
 | 공통 Mission UI | 현재 목표·진행·역할 안내와 성공/실패·재시도·로비 복귀는 있음 |
-| Tutorial 전용 UI | 단계별 브리핑, 클리어 타임, 전체 8개 진행도·완료 UI는 없음 |
+| Tutorial 진행 UI | TUT-PROGRESS-01 시간·다음 수업·n/8·전체 완료 구현·자동 검증됨·수동 확인 대기. 기존 결과 Widget 사용, 조작키 브리핑 미입력(문구 결정 필요) |
 | 전체 환경 | 현재 맵은 평면 Greybox다. Figma의 Warehouse 메모는 아직 미반영 |
 
 현재 기능 시험 맵은 다음 두 개를 구분한다.
@@ -69,7 +69,7 @@
 
 ### Data Asset이 담당할 것
 
-각 수업은 독립 `UDroneMissionDefinition`으로 먼저 만든다. 독립 실행·재시도·자동화가 안정된 뒤 전체 8개 순차 진행 Controller를 붙인다.
+각 수업은 독립 `UDroneMissionDefinition`으로 만들며 `NextMissionId` 연결을 기존 `UDroneGameFlowSubsystem`이 읽어 전체 8개 순차 진행을 관리한다(5절).
 
 필수 필드는 다음과 같다.
 
@@ -235,22 +235,54 @@ Figma에서도 4-1과 합칠지는 미정이므로 처음에는 별도 Data Asse
 
 ## 5. Tutorial 전용 UI 구현
 
-기존 `UDroneMissionObjectiveWidget`과 `UDroneMissionResultWidget`은 유지한다. Tutorial 전용 표현은 Blueprint Widget 또는 얇은 C++ 부모로 추가한다.
+### 현재 구현·결과 화면 (TUT-PROGRESS-01)
 
-권장 WBP:
+2026-10-02 새벽 C PC `ec2e88f` + 로컬 미커밋, 작업 도구 Claude·문서/Space 반영 Codex. **구현됨·자동 검증됨·수동 확인 대기**. 기존 `UDroneMissionResultWidget`이 Figma S48(수업 완료)·S49(전체 완료)를 담당하며 별도 `WBP_TutorialBriefing / WBP_TutorialLessonResult / WBP_TutorialProgress / WBP_TutorialComplete` 4개는 없다. `UDroneMissionObjectiveWidget`도 유지한다.
 
-| Widget | 역할 |
+| 결과 | 표시·버튼 |
 |---|---|
-| `WBP_TutorialBriefing` | 수업 이름, 목표, 조작키, 시작 버튼 |
-| `WBP_TutorialLessonResult` | 클리어 시간, 재시도, 다음 수업 |
-| `WBP_TutorialProgress` | 현재 `n/8`, 완료 수업 표시 |
-| `WBP_TutorialComplete` | 전체 완료, 로비 복귀 |
+| 수업 완료(S48) | “훈련 완료”, 수업 이름, “시간 mm:ss.cc”, “수업 n/8 \| 완료 c/8”. [다음](패드 첫 포커스) [다시하기] [작전 로비로 복귀]. 복귀 버튼은 Figma에 없지만 유지 |
+| 8개 모두 완료(S49) | “훈련 완료”, “이제 운용 할 준비가 되었습니다.”, “수업 8/8 모두 완료”. [미션 진행](로비 미션 탭 M1) [시작 메뉴](타이틀). [다시하기] 숨김 |
+| 스토리 등 성공 | “미션 성공”, “클리어 시간”, “미션 n/4 \| 완료”, [다음 미션: 이름] |
+| 실패 | “진행 시간”, 패드 첫 포커스 [다시하기] |
 
-Widget Tick에서 Mission 상태나 Pawn을 매번 찾지 않는다. Director의 `OnMissionSnapshotChanged`, 결과 Delegate와 역할 Component Delegate를 구독한다.
+Figma S48·S49 문구는 원문을 따르며 “운용 할” 띄어쓰기도 유지한다. [다음]은 FrontEnd 맵의 다음 수업 브리핑(MissionTrailer)부터 열고 [출격]하면 그 수업 맵을 연다. 수업 순번과 완료 수는 서로 다르다.
 
-클리어 시간은 Widget이 직접 재지 않는다. Mission 시작 시각과 성공 시각을 Runtime 데이터에서 계산해 결과 Struct로 전달한다. Best 기록 영속화는 화면과 수치가 확정된 뒤 `USaveGame`으로 추가한다.
+### 순서 변경·시간·완료 기록
 
-전체 8개 진행 관리 클래스는 아직 없다. 독립 수업 검증이 끝난 뒤 `UDroneTutorialProgressSubsystem` 또는 기존 `UDroneGameFlowSubsystem`의 Tutorial 전용 데이터로 추가한다. 둘을 동시에 만들지 말고 GameInstance 수명의 소유자 한 곳만 선택한다.
+1. `/Game/Drone/Data/Missions/DA_Mission_*`의 `Mission Definition|Progression → NextMissionId`에 다음 DA의 **MissionId**를 지정한다.
+2. 현재 연결은 호버→전진→회전→게이트→자폭(FPV)→드랍(Payload)→UGV NPC→포탑. 마지막 포탑은 연결 없이 끝낸다. 공용 Training·Racing도 연결 없음.
+3. 순서를 바꾸면 연결의 앞/뒤 DA를 함께 맞추고 마지막 연결을 비운다. `GetMissionSequence`에 고리 방어가 있지만 잘못된 고리를 정상 수업 과정으로 취급하지 않는다. 결과 [다음]·로비 순서·수업 n/8은 이 연결을 따른다.
+4. Story는 M1 골든타임→M2 인터셉트→M3 베일브레이커→M4 엔드게임. M2→M3 결과 분기 자체는 현재 미정이며 NextMissionId는 순서만 정한다.
+
+`UDroneGameFlowSubsystem`: `RequestNextMission`(성공 결과에서만), `GetNextMissionId`, `GetMissionSequence`, `GetMissionSequencePosition`(순번·전체·완료 수), `IsMissionCompleted`, `GetMissionIdsInLobbyOrder`, `RequestReturnToLobbyFocusing`, `RequestReturnToTitle`. Snapshot `CompletedMissionIds`는 이번 실행 동안만 유지하며 **영구 저장은 현재 미정**이다. Best Lap JSON 저장과 별개다. `LastMissionElapsedSeconds`는 Mission Director가 World 시간으로 출격~결과(재출격 포함)를 계산해 넘긴다. Director 공개 `GetMissionElapsedSeconds()` 사용, Widget에서 직접 시간을 재지 않는다.
+
+로비 튜토리얼 탭은 호버부터 수업 순서이고 공용 Training은 그 뒤, 미션 탭은 M1→M4다. 이번 실행에서 성공한 이름 뒤 “· 완료”, 설명에 “수업 n/8 (완료 c)” 또는 “순서 n/4”가 표시된다.
+
+### BP 문구·선택 WBP 이름
+
+결과 위젯 Class Defaults의 `Tutorial Text`에서 다음 6개 문구를 바꿀 수 있다: `TrainingCompleteTitle`, `TutorialAllCompleteMessage`, `NextLessonButtonLabel`, `TutorialRetryButtonLabel`, `ContinueToMissionsButtonLabel`, `TitleMenuButtonLabel`.
+
+선택 위젯 이름: `MissionResultDetailText`, `NextMissionButton`(+`NextMissionButtonText`), `RetryMissionButtonText`, `ReturnToLobbyButtonText`. 결과 화면 배치·문구를 조정한 뒤 패드 첫 포커스와 버튼 표시/숨김을 함께 확인한다.
+
+### 검증·수동 확인
+
+- Claude DA 연결 저장: Editor Python 튜토리얼 8·Story 4 **12/12 저장·재조회, exit 0**, 맵 미수정. `C:\URproject\drone\Saved\Automation\ClaudeTutProgress\py.log`·`py2.log`.
+- 신규 `Drone.Flow.TutorialProgression`·`TutorialNextLessonPIE`·`TutorialCompletePIE` **3건 Success**(C PC Claude, RenderOffScreen 1920×1080, `C:\URproject\drone\Saved\Automation\ClaudeTutProgressFull\test2.log`). 순서·위치·고리 방어·실패 다음 불가·8개 연속 다음·시간·완료 8/8·타이틀/로비 정렬/M1 포커스를 검증했다. 실제 호버 출격→목표 완료→“수업 1/8 | 완료 1/8”·[다음] 첫 포커스→전진 브리핑도 검사했다. 전체 완료 PIE는 나머지 7개를 테스트용 완료 처리한 뒤 호버 클리어→S49를 검사한 것이며 실제 8수업 수동 완주는 아니다.
+- 전체 렌더 회귀는 **87개 중 81 Success·6 Fail**. NPC 감지 1·기존 Production Training 2·렌더 Shotgun 1·레이아웃 진단 변동 1·전체 실행 순서 의존 Route 1. 상세는 STATUS/WORKBOARD를 따른다. GamepadMissionFlowPIE의 호버 DA 결과 모드 변경은 검사 동안만 메모리에서 수행(저장 안 함), Route 숫자키 대기는 최대 30프레임이다.
+- 수동 확인 대기: FrontEnd 로비 튜토리얼→호버 클리어→S48 글자/배치·[다음]→전진 브리핑→[출격], 8개 연속 진행 체감·로비 “· 완료” 가독성, 전체 완료 S49→[미션 진행] M1/ [시작 메뉴] 타이틀. 자동화 성공을 실제 화면·패드 수동 Pass로 확대하지 않는다. Codex는 Build·PIE·맵 생성 도구를 실행하지 않았다.
+
+### Figma에 없는 항목·문구 결정 필요
+
+Codex research 2026-10-02 `runs/20261002-003829-research-research-tutorial-controls/result.md`(Unreal `.claude/codex-bridge/` 아래), Figma Page 1 S45~S51 조사 기준이다. “없음”은 조사한 튜토리얼 원문에서 찾지 못했다는 뜻이다.
+
+- 8수업의 키보드 키 배정.
+- 자폭·드랍·UGV NPC·고정형 포탑의 구체적인 패드 키, 실제 브리핑 대사·별도 상세 클리어 조건 문구.
+- 튜토리얼 화자(교관/허브 등) 표기.
+- 수업별 전용 전체 완료 문구(공통 전체 완료는 S49에 있음).
+- 구현 Actor Tag·Event·체력·Arm/Disarm·귀환 규칙을 확정하는 원문.
+
+호버·전진·회전·게이트 4개에는 패드 기준 브리핑 원문이 있다. 미기재분 문구·화자 결정이 필요해 **이번 튜토리얼 조작키 브리핑은 넣지 않았다**. Story 허브 대사를 임의 전용하지 않는다. 4-1·4-2 통합은 Figma “합칠지 상의 필요”로 현재 미정이다.
 
 ## 6. Test Map 구성 순서
 
