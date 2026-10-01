@@ -12,10 +12,15 @@
 
 ## 맵 소유권
 
+- 후속 점검/테스트의 기준은 [비행 물리·OilRig 비·UI·독립 미션 가이드](docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md)다. Acro는 현실 요소를 반영한 근사 모델이며 실기체 검증 완료라고 표현하지 않는다.
+- `/Game/Drone/Maps/TestMap/Tutorial/Lvl_Tutorial_*_Test`: 수업 8개 독립 시험맵. 해당 DA MissionMap과 Default Mission Entry가 연결됐다. 기존 공유 시험맵은 보존한다.
+- `/Game/Drone/Maps/TestMap/Lvl_OilRigRainComparisonTest`: 원본/비 끔/근거리 원본/프로젝트 비 A/B 비교용이다. `Lvl_OilRigPreview`와 ThirdParty Niagara 원본에 실험 세팅을 저장하지 않는다.
+
 - `/Game/Drone/Maps/Lvl_DroneTraining`: 팀원이 실제 Tutorial 환경을 제작하는 Production 맵이다. 합의 전 저장·덮어쓰기·자동 재구성·분할·이동을 금지한다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`: Course, Gate, 역할 기능과 HUD를 자유롭게 검증하는 경량 시험 맵이다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneTrainingRouteSelectionTest`: Route 4개를 편집하고 Play 중 `1~4` 고정 선택·`5` 무작위 선택을 검증하는 독립 시험 맵이다. Production Training과 분리한다.
-- `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`: Hover/Forward/Heading/Gate/FPV/Payload/UGV NPC/UGV Turret 8개 독립 Mission이 공유하는 평면 Greybox 시험장이다. FrontEnd에서 Mission을 선택해 진입하며 `DroneTutorialMissionTest.Owned` Tag Actor만 생성 도구가 관리한다.
+- `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`: Hover/Forward/Orbit/Gate/FPV/Payload/UGV NPC/UGV Turret 8개 독립 Mission이 공유하는 평면 Greybox 시험장이다. Orbit은 원형 코스 한 바퀴이며 기존 Heading DA ID만 호환용으로 유지한다. FrontEnd에서 Mission을 선택해 진입하며 `DroneTutorialMissionTest.Owned` Tag Actor만 생성 도구가 관리한다.
+- `/Game/Drone/Maps/TestMap/Lvl_DroneRacingTest`: 로비 Racing 탭의 독립 원형 완주/시간 기록 시험맵. 정식 경기 규칙·Best Lap 영구 저장은 아직 없음. 튜토리얼 수업별 시험맵은 사용자 후속 요청으로 분리 완료했으며 Production 맵 분할과는 구분한다.
 - `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`: NPC·Smart Object·유인/무인 포탑·차량 전용 시험 맵이다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest`: 재밍·귀환·역할 Event 배치 전용 시험 맵이다. 직접 실행은 Prototype Flow이므로 Mission 완료 판정은 후속 Test Mission 진입에서 확인한다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest`: 기존 AI 맵의 순찰·MG 경합을 건드리지 않고 추가 Shotgun NPC의 감지·실제 8개 산탄 Projectile·탄약을 보는 독립 시험 맵이다. 작은 탄두/Tracer 교체 지점은 `/Game/Drone/AI/Blueprints/Projectiles/BP_ShotgunPelletProjectile`이다.
@@ -26,6 +31,8 @@
 ## 게임 흐름
 
 확정 흐름은 `게임 실행 → 시작 트레일러 → 로비 → 미션 선택/설명 → 시작 → 미션 트레일러 → 맵 진입 → 드론 선택 → 미션 시작/목표 UI`다.
+
+2026-10-01 사용자 제공 `Title_Asset`으로 시작 화면을 구성하고 로비를 Tutorial/Racing/Mission 탭으로 구분한다. WBP Class Defaults의 Artwork와 DA Thumbnail에서 이미지를 교체한다. 사용자의 회전 수업 정의는 특정 방향 바라보기가 아니라 원형 코스 비행이다. 스틱 Mode 1/2와 Easy/Acro 비행 제어 및 물리 모델을 서로 혼동하지 않는다.
 
 사람 Operator 직접 조작, NPC 대화로 임무 수령, 플레이어와 Drone 간 실시간 화면 전환 기획은 폐기했다. NPC·Smart Object·전투 기능은 Mission 내부 요소로 유지한다.
 

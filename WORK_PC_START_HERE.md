@@ -1,15 +1,19 @@
 # 작업컴 시작 가이드
 
-기준일: 2026-09-29 (Asia/Seoul)
+기준일: 2026-10-01 (Asia/Seoul)
 
 이 문서는 작업컴 `D:\JGY\project\md`와 `D:\JGY\project\drone`에서 현재 Drone 작업을 바로 이어가기 위한 단일 시작점이다. 최신 구현 사실은 `STATUS.md`, 다음 작업은 `WORKBOARD.md`, 변경 금지 경계는 `CONTEXT.md`를 우선한다.
 
 ## 1. 현재 인계 상태
 
-- 최신 확인 Unreal 원격 기준: `main = origin/main = 7ad9a236109b81772005f2ec392372ebbfc245d3`
-- 최신 확인 문서 원격 기준: `main = origin/main = 578304f52737fcb7abc047f7a9b98aa2724f1e5c`
-- Tutorial 8개 Mission, 공유 시험맵, Heading 판정, UGV 총·유탄, NPC 걷기 자산은 위 원격 기준에 포함됐다. 현재 작업컴에는 여기에 Physics Sandbox 1개·Story TestMap 4개·Hover 실제 PIE가 로컬 미커밋 변경으로 추가돼 있다.
-- 2026-09-29 `git fetch --all --prune`에서 두 저장소의 `HEAD...origin/main = 0/0`과 Clean 상태를 확인했다. 별도 Commit·Push 선행 없이 작업컴에서 Pull·LFS를 진행하면 된다.
+추가 로컬 변경: 출격 전 뒤로가기(기체 선택→설명→로비→시작), 설정 닫기, Esc/패드 Back과 미션/탭 복원을 구현했다. Build·33개 회귀 실패 0, 실제 버튼/Esc 복귀 확인. [BP 연결·검증 범위](docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md). 아직 원격 미반영이다.
+
+2026-10-01 후속 로컬 변경: 튜토리얼 8개 독립 시험맵 + Story/Racing 포함 직접 Play용 Mission Entry, Title 시안 보완/Setting 연결, 비 CPU 예산 개선 및 OilRig 비교 맵을 추가했다. **아직 Commit/Push하지 않았으므로 아래 기존 원격 기준에는 이번 변경이 없다.** 사용자가 GitHub Desktop에서 두 저장소를 직접 반영한 뒤 작업컴에서 Pull/LFS해야 한다. [검증·실행·남은 작업](docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md)
+
+- 최신 확인 Unreal 원격 기준: `main = origin/main = 3b77aef7222865b24c7e9ebdc773700c1d2882ff`
+- 최신 확인 문서 원격 기준: `main = origin/main = 1ffe3b2f5cf7f5751524d1cc5e3bf417a462ef27`
+- Tutorial 8개 Mission, Physics Sandbox, Story TestMap 4개, Training Route 시험, 광섬유 GSU, Bangkok City와 OilRig Preview 이식물이 위 원격 기준에 포함됐다.
+- 2026-10-01 후속 변경 **전** 확인: `git fetch origin --prune`에서 두 저장소의 `HEAD...origin/main = 0/0`, Unreal 작업 트리와 LFS Push 대기 목록이 비어 있었다. 당시 원격 기준선 기록이며 현재 미커밋 후속 변경까지 전달된 상태는 아니다.
 - 이미 작업컴에서 이 문서를 Pull해 읽고 있다면 4절 점검 결과를 우선한다. 두 저장소가 원격과 일치하고 필수 Asset 검사가 통과하면 전달이 완료된 상태다.
 - Codex 원시 세션 폴더, `auth.json`, API Key, 토큰은 복사하지 않는다.
 
@@ -20,8 +24,8 @@ Unreal Editor와 실행 중인 명령줄 Editor를 모두 종료한다. 그다�
 ### 2-1. Unreal 저장소
 
 1. 저장소 `gyeonliz/drone`을 선택한다.
-2. 변경 목록에 `Source/Drone`, `Tools/AssetMigration`, `/Game/Drone/Mission`, Tutorial Mission Data Asset 8개, `Lvl_DroneTutorialMissionTest`가 포함됐는지 확인한다.
-3. Commit 제목 예시: `튜토리얼 8개 미션 테스트맵과 UGV 무장 구현`
+2. 변경 목록에 `Source/Drone`, `Tools/AssetMigration`, Tutorial Mission DA 8개, `Maps/TestMap/Tutorial` 8맵, Story/Racing Entry, `Lvl_OilRigRainComparisonTest`, FrontEnd WBP/이미지가 포함됐는지 확인한다. `Saved`의 측정 로그/CSV는 기본 Git 제외이므로 필요한 증거는 별도 전달하거나 이 문서의 결과를 참고한다.
+3. Commit 제목 예시: `미션별 시험맵과 시작 화면 연결 및 비 최적화 검증`
 4. Commit 후 `Push origin`을 누른다.
 5. Git LFS 업로드가 끝날 때까지 GitHub Desktop을 닫지 않는다.
 
@@ -32,7 +36,7 @@ Unreal Editor와 실행 중인 명령줄 Editor를 모두 종료한다. 그다�
 3. Commit 제목 예시: `작업컴 인계 문서와 튜토리얼 가이드 최신화`
 4. Commit 후 `Push origin`을 누른다.
 
-원격의 2026-09-29 기준선은 이미 Push됐지만, Physics·Story·Hover 후속 변경은 아직 로컬 미커밋 상태다. `git lfs push`만으로는 Commit이 GitHub 이력에 올라가지 않으므로 검토 후 Commit과 GitHub Desktop의 `Push origin`까지 성공해야 한다.
+2026-10-01 확인 기준 위 기능과 대형 환경 이식은 원격에 Push됐다. 이후 새 변경을 만드는 경우 `git lfs push`만으로는 Commit이 GitHub 이력에 올라가지 않으므로 검토 후 Commit과 GitHub Desktop의 `Push origin`까지 성공해야 한다.
 
 ## 3. 작업컴에서 받는 순서
 
@@ -106,7 +110,7 @@ Production /Game/Drone/Maps/Lvl_DroneTraining은 저장하거나 재구성하지
 
 1. Hover: Zone 안에서 3초 안정 유지 후 귀환
 2. Forward: 전방 Trigger 통과 후 귀환
-3. Heading: 동쪽 90° ±8°를 1초 유지 후 귀환
+3. Orbit(기존 Heading ID): 원형 코스 Gate 0 → 1~7 → 결승 8 한 바퀴 후 귀환
 4. Gate Flight: Ring 4개를 순서와 정방향으로 통과
 5. FPV: Arm 후 체력 100 표적에 충돌
 6. Payload: 화물 투하로 표적 적중 후 귀환
@@ -125,7 +129,7 @@ UGV는 `W/S` 전후, `A/D` 조향, `Q/E` 제자리 회전이며 마우스/패드
 - 전체 `Drone.*`는 51개 성공, 별도 기준선 7개 실패
 - 로컬 후속 작업은 새 Physics/Story 5개 맵 Map Check `0 errors / 0 warnings`
 - `Drone.Physics.CollisionResponse`, `Drone.Mission.StoryPhysicsTestMaps`, `Drone.Tutorial.HoverMissionPIE` 성공
-- FrontEnd Contract/PIE가 Tutorial+Story Test 총 13개 Mission과 버튼 13개를 확인
+- 2026-10-01 새 로비는 Tutorial 9 / Racing 1 / Story Mission 4, 총 14개다. 탭별 목록과 이미지 설정은 [새 가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)를 따른다. 아래 이전 51개 전체 검증은 당시 기준선이다.
 
 7개 실패는 새 Tutorial 기능 실패로 묶지 않는다.
 
@@ -136,6 +140,8 @@ UGV는 `W/S` 전후, `A/D` 조향, `Q/E` 제자리 회전이며 마우스/패드
 Production 맵을 자동 재구성해서 테스트를 억지로 통과시키지 않는다. 상세 내용은 `docs/gameplay/DRONE_CODE_STRUCTURE_AUDIT_2026-09-29.md`를 본다.
 
 ## 8. 바로 이어갈 실제 작업
+
+2026-10-01 새 Title/Orbit/Racing 변경은 아직 로컬 미커밋이다. 사용자가 두 저장소를 Commit/Push해야 다른 PC에서 Pull로 받을 수 있다. 이후 FrontEnd에서 제공 배경·로고·3탭·목록, 원형 코스 완주→귀환, 독립 Racing 진입을 먼저 확인한다. Editor Build, 두 시험맵 Map Check 0/0, 관련 집중 자동화 14/14는 현재 PC에서 통과했다. 이미지 교체법과 Mode 1/2 설명은 [새 가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)를 본다. 기존 아래 기능 확인도 남아 있다.
 
 우선순위는 다음과 같다.
 

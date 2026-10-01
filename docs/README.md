@@ -1,6 +1,10 @@
 # Drone 상세 문서 안내
 
+- [비행 물리 정확도·OilRig 비 성능·UI·미션별 독립 맵 점검](gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md): 2026-10-01 후속 구현과 실제 검증, 미완료 범위
+
 일상 작업에서는 루트의 [`STATUS.md`](../STATUS.md)와 [`WORKBOARD.md`](../WORKBOARD.md)만 보면 된다. 아래 문서는 특정 기능을 구현하거나 팀원에게 작업법을 전달할 때 연다.
+
+- [시작 화면·로비 탭·원형 코스·Mode 1/2·맵 분리](gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md): 2026-10-01 제공 Title 이미지의 BP 교체 방법과 새 시험 흐름
 
 ## Planning
 

@@ -1,6 +1,6 @@
 # Drone Tutorial 구현·테스트 가이드
 
-기준일: 2026-09-29. Figma `Project:Droner`의 Tutorial 8개 훈련을 기준으로 작성했다. Figma 원본은 수정하지 않았으며, 아래에서 구현 완료와 후속 작업을 구분한다.
+기준일: 2026-10-01. Figma의 Tutorial 8개 훈련과 사용자의 회전=원형 코스 비행 정정을 반영했다. Figma 원본은 수정하지 않았다. 시작 화면·탭·원형 코스 상세는 [별도 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)를 따른다.
 
 ## 1. 목표와 안전 경계
 
@@ -32,7 +32,7 @@
 |---|---|
 | 호버링 | `DA_Mission_Tutorial_Hover`, `BP_TutorialHoverZone`, 3초 판정과 귀환까지 있음 |
 | 전진 | `DA_Mission_Tutorial_Forward`와 공용 Trigger Station 구현 |
-| 회전 | `ADroneTutorialHeadingZone`, `BP_TutorialHeadingZone`, `DA_Mission_Tutorial_Heading` 구현 |
+| 회전 | `DA_Mission_Tutorial_Heading` ID를 유지하되 원형 Course 9개 Gate 완주→귀환으로 변경. Heading Zone은 이 수업에 사용하지 않음 |
 | 게이트 | `ADroneTrainingCourse`, Ring 4개, 순서·정방향 판정과 `DA_Mission_Tutorial_GateFlight` 연결 |
 | 자폭 | `DA_Mission_Tutorial_FPV`, Arm/Disarm, 충돌 피해와 표적 파괴까지 있음 |
 | 드랍 | `DA_Mission_Tutorial_Payload`, 투하·적중·귀환과 예비 Carryable까지 있음 |
@@ -54,7 +54,7 @@
 
 ### C++가 담당할 것
 
-- 반복 가능한 판정: 호버 안정성, 목표 Heading, 총·유탄 피해, 클리어 시간
+- 반복 가능한 판정: 호버 안정성, 원형 Course 완주, 총·유탄 피해, 클리어 시간
 - Mission 사건 전달: `ReportObjectiveEvent`
 - 체력·죽음·중복 완료 방지
 - 입력 Action을 현재 Drone Capability에 따라 한 곳에서 분기
@@ -130,33 +130,17 @@ Editor 시험:
 - 다른 Actor가 들어가도 완료되지 않아야 한다.
 - 완료 뒤 다시 들어가도 두 번 진행되지 않아야 한다.
 
-### 1-3 회전 — 목표 Heading Actor 추가
+### 1-3 회전 — 원형 코스 한 바퀴 비행
 
-왜 필요한가: 위치 Trigger만으로는 실제 Yaw 회전을 배웠는지 확인할 수 없다.
+회전은 특정 방향을 바라보는 수업이 아니라 원형 코스를 도는 비행이다. Course/Gate/Sequence/Lap Recorder를 재사용하고 별도 비행 물리를 만들지 않는다.
 
-구현 클래스는 `ADroneTutorialHeadingZone`이다.
+1. `TutorialMissionTest_OrbitCourse`의 닫힌 Spline을 따라 비행한다.
+2. Gate 0 → 1~7 → 결승 8을 정방향·순서대로 통과한다. 7/8 바퀴만 돌면 미완료다.
+3. Rule은 `TrainingLap`, TargetId `Tutorial.Orbit.Course`이고, 실제 Lap Event 후 귀환 목표로 넘어간다.
+4. `DA_Mission_Tutorial_Heading` 이름/ID는 참조 호환용으로 유지하며 표시명은 원형 코스 비행이다.
+5. BP/맵 Details에서 반경·고도·Gate 크기·제한 시간을 조정한다. 마지막 Gate는 Spline 전체 길이에 있어야 한다.
 
-헤더에 둘 값:
-
-- `UBoxComponent* HeadingBox`
-- `TargetHeadingDegrees`
-- `HeadingToleranceDegrees`
-- `RequiredHoldSeconds`
-- `EvaluationIntervalSeconds`
-- `bResetProgressWhenMisaligned`
-- 진행·완료 Delegate와 Getter
-
-CPP 동작:
-
-1. 현재 출격한 플레이어 Drone만 허용한다.
-2. Box 안에서 Drone Yaw와 목표 Heading의 최단 각도 차이를 계산한다.
-3. 허용 오차 안에서 일정 시간을 유지하면 한 번만 완료한다.
-4. 상시 Tick 대신 Box Overlap 중 Timer만 사용한다.
-5. 완료 시 Director에 회전 전용 Event를 보고한다.
-
-Event를 새로 만들면 `EDroneMissionObjectiveEvent`의 마지막에 `HeadingAligned`를 추가한다. 기존 저장 Asset의 열거형 숫자를 지키기 위해 중간에 끼워 넣지 않는다.
-
-Blueprint `BP_TutorialHeadingZone`에서는 화살표 Mesh와 목표 방향 색만 설정한다. 기본 후보는 목표 90도, 허용 오차 8도, 유지 1초이며 최종값은 수동 확인 뒤 조정한다.
+`BP_TutorialHeadingZone` 및 `HeadingAligned` Event는 기존 자산/다른 방향 맞추기 시험의 호환용으로 보존하지만 이 수업에는 연결하지 않는다.
 
 ### 1-4 게이트 자유비행 — 기존 Course 재사용
 
@@ -174,7 +158,7 @@ Blueprint `BP_TutorialHeadingZone`에서는 화살표 Mesh와 목표 방향 색�
 3. Gate 로컬 `+X`가 진행 방향을 향하는지 확인한다.
 4. Mission Rule을 `TrainingLap`, RequiredProgress 1로 설정한다.
 
-현재 Director는 맵에서 처음 찾은 유효 Course 한 개의 Lap Recorder를 구독한다. 같은 맵에 여러 Course를 넣으면 어떤 Course가 선택될지 명시적이지 않으므로, 수업 맵에는 우선 Course 하나만 둔다. 여러 Course가 필요해지면 Mission Definition에 Course ID를 추가하고 Director가 ID로 찾도록 먼저 확장한다.
+Director는 TrainingLap Rule의 TargetId와 같은 Actor Tag를 가진 Course를 구독한다. 게이트 수업은 `Tutorial.GateFlight.Course`, 원형 수업은 `Tutorial.Orbit.Course`를 사용한다. 명시적 코스 목표에서는 다른 코스의 선/Trigger를 끄고 HUD도 같은 Recorder를 읽는다. Tag 미지정의 Legacy 미션은 첫 Course 선택을 유지하므로 새 다중 코스 미션은 Tag를 반드시 지정한다.
 
 ### 2 자폭 드론 — 현재 구현 검증
 

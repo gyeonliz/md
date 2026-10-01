@@ -1,16 +1,24 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-09-30 — Bangkok City·OilRig Preview 실맵 이식
+마지막 갱신: 2026-10-01 — 비행 물리 평가·OilRig 비 비교·시안 UI 보완·독립 수업 맵
 
 ## Now
 
+뒤로가기 후속 완료: 출격 전 세 화면의 버튼·Esc/패드 Back, 설정 닫기, 미션/탭 보존 및 비행 중 차단. Build·33개 회귀 실패 0, 실제 설명/기체 Back→레이싱 선택 복원→시작 화면 확인. 패드 실기 입력과 전체 미션 완주는 별도 확인한다.
+
+최종 검증: Editor Build·집중 회귀 32/32 성공, 시험맵 14개 Map Check 0/0. 직접 Hover Play 진입의 카탈로그 중복 등록 오류를 수정했다. 1280 UI 상호작용과 1920 제목/Exit 화면을 확인했으며, 전체 미션 손 조작 완주와 최종 음원/전환 연출은 남아 있다. 전체 로그의 Toolset Python 오류는 엔진 실행 환경 후속 점검 항목이다.
+
+이번 후속 구현: Tutorial 8개 수업별 TestMap + Story 4/Racing 1의 직접 Play용 Mission Entry, Title `Start/Training/Setting/Exit` 시안 배치·Setting 연결, Rain 초기 추적 예산/맑은 날 갱신 생략/배치 갱신, OilRig 비 4모드 비교 맵. [검증과 다음 판단](docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md)
+
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
-| ASSET-BANGKOK-01 | Bangkok City 환경 이식 | 실제 `Maps/BangkokCity`를 `/Game/Drone/Maps/Lvl_BangkokCity`, 의존 자산 987개를 `/Game/Drone/ThirdParty/BangkokCity`로 이식. 본 프로젝트 Map load·외부/누락 0/0·GameMode None·Map Check 0/0 통과 | Editor에서 재질·조명·충돌·스케일·첫 로드와 FPS 확인. 약 11.46GiB 신규 LFS를 기존 사용자 변경과 분리 확인한 뒤 사용자 Commit/Push |
-| ASSET-OILRIG-PREVIEW-01 | OilRig 실제 Preview 환경 이식 | 기존 Overview `Lvl_OilRig` 보존. 실제 `Maps/Preview`를 `Lvl_OilRigPreview`, 의존 자산 614개를 `ThirdParty/OilRigPreview`로 이식. Door BP 32개는 외형 64개를 정적화하고 Sample FirstPerson 로직만 제거. 빈 Actor 14개·완전 중복 1개 정리. Map load·외부/누락 0/0·GameMode None·Map Check 0/0 통과 | Editor에서 문/문틀 위치, 재질·조명·충돌·오션·비·첫 로드와 FPS를 수동 확인. 약 3.80GiB 신규 LFS를 기존 사용자 변경과 분리 확인한 뒤 사용자 Commit/Push |
+| UI-TITLE-LOBBY-02 | Title 이미지·Tutorial/Racing/Mission 탭 | PNG 6개 이식, WBP Artwork·DA Thumbnail 슬롯, 9/1/4 목록 필터·스크롤·선택 안전 경계, 독립 Racing 시험맵/DA. Editor Build·두 시험맵 Map Check 0/0·집중 회귀 14/14 성공(테스트 오류/경고 0) | 제공 이미지 버튼/로고·1280/1920 해상도·탭·목록·레이싱 전체 진입을 수동 확인. [가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md) |
+| TUT-ORBIT-02 | 회전 수업 = 원형 코스 한 바퀴 | Heading DA ID 호환 유지, Closed Spline·9 Gate, Tag별 Recorder·HUD, 다른 코스 비활성. 독립 Heading 수업 맵으로 연결 | 실제 비행 제자리 Yaw/다른 코스/7⁄8 바퀴 미완료, 결승→귀환→성공 확인 |
+| ASSET-BANGKOK-01 | Bangkok City 환경 이식 | 실제 `Maps/BangkokCity`를 `/Game/Drone/Maps/Lvl_BangkokCity`, 의존 자산 987개를 `/Game/Drone/ThirdParty/BangkokCity`로 이식. 본 프로젝트 Map load·외부/누락 0/0·GameMode None·Map Check 0/0 통과. 약 11.46GiB LFS까지 원격 반영 완료 | Editor에서 재질·조명·충돌·스케일·첫 로드와 FPS 확인 |
+| ASSET-OILRIG-PREVIEW-01 | OilRig 실제 Preview 환경 이식 | 기존 Overview `Lvl_OilRig` 보존. 실제 `Maps/Preview`를 `Lvl_OilRigPreview`, 의존 자산 614개를 `ThirdParty/OilRigPreview`로 이식. Door BP 32개는 외형 64개를 정적화하고 Sample FirstPerson 로직만 제거. 빈 Actor 14개·완전 중복 1개 정리. Map load·외부/누락 0/0·GameMode None·Map Check 0/0 통과. 약 3.80GiB LFS까지 원격 반영 완료 | Editor에서 문/문틀 위치, 재질·조명·충돌·오션·비·첫 로드와 FPS를 수동 확인 |
 | PHY-CAMERA-01 | 벽·그물 접촉 화면 안정화 | 접촉 피격 Shake 호출·급감속과 벽 순간 이격/Root 회전을 제거. 연속 접촉은 재충격 대신 제약으로 처리하며 외형 기울기와 FPV 카메라를 분리. Camera 위치 보간·그물 Camera Ignore 추가. 총알 피격 화면 Shake는 기존 동작 유지. Editor Build·Physics 4/4·Prototype 8/8·Story 저장 계약 1/1 성공(오류/경고 0), 관련 BP 6개 Compile 0/0 | Physics Sandbox에서 1/3인칭 저속/고속/지속 벽 접촉·그물 감속/포획 때 화면 떨림 감소와 충돌 유지 확인. NPC 맵에서 총알 피격 화면 흔들림이 남는지 확인. 자동화만으로 체감 Pass 처리하지 않음 |
 | TUT-GATE-PRESENTATION-01 | Gate 통과음·위치·크기·자산 재질 | 정상 통과 음성/Sound 슬롯과 BP 연출 Event, 하단 1/6 배치·기존 저장 Child 시작 위치 복구, 공통/개별 Gate 전용 Scale, 전체 Mesh와 상태별 Material 슬롯 구현. 최종 Editor Build·관련 회귀 8/8 성공(오류/경고 0), Gate/Course BP Compile 0/0 | 실제 음원·최종 Gate Mesh를 BP에 지정한 뒤 TestMap에서 가청성, 1/6 위치, 확대해도 선 크기 불변, 상태별 재질·미지정 슬롯 보존을 수동 확인. 팀원 Production 맵은 직접 저장하지 않음 |
-| SYNC-WORKPC-01 | 작업컴 즉시 재개 인계 | 2026-09-29 Unreal `7ad9a23`, 문서 `578304f`가 각각 `origin/main`과 일치하고 Clean임을 확인. 인계 문서와 점검 스크립트의 Build·Map Check 0/0·`WORKSTATION_READY` 검증 완료 | 작업컴에서 두 저장소 Pull·LFS 후 같은 명령으로 `WORKSTATION_READY` 재확인 |
+| SYNC-WORKPC-01 | 작업컴 즉시 재개 인계 | Fetch 기준 Unreal `3b77aef`, 문서 `1ffe3b2` 원격 일치. 이후 새 Title/Orbit/Racing 로컬 변경이 있어 아직 원격 미반영. 기존 인계 점검 `WORKSTATION_READY` 기준 보존 | 사용자가 새 변경을 Commit/Push한 뒤 작업컴 Pull·LFS·Build·Validate. 자동 Commit 금지 |
 | MISSION-FRAMEWORK-01 | Mission 통합 Blueprint 기반 | Manager/GameMode/Controller, 목표·실패·귀환 Trigger, 체력 100 파괴 표적을 `/Game/Drone/Mission`에 추가. Build와 Mission 자동화 3/3 성공 | Mission 1 Test Map/Definition에서 Delivery→선택 목표→Return과 시간/파괴 실패를 실제 Flow로 확인 |
 | STORY-TEST-01 | Story Mission별 격리 TestMap 4개 | GoldenTime Drop/Return, Intercept Spline 차량·목적지 실패, VeilBreaker 재밍 이탈/Return, Endgame UGV 표적 3개/Return과 DA 4개 생성. Map Check 5맵 0/0, 저장 계약과 FrontEnd 13개 Catalog 자동화 성공 | 각 맵을 FrontEnd에서 수동 실행해 목표·실패·귀환을 확인하고 M1 선택 목표, M3 기체 교대, M4 장거리 타격을 후속 카드로 분리 |
 | PHYSICS-SANDBOX-01 | 벽 충돌·그물 얽힘·국소 파괴 벽 | 일반 비행체 속도 비례 벽 반발·Wing/Rotor Probe와 그물 감속·조종/추력 저하·자세 교란·포획/하강까지 구현. Drone 충돌은 그물을 기본 절단하지 않고 탄환/폭발 Point Damage 국소 절단은 유지. Build 성공, `Drone.Physics` 2/2·`Drone.Prototype` 8/8·Story 저장 계약 1/1 성공 | Sandbox에서 저속 접촉은 작게 밀리고 고속 충돌은 크게 반발하는지, 날개 끝 접촉 방향의 자세 Kick, 그물 포획·하강·자동 해제와 조종 복구를 화면 확인하고 실제 Chaos Cloth/Dataflow와 Geometry Collection을 별도 구역에서 비교 |

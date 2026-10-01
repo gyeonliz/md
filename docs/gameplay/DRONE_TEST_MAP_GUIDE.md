@@ -1,5 +1,7 @@
 # Drone 기능 시험 맵 가이드
 
+2026-10-01 후속: 튜토리얼 8개를 `TestMap/Tutorial/Lvl_Tutorial_*_Test`로 분리하고 Story 4/Racing 1과 함께 직접 Play 기본 Mission Entry를 설치했다. OilRig 비 4모드 비교 맵과 Title 시안 보완도 추가했다. 최신 위치·테스트 절차는 [통합 점검 가이드](DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md)를 우선한다. 아래 9월 맵 설명은 당시의 기록이다.
+
 기준일: 2026-09-29
 
 ## 9/17 안전 감사 추가
@@ -43,7 +45,7 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 제작 중인 실�
 
 - `DA_Mission_Tutorial_Hover`: Scout, Hover Zone 3초 → Return Zone
 - `DA_Mission_Tutorial_Forward`: Scout, 전방 Trigger 통과 → Return Zone
-- `DA_Mission_Tutorial_Heading`: Scout, 동쪽 90° ±8°를 1초 유지 → Return Zone
+- `DA_Mission_Tutorial_Heading`: Scout, 원형 코스의 시작·체크포인트 7개·결승을 정방향 완주 → Return Zone (2026-10-01 정정)
 - `DA_Mission_Tutorial_GateFlight`: Scout, Gate 4개를 순서·정방향으로 통과
 - `DA_Mission_Tutorial_FPV`: FPV Strike, Arm 뒤 체력 100 표적 파괴
 - `DA_Mission_Tutorial_Payload`: Drop, Payload Target 적중 → Return Zone
@@ -64,7 +66,7 @@ cd C:\URproject\drone
 
 2026-09-24 Figma `Project:Droner`의 Tutorial 상세를 읽기 전용으로 다시 확인했다. 기획상 전체 수업은 `호버링 → 전진 → 회전 → 게이트 자유비행 → 자폭 드론 → 드랍 드론 → UGV 적 NPC 처치 → 고정형 포탑 처치`의 8개다. 각 수업은 조작키·목표 브리핑, 시작, 플레이, 클리어 타임 UI를 반복하고 마지막에 전체 완료 UI가 나온다.
 
-현재 `Lvl_DroneTutorialMissionTest`에는 8개 수업의 독립 Mission Flow와 Station이 모두 있다. 회전은 `BP_TutorialHeadingZone`, 게이트는 `BP_DroneTrainingCourse`, UGV는 상부 조준 Pivot을 따르는 총·유탄 Projectile을 사용한다. UGV 총은 좌클릭/패드 Right Shoulder, 유탄은 우클릭/패드 Left Shoulder다.
+현재 `Lvl_DroneTutorialMissionTest`에는 8개 수업의 독립 Mission Flow와 Station이 모두 있다. 회전과 게이트는 서로 다른 Tag의 `BP_DroneTrainingCourse`로 구분하고, UGV는 상부 조준 Pivot을 따르는 총·유탄 Projectile을 사용한다. UGV 총은 좌클릭/패드 Right Shoulder, 유탄은 우클릭/패드 Left Shoulder다. 독립 `Lvl_DroneRacingTest`는 로비 레이싱 탭에서 들어간다. [시작 화면·탭·원형 코스 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)를 함께 본다.
 
 기능 판정과 독립 재시도는 구현됐지만 단계별 클리어 타임·8개 연속 진행·전체 완료 UI는 아직 없다. Figma의 Warehouse 사용 메모도 반영하지 않은 평면 Greybox다. 이 시험장에서 수동 체감을 확인한 뒤 검증된 Station만 팀원 Tutorial 환경에 수동 이식한다.
 
@@ -74,7 +76,7 @@ cd C:\URproject\drone
 
 1. 호버링: Zone 안에서 속도와 자세를 안정시키고 3초 유지한 뒤 Return Zone으로 돌아간다.
 2. 전진: 시작점 앞 `TutorialMissionTest_ForwardGoal` Box를 통과한 뒤 Return Zone으로 돌아간다.
-3. 회전: Heading Zone 안에서 Yaw를 동쪽 90°로 맞춰 1초 유지한 뒤 Return Zone으로 돌아간다.
+3. 회전: 원형 안내선을 따라 Gate 0 → 1~7 → 결승 8을 순서대로 한 바퀴 통과한 뒤 Return Zone으로 돌아간다. 제자리 Yaw나 다른 코스 완주로 완료되면 안 된다.
 4. 게이트: 네 Ring을 번호 순서와 Ring 로컬 `+X` 방향으로 통과한다.
 5. FPV: 좌클릭으로 Arm하고 충분한 속도로 `TutorialMissionTest_FPVTarget`에 충돌한다.
 6. 드랍: 좌클릭으로 화물을 투하해 Payload Target에 맞힌 뒤 Return Zone으로 돌아간다.

@@ -1,6 +1,24 @@
 # Drone 개발 진행 기록
 
-기준일: 2026-09-30 (Asia/Seoul)
+기준일: 2026-10-01 (Asia/Seoul)
+
+## 2026-10-01 후속 — 출격 전 뒤로가기
+
+- Acro의 자세 제한 없는 롤/루프·추력 방향 가속·하강 지원과 실제 기체 응답 검증의 차이를 설명했다. 비행 수치/물리는 이번에 변경하지 않았다.
+- FrontEnd 로비/설명, 기체 선택의 Back 버튼과 Widget `NavigateBack`, Esc·패드 Back 입력을 추가했다. Flow에서 선택/Story Fact 수명과 상태를 검증하고 기체 선택의 실제 FrontEnd 맵 복귀는 Mission Controller가 담당한다. 설명→로비에서 미션/탭을 보존하고 로비→시작은 선택을 지운다. 반복 키·비행/로딩/결과의 잘못된 Back은 차단한다.
+- Editor Build 성공, `BackNavigationContract`와 실제 버튼 Delegate PIE 포함 33개 실패 0. 1건의 경고는 엔진 외부 연결 확인 HTTP 요청 시간 초과다. computer-use로 1280 화면에서 설명 Back 클릭·레이싱 맵의 기체 선택 Back·FrontEnd 설명/Esc→레이싱 탭 복원/Esc→시작을 확인했다. 패드 실제 기기 입력은 미검증이다.
+- [가이드](../gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md)에 BP 버튼 이름·API·동작·검증 범위를 기록했다. Commit/Push하지 않았다.
+
+## 2026-10-01 후속 — 물리/비/UI/독립 미션 점검
+
+- 최종 Editor Build 및 집중 회귀 32/32 Success·테스트 오류/경고 0. 직접 Hover Play PIE의 중복 Mission 등록 실패를 고쳐 출격→3초 유지→Return 전환도 통과했다. Tutorial/Story/Racing/비 비교 시험맵 14개 Map Check 0/0. 1280 상호작용·1920 제목/Exit 수동 관찰과 별도 엔진 `-game` Toolset Python 오류를 구분해 기록했다.
+
+- 실제 코드상 Acro의 추력/중력/항력과 회전 보간, 바람 위치 Drift, 질량 반영 및 미구현 관성/PID/센서/모터별 토크를 구분했다. FPV DA는 현재 4500cm/s × 1.25, BP Override Off임을 확인하고 옛 27m/s 고정 테스트를 현재 데이터 계약으로 수정했다. 기체 수치는 변경하지 않았다.
+- OilRig Preview 13,144 Actor/12,710 Mesh Component/25 CPU Niagara System(2 Emitter씩) 확인. Effect Type None·Fixed Bounds Off. 원본을 보존한 비교 맵과 자동 정순/역순 성능 측정을 만들었다. 최종 평균 원본 20.56ms/Off 9.67ms/근거리 8개 10.65ms/프로젝트 비 9.65ms. 한 시점·품질 차이가 있는 비용 비교다.
+- Rain은 최초/실내 전환 추적 예산, 무강우 작업 생략, ISM 일괄 갱신으로 보완. 미검사 열은 숨겨 지붕 관통을 방지한다.
+- Tutorial 8개 수업별 맵 및 DA MissionMap 연결, Story/Racing 포함 13개 직접 Play 기본 Entry. 기존 공유 맵/Production Training은 보존했다. Python Rotator는 명명 인자로 수정했다.
+- 제공 시안의 Start/Training/Setting/Exit 배치와 그래픽 Setting·돌아가기, Hover/Pressed/음원 교체 슬롯, 실제 목록/썸네일/탭 반응을 확인했다. 음원·최종 애니메이션을 지급받아 연결한 상태는 아니다.
+- Map Check와 최종 테스트 보고서/수동 화면 범위는 [통합 점검 가이드](../gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md)에 기록한다. Commit/Push하지 않았다.
 
 이 문서는 Drone 개발의 **진행 이력**을 시간순으로 남긴다. 가장 최신의 현재 상태는 [`../WORKBOARD.md`](../../WORKBOARD.md), 확정 구현 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](../planning/DRONE_TUTORIAL_STORY_PLAN.md)를 따른다.
 
@@ -20,19 +38,38 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 2026-09-30 기준으로 9월 17일 이후 작업·현재 상태·Mission 전면 개편 전 다음 계획을 공유용 문서 [`DRONE_PROGRESS_REPORT_2026-09-17_TO_2026-09-30.md`](DRONE_PROGRESS_REPORT_2026-09-17_TO_2026-09-30.md)에 정리했다. 이 보고서는 교수님·팀원에게 설명하기 쉬운 기능 단위 요약이며, 세부 증거와 날짜별 변경은 이 Worklog를 계속 기준으로 삼는다.
 
-마지막 갱신: 2026-09-30 — 공급 광섬유 통 GSU를 광섬유 Drone에 적용
+마지막 갱신: 2026-10-01 — 원격 기준선과 작업컴 인계 상태 최신화
 
 | 구분 | 현재 상태 |
 |---|---|
-| 전체 단계 | Tutorial 8개 공유 시험장, Physics Sandbox 1개, Story Mission별 격리 TestMap 4개와 속도 비례 벽 반발·Wing/Rotor Probe·그물 얽힘/포획 구현. FrontEnd Catalog 13개 |
-| Unreal 기준선 | 작업 시작 기준 `main=origin/main=494dde2`; 2026-09-30 물리·비행·Gate 코드/테스트는 로컬 미커밋 상태 |
+| 전체 단계 | Tutorial 8개 공유 시험장, 독립 Racing 시험맵, Physics Sandbox, Story Mission별 격리 TestMap 4개. 새 Title·3탭 로비 Catalog 14개 |
+| Unreal 기준선 | Fetch 기준 `main=origin/main=3b77aef`; 이후 Title/Orbit/Racing 코드·자산은 로컬 미커밋 변경 |
 | 자동 검증 | 최신 접촉 카메라 교정: Physics 4/4·Prototype 8/8·Story 저장 계약 1/1, 총 13개 오류·경고 0. 관련 BP 6개 Compile 0/0, MSVC 14.51.36257 Editor Build 성공. 이전 Gate 8/8·Flow 5/5 결과 보존 |
 | 지금 작업 중 | 공급 GSU 통을 광섬유 Drone 하부에 적용했고 화면 위치·크기 확인 대기. 벽·그물 카메라 떨림 분리와 총알 피격 Shake 유지, Gate 최종 음원/자산, Physics/비행 체감 확인도 유지. 실제 Chaos 자산과 Best Lap 영구 저장은 미구현 |
 | 차단 조건 | 벽 연속 접촉 체감, 저속/고속 그물 접촉·포획/복구, 파괴 벽 파편, Story 목표/실패/귀환, Hover 표식 가독성의 화면 확인 필요 |
 | 다음 행동 | Tutorial/Story TestMap에서 광섬유 Drone의 GSU 통 크기·하부 위치·케이블 시작점 확인 → Physics Sandbox에서 벽/그물 접촉 카메라 안정성 확인 + NPC TestMap에서 총알 피격 Shake 유지 확인 → Gate BP 음원/최종 Mesh/세 상태 재질 지정·TestMap 수동 확인 → 실제 Chaos 자산 비교 → Best Lap SaveGame |
 | 다음 기능 | 단계별 클리어 UI·8개 진행/전체 완료 → Story Mission 1~4 목표·실패 규칙 고도화 |
 | 이후 | 실제 Dataflow/Chaos 부분 고정 그물과 Geometry Collection 벽을 현재 Runtime 기준과 비교, Story 환경·연출 이식 |
-| Git 처리 | 광섬유 GSU 전용 Mesh·Texture 4개·Material과 Fiber BP/Definition, 재생성 도구·회귀를 로컬에 추가함. 현재 코드·문서는 미커밋이며 Commit·Push하지 않음 |
+| Git 처리 | Unreal `3b77aef`, 문서 `1ffe3b2`까지 원격 반영 완료. 새 Title/탭/Orbit/Racing 코드·자산·문서는 로컬 변경이며 Commit·Push하지 않음 |
+
+## 2026-10-01 — Title 이미지·3탭 로비·원형 비행 정정
+
+- 사용자 제공 Title_Asset의 PNG 6개를 `/Game/Drone/FrontEnd/Textures/Title`에 가져오고 WBP Class Defaults의 교체 슬롯에 연결했다. 배경·로고·버튼 원본 파일과 Figma는 수정하지 않았다.
+- 로비를 Tutorial/Racing/Mission으로 구분해 실제 목록·선택 강조·썸네일·스크롤을 연결했다. 숨겨진 탭 선택은 시작할 수 없다. Tutorial 9 / Racing 1 / Story 4 = Catalog 14개다.
+- 회전은 제자리 방향 정렬이 아닌 원형 코스 비행이라는 사용자 정정을 반영했다. Heading 자산/ID는 유지하고 Lap→귀환으로 규칙을 바꿨으며 기존 Owned Heading Zone/Pad만 제거하고 Orbit Course를 추가했다. 수동 Hover/기타 배치는 보존했다.
+- 9개 Gate는 시작+체크포인트 7개+결승이다. 결승을 전체 Spline 길이에 두어 7/8 바퀴에 성공하지 않으며 시작과 겹치지 않게 결승만 2.5m 분리했다.
+- 다른 Course가 먼저 발견되는 문제를 막기 위해 Director/HUD가 Tag에 맞는 같은 Recorder를 읽고 다른 코스를 끈다. Native `CircularCourse` 자동화는 역순·역방향·제자리 회전·다른 코스·미완주·Lap→귀환을 검증한다.
+- 별도 `Lvl_DroneRacingTest`, `DA_Mission_Racing_Circuit_Test`를 만들었다. 정식 경기 규칙/영구 Best Lap은 이번 범위가 아니다. Story 맵 분리는 유지하고 튜토리얼 전체 맵 분리는 사용자 검토 단계로 남겼다.
+- Editor Build 성공(MSVC 14.51.36256). 두 시험맵 Map Check 0 errors / 0 warnings. 첫 집중 회귀는 9/10 성공했고 새 Racing ID가 빠진 기존 목록 기대값 하나를 수정했다. 최종 집중 회귀는 Flow 5개, Mission 2개, Acro Input 1개, Tutorial/Hover/Gate 6개, 총 14/14 Success(오류/경고 0), Exit 0이다. 보고서 `drone/Saved/Automation/TitleLobbyOrbit/index.json`, 2026-10-01 01:47:42 KST. Build에는 엔진 Deprecated API와 비선호 최신 MSVC 경고가 남으며 프로젝트 신규 컴파일 오류는 없다.
+- `GateAssetVisual`의 미지정 선택 슬롯이 Map Check에 Null Mesh 경고를 만들지 않도록 숨겨진 안전 Mesh만 할당했다. 미지정일 때 외형은 계속 숨기고 최종 Gate Mesh 지정 기능은 유지한다.
+- Mode 1/2는 스틱 배치, Angle/Acro는 비행 제어 방식이라고 DJI/Betaflight 공식 자료와 현재 코드로 구분했다. 단순화 물리를 실제 FC/PID 1:1 모델로 표현하지 않으며 이번에 물리 수치는 임의 변경하지 않았다.
+- [시작 화면·BP 이미지·탭·원형·맵 분리 가이드](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)와 작업컴/현재 상태를 갱신했다. 실제 UI 배치·원형 비행 체감은 수동 확인 대기. Commit/Push 없음.
+
+## 2026-10-01 — 원격 기준선과 작업컴 인계 최신화
+
+- 두 저장소에서 `git fetch origin --prune`을 다시 실행했다. Unreal은 `3b77aef`, 문서는 `1ffe3b2`로 각각 `HEAD...origin/main = 0/0`이다.
+- Unreal 작업 트리는 Clean이고 `git lfs status`의 Push·Commit·Staging 대기 목록도 비어 있다. Bangkok City·OilRig Preview 맵과 ThirdParty 의존 자산은 2026-09-30 원격 Commit에 포함됐다.
+- `STATUS.md`, `WORKBOARD.md`, `WORK_PC_START_HERE.md`의 예전 Commit ID와 로컬 미커밋 표현을 실제 원격 상태로 교정했다. 이번 문서 최신화는 사용자 지시에 따라 Commit·Push하지 않는다.
 
 ## 2026-09-30 — 공급 광섬유 통 GSU 적용
 

@@ -1,30 +1,38 @@
 # 현재 작업 상태
 
-기준일: 2026-09-30 (Asia/Seoul)
+기준일: 2026-10-01 (Asia/Seoul)
 
 ## 한눈에 보기
 
-- Bangkok City 이식: 공급 `D:\JGY\project\BangkokCity`의 실제 도시 맵 `Maps/BangkokCity`를 프로젝트 소유 `/Game/Drone/Maps/Lvl_BangkokCity`와 `/Game/Drone/ThirdParty/BangkokCity` 987개 의존 자산으로 이식했다. 본 프로젝트에서 맵 로드, 외부/누락 참조 0/0, GameMode Override 없음, Map Check 0 errors / 0 warnings를 확인했다. 약 11.46GiB의 신규 LFS 대상이므로 화면·성능 확인 후 별도 Commit/Push가 필요하다.
-- OilRig Preview 이식: 기존 Overview 기반 `/Game/Drone/Maps/Lvl_OilRig`은 보존하고 실제 장면 `Maps/Preview`를 `/Game/Drone/Maps/Lvl_OilRigPreview`로 별도 이식했다. 문 BP 32개의 외형 64개는 정적 메시로 보존하고 FirstPerson Sample 로직만 제거했다. 의존 자산 614개, 외부/누락 0/0, GameMode Override 없음, Map Check 0/0이며 약 3.80GiB 신규 LFS 대상이다.
+- 2026-10-01 뒤로가기 후속: 설정 닫기·로비→시작·설명→로비·기체 선택→FrontEnd 설명을 버튼/Esc/패드 Back 경계로 추가. 미션/해당 탭 유지, 시작 복귀 시 선택 초기화, 키 반복 방지, 로딩/비행/결과의 잘못된 Back 거절을 적용했다. Build 성공, 집중 회귀 33개 실패 0(외부 LogHttp 시간 초과 경고 동반 성공 1건). 실제 1280 화면에서 설명/기체 Back와 Esc 연속 복귀·레이싱 선택 복원을 확인했다. 이번에도 Commit/Push하지 않았다.
+
+- 이번 후속 최종 검증: Editor Build 성공, 집중 회귀 **32/32 Success·테스트 오류/경고 0**, Tutorial/Story/Racing/비 비교 14개 시험맵 Map Check 0/0. 독립 Hover 맵의 직접 Play→출격→3초 유지도 통과했다. 1280 UI 버튼/탭·목록과 1920 제목/Exit를 실제 화면에서 확인했다. 전체 미션 수동 완주·음원/전환 애니메이션·실기체 물리 교정은 남아 있다. `-game`의 엔진 Experimental Toolset Python 오류는 별도 환경 이슈로 가이드에 기록했다. 아래 14/14는 앞선 검증 기록이다.
+
+- 2026-10-01 후속: 비행 물리를 코드와 실제 FPV DA로 감사했다. Acro는 현실 요소를 반영한 근사 모델, 바람은 위치 Drift 방식이며 실기체 검증 완료는 아니다. OilRig 원본 비는 CPU Emitter 50개(시스템 25개) 구성, Effect Type 없음/동적 Bounds. 실제 1280×720 고정 시점 비교에서 평균 원본 약 20.56ms, 비 끔 9.67ms, 근거리 8개 제한 10.65ms, 프로젝트 비 9.65ms였다(화질 동등/전체 맵 결과 아님). Tutorial 8개 독립 맵과 Story 4/Racing 1 직접 Play Entry를 설치했고 Title 시안·Setting·버튼 슬롯 및 비 추적 예산/맑은 날 작업 생략을 보완했다. 후속 최종 회귀 결과는 [통합 점검 가이드](docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md)를 우선한다. 이번 변경은 미커밋/미푸시다.
+
+- 2026-10-01 최신 로컬 작업: 제공 Title_Asset PNG 6개를 시작 화면 WBP Artwork 슬롯에 연결했다. 로비는 Tutorial 9 / Racing 1 / Mission 4개 탭 필터·스크롤·썸네일을 사용하며 총 Catalog는 14개다. 회전 수업은 기존 Heading ID를 유지한 원형 9개 Gate 완주→귀환으로 정정했다. 독립 `Lvl_DroneRacingTest`를 추가하고 Course Tag 기반 Director/HUD 연결도 수정했다. Editor Build·두 시험맵 Map Check 0/0·집중 회귀 14/14 성공(테스트 오류/경고 0). 최종 화면/조작 체감은 사용자 확인 대기다. [설정·테스트 가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)
+
+- Bangkok City 이식: 공급 `D:\JGY\project\BangkokCity`의 실제 도시 맵 `Maps/BangkokCity`를 프로젝트 소유 `/Game/Drone/Maps/Lvl_BangkokCity`와 `/Game/Drone/ThirdParty/BangkokCity` 987개 의존 자산으로 이식했다. 본 프로젝트에서 맵 로드, 외부/누락 참조 0/0, GameMode Override 없음, Map Check 0 errors / 0 warnings를 확인했다. 약 11.46GiB의 LFS 자산과 맵은 2026-09-30 원격 `main`에 반영됐고 화면·성능 확인만 남아 있다.
+- OilRig Preview 이식: 기존 Overview 기반 `/Game/Drone/Maps/Lvl_OilRig`은 보존하고 실제 장면 `Maps/Preview`를 `/Game/Drone/Maps/Lvl_OilRigPreview`로 별도 이식했다. 문 BP 32개의 외형 64개는 정적 메시로 보존하고 FirstPerson Sample 로직만 제거했다. 의존 자산 614개, 외부/누락 0/0, GameMode Override 없음, Map Check 0/0이다. 약 3.80GiB의 LFS 자산과 맵도 2026-09-30 원격 `main`에 반영됐고 화면·성능 확인만 남아 있다.
 - 광섬유 GSU 적용: 공급 `GSU.fbx`가 전체 Drone이 아닌 광섬유 통임을 확인했다. 기체는 사용자 지정에 따라 DroneSpy Body·분리 Rotor 4개를 사용하고, 통은 전용 `FiberSpoolMeshComponent`에 약 28cm 높이로 하부 장착해 BaseColor·Normal·ORM·Emissive Material과 통 상단 케이블 출구를 연결했다. Editor Build 및 `ExtendedRoleDrones` 1/1 성공이며 화면 위치·크기 확인이 남아 있다.
 - 접촉 카메라 교정: 사용자 확인 범위는 벽·그물만이며 총알 피격 화면 흔들림은 유지한다. 그물의 피격 Shake 호출·반복 급감속, 벽 순간 이격/Root 회전과 연속 재충격을 제거하고 외형 접촉 기울기를 FPV 카메라와 분리했다. 그물은 Pawn을 계속 막지만 Camera 채널은 기본 Ignore다. 빌드 성공, Physics 4/4·Prototype 8/8·Story 저장 계약 1/1 성공(총 13, 자동화 오류/경고 0), 관련 BP 6개 Compile 0/0. 렌더 체감은 수동 확인 대기다.
 - Gate 편집: 정상 통과 음성/사운드 BP 슬롯, 하단 1/6 Spline 배치, 코스 선과 독립적인 공통/개별 Gate 스케일, 완성형 Gate Mesh 슬롯, 세 상태별 머티리얼 지정과 적용 슬롯 선택을 구현했다. 음원·최종 Mesh는 미지정이고 가청성/최종 외형 수동 확인은 남아 있다. Production Training과 Content 자산은 저장하지 않았다.
-- 현재 단계: Tutorial 8개 독립 Station, Story Mission별 TestMap 4개, Training 4-Route 선택 시험맵과 함께 물리 Sandbox를 속도 비례 벽면 반발·Wing/Rotor Probe v2, 그물 얽힘/포획 v1, 조각 파괴 벽까지 확장했다. 로비 Catalog는 Tutorial 9항목과 Story Test 4항목, 총 13개를 노출한다. Route/Physics 시험맵은 로비가 아닌 직접 Play한다
+- 현재 단계: Tutorial 8개 독립 Station, Story Mission별 TestMap 4개, 별도 Racing 시험맵과 Training 4-Route 시험맵, Physics Sandbox를 유지한다. 로비 Catalog는 Tutorial 9 / Racing 1 / Story Test 4, 총 14개다. Route/Physics 시험맵은 로비가 아닌 직접 Play한다
 - 조작 단계: 느림/보통/빠름 선택을 제거하고 각 기체의 기존 빠름 기준을 단일 무적재 성능으로 사용한다. FPV Rate/Acro Mode 1·Mode 2는 송신기 세로축 배치만 다르고 같은 질량·최대 추력·모터 응답·선형/제곱 항력 모델을 공유한다. Drop Drone은 내장/실제 부착 화물의 kg 질량이 총질량에 더해져 최고속도·가속·감속·Yaw·호버 추력 여유가 감소한다
 - 바로 다음 확인: Physics Sandbox에서 벽/그물 접촉 카메라 안정성·부드러운 밀림과 Shotgun/NPC TestMap에서 총알 피격 화면 Shake 유지 여부를 확인한다. Gate BP 음원·최종 Mesh·상태 재질과 Route 확인도 유지한다. 이후 실제 Chaos Cloth/Geometry Collection 비교 Spike → Best Lap SaveGame → Tutorial 진행/완료 UI → Story 1~4 목표·실패 규칙 고도화로 진행한다
 - 검증 운영: 외부 OpenCode 모델 호출은 종료했다. 프로젝트 전용 Agent·모델 설정은 제거했으며 이후 구현과 검증은 Unreal 자동화와 사용자 수동 화면 확인으로 진행한다
-- Unreal Editor: 2026-09-30 Editor Build와 Physics/Prototype 자동화 뒤 종료 상태
+- Unreal Editor: 2026-10-01 Title/Orbit Asset 설정과 집중 회귀 완료 뒤 종료 상태
 - Production Training: 팀원이 실제 Tutorial 환경을 제작 중이므로 열람 외 저장·덮어쓰기·자동 재구성 금지
-- 작업컴 인계: `WORK_PC_START_HERE.md`와 `tools/work-pc/Test-DroneWorkstation.ps1` 준비 완료. Windows PowerShell 5.1에서 Git·LFS·필수 Asset·Build·Tutorial Validate 전체 경로가 `WORKSTATION_READY`로 통과했다. 2026-09-29 구현과 문서는 원격 `main`에 반영됐으며 작업컴에서는 Pull·LFS 후 같은 점검만 다시 수행하면 된다
+- 작업컴 인계: `WORK_PC_START_HERE.md`와 `tools/work-pc/Test-DroneWorkstation.ps1` 준비 완료. Windows PowerShell 5.1에서 Git·LFS·필수 Asset·Build·Tutorial Validate 전체 경로가 `WORKSTATION_READY`로 통과했다. 2026-10-01 Fetch 기준 Unreal `3b77aef`, 문서 `1ffe3b2`까지 원격 `main`과 일치한다. 작업컴에서는 Pull·LFS 후 같은 점검만 다시 수행하면 된다
 
 ## Git 기준
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal `D:\JGY\project\drone` | 현재 확인 `main = origin/main = 3e4d1ae` | Bangkok City와 OilRig Preview 맵·ThirdParty 자산·이식/감사 도구가 로컬 미커밋. 기존 Tutorial TestMap·MetroMaintenanceStation 변경은 사용자 작업으로 보존 |
-| 문서 `D:\JGY\project\md` | 현재 확인 `main = origin/main = cecf47a` | Bangkok/OilRig Preview 이식 결과와 수동 확인 기준을 2026-09-30 로컬 문서 변경으로 추가 |
+| Unreal 현재 확인 복제본 `C:\URproject\drone` | `main = origin/main = 3b77aef` | Fetch 직후 Clean이었고 현재 Title/탭/Orbit/Racing 코드·자산이 로컬 변경. Bangkok City·OilRig까지는 원격 반영 완료 |
+| 문서 현재 확인 복제본 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` | 점검 시작 시 `main = origin/main = 1ffe3b2` | 2026-10-01 Fetch 후 원격 일치. 이번 최신화 문서만 로컬 변경 |
 
-2026-09-30 현재 두 저장소 모두 `HEAD...origin/main = 0/0`이다. Unreal 작업 트리에는 Bangkok 신규 이식물과 기존 사용자 Content 변경이 함께 있으므로 Commit 전 선택 범위를 확인한다. Commit·Push는 사용자가 수행한다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 인증/설정을 남기지 않는다.
+2026-10-01 Fetch 결과 두 저장소 모두 `HEAD...origin/main = 0/0`이었다. 이후 Unreal Title/탭/Orbit/Racing 코드·자산과 관련 Markdown을 로컬 수정했으므로 현재 작업 트리는 Clean이 아니다. 새 작업은 아직 원격에 없고 Commit·Push는 사용자가 수행한다. 외부 모델 검증은 종료했고 프로젝트 저장소에 OpenCode 인증/설정을 남기지 않는다.
 
 ## 최신 완료 항목
 
@@ -62,10 +70,10 @@
 - 2026-09-29 최종 회귀에서 `Drone.Physics.Breakables`, `Drone.Physics.CollisionResponse` 2/2와 `Drone.Mission.StoryPhysicsTestMaps` 1/1이 오류·경고 없이 Success다. `Drone.Tutorial.MissionLessonsTestMap`, `Drone.Flow.Contract`, `Drone.Flow.FrontEndContract`, `Drone.Flow.FrontEndPIE`의 기존 성공 기준도 유지한다. FrontEnd는 등록 Mission 13개와 버튼 13개를 확인했다
 
 - 2026-09-29 `Lvl_DroneTutorialMissionTest`를 8개 수업 Station으로 확장했다. `DA_Mission_Tutorial_Forward/Heading/GateFlight/UGV_NPC/UGV_Turret`을 추가하고 로비 Catalog는 기존 Training 포함 9개 Mission을 노출한다
-- `ADroneTutorialHeadingZone`은 World Yaw 최단 각도, 기본 90°±8°·1초 유지와 Overlap 중 0.1초 Timer로 `HeadingAligned`를 한 번 보고한다
+- `ADroneTutorialHeadingZone`의 방향 정렬 기능은 별도 시험/참조 호환용으로 보존했다. 현재 회전 수업에는 사용하지 않고 원형 Course의 `TrainingLap`을 사용한다
 - `UDroneGroundWeaponComponent`와 `ADronePlayerProjectile`을 추가했다. GroundWeapons Capability에서만 활성화하고 상부 Muzzle 기준 좌클릭 총 25 피해·우클릭 유탄 100 반경 피해를 사용한다
 - Tutorial 시험맵 Rebuild/Validate Map Check `0 errors / 0 warnings`, Build 성공, 새 Mission 집중 회귀 9/9 성공. 전체 `Drone.*`는 51개 성공과 기존 기준선 실패 7개이며 실패는 NPC 맵 고정 Actor 수, Shotgun PIE 감지, 보호 중 Production Training 코스 기대값이다
-- `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`에 Hover/Forward/Heading/Gate/FPV/Payload/UGV NPC/UGV Turret Station과 공용 Return Zone을 배치했다. Map Check 오류·경고 0
+- `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`에 Hover/Forward/Orbit/Gate/FPV/Payload/UGV NPC/UGV Turret Station과 Return Zone을 배치했다. 2026-10-01 기존 Owned Heading 두 Actor만 원형 Course로 교체하고 수동 Hover/기타 배치를 보존했다. Map Check 오류·경고 0
 - Tutorial 독립 Mission Definition 8개는 각 수업에 맞는 목표 순서와 허용 기체 한 종류를 가진다
 - `Hover Maintained` Mission Event와 `BP_TutorialHoverZone`을 추가했다. 기본 3초·75cm/s·수직 40cm/s·15°이며 Overlap 중 0.1초 Timer만 사용하고 Blueprint 조정 가능하다
 - Game Flow 기본 Catalog를 기존 Training과 Tutorial 독립 Mission 8개, 총 9개로 확장하고 C++ fallback 로비가 등록된 Mission 버튼을 모두 생성하도록 바꿨다
