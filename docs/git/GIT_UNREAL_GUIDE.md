@@ -1,16 +1,18 @@
 # Unreal Engine + Git/GitHub 실전 작업 가이드
 
+
+최신 기준은 [STATUS](../../STATUS.md)의 Git·검증 표를 따른다. 현재 C PC Unreal은 `C:\URproject\drone`, UE 5.8.3(CL 58210709, 2026-10-04 Build.version 확인)이다. 이전 D PC 기록과 구분하며 팀 허용 패치 범위는 현재 미정이다. 현재 `/Game/Material` 7개(M_Enemy/M_Radar/M_Rador_Tower/M_Start/M_Target/M_Turret/M_net)는 main에 있고 `/Game/Drone/Materials` 폴더는 없다. 팀원 자산 이동 여부는 현재 미정이며 8.2 당시 제안을 그대로 실행하지 않는다.
 이 문서는 기존 Unreal Engine 프로젝트를 Git/GitHub에 안전하게 연결하고, 메인컴·작업컴 또는 팀원 간에 같은 프로젝트를 이어서 작업하기 위한 기준 절차다.
 
 ## 0. 현재 기준과 미정 사항
 
 - 사용자가 밝힌 프로젝트 기준 버전은 **Unreal Engine 5.8.1**이다.
-- 작업컴의 설치 식별자는 **`UE_5.8`**이며, 당시 `Build.version`에서 `MajorVersion=5`, `MinorVersion=8`, `PatchVersion=1`을 확인했다. 따라서 작업컴 설치본은 **UE 5.8.1로 검증됨** 상태다.
-- 이번 확인 PC도 `C:\Program Files\Epic Games\UE_5.8\Engine\Build\Build.version`에서 UE 5.8.1, Changelist 56057345를 확인했고 실제 프로젝트의 `EngineAssociation`은 `5.8`이다.
+- 작업컴의 설치 식별자는 **`UE_5.8`**이며, 당시 `Build.version`에서 `MajorVersion=5`, `MinorVersion=8`, `PatchVersion=1`을 확인했다. 이는 이전 작업컴의 당시 **UE 5.8.1 검증 기록**이다.
+- 현재 C PC Build.version: UE 5.8.3·CL 58210709(2026-10-04 확인). 기존 5.8.1·CL 56057345는 2026-08-23 당시 기록이며 팀 허용 패치 범위는 현재 미정.
 - 다만 `UE_5.8` 폴더명이나 `.uproject`의 `EngineAssociation` 값만으로 패치 버전을 판정해서는 안 된다. 이번 확인 PC를 메인컴 또는 작업컴 중 어느 역할로 부를지는 이 문서에서 임의로 정하지 않으므로, 메인컴 설치 버전과 두 PC 일치 판정은 PC 역할을 확인한 뒤 닫는다.
 - 실제 Drone GitHub 저장소는 **`gyeonliz/drone`**으로 확정했다.
 - GitHub 저장소 공개 범위(Public/Private)는 **현재 미정**이다.
-- 기본 Drone 작업 경로는 `D:\JGY\project\drone`이고 문서 경로는 `D:\JGY\project\md`다. 다른 PC의 검증 Clone `C:\URproject\drone`도 별도 기록으로 보존한다. 현재 중앙 main은 `2fcfb04`이며 AI-FRIEND-01까지 병합·Push했다. Game/Editor Build, AI 7/7, 전체 `Drone.` 23/23, Blueprint 0/0/0, 환경 맵 검증과 LFS fsck를 통과했다. 프로젝트 사용 맵과 환경 중앙 사본은 `/Game/Drone/Maps`에 있고 Unreal 생성 기본 Map 4개만 제거했다. 실제 코드 구조와 사용자 확인 작업은 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](../reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다. 다른 PC Pull/LFS/UE 실행 검증은 아직 남았다.
+- 현재 C PC의 Unreal은 `C:\URproject\drone`, 이전 D PC는 `D:\JGY\project\drone`이다. 최신 HEAD·로컬 변경은 [STATUS](../../STATUS.md) Git 표를 따른다. 2fcfb04는 2026-08-28 당시 기준이며 다른 PC 체크리스트는 일반 템플릿이다.
 - 사용자는 현재 Drone 프로젝트에서 Android를 사용하지 않는다고 확정했다. 기준 Drone 프로젝트에서는 Android File Server Plugin과 네트워크 연결을 끄고 `SecurityToken`을 빈 할당으로 정리했다.
 - 아래 브랜치 구조는 현재 컨텍스트에 맞춘 권장 시작안이며, 최종 팀 규칙으로 확정된 것은 아니다.
 - 이 가이드는 명령줄 Git을 기준으로 한다. Unreal Editor 안의 Git 플러그인 제공 여부와 동작은 실제 UE 5.8 환경에서 확인하기 전까지 전제하지 않는다.
@@ -127,8 +129,8 @@ GitHub 이메일 공개를 원하지 않으면 GitHub가 제공하는 `noreply` 
 | --- | --- |
 | 프로젝트 기준 | UE 5.8.1이라고 전달받음 |
 | 작업컴 설치 식별자 | `UE_5.8` |
-| 작업컴 `Build.version` | 5.8.1 확인 완료 |
-| 이번 확인 PC `Build.version` | 5.8.1, Changelist 56057345 확인 완료 |
+| 이전 D PC `Build.version` | 5.8.1 당시 확인 기록 |
+| 현재 C PC `Build.version` | UE 5.8.3·CL 58210709(2026-10-04 확인) |
 | 메인컴 설치 버전 | 아직 확인 필요 |
 | 실제 프로젝트 `EngineAssociation` | `D:\JGY\project\drone\Drone.uproject`와 다른 PC `C:\URproject\drone\Drone.uproject`에서 `5.8` 확인 |
 
@@ -348,7 +350,7 @@ git config --get branch.main.pushRemote
 
 `Yook34/drone`은 `gyeonliz/drone`의 Fork이며 Merge Base는 `095dda7`이다. 중앙 전용 Commit은 0개, Fork 전용 Commit은 4개다. 따라서 팀원 PC가 Fork를 Clone해 `origin=Yook34/drone`인 경우 팀원 GitHub에 Push된 것은 정상 동작이다.
 
-이후 팀원 환경 변경은 중앙에 반영됐고 현재 중앙 `main`은 `2fcfb04`다. 위 표는 Push가 사라진 것처럼 보였던 원인을 설명하는 당시 감사 기록이며 최신 기준선으로 사용하지 않는다.
+이후 팀원 환경 변경은 중앙에 반영됐고 2026-08-28 당시 중앙 `main`은 `2fcfb04`였다. 위 표는 Push가 사라진 것처럼 보였던 원인을 설명하는 당시 감사 기록이며 최신 기준선으로 사용하지 않는다.
 
 #### 방식 A — Fork + Pull Request
 
@@ -398,7 +400,7 @@ git push -u origin feature/yook34-battlefield-assets
 
 중앙 직접 Push가 403 또는 권한 오류로 거절되면 Remote 문제가 아니라 Collaborator 권한 문제다. 저장소 소유자가 팀원 계정을 초대하거나 방식 A를 사용한다.
 
-### 8.2 현재 팀원 Fork 변경 선별 인수
+### 8.2 2026-08-28 감사 당시 팀원 Fork 선별 인수
 
 팀원 Fork의 순 변경에는 다음 항목이 함께 섞여 있다.
 

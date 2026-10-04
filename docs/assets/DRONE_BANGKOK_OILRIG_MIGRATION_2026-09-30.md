@@ -4,8 +4,10 @@
 
 ## 결론
 
+10/04 사용자 확인: Lvl_BangkokCity.umap은 ec2e88f(10/01 팀원)에서 의도적으로 삭제됨(사용 불가 판단). ASSET-BANGKOK-01은 종료(맵 삭제). 아래9월 D PC 이식·검증은 당시 근거이며 현재 맵 존재/Pass를 뜻하지 않는다. ThirdParty/BangkokCity 의존987개·LFS약11.46GiB는 남아 있고 정리 여부는 사용자 결정 대기.
+
 - Bangkok은 공급 폴더의 자산 전시용 `Maps/Overview`가 아니라 실제 도시 환경 `Maps/BangkokCity`를 이식했다.
-- 프로젝트 맵은 `/Game/Drone/Maps/Lvl_BangkokCity`다.
+- 당시 이식 맵은 /Game/Drone/Maps/Lvl_BangkokCity였으나 10/01 의도된 삭제로 현재 없다.
 - 프로젝트 소유 의존 자산은 `/Game/Drone/ThirdParty/BangkokCity` 아래 987개다.
 - OilRig의 기존 `/Game/Drone/Maps/Lvl_OilRig`은 `/Game/Liope_Tr/Maps/Overview` 기반 자산 전시 맵이므로 보존한다.
 - 실제 오일리그 장면인 `/Game/Liope_Tr/Maps/Preview`는 별도 `/Game/Drone/Maps/Lvl_OilRigPreview`로 이식했다. 의존 자산은 `/Game/Drone/ThirdParty/OilRigPreview` 아래 614개다.
@@ -39,7 +41,7 @@
 
 ## OilRig Overview와 Preview 분리
 
-기존 이식 도구 `Tools/AssetMigration/PrepareOilRigMap.py`의 Source Map은 `/Game/Liope_Tr/Maps/Overview`, Target은 `/Game/Drone/Maps/Lvl_OilRig`다. 이 처리에서 Vendor GameMode를 비우고 구형 FirstPerson Demo Door Actor 8개를 제거한 뒤 환경 의존성만 이식했다. Preview 전용 FirstPerson Map 체인은 중앙 OilRig 맵에 포함하지 않았다.
+기존 이식 도구 `Tools/AssetMigration/PrepareOilRigMap.py`(10/04 삭제됨, Git 이력 참조; 현행 실행 안내 아님)의 Source Map은 `/Game/Liope_Tr/Maps/Overview`, Target은 `/Game/Drone/Maps/Lvl_OilRig`다. 이 처리에서 Vendor GameMode를 비우고 구형 FirstPerson Demo Door Actor 8개를 제거한 뒤 환경 의존성만 이식했다. Preview 전용 FirstPerson Map 체인은 중앙 OilRig 맵에 포함하지 않았다.
 
 사용자 확인으로 실제 플레이 환경은 `Preview`임을 확정했다. 기존 검증본을 덮지 않고 다음과 같이 별도 이식했다.
 
@@ -64,7 +66,7 @@
 
 ## 사용자가 확인할 일
 
-1. Editor에서 `/Game/Drone/Maps/Lvl_BangkokCity`와 `/Game/Drone/Maps/Lvl_OilRigPreview`를 각각 연다.
+1. Editor에서 /Game/Drone/Maps/Lvl_OilRigPreview만 연다. Bangkok 맵 확인 지시는 삭제로 종료했다.
 2. Missing Material, 검은 Texture, 조명 과노출, 스케일·충돌 이상을 확인한다.
 3. OilRig Preview의 문·문틀 32세트가 제 위치에 보이는지 확인한다. 현재 문은 외형/충돌만 있고 FirstPerson 상호작용은 의도적으로 제거됐다.
 4. 첫 로드 시간과 대표 구간 FPS를 기록한다.
@@ -77,9 +79,9 @@
 - `Tools/AssetMigration/PrepareBangkokCityMap.py`: 중앙 맵 복제와 GameMode 제거
 - `Tools/AssetMigration/StageDependencyClosure.py`: 의존성 폐쇄 이동과 외부/누락 검사
 - `Tools/AssetMigration/AuditBangkokCityMigration.py`: 본 프로젝트 Map load·참조·GameMode 감사
-- `Tools/AssetMigration/PrepareOilRigPreviewMap.py`: Preview 복제, GameMode 제거, Door 외형 정적화
+- `Tools/AssetMigration/PrepareOilRigPreviewMap.py`(10/04 삭제됨, Git 이력 참조; 현행 실행 안내 아님): Preview 복제, GameMode 제거, Door 외형 정적화
 - `Tools/AssetMigration/StageDependencyClosure.py`: OilRig Preview 의존성 전용 경로 이동
-- `Tools/AssetMigration/CleanOilRigPreviewMap.py`: 빈/완전 중복 StaticMeshActor 정리
+- `Tools/AssetMigration/CleanOilRigPreviewMap.py`(10/04 삭제됨, Git 이력 참조; 현행 실행 안내 아님): 빈/완전 중복 StaticMeshActor 정리
 - `Tools/AssetMigration/AuditOilRigPreviewMigration.py`: 본 프로젝트 Map load·참조·GameMode·Map Check 감사
 
 스테이징 원본 복사본은 Git 대상이 아니며 본 프로젝트 실행에는 필요 없다.

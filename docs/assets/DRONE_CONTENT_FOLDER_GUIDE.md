@@ -1,5 +1,7 @@
 # Drone Content 폴더 정리 기준
 
+
+이 트리와 Map 표는 2026-09-16 이전 D PC 기록이다. 현재 C PC Git 기준은 [STATUS](../../STATUS.md), 실제 맵 목록·진입은 [테스트 맵 가이드](../gameplay/DRONE_TEST_MAP_GUIDE.md)를 따른다. 현재 FrontEnd·TestMap/Tutorial 8맵·Story 4맵·Racing 및 Friendly StateTree, ThirdParty BangkokCity/DronePackFPV/DroneSounds/FiberOpticGSU/OilRigPreview가 추가돼 있다.
 기준일: 2026-09-16
 Drone 기준선: 로컬 추적 `main=origin/main=10da7ce`
 Unreal Engine: 5.8.1
@@ -15,7 +17,7 @@ Unreal Engine: 5.8.1
 
 Drone에서는 이 중 **프로젝트가 실제로 사용하는 Map을 한 폴더에 모으는 규칙**을 적용했다. 공급사 자산 전체를 프로젝트 소유 자산처럼 섞는 방식은 적용하지 않았다.
 
-## 2. 현재 Drone Content 구조
+## 2. 2026-09-16 당시 Drone Content 구조
 
 ```text
 Content/Drone/
@@ -69,7 +71,7 @@ Map의 현재 용도는 다음과 같다.
 
 | Map | 용도 | 상태 |
 |---|---|---|
-| `Lvl_DroneTraining` | Tutorial Vertical Slice와 현재 기본 실행 Map | PIE 초기 화면·자동화 확인, 한 Lap 수동 확인 대기 |
+| `Lvl_DroneTraining` | Editor 시작 Map(팀원 Production) | PIE 초기 화면·자동화 확인, 한 Lap 수동 확인 대기 |
 | `TestMap/Lvl_DroneTutorialSystemsTest` | 팀원 Training과 분리된 Ring·역할 표적·Carryable·HUD 기능 시험 | 경량 맵 생성, Build·Map Check 0/0·전용 자동화 1/1 통과, Editor 한/두 Lap 수동 확인 대기 |
 | `TestMap/Lvl_DroneMissionSystemsTest` | 재밍 약/강/겹침·귀환 Zone·역할 표적 기능 시험 | 경량 맵 생성, Map Check 0/0·전용 자동화 통과, 실제 Mission Flow PIE 대기 |
 | `TestMap/Lvl_DroneShotgunSystemsTest` | 추가 샷건 NPC의 감지·산탄 Projectile·탄약·LOS 시험 | 독립 사격장 생성, Map Check 0/0·Asset/PIE 2/2 통과, 화면 체감 확인 대기 |
@@ -116,7 +118,7 @@ Source/Drone/Variant_SideScrolling/
 현재 `Config/DefaultEngine.ini`는 다음을 사용한다.
 
 ```ini
-GameDefaultMap=/Game/Drone/Maps/Lvl_DroneTraining.Lvl_DroneTraining
+GameDefaultMap=/Game/Drone/Maps/Lvl_DroneFrontEnd.Lvl_DroneFrontEnd
 EditorStartupMap=/Game/Drone/Maps/Lvl_DroneTraining.Lvl_DroneTraining
 GlobalDefaultGameMode=/Game/Drone/Prototype/Blueprints/BP_DronePrototypeGameMode.BP_DronePrototypeGameMode_C
 ```

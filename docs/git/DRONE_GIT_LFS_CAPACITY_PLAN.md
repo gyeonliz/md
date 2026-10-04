@@ -1,5 +1,7 @@
 # Drone Git LFS 용량·대역폭 절감 계획
 
+
+GIT-LFS-CAP-01은 현재 WORKBOARD 카드 없음(2026-09-15 스냅숏 기준). 복원·보류·폐기 여부는 사용자 결정 대기이며 현행 Next로 실행하지 않는다.
 기준일: 2026-09-15 (Asia/Seoul)
 
 이 문서는 `D:\JGY\project\drone`의 실제 Git LFS Pointer를 로컬에서 집계한 결과와, 팀 작업을 깨뜨리지 않고 GitHub LFS 사용량을 줄이는 순서를 정리한다. 이 기록만으로 `.gitattributes`를 변경하거나 Asset을 삭제·이동하지 않는다.

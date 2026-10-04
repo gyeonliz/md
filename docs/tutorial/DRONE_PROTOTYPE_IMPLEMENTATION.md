@@ -1,10 +1,12 @@
 # Drone Prototype Pawn 구현 및 검증 기록
 
+
+현재 C PC Git·검증은 [STATUS](../../STATUS.md), 입력은 [입력 계약](DRONE_PROTOTYPE_INPUT_CONTRACT.md)·[조정 가이드](../reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다. IA 14개·IMC 33매핑이며 아래 D PC/16매핑/여섯 Action/551e287·14/14·TUT-04는 당시 기록이다.
 기준일: 2026-08-24 (Asia/Seoul)
 
-## 1. 현재 결과
+## 1. 2026-08~09 이전 D PC 당시 결과
 
-현재 작업 경로 `D:\JGY\project\drone`에 기존 Third Person 경로와 분리된 최소 Drone Prototype이 있다. `C:\URproject\drone`은 2026-08-24 다른 PC에서 검증한 경로이며, 구현을 시작한 2026-08-19 당시 `C:\project\Drone`도 역사 기록일 뿐 현재 D 드라이브 작업 경로가 아니다.
+2026-08~09 이전 D PC 당시 기록: D:\JGY\project\drone에서 Prototype을 분리했다. C:\URproject\drone은 당시 다른 PC 검증 경로였으며 지금은 현재 C PC 경로다. 현재 위치·Git은 STATUS를 따른다.
 
 - `ADronePrototypePawn` C++ 클래스가 컴파일된다.
 - `ADronePrototypeGameMode`를 직접 선택하면 native 기본값으로 해당 Pawn을 Spawn한다.
@@ -162,7 +164,7 @@ Yaw Rate     90 degrees/second
 
 Input Action이 배정되지 않았으면 크래시 대신 진단 로그를 남긴다.
 
-## 7. 현재 Blueprint와 Input 설정
+## 7. 2026-09-04 당시 Blueprint와 Input 설정
 
 다음 자산은 생성과 저장 뒤 별도 Editor 프로세스에서 다시 로드해 검증했다.
 
@@ -183,7 +185,7 @@ Input Action이 배정되지 않았으면 크래시 대신 진단 로그를 남�
 
 기존 Setup 도구와 추가 입력 생성 도구는 Input·Pawn·GameMode·Map을 검증한다. 추가한 BP Controller와 WBP 2개는 `Drone.UI.FlightHUDBlueprintAsset` 자동화가 부모 Class, 필수 TextBlock·Font와 Class 연결을 별도로 검증한다. 현재 위 목록은 Toggle View Action을 포함해 12개다.
 
-현재 IMC에는 16개 Mapping이 있다.
+현재 IMC에는33개 Mapping·Input Action14개가 있다(10/04 C PC). 아래는 초기 공용 입력 목록이며 Acro 전용6Action·역할 입력은 최신 입력 계약을 따른다.
 
 - Move: `W/S/A/D`
 - Altitude: `Space Bar/Left Ctrl`
@@ -197,9 +199,9 @@ Input Action이 배정되지 않았으면 크래시 대신 진단 로그를 남�
 
 Modifier와 기대 부호는 [`DRONE_PROTOTYPE_INPUT_CONTRACT.md`](DRONE_PROTOTYPE_INPUT_CONTRACT.md)에 기록했다. 역할 배치는 사용자 승인 v1 기준이며 감도·반전·최종 물리는 수동 체감 뒤 조정한다.
 
-실제 실행 Pawn인 `BP_DroneFPVIntegration`은 `ADronePrototypePawn` 자식이다. Class Defaults에 IMC와 여섯 Action을 연결했고 Drone Pack 외형을 Visual Pivot 아래에 둔다. Event Graph에서 IMC를 추가하거나 Action을 다시 바인딩하지 않는다.
+실제 실행 Pawn인 `BP_DroneFPVIntegration`은 `ADronePrototypePawn` 자식이다. 초기 공용 Action 연결 기록이며 현재 Class Defaults에서는 IMC·Acro 전용6개를 포함한 해당 기체의 입력 Action을 확인한다. Drone Pack 외형을 적용했고 Drone Pack 외형을 Visual Pivot 아래에 둔다. Event Graph에서 IMC를 추가하거나 Action을 다시 바인딩하지 않는다.
 
-`BP_DronePrototypeGameMode`는 `ADronePrototypeGameMode` 자식이며 Default Pawn은 BP Prototype Pawn, PlayerController Class는 `BP_DronePrototypePlayerController`다. 해당 BP Controller의 `FlightHUDWidgetClass`는 `WBP_DroneFlightHUD`다. 입력 IMC는 계속 Pawn 한 곳에서만 관리하고 BP Controller/Event Graph에는 중복 등록하지 않는다. native `ADronePrototypePlayerController`와 `UDroneFlightHUDWidget`은 직접 선택했을 때 사용할 기본 Class/레이아웃을 유지한다.
+`BP_DronePrototypeGameMode`는 `ADronePrototypeGameMode` 자식이며 Default Pawn은 BP_DroneFPVIntegration(ADronePrototypePawn 자식), PlayerController Class는 `BP_DronePrototypePlayerController`다. 해당 BP Controller의 `FlightHUDWidgetClass`는 `WBP_DroneFlightHUD`다. 입력 IMC는 계속 Pawn 한 곳에서만 관리하고 BP Controller/Event Graph에는 중복 등록하지 않는다. native `ADronePrototypePlayerController`와 `UDroneFlightHUDWidget`은 직접 선택했을 때 사용할 기본 Class/레이아웃을 유지한다.
 
 `Lvl_DronePrototype`은 기존 World Partition Template Map을 복제하지 않고 새로 만든 작은 비-World-Partition 시험장이다. Map-level GameMode Override, PlayerStart 한 개, 배치 Pawn 0개, 지면·이륙 Pad·벽·높이 표식·목표·귀환·Patrol·Turret 위치 표시를 포함한다. 위치와 크기는 모두 Greybox 임시값이다.
 
@@ -211,7 +213,7 @@ Modifier와 기대 부호는 [`DRONE_PROTOTYPE_INPUT_CONTRACT.md`](DRONE_PROTOTY
 4. Map에 `PlayerStart`가 한 개이고 Pawn이 직접 배치되지 않았는지 확인한다.
 5. BP GameMode의 PlayerController Class가 `BP_DronePrototypePlayerController`인지 확인한다.
 6. BP Controller의 Flight HUD Widget Class가 `WBP_DroneFlightHUD`인지 확인한다.
-7. PIE를 시작하고 BP Prototype Pawn 한 대가 BP Controller에 Possess되는지, 좌측 상단 WBP가 표시되는지 확인한다.
+7. PIE를 시작하고 BP_DroneFPVIntegration 한 대가 BP Controller에 Possess되는지, 좌측 상단 WBP가 표시되는지 확인한다.
 8. Enhanced Input Debug에서 `IMC_DronePrototype`이 Priority 1로 한 번만 등록되는지 확인한다.
 9. `W/S/A/D`, `Space/Left Ctrl`, `Q/E`를 시험해 Move, Altitude와 보조 Yaw 방향을 확인한다.
 10. Mouse X가 Drone Actor Yaw를 바꾸며 추적 Camera가 기체 뒤를 따라가는지, Mouse Y가 기체 Yaw 없이 CameraBoom Pitch만 바꾸는지 확인한다.
@@ -232,11 +234,11 @@ Blueprint와 Input 연결까지 완료했을 때의 정상 기준은 다음과 �
 - Camera가 SpringArm 기준으로 표시된다.
 - 수평 이동, 고도, Yaw, Look 입력이 서로 독립적으로 반응한다.
 - PIE를 반복해도 입력이 중복되지 않는다.
-- 기존 `Lvl_ThirdPerson` 실행 경로는 그대로 동작한다.
+2026-08 당시 기준(1c8f391·08/26에서 Template 맵 삭제): - 기존 `Lvl_ThirdPerson` 실행 경로는 그대로 동작한다.
 
 착륙, Crash/실패, 배터리, 통신 거리, 재밍은 이 정상 기준에 포함하지 않는다.
 
-## 10. 문제가 생겼을 때 확인할 항목
+## 10. 문제가 생겼을 때 확인할 항목 — 2026-09-04 당시 기록
 
 ### Pawn이 Spawn되지 않음
 
@@ -248,7 +250,7 @@ Blueprint와 Input 연결까지 완료했을 때의 정상 기준은 다음과 �
 ### Pawn은 생기지만 입력이 없음
 
 - native GameMode가 native Pawn을 Spawn하고 있지 않은지
-- 실제 실행 Pawn `BP_DroneFPVIntegration`의 IMC와 여섯 Action이 모두 연결됐는지
+- 현재 입력 확인은 IMC 33매핑·IA 14개와 비행 FPV/Scout/Drop/FiberOptic의 Acro 전용 Action 6개가 모두 연결됐는지 확인한다. [입력 계약](DRONE_PROTOTYPE_INPUT_CONTRACT.md)을 따른다.
 - Project Settings의 Default Input Component Class가 Enhanced Input인지
 - Output Log의 누락 자산 또는 Mapping 등록 메시지
 - IMC에 실제 키 Mapping이 추가됐는지
@@ -351,7 +353,7 @@ Editor Python은 프로젝트 Plugin 설정을 바꾸지 않고 실행 시점에
 - 새 Input Action과 갱신한 BP/IMC를 포함한 기존 9개 자산은 Setup 별도 프로세스에서 재로드 검증
 - 추가 BP Controller와 WBP 2개는 Blueprint Asset 자동화와 PIE 실제 Class 검증
 
-## 12. 현재 다음 완료 게이트
+## 12. 현재 다음 완료 게이트 — 2026-09-04 당시 기록
 
 현재 Tutorial/Story 우선 실행 순서와 Greybox 기준은 [`DRONE_TUTORIAL_STORY_PLAN.md`](../planning/DRONE_TUTORIAL_STORY_PLAN.md)를 우선하며, PFN 카드 세부 정의는 [`DRONE_PREASSET_FUNCTION_PLAN.md`](../planning/DRONE_PREASSET_FUNCTION_PLAN.md)를 함께 따른다.
 

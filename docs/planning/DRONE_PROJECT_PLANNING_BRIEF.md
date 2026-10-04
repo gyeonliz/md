@@ -1,5 +1,7 @@
 # Project:Droner 통합 기획·개발 현황서
 
+
+현재 흐름은 타이틀 스토리/레이싱/튜토리얼/설정/종료 5메뉴→분류 직접 진입이다. 오프닝·엔딩 재생 조건은 현재 미정. [회의 후 흐름](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)·[타이틀 가이드](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)와 루트 STATUS/WORKBOARD를 우선하며 아래 초기 계획을 새 확정 요구로 전용하지 않는다.
 기준일: 2026-09-08 (Asia/Seoul)
 
 문서 상태: 역할 기능 3종·FLOW-01~08 공유 main 반영 완료. Mission Definition 3종을 Integration Pawn으로 실연결하고 Build·Prototype 7/7·Flow 5/5·FPV Asset 1/1 통과. 실제 화면 확인과 Pull/Stash 바이너리 충돌 정리 대기
@@ -11,10 +13,10 @@
 | 항목 | 현재 기준 |
 |---|---|
 | 장르 | 싱글플레이 드론 운용·정찰·미션 게임 |
-| 엔진 | Unreal Engine 5.8 계열, 현재 실행 Editor 5.8.2 |
-| 현재 작업 루트 | Unreal `D:\JGY\project\drone`, 문서 `D:\JGY\project\md` |
+| 엔진 | UE 5.8 계열(현재 C PC 5.8.3·CL 58210709, 10/04 Build.version 확인), 팀 패치 허용 범위 미정 |
+| 현재 작업 루트 | 현재 C PC Unreal `C:\URproject\drone`, 문서는 이 저장소. PC별 경로는 CLAUDE.md 표 참조 |
 | 다른 PC의 경로 | PC마다 다르므로 Git Commit과 LFS 상태로 판별 |
-| Unreal 공유 기준 | `main=origin/main=63f60c1`; 역할·FLOW 변경 공유 완료, 현재 LFS 충돌 2개는 로컬 정리 전 |
+| Unreal 공유 기준 | [STATUS Git 기준](../../STATUS.md): 41444c2 + 로컬 미커밋·미추적, 이번 Commit/Push 없음 |
 | 플레이어 표현 | 사람 캐릭터 없이 Drone 조작 중심 |
 | 핵심 모드 | Tutorial 비행 훈련, Story Mission |
 | 현재 신규 개발 | 정찰 Scan·FPV 충돌 자폭·드랍 Payload와 FLOW-01~08 Source 존재. Mission Data Asset 3종을 Integration Pawn으로 실연결하고 자동 검증 완료, 모델·조작·역할 기능 수동 화면 확인 대기 |
@@ -46,7 +48,7 @@ Figma `Project:Droner`에 정리된 현재 참고 설정은 아래와 같다. Fi
 
 최종 게임 제목은 `Project:Droner`, `DRONE LINE` 또는 다른 이름 중 아직 확정하지 않았다.
 
-## 3. 확정된 전체 화면 흐름
+## 3. 2026-09-08 당시 화면 흐름
 
 ```text
 게임 실행
@@ -133,7 +135,7 @@ Tutorial UI 표시 항목:
 
 Story Mission은 로비에서 직접 선택한다. 사람 조작과 NPC 대화 수령은 포함하지 않는다.
 
-2026-09-16 Figma 읽기 전용 확인 기준으로 Story Mission 화면은 `골든 타임`, `인터셉트`, `베일 브레이커`, `엔드게임` 4개다. 실제 저장 Mission Definition/Map은 아직 없으며, 같은 Figma 파일 안의 Mission 2→3 스토리 문구 충돌은 양쪽을 지원하는 데이터 분기로 남겼다.
+2026-09-16 Figma 점검에서 Story 화면 `골든 타임`, `인터셉트`, `베일 브레이커`, `엔드게임` 4개를 확인했다. 당시 Definition/Map 부재 기록과 달리 2026-10-03 로컬에는 해당 DA 4개·격리 TestMap4개·M1→M4 NextMissionId가 존재하고 유효성 확인됐다. 최종 환경/목표 콘텐츠가 완성됐다는 뜻은 아니다. Mission2→3 충돌은 양쪽 Story Fact 기반을 유지하며 기본 결말은 미정이다.
 
 | Figma Mission | 재사용 가능한 공통 기능 | 아직 필요한 결정·연결 |
 |---|---|---|
@@ -142,7 +144,7 @@ Story Mission은 로비에서 직접 선택한다. 사람 조작과 NPC 대화 �
 | 3 베일 브레이커 | 재밍 단계/HUD/강한 둔화, 광섬유 면역 Capability, Jammer 해제, AI/MG/자동포탑 | 광섬유/UGV Pawn, 한 Mission 내 기체 교대, 산악 기지 Map/DA, 방공망 대상 |
 | 4 엔드게임 | 순차 목표 Rule, Target Destroyed, AI·포탑 기반, 결과 Flow | 본진 Map/DA, 모든 기체 교대, 장거리 타격/엔딩 Sequence |
 
-현재 저장된 Mission Definition은 Training Vertical Slice 하나다. 상세 Figma node와 충돌·작업 순서는 [Figma Mission 구현 매트릭스](DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md), 코드·배치는 [Mission 목표 Rule 가이드](../gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md)와 [재밍 Greybox 가이드](../gameplay/DRONE_JAMMING_GREYBOX_GUIDE.md)를 본다.
+현재 저장된 Mission Definition은 Tutorial8·공용 Training1·Story4·Racing 시험1(14개)다. Story4 시험 배치와 최종 국가/환경·기체 교대·수량/실패 조건을 구분하며 아래 과거 표의 Map/DA 필요 항목은 제품 콘텐츠 연결을 뜻한다. 상세 Figma node와 충돌·작업 순서는 [Figma Mission 구현 매트릭스](DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md), 코드·배치는 [Mission 목표 Rule 가이드](../gameplay/DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md)와 [재밍 Greybox 가이드](../gameplay/DRONE_JAMMING_GREYBOX_GUIDE.md)를 본다.
 
 Mission 공통 상태 후보:
 
@@ -203,7 +205,7 @@ Figma의 UI 참고 이미지는 청록·녹색 계열 전술 HUD, 얇은 선, �
 | 협업 자산 | FPV Drone, 환경 Map, Ground Drone/MG, NPC·VFX·SFX 후보 선별 이식 |
 | Front-end 기반 | GameInstance Flow/Catalog, 실제 Mission·Drone Data Asset, 전용 Map/BP GameMode·Controller/WBP, 정적 Opening→Lobby, Training Mission 선택·설명·시작 |
 
-현재 D 드라이브 공유 Unreal 기준은 `63f60c1`이다. 역할 기능 3종, 조작 모드 분리와 FLOW-04~08은 공유 main에 반영됐다. 다만 Pull 때 복원된 Stash의 `test1.umap`, `M_Start.uasset`이 Upstream과 충돌해 정리 전이며 Codex는 바이너리 선택·Commit·Push하지 않았다. 과거 `46f7f37` 기준 설명은 이전 작업 PC의 역사 기록이다.
+2026-09-08 이전 D PC의 63f60c1·test1/M_Start LFS 충돌은 당시 기록이다. 현재 C PC Git 상태는 STATUS를 따른다.
 
 ### 로컬 구현·수동 확인 대기
 
@@ -215,15 +217,15 @@ Figma의 UI 참고 이미지는 청록·녹색 계열 전술 HUD, 얇은 선, �
 - Drone Loop 단일 재생과 종료 정지 청감
 - MilitaryCamp·MilitaryBase·Battlefield·OilRig의 조명·재질·충돌·성능·채택 여부
 
-### 아직 구현하지 않음
+### 현재 구현 경계 — 10/04 대조
 
 - 실제 시작 트레일러 영상과 최종 로비 외형
-- 미션 트레일러와 선택 Map 전환
-- Map 안 Drone 선택·Preview·허용 목록 검증
-- Mission Director와 측면 목표 UI
-- 성공/실패 결과·재도전·로비 복귀
+- 미션 트레일러와 선택 Map 전환 — 기능 구현됨·자동 검증됨·수동 확인 대기. 실제 영상·최종 표현은 별도.
+- Map 안 Drone 선택·Preview·허용 목록 검증 — 기능 구현됨·자동 검증됨·수동 확인 대기. 실제 영상·최종 표현은 별도.
+- Mission Director와 측면 목표 UI — 기능 구현됨·자동 검증됨·수동 확인 대기. 실제 영상·최종 표현은 별도.
+- 성공/실패 결과·재도전·로비 복귀 — 기능 구현됨·자동 검증됨·수동 확인 대기. 실제 영상·최종 표현은 별도.
 - 명시적 Take Off·Landing·Crash 상태
-- Jamming Runtime
+- Jamming Runtime — 기능 구현됨·자동 검증됨·수동 확인 대기. 실제 영상·최종 표현은 별도.
 - 최종 NPC·무기·MG 승하차 Animation·Niagara·Sound 표현
 - Drone 폭발·Respawn과 최종 Mission 실패 연출
 
@@ -406,7 +408,7 @@ ADroneMissionDirector
 | 항목 | 현재 처리 |
 |---|---|
 | 최종 게임 제목 | 보류 |
-| 시작 Trailer 매 실행/최초 1회 | 첫 Greybox는 매 실행 |
+| 시작 Trailer 매 실행/최초 1회 | 현재 미정. 오프닝을 매 실행 필수로 확정하지 않음 |
 | Trailer Skip 키·최소 시간 | FLOW-02에서 결정 |
 | 2D/3D 로비 | 첫 Greybox는 가벼운 전용 Front-end Map |
 | Drone 선택 Preview 방식 | 첫 Greybox는 Mission Map 위 UI, 필요 시 Preview Map 분리 |
@@ -414,7 +416,7 @@ ADroneMissionDirector
 | Shotgun 실제 Mesh | 후보 미확보 |
 | Soldier/Insurgent 외형 | Manny와 Skeleton이 달라 Retarget 검증 필요 |
 | 환경 Map 선택 | 시각·Collision·성능 검토 뒤 결정 |
-| SaveGame | Front-end·결과 흐름 안정화 뒤 |
+| 기록 저장 | Best Lap JSON 구현·자동 검증, 실제 재실행 복원 수동 대기. Tutorial 완료 영구 저장은 현재 미정 |
 
 ## 15. 문서와 Git 운영
 

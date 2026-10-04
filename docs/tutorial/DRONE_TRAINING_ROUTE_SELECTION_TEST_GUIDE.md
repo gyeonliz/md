@@ -53,7 +53,7 @@ World Outliner에서 다음 Actor 중 하나를 선택한다.
 - `Drone.Tutorial.TrainingRouteSelectionPIE`: 실제 `1~5` 키 입력과 HUD Source 전환
 
 ```powershell
-cd D:\JGY\project\drone
+cd C:\URproject\drone # 현재 C PC 예시; 다른 PC는 실제 Unreal 저장소 경로로 바꿀 것
 .\Tools\AssetMigration\Invoke-DroneTrainingRouteSelectionTestMap.ps1 -Mode Validate
 ```
 

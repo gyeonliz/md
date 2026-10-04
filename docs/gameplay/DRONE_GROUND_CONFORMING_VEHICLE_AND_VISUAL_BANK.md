@@ -128,7 +128,7 @@ Drone의 공용 `HealthComponent`에서 실제 피해가 적용될 때 본체와
 
 ### Drone
 
-1. `/Game/Drone/Prototype/Maps/Lvl_DronePrototype` 또는 Training Map에서 Drone을 조종한다.
+1. /Game/Drone/Maps/Lvl_DronePrototype 또는 TestMap/Lvl_DroneWeatherSystemsTest에서 Drone을 조종한다. 기능 검증은 TestMap, Production 편집·저장은 맵 소유 팀원만 한다.
 2. `W`를 누르면 기수가 아래로, `S`를 누르면 기수가 위로 기우는지 본다.
 3. `D`를 누르면 본체와 Rotor 네 개가 오른쪽 이동 방향으로 기울고, `A`는 반대로 기우는지 본다.
 4. `W+D` 같은 복합 입력에서는 Pitch와 Roll이 동시에 적용되는지 본다.

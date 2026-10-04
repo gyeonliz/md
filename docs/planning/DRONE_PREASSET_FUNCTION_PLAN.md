@@ -1,8 +1,10 @@
 # 구매 소스 확보 전 Drone 기능 우선 개발 계획
 
+
+현재 작업 순서는 [STATUS](../../STATUS.md)·[WORKBOARD](../../WORKBOARD.md)를 따른다. FLOW-01은 구현 완료이며 아래 초기 신규 기능 제안·D 경로는 당시 기록(D PC 예시, 실제 경로로 바꿀 것)이다.
 기준일: 2026-09-03 (Asia/Seoul)
 
-> 이 문서는 에셋 확보 전 수립한 기능 우선 계획이다. 현재 D 드라이브 작업 PC의 제공 에셋은 `D:\JGY\project\Unreal_260821`에 있으며 FPV 외형·Loop 최소 이식까지 완료했지만, 기능 우선 순서와 Greybox 기준은 그대로 유지한다.
+2026-09-03 이전 D PC 기록: > 이 문서는 에셋 확보 전 수립한 기능 우선 계획이다. 현재 D 드라이브 작업 PC의 제공 에셋은 `D:\JGY\project\Unreal_260821`에 있으며 FPV 외형·Loop 최소 이식까지 완료했지만, 기능 우선 순서와 Greybox 기준은 그대로 유지한다.
 
 ## 1. 목적
 
@@ -26,7 +28,7 @@ Spawn
 
 사용자가 Tutorial과 Mission 구성을 확정한 뒤의 최신 실행 순서는 [`DRONE_TUTORIAL_STORY_PLAN.md`](DRONE_TUTORIAL_STORY_PLAN.md)가 우선하며, 실행→트레일러→로비→미션 선택→브리핑→맵→Drone 선택→Mission 시작의 상세 구조는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 따른다. 이 문서는 기존 PFN 카드, Placeholder 원칙과 에셋 교체 경계를 보존하는 참고 기준이다.
 
-## 2. 현재 출발점
+## 2. 2026-09-03 이전 D PC 당시 출발점
 
 확인된 현재 상태는 다음과 같다.
 
@@ -288,7 +290,7 @@ PFN-37의 최신 결과가 **3회 연속 Pass**여야 이 게이트를 통과한
 - Crash는 한 번만 실패 처리된다.
 - 성공과 실패가 각각 Evaluation으로 이어진다.
 - 새 PIE 세 번에서 결과가 재현된다.
-- 기존 Third Person 기본 실행 경로가 깨지지 않는다.
+2026-08 당시 기준(Template 맵은 1c8f391·08/26에서 삭제): - 기존 Third Person 기본 실행 경로가 깨지지 않는다.
 
 ## 12. P6 — 구매 요구사항과 교체 준비
 
@@ -365,7 +367,7 @@ PFN-37의 최신 결과가 **3회 연속 Pass**여야 이 게이트를 통과한
 
 자동화 가능한 C++ 상태, Spawn/Possess, Reservation, Mission 전환은 자동화 테스트 후보로 추가한다. LocalPlayer 입력, Blueprint 연결, Map 배치, Camera는 Editor PIE로 별도 확인한다.
 
-## 16. 바로 시작할 순서
+## 16. 바로 시작할 순서 — 2026-09-03 당시 계획
 
 현재 기준 P1 진행 상태는 다음과 같다.
 

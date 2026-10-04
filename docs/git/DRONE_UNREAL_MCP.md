@@ -1,5 +1,7 @@
 # Drone UE 5.8 Unreal MCP 연결 기준
 
+
+현재 사용법(2026-10-04 C PC): Unreal `C:\URproject\drone`·UE 5.8.3. Claude는 루트 `.mcp.json`, Codex는 브리지 `ui -UnrealMcp` 범위에서 자산을 편집한다. 자동화는 Claude 담당이며 `-ModelContextProtocolPort=8010`으로 사용자 Editor 8000을 보존한다. 공유 Default ini 자동 시작 유지 여부는 현재 미정. 아래 D 경로·55b3ffe·UE-MCP-02는 이전 D PC 당시 기록이다.
 기준일: 2026-08-26 (Asia/Seoul)
 
 ## 결론
@@ -9,6 +11,7 @@ Drone 프로젝트는 자체 통신 플러그인 대신 UE 5.8.1에 포함된 Ep
 - Unreal 프로젝트: `D:\JGY\project\drone`
 - MCP 주소: `http://127.0.0.1:8000/mcp`
 - Codex 프로젝트 설정: `D:\JGY\project\drone\.codex\config.toml`
+- Claude 클라이언트: Unreal 저장소 루트 .mcp.json
 - Unreal 자동 시작 기본값: `Config/DefaultEditorPerProjectUserSettings.ini`
 - 외부 네트워크 공개 금지, 같은 PC의 loopback 연결만 사용
 
@@ -49,11 +52,17 @@ default_tools_approval_mode = "writes"
 
 읽기 호출은 바로 사용하고 변경성 Tool은 Codex의 승인을 거치도록 `writes` 정책을 쓴다. Unreal MCP는 인증 계층이 없는 Experimental 기능이므로 포트를 LAN이나 인터넷 주소에 바인딩하지 않는다.
 
+## Unreal MCP 자동 시작 — Git 공유 Default 설정 (10/04 정정)
+
+자동 시작은 Git 추적 Config/DefaultEditorPerProjectUserSettings.ini의 [/Script/ModelContextProtocolEngine.ModelContextProtocolSettings] bAutoStartServer=True·ServerPortNumber=8000·ServerUrlPath=/mcp로 8월부터 모든 PC에 켜져 있다. PC별 Saved ini는 끄거나 바꿀 때만 사용한다. C PC Saved 설정 완료라는 이전 설명은 오류였고 공유 Default로 충족한다.
+
+Claude 클라이언트는 Unreal 루트 .mcp.json을 사용한다. 연결이 안 되면 자동화 등 다른 Unreal 프로세스가8000포트를 점유했는지 확인한다. 자동화 실행은 -ModelContextProtocolPort=8010으로 사용자Editor8000을 보존한다. 열린Editor 즉시시작은 ModelContextProtocol.StartServer이며 설정 존재와 실제 도구 연결 성공을 구분한다.
+
 ## 연결 및 사용
 
-1. `D:\JGY\project\drone\Drone.uproject`를 UE 5.8.1로 연다.
+1. 현재 C PC는 `C:\URproject\drone\Drone.uproject`를 UE 5.8.3으로 연다(10/04 확인). 다른 PC는 실제 Unreal 경로로 바꾼다.
 2. 출력 로그에서 `LogModelContextProtocol: Starting MCP server on port 8000`을 확인한다.
-3. Codex 작업을 `D:\JGY\project\drone` 프로젝트 루트에서 연다.
+3. Claude는 Unreal 루트 `.mcp.json`, Codex UI는 브리지 `ui -UnrealMcp`를 사용한다. docs 역할은 Unreal 도구를 실행하지 않는다.
 4. 연결된 Agent는 `list_toolsets → describe_toolset → call_tool` 순서로 필요한 Tool만 탐색한다.
 5. Unreal 호출은 Game Thread에서 직렬 실행되므로 서로 겹치는 MCP 호출을 보내지 않는다.
 
@@ -90,6 +99,6 @@ ModelContextProtocol.GenerateClientConfig Codex
 - `AutomationTestToolset.ListTests`의 `Drone.` 필터: 총 12개 반환
 - Codex 앱 번들 `codex.exe`는 WindowsApps 실행 권한 거부로 현재 PowerShell에서 `codex mcp list`를 직접 검증하지 못함
 
-위 12/12는 MCP 연결 당시의 검증 기록이다. 현재 main `55b3ffe`에서는 전체 `Drone.` 16/16과 Blueprint 오류 0을 통과했다. Drone 루트에서 새 Codex 작업을 열 때 `unreal-mcp`가 네이티브 Tool 목록에 나타나는지와 Current Level 호출을 한 번 확인해 `UE-MCP-02`를 닫는다. 이 연결 작업은 실제 스피커 Loop 청감이나 TUT-04B 두 Lap 화면 확인을 대신하지 않는다.
+위 12/12는 MCP 연결 당시의 검증 기록이다. 2026-08-27 당시 main `55b3ffe`에서는 전체 `Drone.` 16/16과 Blueprint 오류 0을 통과했다. Drone 루트에서 새 Codex 작업을 열 때 `unreal-mcp`가 네이티브 Tool 목록에 나타나는지와 Current Level 호출을 한 번 확인해 당시 `UE-MCP-02` 확인 절차였다(현재 카드 없음). 이 연결 작업은 실제 스피커 Loop 청감이나 TUT-04B 두 Lap 화면 확인을 대신하지 않는다.
 
 2026-08-26 09:17 KST에는 D 드라이브 프로젝트의 새 Editor PID 9884에서 MCP 서버 시작, 23 Toolset 등록과 `127.0.0.1:8000/mcp` HTTP 응답을 다시 확인했다. 현재 작업은 문서 루트에서 시작했으므로 이 재확인도 `UE-MCP-02`의 Codex 네이티브 Tool 노출 완료로 간주하지 않는다.

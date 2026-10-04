@@ -16,7 +16,7 @@
 
 1. `WORK_PC_START_HERE.md` → `CONTEXT.md` → `STATUS.md` → `WORKBOARD.md` 순으로 읽는다.
 2. 두 저장소의 `git status`, `git log -1`, `git rev-list --left-right --count origin/main...main`으로 실제 상태를 대조한다.
-3. 상세 주제는 `docs/README.md`에서 필요한 문서만 찾아 읽는다. `docs/history/DRONE_WORKLOG.md`(약 290KB)는 통째로 읽지 말고 검색한다.
+3. 상세 주제는 `docs/README.md`에서 필요한 문서만 찾아 읽는다. `docs/history/DRONE_WORKLOG.md`(계속 증가하는 대용량 문서)는 통째로 읽지 말고 검색한다.
 
 ## 응답·작업 방식 (Codex 대화에서 이관, 2026-10-01)
 

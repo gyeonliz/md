@@ -1,5 +1,7 @@
 # Drone Smart Object NPC 준비·사용 가이드
 
+
+현재 Controller StateTree는 `HostileStateTree` / `FriendlyStateTree`(EditDefaultsOnly Soft 참조)로 지정한다. 기본은 기존 `ST_NPC_HostilePatrol`·`ST_NPC_FriendlyBaseRoutine`이며 Controller BP에서 바꿀 수 있다. 로드 실패는 에러 로그, StateTrees 폴더는 AlwaysCook·StateTreeCookContract 자동 검증됨(10/04 C PC Claude), 실제 패키징 미실행. Rifle `bDrawRifleDebugTrace`·MG `bDrawMGTurretDebugTrace` 기본 Off. Shotgun 머리 흔들림은 렌더 전용이 아닌 실제 동작으로 사람 판단 대기다.
 기준일: 2026-09-17 (Asia/Seoul)
 
 팀원이 맵에서 실제 지점과 동선을 수정할 때는 먼저 [`DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md`](DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md)를 따른다. 이 문서는 코드·Asset 계약과 전체 기능 설명을 담당한다.
@@ -21,7 +23,7 @@ Smart Object는 하나의 파일만 고치는 기능이 아니다. **장소**, *
 | MG 사거리·발사 간격·피해·총구·조준 속도 | `BP_SO_MGTurret` Class Defaults | `Drone > AI > MG`의 Range/Cooldown/Damage/Muzzle와 `Aim`의 Yaw/Pitch/보간/발사 허용각을 조정한다 |
 | AI의 Smart Object 검색 범위 | `Source/Drone/AI/DroneSmartObjectReservationComponent.h` | `SearchRadius`, `SearchHalfHeight` 기본값을 수정한다. 역할별 차이가 필요하면 Controller Blueprint 분리를 먼저 한다 |
 | 순찰 재선택 회피 거리 | `Source/Drone/AI/DroneNPCAIController.h` | `PatrolRepeatAvoidanceRadius`를 조정한다 |
-| 개인화기 추적·포기 수치 | Controller Blueprint Class Defaults | `Drone > AI > Engagement`의 Range Hysteresis, Combat Leash, Range Ratio, Repath Interval/Distance, No Progress Timeout/Tolerance, Nav Projection Extent, Disengage Cooldown/Return Ratio를 조정한다 |
+| 개인화기 추적·포기 수치 | Controller Blueprint Class Defaults | `Drone > AI > Engagement`의 Out Of Range Confirmation Seconds, Combat Leash, Pursuit Range Ratio, Repath Interval/Distance, No Progress Timeout/Tolerance, Nav Projection Extent, Disengage Cooldown/Return Ratio를 조정한다 |
 | 도착 허용 반경·대기·재시도 시간 | `/Game/Drone/AI/StateTrees/ST_NPC_HostilePatrol`, `ST_NPC_FriendlyBaseRoutine` | 해당 Native Task 노드의 `AcceptanceRadius`, `WaitDuration`, `RetryInterval`을 조정한다 |
 | MG/Cover 우선순위와 실패 분기 | `/Game/Drone/AI/StateTrees/ST_NPC_HostilePatrol` | State와 Transition을 조정한다. Native Task Struct 이름·순서는 검증 도구 계약과 같이 갱신한다 |
 | 검색·Claim·Occupied·Release 코드 | `DroneSmartObjectReservationComponent.*`, `DroneNPCAIController.*` | 예약 Handle은 Component 한 곳에서만 소유한다. Blueprint에 별도 Claim 로직을 중복하지 않는다 |
@@ -52,13 +54,13 @@ Smart Object는 하나의 파일만 고치는 기능이 아니다. **장소**, *
 ### Definition 수정 시 주의
 
 - `Activity` Enum은 사람용 표시이고 실제 검색 기준은 Definition Slot의 Activity Tag다. 둘을 반드시 같은 역할로 맞춘다.
-- `Invoke-DroneSmartObjectSetup.ps1 -Mode Validate`는 읽기 중심 정합성 검사다.
+- `Invoke-DroneSmartObjectSetup.ps1 -Mode Validate -ProjectPath C:\URproject\drone\Drone.uproject`는 읽기 중심 정합성 검사다.
 - `-Mode Create`는 관리 대상 6개 Definition의 Slot 배열과 Blueprint 기본 연결을 다시 기록한다. 수동 Slot Offset·다중 Slot·Behavior를 넣은 뒤에는 의도적으로 재생성할 때만 사용한다.
-- 현재 실행 Wrapper는 문서 저장소와 같은 상위 폴더의 `drone/Drone.uproject`를 기본 경로로 자동 계산한다. 다른 복제본을 검사할 때만 `-ProjectPath`를 명시한다.
+- Wrapper의 형제 폴더 자동 계산은 md와 drone이 형제 폴더인 이전 D PC에서만 동작한다. 현재 C PC에서는 `-ProjectPath C:\URproject\drone\Drone.uproject`를 반드시 명시한다.
 
 ```powershell
-cd D:\JGY\project\md
-powershell -ExecutionPolicy Bypass -File .\tools\unreal\Invoke-DroneSmartObjectSetup.ps1 -Mode Validate
+cd <문서 저장소> # PC별 실제 경로로 바꿀 것
+powershell -ExecutionPolicy Bypass -File .\tools\unreal\Invoke-DroneSmartObjectSetup.ps1 -Mode Validate -ProjectPath C:\URproject\drone\Drone.uproject
 ```
 
 ## 1. 이번 구조로 만들 동작
@@ -196,10 +198,10 @@ Hostile Controller가 `ADronePrototypePawn`을 처음 감지하면 현재 Smart 
 
 - `Fire`: 사격 구간 안에서는 이동을 멈추고 Drone 방향으로 몸을 보간하며 재장전/사격을 시도한다.
 - `PursueDrone`: 사격 구간 밖이면 공중 표적 위치를 NavMesh에 투영해 이동한다. 진행 중인 목적지가 기본 150cm 이내로 같으면 `MoveTo`를 다시 발행하지 않는다.
-- `Range Hysteresis`: 실제 무기 사거리를 벗어나면 즉시 추적한다. 한 번 추적을 시작하면 `사거리 - 100cm` 안으로 들어올 때까지 계속 접근한 뒤 사격으로 복귀한다. Shotgun 기본값은 `1,600cm 밖 Pursue / 1,500cm 안 Fire`라 사거리 밖에서 멈추지 않으면서 경계 왕복도 막는다.
+- 사거리 밖 판정이 Out Of Range Confirmation Seconds 기본0.2초 이어지면 Pursue, 사거리 안에 들어오면 즉시 정지·Fire한다. 공간100cm Hysteresis는 없다.
 - `Disengage`: 최초 교전 위치 기준 기본 3,000cm 리시를 벗어나거나 기본 2.5초 동안 유효한 접근이 없으면 사격·이동·예약을 정리하고 순찰로 돌아간다.
 - 포기한 같은 Drone은 기본 3초 Cooldown과 리시의 85% 안쪽 복귀 조건을 만족하기 전까지 즉시 재감지하지 않아 Patrol/Pursue 왕복을 막는다.
-- 이동 상태의 몸 Yaw는 Character Movement가 이동 방향으로만 갱신한다. 정지 `DroneDetected`와 `UseCover`에서만 개인화기 Yaw 보간을 사용해 두 회전 로직이 경쟁하지 않는다.
+- Pursue 중 Controller가 Nav 최종 사거리 정지점 방향으로 몸 Yaw·Bone Gaze를 맞춘다(bOrientRotationToMovement=false). Patrol 예약 Slot이 있으면 Slot 방향으로 Controller가 회전시키며 그 밖의 이동은 CharacterMovement가 맡는다.
 - 위 수치는 Controller Blueprint의 `Drone > AI > Engagement`에서 맵/난이도별로 조정한다. Blueprint Event Graph에 별도 추적 Tick이나 `MoveTo`를 중복 작성하지 않는다.
 
 ## 4. Content 폴더 권장 구조
@@ -245,7 +247,11 @@ Hostile Controller가 `ADronePrototypePawn`을 처음 감지하면 현재 Smart 
 
 `AI-VIS-01A` 읽기 전용 감사 결과 Modular Soldier와 Insurgent Skeleton은 현재 Manny Skeleton과 직접 일치하지 않으며, 이식된 두 Root의 Animation Asset은 각각 0개다. 특정 외형을 적·아군으로 확정하지 않았고 Retarget·T Pose·손 위치 검증 전에는 역할 BP에 강제 적용하지 않는다.
 
-현재 프로젝트에는 Manny Skeleton용 Rifle Animation 38개와 FPS Weapon Mesh 70개가 있다. `MM_Rifle_Fire`, `MM_Rifle_Reload`, AR4 Rifle 후보는 정상 로드된다. Hostile Rifle·Shotgun은 프로젝트 소유 `ABP_NPC_Rifle_Greybox`와 `BS_NPC_Rifle_Locomotion`으로 Rifle ADS Idle·8방향 Walk/Jog·Jump를 사용하고, Friendly만 `ABP_Unarmed`를 유지한다. Fire/Reload는 `DefaultSlot` Dynamic Montage로 임시 재생하고 Fire 기본 Play Rate `2.4x`는 0.533초 동작을 약 0.222초에 끝내 0.25초 Rifle 연사 중 재시작 떨림을 막는다. Shotgun도 MVP 동안 같은 Manny 동작을 재사용한다. 역할 BP Class Defaults의 `Drone AI NPC Visual Animation`에서 `Use Greybox Weapon Animations`를 끄거나 Fire/Reload Animation·Play Rate를 교체할 수 있다. 이름으로 식별되는 Shotgun Weapon Mesh는 0개이므로 Rifle Mesh를 Shotgun으로 속여 적용하지 않으며 최종 외형·Shotgun Animation은 `AI-VIS-01B` 범위다.
+현재 프로젝트에는 Manny Skeleton용 Rifle Animation 38개와 FPS Weapon Mesh 70개가 있다. `MM_Rifle_Fire`, `MM_Rifle_Reload`, AR4 Rifle 후보는 정상 로드된다. Hostile Rifle·Shotgun은 프로젝트 소유 `ABP_NPC_Rifle_Greybox`와 `BS_NPC_Rifle_Locomotion`으로 Rifle ADS Idle·8방향 Walk/Jog·Jump를 사용하고, Friendly는 `ABP_NPC_Unarmed_Greybox`와 BS_NPC_Unarmed_Locomotion을 사용한다. Fire/Reload는 `DefaultSlot` Dynamic Montage로 임시 재생하고 Fire 기본 Play Rate는1.0이며 같은 Sequence 재생 중에는 다시 시작하지 않아 연사 떨림을 막는다. Shotgun도 MVP 동안 같은 Manny 동작을 재사용한다. 역할 BP Class Defaults의 `Drone AI NPC Visual Animation`에서 `Use Greybox Weapon Animations`를 끄거나 Fire/Reload Animation·Play Rate를 교체할 수 있다. 이름으로 식별되는 Shotgun Weapon Mesh는 0개이므로 Rifle Mesh를 Shotgun으로 속여 적용하지 않으며 최종 외형·Shotgun Animation은 `AI-VIS-01B` 범위다.
+
+AI-LOCOMOTION-01 구현됨·자동 검증됨(2026-10-04 C PC Claude 재생 확인)·수동 확인 대기. 두 AnimBP의 ShouldMove를 속도 > 3만으로 수정: 수정 전 이동 표본41개 중0→수정 후40개(NPC8명) 모두 ShouldMove·걷기/뛰기 BlendSpace 진입. Drone.AI 19개 중18 Success·기존 NPCPerceptionSearchPIE 1 Fail, Shotgun 시선 Success. Claude 지시서 근거(ClaudeNPCWalk/before.log·after.log). 자연스러운 순찰/추적 전환·발 미끄러짐(속도 대비 보폭)·뒷걸음 방향 수동 확인 대기. Epic 마네킹 임시 동작·최종 아님.
+
+9/29 검증은 자산 연결뿐이어서 실제 재생은 확인되지 않았다. ABP_NPC_Rifle_Greybox·ABP_NPC_Unarmed_Greybox는 UE 템플릿 ABP_Unarmed 복제본의 ShouldMove(지면 속도 > 3 AND CurrentAcceleration ≠ 0)를 사용했다. AI 경로 이동은 기본 bUseAccelerationForPaths=false, 개인화기 추적은 9월에 의도한 직접 속도 추종으로 가속도0→Idle이었다. Claude는 이동 코드를 유지하고 UDroneNPCAnimationAuthoringLibrary::UseVelocityOnlyLocomotionGate/ValidateVelocityOnlyLocomotionGate로 두 AnimBP 이벤트 그래프를 속도 조건만으로 수정·두 자산 저장, Rifle Gaze 체인 유지 확인. Tools/AssetMigration/BuildNPCGreyboxAnimationAssets.py·VerifyNPCGreyboxAnimationAssets.py에도 반영해 재생성 유지·검증 통과. 시험은 Drone.AI.NPCLocomotionAnimPIE(TestMap/Lvl_NPCSmartObjectGreybox 순찰 이동), 로그는 C:\URproject\drone\Saved\Automation\ClaudeNPCWalk\before.log·after.log. Codex는 엔진을 실행하지 않았다.
 
 ## 5. 생성된 Smart Object 지점 확인·사용하기
 
@@ -349,7 +355,7 @@ Spawn Point의 `Spawn On Begin Play` 기본값은 꺼져 있다. 실수로 PIE�
 | `BP_NPC_Friendly_Base` | Friendly / Unarmed / MG 사용 불가 | 2명 |
 | `BP_NPCSpawnPoint` | `ADroneNPCSpawnPoint` Blueprint 자식 | 필요할 때 사용 |
 
-경로는 `/Game/Drone/AI/Blueprints`다. 현재 Mesh와 Animation은 Manny Simple·`ABP_Unarmed` 임시 Greybox이므로 최종 외형이 아니다. Soldier/Insurgent 후보 중 실제 역할별 외형 선택은 `AI-VIS-01B`에서 Retarget과 화면을 확인한 뒤 결정한다.
+경로는 /Game/Drone/AI/Blueprints다. 적 Rifle/Shotgun은 Insurgent Preset1/2·ABP_NPC_Rifle_Greybox, 아군은 QuantumCharacter·ABP_NPC_Unarmed_Greybox(+BS_NPC_Unarmed_Locomotion)를 사용한다. 최종 아트 완성을 뜻하지 않는다.
 
 Controller의 엔진 자동 시작은 꺼져 있고 C++가 Profile에 맞는 Asset을 명시적으로 선택한다. Smart Object Runtime이 준비된 World BeginPlay 뒤 Hostile은 `ST_NPC_HostilePatrol`, Friendly는 `ST_NPC_FriendlyBaseRoutine`을 시작한다.
 
@@ -384,9 +390,9 @@ Controller의 엔진 자동 시작은 꺼져 있고 C++가 Profile에 맞는 Ass
 전용 맵은 `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`다.
 
 - Hostile Rifle 1명, Hostile Shotgun 1명, Friendly Base 2명
-- EnemyPatrol 3개, Guard 1개, MGTurret 1개
+- EnemyPatrol 5개(A·A2·B·B2·C), Guard 1개, MGTurret 1개
 - FriendlyBasePatrol 3개, Ambient 2개
-- PlayerStart, NavMeshBoundsVolume, 조명·Sky, 시각용 바닥
+- 자동포탑 Emplaced/Vehicle 2종·차량 Carrier, PlayerStart, NavMeshBoundsVolume, 조명·Sky, 시각용 바닥
 - NavMesh에 실제로 기여하는 `ADroneNPCNavigationFloor`
 
 `ADroneNPCNavigationFloor`는 `BlockAll` 충돌과 Navigation Relevant 설정을 가진 전용 C++ 바닥이다. 시각용 Plane만으로는 NavMesh가 생기지 않는 경우를 피한다. 현재 MVP 맵은 Recast Runtime Generation을 `Dynamic`, `Force Rebuild On Load`를 활성화해 자동 검증한다. 넓은 최종 맵에 적용할 때는 성능 범위를 다시 측정하고 프로젝트 전역 설정 유지 여부를 결정한다.
@@ -468,7 +474,7 @@ Blueprint에서는 `NPCWeaponComponent`의 다음 Event에 표현만 연결한�
 - `OnWeaponFired`: `WeaponType`, `TraceStart`, `AimPoint`를 받는다. Rifle은 한 발마다 1회, Shotgun은 Pellet마다가 아니라 Volley마다 1회다.
 - `OnReloadCompleted`: `WeaponType`, `CurrentAmmo`, `MagazineCapacity`를 받는다. 실제 Reload 성공 때만 1회다.
 
-현재 Manny 임시 Animation은 C++이 자동 재생하며, Projectile 충돌·Damage도 C++에서 작동한다. Hostile 역할 BP의 Mesh `Anim Class`는 `ABP_NPC_Rifle_Greybox`, Friendly는 `ABP_Unarmed`가 정상값이다. Blueprint Event Graph에서는 `NPC Weapon Fired Visual`과 `NPC Reload Completed Visual`에 최종 Animation·Niagara·Sound 표현만 연결한다. 최종 Montage를 직접 연결할 때는 `Use Greybox Weapon Animations`를 꺼서 중복 재생을 막는다. Projectile Spawn, Line Trace, Damage, 탄약 감소를 다시 작성하면 이중 발사·피해·소모가 생기므로 넣지 않는다.
+현재 Manny 임시 Animation은 C++이 자동 재생하며, Projectile 충돌·Damage도 C++에서 작동한다. Hostile 역할 BP의 Mesh `Anim Class`는 `ABP_NPC_Rifle_Greybox`, Friendly는 `ABP_NPC_Unarmed_Greybox`가 정상값이다. Blueprint Event Graph에서는 `NPC Weapon Fired Visual`과 `NPC Reload Completed Visual`에 최종 Animation·Niagara·Sound 표현만 연결한다. 최종 Montage를 직접 연결할 때는 `Use Greybox Weapon Animations`를 꺼서 중복 재생을 막는다. Projectile Spawn, Line Trace, Damage, 탄약 감소를 다시 작성하면 이중 발사·피해·소모가 생기므로 넣지 않는다.
 
 권장 구현 순서는 다음과 같다.
 
@@ -484,7 +490,7 @@ Blueprint에서는 `NPCWeaponComponent`의 다음 Event에 표현만 연결한�
 
 현재 Greybox 탄속은 Rifle `4,500 cm/s`, Shotgun `3,500 cm/s`, MG `5,500 cm/s`다. 최대 사거리 기준 비행 시간이 지나면 탄환이 자동 제거되며 Actor 자체 Tick·복잡한 물리 Simulation은 사용하지 않는다. Engine 기본 Sphere는 에셋 구매 전 탄속 확인용이고 최종 Tracer/Niagara는 Blueprint 파생 Projectile에서 교체한다.
 
-사격 방향은 목표 중심을 축으로 하는 원뿔 내부에서 탄환마다 무작위로 선택한다. 기본 반각은 Rifle `2.5도`, Shotgun `6도`, MG `3.5도`이며 `0도`는 정확 사격이다. Rifle/Shotgun 역할 Blueprint에서는 `NPCWeaponComponent`를 선택해 `Drone AI Weapon Rifle > Rifle Spread Half Angle Degrees`와 `Drone AI Weapon Shotgun > Shotgun Spread Half Angle Degrees`를 조정한다. MG는 `BP_SO_MGTurret`의 `Drone > AI > MG > Accuracy > MG Turret Spread Half Angle Degrees`를 조정한다. Event Graph에서 바꿀 때는 각각 `Configure Accuracy Greybox`, `Configure MG Turret Accuracy Greybox`를 사용한다.
+사격 방향은 목표 중심을 축으로 하는 원뿔 내부에서 탄환마다 무작위로 선택한다. 기본 반각은 Rifle `2.5도`, Shotgun `12도`, MG `3.5도`이며 `0도`는 정확 사격이다. Rifle/Shotgun 역할 Blueprint에서는 `NPCWeaponComponent`를 선택해 `Drone AI Weapon Rifle > Rifle Spread Half Angle Degrees`와 `Drone AI Weapon Shotgun > Shotgun Spread Half Angle Degrees`를 조정한다. MG는 `BP_SO_MGTurret`의 `Drone > AI > MG > Accuracy > MG Turret Spread Half Angle Degrees`를 조정한다. Event Graph에서 바꿀 때는 각각 `Configure Accuracy Greybox`, `Configure MG Turret Accuracy Greybox`를 사용한다.
 
 소총과 샷건의 최종 사거리·연사 속도·Pellet 수·Spread는 현재 미정이다. Greybox 테스트에서 임시값을 기록하고 플레이 결과로 조정한다. 각도는 반각이므로 전체 원뿔 폭은 설정값의 두 배이며, 같은 각도에서도 거리가 멀수록 탄착 범위가 넓어진다.
 
@@ -563,7 +569,7 @@ flowchart TD
     C -- 아니오 --> F{밖 판정이 0.2초 지속됐는가?}
     F -- 아니오 --> C
     F -- 예 --> G[NavMesh 지상점으로 Pursue]
-    G --> J[몸 Yaw와 Bone Gaze를 실제 이동 벡터에 정렬]
+    G --> J[몸 Yaw와 Bone Gaze를 Nav 최종 사거리 정지점에 정렬]
     J --> K{사거리 안 / 무진행 / 리시 밖?}
     K -- 사거리 안 --> D
     K -- 2.5초 무진행 또는 리시 밖 --> H
@@ -574,13 +580,13 @@ flowchart TD
 
 - 사거리 안쪽인데 더 가까이 붙기 위한 공간 Hysteresis는 없다. 사거리 안에 들어오면 같은 Tick의 교전 갱신에서 `StopMovement` 후 Fire로 돌아간다.
 - 1,590↔1,610cm처럼 경계가 짧게 흔들릴 때는 거리를 100cm 더 쫓아가게 하지 않고 `Personal Weapon Out Of Range Confirmation Seconds` 기본 0.2초로 전환만 거른다.
-- 추적 중 몸과 고개는 Drone 직선 방향이 아니라 현재 수평 이동 벡터를 함께 따른다. 장애물을 우회해도 몸·고개가 경로와 반대로 돌지 않는다.
+- Pursue 중 몸·고개는 Controller가 Nav 최종 사거리 정지점 방향으로 맞춘다. 수평 이동 벡터는 목표가0일 때 대체값이다.
 - 같은 투영 목적지로 이동 중이면 MoveTo를 다시 만들지 않는다. 목적지가 기본 150cm 이상 변했거나 기존 이동이 끝났을 때만 다시 요청한다.
 - `Personal Weapon Combat Leash Radius` 기본 3,000cm 밖이거나 `Personal Weapon Pursuit No Progress Timeout Seconds` 기본 2.5초 동안 접근하지 못하면 표적을 포기한다.
 
 Blueprint 조정 경계:
 
-- 값은 `ADroneNPCAIController`에 Blueprint 노출돼 있다. 다만 현재 역할 NPC는 C++ Controller Class를 직접 사용하므로 역할 BP 화면에서 이 값을 바로 편집할 수는 없다. 역할별 튜닝이 필요하면 `/Game/Drone/AI/Blueprints` 아래 프로젝트 소유 Controller BP를 만든 뒤 각 NPC의 `AI Controller Class`로 지정하는 작업을 먼저 한다.
+- Hostile Rifle/Shotgun은 `BP_DroneNPCAIController_Outdoor`를 사용하므로 해당 BP의 `Drone > AI > Engagement`에서 조정한다. Friendly 등 다른 역할에 별도 튜닝이 필요할 때만 파생 Controller BP를 만들어 지정한다.
 - 파생 Controller BP의 `Drone > AI > Engagement`에서 0.2초 확인시간, 리시, 재경로 거리·주기, 무진행 시간을 조정한다.
 - 추적 몸 회전 속도는 같은 Controller BP의 `Drone > AI > Gaze > Pursuit Facing Turn Speed Degrees Per Second`에서 조정한다. 기본 720°/s다.
 - Rifle/Shotgun 실제 사거리는 NPC의 `NPCWeaponComponent` Class Defaults가 기준이다. 교전 정책에 별도 사거리 숫자를 중복 입력하지 않는다.
@@ -601,8 +607,8 @@ Blueprint 조정 경계:
 | `AI-WPN-02` | Rifle Greybox 발사 | **Done** — 단일 Visibility Trace, 장애물·사거리·Cooldown과 공용 계약 회귀 검증 |
 | `AI-WPN-03` | Shotgun Greybox 발사 | **Done** — 한 Trigger의 다중 Pellet, 원뿔 내 무작위 Spread, 장애물·사거리·Cooldown 검증 |
 | `AI-BALLISTIC-01` | 회피 가능한 공용 Projectile | **Done** — Rifle 4,500·Shotgun 3,500·MG 5,500 cm/s, Sweep 충돌·사거리 수명·기존 Trace 선택 경계와 집중 자동화 통과, 로컬 미커밋 |
-| `AI-ACCURACY-01` | BP 조정형 사격 원뿔 | **Done** — Rifle 2.5도·Shotgun 6도·MG 3.5도, 탄환별 원뿔 내부 무작위 방향과 0도 정확 사격, 집중 3/3·MG 통합 PIE 1/1 통과, 로컬 미커밋 |
-| `AI-ANIM-TEMP-01` | Manny 임시 무기 Animation | **Done** — Hostile 전용 Rifle Idle·8방향 Walk/Jog·Jump AnimBP와 Fire/Reload DefaultSlot Montage 연결. Fire 2.4x로 Rifle 연사 재시작 떨림 구조 제거, Friendly Unarmed 유지, Build·자동화·저장 Asset 검증 통과. 손 위치·총기 정렬과 반복 동작은 수동 재확인 |
+| `AI-ACCURACY-01` | BP 조정형 사격 원뿔 | **Done** — Rifle 2.5도·Shotgun12도(09/16 이전 기록의6도는 폐기)·MG 3.5도, 탄환별 원뿔 내부 무작위 방향과 0도 정확 사격, 집중 3/3·MG 통합 PIE 1/1 통과, 로컬 미커밋 |
+| `AI-ANIM-TEMP-01` | Manny 임시 무기 Animation | **Done** — Hostile 전용 Rifle Idle·8방향 Walk/Jog·Jump AnimBP와 Fire/Reload DefaultSlot Montage 연결. 당시 Fire2.4x 서술은 정정: 실제 기본1.0·같은Sequence 재생중 재시작 억제, Friendly Unarmed 유지, Build·자동화·저장 Asset 검증 통과. 손 위치·총기 정렬과 반복 동작은 수동 재확인 |
 | `AI-MG-01` | MG Claim·Move | **Done** — MG 운영자 1명만 1-Slot Claim·이동·도착 뒤 유지, Shotgun 개인 무기 Fallback |
 | `AI-MG-02` | MG Occupy·Aim·Fire·Release | **Done** — Occupied·Aim·8 Damage Projectile·중단/사망 해제·다른 AI 재점유 집중 PIE 통과, 로컬 미커밋 |
 | `AI-MG-03` | Base/Yaw/Pitch/Muzzle 3분할·사수 후방 위치 | **Doing** — MG 전용 원기둥 Base/Body/Barrel 3개, 계층 복구, BP 조정형 후방 Operator Anchor, 사수 위치·방향 유지와 정렬 후 발사 구현. Build·통합 PIE 완료, 손 위치·화면 축 확인 대기 |
@@ -621,15 +627,17 @@ Blueprint 조정 경계:
 다른 PC에서 Pull한 뒤 Asset의 저장된 연결을 다시 확인할 때 문서 저장소 루트에서 실행한다.
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneSmartObjectSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneSmartObjectSetup.ps1 -Mode Validate -ProjectPath <Unreal 저장소>\Drone.uproject
 ```
 
 `VALIDATION_OK`가 출력되면 6쌍의 형식·역할별 정확한 부모 Class·Slot Tag·Definition, MG 원기둥 3개와 후방 Operator Anchor 연결이 일치한다. `MGTurret`만 `ADroneMGTurretStation`, 나머지 5개는 `ADroneSmartObjectStation`을 직접 부모로 사용한다. `Create` 모드는 정확한 12개 Asset을 재구성하는 유지보수용이며 일반 작업에서는 실행할 필요가 없다.
 
+10/04 C PC Claude 도구 정리: NPCGreybox Validate의 구형 ABP_Unarmed 검사 문제는 해소됨·Validate 통과(지시서). 현재 TestMap 경로·역할별 메시/AnimBP를 검증하고 Create는 기존 맵이 있으면 NPC BP를 건드리기 전에 거부한다. HostileCoverResponse도 TestMap 경로로 정정했다. Codex는 도구를 수정·실행하지 않았다.
+
 NPC 역할 Blueprint와 Greybox 맵까지 다시 확인할 때는 다음 명령을 사용한다.
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneNPCGreyboxSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneNPCGreyboxSetup.ps1 -Mode Validate -ProjectPath <Unreal 저장소>\Drone.uproject
 ```
 
 이 검증은 역할 Profile, AI Controller Possess, 역할 Tag, NPC 4명과 Station 10개 배치, Navigation Floor, Recast 설정, NPC 시작 위치의 NavMesh 투영을 확인한다. `BuildNavigation` 모드는 생성 자산을 수리하거나 Navigation을 다시 저장해야 할 때만 사용한다.
@@ -637,7 +645,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 Hostile 순찰 StateTree의 Schema·상태 순서·Native Task·컴파일 상태는 다음 읽기 전용 명령으로 확인한다.
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneHostilePatrolStateTreeSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneHostilePatrolStateTreeSetup.ps1 -Mode Validate -ProjectPath <Unreal 저장소>\Drone.uproject
 ```
 
 `Create`는 Asset이 없을 때만 새로 만들며 기존 StateTree는 덮어쓰지 않는다. 일반 Pull·검증에서는 `Validate`만 사용한다.
@@ -645,7 +653,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 Friendly 기지 루틴 StateTree도 같은 방식으로 읽기 전용 검증한다.
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneFriendlyBaseRoutineStateTreeSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneFriendlyBaseRoutineStateTreeSetup.ps1 -Mode Validate -ProjectPath <Unreal 저장소>\Drone.uproject
 ```
 
 이 검증은 `FriendlyBaseRoutine`의 Claim·Move·Wait·Release 상태 순서, Native Task 종류와 컴파일 준비 상태를 확인한다. `Create`는 Asset이 없을 때만 사용하며 기존 Asset을 덮어쓰지 않는다.
@@ -653,13 +661,13 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 Hostile 감지·Search 전환까지 포함한 최종 StateTree는 다음 명령으로 확인한다.
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneHostilePerceptionStateTreeSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneHostilePerceptionStateTreeSetup.ps1 -Mode Validate -ProjectPath <Unreal 저장소>\Drone.uproject
 ```
 
 MG Claim·Move·Hold 분기까지 포함한 현재 최종 StateTree는 다음 명령으로 확인한다.
 
 ```powershell
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneHostileMGTurretStateTreeSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneHostileMGTurretStateTreeSetup.ps1 -Mode Validate -ProjectPath <Unreal 저장소>\Drone.uproject
 ```
 
 일반 Pull 뒤에는 `Validate`만 사용한다. `Upgrade`는 정확한 기존 6-State 감지 Tree에 MG 세 상태를 추가하는 유지보수용이며, 이미 9-State로 업그레이드된 자산에는 변경을 만들지 않는다.
@@ -699,7 +707,7 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 - Friendly와 Hostile의 기본 Smart Object 검색 범위 분리
 - Smart Object Definition·Station Blueprint 6쌍
 - 역할별 NPC Blueprint 3종과 Spawn Point Blueprint
-- `Lvl_NPCSmartObjectGreybox`의 NPC 4명·Station 12개(기존 10 + Cover 2)·Navigation Floor
+- `Lvl_NPCSmartObjectGreybox`의 NPC 4명·Station 14개(EnemyPatrol 5·Guard 1·MG 1·FriendlyPatrol 3·Ambient 2·Cover 2)·Navigation Floor
 - Profile·Possess·Activity Tag·NavMesh 투영 자동화
 - Hostile `ST_NPC_HostilePatrol`과 Claim·Move·Wait·Release Native Task
 - 직전 지점 우선 회피, 이동 실패·감지·UnPossess 시 예약 해제
@@ -728,4 +736,4 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-Dron
 - Cover와 전투 종료 뒤 통합 Return 실제 행동
 - 최종 맵에 NPC와 Smart Object 배치
 
-UE 5.8.1에서 `Gameplay Interactions`는 Experimental 표기가 있는 Plugin이다. 프로젝트에 제한적으로 사용하되 엔진 업데이트 때 API 변경 가능성을 확인하고, 핵심 역할·예약 규칙은 프로젝트 C++와 테스트에 남긴다.
+UE 5.8 계열(현재 C PC 5.8.3, 2026-10-04 확인)에서 `Gameplay Interactions`는 Experimental 표기가 있는 Plugin이다. 프로젝트에 제한적으로 사용하되 엔진 업데이트 때 API 변경 가능성을 확인하고, 핵심 역할·예약 규칙은 프로젝트 C++와 테스트에 남긴다.

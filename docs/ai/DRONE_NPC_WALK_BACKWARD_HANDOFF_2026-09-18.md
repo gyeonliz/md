@@ -253,7 +253,7 @@ BlendSpace Y
 [NPC-COLLISION-FIX] 외형 Primitive에서 복구한 잘못된 충돌·Overlap·Nav 설정
 ```
 
-맵을 45~60초 실행한 뒤 종료하고 `D:\JGY\project\drone\Saved\Logs\Drone.log`에서 위 태그와 `is stuck and failed to move`를 함께 검색한다. 화면 해결을 확인하면 `bEnableMovementDiagnostics` 기본값을 꺼 로그 비용을 제거한다.
+맵을 45~60초 실행한 뒤 종료하고 `C:\URproject\drone\Saved\Logs\Drone.log`에서 위 태그와 `is stuck and failed to move`를 함께 검색한다. 화면 해결을 확인하면 `bEnableMovementDiagnostics` 기본값을 꺼 로그 비용을 제거한다.
 
 ## 7. 자동화 검증 명령
 
@@ -332,3 +332,8 @@ C:\URproject\drone\Saved\Automation\PatrolWalkFix2\index.json
 - Headless 테스트 성공을 시각적 보행 정상 판정으로 잘못 기록하지 않았는가
 
 최종 판정은 실제 PIE 화면에서 `ActorForward`, `VelocityDirection`, AnimBP `Direction`을 같은 프레임에 확인한 결과로 한다.
+
+
+## 2026-10-04 현행 진단 안내 정정
+
+위 09/18 내용은 당시 인계 원문이다. 현재 이동 진단 로그는 Controller의 bEnableMovementDiagnostics를 켠 경우에만 남는다(커밋 기본값 False). 로그는 `<Unreal 저장소>\Saved\Logs\Drone.log`, 현재 C PC는 `C:\URproject\drone\Saved\Logs\Drone.log`다. 과거 본문은 보존했고 경로만 정정했다.

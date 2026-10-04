@@ -1,6 +1,6 @@
 # Drone 프로젝트 문서
 
-이 저장소는 `D:\JGY\project\drone` Unreal 프로젝트의 기획, 현재 상태, 작업 순서와 팀 가이드를 관리한다.
+이 저장소는 Drone Unreal 프로젝트의 기획, 현재 상태, 작업 순서와 팀 가이드를 관리한다.
 
 ## 먼저 볼 문서
 
@@ -17,8 +17,9 @@
 
 ## 저장소
 
-- Unreal: `D:\JGY\project\drone`
-- 문서: `D:\JGY\project\md`
+- Unreal(C PC): `C:\URproject\drone`
+- 문서(C PC): 이 폴더. PC별 경로는 [CLAUDE.md](CLAUDE.md) 표와 Unreal .claude/codex-bridge/local.json의 mdRepo를 참고한다.
+- 이전 D PC: D:\JGY\project\drone / D:\JGY\project\md — 현재 C PC 경로와 구분한다.
 - Production 코드: `Source/Drone`
 - 프로젝트 소유 자산: `/Game/Drone`
 - 팀원 Tutorial 맵: `/Game/Drone/Maps/Lvl_DroneTraining`

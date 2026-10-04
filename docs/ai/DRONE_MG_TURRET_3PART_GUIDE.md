@@ -20,7 +20,7 @@ StationRoot
          └─ MGTurretMuzzle 발사 위치
 ```
 
-- 이 계층은 `ADroneMGTurretStation`과 이를 직접 부모로 쓰는 `BP_SO_MGTurret`에만 존재한다.
+- 이 계층은 ADroneMGTurretStation 계열(BP_SO_MGTurret, BP_AutoTurret_Emplaced/Vehicle)에 있고 일반 ADroneSmartObjectStation에는 없다.
 - Patrol·Ambient·Cover 등 일반 `ADroneSmartObjectStation`에는 포탑 Pivot이나 Mesh가 없다.
 - Smart Object Slot은 검색·한 명 점유 계약에 사용하고, 실제 MG 사수 위치·몸 방향은 `MGTurretOperatorAnchor`가 담당한다.
 - `MGTurretOperatorAnchor`는 `MGTurretYawPivot`의 자식이다. 몸체가 Yaw 회전하면 사수의 후방 위치와 몸 방향도 같은 회전을 직접 상속한다.

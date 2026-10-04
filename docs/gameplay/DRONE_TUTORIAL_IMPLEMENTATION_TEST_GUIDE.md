@@ -45,10 +45,10 @@
 
 현재 기능 시험 맵은 다음 두 개를 구분한다.
 
-- `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`: Tutorial 8개 독립 Mission Flow와 Station 시험
+- 현재 Tutorial 8수업은 `/Game/Drone/Maps/TestMap/Tutorial/Lvl_Tutorial_*_Test`의 독립 맵이다. 각 DA MissionMap·직접 Play용 MissionTest_DefaultEntry가 연결돼 있다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`: Gate/Lap·역할 기능·HUD 시험
 
-전체 8개 Station은 `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`에 통합했다. 별도 `Lvl_DroneTutorialFullCourseTest` 맵은 만들지 않았다.
+보존된 `Lvl_DroneTutorialMissionTest`는 종합 확인용 공유 시험장(선택 Mission·직접 Play Entry 없음)이다. 현재 8수업 진입은 FrontEnd 또는 독립 수업 맵을 사용한다.
 
 ## 3. 공통 구현 구조
 
@@ -148,7 +148,7 @@ Editor 시험:
 
 - 담당 클래스: `ADroneTrainingCourse`, `ADroneTrainingGate`
 - Event: `TrainingLap`
-- Data Asset 후보: `DA_Mission_Tutorial_GateFlight`
+- 저장 Data Asset: `DA_Mission_Tutorial_GateFlight`
 - 허용 기체: Scout
 
 맵 설정:
@@ -215,7 +215,7 @@ Pawn 연결:
 
 Mission 설정:
 
-- Data Asset 후보: `DA_Mission_Tutorial_UGV_NPC`
+- 저장 Data Asset: `DA_Mission_Tutorial_UGV_NPC`
 - Event: `TargetDestroyed`
 - TargetId: `Tutorial.UGV.NPC`
 - 대상: 별도 시험용 적 NPC 한 명, Actor Tag 일치
@@ -226,7 +226,7 @@ NPC에는 이미 `UDroneHealthComponent`가 있다. Mission 시작 전에 배치
 
 Figma에서도 4-1과 합칠지는 미정이므로 처음에는 별도 Data Asset으로 만든다.
 
-- Data Asset 후보: `DA_Mission_Tutorial_UGV_Turret`
+- 저장 Data Asset: `DA_Mission_Tutorial_UGV_Turret`
 - Event: `TargetDestroyed`
 - TargetId: `Tutorial.UGV.Turret`
 - 대상: 전용 체력 포탑 또는 `BP_MissionDamageTarget`에 포탑 Visual을 적용한 Greybox
@@ -242,7 +242,7 @@ Figma에서도 4-1과 합칠지는 미정이므로 처음에는 별도 Data Asse
 | 결과 | 표시·버튼 |
 |---|---|
 | 수업 완료(S48) | “훈련 완료”, 수업 이름, “시간 mm:ss.cc”, “수업 n/8 \| 완료 c/8”. [다음](패드 첫 포커스) [다시하기] [작전 로비로 복귀]. 복귀 버튼은 Figma에 없지만 유지 |
-| 8개 모두 완료(S49) | “훈련 완료”, “이제 운용 할 준비가 되었습니다.”, “수업 8/8 모두 완료”. [미션 진행](로비 미션 탭 M1) [시작 메뉴](타이틀). [다시하기] 숨김 |
+| 8개 모두 완료(S49) | “훈련 완료”, “이제 운용 할 준비가 되었습니다.”, “수업 8/8 모두 완료”. [미션 진행](로비 미션 탭 M1) [시작 메뉴](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md). [다시하기] 숨김 |
 | 스토리 등 성공 | “미션 성공”, “클리어 시간”, “미션 n/4 \| 완료”, [다음 미션: 이름] |
 | 실패 | “진행 시간”, 패드 첫 포커스 [다시하기] |
 
@@ -411,8 +411,8 @@ Mission Flow 전체 확인은 Test Map을 직접 Play하지 않고 `/Game/Drone/
 1. 현재 8개 수업을 FrontEnd에서 수동 검증한다.
 2. 호버/전진/회전 Trigger 크기와 게이트 위치를 체감에 맞춰 조정한다.
 3. UGV 총탄 속도·4발 처치와 유탄 낙차·반경을 화면에서 확인한다.
-4. 단계별 브리핑·클리어 타임 UI를 붙인다.
-5. 8개 진행도와 전체 완료 UI를 연결한다.
+4. 클리어 시간·다음 수업 UI는 구현됨·자동 검증됨·수동 확인 대기다. 조작키 브리핑 문구·화자는 현재 미정이다.
+5. 8개 진행도·전체 완료 UI는 구현됨·자동 검증됨·수동 확인 대기다. 실제 8수업 연속 완주와 완료 화면을 확인한다.
 6. 마지막에 Warehouse Greybox를 입히고 전체 회귀·성능 테스트를 한다.
 
 각 단계는 Build, Map Check, 자동화, 수동 PIE가 모두 끝나야 다음 단계로 넘어간다.

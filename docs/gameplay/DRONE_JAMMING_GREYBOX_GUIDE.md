@@ -46,7 +46,7 @@ Figma에서 확인한 광섬유 Drone은 예외다. 해당 Drone Definition의 `
 ## Editor에서 테스트
 
 1. 검증용 맵에서 PIE 출격 후 Zone 밖의 HUD 신호 `100% | 정상`을 확인한다.
-2. 기본 강도 0.60 Zone 안에서 `영상 불안정`, 신호 약 40%를 확인한다. 0.85 강도에서는 `강한 방해 · 조작 둔화`, 신호 약 15%와 느려진 이동을 확인한다.
+2. 기본 강도 0.60 Zone 안에서 `신호 불안정`, 신호 약 40%를 확인한다. 0.85 강도에서는 `강한 방해 · 조작 둔화`, 신호 약 15%와 느려진 이동을 확인한다.
 3. Zone 밖으로 나가면 신호 100%, 원래 최대 속도/가속도로 복원되는지 본다. 두 Zone이 겹치면 강한 쪽이 우선이고 강한 Zone만 나가면 남은 Zone 단계로 돌아간다.
 4. `Jamming Exited` 또는 `Jammer Disabled` Rule이 활성일 때 같은 Tag Zone에서 해당 사건을 발생시켜 HUD 목표 진행값을 확인한다. `DisableJammer()` 두 번째 호출은 `false`이며 Mission 진행도 중복되지 않아야 한다.
 5. Commandline 자동화 `Drone.Signal.StageContract`는 단계·겹침·복원·면역 on/off·무효 강도·한 번만 해제 계약을, `Drone.Mission.ObjectiveRules`는 재밍/Story 분기를, `Drone.UI.FlightHUDTelemetryBinding`는 강한 경고·노이즈 강도 전달·이탈 뒤 표시 복원을 확인한다. 2026-09-16 관련 회귀 8/8 Success. 실제 화면·맵 배치 PIE는 아직 미확인이다.
@@ -60,3 +60,6 @@ Figma에서 확인한 광섬유 Drone은 예외다. 해당 Drone Definition의 `
 - 복원이 안 되면 모든 Zone에서 나왔는지, 다른 Zone Source가 남아 있는지, Pawn의 기본 비행 튜닝값을 확인한다.
 
 남은 작업은 최종 Mission 내용 확인 후 검증용 Mission Map/Data Asset 연결, 영상 잡음 WBP 표현, 목표 정보 손실의 화면 규칙 결정, PIE 수동 테스트다. Figma는 현재 이 PC에서 읽기 연결이 없어 화면 내용을 근거로 확정하지 않았다.
+
+
+10/04 현재 C PC Claude: Moderate HUD 문구를 신호 불안정으로 정정·PlayerFacingTextContract 자동 검증됨. VideoNoiseIntensity/Blueprint 데이터는 있지만 영상 Noise 효과는 아직 미연결이다.

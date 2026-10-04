@@ -1,6 +1,6 @@
 # Drone Tutorial·Mission 구현 계획
 
-기준일: 2026-09-29 (Asia/Seoul)
+기준일: 2026-10-03 (Asia/Seoul). 9/29 계획을 현재 소스·DA/STATUS와 대조했으며 날짜별 과거 검증은 보존한다.
 
 ## 1. 목표와 우선순위
 
@@ -11,12 +11,12 @@
 
 2026-09-03 기획 변경으로 사람 Operator 직접 조작, NPC에게 걸어가 대화해 임무를 받는 흐름, Operator↔Drone 실시간 전환은 폐기했다. 새 프런트엔드·미션 진입 구조의 상세 기준은 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)가 우선한다.
 
-구현 순서는 아래와 같이 고정한다.
+현재 우선순위는 기존 구현의 연결/수동 회귀이며 아래 순서는 신규 기능 전체를 다시 만드는 목록이 아니다. 회의 후 5메뉴 계약은 UI 가이드0절, 미정 결정은 WORKBOARD를 따른다.
 
 ```text
 Tutorial 8개 FrontEnd 수동 검증
-→ 조건별 Best Lap SaveGame
-→ 단계별 결과·8개 진행·전체 완료 UI
+→ 구현된 조건별 Best Lap JSON 저장의 실제 재실행 확인
+→ 구현된 단계별 결과·8개 진행·전체 완료 UI 수동 회귀
 → Warehouse Tutorial Greybox
 → Story Mission별 격리 Greybox 4개 수동 확인·목표 고도화
 → Mission 2 차량 Route·목적지 실패
@@ -83,13 +83,13 @@ Widget에서 매 프레임 Pawn을 검색하거나 Property Binding으로 계산
 
 ### Figma 전체 훈련 기준
 
-2026-10-01 사용자 정정: `1-3 회전`은 제자리 방향 맞추기가 아니라 원형 코스를 한 바퀴 도는 비행이다. 로비는 튜토리얼/레이싱/미션 탭으로 구분하며 레이싱 시험맵을 별도 생성했다. Story 맵별 분리는 유지하고 Tutorial 전체 맵 분리는 아직 제안 단계다. [최신 구현·편집 가이드](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)를 우선한다.
+2026-10-01 사용자 정정: `1-3 회전`은 제자리 방향 맞추기가 아니라 원형 코스를 한 바퀴 도는 비행이다. 로비는 튜토리얼/레이싱/미션 탭으로 구분하며 레이싱 시험맵을 별도 생성했다. Story 맵별 분리는 유지하고 Tutorial 8수업 독립 TestMap 분리는 10/01 이후 구현됐다. [최신 구현·편집 가이드](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)를 우선한다.
 
 2026-09-24 Figma `Project:Droner`를 읽기 전용으로 재확인한 전체 순서는 `1-1 호버링 → 1-2 전진 → 1-3 회전 → 1-4 게이트 자유비행 → 2 자폭 드론 → 3 드랍 드론 → 4-1 UGV 적 NPC 처치 → 4-2 고정형 포탑 처치`다. 4-1과 4-2를 합칠지는 Figma에도 미정으로 남아 있다.
 
 각 단계는 `조작키·목표 브리핑 → 시작 → 플레이 → 클리어 타임 오버레이`를 반복하고, 마지막에 Tutorial 전체 완료 UI를 표시한다. 환경 메모는 Warehouse지만 최종 맵 확정으로 보지는 않는다.
 
-현재 `Lvl_DroneTutorialMissionTest`에는 호버링·전진·회전·게이트·자폭·드랍·UGV NPC·UGV 포탑 8개 독립 Mission Flow와 Station이 모두 연결됐다. Gate/Lap 세부 HUD는 별도 `Lvl_DroneTutorialSystemsTest`에도 유지한다. 남은 핵심은 FrontEnd 수동 체감, Best Lap 영구 저장, 단계별 브리핑·클리어 UI, 8개 연속 진행·전체 완료와 Warehouse 환경이다. Production `Lvl_DroneTraining`은 팀원 작업 보호 대상으로 유지하며 검증된 Station만 수동 이식한다. 상세 대응표는 [`DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md`](DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md)를 따른다.
+현재 Tutorial 8수업은 `TestMap/Tutorial/Lvl_Tutorial_*_Test` 독립 맵의 DA MissionMap·직접 Play Entry로 연결돼 있다. 공유 `Lvl_DroneTutorialMissionTest`는 보존된 종합 시험장, Gate/Lap HUD는 `Lvl_DroneTutorialSystemsTest`에서도 확인한다. 남은 것은 8수업 연속 완주·Best Lap JSON 재실행 복원 수동 확인, 조작키 브리핑 문구·화자 결정, Warehouse 환경·미정 항목이다. Production `Lvl_DroneTraining` 편집·저장은 맵 담당 팀원만 한다.
 
 현재 구현 경계는 다음과 같다.
 
@@ -144,17 +144,15 @@ TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경
 - Best Lap과 Best Segment는 평균 기록과 별도로 보존한다.
 - `FDroneTrainingLapComparison`과 `FDroneTrainingSegmentComparison`을 Recorder가 생성하고 `OnLapComparisonReady`로 Blueprint에 전달한다.
 - HUD는 이전 완주 평균, Best, 시간 Delta, 속도 Delta를 표시하며 비교 계산을 다시 구현하지 않는다.
-- 현재 실행 중 History만 사용한다. `USaveGame`은 아직 미구현이다.
+- 이전 평균/전체 History는 현재 실행 중 데이터다. 조건별 유효 Best Lap은 아래 JSON 저장 구현으로 영속화하며 두 범위를 구분한다.
 
-### TUT-04C — Best Lap 영구 저장 (다음 구현)
+### TUT-04C — Best Lap 영구 저장 (구현됨·자동 검증 보고·실기 확인 대기)
 
-- 첫 버전은 모든 시도 내역을 쌓지 않고 **유효한 Best Lap 한 건**만 저장한다. 실패·중단·0초 기록은 저장하지 않는다.
-- 기록 키는 `CourseId + DroneId + ControlMode + HandlingPreset`으로 만든다. 속도·조작 조건이 다른 기록을 하나의 순위로 섞지 않는다.
-- `UDroneTrainingRecordSaveGame`과 버전이 있는 저장 Struct를 프로젝트 코드에 두고 기본 Slot은 `DroneTrainingRecords_v1`, User Index는 0으로 고정한다.
-- 저장값은 Best Lap Time, 평균 속도, Segment 결과와 갱신 시각이다. 실행 중 전체 History와 이전 평균은 계속 Recorder가 소유하고 저장 파일을 무한히 키우지 않는다.
-- 맵 진입 시 저장 없음·구버전·손상 값을 안전하게 무시하고, 완주 시 기존 Best보다 빠를 때만 저장한다. 같은 기록은 중복 쓰지 않는다.
-- HUD는 `이번 실행 평균`과 `저장 최고 기록`을 구분해 표시한다. 저장 실패가 Mission 완료를 막아서는 안 되며 한 번의 명확한 로그만 남긴다.
-- 자동화는 첫 저장, 느린 기록 미갱신, 빠른 기록 갱신, 키 분리, 재로드 복원, 잘못된 값 무시를 검증한다. 수동 검증은 Editor를 완전히 종료·재실행해 Best가 남는지 확인한다.
+- `DroneTrainingRecordSubsystem`은 `Saved/SaveGames/DroneTrainingBestLaps.json`에 JSON으로 저장한다. 저장 키는 `CourseId|DroneId|ControlMode`이며 ControlMode는 숫자로 직렬화한다. 폐기된 성능 단계 `HandlingPreset`은 키에 넣지 않는다.
+- 현재 저장 데이터는 `schemaVersion`과 키별 최고 완주초 `bestLapSeconds`다. 평균속도·Segment 결과·갱신시각·모든 시도 내역을 저장한다고 쓰지 않는다. 실패/중단/0초/NaN 등 유효하지 않은 기록과 느리거나 동일한 기록은 최고값을 갱신하지 않는다.
+- 없음은 NoSave, 손상은 Corrupt 백업/초기화, 다른 Schema는 V버전 백업/초기화다. 손상 USaveGame 바이너리 로드의 엔진 Assert 때문에 JSON으로 변경한 기존 구현이며 SaveGame 클래스를 다시 만들지 않는다.
+- HUD는 실행 중 평균과 저장 최고값을 구분하고 첫 완주 전에도 저장 최고 기록을 표시한다. 기록 저장 실패는 로그를 남기고 이번 실행 값은 유지한다.
+- 기존 Claude 자동 검증 근거 ClaudeBestLap/test2.log와 10/02·10/03 기록은 [WORKLOG의 STATUS 정리 참조](../history/DRONE_WORKLOG.md)·[10월 원문 아카이브](../history/archive/STATUS_2026-10.md)에 보존했다. 실제 랩 재실행 복원·HUD는 수동 대기다.
 
 표시 예시는 다음과 같다.
 
@@ -190,7 +188,7 @@ TUT-01에는 Gate 목록이나 통과 판정이 없다. 현재 Spline 점과 경
 - Spline을 수정하거나 `Rebuild Automatic Gates`를 누르면 이전 생성 Component를 제거하고 중복 없이 다시 만든다.
 - `9de1ead`의 `Lvl_DroneTraining`은 Gate Actor 17개·Course Sequence 4개이고 역할 표적/Carryable이 없다. 실제 코스에 사용할 Gate 범위와 순서를 화면에서 확인한 뒤 독립 Handle 모드로 변환한다.
 - 독립 Handle 변경은 Editor Build와 `Drone.Tutorial.TrainingCourse` 1/1에서 Spline 투영·추가·삭제 및 CourseSpline 불변까지 통과했다. 팀원 Pull 이후 전체 자동화는 알려진 실패 3개가 있어 최신 40/40으로 표시하지 않는다.
-- 남은 완료 조건은 Map에 Point 배치를 저장하고 역할 표적/Carryable을 복원한 뒤 Tutorial 7/7·전체 40/40, Ring 방향·세 상태 색과 전체 순서 비행을 확인하는 것이다.
+- Production 변환·저장은 맵 담당 팀원만 한다. AI는 TestMap에서 최신 Drone.Tutorial 묶음과 전체 Drone.*를 검증하되 고정 7/7·40/40을 완료 조건으로 쓰지 않는다. 최신 전체는 97개·86 Success(10/04 오후 Claude), 알려진 실패·미렌더 판정 제한은 STATUS를 따른다. Ring 방향·색·순서 비행은 수동 확인 대기다.
 
 ## 5. Mission Mode
 
@@ -254,7 +252,7 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 
 ## 6. 외부 Drone 에셋 적용
 
-- 현재 D 드라이브 작업 PC의 제공 에셋 해제본·스테이징 보관 루트는 `D:\JGY\project\Unreal_260821`이며 Drone Git 저장소에 전체 복사하지 않는다. 다른 PC의 `C:\에셋` 재감사와 D 드라이브 ZIP 14개 감사는 PC별 기록으로 구분한다.
+- 2026-09-08 이전 D PC의 제공 에셋 해제본·스테이징 보관 루트는 `D:\JGY\project\Unreal_260821`이며 Drone Git 저장소에 전체 복사하지 않는다. 다른 PC의 `C:\에셋` 재감사와 D 드라이브 ZIP 14개 감사는 PC별 기록으로 구분한다.
 - Loose `.uasset`은 UE 5.8 스테이징 프로젝트에서 먼저 원래 `/Game/<PackRoot>` 경로로 로드한다. Explorer에서 바로 `/Game/Drone` 아래로 옮기지 않는다.
 - 필요한 의존성만 고른 뒤 스테이징 Content Browser에서 `/Game/Drone/ThirdParty/<PackName>`으로 이동·재저장하고 Redirector를 정리한다.
 - 실제 사용 Blueprint는 `/Game/Drone/Integrations/<PackName>` 아래에 만들고 프로젝트 기능 Pawn에 연결한다.
@@ -290,9 +288,9 @@ Jamming은 무작위 입력 손실이 아닌 재현 가능한 단계형 게임 �
 | AST-00 | 제공 에셋 인수 감사 | ZIP 14개와 해제본의 상대 경로·크기 일치 및 팩별 호환성·이식 위험 기록 |
 | AST-01 | 제공 Drone 에셋 선별 적용 | UE 5.8 스테이징 검증 후 기능 코드 변경 없이 Integration BP에서 외형 교체 |
 
-현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`, `TUT-03`과 `TUT-04B` 기술 구현을 완료했다. TUT-03은 Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료와 World Game Time·Telemetry 위치 표본 기반 실제 거리·평균 속도 원본 기록을 포함한다. 최신 공유 기준선은 `2d6a459`이며 FLOW-01~03과 NPC Visual 기반이 로컬 미커밋이다. 실제 두 Lap의 표시 판정은 남아 있다.
+2026-08~09 당시 구현 기록(2d6a459·로컬 FLOW-01~03). 현재 역할 공통 Primary/Secondary Input은 구현됨·자동 검증됨·수동 확인 대기이며 최신 기준은 STATUS다. 현재 `CTRL-01`, `HUD-01`, `HUD-02`, `TUT-01`, `TUT-02`, `TUT-03`과 `TUT-04B` 기술 구현을 완료했다. TUT-03은 Gate 0 시작, 이후 Gate별 Segment, 마지막 Gate Lap 완료와 World Game Time·Telemetry 위치 표본 기반 실제 거리·평균 속도 원본 기록을 포함한다. 당시 공유 기준선은 `2d6a459`이며 FLOW-01~03과 NPC Visual 기반이 로컬 미커밋이다. 실제 두 Lap의 표시 판정은 남아 있다.
 
-TUT-04B의 이전 성공 평균·Best 집계와 HUD 결과 행은 구현·자동 검증됐고 실제 두 Lap 수동 확인이 남았다. `FLOW-01~08`의 상태·데이터, 정적 Opening→Lobby→Briefing→Map→Drone 선택→목표→성공/실패→재도전/로비 복귀는 로컬 구현됐고 완전히 새 PIE 실행 3회 자동 검증을 통과했다. 다음은 Editor 수동 Vertical Slice와 역할 공통 Input이며, Flight 상태와 NavigationArrows Host/Wrapper는 이후 필요한 시점에 연결한다.
+당시 다음 순서 기록이며 현재 Next는 WORKBOARD를 따른다: TUT-04B의 이전 성공 평균·Best 집계와 HUD 결과 행은 구현·자동 검증됐고 실제 두 Lap 수동 확인이 남았다. `FLOW-01~08`의 상태·데이터, 정적 Opening→Lobby→Briefing→Map→Drone 선택→목표→성공/실패→재도전/로비 복귀는 로컬 구현됐고 완전히 새 PIE 실행 3회 자동 검증을 통과했다. 다음은 Editor 수동 Vertical Slice와 역할 공통 Input이며, Flight 상태와 NavigationArrows Host/Wrapper는 이후 필요한 시점에 연결한다.
 
 2026-08-27부터 구현한 NPC·Smart Object·Rifle/Shotgun·MG·Cover 기반은 폐기하지 않고 Mission Map 내부 전투에 재사용한다. 다만 아군 NPC 대화와 사람 Operator는 더 이상 Front-end나 Mission 시작의 선행조건이 아니다. 상세 AI 절차는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](../ai/DRONE_SMART_OBJECT_NPC_GUIDE.md), 최신 화면 흐름은 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](DRONE_FRONTEND_MISSION_FLOW_PLAN.md)를 따른다.
 

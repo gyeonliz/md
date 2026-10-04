@@ -11,7 +11,7 @@ TUT-01의 범위는 다음 두 가지뿐이다.
 
 TUT-01 자체 완료 범위에는 Gate, 통과 Trigger, 통과 순서, 정·역방향 판정, Segment/Lap 기록과 Timing을 포함하지 않는다. 이후 TUT-02에서 Gate·Trigger·순서·정방향 판정을, TUT-03에서 Segment/Lap 시간·실제 이동 거리·평균 속도 원본 기록을 각각 별도 책임으로 구현했다.
 
-TUT-01 자체 완료 기준선은 Unreal Commit `5a9a2fa`다. 현재 프로젝트 기준선 `55b3ffe`에는 TUT-02 Gate, TUT-03 Lap Recorder, TUT-04B 비교 결과, 자산 이식과 맵 중앙화가 추가됐으며 Editor Build, 전체 `Drone.` 16/16과 Blueprint 오류 0을 통과했다. Standalone에서는 TUT-02 기준 실제 BP Pawn·Controller·WBP HUD, 밝은 청록 안내선과 Current/Inactive Gate를 확인했다.
+TUT-01 자체 완료 기준선은 Unreal Commit `5a9a2fa`다. 2026-08-26 당시 프로젝트 기준선 `55b3ffe`에는 TUT-02 Gate, TUT-03 Lap Recorder, TUT-04B 비교 결과, 자산 이식과 맵 중앙화가 추가됐으며 Editor Build, 전체 `Drone.` 16/16과 Blueprint 오류 0을 통과했다. Standalone에서는 TUT-02 기준 실제 BP Pawn·Controller·WBP HUD, 밝은 청록 안내선과 Current/Inactive Gate를 확인했다.
 
 ## 1. 왜 필요한가
 
@@ -142,7 +142,7 @@ Can Ever Affect Nav     false
 (5000, 0,    300)
 ```
 
-native 기본값은 점 다섯 개지만 현재 저장된 `Lvl_DroneTraining` 인스턴스는 사용자가 추가한 점을 포함해 6개, 길이 약 `6491.96 cm`다. 기본 `200 cm` 거리 샘플링에서는 표시 Segment 33개가 생성된다. 이 좌표와 길이는 최종 레벨 디자인이 아니라 비행 경로를 확인하기 위한 Greybox다.
+2026-08-26 당시 시험 인스턴스는6점·6491.96cm·200cm 균일분할33조각이었다. 현재 Production 측정은10/04 C PC Claude 읽기 전용: Scale2·로컬9.6km/월드19.2km·92 CurveAuto다. 표시선 곡률 분할·MaximumCourseLineSegments 조정과 드래그 비용은 최신 저작 가이드3-1절을 따른다.
 
 ### 4.2 `OnConstruction`과 `BeginPlay`
 
@@ -202,26 +202,28 @@ Hidden In Game          false
 
 외형을 바꾸더라도 새 Mesh에 Collision을 켜지 않는다. C++은 Construction과 BeginPlay마다 Course가 소유한 모든 Primitive에 비간섭 값을 다시 적용한다. Gate Trigger는 이 BP의 SplineMesh에 섞지 않고 TUT-02의 별도 `BP_DroneTrainingGate` Actor에 둔다.
 
-### `Lvl_DroneTraining`
+### TestMap 기능 검증
 
-1. `/Game/Drone/Maps/Lvl_DroneTraining`을 연다.
+Production Lvl_DroneTraining은 열람만 하며 편집·저장은 맵 소유 팀원만 한다. 기능 검증은 TestMap에서 한다.
+
+1. /Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest를 연다.
 2. World Settings의 GameMode Override가 `BP_DronePrototypeGameMode`인지 확인한다.
 3. World Outliner에서 `BP_DroneTrainingCourse`가 한 개만 있는지 확인한다.
 4. `PlayerStart`가 한 개이고 Prototype Pawn이 직접 배치되지 않았는지 확인한다.
 5. 배치된 Course Actor를 선택해 Level 전용 경로를 조정할 수 있다.
-6. 맵과 BP를 모두 저장한다.
+6. 지정 TestMap과 BP만 저장한다. Production 맵은 저장하지 않는다.
 
-현재 경로는 코스 흐름을 시험하는 Greybox다. TUT-02의 실제 BP Gate 네 개는 별도 Actor로 배치됐으며, `OrderedGates` 배열 순서가 GateIndex의 유일한 원본이다. Construction·BeginPlay와 `Synchronize Gate Definitions` 버튼이 `CourseId`와 `GateIndex`를 자동 동기화한다. 현재 HUD에는 최근 구간과 완료 구간 평균 통계가 한글로 연결됐고 이전 Lap 평균·Best 대비 표시는 후속 범위다.
+현재 경로는 코스 흐름을 시험하는 Greybox다. TUT-02의 실제 BP Gate 네 개는 별도 Actor로 배치됐으며, `OrderedGates` 배열 순서가 GateIndex의 유일한 원본이다. Construction·BeginPlay와 `Synchronize Gate Definitions` 버튼이 `CourseId`와 `GateIndex`를 자동 동기화한다. 현재 HUD에는 최근 구간과 완료 구간 평균 통계가 한글로 연결됐고 이전 Lap 평균·Best·Delta와 조건별 JSON 최고기록은 구현됨·자동 검증됨, 실제 재실행 복원은 수동 대기다.
 
 ## 6. Editor에서 테스트하는 방법
 
 ### 눈으로 확인
 
-1. UE 5.8.1에서 `Lvl_DroneTraining`을 연다.
+1. 설치된 UE5.8에서 TestMap/Lvl_DroneTutorialSystemsTest를 연다.
 2. `BP_DroneTrainingCourse`를 선택하고 Spline 점 하나를 움직인다.
 3. 점 사이의 안내선이 새 곡선을 따라 재구성되는지 확인한다.
 4. PIE 또는 Standalone을 시작한다.
-5. 기존 `BP_DronePrototypePawn`과 `WBP_DroneFlightHUD`가 나타나는지 확인한다.
+5. 실제 DefaultPawn BP_DroneFPVIntegration(ADronePrototypePawn 자식)과 `WBP_DroneFlightHUD`가 나타나는지 확인한다.
 6. Drone을 안내선의 한쪽에서 반대쪽으로 통과시킨다.
 7. 안내선에 부딪히거나 멈추거나 밀려나지 않는지 확인한다.
 8. Editor에서 `P`를 눌러 Navigation 표시를 켜고 안내선 때문에 NavMesh가 잘리거나 새 장애물 영역이 생기지 않는지 확인한다.

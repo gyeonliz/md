@@ -85,7 +85,7 @@ Rate/Acro는 Front-end Drone 선택 화면에서 FPV 기체를 고르면 기본 
 
 | 항목 | 현재 Greybox 값 | 근거와 해석 |
 |---|---:|---|
-| 무적재 수평 최대 속도 | 27 m/s | DJI Avata 2 Manual mode 공개 최대 수평 속도. FPV 기준 `2160 cm/s × Unloaded 1.25 = 2700 cm/s` |
+| 무적재 수평 최대 속도 | 현재 DA 기준56.25m/s | DA MaxSpeed4500cm/s×Unloaded1.25=5625cm/s. 게임 속도 상한·실기 검증 아님. 초기27m/s는 과거 공개사양 참고값 |
 | 상승/하강 World Z 제한 | 9 m/s | DJI Avata 2 Sport 공개 최대 상승·하강 속도 |
 | Pitch/Roll 최대 Rate | 650°/s | Betaflight 공식 Rate Calculator가 설명하는 Racing 예시 범위 550~650°/s의 상단 |
 | Yaw 최대 Rate | 400°/s | 플레이 테스트용 보수적 프로젝트 값. DJI의 공개 사양값으로 오해하지 않는다 |
@@ -106,13 +106,13 @@ DJI 공개값에는 무풍·해수면 등 측정 조건이 붙으며, 현재 프
 대상은 `BP_DroneScoutIntegration`, `BP_DroneFPVIntegration`, `BP_DroneDropIntegration`, `BP_DroneFiberOpticIntegration`, `BP_DroneGroundUGVIntegration` 또는 `ADronePrototypePawn` 파생 Blueprint다.
 
 1. Pawn 참조에서 `Set Control Mode`를 호출한다.
-2. `Assisted Easy`, `Manual Realistic Greybox`, `Acro Rate Mode 1 Greybox`, `Acro Rate Realistic Greybox` 중 하나를 전달한다. 마지막 기존 이름은 Asset 호환을 위해 유지한 Mode 2다.
+- `Set Control Mode`: BP 표시명 `쉬운 조작`(AssistedEasy), `실제 조작형 (그레이박스)`(ManualRealisticGreybox), `FPV Rate/Acro Mode 1 (그레이박스)`(AcroRateMode1Greybox), `FPV Rate/Acro Mode 2 (그레이박스)`(AcroRateRealisticGreybox) 중 선택한다.
 3. `Toggle Control Mode`는 쉬운 조작 → 제한 자세 → Mode 1 → Mode 2 → 쉬운 조작 순서로 순환한다.
 4. 과거 `Set/Cycle Handling Preset` 호출은 호환을 위해 남아 있지만 항상 단일 `Balanced` 기준으로 정규화되며 속도를 바꾸지 않는다.
 5. UI 문구 갱신은 `On Flight Control Settings Changed` Event에 바인딩한다.
 6. 시작 조작은 각 `DA_Drone_*_Greybox`의 `Flight Profile > Default Control Mode`에서 설정한다.
 
-키 바인딩은 아직 확정하지 않았다. FLOW-05 Drone 선택 화면의 `조작`·`반응성` 버튼이 값을 고르고, Controller가 Spawn Pawn에 같은 API로 적용한다.
+선택 화면은 `조작 모드` 버튼만 값을 고른다. 반응성 버튼은 호환용으로 숨김이며 Controller가 Spawn Pawn에 모드 API를 적용한다.
 
 ## Blueprint에서 조정 가능한 수치
 
@@ -153,7 +153,7 @@ FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조�
 
 ## Editor 확인 순서
 
-1. `Lvl_DroneTraining` 또는 Prototype Map을 연다.
+1. TestMap/Lvl_DroneWeatherSystemsTest 또는 /Game/Drone/Maps/Lvl_DronePrototype를 연다. Production 편집·저장은 맵 소유 팀원만 한다.
 2. 정찰 Data Asset의 단일 무적재 기준으로 전후·좌우·고도를 확인한다.
 3. `Set Control Mode(ManualRealisticGreybox)`를 임시 Widget/Button에서 호출한다.
 4. 전진 입력에서 Root와 FPV Camera가 Pitch되고, 고도 입력이 기체 Local Up을 따르는지 확인한다.
@@ -192,7 +192,7 @@ FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조�
 
 이 키는 기능 검증용 임시값이다. 최종 키보드·마우스·Gamepad 배치는 현재 미정이다.
 
-세 역할을 바꿔가며 시험할 때는 `/Game/Drone/Maps/Lvl_DroneFrontEnd`에서 시작해 `계속 → Training Mission 선택 → 미션 시작 → 작전 시작 → Drone 선택 → 출격` 순서로 진입한다. `/Game/Drone/Maps/Lvl_DroneTraining`은 실제 표적이 놓인 맵이지만 직접 PIE하면 기본 기체만 시작해 전체 역할 선택 흐름을 건너뛴다. 특히 FPV 폭발 뒤 Pawn이 파괴되므로 직접 실행에서는 더 조종할 대상이 없고, Front-end Mission 흐름에서는 결과 UI의 재도전 또는 로비 복귀를 사용한다. 폭발 기능 자체는 Unreal Editor를 종료하지 않는다.
+역할 표적 `RoleTest_*`는 `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`에 있다. 직접 Play로 확인하거나 FrontEnd 타이틀 메뉴→로비 선택→브리핑→기체 선택→출격 흐름을 사용한다. Production `Lvl_DroneTraining`에는 해당 표적이 없다.
 
 Training 역할 시험 표적은 코스 진행 판정과 분리되어 있다.
 
@@ -213,4 +213,4 @@ Training 역할 시험 표적은 코스 진행 판정과 분리되어 있다.
 
 `BP_DroneDropIntegration`의 `PayloadDropComponent > Payload Class`도 이 BP로 연결되어 있다. 따라서 기체가 처음 들고 시작하는 화물과 맵에 미리 배치한 화물이 모두 같은 크레이트·착지 잔류·재적재 규칙을 사용한다.
 
-광섬유·UGV·장거리 타격은 위 3종 Vertical Slice 뒤 진행한다. 특히 UGV는 공중 Pawn의 핸들링 프리셋을 재사용하지 않고 별도 지상 이동 구조로 만든다.
+장거리 타격만 후속이다. 광섬유·UGV는 구현됨·자동 검증됨·수동 확인 대기이며 Mission 내 기체 교대는 후속이다.

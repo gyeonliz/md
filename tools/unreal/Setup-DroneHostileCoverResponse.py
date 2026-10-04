@@ -10,7 +10,8 @@ import unreal
 
 PREFIX = "DRONE_HOSTILE_COVER"
 STATE_TREE_PATH = "/Game/Drone/AI/StateTrees/ST_NPC_HostilePatrol"
-MAP_PATH = "/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox"
+# 2026-10-04: 맵은 TestMap 폴더로 옮겨졌다(이전 경로에는 맵이 없다).
+MAP_PATH = "/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox"
 COVER_BLUEPRINT_PATH = "/Game/Drone/AI/SmartObjects/Blueprints/BP_SO_Cover"
 COVER_PLACEMENTS = (
     ("Station_Cover_A", (1750.0, -1050.0, 0.0), 150.0),

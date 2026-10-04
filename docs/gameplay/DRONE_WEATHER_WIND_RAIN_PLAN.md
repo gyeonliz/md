@@ -11,7 +11,7 @@
 - `WTH-01` Profile/Snapshot/World Subsystem, `WTH-02` 지속풍·돌풍 Drone 응답, `WTH-02B` Attack/Release와 표시 벡터 적분은 2026-09-16 기준 구현됐다.
 - `BP_DroneRandomWeatherController`를 맵에 한 개 배치하는 Weather Manager 방식이 구현됐다. 8방향과 무풍을 무작위 선택하고 방향·세기 변경 주기와 풍속 범위를 Blueprint에서 조정한다.
 - `/Game/Drone/Data/Weather`에 `Clear`, `LightWind`, `RainStorm_Greybox` Profile이 있고, `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`는 `LightWind`를 즉시 적용한다.
-- 비 Snapshot은 기존 DrawDebug 선분 프리뷰와 `/Game/Drone/Weather/Blueprints/BP_DroneRainVisual`이 소비한다. Rain Visual은 카메라 주위 최대 160개 Instanced Mesh를 재사용하는 Greybox이며 카메라 위쪽 Trace로 지붕 아래 로컬 강우를 감쇠한다. 정식 Niagara, 젖음 Material/MPC consumer, Splash·Audio는 아직 구현 완료 기능이 아니다.
+- 비 Snapshot은 기존 DrawDebug 선분 프리뷰와 `/Game/Drone/Weather/Blueprints/BP_DroneRainVisual`이 소비한다. Rain Visual은 카메라 주위 기본112개(8~512 조정) Instanced Mesh를 재사용하는 Greybox이며 카메라 위쪽 Trace로 지붕 아래 로컬 강우를 감쇠한다. 정식 Niagara, 젖음 Material/MPC consumer, Splash·Audio는 아직 구현 완료 기능이 아니다.
 - 최종 Mission별 날씨, 비가 신호·체력·배터리에 미치는 영향, 최종 성능 예산은 현재 미정이다.
 - 1차 Vertical Slice에서는 바람이 비행에 미치는 영향과 비의 시야·연출만 분리해 검증한다.
 - 비를 맞는다고 Drone 체력 감소, 통신 두절, Mission 실패를 자동으로 넣지 않는다. 필요하면 별도 Mission Rule로 명시한다.
@@ -41,7 +41,7 @@ Asset: `/Game/Drone/Weather/Blueprints/BP_DroneRandomWeatherController`
 
 풍향 후보는 `E / NE / N / NW / W / SW / S / SE / CALM`이다. 프로젝트 좌표 기준 `+X=E`, `+Y=N`으로 표기한다. Flight HUD에는 `풍향 NE | 풍속 5.2 m/s` 형식으로 표시되며, Debug Visualizer도 같은 Cardinal 표기와 m/s를 사용한다.
 
-`BP_DroneRainVisual` Class Defaults에서는 최대 빗줄기 수, 카메라 주변 반경·높이, Streak 크기·낙하 속도·바람 영향, 지붕 Trace 간격/거리, 실내 감쇠 보간 시간과 Material을 조정한다. 기본값은 최대 160개, Trace 0.2초, 감쇠 보간 0.35초다. Collision·Navigation·Shadow는 사용하지 않는다.
+`BP_DroneRainVisual` Class Defaults에서는 최대 빗줄기 수, 카메라 주변 반경·높이, Streak 크기·낙하 속도·바람 영향, 지붕 Trace 간격/거리, 실내 감쇠 보간 시간과 Material을 조정한다. 기본 최대112개(8~512 조정), 실내 판정0.2초·빗줄기 열별 천장Trace 프레임당8열 예산, 감쇠 보간0.35초다. Collision·Navigation·Shadow는 사용하지 않는다.
 
 ## 구현된 데이터 구조
 

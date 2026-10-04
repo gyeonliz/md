@@ -1,5 +1,7 @@
 # Drone Prototype PFN-06 PIE 검증 기록
 
+
+최신 기준은 [STATUS](../../STATUS.md)의 Git·검증 표를 따른다. 현재 C PC Unreal은 `C:\URproject\drone`, UE 5.8.3(CL 58210709, 2026-10-04 Build.version 확인)이다. 이전 D PC 기록과 구분하며 팀 허용 패치 범위는 현재 미정이다. 아래 55b3ffe·16/16과 D 경로는 09-15 당시 기록(D PC 예시, 실제 경로로 바꿀 것)이다.
 기준일: 2026-08-24 (Asia/Seoul)
 
 이 문서는 PFN-06의 체크 항목과 실행별 결과를 기록하는 **단일 기준 문서**다. `STATUS.md`, `WORKBOARD.md`, 구현 문서는 판정 요약과 이 문서 링크만 유지하며 체크리스트를 복제하지 않는다.
@@ -17,7 +19,7 @@ TUT-03     Done, Segment/Lap 시간 · 실제 이동 거리 · 평균 속도 원
 TUT-04B    Implemented, 자동 검증 Pass · 실제 두 Lap 확인 대기
 ```
 
-현재 main 기준은 `55b3ffe`이며 전체 `Drone.` 자동화 16/16과 Blueprint 오류 0을 통과했다. TUT-04B 결과 HUD가 추가됐으므로 두 번 완주해 첫 기준과 이전 평균·Best·Delta 표시를 확인한다. 현재 구조와 사용자 수동 확인 절차는 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](../reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
+2026-09-15 당시 main 기준은 `55b3ffe`이며 전체 `Drone.` 자동화 16/16과 Blueprint 오류 0을 통과했다. TUT-04B 결과 HUD가 추가됐으므로 두 번 완주해 첫 기준과 이전 평균·Best·Delta 표시를 확인한다. 현재 구조와 사용자 수동 확인 절차는 [`DRONE_CODE_STRUCTURE_AND_USER_TASKS.md`](../reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다.
 
 2026-08-19 사전 PIE 두 번에서 Prototype 입력 계열이 실제로 반응하는 것은 확인했다. 그러나 어느 실행도 한 번의 새 PIE 안에서 전체 체크리스트를 끝내지 못했으므로 Pass로 계산하지 않는다. 두 실행은 이미 종료된 역사적 부분 확인이며 현재 열린 PIE가 있다는 뜻이 아니다.
 
@@ -64,7 +66,7 @@ TUT-04B    Implemented, 자동 검증 Pass · 실제 두 Lap 확인 대기
 
 ## 정식 3회 공통 체크리스트
 
-2026-08-21 PFN-06 검증 당시와 현재 D 드라이브 작업 PC의 프로젝트는 `D:\JGY\project\drone\Drone.uproject`다. `C:\URproject\drone`은 2026-08-24 다른 PC에서 확인한 경로다. 확정된 고정 추적 Camera와 Gamepad 계약을 반영한 `Drone.Prototype.PIEInputLifecycle`가 당시 Automation Report에서 새 PIE 3회를 모두 통과했다. 각 실행은 아래 항목을 전부 만족해야 한 번의 Pass다.
+2026-08-21 PFN-06 검증 당시와 이전 D PC의 프로젝트는 `D:\JGY\project\drone\Drone.uproject`다. `C:\URproject\drone`은 당시 다른 PC의 검증 경로였으며 지금은 현재 C PC 경로다. 확정된 고정 추적 Camera와 Gamepad 계약을 반영한 `Drone.Prototype.PIEInputLifecycle`가 당시 Automation Report에서 새 PIE 3회를 모두 통과했다. 각 실행은 아래 항목을 전부 만족해야 한 번의 Pass다.
 
 - [x] `Lvl_DronePrototype`에서 새 PIE 시작
 - [x] BP Prototype Pawn 정확히 한 대 Spawn

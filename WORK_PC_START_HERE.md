@@ -1,44 +1,20 @@
 # 작업컴 시작 가이드
 
-기준일: 2026-10-01 (Asia/Seoul)
+기준일: 2026-10-04 (Asia/Seoul)
 
-최신 상태는 STATUS·WORKBOARD(2026-10-01 저녁 `ec2e88f`)가 기준이며 아래 일부 문단은 당시 기록이다. 아래 D 경로 명령은 **D PC 예시**다. Build·PIE·자동화 테스트는 Claude 담당이다.
+최신 상태는 STATUS·WORKBOARD가 기준이며 아래 일부 문단은 당시 기록이다. 아래 D 경로 명령은 **D PC 예시**다. Build·PIE·자동화 테스트는 Claude 담당이다.
 
 이 문서는 PC를 옮겨 Drone 작업을 이어가기 위한 단일 시작점이다. 현재 C 드라이브 PC는 Unreal `C:\URproject\drone`, 문서는 이 작업 폴더이며 이전 D 드라이브 작업컴 경로는 `D:\JGY\project\md`/`drone`다. 아래 D 경로 명령은 해당 작업컴용 예시이므로 다른 PC에서는 실제 경로로 바꾼다. 최신 사실은 `STATUS.md`, 다음 작업은 `WORKBOARD.md`, 경계는 `CONTEXT.md`를 우선한다.
 
 ## 1. 현재 인계 상태
 
-2026-10-01 현재 C PC 수신 확인: 후속 로비·설정 코드, 출격 전 Back·선택 복원, Tutorial 8개 독립 시험맵·Story/Racing 직접 Play Entry, 비 CPU 예산 개선·OilRig 비교 맵이 체크아웃에 있다. 소스 수신은 현재 로컬 바이너리/플레이 완료를 뜻하지 않는다. [기능·인계 검증 범위](docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md)
+최신 해시·미커밋 범위는 [STATUS Git 기준 표](STATUS.md)를 따른다. 현재 C PC Unreal C:\URproject\drone에는 10/02~10/04 코드·입력·UI·도구의 로컬 미커밋/미추적이 있으므로 원격 수신만으로 전달 완료를 판단하지 않는다. PC 이동 전 사용자가 변경을 검토하고 공유할 때만 Commit/Push한다. 소스 수신과 최신 바이너리·수동 플레이 Pass는 구분한다. Lvl_BangkokCity는 10/01 의도적으로 삭제됐으며 남은 의존 자산 정리 여부는 미정이다.
 
-- 최신 확인 Unreal: `C:\URproject\drone`, `main = origin/main = 9f67706bbecb85499bfc62f82dd96b77e09a56df`
-- 최신 확인 문서: `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6`, 점검 시작 `main = origin/main = ff69c11cc997874ddad890bf2c36ac94d406e2ea`
-- Physics Sandbox, Story 4맵, Training Route, 광섬유 GSU, Bangkok City·OilRig Preview도 포함됐다.
-- `git ls-remote origin refs/heads/main`으로 실제 원격과 대조했다. 점검 시작 두 Clean·앞섬/뒤처짐 0/0. 이전 D PC의 LFS/32개 패키지 본문·기본 준비 0/0 기록은 보존하지만 이번에는 LFS 전체 무결성·기본 준비 도구를 재실행하지 않았다.
-- 이전 D PC의 Build/UI 5/5(NullRHI/NoSound)·렌더 목록 튐 Fail 보고서는 현재 C PC에 없다. 현재 C Saved의 GameReadiness 32·Back 33개 실패 0·TitleLobbyOrbit 14 성공 보고서는 이전 UI 검사이며 최신 화면 Pass가 아니다. 이번 Build/PIE·소리/해상도/패드 확인은 실행하지 않았다.
-- 기존 이미지 유지, 시작→Story4/훈련→Tutorial9·Racing1, 로비/브리핑·기체 카드, 사운드/화면/성능 설정 코드는 수신됐다. 목록 튐은 미수정이며 패드 Back과 전체 패드 선택을 구분한다. 이번 변경은 MD·Space만이며 Commit/Push는 사용자 담당이다.
-- 이미 작업컴에서 이 문서를 Pull해 읽고 있다면 4절 점검 결과를 우선한다. 두 저장소가 원격과 일치하고 필수 Asset 검사가 통과하면 전달이 완료된 상태다.
-- Codex 원시 세션 폴더, `auth.json`, API Key, 토큰은 복사하지 않는다.
+이전 D PC Build/UI5/5(NullRHI/NoSound)·목록 렌더 Fail의 원시 TrainingLobbySettings 보고서는 현재 C PC에 없다. 최신 검증은 STATUS를 따른다. 인증 파일·API 키·원시 세션을 복사하지 않는다.
 
-## 2. 새 변경을 메인컴에서 만든 경우의 사용자 작업
+## 2. 새 변경을 공유할 때의 사용자 작업
 
-Unreal Editor와 실행 중인 명령줄 Editor를 모두 종료한다. 그다음 GitHub Desktop에서 아래 순서로 처리한다.
-
-### 2-1. Unreal 저장소
-
-1. 저장소 `gyeonliz/drone`을 선택한다.
-2. 실제 새 코드/자산 변경이 있는 경우에만 검토한다. 현재 UI·설정은 `9f67706`으로 공유돼 있으며 이번 최신화에는 Unreal 변경이 없다. `Saved` 보고서는 Git 제외이므로 필요한 증거는 민감 정보를 제외한 결과로 별도 전달하거나 문서 기록을 참고한다.
-3. 향후 UI 수정 Commit 제목 예시: `로비 목록 안정화와 패드 선택 보강`(이번에는 구현하지 않음)
-4. Commit 후 `Push origin`을 누른다.
-5. Git LFS 업로드가 끝날 때까지 GitHub Desktop을 닫지 않는다.
-
-### 2-2. 문서 저장소
-
-1. 저장소 `gyeonliz/md`를 선택한다.
-2. `WORK_PC_START_HERE.md`, `STATUS.md`, `WORKBOARD.md`, `CONTEXT.md`, `docs`, `tools/work-pc` 변경을 확인한다.
-3. Commit 제목 예시: `작업컴 인계 문서와 튜토리얼 가이드 최신화`
-4. Commit 후 `Push origin`을 누른다.
-
-기존 독립 맵/대형 환경과 UI·Settings는 수신 기준에 있으므로 다시 구현/Commit하지 않는다. 이번 새 공유 대상은 최신화 MD이며 Space 페이지는 별도 반영한다. `git lfs push`만으로는 Commit 이력이 올라가지 않으므로 실제 새 변경이 있을 때 사용자가 검토 후 Commit과 `Push origin`을 수행한다.
+해시·미커밋 범위는 STATUS Git 기준 표를 따른다. 사용자가 공유를 결정한 경우 GitHub Desktop에서 drone·md 변경을 각각 검토한 뒤 Commit/Push하고 LFS 업로드 완료를 확인한다. Saved 보고서는 Git 제외이므로 필요한 검사명·날짜·PC·수치만 전달한다. Codex는 별도 요청 없이 Commit/Push하지 않는다.
 
 ## 3. 작업컴에서 받는 순서
 
@@ -89,26 +65,21 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass `
 | Unreal Process | Editor 저장·종료 후 재실행 |
 | Tutorial Validation 실패 | 출력된 `Saved/Automation/TutorialMissionTestSetup/.../Setup.log` 확인 |
 
-## 5. Codex에서 시작하는 방법
+## 5. Claude Code에서 시작하는 방법
 
-작업컴 Codex에서 프로젝트 루트를 `D:\JGY\project\drone`으로 연다. 첫 메시지는 다음처럼 사용한다.
+코드·Build·테스트는 Claude Code가 Unreal 저장소의 CLAUDE.md와 WORKBOARD Next를 따라 수행한다. 문서는 Codex가 맡는다. Claude 허브가 Codex를 docs/ui/image 역할 지시서로 한 번에 하나씩 호출하고 결과를 검증한다. 문서 경로는 각 PC .claude/codex-bridge/local.json의 mdRepo를 사용한다. Production Lvl_DroneTraining 편집·저장은 맵 소유 팀원만, 기능 검증은 TestMap이다.
 
-```text
-D:\JGY\project\md\WORK_PC_START_HERE.md,
-D:\JGY\project\md\CONTEXT.md,
-D:\JGY\project\md\STATUS.md,
-D:\JGY\project\md\WORKBOARD.md를 먼저 읽고 현재 Git 상태와 대조해.
-Production /Game/Drone/Maps/Lvl_DroneTraining은 저장하거나 재구성하지 말고,
-테스트는 /Game/Drone/Maps/TestMap에서 진행해.
-커밋과 푸시는 내가 요청하기 전에는 하지 마.
-우선 FrontEnd 뒤로가기/패드 입력, 독립 Tutorial/Orbit/Racing·Story 4개 수동 완주 상태를 확인하고 WORKBOARD Next 순서대로 이어가.
+새 PC 협업 세팅(실제 Unreal 경로로 바꿔 실행):
+
+```powershell
+C:\URproject\drone\.claude\codex-bridge\Test-CollabSetup.ps1 -WriteLocalConfig -InstallUserRules
 ```
 
-과거 대화 전체를 다시 설명할 필요는 없다. 위 네 문서와 실제 저장소 상태가 현재 기준이다.
+전체 절차는 [CLAUDE_CODEX_SETUP](docs/git/CLAUDE_CODEX_SETUP.md)을 따른다. 이 문서 최신화에서는 세팅·Build·테스트를 실행하지 않았다.
 
 ## 6. 가장 먼저 열 맵과 수동 확인
 
-통합 흐름은 `/Game/Drone/Maps/Lvl_DroneFrontEnd`에서 Play한다. 시작→Story4, 훈련→Tutorial9/Racing1, 설정의 적용/취소·재실행 복원·실제 음량을 확인한다. 창 모드/해상도는 PIE에서 비활성화되므로 Standalone을 사용한다. 설명→기체 선택→출격과 버튼/Esc/패드 Back 및 아래 8수업은 별도 완주한다. 독립 Tutorial 8·Story4·Racing1은 직접 Play도 가능하다.
+통합 흐름은 `/Game/Drone/Maps/Lvl_DroneFrontEnd`에서 Play한다. 타이틀 스토리/레이싱/튜토리얼/설정/종료 5메뉴→분류 직접 진입(로비 Tutorial/Racing 탭·LB/RB는 현재 유지, 최종 유지 여부 미정), 설정의 적용/취소·재실행 복원·실제 음량을 확인한다. 창 모드/해상도는 PIE에서 비활성화되므로 Standalone을 사용한다. 설명→기체 선택→출격과 버튼/Esc/패드 Back 및 아래 8수업은 별도 완주한다. 독립 Tutorial 8·Story4·Racing1은 직접 Play도 가능하다.
 
 1. Hover: Zone 안에서 3초 안정 유지 후 귀환
 2. Forward: 전방 Trigger 통과 후 귀환
@@ -123,37 +94,13 @@ UGV는 `W/S` 전후, `A/D` 조향, `Q/E` 제자리 회전이며 마우스/패드
 
 ## 7. 자동 검증 기준
 
-현재 작업컴 후속 UI 검증: Editor Build 성공, `FrontEndContract / BackNavigationContract / MissionEntryContract / SettingsContract / FrontEndPIE` 5/5·자동화 오류/경고 0. 보고서 `Saved/Automation/TrainingLobbySettings/index.json`. NullRHI/NoSound여서 렌더·가청성·실제 창 설정·디스크 재실행 복원은 미확인이다. 아래는 다른 PC `C:\URproject\drone`의 기존 Oct 1 인계 결과이며 오늘 전체 재실행 결과는 아니다.
+최신 검사명·조건·수치·로그는 STATUS 검증 표를 따른다(10/04 C PC Claude 실행). 새벽12/12·90/94와 후속 집중30/32·전체95개2회는 각각 다른 실행이다. 최신 전체2회는 PIE 미렌더여서 패드 포커스6개 판정 제외, 나머지 알려진4개 Fail. 화면 그려진 실행의 포커스 확인은 대기다.
 
-- Editor Development Build 성공, Title/Orbit 앞선 회귀 14/14 성공
-- GameReadiness 집중 회귀 32/32·오류/경고 0, Tutorial 8 + Story 4 + Racing 1 + 비 비교 1의 Map Check 14맵 0/0
-- Hover 로비 PIE와 독립 맵 직접 Play PIE에서 실제 출격→3초 유지→귀환 목표 전환 성공
-- Back 후속 회귀 33개 실패 0, 외부 LogHttp 시간 초과 경고 동반 성공 1건
-- 1280 UI 일부 상호작용·뒤로가기/선택 복원, 1920 제목/Exit 확인. 전체 미션 완주·실제 패드·최종 음원/연출은 미확인
-- 오늘 작업컴 기본 준비 점검 0/0은 위 런타임 결과와 별도다. `-game` Toolset Python 환경 오류도 프로젝트 집중 테스트 실패와 구분한다
-
-이전 전체 `Drone.*` 결과는 **51개 성공/7개 실패**였다. 최신 집중 회귀로 전체 회귀가 전부 Green이라고 판정하지 않는다. 당시 7개 실패는 다음과 같으며 Production을 재구성해 억지로 통과시키지 않는다.
-
-- NPC Greybox 시험이 예전의 정확한 Actor 수를 기대하는 항목
-- Shotgun PIE에서 활성 Drone 표적을 잡지 못하는 항목
-- 팀원 소유 Production Training 맵에 예전 Course/Gate가 있다고 가정하는 항목
-
-Production 맵을 자동 재구성해서 테스트를 억지로 통과시키지 않는다. 상세 내용은 `docs/gameplay/DRONE_CODE_STRUCTURE_AUDIT_2026-09-29.md`를 본다.
+이전 D PC UI5/5(NullRHI/NoSound)·Build 성공은 당시 문서 근거이고 Saved/Automation/TrainingLobbySettings/index.json은 C PC에 없다. C PC Saved의 10/01 기존 GameReadiness32 Success·Back32 Success+경고 동반 성공1·TitleLobbyOrbit14 Success는 최신 UI 이전 검사다. 다른 PC 결과를 현재 PC의 수동 Pass로 확대하지 않는다. Production 맵 의존 Fail을 맵 저장/재구성으로 통과시키지 않는다.
 
 ## 8. 바로 이어갈 실제 작업
 
-최신 구현은 이미 수신됐다. 다른 PC의 자동화와 일부 화면 확인을 인계받았지만 현재 PC의 전체 미션 체감은 미확인이다. 이미지 교체법과 Mode 1/2는 [가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md), 실제 우선순위는 `WORKBOARD.md`를 따른다.
-
-우선순위는 다음과 같다.
-
-1. FrontEnd 뒤로가기/탭 복원·패드 입력, 독립 Tutorial 8개·Orbit/Racing·Story 4개 수동 완주와 실패/결과를 확인한다.
-2. Best Lap SaveGame을 조건별로 저장·복원하고 저장 없음/구버전/손상 처리를 검증한다.
-3. Tutorial 브리핑·클리어 타임·재시도/다음 수업·`n/8`·전체 완료 UI를 추가한다.
-4. Story M1 선택 목표/실패 → M2 Story Fact → M3 기체 교대 → M4 장거리 타격/엔딩을 고도화한다.
-5. 관련 단계의 회귀로 Gate 음원/Mesh/재질·1/6 배치, Physics 벽/그물 카메라 안정성과 총알 Shake 유지, FPV/Drop 하중·Mode 1/2·AI/Shotgun·비/광섬유/UGV를 확인한다. 발견된 수치는 BP에서 조정한다.
-6. 별도 Spike로 실제 Dataflow/Chaos Cloth·Geometry Collection을 Greybox와 비교한다. 최종 Niagara/젖음/Audio·영상/UI·패키징은 후속이다.
-
-아직 최종값으로 확정하지 않은 항목은 `STATUS.md`와 `WORKBOARD.md`에서 계속 미정으로 유지한다.
+[WORKBOARD Next](WORKBOARD.md)를 따른다. Acro Mode1에서 스틱에 엄지를 걸친 채 Space→상승, 키 해제→패드 인계와 코스 급커브 표시·Editor 편집 체감을 먼저 수동 확인한다. 5메뉴·포커스·입력 표시·8수업·Best Lap 실제 재실행 복원도 수동 대기다. 미정 수치·기본값·레이싱/스토리 결정은 사람이 정한다.
 
 ## 9. 종료할 때
 

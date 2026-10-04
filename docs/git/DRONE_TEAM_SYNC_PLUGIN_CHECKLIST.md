@@ -1,16 +1,18 @@
 # Drone 팀원 Git·LFS·Unreal Plugin 동기화 체크리스트
 
+
+아래 09-04 검사 수치는 당시 기록이다. 현재 Plugin 목록은 Drone.uproject가 기준이며 09-29 추가 `Dataflow`, `GeometryCollectionPlugin`, `ChaosClothAsset`, `ChaosClothAssetEditorCore` 4개도 확인한다. 최신 기준은 [STATUS](../../STATUS.md)의 Git·검증 표를 따른다. 현재 C PC Unreal은 `C:\URproject\drone`, UE 5.8.3(CL 58210709, 2026-10-04 Build.version 확인)이다. 이전 D PC 기록과 구분하며 팀 허용 패치 범위는 현재 미정이다.
 기준일: 2026-09-04 (Asia/Seoul)
 
 ## 확인된 기준
 
-- 중앙 저장소: `https://github.com/gyeonliz/drone.git`, `main=6fd0e77`
+- 중앙 저장소: `https://github.com/gyeonliz/drone.git`, 현재 HEAD는 STATUS와 origin/main 대조(6fd0e77은 09/04 당시)
 - 별도 원격 참고: `https://github.com/Yook34/drone.git`, `main=c845430`, 중앙보다 `18 Commit 뒤 / 0 Commit 앞`
 - 사용자가 확인한 실제 팀 협업 경로는 권한을 받은 중앙 `gyeonliz/drone` 직접 Pull이다. 위 별도 원격 상태를 팀원 PC 상태로 간주하지 않는다.
 - 차이는 총 586개 파일이며 Content 520개, Source 61개가 포함된다.
 - 두 Head의 `Drone.uproject`와 `Plugins` 차이는 0이다.
 - Project `Plugins` 폴더와 Git Submodule은 없다.
-- 기준 Unreal은 **UE 5.8.1, Changelist 56057345**다.
+- 기준은 UE 5.8 계열이다. 현재 C PC 5.8.3·CL 58210709(10/04 확인), 5.8.1·CL 56057345는 이전 기록·팀 허용 패치 범위 미정.
 - LFS Package는 4,563개이며 중앙 작업컴의 Pointer 검사가 통과했다.
 - 필수 입력 영역의 Git Untracked/Ignore 파일과 외부 Junction/Symlink는 0개다.
 - 별도 Clean Worktree에서 `Binaries`·`Intermediate` 없이 Editor Source Build가 성공했다.
@@ -70,7 +72,7 @@ git rev-parse --short HEAD
 git status --short
 ```
 
-마지막 Commit은 `6fd0e77`, 상태 출력은 비어 있어야 한다.
+현재 Commit은 [STATUS](../../STATUS.md)를 보고 `git rev-parse HEAD`와 `git rev-parse origin/main`을 대조한다. 6fd0e77은 2026-09-04 당시 기록이다.
 
 팀원 Clone의 `origin`이 `Yook34/drone`이라면 중앙을 `upstream`으로 추가하고 중앙 기준으로 Fast-forward한다.
 
@@ -86,7 +88,7 @@ git lfs pull upstream main
 
 ## Unreal 재생성·빌드
 
-1. Epic Games Launcher에서 Unreal Engine 버전이 `5.8.1`인지 확인한다.
+1. Epic Games Launcher와 Build.version에서 해당 PC의 정확한 UE 5.8 패치 버전을 확인한다. 현재 C PC는 5.8.3, 팀 허용 패치 범위는 현재 미정이다.
 2. `Drone.uproject` 우클릭 → `Generate Visual Studio project files`를 실행한다.
 3. `DroneEditor Win64 Development`를 Build한다.
 4. `Drone.uproject`를 열고 Output Log에서 `Plugin failed`, `Failed to load /Script`, `Unknown Class`, `Failed to load package`를 검색한다.
@@ -103,23 +105,23 @@ git lfs pull upstream main
 - Runtime: `StateTree`, `PropertyBindingUtils`, `GameplayStateTree`, `SmartObjects`, `GameplayInteractions`, `HDRIBackdrop`
 - Editor 전용: `ModelingToolsEditorMode`, `ModelContextProtocol`, `EditorToolset`, `AutomationTestToolset`, `UMGToolSet`, `StateTreeToolset`, `AIModuleToolset`
 
-팀원에게 별도로 복사할 Project Plugin 폴더는 현재 없다. 정확히 같은 5.8.1 설치에서 위 Plugin을 찾지 못하면 Epic Games Launcher의 해당 Engine 설치에서 `Verify`를 먼저 실행한다.
+팀원에게 별도로 복사할 Project Plugin 폴더는 현재 없다. 팀에서 합의한 UE 5.8 패치 설치에서 위 Plugin을 찾지 못하면 Epic Games Launcher의 해당 Engine 설치에서 `Verify`를 먼저 실행한다.
 
 추가 확인된 `Fab`은 Epic Launcher가 Engine에 별도로 설치하는 Editor Plugin이다. Project의 Megascans Asset 4개가 `/Script/Fab` 가져오기 메타데이터를 갖고 있다. Fab가 없으면 이 4개에서 재수입 메타데이터 경고가 생길 수 있으므로 팀원 UE 5.8에도 Fab를 설치하는 편이 안전하다. 다만 이미 Commit된 Mesh·Material·Texture 본문과 Drone Runtime 기능 자체는 Git LFS로 받는다.
 
 `ModelContextProtocol`은 Editor 전용이며 기본 설정이 포트 8000 자동 시작이다. 다른 프로그램이 8000번 포트를 사용하면 MCP만 실패할 수 있지만 게임 Runtime 기능에는 영향을 주지 않는다.
 
-Military Map의 Water는 현재 작업컴에서 정상 Mount되고 최근 로그에도 관련 실패가 없다. 중앙 동기화·LFS Pull·5.8.1 일치 뒤에도 Water Class 누락이 재현될 때는 해당 PC 로그를 확보하고 `Water`를 `.uproject`에 직접 명시하는 변경을 검토한다.
+Military Map의 Water는 현재 작업컴에서 정상 Mount되고 최근 로그에도 관련 실패가 없다. 중앙 동기화·LFS Pull·팀 엔진 패치 합의 뒤에도 Water Class 누락이 재현될 때는 해당 PC 로그를 확보하고 `Water`를 `.uproject`에 직접 명시하는 변경을 검토한다.
 
 ## 문제 분류
 
 | 증상 | 우선 확인 |
 |---|---|
-| 새 AI·기관총·Mission 기능이 없음 | `git rev-parse --short HEAD`가 `6fd0e77`인지 확인 |
+- `git rev-parse HEAD`와 `git rev-parse origin/main` 일치를 확인한다. 로컬 미커밋도 별도로 점검한다.
 | Mesh·Material·Map이 비거나 LFS Pointer처럼 보임 | `git lfs pull origin main` 또는 `git lfs pull upstream main` |
 | Pull은 됐는데 C++ 기능이 이전 상태 | Editor 종료 → Project Files 재생성 → `DroneEditor Win64 Development` Build. `Binaries`는 공유되지 않음 |
-| `Drone could not be compiled` | UE 5.8.1과 MSVC Toolchain 확인 → Project Files 재생성 → `DroneEditor` Build |
-| Plugin을 찾을 수 없음 | Engine 5.8.1 설치 Verify, Plugin 이름과 Error Log 확보 |
+| `Drone could not be compiled` | 해당 PC의 UE 5.8 패치와 MSVC Toolchain 확인 → Project Files 재생성 → `DroneEditor` Build |
+| Plugin을 찾을 수 없음 | Engine UE 5.8 설치 Verify, Plugin 이름과 Error Log 확보 |
 | Fab 관련 Import Data 경고 | UE 5.8용 Fab Plugin 설치. Runtime 기능 문제와 분리 |
 | MCP 연결만 실패 | 포트 8000 충돌 확인. 게임 기능 문제와 분리 |
 | Editor 배치·최근 Map·캐시만 다름 | `Saved`·`DerivedDataCache`는 PC별 로컬 상태이므로 정상 |

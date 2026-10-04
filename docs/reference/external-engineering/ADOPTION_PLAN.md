@@ -1,5 +1,7 @@
 # 외부 도구 도입 계획
 
+
+기존 Skills 설치 설명은 Metacon_41 사용자 PC(현재 C PC 아님) 기준이다. 감사 당시 C PC에는 해당 diagnosing-bugs/tdd 미설치로 확인됐다. AI-TOOL-REVIEW-01은 현재 WORKBOARD 카드 없음(09-15 스냅숏 기준), 복원·보류·폐기 여부 사용자 결정 대기. 현재 상태는 [STATUS](../../../STATUS.md)를 따른다.
 ## 현재 상태
 
 - Ponytail: 미설치

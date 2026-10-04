@@ -4,6 +4,8 @@
 
 이 문서는 팀원이 Unreal Editor에서 NPC 순찰·생활·엄폐·유인 기관총 지점을 안전하게 배치하고 동선을 조정하기 위한 작업 절차다. 코드 구조 전체는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](DRONE_SMART_OBJECT_NPC_GUIDE.md)를 참고하고, 실제 맵 배치는 이 문서를 먼저 따른다.
 
+10/04 C PC Claude 결과: NPCGreybox Validate의 구형 AnimBP 기대값 문제 해소·Validate 통과. 현재 역할별 메시/AnimBP와 TestMap 경로 사용, Create는 기존 맵이면 BP 수정 전 거부한다(지시서 근거).
+
 ## 1. 먼저 알아둘 현재 동선 규칙
 
 현재 Smart Object 동선은 **스플라인을 따라 순서대로 이동하는 경로가 아니다**.
@@ -156,13 +158,13 @@ StateTree 구조를 바꾸면 저장만 하지 말고 Compile 성공과 자동�
 Editor를 종료한 뒤 문서 저장소에서 실행한다.
 
 ```powershell
-cd D:\JGY\project\md
+cd <문서 저장소> # 실제 경로로 바꿀 것
 
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneSmartObjectSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneSmartObjectSetup.ps1 -Mode Validate -ProjectPath <Unreal 저장소>\Drone.uproject
 
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneNPCGreyboxSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneNPCGreyboxSetup.ps1 -Mode Validate -ProjectPath <Unreal 저장소>\Drone.uproject
 
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneHostilePerceptionStateTreeSetup.ps1 -Mode Validate -ProjectPath D:\JGY\project\drone\Drone.uproject
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File tools\unreal\Invoke-DroneHostilePerceptionStateTreeSetup.ps1 -Mode Validate -ProjectPath <Unreal 저장소>\Drone.uproject
 ```
 
 자동화의 핵심 회귀는 `Drone.AI.NPCPerceptionSearchPIE`다. 유인 MG 1개 점유, 다른 적의 Cover/제자리 사격 Fallback, 사수 사망 뒤 재점유, DroneLost/Search/Patrol 복귀를 확인한다.

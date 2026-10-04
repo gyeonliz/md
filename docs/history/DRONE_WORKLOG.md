@@ -1,6 +1,8 @@
 # Drone 개발 진행 기록
 
-기준일: 2026-10-01 (Asia/Seoul)
+기준일: 2026-10-04 (Asia/Seoul)
+
+기존 날짜별 기록의 배열은 보존하고 새 기록은 끝에 날짜순으로 추가한다. 현재 상태는 [STATUS](../../STATUS.md)를 따른다.
 
 ## 2026-10-01 후속 — C 드라이브 PC 현황 최신화와 다음 작업 정리
 
@@ -76,23 +78,9 @@ Drone 코드·자산·계획 작업을 진행할 때마다 작업 종료 전에 
 
 진행률은 근거 없는 전체 백분율로 표시하지 않는다. 대신 `현재 단계`, `통과한 게이트/전체 게이트`, `Doing`, `다음 활성 카드`로 기록한다. 자동화가 통과해도 필수 수동 확인이 남아 있으면 완료로 이동하지 않는다.
 
-## 현재 스냅샷
+## 현재 상태 참조
 
-2026-09-30 기준으로 9월 17일 이후 작업·현재 상태·Mission 전면 개편 전 다음 계획을 공유용 문서 [`DRONE_PROGRESS_REPORT_2026-09-17_TO_2026-09-30.md`](DRONE_PROGRESS_REPORT_2026-09-17_TO_2026-09-30.md)에 정리했다. 이 보고서는 교수님·팀원에게 설명하기 쉬운 기능 단위 요약이며, 세부 증거와 날짜별 변경은 이 Worklog를 계속 기준으로 삼는다.
-
-마지막 갱신: 2026-10-01 — 원격 기준선과 작업컴 인계 상태 최신화
-
-| 구분 | 현재 상태 |
-|---|---|
-| 전체 단계 | Tutorial 8개 공유 시험장, 독립 Racing 시험맵, Physics Sandbox, Story Mission별 격리 TestMap 4개. 새 Title·3탭 로비 Catalog 14개 |
-| Unreal 기준선 | Fetch 기준 `main=origin/main=3b77aef`; 이후 Title/Orbit/Racing 코드·자산은 로컬 미커밋 변경 |
-| 자동 검증 | 최신 접촉 카메라 교정: Physics 4/4·Prototype 8/8·Story 저장 계약 1/1, 총 13개 오류·경고 0. 관련 BP 6개 Compile 0/0, MSVC 14.51.36257 Editor Build 성공. 이전 Gate 8/8·Flow 5/5 결과 보존 |
-| 지금 작업 중 | 공급 GSU 통을 광섬유 Drone 하부에 적용했고 화면 위치·크기 확인 대기. 벽·그물 카메라 떨림 분리와 총알 피격 Shake 유지, Gate 최종 음원/자산, Physics/비행 체감 확인도 유지. 실제 Chaos 자산과 Best Lap 영구 저장은 미구현 |
-| 차단 조건 | 벽 연속 접촉 체감, 저속/고속 그물 접촉·포획/복구, 파괴 벽 파편, Story 목표/실패/귀환, Hover 표식 가독성의 화면 확인 필요 |
-| 다음 행동 | Tutorial/Story TestMap에서 광섬유 Drone의 GSU 통 크기·하부 위치·케이블 시작점 확인 → Physics Sandbox에서 벽/그물 접촉 카메라 안정성 확인 + NPC TestMap에서 총알 피격 Shake 유지 확인 → Gate BP 음원/최종 Mesh/세 상태 재질 지정·TestMap 수동 확인 → 실제 Chaos 자산 비교 → Best Lap SaveGame |
-| 다음 기능 | 단계별 클리어 UI·8개 진행/전체 완료 → Story Mission 1~4 목표·실패 규칙 고도화 |
-| 이후 | 실제 Dataflow/Chaos 부분 고정 그물과 Geometry Collection 벽을 현재 Runtime 기준과 비교, Story 환경·연출 이식 |
-| Git 처리 | Unreal `3b77aef`, 문서 `1ffe3b2`까지 원격 반영 완료. 새 Title/탭/Orbit/Racing 코드·자산·문서는 로컬 변경이며 Commit·Push하지 않음 |
+최신 상태는 [STATUS](../../STATUS.md), 순서는 [WORKBOARD](../../WORKBOARD.md)를 따른다. 기존 스냅샷은 [10월 아카이브](archive/STATUS_2026-10.md)에 원문 보존했다.
 
 ## 2026-10-01 — Title 이미지·3탭 로비·원형 비행 정정
 
@@ -2015,7 +2003,7 @@ HeadingValueText
 - 기준: C PC Unreal HEAD `ec2e88f` + 로컬 미커밋, 작업 도구 Claude·문서/Space 반영 Codex. 구현·검사 조건은 Claude 지시서 근거이며 Codex는 HEAD와 지정 전체 회귀 로그의 결과를 읽기 전용 대조했다. Build·Editor Python·PIE·맵 생성·수동 검증은 이번 문서 작업에서 실행하지 않았다.
 - `TUT-PROGRESS-01`: **구현됨·자동 검증됨·수동 확인 대기**. Mission DA `NextMissionId`로 호버→전진→회전→게이트→자폭(FPV)→드랍(Payload)→UGV NPC→포탑(끝)을 연결했다. Story는 Figma 번호 M1 골든타임→M2 인터셉트→M3 베일브레이커→M4 엔드게임(끝), 공용 Training·Racing은 연결 없음. Editor Python으로 DA 12/12 저장·재조회(exit 0), 맵 미수정(ClaudeTutProgress/py.log·py2.log). Story 연결은 순서만 정하며 M2→M3 결과 분기는 현재 미정이다.
 - `UDroneGameFlowSubsystem`이 성공 결과에서만 `RequestNextMission`으로 FrontEnd의 다음 수업 브리핑(MissionTrailer)을 열고 [출격]하면 해당 맵으로 이동한다. GetNextMissionId/GetMissionSequence(고리 방어)/GetMissionSequencePosition/IsMissionCompleted/GetMissionIdsInLobbyOrder, RequestReturnToLobbyFocusing·RequestReturnToTitle 연결. Snapshot `CompletedMissionIds`는 이번 실행 동안만 유지(영구 저장 현재 미정), `LastMissionElapsedSeconds`는 Director가 World 시간으로 계산한 출격~결과 시간(재출격 포함), 공개 GetMissionElapsedSeconds(). Widget이 시간을 재지 않는다.
-- 결과 `UDroneMissionResultWidget`이 S48/S49를 담당한다. 수업 완료는 “훈련 완료”·수업 이름·“시간 mm:ss.cc”·“수업 n/8 | 완료 c/8”, [다음](패드 첫 포커스)·[다시하기]·[작전 로비로 복귀](Figma에는 없지만 유지). 8개 모두 완료는 “훈련 완료”·“이제 운용 할 준비가 되었습니다.”·“수업 8/8 모두 완료”, [미션 진행](로비 미션 탭 M1)·[시작 메뉴](타이틀), [다시하기] 숨김. Story 등은 “미션 성공”·“클리어 시간”·“미션 n/4 | 완료”·[다음 미션: 이름], 실패는 “진행 시간”과 첫 포커스 [다시하기].
+- 결과 `UDroneMissionResultWidget`이 S48/S49를 담당한다. 수업 완료는 “훈련 완료”·수업 이름·“시간 mm:ss.cc”·“수업 n/8 | 완료 c/8”, [다음](패드 첫 포커스)·[다시하기]·[작전 로비로 복귀](Figma에는 없지만 유지). 8개 모두 완료는 “훈련 완료”·“이제 운용 할 준비가 되었습니다.”·“수업 8/8 모두 완료”, [미션 진행](로비 미션 탭 M1)·[시작 메뉴](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md), [다시하기] 숨김. Story 등은 “미션 성공”·“클리어 시간”·“미션 n/4 | 완료”·[다음 미션: 이름], 실패는 “진행 시간”과 첫 포커스 [다시하기].
 - 로비 튜토리얼은 수업 순서(호버 맨 위·공용 Training은 그 뒤), 미션은 M1→M4. 이번 실행 성공 미션 이름 뒤 “· 완료”, 설명에 “수업 n/8 (완료 c)”/“순서 n/4”. Tutorial Text 6개와 선택 WBP 이름은 튜토리얼 가이드 5절에 정리했다.
 - 자동 검증(Claude, C PC, RenderOffScreen 1920×1080, `C:\URproject\drone\Saved\Automation\ClaudeTutProgressFull\test2.log`): 신규 `Drone.Flow.TutorialProgression`·`TutorialNextLessonPIE`·`TutorialCompletePIE` **3건 Success**. 순서/위치/고리 방어·실패 시 다음 불가·8개 연속 다음·시간/완료 8/8·타이틀·로비 정렬·M1 포커스, 실제 호버 클리어→S48→전진 브리핑을 검증했다. 전체 완료 PIE는 나머지 7개를 테스트용 완료 처리한 뒤 호버 클리어→S49를 검사했으며 실제 8수업 수동 완주 근거는 아니다.
 - 최신 전체 `Drone.*` 렌더링 회귀: **87개 중 81 Success·6 Fail**(같은 로그). NPCPerceptionSearchPIE=기존 AI-PERCEPTION-TEST-01, TrainingAssets·TrainingPIESmoke=기존 팀원 Production 맵, ShotgunSystemsTestMapPIE=렌더링 실행에서만 실패/NullRHI 통과(`AI-SHOTGUN-RENDER-01`), LobbyLayoutStabilityPIE=실행마다 첫 프레임 높이·판정 변동(10/01부터 관찰, `UI-LAYOUT-DIAG-01`), TrainingRouteSelectionPIE=전체 렌더링 회귀에서만 숫자키 미반영(`TEST-ORDER-ROUTE-01`). Route는 최대 30프레임 대기에도 Route 1 유지, 단독·패드 테스트 뒤·Training Smoke 뒤 Success이며 원인 선행 테스트 미특정. 전체 Pass로 확대하지 않는다.
@@ -2025,3 +2013,755 @@ HeadingValueText
 - Drone Space(2026-10-02 새벽 후속): 기존 진행상황과 다음 작업 3개·테스트 맵과 확인 가이드 1개·Blueprint 조정과 팀원 가이드 2개 연산 저장(총 6개, 거부 없음). 세 페이지 저장 후 재조회에서 구현/Story 순서·87개 판정·수동 절차·NextMissionId/Tutorial Text 6개/선택 WBP 이름의 기대 본문 7개가 모두 일치했다. 이번 대상 미반영 없음. 새 Page·Commit/Push·Unreal 쓰기·Build/PIE/맵 생성·Trello/Figma 수정은 하지 않았다. GitHub 로컬 MD 본문은 사용자 Commit/Push 후 반영된다.
 
 - 문서 반영(Codex): STATUS 최신 절/10-01 밤 미구현 줄 후속 표시, WORKBOARD TUT-PROGRESS-01·문구/영구 저장·진단 3건 카드와 Next 순서, 튜토리얼 가이드 5절 S48/S49·설정·Figma 미기재 목록, Mission 프레임워크 NextMissionId·Story 순서 갱신. 기존 Codex/Claude 과거 이력은 보존하고 이 수행 이력을 끝에 추가했다. Figma 조사 근거는 2026-10-02 Codex research runs/20261002-003829-research-research-tutorial-controls/result.md이며 원본 수정·수치/기획 확정은 하지 않았다.
+
+## 2026-10-03 — 회의 후 UI/DA 점검과 문서 정합성 (Codex)
+
+C PC Unreal main5b03ad3/원격41444c2(2커밋 뒤)·md250e975, 시작 두 Clean. Library 체크리스트/ASR 대조회의록을 읽고 최신 역할(Codex BP/UI, Claude C++)을 적용. 레이싱 DA 설명의 Best Lap 미구현 문구 한 곳을 정정하고 12개 비UI 속성 동일·DA 유효성을 확인했다. 로컬14개 DA·8수업/Story4 순서/실패 실제값 확인, 기존 결과/브리핑/JSON저장 기반은 재구현하지 않음. UI 설명 독립 Editor 재로드 통과. Codex 직접 집중 회귀 FrontEndContract·TutorialProgression·BestLapPersistence 3/3 Success(기존 바이너리, NullRHI/NoSound, 종료0·오류0·Best Lap 손상/구버전 복구 경고2; focused_regression/index.json). 맵/C++/WBP/Production은 미수정; 실제5메뉴·패드 표시/장치/맵3 수동은 대기.
+
+5메뉴/C++ 인터페이스와 미정 결정표를 WORKBOARD에 남겼다. 메인컴 드론 Claude 세션 idle은 공식CLI로 확인했지만 CLI 미로그인으로 실제 전달/응답 없음. 비공개 세션 JSON 읽기는 자동 승인 검토가 민감한 세션 자료 노출 위험으로 거부했으며 실행/우회하지 않았다. 별도 인증·세션 재개/중복제출·Push/배포/Figma/Trello 수정 없음. Drone Space 진행/테스트/BP 3개 페이지는 미반영: 진행 페이지 쓰기를 자동 승인 검토가 외부 저장 대상/자료의 명시적 승인 부족으로 거부해 후속 쓰기를 중단했다. 기존 진행 본문 미변경을 읽기 재확인했으며 검토 가능한 초안은 작업폴더 drone_space_pending_patch.json에 보관. 이전 기록 보존, 백업·SHA/새 검증 로그는 작업폴더에 보관.
+
+## 2026-10-03 C PC 추가 UI 준비·진단 — 핵심 연결 대기
+
+전체 요청은 **부분 완료**다. 레이싱 DA의 Best Lap 설명과 문서 정합성 수정을 마쳤고, 아래 신규 UMG 두 개를 준비·저장했다. 기존 `WBP_DroneFrontEndRoot`/`WBP_DroneFlightHUD`, C++, 맵, 설정은 바꾸지 않았다. 신규 위젯은 아직 제품 호스트에 참조·연결되지 않았다.
+
+| 준비한 로컬 에셋 | 실제 내용 | 남은 연결 |
+|---|---|---|
+| `/Game/Drone/FrontEnd/UI/WBP_DroneFiveItemMenu` | 스토리/레이싱/튜토리얼/설정/종료 순서의 텍스트 버튼 5개, 상하 Explicit 포커스 이름 참조, 클릭 요청 Dispatcher 5개+Back, `FocusFirstItem`/`RequestBack` | C++의 현재 4버튼 호스트·카테고리 진입·뒤로가기와 연결 필요 |
+| `/Game/Drone/Prototype/UI/WBP_DroneControlInputDisplay` | 좌우 스틱 UI, `UpdateStickAxes(LeftX,LeftY,RightX,RightY)`의 [-1,1] 클램프/화면 Y 반전, `SetControlInputDisplayVisible(Show)` | Settings 상태·실제 입력 축·HUD 장착 필요. 고도계는 독립이며 전역 기본값/자동 전환 정책은 미정 |
+
+공개 Unreal `ToolsetRegistry`를 통해 실제 WBP Designer/그래프를 확인하고 편집했다. 기존 타이틀 WBP Designer는 0개 위젯이며 native fallback 4메뉴를 사용한다. 기존 비행 HUD Designer는 8개 위젯이고 입력 표시/토글 BP 변수는 없다. 이전 일반 Python API 실패를 BP 편집 도구 부재로 확대 해석하지 않는다. 신규 메뉴의 runtime-only 포커스 참조가 저장되지 않는 문제는 Designer `WidgetToFocus` 이름 참조로 교정했다.
+
+검증: UE 5.8 새 에디터 재로드·경고를 오류로 처리한 BP 컴파일, 정확한 5메뉴/버튼/포커스/클릭 실행 연결/Dispatcher/함수/고도계 독립/저장 SHA **19/19 Pass**. `WidgetLibrary.create`가 Python에 노출되지 않아 위젯 함수 실제 실행은 미실행. 화면 렌더·PIE·실제 패드/혼합 입력/분리·재연결·제품 맵3 완주/복귀는 미검증. 앞서 기존 바이너리 focused 회귀는 3/3 Success이며 신규 UI 제품 연결의 검증으로 간주하지 않는다.
+
+Claude 인계 진단: `C:\URproject\drone`의 idle Code 세션 `fd8b6237-e858-42e3-b584-d1ffaafa940f`(표시명 “대화 내용 수집”, PID33636)는 Claude Desktop PID8872가 관리하는 stream-json/stdio 자식이다. 별도 CLI `loggedIn=false`는 Desktop 로그아웃 증거가 아니다. 현재 Codex 실행 도구에는 기존 Claude UI 입력용 `node_repl/@oai/sky`나 세션 전송 connector가 없다. 공식 `agents --json`은 읽기 목록 경로이고 help에 기존 대화 메시지 전송 명령은 없다. **C++ 인계 미전달/미시작**. 사용자가 기존 Claude Desktop→Code의 위 드론 세션에 작업 폴더의 `claude_drone_cpp_handoff.txt`를 붙여넣으면 정상 기존 UI 경로로 전달할 수 있다. 토큰/키/사적 세션 원문은 읽거나 복사하지 않았고 resume/attach/중복 세션은 실행하지 않았다.
+
+원격 읽기 비교: drone 로컬 `5b03ad3` 대비 원격 main `41444c2`의 2커밋은 훈련맵/게이트4개/산악맵 6파일이며 DA·신규 UI·C++과 직접 경로 충돌 없음. MD 원격은 `250e9758`로 로컬과 같다. 6개 LFS 원격 본문 모두 로컬 캐시 없음, 게이트4개 로컬 파일 없음. 최신 원격 맵의 런타임 검증은 미실행이며 다운로드·pull·merge·checkout·reset은 하지 않았다.
+
+Space 동기화는 최신 요청에서 제외했다. 기존 Space 쓰기 자동 승인 거절 후 재시도/권한 우회하지 않았다. 로컬 신규 위젯은 `remove_drone_ui_components.ps1` 기본 Preview로 확인 후 필요할 때만 `-Apply`로 제거할 수 있으며 후속 수정 SHA가 다르면 중단한다. 원래 DA+MD8 복구는 `restore_drone_meeting_changes.ps1` 기본 Preview/선택적 `-Apply`; 최초 원본 백업을 유지한다.
+
+
+## 2026-10-03 밤 — 5메뉴·조종 입력 표시·레이싱 숫자키 연결 완료
+
+- 기준: Asia/Seoul 2026-10-03 밤, C PC Unreal HEAD `5b03ad3` + 로컬 미커밋. 원격 2커밋(Training.umap·MountainRange.umap·Gate 4개)은 LFS 대용량으로 미수신. C++·Build·자동화 테스트는 Claude, BP 연결 스크립트는 Codex(ui run `20261003-225410-ui-ui-menu5-inputdisplay`) 작성 후 Claude 실행·검증, 문서·Space는 Codex 담당이다. Codex는 HEAD·지정 회귀 로그를 읽기 전용 대조했으며 이번 문서 작업에서 Unreal 쓰기·Build·PIE·맵 생성·수동 검증을 실행하지 않았다.
+- **5메뉴 구현됨·자동 검증됨·수동 확인 대기**: 스토리·레이싱·튜토리얼·설정·종료 순서. `OpenLobbyForCategory`/`OpenStoryLobby`/`OpenRacingLobby`/`OpenTutorialLobby`가 진입 전 분류를 지정해 중간 시작 화면 없이 첫 목록·포커스를 만든다. `RequestExitGame`, 기존 `FinishOpeningTrailer`(스토리)·`OpenTrainingLobby`(튜토리얼)는 호환 유지. `TitleMenuClass`의 5버튼/요청 Dispatcher 계약 오류는 `[TITLE-MENU]` 경고와 기본 5버튼으로 대체. `GetTitleButton`·Title*Index는 0~4, 설정 복귀는 3, 로비 복귀는 진입 메뉴, 맵 이동 후 새 화면은 마지막 분류 메뉴. 상하 순환·B/Esc 반복 한 화면 Back. 로비 Tutorial/Racing 탭·LB/RB는 유지하며 최종 유지 여부는 현재 미정이다.
+- **조종 입력 표시 구현됨·자동 검증됨·기본값 미정**: 설정 “조종 > 조종 입력 표시”(`ControlInputDisplayCheck`), 적용/취소/기본값 복원 구조 유지. 기존 음량 SaveGame에 `bHasControlInputDisplayChoice`·`bControlInputDisplayEnabled` 저장, 사용자 선택 우선. `DefaultGame.ini`의 `[/Script/Drone.DroneAudioSettingsSubsystem] bControlInputDisplayEnabledByDefault=False`는 결정 전 임시 끔이다. 기본값 복원→적용은 선택을 지워 이후 기본값을 따른다. 자동화는 `DroneAudioSettings_Automation` 슬롯으로 실제 설정 보호.
+- `GetControlInputSnapshot()`(BlueprintPure)은 스틱 물리 위치 X 오른쪽+, Y 위+, [-1,1]. 쉬운/실제 조작형 왼쪽 이동·오른쪽 X 회전/Y 카메라·트리거 고도, Acro Mode 2 왼쪽 Yaw/스로틀·오른쪽 Roll/Pitch, Mode 1 왼쪽 Yaw/Pitch·오른쪽 Roll/스로틀, 지상 왼쪽 조향/전후. 키보드도 같은 액션 위치로 보인다. 장치 구분·자동 전환·혼합 입력·분리/재연결 정책은 현재 미정, 입력 바인딩/매핑 추가 없음. HUD는 아래 가운데 입력 위젯을 붙여 설정 ON·기체 존재 시만 Visibility/축 함수를 호출하고 고도계·다른 HUD는 독립 유지한다.
+- **BP 연결 저장·자동 검증됨**: `WBP_DroneFrontEndRoot.TitleMenuClass = WBP_DroneFiveItemMenu`, `WBP_DroneFlightHUD.ControlInputDisplayClass = WBP_DroneControlInputDisplay`. 두 자산만 BS_UP_TO_DATE 컴파일·저장(ClaudeMenu5/wire.log). BP 최초 로드 시 부모와 다른 값만 인스턴스로 복사하므로 테스트의 메모리 Class Defaults 덮어쓰기를 연결 증거로 삼지 않고 실제 저장된 연결을 검사했다. 이전 `C:\Users\jkw11\Documents\Codex\2026-10-03\task-2\claude_drone_cpp_handoff.txt`의 5메뉴·설정/축/HUD **남은 C++ 연결은 이번 결과로 닫음**. 원본 인계문은 과거 기록으로 보존, 맵3·실기 검증은 남는다.
+- **레이싱 숫자키 보호 구현됨·자동 검증됨**: 현재 제품 Racing `TestMap/Lvl_DroneRacingTest`에는 RouteSelector가 없어 숫자키 노출 없음. `bAllowPlayerRouteKeys=true`·`bBlockRouteKeysInRacingMissions=true` 보호로 로비 Racing 미션은 1~5 바인딩·안내 숨김. 시험맵 직접 실행·튜토리얼·훈련·스토리는 기존대로, 랜덤 포함 경로 전환 기능 보존. 원격 맵3 완주/복귀는 LFS 미수신으로 **미실행**.
+- **MCP C PC 설정 완료(Claude 지시서)**: 엔진 내장 ModelContextProtocol 플러그인은 켜져 있으나 서버 자동 시작 기본 꺼짐. Git 제외 `Saved/Config/WindowsEditor/EditorPerProjectUserSettings.ini`의 `[/Script/ModelContextProtocolEngine.ModelContextProtocolSettings] bAutoStartServer=True`로 다음 Editor 실행부터 `localhost:8000/mcp` 자동 시작, 현재 Editor는 `ModelContextProtocol.StartServer`. 엔진 HTTP 기본 바인드 localhost. 다른 PC 적용/실제 연결은 별도 확인 대기, 팀 공유 설정에 넣지 않는다.
+
+### 검증 출처 — Claude 실행, C PC
+
+| 검사 | 결과·조건 | 근거 |
+|---|---|---|
+| Build | Editor 종료 후 Succeeded(지시서 근거) | Claude 결과 지시서 |
+| Flow+UI+Prototype+Tutorial.TrainingRoute | RenderOffScreen 1920×1080, 실제 저장 BP 연결, **33/33 Success** | `C:\URproject\drone\Saved\Automation\ClaudeMenu5\test2.log` |
+| TitleFiveMenuPIE / TitleFiveMenuWidgetPIE | native 5문구·각 분류/첫 목록·메뉴 복귀 포커스·설정3·재입력 무시, 저장된 BP 버튼→Dispatcher로 같은 흐름 Success. 종료 Dispatcher 연결만 확인, 누르지 않음 | 같은 로그 |
+| GamepadNavigationPIE / GamepadMissionFlowPIE | 패드 키 주입·5메뉴 WBP, 위↑ 순환·Racing 직접 진입/복귀·Tutorial 호버 비행/결과/복귀 Success | 같은 로그 |
+| ControlInputDisplayPIE | Lvl_DronePrototype 패드 축 주입, ON 표시·왼쪽 위 -38px·해제 중심·오른쪽 X +38px·오른쪽 위+·Acro Mode 1/2·OFF 숨김/갱신 중지·비행 HUD 유지 Success | 같은 로그 |
+| SettingsContract / FrontEndContract / FrontEndPIE / FlightHUDTelemetryBinding / TrainingRouteKeyPolicy | Success | 같은 로그 |
+| 전체 Drone.* | RenderOffScreen **91개 중 86 Success·5 Fail**, 전체 Pass 아님 | `C:\URproject\drone\Saved\Automation\ClaudeMenu5Full\test.log` |
+
+- 기존 Fail 5개: NPCPerceptionSearchPIE(`AI-PERCEPTION-TEST-01`), ShotgunSystemsTestMapPIE(렌더링에서만), LobbyLayoutStabilityPIE(진단·변동), TrainingAssets·TrainingPIESmoke(팀원 Production 맵). `TEST-ORDER-ROUTE-01`의 TrainingRouteSelectionPIE는 이번 전체 회귀 Success이나 순서 의존 원인 미특정·해결 확정 아님.
+- **수동 확인 대기**: 실제 패드 5메뉴/입력 표시 체감, 1280/1920 메뉴 크기·입력 표시 위치, Bluetooth 분리/재연결·혼합 입력, 제품 맵3 완주/복귀. **현재 미정**: 입력 표시 기본값·장치 자동 전환·혼합/재연결 정책, 로비 탭/LB·RB 유지, M2 결말, M3·4 수량/규칙, 캐릭터 메시, 고도계 토글(확정 요구 아님), 회의4개 vs 문서8수업. 기존 사람 기획/디자인·날짜별 기록·Production 맵 보존.
+
+## 2026-10-03 밤 후속 — 5메뉴·조종 입력 표시 Space 반영 마무리 (Codex)
+
+- run `20261003-231705-docs-docs-menu5-space` 지시서와 직전 `briefs/20261003-docs-menu5-inputdisplay.md`를 UTF-8로 읽고 로컬 미커밋 MD 10개 diff를 대조했다. STATUS·WORKBOARD·타이틀/Blueprint 가이드·SETUP·WORKLOG에 5메뉴/설정·축/HUD 연결, 레이싱 키 보호, 33/33·전체91개 중86 Success/기존5 Fail, 기본값/정책 미정·수동 대기가 반영돼 있었다. 흐름 계획의 현재 절에 남은 “연결 구현 대기” 한 문장만 구현됨·자동 검증됨·수동 대기로 보완했다. 과거 Codex/Claude 이력은 보존했다.
+- 추가 사실(Claude 실행·지시서 근거, 2026-10-03 밤 C PC): 사용자 Editor `Lvl_DroneFrontEnd` MCP 서버 응답·Claude `unreal-mcp` 연결 완료. Claude가 MCP PIE로 캡처한 타이틀에서 저장된 `WBP_DroneFiveItemMenu`(스토리·레이싱·튜토리얼·설정·종료)가 로고 아래 왼쪽에 표시되고 첫 [스토리]에 패드 포커스 강조, Editor 로그 `[TITLE-MENU]`·`[INPUT-DISPLAY]` 경고·오류 없음. 약560px 폭 Editor 뷰포트 캡처여서 실제1280/1920 배치·실제 패드 체감은 수동 대기. 입력 표시는 임시 기본 꺼짐(최종 기본값 현재 미정)이므로 사용자가 설정 ON→적용 후 비행에서 확인할 항목이다. STATUS에 짧게 추가하고 WORKBOARD MCP-LOCAL-01의 현재 연결 상태를 갱신했다. Codex가 Build/PIE/수동 검증을 실행한 것이 아니다.
+- Drone Space: 진행상황과 다음 작업·테스트 맵과 확인 가이드·Blueprint 조정과 팀원 가이드 모두 직전 내용이 이미 저장된 것을 현재 본문으로 확인했다. 중복 추가 없이 기존 관련 블록 1개씩 추가 사실을 보완(총3개 연산, 모두 적용·거부 없음). 저장 후 content 스트림 전체 재조회로 기대 본문 정확 일치와 나머지 기존 블록 원문 보존을 3/3 확인했다(진행 sequence15, 테스트9, BP9). 이번 대상 미반영 없음. 입력 표시·실제 해상도 수동 Pass로 확대하지 않았다.
+- 새 파일/Page·Commit/Push·Unreal 저장소 쓰기·Build/PIE/맵 생성·Trello/Figma 수정·공유 권한/예약 자동화 변경 없음. 로컬 미커밋 MD의 GitHub 반영은 사용자 Commit/Push 후이며 기존 수동 대기·미정·전체 회귀5 Fail은 유지한다.
+
+## 2026-10-04 STATUS 정리 — 10월 세션·기존 요약 원문 보존 (Codex)
+
+아래는 정리 전 STATUS의 10/01 이후 세션과 기존 한눈에 보기·Git 요약 원문이다. 당시 미수신·연결 대기는 당시 상태이며 최신 10/04 판정은 다음 세션 기록과 STATUS를 따른다. 기존 Codex/Claude 표기를 보존했다. 9월 집계 네 절은 [원문 아카이브](archive/STATUS_2026-09.md)에 이동했다.
+
+STATUS 원문과 중복 세션은 [10월 STATUS 아카이브](archive/STATUS_2026-10.md)에 그대로 보존했다.
+
+## 2026-10-04 새벽 — Acro 회의 조사·입력/자세 수정·포커스 관찰 반영
+
+- 지시서: `C:\URproject\drone\.claude\codex-bridge\runs\20261004-010254-docs-docs-acro-meeting-fix\prompt.md`를 UTF-8로 읽었다. 작업 도구: 조사·C++·Build·테스트·IMC headless 패치 Claude, Scout/Drop 입력6개 연결·BP 컴파일/저장 Codex(ui run 20261004-001325-ui-ui-acro-input-assets, Editor MCP)→Claude 확인, 이번 문서/Space Codex. C PC Unreal HEAD=추적 origin/main41444c2+로컬 미커밋을 Codex 읽기 Git 확인. 원격 pull·LFS 실제 파일 확인은 Claude 지시서 근거. 문서 HEAD250e975, 기존 미커밋10개 보존.
+- 회의 조사 결론: Space 단독 자세 변화 경로 없음(Mode1/2×스로틀+1/0/-1·프레임 끊김 자동 확인). 키보드0.1초 탭=FPV 최대650°/s×시간 약65°·무수평복귀, W+Space 습관은 체감 원인 후보이며 수동 대기. 키보드 Mode1/2 동일, 패드세로축만 RC 표준 배치(Mode2 왼쪽스로틀/오른쪽피치·Mode1 반대). 회의 “좌우 스틱 반전” 뜻은 미정.
+- 결함2건: Enhanced Input은 DefaultInput.ini 데드존을 쓰지 않으며 IMC Acro4축에 데드존 없어0.05쏠림이 키보드스로틀을 덮고 회전이 누적됨→동일 IMC 쉬운 조작값 Lower0.2/Upper1.0/Radial을 맨 앞 복사,33매핑/키/Action/순서 보존. Codex MCP Instanced Modifier 생성(None) 실패 후 저장 없이 복구→Claude Editor종료/headless Python IMC만 저장·재조회(patch_dz.log). Scout/Drop은6개 AcroAction None→Codex MCP로 FPV와 동일 연결·컴파일·저장. 최종 result.md는 모델 용량 오류로 없지만 Claude Python 재조회(assign_bp.log)·자동화로 확인. FPV/FiberOptic 기존 연결·UGV 제외.
+- 정확도(C++): ADronePrototypePawn::UpdateControlAttitude 1차 응답 정확 적분 `Target·dt+(Start−Target)·τ·(1−e^(−dt/τ))`, 피치/요/롤 단일 축-각 합성으로30/60/240fps 자세 일치. 기존 FlightProfile.AcroRateSettings 응답시간/최대각속도 유지. BuildDroneAcroInput.py는4축 데드존 복사·FPV/Scout/Drop/FiberOptic6개 입력 연결을 생성하도록 Claude 변경, 이번 도구 미실행.
+- 새 자동화3개: AcroAttitude(Space 불변·0.1초 탭·FPS/Mode 동일), AcroInputBehaviorPIE(실제 키/축 주입·Mode배치·쏠림 보호), AcroInputAssetContract(비행BP4종/DeadZone4개). Build Succeeded는 Claude 지시서(별도 Build 경로 미제공). Codex가 읽은 로그: Saved/Automation/ClaudeAcro/test_after_dz.log 집중12/12 Success, ClaudeAcroFull/test3.log 화면 그려진 전체94개 중90 Success·Fail4(NPCPerceptionSearchPIE·렌더전용 ShotgunSystemsTestMapPIE·Production TrainingAssets/TrainingPIESmoke). 전체 Pass/수동 Pass 아님.
+- UI-FOCUS-RACE-01: UIOnly WidgetToFocus 루트의 엔진지연 처리가 버튼포커스를 가져가는 경쟁. FDroneGamepadFocus 5프레임 감시/루트·없음 이탈 복원, 다른 강조버튼 이동 보존. 화면 그려진 수정 전 final.log Fail·후 test3.log Success 각1회뿐이므로 수정 후 확인 중. 단독 혼재·실제 결과/타이틀 첫강조 수동대기. NextLessonPIE 실패에 강조/Slate위젯 이름 진단 추가.
+- TEST-RENDER-UNPAINTED-01: 전체5회 중3회(test.log/test2.log/final2.log) samples=0·Shotgun렌더실패가Success·패드포커스6개 동반Fail, 판정 제외. -stdout/MCP포트와 무관·원인 미특정, Claude known-test-failures.md에 판정전 화면확인 기록. 같은증상 수정→검증2회 후 중단 유지, 사람/추가관찰 필요. TEST-ORDER-ROUTE-01은5회 모두 TrainingRouteSelectionPIE Success를 Codex 로그대조, 원인 미특정·해결확정 아님·3회 미렌더와 구분.
+- 레이싱 pull뒤 조사(Claude): MWLandscapeAutoMaterial Island/MountainRange 계열 코스1개·PlayerStart없음. 아이템/Gate 자산 맵·DA 참조없음. 제품DA는 TestMap/Lvl_DroneRacingTest 유지, 연결지형·PlayerStart·완주/복귀는 사용자/팀원 결정필요, 맵미수정. RACING-TERRAIN-LINK-01 카드 추가·기존 RACING-MEETING-01 최신화.
+- 수동대기: 실제 패드/키보드 Mode1/2 전환→Space단독→패드놓고Space→키보드0.1초탭/약65° 후 유지, Scout/Drop Acro비행, 결과/타이틀 첫강조. 현재미정: 키보드배율/Angle모드/마우스Yaw·회의반전뜻·입력표시기본값·로비탭·레이싱연결·Production Training2건. 기획/사람디자인·날짜별기록·팀원맵 보존.
+- 로컬 문서: STATUS 최신요약/Git/검증·수동경계, WORKBOARD 관련카드/Next, Blueprint 조정 가이드6개입력/4축데드존/AcroRateSettings/재생성경계, 테스트가이드 수동순서/미렌더 판정 추가. 이번docs는 Unreal쓰기·Build/PIE/맵재생성·Commit/Push·Trello/Figma·권한/예약 변경 없음.
+- STATUS 다이어트: 정리 전100,283바이트·386줄(LF분할, 마지막빈줄 포함)→정리 후12,653바이트·71줄(같은 기준). 2026-10-01이전 9월 집계 원문을 docs/history/archive/STATUS_2026-09.md로 이동한 절: 「최신 완료 항목」「검증된 근거」「아직 확인하지 않은 항목」「알려진 실패와 경계」. 기준일 이전 날짜가 본문에 있는 집계절이며 날짜제목절은 없었다. 10/01~10/03 세션/한눈/Git원문은 위 WORKLOG 정리절에 그대로 추가 보존하여 STATUS는현재요약만 유지. 네절원문 archive포함·나머지 STATUS원문 WORKLOG포함을 쓰기후검사했다. WORKBOARD 다이어트는 하지 않았다.
+
+- Space 저장/재조회 완료: 기존 진행상황과 다음 작업 4개 연산(sequence16), 테스트 맵과 확인 가이드2개(sequence10), Blueprint 조정과 팀원 가이드2개(sequence10), 총8개 적용·거부없음. 진행/BP 기대 본문 정확일치, 테스트는 목록 블록 분할을 제외한 모든 원문줄/공백정규화 일치 확인. 비대상 기존 블록44/32/47개 각각 원문보존 확인. 새Page/권한/자동화 변경없음. 이번대상 미반영없음.
+- 최종 git status --short 대조: 이번 작업6파일(STATUS·WORKBOARD·WORKLOG·DRONE_CODE_STRUCTURE_AND_USER_TASKS·DRONE_TEST_MAP_GUIDE·archive/STATUS_2026-09), 나머지 기존미커밋6개(타이틀가이드·SETUP·기획4개)는 이번에수정하지않음. git diff --check 통과(줄끝 자동변환 안내만 있음), 엔진검사 재실행없음. Claude후속은포커스/미렌더 관찰과사용자결정후레이싱연결이며 새코드수정미실행.
+
+## 2026-10-04 후속 — Production Course 표시선 상한 읽기 조사
+
+- 사용자 요청: BP_DroneTrainingCourse 92개 CurveAuto·약19.2km·256개 표시선 각짐을 UI보다 먼저 확인하고 기존 변경을 보존하며 최소 수정/실제 화면 검증. 실행 역할은 Claude, 이번 읽기 조사·문서/Space 담당은 Codex다. C PC Unreal HEAD41444c2 + 기존 미커밋/미추적을 확인했고 변경하지 않았다.
+- 직접 확인: Course.cpp 고정 MaximumGeneratedSegmentCount=256, GetExpectedCourseLineSegmentCount의 min(ceil(length/target),256), Rebuild의 length/count 재분배. C++ 목표 기본200cm·기본 Engine Cube, 이전 TestMap 생성 스크립트100cm. 제보 길이가 계산 SplineLength와 같다면 조각약75m이며 목표100cm만 바꿔도 상한은 동일하다. 최종 각짐 원인은 실제 BP CDO/인스턴스·메시/스케일·화면 비교 전이라 유력으로 구분한다.
+- Editor PID44680·127.0.0.1:8000 Listen 확인, 프로젝트 설정은 unreal-mcp HTTP 주소를 사용한다. 현재 Codex 노출 도구에는 Unreal MCP가 없고 플러그인 검색에서도 관련 연결을 찾지 못했다. 서버 Listen을 MCP 도구 연결·현재 인스턴스 조회·화면 Pass로 표시하지 않는다. 서버 호출/설정 변경·Unreal Python·Editor 종료/Build/PIE·Production 저장/재생성은 실행하지 않았다.
+- TUT-COURSE-SMOOTH-01 카드와 Course 가이드에 Claude 인계를 작성했다. 실제 기본값/인스턴스/생성수 확인→별도 동일 경로 비교→상한 정책 최소 수정→긴 경로/비간섭/Gate 자동 회귀→동일 카메라 실제 렌더·비용 확인 순서다. 코드 최소 수정·새 자동화·수동 화면 검증은 모두 대기이며 Commit/Push·Trello/Figma·권한/예약 변경 없음. Space 반영 결과는 아래에 추가한다.
+- Space 진행 Page의 코스 행/최우선 작업2건·BP 가이드 코스 설명1건 저장 후 재조회 정확 일치를 확인했다(sequence17/11). BP 문단 추가 patch는 topology_change로 미반영되어 재조회 후 한 문단 전체 교체로 수정했고 비대상 본문/링크는 보존했다. 새 Page·권한 변경 없음. 이번 반영 대상은 미반영 없음이며 실제 Unreal 인스턴스/수정/화면 검증은 여전히 대기다.
+
+
+## 2026-10-03 UI 준비·진단 원문 보존 — 10/04 이관
+
+10/03 당시 기록이며 같은 날 밤 제품 연결 완료로 대체됐다. **10/03 밤 제품 연결 이후 remove_drone_ui_components.ps1 사용 금지(실행 시 5메뉴·입력 표시 위젯 삭제, Git 미추적이라 복구 불가).** 아래 제거 안내는 역사 기록으로만 보존한다.
+
+### WORKBOARD에서 이동한 원문
+
+## 2026-10-03 C PC 추가 UI 준비·진단 — 핵심 연결 대기
+
+전체 요청은 **부분 완료**다. 레이싱 DA의 Best Lap 설명과 문서 정합성 수정을 마쳤고, 아래 신규 UMG 두 개를 준비·저장했다. 기존 `WBP_DroneFrontEndRoot`/`WBP_DroneFlightHUD`, C++, 맵, 설정은 바꾸지 않았다. 신규 위젯은 아직 제품 호스트에 참조·연결되지 않았다.
+
+| 준비한 로컬 에셋 | 실제 내용 | 남은 연결 |
+|---|---|---|
+| `/Game/Drone/FrontEnd/UI/WBP_DroneFiveItemMenu` | 스토리/레이싱/튜토리얼/설정/종료 순서의 텍스트 버튼 5개, 상하 Explicit 포커스 이름 참조, 클릭 요청 Dispatcher 5개+Back, `FocusFirstItem`/`RequestBack` | C++의 현재 4버튼 호스트·카테고리 진입·뒤로가기와 연결 필요 |
+| `/Game/Drone/Prototype/UI/WBP_DroneControlInputDisplay` | 좌우 스틱 UI, `UpdateStickAxes(LeftX,LeftY,RightX,RightY)`의 [-1,1] 클램프/화면 Y 반전, `SetControlInputDisplayVisible(Show)` | Settings 상태·실제 입력 축·HUD 장착 필요. 고도계는 독립이며 전역 기본값/자동 전환 정책은 미정 |
+
+공개 Unreal `ToolsetRegistry`를 통해 실제 WBP Designer/그래프를 확인하고 편집했다. 기존 타이틀 WBP Designer는 0개 위젯이며 native fallback 4메뉴를 사용한다. 기존 비행 HUD Designer는 8개 위젯이고 입력 표시/토글 BP 변수는 없다. 이전 일반 Python API 실패를 BP 편집 도구 부재로 확대 해석하지 않는다. 신규 메뉴의 runtime-only 포커스 참조가 저장되지 않는 문제는 Designer `WidgetToFocus` 이름 참조로 교정했다.
+
+검증: UE 5.8 새 에디터 재로드·경고를 오류로 처리한 BP 컴파일, 정확한 5메뉴/버튼/포커스/클릭 실행 연결/Dispatcher/함수/고도계 독립/저장 SHA **19/19 Pass**. `WidgetLibrary.create`가 Python에 노출되지 않아 위젯 함수 실제 실행은 미실행. 화면 렌더·PIE·실제 패드/혼합 입력/분리·재연결·제품 맵3 완주/복귀는 미검증. 앞서 기존 바이너리 focused 회귀는 3/3 Success이며 신규 UI 제품 연결의 검증으로 간주하지 않는다.
+
+Claude 인계 진단: `C:\URproject\drone`의 idle Code 세션 `fd8b6237-e858-42e3-b584-d1ffaafa940f`(표시명 “대화 내용 수집”, PID33636)는 Claude Desktop PID8872가 관리하는 stream-json/stdio 자식이다. 별도 CLI `loggedIn=false`는 Desktop 로그아웃 증거가 아니다. 현재 Codex 실행 도구에는 기존 Claude UI 입력용 `node_repl/@oai/sky`나 세션 전송 connector가 없다. 공식 `agents --json`은 읽기 목록 경로이고 help에 기존 대화 메시지 전송 명령은 없다. **C++ 인계 미전달/미시작**. 사용자가 기존 Claude Desktop→Code의 위 드론 세션에 작업 폴더의 `claude_drone_cpp_handoff.txt`를 붙여넣으면 정상 기존 UI 경로로 전달할 수 있다. 토큰/키/사적 세션 원문은 읽거나 복사하지 않았고 resume/attach/중복 세션은 실행하지 않았다.
+
+원격 읽기 비교: drone 로컬 `5b03ad3` 대비 원격 main `41444c2`의 2커밋은 훈련맵/게이트4개/산악맵 6파일이며 DA·신규 UI·C++과 직접 경로 충돌 없음. MD 원격은 `250e9758`로 로컬과 같다. 6개 LFS 원격 본문 모두 로컬 캐시 없음, 게이트4개 로컬 파일 없음. 최신 원격 맵의 런타임 검증은 미실행이며 다운로드·pull·merge·checkout·reset은 하지 않았다.
+
+Space 동기화는 최신 요청에서 제외했다. 기존 Space 쓰기 자동 승인 거절 후 재시도/권한 우회하지 않았다. 로컬 신규 위젯은 `remove_drone_ui_components.ps1` 기본 Preview로 확인 후 필요할 때만 `-Apply`로 제거할 수 있으며 후속 수정 SHA가 다르면 중단한다. 원래 DA+MD8 복구는 `restore_drone_meeting_changes.ps1` 기본 Preview/선택적 `-Apply`; 최초 원본 백업을 유지한다.
+
+
+### 타이틀 가이드에서 이동한 원문
+
+## 2026-10-03 C PC 추가 UI 준비·진단 — 핵심 연결 대기
+
+전체 요청은 **부분 완료**다. 레이싱 DA의 Best Lap 설명과 문서 정합성 수정을 마쳤고, 아래 신규 UMG 두 개를 준비·저장했다. 기존 `WBP_DroneFrontEndRoot`/`WBP_DroneFlightHUD`, C++, 맵, 설정은 바꾸지 않았다. 신규 위젯은 아직 제품 호스트에 참조·연결되지 않았다.
+
+| 준비한 로컬 에셋 | 실제 내용 | 남은 연결 |
+|---|---|---|
+| `/Game/Drone/FrontEnd/UI/WBP_DroneFiveItemMenu` | 스토리/레이싱/튜토리얼/설정/종료 순서의 텍스트 버튼 5개, 상하 Explicit 포커스 이름 참조, 클릭 요청 Dispatcher 5개+Back, `FocusFirstItem`/`RequestBack` | C++의 현재 4버튼 호스트·카테고리 진입·뒤로가기와 연결 필요 |
+| `/Game/Drone/Prototype/UI/WBP_DroneControlInputDisplay` | 좌우 스틱 UI, `UpdateStickAxes(LeftX,LeftY,RightX,RightY)`의 [-1,1] 클램프/화면 Y 반전, `SetControlInputDisplayVisible(Show)` | Settings 상태·실제 입력 축·HUD 장착 필요. 고도계는 독립이며 전역 기본값/자동 전환 정책은 미정 |
+
+공개 Unreal `ToolsetRegistry`를 통해 실제 WBP Designer/그래프를 확인하고 편집했다. 기존 타이틀 WBP Designer는 0개 위젯이며 native fallback 4메뉴를 사용한다. 기존 비행 HUD Designer는 8개 위젯이고 입력 표시/토글 BP 변수는 없다. 이전 일반 Python API 실패를 BP 편집 도구 부재로 확대 해석하지 않는다. 신규 메뉴의 runtime-only 포커스 참조가 저장되지 않는 문제는 Designer `WidgetToFocus` 이름 참조로 교정했다.
+
+검증: UE 5.8 새 에디터 재로드·경고를 오류로 처리한 BP 컴파일, 정확한 5메뉴/버튼/포커스/클릭 실행 연결/Dispatcher/함수/고도계 독립/저장 SHA **19/19 Pass**. `WidgetLibrary.create`가 Python에 노출되지 않아 위젯 함수 실제 실행은 미실행. 화면 렌더·PIE·실제 패드/혼합 입력/분리·재연결·제품 맵3 완주/복귀는 미검증. 앞서 기존 바이너리 focused 회귀는 3/3 Success이며 신규 UI 제품 연결의 검증으로 간주하지 않는다.
+
+Claude 인계 진단: `C:\URproject\drone`의 idle Code 세션 `fd8b6237-e858-42e3-b584-d1ffaafa940f`(표시명 “대화 내용 수집”, PID33636)는 Claude Desktop PID8872가 관리하는 stream-json/stdio 자식이다. 별도 CLI `loggedIn=false`는 Desktop 로그아웃 증거가 아니다. 현재 Codex 실행 도구에는 기존 Claude UI 입력용 `node_repl/@oai/sky`나 세션 전송 connector가 없다. 공식 `agents --json`은 읽기 목록 경로이고 help에 기존 대화 메시지 전송 명령은 없다. **C++ 인계 미전달/미시작**. 사용자가 기존 Claude Desktop→Code의 위 드론 세션에 작업 폴더의 `claude_drone_cpp_handoff.txt`를 붙여넣으면 정상 기존 UI 경로로 전달할 수 있다. 토큰/키/사적 세션 원문은 읽거나 복사하지 않았고 resume/attach/중복 세션은 실행하지 않았다.
+
+원격 읽기 비교: drone 로컬 `5b03ad3` 대비 원격 main `41444c2`의 2커밋은 훈련맵/게이트4개/산악맵 6파일이며 DA·신규 UI·C++과 직접 경로 충돌 없음. MD 원격은 `250e9758`로 로컬과 같다. 6개 LFS 원격 본문 모두 로컬 캐시 없음, 게이트4개 로컬 파일 없음. 최신 원격 맵의 런타임 검증은 미실행이며 다운로드·pull·merge·checkout·reset은 하지 않았다.
+
+Space 동기화는 최신 요청에서 제외했다. 기존 Space 쓰기 자동 승인 거절 후 재시도/권한 우회하지 않았다. 로컬 신규 위젯은 `remove_drone_ui_components.ps1` 기본 Preview로 확인 후 필요할 때만 `-Apply`로 제거할 수 있으며 후속 수정 SHA가 다르면 중단한다. 원래 DA+MD8 복구는 `restore_drone_meeting_changes.ps1` 기본 Preview/선택적 `-Apply`; 최초 원본 백업을 유지한다.
+
+
+## 2026-10-04 감사1차 수정·코스/Acro 후속 반영 — C PC
+
+작업 지시: Claude bridge run20261004-063805-docs-docs-audit-fix-batch1/prompt.md(UTF-8). 코드/도구/자동화·리뷰 Claude, 로컬MD·DroneSpace Codex. Unreal HEAD=추적origin/main41444c2·0/0는 읽기전용Git조회, 미커밋/미추적 유지. Build/PIE/패키징/쿠킹/맵생성·Unreal셸쓰기·Commit/Push·Trello/Figma수정·키읽기 미실행. md tools2개는 작업 시작 전 Claude 변경이며 Codex는 수정하지 않았다.
+
+### 후속 결과와 검증 출처
+
+- ACRO-MEETING-01: Mode1 Space 하강/반전은 키보드Action·패드세로축Action이 한 변수를 나중 값으로 덮는 문제. Space+오른쪽-0.5→스로틀-0.38, W+왼쪽-0.5→피치-0.38, Mode2도동일. 입력원분리·절댓값큰쪽사용, 키보드해제시패드인계·모두해제0. AcroInputBehaviorPIE D구역8시나리오 자동검증. overlap_before.log의실패4항목(테스트1개Fail)→overlap_after.log17Success/0Fail·review_fix_test.log집중30Success/2Fail를Codex조회. 실제패드체감수동대기.
+- TUT-COURSE-SMOOTH-01: Production읽기전용측정 Scale2·로컬9.6km/월드19.2km·92CurveAuto, 기존256균일조각약75m·표시선오차최대7.9m/95%2.3m. MountainRange33.8km·Island10.6km도같은원인. 짧은TestMap68/113조각불변, 긴코스만sqrt(곡률)밀도+15%균일몫. MaximumCourseLineSegments 기본1024(16~4096·Tutorial|Course|Visual)는최대약50cm/95%7cm로선택한시작값·확정값아님,2048측정최대20cm. 재생성25646ms·1024258ms(로드/BeginPlay1회). BP Run Construction Script on Drag Off·놓을때1회·BP만저장, Production미저장·MCP급커브캡처확인. CourseLineAdaptiveSegments15.2km 최대오차균일256244cm→곡률25640cm→곡률10243cm·상한증감·BP설정자동검증. 근거ClaudeCourse/inspect.log·deviation.log·bp_drag.log·review_fix_test.log(측정/캡처는Claude지시서근거). 팀원코스외형·Editor편집체감수동대기.
+- 도구재실행안전(Claude수정): ConfigureDroneTitleLobby.py 현재레이싱DA문구유지·Heading/GateFlight일치(lobby_cmp.log). md NPCGreybox TestMap·적InsurgentPreset1/2/ABP_NPC_Rifle_Greybox·아군QuantumCharacter/ABP_NPC_Unarmed_Greybox·기존맵Create거부(BP수정전)·Validate통과(지시서). HostileCoverResponse TestMap. Codex도구미수정·미실행.
+- 회귀: Drone.Prototype+Drone.Tutorial+ControlInputDisplayPIE32개중30Success·2Fail은팀원Production맵의존(변경전메시지동일). 전체Drone.*95개2회각85Success·10Fail(test.log/test2.log)이며둘다PIE미렌더(samples=0); 포커스6개판정제외·나머지알려진4개NPCPerceptionSearchPIE/LobbyLayoutStabilityPIE진단/TrainingAssets/TrainingPIESmoke. 오늘9회중7회미렌더는Claude지시서, 화면그려진포커스확인대기. known-test-failures갱신. 새벽12/12·90/94는별도 실행으로보존하고합산하지않음.
+- Claude반박검증리뷰: 낮음4건(테스트초기화누수·입력해제검사누락·코스드래그비용·엄폐맵경로)모두수정, 제품동작버그없음판정. Codex가새Build나테스트를실행한결과가아님.
+- Bangkok: ec2e88f(10/01)맵삭제·10/04사용자의도된삭제확인, ASSET-BANGKOK-01종료. 의존987개·LFS약11.46GiB정리사용자결정. md공개범위/제출가이드개인정보처리·9/17OpenRouter키폐기확인도현재미정·키값미열람.
+
+### 감사 처리목록 — 원본 감사파일의 파일:줄
+
+99건중41건처리·58건이번미처리(2차대상; 고의로범위확장안함). 별도상대링크11건은99건에포함하지않는다.
+
+| 파일 | 감사 원본 줄 |
+|---|---|
+| WORKBOARD.md | 76·243·35·80·109·226 |
+| docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md | 30 |
+| CONTEXT.md | 23·15 |
+| WORK_PC_START_HERE.md | 126·94·150 |
+| docs/ai/DRONE_SMART_OBJECT_NPC_GUIDE.md | 199·202·471·487·632·248 |
+| docs/assets/DRONE_BANGKOK_OILRIG_MIGRATION_2026-09-30.md | 8 |
+| docs/assets/DRONE_CONTENT_FOLDER_GUIDE.md | 119 |
+| docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md | 267 |
+| docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md | 88·156 |
+| docs/git/CLAUDE_CODEX_COLLABORATION.md | 10·99 |
+| docs/git/CLAUDE_CODEX_SETUP.md | 59 |
+| docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md | 432·619 |
+| docs/tutorial/DRONE_PROTOTYPE_IMPLEMENTATION.md | 202 |
+| docs/tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md | 20 |
+| docs/tutorial/DRONE_TRAINING_COURSE_IMPLEMENTATION.md | 212·145 |
+| CLAUDE.md | 19 |
+| README.md | 20 |
+| docs/README.md | 94 |
+| docs/ai/DRONE_MG_TURRET_3PART_GUIDE.md | 23 |
+| docs/gameplay/DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md | 131 |
+| docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md | 62 |
+| docs/gameplay/DRONE_TEST_MAP_GUIDE.md | 134 |
+| docs/gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md | 44 |
+| docs/planning/WORK_MANAGEMENT.md | 107 |
+
+### WORKBOARD 다이어트
+
+전58,728바이트·244줄 → 후39005바이트·142줄(UTF-8·LF개수+1). 옮긴절: 10/04새벽최신기준, 10/02새벽후속/새벽,10/01밤후속/밤/저녁최신기준과앞선점검, 이동후보맵, 병행수동회귀, 최근완료, 종료된요청범위. 원문은archive/WORKBOARD_2026-10.md, 완료·대체카드ASSET-BANGKOK-01/UI-TITLE-LOBBY-02/UI-DATA-COPY-01은현재상태1줄정정후이동. 10/03UI준비·진단은위WORKLOG절에원문보존, 연결후위젯삭제사용금지명시. 이관본문은링크기준경로만정정. 현재카드·결정필요·사용자맵확인·Next보존.
+
+### 상대링크·Space 확인
+
+상대링크11개수정: STATUS_2026-09.md3개·WORKLOG7개·TUTORIAL_IMPLEMENTATION_TEST_GUIDE1개(버튼타이틀대상은실제타이틀가이드로경로정정). 지정3문서및이번변경32문서파일대상상대링크재점검0개. 기존이력본문은링크경로만수정, 기존기획/날짜/작업도구표기보존.
+
+DroneSpace 기존진행상황과다음작업·테스트맵과확인가이드·Blueprint조정과팀원가이드3페이지의총13개연산저장, 13개모두재조회본문일치. 기존기획·날짜별기록·Trello링크보존, 새페이지·공유권한변경·예약자동화없음. GitHub본문은로컬미커밋상태로아직미반영.
+
+### 최종 문서 확인·Git 상태
+
+32개 변경 문서의 상대파일링크0개·코드펜스불균형0개·주요계약검사누락0개. git diff --check 통과. 아래 status는 전체작업트리이며 기존변경(planning4개·tools2개)도포함한다. 이번Codex수정은문서32개(새아카이브1개포함), 기존파일내용은보존했다.
+
+```text
+ M CLAUDE.md
+ M CONTEXT.md
+ M README.md
+ M STATUS.md
+ M WORKBOARD.md
+ M WORK_PC_START_HERE.md
+ M docs/README.md
+ M docs/ai/DRONE_MG_TURRET_3PART_GUIDE.md
+ M docs/ai/DRONE_NPC_GAZE_TRACKING_PLAN.md
+ M docs/ai/DRONE_SMART_OBJECT_NPC_GUIDE.md
+ M docs/ai/DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md
+ M docs/assets/DRONE_BANGKOK_OILRIG_MIGRATION_2026-09-30.md
+ M docs/assets/DRONE_CONTENT_FOLDER_GUIDE.md
+ M docs/gameplay/DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md
+ M docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md
+ M docs/gameplay/DRONE_TEST_MAP_GUIDE.md
+ M docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md
+ M docs/gameplay/DRONE_TUTORIAL_IMPLEMENTATION_TEST_GUIDE.md
+ M docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md
+ M docs/gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md
+ M docs/git/CLAUDE_CODEX_COLLABORATION.md
+ M docs/git/CLAUDE_CODEX_SETUP.md
+ M docs/git/DRONE_UNREAL_MCP.md
+ M docs/history/DRONE_WORKLOG.md
+ M docs/planning/DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md
+ M docs/planning/DRONE_FRONTEND_MISSION_FLOW_PLAN.md
+ M docs/planning/DRONE_PROJECT_PLANNING_BRIEF.md
+ M docs/planning/DRONE_TUTORIAL_STORY_PLAN.md
+ M docs/planning/WORK_MANAGEMENT.md
+ M docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md
+ M docs/tutorial/DRONE_PROTOTYPE_IMPLEMENTATION.md
+ M docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md
+ M docs/tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md
+ M docs/tutorial/DRONE_TRAINING_COURSE_IMPLEMENTATION.md
+ M tools/unreal/Setup-DroneHostileCoverResponse.py
+ M tools/unreal/Setup-DroneNPCGreybox.py
+?? docs/history/archive/
+```
+
+
+### 이관 원문: docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md — 2026-10-04 최신 Acro 입력·데드존·응답 조정 (C PC)
+
+## 2026-10-04 최신 Acro 입력·데드존·응답 조정 (C PC)
+
+Unreal HEAD `41444c2` + 로컬 미커밋. 조사·C++·Build·자동화 Claude, Scout/Drop 입력 연결 Codex ui run `20261004-001325-ui-ui-acro-input-assets`(Editor MCP)→Claude 검증, 문서 Codex. 아래 10/03·9월 검증은 당시 범위다. 새벽 집중12/12·화면 그려진90/94는 당시 근거다. 최신10/04 후속 집중30/32(팀원Production맵의존2Fail)·전체95개2회미렌더, 패드포커스6개판정제외·화면그려진포커스확인대기. 실제패드·키보드체감은수동대기다.
+
+| 조정 위치 | 계약·현재값 | 확인할 것 |
+|---|---|---|
+| Acro 선택 가능한 모든 비행 기체 BP Class Defaults | FPV·Scout·Drop·FiberOptic에 AcroPitchAction/AcroRollAction/AcroYawAction/AcroThrottleAction/AcroGamepadLeftVerticalAction/AcroGamepadRightVerticalAction 6개를 FPV와 같은 Input Action으로 연결 | 하나라도 None이면 Acro 입력 누락 가능. Scout/Drop 누락 수정·컴파일·저장 후 Claude 재조회와 AssetContract로 확인. 지상 UGV 제외 |
+| IMC_DronePrototype Acro 패드 축4개, Modifiers 맨 앞 | Gamepad_RightX→AcroRoll, LeftX→AcroYaw, LeftY→AcroGamepadLeftVertical, RightY→AcroGamepadRightVertical에 Dead Zone | 같은 IMC 쉬운 조작 Gamepad_RightX→IA_DronePrototype_Yaw 값을 복사: Lower0.2·Upper1.0·Radial. 새 수치 결정 아님. 33매핑·키·Action·순서 보존 |
+| Drone Definition Data Asset `FlightProfile.AcroRateSettings` | `BodyRateResponseTimeSeconds`·최대 Pitch/Yaw/Roll 각속도 | 조정은 여기서 한다. Pawn 정확 적분과 단일 축-각 합성으로 30/60/240fps 자세 일치, 이번 기존 조정값 유지. 키보드 별도 배율/Angle 모드·마우스 Yaw는 현재 미정 |
+| `Tools/AssetMigration/BuildDroneAcroInput.py` | Acro 패드 Dead Zone 복사 및 FPV/Scout/Drop/FiberOptic 6개 연결 생성 | 재생성 때 수정 유지하도록 Claude 변경. 이번 미실행, docs 작업에서 실행하지 않음 |
+
+10/04 추가수정(Claude): Acro 키보드/패드Action이 한 변수에 나중 값을 덮는 원인 재현(Space+오른쪽-0.5→스로틀-0.38·W+왼쪽-0.5→피치-0.38). 입력원을 분리하고 절댓값 큰 쪽을 사용해 키를 누르면키보드가이기고떼면패드로인계한다. AcroInputBehaviorPIE D구역8시나리오(해제/인계/0포함)자동검증·실제패드수동대기. Mode차이는패드세로축배치뿐, 키보드 W/S·A/D·Q/E·Space/Ctrl동일.
+
+Enhanced Input은 DefaultInput.ini 축 데드존을 쓰지 않으므로 해당 INI만 보고 Acro 패드 보호를 판정하지 않는다. 기존 0.05 쏠림이 키보드 스로틀을 덮고 회전이 누적되던 결함은 매핑 Dead Zone으로 수정·자동 검증됐다. Codex MCP의 Instanced Modifier 생성은 None으로 실패해 저장 없이 복구했고, IMC 실제 저장은 Claude headless Python 패치(`Saved/Automation/ClaudeAcro/patch_dz.log`)다. Scout/Drop BP 저장은 Codex(ui), run의 최종 보고는 모델 용량 오류로 없지만 Claude `assign_bp.log`·자동화로 확인했다.
+
+Mode2 LeftY=Throttle/RightY=Pitch, Mode1 LeftY=Pitch/RightY=Throttle; 키보드는 양쪽 W/S Pitch·A/D Roll·Q/E Yaw·Space/Ctrl Throttle로 같은 결과다. Space 단독 자세 불변은 자동 검증, FPV 키보드0.1초 탭 약65° 회전/무수평복귀는 체감 원인 후보다. 실제 장치에서 [테스트 순서](../gameplay/DRONE_TEST_MAP_GUIDE.md)를 확인하고 회의 “반전” 뜻을 사람에게 확인해야 한다.
+
+UI-FOCUS-RACE-01은 UIOnly 지연 루트 포커스에 대한 5프레임 감시/복원 수정 후 확인 중이다. 다른 강조 버튼으로 패드 이동한 경우 복원하지 않는다. 화면 그려진 회귀 수정 후 Success는 1회, 수동 첫 강조 확인 대기다. 추가 회귀는 LobbyLayout samples=0 등 미렌더 실행 여부부터 확인한다. 10/04 pull 뒤 지형 코스와 제품 Racing 연결/PlayerStart·완주 판정은 현재 미정이며 이전 LFS 미수신 문구는 당시 이력이다.
+
+
+
+
+### 이관 원문: docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md — 2026-10-03 밤 최신 Blueprint 조정 — 5메뉴·조종 입력 표시·레이싱 키
+
+## 2026-10-03 밤 최신 Blueprint 조정 — 5메뉴·조종 입력 표시·레이싱 키
+
+C PC Unreal `5b03ad3` + 로컬 미커밋. C++·Build·테스트 Claude, BP 연결 스크립트 Codex(ui)→Claude 실행·검증. 저장 BP2개 BS_UP_TO_DATE, 집중 렌더 33/33 Success, 전체 91개 중 86 Success·기존5 Fail. 아래 9월 기록은 당시 기준이며 현재 메뉴/API는 [타이틀·로비 가이드](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md) 0·2절을 우선한다. 자동 검증 출처 `Saved/Automation/ClaudeMenu5/test2.log`·`ClaudeMenu5Full/test.log`, 수동 패드·1280/1920·연결 해제/혼합 입력·맵3는 대기다.
+
+| 위치 | 조정 항목·현재값 | 의미 |
+|---|---|---|
+| WBP_DroneFrontEndRoot Class Defaults | TitleMenuClass = WBP_DroneFiveItemMenu | 저장 연결됨. 버튼 StoryButton/RacingButton/TutorialButton/SettingsButton/ExitButton, 필수 OnStoryRequested/OnRacingRequested/OnTutorialRequested/OnSettingsRequested/OnExitRequested·선택 OnBackRequested. 계약 오류는 [TITLE-MENU] 경고+native 5개 |
+| 같은 Root Class Defaults | TitleButtonHeight=80, TitleButtonSpacing=26 | C++ 기본 5버튼의 임시 크기/간격. 지정한 메뉴 WBP 디자인은 Designer에서 조정 |
+| WBP_DroneFlightHUD Class Defaults | ControlInputDisplayClass = WBP_DroneControlInputDisplay | 저장 연결됨. SetControlInputDisplayVisible(bool), UpdateStickAxes(float LeftX,LeftY,RightX,RightY) 이름 계약 |
+| 같은 HUD Class Defaults | ControlInputDisplayOffset=(0,-24) | 아래 가운데 기준 위치. 실제 1280/1920 가독성·다른 HUD 가림 확인 |
+| 같은 HUD Class Defaults | ControlInputDisplayUpdateInterval=1/30초 | 월드 타이머 갱신, ON·기체 있을 때만 표시/축 전달, 축 값 바뀔 때만 호출·OFF 갱신 중지 |
+| Config/DefaultGame.ini | [/Script/Drone.DroneAudioSettingsSubsystem] bControlInputDisplayEnabledByDefault=False | 사용자 결정 전 임시 끔·최종 기본값 미정. 저장 사용자 선택 우선, 기본값 복원→적용은 선택 삭제 |
+| 설정 UDroneSettingsWidget | ControlInputDisplayCheck | 조종 > 조종 입력 표시, 기존 적용/취소/기본값 유지. 음량 SaveGame bHasControlInputDisplayChoice/bControlInputDisplayEnabled, 자동화 DroneAudioSettings_Automation |
+| ADroneTrainingRouteSelector BP/배치 액터 Details | bAllowPlayerRouteKeys=true | 플레이어 경로 키 허용 스위치 |
+| 같은 Selector | bBlockRouteKeysInRacingMissions=true | 로비 Racing 미션은 1~5 바인딩/안내 차단. 시험맵 직접 실행·Tutorial/Training/Story는 기존대로, 랜덤 API 삭제 안 함 |
+
+축은 Pawn `GetControlInputSnapshot()` BlueprintPure가 소유하며 UI에서 별도 입력 바인딩을 만들지 않는다. 물리 위치 X 오른쪽+, Y 위+, [-1,1], 커서 중심±38px/화면Y 반전. 쉬운/실제 왼쪽 이동·오른쪽 회전/카메라·트리거 고도, Acro Mode2 왼쪽 Yaw/스로틀·오른쪽 Roll/Pitch, Mode1 왼쪽 Yaw/Pitch·오른쪽 Roll/스로틀, 지상 왼쪽 조향/전후. 키보드도 같은 액션 위치, 장치 자동 전환/혼합 입력/분리·재연결 정책 현재 미정. 고도계는 독립 유지한다.
+
+테스트 Class Defaults를 메모리로 채우는 덮어쓰기는 BP 최초 로드의 부모 대비 차이 복사 때문에 인스턴스 연결 증거가 아니다. 실제 저장된 위 두 Class Defaults를 검사한다. 제품 Lvl_DroneRacingTest에는 RouteSelector가 없어 숫자키 미노출 확인, 원격 맵3는 LFS 미수신·완주/복귀 미실행. 사람 디자인·Production Training 맵 보존, 최종 기본값/레이아웃/정책은 임의 확정하지 않는다.
+
+
+
+
+### 이관 원문: docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md — 현재 검증 기준선
+
+## 현재 검증 기준선
+
+| 검증 항목 | 현재 확인 결과 |
+|---|---|
+| `DroneEditor Win64 Development` | Build 성공 |
+| `Drone.Tutorial` Automation | 7/7 통과 |
+| `Drone.AI` Automation | 11/11 통과. Rifle 빈 시험 World의 예상 RecastNavMesh 경고 1건 |
+| 전체 `Drone.` Automation | 27/27 통과, 실패 0 |
+| 전투 집중 검증 | AI-MG-02·HP-01·AI-COVER-01·AI-COMBAT-END-01·AI-AMMO-01 관련 집중 테스트 통과. AI-VIS-01A Editor Build와 WeaponContract·RifleTrace·ShotgunTrace 3/3 통과. 이 변경을 포함한 `6a18210` 뒤 전체 묶음은 아직 반복하지 않음 |
+| Front-end Flow | FLOW-01~08 완료. `Drone.Flow` 5/5 통과, 전체 수명주기를 완전히 새 PIE 실행 3회 반복해 Root·Map 요청·Drone·Director·Finish 중복 0 확인 |
+| 역할·비행 회귀 | 공통 Primary/Secondary Action 포함 `Drone.Prototype` 7/7 통과. IMC 21 Mapping과 Pawn 소유 Binding 확인 |
+| `CompileAllBlueprints` | Blueprint Errors 0, Blueprint warnings 0, failed load 0. 별도 Summary에 기존 Battlefield Pose GUID와 MCP 고지 경고 유지 |
+| 현재 에셋 이식 재검증 | FPV 전용 1/1, Blueprint 0/0/0, 스테이징 선택 자산·현재 Integration 금지 의존성 0, 이식 13개 LFS와 fsck 통과 |
+| 기존 Standalone 시각 기록 | FPV 외형, 고정 추적 Camera, 실제 WBP HUD, Cyan 안내선, Current/Inactive Gate 표시 확인 |
+| 사용자 수동 확인 | Training 두 Lap 비교 HUD, OilRig Map Check·화면·성능, Ground Drone/MG·NPC·Raw Drone 외형을 확인할 차례 |
+
+현재 main의 `UDroneTrainingLapRecorderComponent`는 Segment/Lap 원본 뒤 TUT-04B 비교 결과도 만든다. 첫 성공은 기준 기록, 이후 성공은 현재 시도를 제외한 이전 평균과 Best를 사용한다. HUD에 이전 완주 평균·Best·시간 Delta·속도 Delta가 표시되며 계산은 Blueprint에 중복하지 않는다. 실제 두 Lap 표시 확인 전까지 TUT-04의 수동 판정은 남아 있다.
+
+
+
+
+### 이관 원문: docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md — 2026-09-08 현재 역할·Front-end·Mission 구조
+
+## 2026-09-08 현재 역할·Front-end·Mission 구조
+
+현재 코드 흐름은 아래처럼 연결된다.
+
+```text
+UDroneGameFlowSubsystem (GameInstance 수명)
+  → UDroneFrontEndRootWidget
+  → ADroneFrontEndPlayerController가 선택 MissionMap OpenLevel
+  → ADroneMissionGameMode + ADroneMissionPlayerController
+  → UDroneSelectionWidget
+  → 선택 Definition Pawn 1대 Spawn/Possess
+  → ADroneMissionDirector
+  → UDroneMissionObjectiveWidget
+  → UDroneMissionResultWidget
+  → 같은 Mission Retry 또는 Front-end Lobby
+```
+
+핵심 책임은 다음과 같다.
+
+| 코드 | 현재 책임 |
+|---|---|
+| `Flow/DroneGameFlowSubsystem.*` | 맵을 넘어 유지되는 상태, Mission/Drone 선택, 성공 Story Fact와 중복 요청 거부 |
+| `Flow/DroneFrontEndPlayerController.*` | Front-end Root 1개 생성, 선택한 Map을 정확히 한 번 열기 |
+| `UI/DroneFrontEndRootWidget.*` | Opening·Lobby·정적 Briefing 표시와 버튼 입력 |
+| `Flow/DroneMissionGameMode.*` | 선택 전 비-Drone Spectator 사용, 자동 Drone Spawn 방지 |
+| `Flow/DroneMissionPlayerController.*` | 선택 UI, 선택 Definition 한 대 Spawn/Possess, Director·목표·결과 UI 수명주기 |
+| `UI/DroneSelectionWidget.*` | 정찰/FPV/드랍과 쉬운/실제 조작형·안정/균형/고기동 선택 |
+| `Mission/DroneMissionObjectiveTypes.h`, `DroneMissionDefinition.*` | Objective ID·사건·수량·시간·대상 Tag·Story Fact 조건과 성공 Fact 데이터/검증, 기존 문구형 목표 fallback |
+| `Mission/DroneMissionDirector.*` | 출격 뒤 현재 Rule의 Scan/Delivery/Destroy/Lap/Return/Jamming Event·시간 제한·중복 Actor 관리, Snapshot과 성공/실패 1회 확정 |
+| `Mission/DroneMissionReturnZone.*` | BP/맵 배치형 귀환 Box Trigger. 실제 기지 위치·크기와 대상 Tag는 아직 미정 |
+| `Signal/DroneSignalTypes.h`, `DroneSignalComponent.*` | 재밍 Source 중 최대값·단계·신호율·비행 반응/영상 Noise와 Definition 기반 면역. Tick 없음 |
+| `Signal/DroneJammingVolume.*` | BP/맵 배치형 방해 Box와 이탈·명시적 Jammer 해제 Event. 실제 Zone 위치·무력화 방식은 미정 |
+| `Abilities/DroneReconScanComponent.*` | 거리·화각·LOS 유지형 정찰 Scan |
+| `Abilities/DroneImpactDetonationComponent.*` | Arm 뒤 유효 속도 충돌 시 1회 폭발·기체 파괴 |
+| `Abilities/DronePayloadDropComponent.*` | 상단 시점, 투하, 빈 상태의 근접 운반 화물 검색·실제 Actor 부착·재투하, 목표 접촉 결과와 재장전 |
+| `Abilities/DroneDroppedPayload.*` | 투하 중 충돌 판정과 맵 배치 Pickup/Carried 상태; `BP_DroneCarryablePayload`의 Native 부모 |
+| `UI/DroneMissionObjectiveWidget.*` | Director Event만 구독하는 측면 목표 패널; Tick/Actor 전체 검색 없음 |
+| `UI/DroneMissionResultWidget.*` | 성공/실패, 재도전, 로비 복귀 |
+
+Training Mission의 현재 Greybox 규칙은 저장 Data Asset의 `Objective.TrainingLap` 1회 Lap 완료=성공, `Drone Health 0`=실패다. 이는 Vertical Slice 시험 규칙이며 새 Mission별 목표 수량·대상·귀환 기지와 최종 Story Mission 규칙은 현재 미정이다.
+
+2026-09-16 신호 Greybox는 Mission 후보에 재사용할 기능 기반으로만 추가됐다. Zone 강도에 따른 HUD 경고·강한 단계 기본 비행 속도/가속도 배율·이탈/해제 Rule Event가 코드/자동화 완료다. `VideoNoiseIntensity`와 Blueprint Event는 전달하지만 실제 영상 Noise Material·목표 정보 손실 화면과 새 Story Mission Data Asset/맵 배치는 아직 없다. [재밍 가이드](../gameplay/DRONE_JAMMING_GREYBOX_GUIDE.md)에서 담당 클래스와 Editor 시험을 본다.
+
+### 현재 UI의 정확한 상태
+
+- Front-end에는 기존 `WBP_DroneFrontEndRoot`가 있지만 FLOW-04 이후 필수 이름이 모두 없으면 C++ 기본 Layout으로 안전하게 대체된다.
+- Drone 선택·목표·결과는 현재 C++ native fallback UI로 실제 실행 가능하다.
+- 최종 WBP Designer와 Drone 3D Preview는 아직 만들지 않았다. 기능 완료와 최종 외형 완료를 같은 것으로 기록하지 않는다.
+- 최종 WBP를 만들 때 아래 이름을 그대로 배치하면 C++ 상태·버튼·Delegate 로직을 재사용할 수 있다. Blueprint Event Graph에 Flow나 Spawn 로직을 다시 만들지 않는다.
+
+| Widget 부모 | 필수 Designer 이름 |
+|---|---|
+| `UDroneFrontEndRootWidget` | `OpeningPanel`, `LobbyPanel`, `MissionBriefingPanel`, `ContinueButton`, `OpeningTitleText`, `LobbyTitleText`, `LobbyStatusText`, `MissionSelectButton`, `MissionSelectButtonText`, `MissionNameText`, `MissionDescriptionText`, `MissionMetaText`, `StartMissionButton`, `MissionBriefingTitleText`, `MissionBriefingBodyText`, `FinishMissionBriefingButton` |
+| `UDroneSelectionWidget` | `DroneSelectionPanel`, `MissionNameText`, `DroneNameText`, `DroneDescriptionText`, `DroneProfileText`, `DroneButton0~2`, `DroneButton0Text~2Text`, `ControlModeButton`, `ControlModeButtonText`, `HandlingPresetButton`, `HandlingPresetButtonText`, `LaunchDroneButton` |
+| `UDroneMissionObjectiveWidget` | `MissionObjectivePanel`, `MissionObjectiveTitleText`, `MissionObjectiveText`, `MissionObjectiveProgressText` |
+| `UDroneMissionResultWidget` | `MissionResultPanel`, `MissionResultTitleText`, `RetryMissionButton`, `ReturnToLobbyButton` |
+
+### 사용자가 지금 Editor에서 확인할 순서
+
+1. `/Game/Drone/Maps/Lvl_DroneFrontEnd`를 연 뒤 PIE를 시작한다.
+2. `계속 → Training Mission 선택 → 미션 시작 → 작전 시작` 순서로 누른다.
+3. Training Map에서 선택 전 Drone이 없고 정찰·FPV 자폭·드랍 카드 세 개가 보이는지 확인한다.
+4. `쉬운 조작/실제 조작형`과 `안정/균형/고기동`을 각각 바꿔 본 뒤 한 기체를 출격시킨다.
+5. 선택한 Drone 한 대만 생성되고 Flight HUD와 측면 목표가 표시되는지 확인한다.
+6. Drop Drone은 선적재 화물을 좌클릭/RB로 한 번 투하한 뒤 `RoleTest_CarryablePayload` 크레이트 300cm 안에서 같은 키로 적재한다. 크레이트가 기체 하단을 따라가고 다시 누르면 실제 크레이트가 투하되는지 확인한다.
+7. Gate 0→1→2→3을 통과해 성공 화면과 `재도전`을 확인한다.
+8. 재도전 뒤 다른 기체를 선택하고 파괴/체력 0 경로에서 실패 화면과 `로비 복귀`를 확인한다.
+9. 로비에 돌아왔을 때 이전 Drone·목표·결과 UI가 남아 있지 않은지 확인한다.
+
+정찰 `StartScan`, FPV `ArmImpactDetonation`, 드랍 `ActivatePrimaryPayloadAction/SetDropViewEnabled` API와 Event에 공통 `Primary Ability / Secondary Ability` Input Action을 연결했다. 임시 Greybox 키는 좌클릭/RB와 우클릭/LB이며 최종 키로 확정한 것이 아니다. 정찰은 Primary로 가장 가까운 유효 Target Scan·Secondary로 취소, FPV는 Arm/Disarm, 드랍은 적재 중 투하·빈 상태 근접 화물 적재/탑뷰 전환이다. Training Map에는 정찰·자폭·투하 시험 표적, 배치형 크레이트와 Event 기반 한글 역할 상태 UI가 배치되어 있다.
+
+자동 검증은 `DroneEditor Win64 Development`, `Drone.Flow` 5/5, `Drone.Prototype` 7/7, `Drone.Integration` 3/3, `Drone.Tutorial` 7/7을 통과했다. `MissionEntryPIE`는 Scout 전용 Pawn과 재시도 Drop 전용 Pawn을 포함한 전체 수명주기를 완전히 새 PIE 실행에서 3회 반복해 3/3 통과했다. Commit·Push는 하지 않았다.
+
+
+
+### 이관 원문: docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md — 1. 이전 4메뉴 구현 기록 (2026-10-01)
+
+## 1. 이전 4메뉴 구현 기록 (2026-10-01)
+
+- 사용자가 제공한 `Title_Asset`의 배경, 어두운 오버레이, 로고, 일반/호버/클릭 버튼 PNG 6개를 Unreal Texture로 가져왔다. 참고이미지는 완성 화면 비교용이며 그대로 한 장짜리 버튼 화면으로 쓰지 않는다.
+- 시작 화면의 제공 배경·어두운 오버레이·로고·버튼 6개 이미지는 유지한다. `Start / Training / Setting / Exit` 중 Start는 Story 4개 목록, Training은 `튜토리얼 / 레이싱` 하위 선택으로 연결한다. 훈련 목록은 튜토리얼 9개(기존 종합 Training 포함)와 레이싱 1개다. Story 목록에는 훈련 탭을 표시하지 않는다.
+- 로비를 첨부 기획안의 좌측 스크롤 목록 / 중앙 작전 이미지·이름·지역·난이도 / 우측 개요·목표의 3열로 정리하고 하단 중앙 시작 버튼을 배치했다. 선택 강조와 현재 분류 필터를 유지하며, 다른 분류에 남은 선택을 바로 실행하지 않는다.
+- 브리핑은 좌측 이미지와 우측 스크롤 설명·목표 순서, 하단 작전 지역 이동 버튼이다. 로비/브리핑/설정에도 기존 배경을 사용하고, 선택 Mission에 별도 Thumbnail이 없으면 기존 배경으로 보완한다.
+- 기체 선택은 상단 큰 역할 프리뷰와 상세·조작 설정, 프리뷰 아래 출격 버튼, 하단 가로 기체 카드로 재배치했다. 기체 5종 Catalog와 Mission 허용 목록은 유지한다. 프리뷰는 공중 기체/UGV를 구분하는 역할 도식이며 실제 Mesh 렌더 프리뷰는 아니다.
+- 로비·브리핑·기체 선택은 1920×1080 설계를 비율 유지해 축소하고 긴 설명은 스크롤한다. 1280×720·1920×1080 실제 화면 가독성은 수동 확인 대기다.
+- Setting의 임시 품질 3버튼을 전체 음량·창 모드·해상도·품질·수직 동기화·프레임 제한과 적용/기본값/뒤로가기 화면으로 교체했다. 저장과 미적용 취소 기준은 아래 9절을 따른다.
+- 회전 수업을 **방향 맞추기가 아닌 원형 코스를 한 바퀴 도는 비행**으로 수정했다.
+- 독립 레이싱 시험맵을 추가했다. Best Lap JSON 영구 저장은 2026-10-02 구현·자동 검증 완료·실기 재실행 확인 대기다. 정식 경기 규칙·순위는 미완료다.
+
+
+
+
+### 이관 원문: docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md — 8. 도구와 확인할 것
+
+## 8. 도구와 확인할 것
+
+`Tools/AssetMigration/Invoke-DroneTitleLobby.ps1`은 Editor 종료 후 실행한다. 이미 이식된 Texture가 있으면 원본 Downloads 폴더가 없는 작업컴에서도 실행할 수 있다. 원본 재수입이 필요하면 `-TitleAssetDir '실제 Title_Asset 경로'`를 지정한다.
+
+도구는 WBP 이미지 기본값, 전용 Tutorial 원형 Station, 관련 DA 두 개, 독립 Racing 맵/DA만 갱신한다. 기존 레이싱 맵 전체 재생성이나 Production 저장은 하지 않는다. 최종 UI 수동 변경 뒤 이 도구를 무작정 재실행하면 이미지 기본값이 제공 이미지로 돌아가므로 주의한다.
+
+자동화 보고서는 프로젝트 `Saved/Automation/TitleLobbyOrbit` 아래에 저장한다. 실제 수동 확인은 다음을 남긴다.
+
+2026-10-01 다른 PC `C:\URproject\drone`의 기록: 앞선 Editor Build·14/14 → GameReadiness **32/32·테스트 오류/경고 0**, 시험맵 14개 Map Check 0/0 → Back 후속 33개 실패 0(HTTP 경고 동반 성공 1건). 1280 Setting/Training/탭·목록 일부와 Back/선택 복원, 1920 제목/Exit를 당시 확인했다. 이번 UI 변경 이전의 D 드라이브 최신화에서는 재실행하지 않았고 해당 다른 PC의 Oct 1 원시 `Saved` 보고서도 수신하지 않았다. 이 기록을 이번 UI의 수동 Pass로 해석하지 않는다. [검증 출처와 범위](../gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md)
+
+이번 추가 UI/설정 코드는 현재 D 드라이브에서 MSVC `14.51.36257` Editor Build 및 `FrontEndContract / BackNavigationContract / MissionEntryContract / SettingsContract / FrontEndPIE` **5/5 Success**, 자동화 이벤트 오류/경고 0이다. 최종 보고서는 `Saved/Automation/TrainingLobbySettings/index.json`(2026-10-01 02:03:48 UTC). 분류/숨은 선택/복귀, 음량 Clamp·NaN·SaveGame 메모리 직렬화와 실제 Settings 자식 컨트롤·슬라이더/Back Delegate·미적용 취소를 검사했다. NullRHI/NoSound이므로 새 화면·실제 가청성·Standalone 창 변경·디스크 저장 후 재실행·전체 미션 손 조작 완주·패드 실기·최종 음원/연출은 수동 확인 대기다.
+
+1. 1920×1080와 1280×720에서 로고·버튼·3열 로비·브리핑·가로 기체 카드·출격이 잘리는지. 긴 설명/목표/기체 정보는 스크롤해 끝까지 읽을 수 있는지.
+2. 제공 버튼 PNG의 투명 여백, 텍스트 위치, 클릭 범위가 자연스러운지.
+3. 원형 7/8 바퀴에서 미완료, 마지막 결승 통과 후 귀환으로 전환되는지.
+4. 레이싱의 9개 Gate 정방향 완주 → 성공 결과가 나오는지.
+5. 타이머 만료/충돌 실패 → 재시도 때 Gate 진행이 초기화되는지.
+6. Start→Story 4와 Training→Tutorial 9/Racing 1 분리, 탭 선택·목록 선택 강조, 브리핑/기체 선택의 Back/Esc/패드 B, 선택/분류 복원과 반복 키 차단이 맞는지.
+7. Setting의 음량 미리보기→취소 복원, 적용→재실행 복원, 품질/VSync/FPS 적용, 기본값의 미적용 취소를 확인한다. 창 모드/해상도는 PIE에서 비활성이고 Standalone에서 변경/재실행 확인한다.
+
+자동화 성공만으로 최종 시각/조작 체감 검증까지 끝났다고 처리하지 않는다.
+
+
+
+
+### 이관 원문: docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md — 10. 목록 튐 진단 (수정 전)
+
+## 10. 목록 튐 진단 (수정 전)
+
+2026-10-01 사용자 화면 제보를 렌더 PIE로 확인했다. 현재 실제 UI는 아직 수정하지 않았다. 기존 기능 자동화 5/5는 화면의 프레임별 배치 안정성을 검사하지 않았다.
+
+| 측정 대상 | 첫 프레임 이후 최대 이동 | 판정 |
+|---|---|---|
+| 훈련 진입 목록 내부 | 80.507 설계 px | 튐 재현 |
+| Hover 항목 선택 목록 내부 | 67.508 설계 px | 튐 재현 |
+| Tutorial 선택 간 바깥 세 열 | 0.000 px | 열 자체는 고정 |
+| 진단용 명시적 줄바꿈 폭 | 0.000 px | 지연 AutoWrap 원인 확인 |
+| 위 비교 + 스크롤바 공간 확보 | 0.000 px | 이 최소 재현에서 추가 개선 없음 |
+
+좌표는 1280×720 렌더 PIE의 Geometry를 1920×1080 설계 기준으로 정규화했다. 목록 높이도 658.047→708.279px로 다시 계산됐다. 전체 Tutorial 9개 선택에서 반복됐으며, Story 진입의 큰 튐은 이번 측정에서 재현되지 않았다(0.278px).
+
+원인 경로: `SelectLobbyMission → Flow.SelectMission/BroadcastSnapshot → HandleFlowSnapshotChanged → RefreshLobbyContent → RebuildNativeMissionButtons`. 항목만 선택해도 `MissionButtonsColumn->ClearChildren()` 뒤 모든 Label을 새로 만든다. Label은 `AutoWrapText=true`, 명시 폭 없음이다. UE 5.8의 `STextBlock.h`는 AutoWrap 크기를 최소 한 프레임 늦게 얻는다고 명시하며, Slate는 Paint에서 얻은 실제 폭을 다음 측정에 사용한다.
+
+권장 수정은 같은 목록의 버튼을 재사용하고 선택 강조/상세만 갱신하는 것, 첫 Paint 전에 Label의 줄바꿈 폭을 실제 가용 폭과 여백에서 결정하는 것이다. 스크롤 위치·포커스도 보존한다. 진단 비교의 `160px`는 원인 분리용 시험값이지 최종 UI 폭이 아니다.
+
+진단 테스트: `Source/Drone/Flow/Tests/Diagnostics/DroneLobbyLayoutStabilityTest.cpp`, 이름 `Drone.Flow.Diagnostic.LobbyLayoutStabilityPIE`. `RenderOffscreen`으로 실행하고 `LobbyLayoutHoverOnly`로 최소 재현, `LobbyLayoutWrapProbe`로 transient Widget 비교를 추가한다. NullRHI는 이 Geometry 검사에 사용할 수 없다. 보고서는 `Saved/Automation/LobbyLayoutDiagnosticWrapProbe/index.json`(2026-10-01 02:31:18 UTC)이며 원래 UI가 실패하므로 전체 Result는 **Fail**이다. 실제 수정 이후 동일 검사와 1280/1920 화면 확인을 다시 통과해야 완료다.
+
+
+
+
+### 이관 원문: docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md — 11. 패드 UI 확인 범위
+
+## 11. 패드 UI 확인 범위
+
+2026-10-01 C 드라이브 PC의 소스 `9f67706`을 확인했다. Root/기체 선택의 `NativeOnPreviewKeyDown`은 Esc·패드 Face Button Right·Virtual Back을 처리한다. Root의 화면 전환은 `SetUserFocus`로 Root 자신에 포커스를 주며 첫 활성 버튼을 선택하는 코드가 아니다. 네이티브 UI의 화면별 명시 탐색 설정·포커스 강조와 패드만으로 전 화면을 완주하는 검사도 확인되지 않았다. 기본 UMG 포커스 이동이 가능한 경우와 완전한 패드 지원을 구분한다.
+
+다음 구현 범위는 시작/로비/브리핑/기체 선택/설정/결과의 초기 활성 버튼 포커스, 방향 탐색·확인/취소, 포커스 강조, 숨김/비활성 항목 제외, 목록 변경·Back 뒤 선택/스크롤 복원이다. 설정 Slider/ComboBox도 포함한다. 목록 전체 재생성 문제를 먼저 수정해 포커스가 붙은 버튼이 선택할 때마다 사라지지 않게 한다.
+
+완료 조건은 키 입력 자동화와 실제 패드 수동 확인을 분리한다. 마우스를 쓰지 않고 메뉴 진입→탭/미션 선택→브리핑→기체 선택→출격, 설정 조절/적용/취소, 결과→재시도/로비를 확인하고 `PC / 패드 / 화면 / 입력 / 기대 / 결과`를 기록한다. 기존 Back 계약 성공이나 NullRHI 5/5를 이 전체 Pass로 사용하지 않는다. 이번 최신화에서는 코드·BP 변경과 새 검증을 실행하지 않았다.
+
+### 패드 조작 — 2026-10-01 밤 후속
+
+C PC Unreal `ec2e88f` + 로컬 미커밋, 작업 도구 Claude·문서 반영 Codex. UI-PAD-01은 구현됨·자동 검증 완료·실제 PS4 패드 수동 확인 대기다. 위 `9f67706`의 보강 전 기록은 당시 범위다.
+
+| 입력 | 동작 |
+|---|---|
+| 방향 입력 / A / B | UE 기본 방향 탐색·확인 / 각 화면의 기존 Back |
+| 훈련 로비 LB / RB | 튜토리얼 / 레이싱 탭 전환 |
+| 로비 미션 목록 → / 출격 ← | 출격 버튼 / 고른 미션 |
+| 기체 카드 ↑ / 출격·조작 모드 ↓ | 출격 / 고른 카드 |
+| 결과 다시 하기 ↓ | 로비로 |
+| 설정 음량 슬라이더 A → 좌우 | A로 잠근 뒤 UE 기본 좌우 조정 |
+
+| 화면 | 첫 포커스/복귀 |
+|---|---|
+| 타이틀 | 마지막으로 쓴 버튼 → 없으면 시작 |
+| 로비 | 고르던 미션 → 미션 종료 복귀 시 방금 한 미션(`LastLobbyMissionId`) → 첫 미션 |
+| 브리핑 | 출격 버튼 |
+| 설정 | 음량 슬라이더, 닫으면 타이틀 설정 버튼 |
+| 기체 선택 | 고른 기체 → 첫 기체 |
+| 결과 | 실패면 다시 하기, 성공이면 로비로 |
+
+공통 `FDroneGamepadFocus`는 첫 조작 가능한 위젯에 포커스를 주고 새로 보인 위젯이 배치될 때까지 최대 30프레임 재시도한다. 강조는 RenderScale(기본 1.06)·버튼 글자색이며 그리기 변환만 바꿔 레이아웃을 유지한다. 각 UI 위젯(FrontEndRoot·Settings·Selection·MissionResult)의 Class Defaults `GamepadFocusScale`·`GamepadFocusTint`에서 조정한다. 목록의 `ScrollWhenFocusChanges`로 포커스를 따라 스크롤한다. 기체 선택의 출격은 기체 선택 전 비활성이므로 카드에서 A로 먼저 고른 뒤 ↑를 누른다.
+
+자동 검증(C PC, Claude, RenderOffScreen 1920×1080): `GamepadNavigationPIE` 11단계·`GamepadMissionFlowPIE` 16단계 Success, `LobbyLayoutStabilityPIE` Success(최대 0.255px). 근거 `C:\URproject\drone\Saved\Automation\ClaudePad\render6.log`. 전체 NullRHI의 패드 2개는 렌더링 필요 경고로 건너뛰어 별도 렌더 검사와 구분한다. 실제 PS4 패드 검증은 아니다.
+
+수동 확인 순서: 마우스 없이 타이틀 포커스→훈련→Hover 선택→→출격→브리핑→카드 A 선택→↑출격→↓카드 복귀→↑출격을 확인한다. 훈련 LB/RB 탭·선택 복원·B 타이틀 복귀, 설정 A 슬라이더 잠금/좌우·적용/취소/B 설정 버튼 복귀, 결과 다시 하기↓로비로·미션 선택 복원과 강조 가독성을 확인한다. 실패 재출격 DA를 쓰는 튜토리얼에서 추락 시 현재는 결과 화면 대신 첫 출격 위치에서 재출격하는 체감도 확인한다. 자동 결과 화면 탐색 검사는 재출격 수동 확인과 구분한다. `PC / PS4 패드 / 화면 / 입력 / 기대 / 결과`를 남기고 수동 Pass를 추정하지 않는다.
+
+
+
+
+### 이관 원문: docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md — 배터리·신호 대역·HUD 조정 (2026-10-02 새벽, C PC)
+
+## 배터리·신호 대역·HUD 조정 (2026-10-02 새벽, C PC)
+
+작업 도구 Claude, 문서 반영 Codex. 기존 풍향 N/E/…·풍속은 구현되어 있으며 바람 아래 오른쪽 위 패널에 기체명과 신호 대역, 배터리 줄을 추가했다.
+
+| 위치 | 조정값 | 의미 |
+|---|---|---|
+| `/Game/Drone/Data/Drones/DA_Drone_*`의 비행 프로필 | BatteryLifeSeconds | 플레이어 조종 중 소모할 용량(초). 0=배터리 끔·HUD 배터리 줄 숨김 |
+| 같은 기체 Definition의 FlightProfile | SignalBandLabel | 신호 대역 표시 문자열. 5.8GHz는 시험 예시 |
+| 기체 Pawn BP Class Defaults의 DroneBatteryComponent | LowBatteryFraction | 기본 0.2 이하 부족 경고 |
+| 같은 Battery Component | DepletedResponse | 기본 WarnOnly(경고만), 선택 FailMission(미션 실패 처리, 미션이 재출격 설정이면 재출격) |
+| FrontEnd Root Class Defaults | BriefingSecondsPerCharacter / BriefingMinLineSeconds / BriefingMaxLineSeconds | 브리핑 자동 시간 기본 0.075초/글자·2.5~9초. 줄별 DurationSeconds는 Mission DA에서 조정 |
+
+모든 기체에 DroneBatteryComponent가 기본 부착된다. HUD는 “기체명 | 신호 대역” / “BATTERY nn% (mm:ss)”, 부족 시 빨간색·“부족”, 소진 시 “방전”을 표시한다. **현재 기체별 BatteryLifeSeconds는 모두 0, SignalBandLabel은 빈 값이다.** 배터리 시간·소진 처리·신호 대역 최종값은 현재 미정이다.
+
+시험용 기체 Definition에 양수 BatteryLifeSeconds와 시험 신호 문자열을 넣어 출격한 뒤 시작 100%·조종 중 소모·부족·방전을 확인한다. 기체 선택 대기/AI 조종 중에는 소모되지 않아야 한다. FailMission은 미션 FailureResponse에 따라 실패 결과 또는 새 기체 재출격이 되어야 한다. 시험 값은 최종 기획값으로 남기지 않는다. Production Training을 시험용으로 덮어쓰지 않는다.
+
+2026-10-02 C PC Claude NullRHI BatteryHUDPIE + HUD 2개 + CheckpointRestart **4/4 Success**, 근거 `C:\URproject\drone\Saved\Automation\ClaudeHUD\test.log`. 패널 위치·가독성 수동 확인 대기다. 브리핑 대사 DA 입력법은 [Mission 가이드](../gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md)를 따른다.
+
+10/03 UI 준비·진단은 [WORKLOG](DRONE_WORKLOG.md)에 당시 원문 보존했다. 같은 날 밤 0절의 제품 연결 완료로 대체됐다. 연결 위젯 삭제 도구는 사용 금지다.
+
+
+
+## 2026-10-04 오후 감사2차·면접 대비 정리 — C PC, Codex docs
+
+지시서: Claude bridge run 20261004-074911-docs-docs-batch2-interview-cleanup/prompt.md(UTF-8). MdAudit와 InterviewAudit를 읽고 1차 원본 파일:줄 41건과 대조했다. Unreal HEAD=추적 origin/main41444c2는 읽기전용 Git조회(명령 한정 safe.directory, 설정 파일 변경 없음). 로컬 미커밋/미추적·기존 문서 변경 보존, Commit/Push·Unreal 쓰기/Build/PIE/패키징/쿠킹/맵생성·Trello/Figma 수정·키읽기 미실행. md tools2개는 Claude 기존 변경이며 이번 Codex 미수정.
+
+### 감사 처리 수와 항목별 근거
+
+이번 남은58건 전부 대조/처리방향 기록: 문서 정정57건, applications 개인정보1건은 지시서의 수정 금지·사용자 결정 대기로 유지. 누적99건 대조 완료(문서 정정98건·결정 대기1건), 자동으로 개인정보를 가리지 않았으며 해결 완료로 계산하지 않는다. 별도 상대링크11개는 1차 수정, 이번 변경41개 문서와 아카이브 재점검 파일대상 깨진 상대링크0·코드펜스 불균형0. UI 버튼 뒤 괄호 설명처럼 링크가 아닌 표기는 파일 경로 검사에서 제외했다.
+
+| 감사 원본 파일:줄 | 이번 처리 |
+|---|---|
+| docs/ai/DRONE_SMART_OBJECT_NPC_GUIDE.md:583 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md:73 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_TUTORIAL_IMPLEMENTATION_TEST_GUIDE.md:48 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md:195 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/git/GIT_UNREAL_GUIDE.md:13 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/history/DRONE_WORKLOG.md:2091 | STATUS 원문·당시 스냅샷을 10월 아카이브로 이관, 최신 STATUS 참조·이력 배열 보존 |
+| docs/planning/DRONE_PROJECT_PLANNING_BRIEF.md:15 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/planning/DRONE_PROJECT_PLANNING_BRIEF.md:49 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/planning/DRONE_PROJECT_PLANNING_BRIEF.md:218 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/planning/DRONE_TUTORIAL_STORY_PLAN.md:92 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md:7 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md:684 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/tutorial/DRONE_PROTOTYPE_IMPLEMENTATION.md:186 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/ai/DRONE_NPC_GAZE_TRACKING_PLAN.md:73 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/ai/DRONE_NPC_WALK_BACKWARD_HANDOFF_2026-09-18.md:256 | 역사 본문 보존·C PC 로그 경로 정정·현행 진단 기본 False 안내를 새 날짜로 추가 |
+| docs/ai/DRONE_SMART_OBJECT_NPC_GUIDE.md:60 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/ai/DRONE_SMART_OBJECT_NPC_GUIDE.md:387 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/applications/PROJECT_EXPERIENCE_PLAN_HWP_GUIDE.md:31 | 수정 금지 준수·STATUS/WORKBOARD 기존 공개 범위/개인정보 결정 대기 유지 |
+| docs/assets/DRONE_CONTENT_FOLDER_GUIDE.md:20 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_CHAOS_DATAFLOW_PLAN.md:145 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md:3 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md:224 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_STORY_PHYSICS_TEST_MAP_GUIDE.md:54 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_TEST_MAP_GUIDE.md:36 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md:3 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md:43 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md:71 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md:135 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md:261 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_TUTORIAL_IMPLEMENTATION_TEST_GUIDE.md:414 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md:109 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md:115 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/git/CLAUDE_CODEX_SETUP.md:16 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/git/CODEX_CONTEXT_SYNC.md:187 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/git/DRONE_GIT_LFS_CAPACITY_PLAN.md:102 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/git/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md:73 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/git/DRONE_UNREAL_MCP.md:9 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/git/GIT_UNREAL_GUIDE.md:9 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/git/GIT_UNREAL_GUIDE.md:401 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/learning/STUDY_PLANS.md:16 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/planning/DRONE_MVP_GUIDE.md:3 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/planning/DRONE_PREASSET_FUNCTION_PLAN.md:33 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/planning/DRONE_TUTORIAL_STORY_PLAN.md:155 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/planning/DRONE_TUTORIAL_STORY_PLAN.md:191 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/planning/DRONE_TUTORIAL_STORY_PLAN.md:291 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md:11 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md:48 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md:225 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md:1042 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/reference/external-engineering/ADOPTION_PLAN.md:11 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/tutorial/DRONE_PROTOTYPE_IMPLEMENTATION.md:7 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/tutorial/DRONE_PROTOTYPE_IMPLEMENTATION.md:235 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/tutorial/DRONE_PROTOTYPE_PIE_CHECKLIST.md:67 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/tutorial/DRONE_TELEMETRY_IMPLEMENTATION.md:204 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md:5 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md:241 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/tutorial/DRONE_TRAINING_RECORDING_IMPLEMENTATION.md:364 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+| docs/tutorial/DRONE_TRAINING_ROUTE_SELECTION_TEST_GUIDE.md:56 | 정정 또는 당시 기록 표시·현행 문서/코드 계약 참조 |
+
+### Claude 오후 코드/설정/도구 결과
+
+면접 점검5관점+반박 검증58건(높음7·중간32·낮음19) 중14건 처리(부분처리 포함, 잔여44건은 미처리·결정 필요; 전부 수정으로 표시하지 않음). StateTree HostileStateTree/FriendlyStateTree EditDefaultsOnly Soft참조·기존2개기본값·Controller BP변경·실패 에러 로그·StateTrees AlwaysCook 및 StateTreeCookContract, Moderate 신호 불안정/영상 Noise 미연결·Scout/FPV/Drop 광고문구 정정·VeilBreaker 광섬유 드론으로/끊김규칙미정·PlayerFacingTextContract. Rifle/MG 디버그 선 기본 Off, 상수 TestTrue4건 실제조건, 기체6개이상 경고(동적 목록 후속).
+
+Shotgun NullRHI통과는 미렌더 뼈 미갱신 거짓통과였다. 표본동안 항상뼈갱신 후 NullRHI5.81°·렌더5.04°·기준4°·몸통0°. 표적±1.9°추종+애니메이션 흔들림으로 보임은 Claude 의견, 체감·기준은 사람 판단 대기. 미렌더 표지에서 Shotgun삭제, LobbyLayout samples=0만 유지.
+
+참조0반박 검증 삭제: FDroneHandlingPresetTuning·Pawn Stable/Balanced/AgileHandlingTuning, Selection HandleHandlingPresetClicked, FrontEnd HandleLow/Medium/HighQualityClicked·ApplyGraphicsQuality(현행 Settings 한곳), CollisionResponse NetAttitudeDisturbanceDegreesPerSecond, TrainingGate GateRadiusCentimeters·GetTriggerApertureRadiusCentimeters, AudioSettings SaveMasterVolume(현행 SaveSettings), Pawn SetVisualBankInputGreybox, Definition RoleTags, RecordSubsystem ClearAllRecordsForTesting, 불필요 include·Build.cs 템플릿 주석. HoverThrottleNormalized는 도구3개 호환 유지·런타임 미사용 주석.
+
+Unreal Tools/AssetMigration 삭제12개(삭제됨·Git이력참조): BuildDroneRoleTestArena.py·BuildDroneCarryablePayload.py·ConfigureDroneTutorialMissionObjectiveRule.py·UpgradeMGTurretThreePartAsset.py·PrepareOilRigMap.py·PrepareOilRigPreviewMap.py·CleanOilRigPreviewMap.py·ImportDroneFiberOpticGSU.py·Invoke-DroneFiberOpticGSU.ps1·InspectDronePackShowcase.py·InspectDroneTrainingMap.py·InspectDroneVisualHierarchy.py. ConfigureAutomaticTrainingGates 기본검증·저장 DRONE_TRAINING_GATE_APPLY=1·기존 VALIDATE_ONLY=1도검증만. 타이틀 최초 임포트 DRONE_TITLE_ASSET_DIR/-TitleAssetDir필수. md HostileCoverResponse TestMap은 Claude 기존수정. DefaultEngine중복키2줄삭제·DefaultGame ProjectName=Drone, CLAUDE MCP공유Default/문서위임하루상한삭제. 삭제도구를 현재절차로 실행하지 않음.
+
+Build Succeeded는 지시서 근거. StateTreeCookContract·PlayerFacingTextContract·FrontEndContract·FlightProfiles통과, AI/UI NullRHI22개중20Success·NPCPerception/Shotgun알려진2Fail. 지정 전체로그 ClaudeInterviewFull/test.log를 읽기 대조: Drone.*97개중86Success·11Fail. 포커스6개는PIE미렌더 판정제외, 나머지알려진5개는NPCPerception·Shotgun실제동작·LobbyLayout진단·TrainingAssets/TrainingPIESmoke팀원Production맵. 오늘10회중8미렌더는Claude지시서, 실제패키징미실행·수동Pass추정없음.
+
+WORKBOARD/STATUS에 영향순서 결정11개(약51GB라이선스/공개·본인기여/AI활용·루트README·상시실패4개·Pawn분리/명명·Legacy76/100·Bangkok987/약12GB·풍향·MCP공유자동시작·미사용함수19/접근자71/Legacy·Shotgun)를 기록했다. 기존 스토리·기본값·applications/OpenRouter 결정대기 보존. 코드작업은 결정전실행하지 않으며 INTERVIEW-CLEANUP-01로인계 추적.
+
+### 원문 이관·전후 크기
+
+파일크기는 실행직전 실제바이트·LF개수+1 기준(감사의75KB/42KB는1차이전관찰이며 이번실측과 구분).
+
+| 파일 | 이전 바이트/줄 | 이후 바이트/줄 |
+|---|---:|---:|
+| docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md | 75196 / 1056 | 63174 / 962 |
+| docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md | 37844 / 251 | 23626 / 163 |
+
+옮긴 절(원문9/9 보존 확인·상대링크 경로만 이관기준정정):
+
+- docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md — 2026-10-04 최신 Acro 입력·데드존·응답 조정 (C PC)
+- docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md — 2026-10-03 밤 최신 Blueprint 조정 — 5메뉴·조종 입력 표시·레이싱 키
+- docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md — 현재 검증 기준선
+- docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md — 2026-09-08 현재 역할·Front-end·Mission 구조
+- docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md — 1. 이전 4메뉴 구현 기록 (2026-10-01)
+- docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md — 8. 도구와 확인할 것
+- docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md — 10. 목록 튐 진단 (수정 전)
+- docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md — 11. 패드 UI 확인 범위
+- docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md — 배터리·신호 대역·HUD 조정 (2026-10-02 새벽, C PC)
+
+WORKLOG의 STATUS10월원문·중복세션·이전현재스냅샷은 archive/STATUS_2026-10.md에 원문 이관. WORKLOG H1중복 제거·머리최신날짜/새기록끝추가원칙·루트STATUS참조, 기존순서/도구명/검증과이력내용보존.
+
+### Drone Space 저장·재조회
+
+기존 진행상황과다음작업6·테스트맵과확인가이드2·Blueprint조정과팀원가이드4개 연산(총12) 저장, 12/12 기대본문 재조회 정확일치. 비대상 기존블록49/41/50개 원문보존 확인. 새Page/공유권한/예약자동화없음. 이번대상미반영없음, 로컬미커밋본문GitHub는사용자Commit/Push뒤반영.
+
+### 변경 파일(이번 실행 기준)
+
+- docs/ai/DRONE_NPC_GAZE_TRACKING_PLAN.md
+- docs/ai/DRONE_NPC_WALK_BACKWARD_HANDOFF_2026-09-18.md
+- docs/ai/DRONE_SMART_OBJECT_NPC_GUIDE.md
+- docs/ai/DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md
+- docs/assets/DRONE_BANGKOK_OILRIG_MIGRATION_2026-09-30.md
+- docs/assets/DRONE_CONTENT_FOLDER_GUIDE.md
+- docs/gameplay/DRONE_CHAOS_DATAFLOW_PLAN.md
+- docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md
+- docs/gameplay/DRONE_JAMMING_GREYBOX_GUIDE.md
+- docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md
+- docs/gameplay/DRONE_STORY_PHYSICS_TEST_MAP_GUIDE.md
+- docs/gameplay/DRONE_TEST_MAP_GUIDE.md
+- docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md
+- docs/gameplay/DRONE_TUTORIAL_IMPLEMENTATION_TEST_GUIDE.md
+- docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md
+- docs/git/CLAUDE_CODEX_COLLABORATION.md
+- docs/git/CLAUDE_CODEX_SETUP.md
+- docs/git/CODEX_CONTEXT_SYNC.md
+- docs/git/DRONE_GIT_LFS_CAPACITY_PLAN.md
+- docs/git/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md
+- docs/git/DRONE_UNREAL_MCP.md
+- docs/git/GIT_UNREAL_GUIDE.md
+- docs/history/DRONE_WORKLOG.md
+- docs/learning/STUDY_PLANS.md
+- docs/planning/DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md
+- docs/planning/DRONE_MVP_GUIDE.md
+- docs/planning/DRONE_PREASSET_FUNCTION_PLAN.md
+- docs/planning/DRONE_PROJECT_PLANNING_BRIEF.md
+- docs/planning/DRONE_TUTORIAL_STORY_PLAN.md
+- docs/README.md
+- docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md
+- docs/reference/external-engineering/ADOPTION_PLAN.md
+- docs/tutorial/DRONE_PROTOTYPE_IMPLEMENTATION.md
+- docs/tutorial/DRONE_PROTOTYPE_PIE_CHECKLIST.md
+- docs/tutorial/DRONE_TELEMETRY_IMPLEMENTATION.md
+- docs/tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md
+- docs/tutorial/DRONE_TRAINING_RECORDING_IMPLEMENTATION.md
+- docs/tutorial/DRONE_TRAINING_ROUTE_SELECTION_TEST_GUIDE.md
+- STATUS.md
+- WORKBOARD.md
+- docs/history/archive/STATUS_2026-10.md
+
+
+### 최종 Git 확인
+
+정상 저장소 설정의 git diff --check exit0 확인. CRLF 변환 경고는 기존 저장소 줄바꿈 설정이며 내용 검증 실패가 아니다. 아래는 전체 작업트리의 git -C <md> status --short 결과(이번41개와 1차/Claude 기존 변경을 포함한다). Commit/Push 미실행.
+
+```text
+ M CLAUDE.md
+ M CONTEXT.md
+ M README.md
+ M STATUS.md
+ M WORKBOARD.md
+ M WORK_PC_START_HERE.md
+ M docs/README.md
+ M docs/ai/DRONE_MG_TURRET_3PART_GUIDE.md
+ M docs/ai/DRONE_NPC_GAZE_TRACKING_PLAN.md
+ M docs/ai/DRONE_NPC_WALK_BACKWARD_HANDOFF_2026-09-18.md
+ M docs/ai/DRONE_SMART_OBJECT_NPC_GUIDE.md
+ M docs/ai/DRONE_SMART_OBJECT_ROUTE_EDITING_GUIDE.md
+ M docs/assets/DRONE_BANGKOK_OILRIG_MIGRATION_2026-09-30.md
+ M docs/assets/DRONE_CONTENT_FOLDER_GUIDE.md
+ M docs/gameplay/DRONE_CHAOS_DATAFLOW_PLAN.md
+ M docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md
+ M docs/gameplay/DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md
+ M docs/gameplay/DRONE_JAMMING_GREYBOX_GUIDE.md
+ M docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md
+ M docs/gameplay/DRONE_STORY_PHYSICS_TEST_MAP_GUIDE.md
+ M docs/gameplay/DRONE_TEST_MAP_GUIDE.md
+ M docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md
+ M docs/gameplay/DRONE_TUTORIAL_IMPLEMENTATION_TEST_GUIDE.md
+ M docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md
+ M docs/gameplay/DRONE_WEATHER_WIND_RAIN_PLAN.md
+ M docs/git/CLAUDE_CODEX_COLLABORATION.md
+ M docs/git/CLAUDE_CODEX_SETUP.md
+ M docs/git/CODEX_CONTEXT_SYNC.md
+ M docs/git/DRONE_GIT_LFS_CAPACITY_PLAN.md
+ M docs/git/DRONE_TEAM_SYNC_PLUGIN_CHECKLIST.md
+ M docs/git/DRONE_UNREAL_MCP.md
+ M docs/git/GIT_UNREAL_GUIDE.md
+ M docs/history/DRONE_WORKLOG.md
+ M docs/learning/STUDY_PLANS.md
+ M docs/planning/DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md
+ M docs/planning/DRONE_FRONTEND_MISSION_FLOW_PLAN.md
+ M docs/planning/DRONE_MVP_GUIDE.md
+ M docs/planning/DRONE_PREASSET_FUNCTION_PLAN.md
+ M docs/planning/DRONE_PROJECT_PLANNING_BRIEF.md
+ M docs/planning/DRONE_TUTORIAL_STORY_PLAN.md
+ M docs/planning/WORK_MANAGEMENT.md
+ M docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md
+ M docs/reference/external-engineering/ADOPTION_PLAN.md
+ M docs/tutorial/DRONE_PROTOTYPE_IMPLEMENTATION.md
+ M docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md
+ M docs/tutorial/DRONE_PROTOTYPE_PIE_CHECKLIST.md
+ M docs/tutorial/DRONE_TELEMETRY_IMPLEMENTATION.md
+ M docs/tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md
+ M docs/tutorial/DRONE_TRAINING_COURSE_IMPLEMENTATION.md
+ M docs/tutorial/DRONE_TRAINING_RECORDING_IMPLEMENTATION.md
+ M docs/tutorial/DRONE_TRAINING_ROUTE_SELECTION_TEST_GUIDE.md
+ M tools/unreal/Setup-DroneHostileCoverResponse.py
+ M tools/unreal/Setup-DroneNPCGreybox.py
+?? docs/history/archive/
+```
+
+## 2026-10-04 Shotgun 판정 정정 — C PC, Claude 실행·Codex docs 반영
+
+오늘 2차의 실제 머리 흔들림·사람 판단 대기는 잘못된 판정이었다. 과거 기록은 보존하고 후속으로 정정한다. AI-SHOTGUN-RENDER-01 해결(2026-10-04 C PC Claude). 표적 고정 시 머리4.2~4.4°(Idle·사격 애니메이션), 표적±1.9° 왕복 시 머리5.2~5.4°·SmoothedDroneLookRotation 1.45°. 9/18 몸 Hysteresis·Bone Gaze 보간(데드존 경계 0 Snap 없음)은 정상, 5~6° 대부분은 9월 하순 Rifle 계열 AnimBP 교체 뒤 애니메이션 흔들림이다. 절대 머리4° 판정(애니메이션 포함)과 미렌더 뼈 정지에 따른 NullRHI 거짓 통과가 원인. 표적 고정0.6초 기준 측정 후 시선 출력≤2.5°·애니메이션 대비 추가 머리 흔들림≤2.5°로 시험 정정(경계0↔±1.9° 튐3.8° 검출). NullRHI·렌더 Success(ClaudeInterview/shotgun3_*.log), known-test-failures에서 제외(Claude 지시서 근거). 근거: Claude 지시서·Saved/Automation/ClaudeInterview/shotgun2_*.log·shotgun3_*.log. Codex는 성공 로그를 읽기 전용 대조했고 엔진 실행·Unreal 수정·Commit/Push는 하지 않았다. 전체97/86·11Fail과 AI/UI22/20은 당시 수치로 보존하며 후속 집중 성공을 합산하지 않는다.
+
+STATUS·WORKBOARD·테스트 가이드의 Shotgun 판단 대기를 해제로 정정했다. reference 미구현·현재 미정에 엄폐, MG 승하차/최종 난이도, NPC 래그돌/시체·Drone 폭발/Respawn, Drone Class 정책, Network/Multiplayer 권한을 Git HEAD 근거로 복원했다.
+
+Drone Space: 기존 진행상황과 다음 작업 3개·테스트 맵과 확인 가이드 2개 연산 모두 적용, 저장 후 대상 블록 재조회로 기대 본문 일치 확인. Shotgun 항목만 정정했고 새 페이지·다른 주제·과거 기록은 변경하지 않았다. 이번 범위 미반영 없음. git diff --check 통과(기존 CRLF 변환 경고), 변경 파일은 STATUS.md·WORKBOARD.md·docs/history/DRONE_WORKLOG.md·docs/gameplay/DRONE_TEST_MAP_GUIDE.md·docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md 5개, 기존 작업트리 변경과 구분한다.
+
+## 2026-10-04 NPC 걷기 미재생 수정 — C PC, Claude 실행·Codex docs 반영
+
+사용자 보고: NPC가 선 채로 움직임. 9/29 검증은 자산 연결뿐이어서 실제 재생은 확인되지 않았다. ABP_NPC_Rifle_Greybox·ABP_NPC_Unarmed_Greybox는 UE 템플릿 ABP_Unarmed 복제본의 ShouldMove(지면 속도 > 3 AND CurrentAcceleration ≠ 0)를 사용했다. AI 경로 이동은 기본 bUseAccelerationForPaths=false, 개인화기 추적은 9월에 의도한 직접 속도 추종으로 가속도0→Idle이었다. Claude는 이동 코드를 유지하고 UDroneNPCAnimationAuthoringLibrary::UseVelocityOnlyLocomotionGate/ValidateVelocityOnlyLocomotionGate로 두 AnimBP 이벤트 그래프를 속도 조건만으로 수정·두 자산 저장, Rifle Gaze 체인 유지 확인. Tools/AssetMigration/BuildNPCGreyboxAnimationAssets.py·VerifyNPCGreyboxAnimationAssets.py에도 반영해 재생성 유지·검증 통과. 시험은 Drone.AI.NPCLocomotionAnimPIE(TestMap/Lvl_NPCSmartObjectGreybox 순찰 이동), 로그는 C:\URproject\drone\Saved\Automation\ClaudeNPCWalk\before.log·after.log. Codex는 엔진을 실행하지 않았다.
+
+AI-LOCOMOTION-01 구현됨·자동 검증됨(2026-10-04 C PC Claude 재생 확인)·수동 확인 대기. 두 AnimBP의 ShouldMove를 속도 > 3만으로 수정: 수정 전 이동 표본41개 중0→수정 후40개(NPC8명) 모두 ShouldMove·걷기/뛰기 BlendSpace 진입. Drone.AI 19개 중18 Success·기존 NPCPerceptionSearchPIE 1 Fail, Shotgun 시선 Success. Claude 지시서 근거(ClaudeNPCWalk/before.log·after.log). 자연스러운 순찰/추적 전환·발 미끄러짐(속도 대비 보폭)·뒷걸음 방향 수동 확인 대기. Epic 마네킹 임시 동작·최종 아님. 기존 전체 회귀 수치와 합산하지 않는다. STATUS·WORKBOARD·NPC 가이드·테스트 가이드 반영. Unreal 수정·Build/PIE·Commit/Push 없음.
+
+Drone Space: 기존 진행상황과 다음 작업·테스트 맵과 확인 가이드의 NPC 걷기 항목 각1개 연산 적용, 저장 후 재조회로 기대 본문 일치 확인. 이번 범위 미반영 없음. 기존 작업트리 변경 보존, 이번 변경 파일은 STATUS.md·WORKBOARD.md·docs/history/DRONE_WORKLOG.md·docs/ai/DRONE_SMART_OBJECT_NPC_GUIDE.md·docs/gameplay/DRONE_TEST_MAP_GUIDE.md 5개.

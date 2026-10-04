@@ -15,13 +15,17 @@ import unreal
 
 PREFIX = "DRONE_NPC_GREYBOX"
 BLUEPRINT_FOLDER = "/Game/Drone/AI/Blueprints"
-MAP_PATH = "/Game/Drone/Maps/Lvl_NPCSmartObjectGreybox"
+# 2026-10-04: 맵은 AssetTools로 TestMap 폴더에 옮겨졌다(이전 경로에는 맵이 없다).
+MAP_PATH = "/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox"
 NPC_NATIVE_PATH = "/Script/Drone.DroneNPCCharacter"
 SPAWN_NATIVE_PATH = "/Script/Drone.DroneNPCSpawnPoint"
 NAVIGATION_FLOOR_NATIVE_PATH = "/Script/Drone.DroneNPCNavigationFloor"
 GAME_MODE_PATH = "/Game/Drone/Prototype/Blueprints/BP_DronePrototypeGameMode"
-MANNY_MESH_PATH = "/Game/Characters/Mannequins/Meshes/SKM_Manny_Simple"
-UNARMED_ANIM_PATH = "/Game/Characters/Mannequins/Anims/Unarmed/ABP_Unarmed"
+
+# 외형은 8월 AI-NPC-01의 Manny + ABP_Unarmed Greybox에서 이후 역할별 메시·AnimBP(AI-VIS/AI-LOCOMOTION)로 바뀌었다.
+# 2026-10-04 저장 자산 기준값이다. 다시 돌려도 현재 외형을 Greybox로 되돌리지 않게 역할별로 둔다.
+RIFLE_ANIM_PATH = "/Game/Drone/AI/Animation/ABP_NPC_Rifle_Greybox"
+FRIENDLY_ANIM_PATH = "/Game/Drone/AI/Animation/ABP_NPC_Unarmed_Greybox"
 
 NPC_SPECS = (
     {
@@ -29,20 +33,34 @@ NPC_SPECS = (
         "faction": unreal.DroneNPCFaction.HOSTILE,
         "weapon": unreal.DroneNPCWeaponType.RIFLE,
         "can_use_mg": True,
+        "mesh": "/Game/Modular_Insurgents/Mesh/SK_Preset1",
+        "anim": RIFLE_ANIM_PATH,
     },
     {
         "name": "Hostile_Shotgun",
         "faction": unreal.DroneNPCFaction.HOSTILE,
         "weapon": unreal.DroneNPCWeaponType.SHOTGUN,
         "can_use_mg": False,
+        "mesh": "/Game/Modular_Insurgents/Mesh/SK_Preset2",
+        "anim": RIFLE_ANIM_PATH,
     },
     {
         "name": "Friendly_Base",
         "faction": unreal.DroneNPCFaction.FRIENDLY,
         "weapon": unreal.DroneNPCWeaponType.UNARMED,
         "can_use_mg": False,
+        "mesh": "/Game/QuantumCharacter/Mesh/SKM_QuantumCharacter",
+        "anim": FRIENDLY_ANIM_PATH,
     },
 )
+
+
+def load_spec_visuals(spec: dict[str, object]) -> tuple[unreal.SkeletalMesh, unreal.AnimBlueprint]:
+    mesh = unreal.load_asset(str(spec["mesh"]))
+    anim = unreal.load_asset(str(spec["anim"]))
+    require(isinstance(mesh, unreal.SkeletalMesh), f"NPC mesh unavailable: {spec['mesh']}")
+    require(isinstance(anim, unreal.AnimBlueprint), f"NPC Anim Blueprint unavailable: {spec['anim']}")
+    return mesh, anim
 
 NPC_PLACEMENTS = (
     ("NPC_Hostile_Rifle_01", "Hostile_Rifle", (900.0, -650.0, 96.0), 180.0),
@@ -159,8 +177,8 @@ def configure_npc_blueprint(
     require(profile_component is not None, f"Profile Component missing: {blueprint.get_path_name()}")
     profile_component.set_profile(profile)
 
-    # AI-NPC-01은 세 역할을 같은 Manny Greybox 외형으로 표시한다. 실제 Soldier/Insurgent
-    # 채택과 무기 손 위치·Animation 교체는 AI-VIS-01에서 별도로 판정한다.
+    # 처음(AI-NPC-01)에는 세 역할이 같은 Manny Greybox였고, 지금은 NPC_SPECS의 역할별 메시·AnimBP를 쓴다.
+    # manny_mesh 인자 이름은 호환용이며 실제 값은 역할별 메시다.
     mesh = cdo.get_component_by_class(unreal.SkeletalMeshComponent)
     require(mesh is not None, f"Character Mesh Component missing: {blueprint.get_path_name()}")
     mesh.set_skeletal_mesh_asset(manny_mesh)
@@ -415,23 +433,23 @@ def main() -> None:
     spawn_native = unreal.load_class(None, SPAWN_NATIVE_PATH)
     require(npc_native is not None and spawn_native is not None, "Drone NPC native classes unavailable; build first")
 
-    manny_mesh = unreal.load_asset(MANNY_MESH_PATH)
-    anim_blueprint = unreal.load_asset(UNARMED_ANIM_PATH)
-    require(isinstance(manny_mesh, unreal.SkeletalMesh), f"Manny Greybox Mesh unavailable: {MANNY_MESH_PATH}")
-    require(isinstance(anim_blueprint, unreal.AnimBlueprint), f"Unarmed Anim Blueprint unavailable: {UNARMED_ANIM_PATH}")
-
     validate_only = os.environ.get("DRONE_NPC_GREYBOX_VALIDATE_ONLY") == "1"
     build_navigation_only = os.environ.get("DRONE_NPC_GREYBOX_BUILD_NAVIGATION") == "1"
+    if not validate_only and not build_navigation_only:
+        # Create는 맵이 없을 때만 쓴다. 맵 생성 거부보다 먼저 NPC BP 외형을 덮어쓰지 않게 여기서 멈춘다.
+        require(not editor_assets.does_asset_exist(MAP_PATH),
+                f"Create refused: {MAP_PATH} already exists. Use -Mode Validate (NPC Blueprints were not touched).")
     npc_blueprints: dict[str, unreal.Blueprint] = {}
     for spec in NPC_SPECS:
         path = bp_path(str(spec["name"]))
+        spec_mesh, spec_anim = load_spec_visuals(spec)
         if validate_only or build_navigation_only:
             blueprint = editor_assets.load_asset(path)
             require(isinstance(blueprint, unreal.Blueprint), f"Missing NPC Blueprint: {path}")
         else:
             blueprint = create_or_load_blueprint(editor_assets, path, npc_native)
-            configure_npc_blueprint(editor_assets, blueprint, spec, manny_mesh, anim_blueprint)
-        validate_npc_blueprint(blueprint, spec, npc_native, manny_mesh, anim_blueprint)
+            configure_npc_blueprint(editor_assets, blueprint, spec, spec_mesh, spec_anim)
+        validate_npc_blueprint(blueprint, spec, npc_native, spec_mesh, spec_anim)
         npc_blueprints[str(spec["name"])] = blueprint
         log(f"VALIDATED_NPC|{path}")
 

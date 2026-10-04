@@ -204,7 +204,7 @@ Yaw     HDG 002° → 025°/045°
 아직 포함하지 않는 항목:
 
 - 최종 HUD 디자인과 Animation
-- 배터리·신호·Jamming 표시
+- 최종 배터리 시간·신호 대역·소진 처리(현재 미정), 최종 디자인·영상 노이즈
 - 지형 Line Trace 기반 AGL
-- SaveGame 기록
-- 이전 기록 평균·Best 비교와 Tutorial 결과 UI
+- Tutorial 완료 영구 저장(현재 미정); Best Lap은 JSON 구현됨·자동 검증됨·재실행 복원 수동 확인 대기
+- 실제 두 Lap 평균·Best·Delta 및 Tutorial 결과 UI 수동 확인(구현·자동 검증됨)

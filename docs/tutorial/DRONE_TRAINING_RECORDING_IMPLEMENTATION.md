@@ -361,7 +361,7 @@ PIE를 끝내면 현재 실행 전용 History는 사라진다. 이는 SaveGame�
 - 잘못된 순서·역방향·중복 통과는 Segment/Lap 완료 Event나 새 Gate 경계를 만들지 않는다. 기록 중 실제로 이동했다면 그 시간과 3차원 경로는 현재 시도에 계속 포함된다.
 - Reset은 부분 시도만 폐기하고 성공 History를 보존한다.
 - Course 재구성은 비교 기준이 달라졌으므로 성공 History도 비운다.
-- 화면에 결과 HUD·Toast·Best 비교가 나오지 않는 것이 현재 정상이다.
+현재 HUD는 이전 평균·Best·시간/속도 Delta·저장 최고기록을 표시한다. 구현됨·자동 검증됨·실제 두 Lap/재실행 복원 수동 확인 대기다.
 
 ## 10. 문제가 생겼을 때 확인할 항목
 
@@ -425,7 +425,7 @@ TUT-03에서 추가·보강한 주요 자동화 범위는 다음과 같다.
 - 실제 Training Map Course가 Recorder를 소유하고 Tick을 사용하지 않음
 - 실제 BP Gate Overlap으로 Gate 0 승인 시 Lap 기록 시작
 
-## 12. 이번 범위에 포함하지 않은 것
+## 12. 이번 범위에 포함하지 않은 것 — 2026-08-27 TUT-03 당시 범위
 
 다음 항목은 TUT-03에서 구현하지 않았다.
 
@@ -444,7 +444,7 @@ TUT-03에서 추가·보강한 주요 자동화 범위는 다음과 같다.
 
 ## 13. 다음 작업 경계
 
-다음 카드는 `TUT-04 비교와 결과 UI`다.
+TUT-04 비교·결과 HUD와 TUT-04C Best Lap JSON은 구현됨·자동 검증됨·수동 확인 대기이며 현재 다음 순서는 [WORKBOARD](../../WORKBOARD.md)를 따른다.
 
 ```text
 TUT-03 원본 Record와 Event
@@ -454,4 +454,4 @@ TUT-03 원본 Record와 Event
 → Course HUD·Segment Toast·Lap 결과 UI 표시
 ```
 
-SaveGame은 런타임 계산과 UI 비교가 검증된 뒤 별도 단계로 연결한다.
+Best Lap은 TUT-04C의 JSON 저장으로 연결됐고 평균 History는 실행 중만 유지한다. 실제 재실행 복원은 수동 확인 대기다.

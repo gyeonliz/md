@@ -3,11 +3,15 @@
 정한 날: 2026-10-01. 사용자 결정: "코드는 Claude, 나머지 영역은 Codex".
 작성: Claude가 초안을 쓰고, Codex가 넘긴 규칙(Unreal 저장소 `.claude/codex-bridge/runs/20261001-184649-research-codex-rules`, 근거 파일 명시)을 합쳤다. 다른 PC 세팅은 [CLAUDE_CODEX_SETUP.md](CLAUDE_CODEX_SETUP.md).
 
+2026-10-03 사용자 결정: Claude가 허브이며 Codex를 한 번에 하나씩 호출하고 결과를 검증한다. 역할 계약은 Unreal .claude/codex-bridge/roles/docs.md·ui.md·image.md를 따른다. Codex→Claude CLI는 이PC에 없어 사용하지 않는다.
+
 ## 1. 역할
 
 | 영역 | 담당 | 비고 |
 |---|---|---|
 | `Source/Drone` C++, Build, 자동화 테스트, Unreal 도구·맵 생성 스크립트 실행 | **Claude** | Codex는 샌드박스상 Unreal 저장소를 쓸 수 없다 |
+| Blueprint·UMG 구성·연결·컴파일·저장 | **Codex(ui)** | 켜진 Editor MCP로 지시서가 지정한 /Game/Drone 자산만·개별 패키지 저장. Source/Config/맵 직접 셸 수정·PIE/Build/테스트 실행 금지. Production이 열린 상태면 중단·레벨 전환/모두 저장 금지 |
+| 이미지 시안·참고·자리표시 | **Codex(image)** | 실행 폴더 images에만 PNG 저장, 최종 아트 아님. 캐릭터·애니메이션·최종 UI/로고·음원은 사람/팀원/외부 자산 |
 | md 저장소(STATUS·WORKBOARD·WORKLOG·가이드) | **Codex** | Claude는 사실을 담은 지시서로 맡긴다 |
 | Drone Space 페이지 5개 | **Codex** | Claude 도구로는 접근 불가 |
 | Figma·Trello 대조, 보고서·제출 서류, 기획 선택지 정리 | **Codex** | Figma·Trello는 읽기만 |
@@ -19,7 +23,7 @@
 ```
 사용자 ──요청──▶ Claude ──(코드·Build·테스트)──▶ 결과 검증
                    │
-                   ├─ 지시서 → Unreal 저장소 .claude/codex-bridge/Invoke-CodexTask.ps1 → Codex(docs/review/research)
+                   ├─ 지시서 → Unreal 저장소 .claude/codex-bridge/Invoke-CodexTask.ps1 → Codex(docs/review/research/ui/image)
                    │                                    │
                    ◀──── result.md ◀──────────────────────┘
                    │  Claude가 git diff·로그로 검증
@@ -32,7 +36,8 @@
 
 - Claude → Codex: Unreal 저장소 `.claude/codex-bridge/Invoke-CodexTask.ps1` (절차는 `codex-handoff` 스킬).
 - Codex → Claude: 결과 보고의 "Claude에게 넘길 코드 작업", 또는 WORKBOARD 카드(아래 5절).
-- 한쪽만 고친다. Claude가 코드 작업 중이면 Codex는 읽기 전용 역할만 맡는다.
+- Unreal 셸 파일 변경은 Claude만 수행한다. Codex ui는 Claude 지시서 범위의 켜진 Editor 자산 도구만 사용한다. 이미지 참고 자산은 AI 사용 금지 메타데이터를 먼저 확인한다.
+- ui MCP 연결 실패 시 임의로 스크립트 방법으로 전환하지 않고 Claude에게 보고한다. image 재생성은 첫 생성 뒤 최대2회(총3장), 산출물은 실행 폴더만 사용한다.
 
 ## 3. 지시서 고정 칸 (Codex 요청 반영)
 
@@ -92,13 +97,25 @@ Space `Drone 프로젝트`(ID `page_space_0d47818e41608191bc3c83a1c0aaea15`). �
 - 사용자 보고에는 Codex가 한 일, Claude가 검증한 것, Space 반영 여부, 미커밋 상태를 나눠 쓴다.
 - 호출마다 사용자의 Codex 사용량이 든다. 기본 추론 강도 `medium`, 리뷰·원인 조사 `high`, `xhigh`는 요청 시만. 같은 위임을 반복하지 않는다.
 
+## 운영 규칙1~7 — 2026-10-03 사용자 채택
+
+원문 근거: Unreal 저장소 CLAUDE.md의 AI 작업 운영 규칙. 역할별 상세 제한은 .claude/codex-bridge/roles/*.md를 따른다.
+
+1. **반복 수정 상한**: 같은 증상(시각·체감·불안정 테스트 포함)에 "수정→검증"을 2번 해도 풀리지 않거나 작업 단위 하나(1~3시간)를 넘기면 멈춘다. 증상 로그, 시도한 것, BP/DA에서 조정할 수 있는 파라미터 목록을 정리해 사람에게 넘긴다. Codex에게 맡긴 작업도 같다.
+2. **수동 확인 대기 상한**: "구현됨·자동 검증됨·수동 확인 대기" 기능이 5개 이상이면 새 기능을 시작하기 전에 맵별 확인 체크리스트를 먼저 드린다. 사용자가 "진행해"라고 하면 그대로 진행한다. 버그 수정과 사용자가 직접 요청한 작업은 예외다.
+3. **결정 전 양쪽 구현 금지**: 미정 사항(스토리 분기, 기본값, 경기 규칙 등)은 두 안을 모두 구현하지 않는다. 선택지와 영향을 한 쪽 분량으로 정리한 결정 요청을 먼저 드린다.
+4. **Codex 문서 위임은 묶어서**: Build·자동화 결과가 확정된 뒤 관련 변경을 묶어 맡긴다. 횟수 제한은 없다(2026-10-04 사용자 결정으로 하루 2번 상한 삭제). 결과가 바뀔 수 있는 중간에는 맡기지 않는다. 상태 칸만 고칠 때는 `-Effort low`, 지시서에 읽을 범위(절·카드 행)를 적는다. MD·Space를 함께 갱신하는 AGENTS.md 규칙은 그대로다.
+5. **문서 다이어트**: 지우지 않고 아카이브한다. 목표는 STATUS 30KB 이하, WORKBOARD는 현재 카드 표와 Next만, 세션 결과 전문은 WORKLOG에만. 한 번에 하지 않고 다음 docs 위임부터 단계적으로(STATUS 먼저) 한다. 절차는 `.claude/codex-bridge/roles/docs.md`.
+6. **알려진 실패 목록**: `.claude/known-test-failures.md`. 회귀 보고에는 이 목록 밖의 새 실패만 따로 적고, Production 맵 의존 테스트는 "팀원 맵 의존"으로 표기한다. 원인이 풀리면 목록에서 뺀다.
+7. **시각 리소스 조달 순서**: 보유 자산 → 팀원 → Fab·외주 → (마지막) AI 생성(`image` 역할, 시안 전용). 자산 메타데이터의 AI 사용 금지 표시(`isAiForbidden` 등)를 확인하고 그런 자산은 AI 도구에 올리지 않는다. 캐릭터 메시·애니메이션·최종 아트·음원·말로 반복하는 시각 미세 조정은 AI에 맡기지 않는다.
+
 ## 8. 알려진 충돌·낡은 규칙 (Codex 규칙 6절) — 정리 계획
 
 | 위치 | 문제 | 처리 |
 |---|---|---|
-| md `CLAUDE.md` 서두·새 기록 지침·Space 처리 | "문서 저장소가 Claude로 이관", "새 기록 도구는 Claude", "Claude 접근 불가라 로컬만" — 지금은 md·Space가 Codex 담당 | Codex `docs`로 수정 |
-| md `WORK_PC_START_HERE.md` | D 경로 예시가 기본처럼 적힘, 이전 `9f67706`·목록 튐 미수정 상태 잔존, Build/PIE를 Codex 흐름에 연결 | Codex `docs`로 수정 |
-| md `docs/git/CODEX_CONTEXT_SYNC.md` | 종료 절차에 Commit/Push가 무조건 단계처럼 적힘 | "사용자 지시 시에만" 연결 — Codex `docs` |
+| md `CLAUDE.md` 서두·새 기록 지침·Space 처리 | "문서 저장소가 Claude로 이관", "새 기록 도구는 Claude", "Claude 접근 불가라 로컬만" — 지금은 md·Space가 Codex 담당 | 처리됨 — 10/04 해당 현재 역할·PC 기준으로 정정 |
+| md `WORK_PC_START_HERE.md` | D 경로 예시가 기본처럼 적힘, 이전 `9f67706`·목록 튐 미수정 상태 잔존, Build/PIE를 Codex 흐름에 연결 | 처리됨 — 10/04 역할·Git 표 참조·5메뉴·PC 검증·Next 정정 |
+| md `docs/git/CODEX_CONTEXT_SYNC.md` | 종료 절차에 Commit/Push가 무조건 단계처럼 적힘 | 처리됨 — CODEX_CONTEXT_SYNC에 사용자 요청 시에만 반영됨 |
 | Unreal `AGENTS.md` | Space 동기화 문서를 `../md/...` 상대 경로로 가리킴(C PC는 인접 폴더 아님) | Claude 수정 완료 |
 | md `tools/work-pc` | README 없음 | 보류(필요 시 Codex) |
 | Space 루트 네이티브 지침 | `invalid_page_schema`로 미등록 | 등록 완료로 쓰지 않는다 |

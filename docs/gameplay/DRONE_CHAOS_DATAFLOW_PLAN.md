@@ -142,8 +142,8 @@ Dataflow가 자산 제작을 담당한다고 해서 Chaos Cloth Runtime Tearing�
 - Dataflow Runtime Evaluation이 가능해도 첫 버전은 Editor에서 자산을 생성·재저장한다. 매 Frame Graph 재평가는 사용하지 않는다.
 - Legacy ThirdPerson/Variant 신규 의존성 0, 새 생산 자산은 `/Game/Drone/Physics`, 새 코드는 `Source/Drone/Physics`에 둔다.
 - C++·Plugin 변경 전에 열린 Editor를 저장 후 종료한다.
-- 현재 열려 있는 Editor는 별도 복제본 `D:\JGY\project\droner`다. `PHY-DF-00`을 시작할 때 이를 닫고 기준 `D:\JGY\project\drone`을 명시적으로 연다.
-- `droner/Content/Asset`의 36.36 GB 공급사 전체 복사본을 Physics 자산 원본 경로로 사용하거나 Commit하지 않는다. 외부 원본은 `D:\JGY\project\Unreal_260821`, 생산 이식은 `/Game/Drone/Physics`만 사용한다.
+이전 D PC 당시 메모(D PC 예시, 실제 경로로 바꿀 것): - 당시 열려 있던 Editor는 별도 복제본 `D:\JGY\project\droner`다. `PHY-DF-00`을 시작할 때 이를 닫고 기준 `D:\JGY\project\drone`을 명시적으로 연다.
+이전 D PC 외부 원본 경로 기록: - `droner/Content/Asset`의 36.36 GB 공급사 전체 복사본을 Physics 자산 원본 경로로 사용하거나 Commit하지 않는다. 외부 원본은 `D:\JGY\project\Unreal_260821`, 생산 이식은 `/Game/Drone/Physics`만 사용한다.
 
 ## 7. 작업 카드와 순서
 
@@ -178,4 +178,4 @@ Dataflow가 자산 제작을 담당한다고 해서 Chaos Cloth Runtime Tearing�
 - Unreal 실행 로그와 프로젝트 명시 설정에서 Dataflow·Geometry Collection·Chaos Cloth Asset 경로 활성화 확인
 - Cloth/Geometry Collection 생산 자산: 0개
 - 코드 변경: 일반 Flight 공통 벽 반발, 결정적 그물 얽힘/포획 v1, 대상 Point Damage 전달, 선택적 국소 절단/복구 4점 Net Rig, 조각별 물리 전환 Breakable Wall 추가
-- 다음 기능 우선순위: Physics Sandbox 수동 화면에서 반발·그물 감속/포획·복구 체감 확인 → 실제 Cloth/Geometry Collection 비교, 병행해서 Tutorial Best Lap SaveGame
+- 다음 기능 우선순위: Physics Sandbox 벽/그물·카메라 수동 확인→실제 Cloth/Geometry Collection 비교. Best Lap JSON은 구현됨·자동 검증됨(TUT-BEST-01), 같은 조건 실제 재실행 복원은 수동 확인 대기다.

@@ -4,13 +4,46 @@
 
 기준일: 2026-09-29
 
+## Shotgun 시선 안정화 확인 — 2026-10-04 C PC
+
+1. TestMap/Lvl_DroneShotgunSystemsTest를 직접 Play하고 정면 표적 고정 시 Idle·사격 애니메이션 움직임과 좌우±1.9° 추적 시 추가 움직임을 구분한다.
+2. AI-SHOTGUN-RENDER-01 해결(2026-10-04 C PC Claude). 표적 고정 시 머리4.2~4.4°(Idle·사격 애니메이션), 표적±1.9° 왕복 시 머리5.2~5.4°·SmoothedDroneLookRotation 1.45°. 9/18 몸 Hysteresis·Bone Gaze 보간(데드존 경계 0 Snap 없음)은 정상, 5~6° 대부분은 9월 하순 Rifle 계열 AnimBP 교체 뒤 애니메이션 흔들림이다. 절대 머리4° 판정(애니메이션 포함)과 미렌더 뼈 정지에 따른 NullRHI 거짓 통과가 원인. 표적 고정0.6초 기준 측정 후 시선 출력≤2.5°·애니메이션 대비 추가 머리 흔들림≤2.5°로 시험 정정(경계0↔±1.9° 튐3.8° 검출). NullRHI·렌더 Success(ClaudeInterview/shotgun3_*.log), known-test-failures에서 제외(Claude 지시서 근거).
+3. 자동 시험 Drone.AI.ShotgunSystemsTestMapPIE 성공은 실제 장치 수동 Pass와 구분한다. NPCPerception 감지 실패는 별도이며 Production Training은 저장하지 않는다.
+
+## 2026-10-04 Acro·첫 포커스 수동 확인 (C PC)
+
+Unreal `41444c2` + 로컬 미커밋. Claude 조사/C++/Build/자동화·IMC 패치, Codex(ui) Scout/Drop BP 입력 연결→Claude 확인, Codex 문서 반영. 자동 검증12/12 Success(`ClaudeAcro/test_after_dz.log`), 화면 그려진 전체94개 중90 Success·기존4 Fail(`ClaudeAcroFull/test3.log`)이며 **수동 Pass 아님**. 아래 과거 맵 설명과 당시 검사는 보존한다.
+
+1. `/Game/Drone/Maps/Lvl_DroneFrontEnd`에서 Acro 선택 가능한 비행 기체로 출격한다. Mode1/2를 각각 확인한다. 키보드 W/S Pitch·A/D Roll·Q/E Yaw·Space/Ctrl Throttle는 둘 다 같고, 패드 Mode2 LeftY=Throttle/RightY=Pitch·Mode1은 반대다. 회의 “좌우 스틱 반전”이 이 배치인지 다른 축 부호인지 기록한다(현재 미정).
+2. 자세를 맞춘 뒤 W/S·A/D·Q/E를 놓고 **Space만** 누른다. 상승/추력 변화와 별개로 스로틀만으로 자세가 뒤집히지 않아야 한다. 자동화는 스로틀+1/0/-1·프레임 끊김에서 자세 불변 확인. W+Space 동시 입력과 Space 단독을 구분한다.
+3. Mode1에서 스틱에 엄지를 걸친 채 Space→상승, 키 떼고 스틱→패드 조종, 모두 놓으면0인지 확인한다. Mode2도 같은 혼합입력을 비교한다. 키보드/패드 입력원 분리·절댓값 큰 쪽 사용은 자동 검증됐고 실제체감은 수동대기다.
+4. FPV 키보드 W/S 또는 A/D를 짧게 톡(약0.1초) 누른다. 최대650°/s 기준 약65° 회전 후 Acro는 자동 수평 복귀가 없어 자세가 유지될 수 있다. 응답/체감과 W+Space 습관을 기록한다. 키보드 배율·Angle 모드·마우스 Yaw는 현재 미정이며 이 단계에서 임의 결정하지 않는다.
+5. Scout·Drop 각각 Acro Mode1/2 비행 입력6개가 실제로 동작하는지 확인한다. 저장 BP 연결은 자동 계약으로 확인했지만 실제 비행은 수동 대기다. FPV/FiberOptic도 회귀 확인하며 지상 UGV는 Acro 대상에서 제외한다.
+6. 결과·타이틀 화면을 반복 열어 첫 버튼 강조·방향/A/B·다른 버튼 이동 유지 여부를 본다. UI-FOCUS-RACE-01은 UIOnly 지연 루트 포커스 경쟁에5프레임 복원을 넣은 **수정 후 확인 중**. 화면 그려진 수정 전Fail/후Success 각1회뿐, 안정화 완료 아님. TutorialNextLessonPIE 실패 진단의 강조 위젯/Slate 위젯 이름을 비교한다.
+
+기록: 날짜/PC·실제 패드·기체/BP·Mode·키/축·단독/동시 입력·기대/실제·첫 버튼 강조. 자동 키/축 주입 성공을 실제 장치 확인으로 확대하지 않는다. 기존1280/1920 UI·8수업 연속 진행·Best Lap 재실행·설정/입력 표시 수동 확인도 별도 유지한다.
+
+### 추가 자동 회귀 판정 전 화면 확인
+
+TEST-RENDER-UNPAINTED-01: 새벽 전체5회 중3회(당시 관찰) PIE 화면이 그려지지 않음(LobbyLayout `samples=0`, 렌더 전용 Shotgun Fail이 Success로 바뀜). 이 실행은 GamepadMissionFlow/GamepadNavigation/TitleFiveMenu/TitleFiveMenuWidget/TutorialComplete/TutorialNextLesson 포커스6개가 동반 Fail하므로 화면 포커스 판정에서 제외한다. `-stdout`·MCP 포트와 무관·원인 미특정. 새벽 화면그려진 test3.log의94/90/4는 당시근거이며 최신후속95개2회는 아래와 같이별도판정한다. `.claude/known-test-failures.md`의 판정 절차를 따른다. 같은 증상 수정→검증2회 후 중단했으므로 사람 확인/추가 관찰 카드로 유지한다.
+
+최신 오후 전체97개중86 Success·11 Fail은 PIE 미렌더이며 오늘10회 중8회 발생했다. 패드 포커스6개 판정 제외·당시 나머지5개(후속 Shotgun 해결·전체 재실행 아님)는 NPCPerception·Shotgun 판정 오류(후속 해결)·LobbyLayout samples=0 진단·팀원 TrainingAssets/TrainingPIESmoke. Shotgun은 미렌더 표지에서 제외하고 렌더 전용으로 분류하지 않는다. 화면 그려진 포커스 확인 대기·Production 보존.
+
+### 장거리 표시선 수동 확인 — 10/04 C PC
+
+Claude 곡률 분할·MaximumCourseLineSegments 기본1024(시작값·미확정)·BP드래그재구성Off는 구현됨·자동검증됨. TestMap 짧은 코스68/113조각은 기존 균일분할 유지. 팀원은 Production코스 급커브·원경·끝연결과 Editor편집체감을 확인한다. Production은 읽기 전용 측정·MCP캡처만 했고 맵미저장. 기능검증은TestMap, Production편집/저장은 맵소유팀원만. 상세 수치·2048검토·46/258ms비용은 [저작가이드](../tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md)를 따른다.
+
+### pull 뒤 레이싱 지형 확인
+
+Claude 조사(10/04 C PC pull41444c2·LFS 실제 파일 수신): 팀원 코스는 MWLandscapeAutoMaterial 예제 Island/MountainRange 계열1개·PlayerStart 없음, 아이템/Gate 자산의 맵·DA 참조 없음. 제품 DA는 `TestMap/Lvl_DroneRacingTest`. 제품으로 사용할 지형·PlayerStart·완주/복귀 연결은 사용자/팀원 결정 대기이며 이번 맵 미수정·제품 지형 완주 수동 Pass 없음.
+
 ## 9/17 안전 감사 추가
 
 최신 Source와 STATUS/WORKBOARD를 우선한다. 기존 본문의 샷건 `6°`/Cyan 기본 표시/공통 3° 데드존 설명은 과거 기록이며, 현재는 **12° 반각, Cyan 기본 Off, 몸 3° stop/6° start Hysteresis + Bone Gaze 잔여 보간**이다. 사거리 안 즉시 사격/밖 0.2초 확인 후 추적이 현재 계약이다.
 
 Weather TestMap은 최신 Editor 빌드 후 Play에서 숫자열 **7 Clear / 8 LightWind / 9 RainStorm**으로 맵 저장 없이 Snapshot을 즉시 전환한다. 배치된 Random Weather Manager는 8방향+무풍을 사용하며 Flight HUD와 Visualizer에 Cardinal/m/s로 표시한다. RainStorm에서는 강우 값에 반응하는 최대 80개의 저빈도 디버그 선분 프리뷰를 확인할 수 있다. 이는 실제 Niagara 효과나 GPU 최적화 완료를 의미하지 않는다. Wetness consumer·Audio는 여전히 후속 작업이다. 조작 비교 키는 `1/2/3/4`다.
 
-정확한 명령, 무저장 경계, NPC 재현 항목, 미구현 품질 preset 후보 및 `stat unit/gpu/niagara` 비교 절차는 Unreal repo `Tools/AssetMigration/README_NPC_WEATHER_TEST.md`를 따른다. 이 PC 설치 엔진은 Build.version상 **5.8.2**이며 5.8.1 검증으로 표기하지 않는다. 기존 Weather Validate 도구는 자산 생성 fallback이 있어 이번 읽기 전용 감사에는 사용하지 않았다.
+정확한 명령, 무저장 경계, NPC 재현 항목, 미구현 품질 preset 후보 및 `stat unit/gpu/niagara` 비교 절차는 Unreal repo `Tools/AssetMigration/README_NPC_WEATHER_TEST.md`를 따른다. 현재 C PC 설치 엔진은 Build.version상 **5.8.3**·CL58210709(2026-10-04 확인), 이전 PC의5.8.1/5.8.2 기록과 구분한다. 기존 Weather Validate 도구는 자산 생성 fallback이 있어 이번 읽기 전용 감사에는 사용하지 않았다.
 
 ## 맵 구성
 
@@ -108,7 +141,7 @@ cd C:\URproject\drone
 - 바닥의 큰 Cube 화살표는 35° 풍향을 가리키며 충돌하지 않는다.
 - `WeatherSystemsTest_Visualizer`는 현재 Snapshot 풍향으로 24개 Bead를 움직이고 화면에 Profile·Cardinal 풍향·m/s·현재 조작 모드를 표시한다.
 - 쉬운 조작은 기본 65%, 제한 자세는 25%, Rate/Acro는 0% 보정을 사용한다. `WeatherResponseComponent` 기본값에서 바꿀 수 있다.
-- Play 중 숫자 `1/2/3` 또는 NumPad `1/2/3`으로 Easy/Manual/Rate-Acro를 즉시 바꿔 같은 바람에서 Drift를 비교한다.
+- Play 중 숫자1/2/3/4 또는 NumPad1/2/3/4로 Easy/Manual/Acro Mode1/Acro Mode2를 즉시 바꿔 같은 바람에서 Drift를 비교한다.
 - Bead 수·범위·크기·재생 속도와 표시/키 사용 여부는 `/Game/Drone/Weather/Blueprints/BP_DroneWeatherDebugVisualizer` 또는 배치 인스턴스에서 조정한다.
 - `Weather Profile`을 `DA_Weather_Clear` 또는 `DA_Weather_RainStorm_Greybox`로 교체할 수 있다. 폭우 Profile은 비 수치를 전달하지만 Niagara가 아직 없으므로 빗줄기가 안 보이는 것이 정상이다.
 
@@ -126,7 +159,7 @@ cd C:\URproject\drone
 ### Smart Object
 
 1. `Lvl_NPCSmartObjectGreybox`를 열고 Play한다.
-2. Hostile Rifle/Shotgun의 순찰, Drone 발견, 수색, 복귀를 본다.
+2. Hostile Rifle/Shotgun의 순찰, Drone 발견, 수색, 복귀를 본다. 순찰·추적 중 정지/걷기/뛰기 전환·속도 대비 보폭/발 미끄러짐·뒷걸음 방향을 확인한다. AI-LOCOMOTION-01 구현됨·자동 검증됨(2026-10-04 C PC Claude 재생 확인)·수동 확인 대기. 두 AnimBP의 ShouldMove를 속도 > 3만으로 수정: 수정 전 이동 표본41개 중0→수정 후40개(NPC8명) 모두 ShouldMove·걷기/뛰기 BlendSpace 진입. Drone.AI 19개 중18 Success·기존 NPCPerceptionSearchPIE 1 Fail, Shotgun 시선 Success. Claude 지시서 근거(ClaudeNPCWalk/before.log·after.log). 자연스러운 순찰/추적 전환·발 미끄러짐(속도 대비 보폭)·뒷걸음 방향 수동 확인 대기. Epic 마네킹 임시 동작·최종 아님.
 3. Cyan Slot 방향과 NPC 도착 방향이 일치하는지 본다.
 4. 유인 MG 점유와 사수 사망 뒤 생존 NPC 재점유를 확인한다.
 5. 설치형·차량형 자동포탑의 Yaw/Pitch, 장애물 차단, 차량 부모 추종을 확인한다.

@@ -104,7 +104,7 @@ Inbox → Todo → Doing → Done
 - [ ] Doing 카드에 구현 결과와 남은 문제 기록
 - [ ] Unreal 프로젝트 변경 파일 확인
 - [ ] 필요한 테스트 실행
-- [ ] Git Commit/Push
+- [ ] Git Commit/Push — 사용자가 요청한 경우에만(기본은 사용자가 GitHub Desktop으로 처리)
 - [ ] Codex/GPT 작업 컨텍스트 저장
 - [ ] 인증 정보·비밀번호가 전달 대상에 포함되지 않았는지 확인
 

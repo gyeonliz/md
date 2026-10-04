@@ -13,7 +13,7 @@
 - 개인 수험일이 확인되면 정보처리산업기사 계획을 해당 D-Day 기준으로 압축
 - 이 문서에는 확인되지 않은 시험 일정이나 세부 출제 범위를 임의로 넣지 않음
 
-날짜별 실행안과 현재 Drone 상태를 한 번에 볼 때는 [`MOBILE_CURRENT_BRIEF.md`](MOBILE_CURRENT_BRIEF.md)를 먼저 읽는다.
+현재 Drone 상태는 [STATUS](../../STATUS.md)·[WORKBOARD](../../WORKBOARD.md)를 먼저 읽는다. MOBILE_CURRENT_BRIEF는 2026-09-08 과거 이동용 요약이다.
 
 컴퓨터과학·게임개발 추천자료 8종은 이 시험·코딩테스트 계획과 분리한 [`CS_GAMEDEV_READING_PLAN.md`](CS_GAMEDEV_READING_PLAN.md)를 따른다. 평상시 주 2시간, 바쁜 주 25분 한 번을 기준으로 하며 시험 D-Day와 Drone 통합 작업이 우선이다.
 

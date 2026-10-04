@@ -51,7 +51,7 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 실제 Tutorial을 
 
 ## 2. Story Mission 진입 공통
 
-Story 맵을 직접 Play하면 선택된 Mission 정보가 없으므로 Spectator 상태가 될 수 있다. `/Game/Drone/Maps/Lvl_DroneFrontEnd`를 Play하고 로비에서 해당 Story Test Mission을 선택한 뒤 Drone을 골라 시작한다.
+Story 4맵을 직접 Play하면 `MissionTest_DefaultEntry`가 해당 DA로 기체 선택을 준비한다(10/01 이후). 통합 흐름은 FrontEnd의 스토리 메뉴에서 확인한다.
 
 ### Mission 1 — Golden Time
 
@@ -87,7 +87,7 @@ Story 맵을 직접 Play하면 선택된 Mission 정보가 없으므로 Spectato
 
 ## 3. Tutorial Hover 재확인
 
-1. FrontEnd에서 `Tutorial Hover`를 선택한다.
+1. FrontEnd에서 `튜토리얼 1-1 - 호버링`를 선택한다.
 2. Scout Drone으로 시작한다.
 3. 시험맵의 네 모서리 기둥으로 표시된 Hover Zone 안으로 들어간다.
 4. 이동 입력을 놓고 속도와 회전을 안정시킨 채 3초 유지한다.

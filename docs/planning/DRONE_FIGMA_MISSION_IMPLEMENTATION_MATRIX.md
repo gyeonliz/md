@@ -17,6 +17,25 @@
 
 Figma에서 확인한 큰 구조는 `튜토리얼 + Story Mission 4개 / 환경 맵 3개`다.
 
+## 2026-10-03 현재 구현 대조
+
+아래 9/18·9/24 Figma 기록은 보존한다. 현재 상태는 [STATUS](../../STATUS.md), 10/02·10/03 검증·DA 관찰은 [WORKLOG의 STATUS 정리 참조](../history/DRONE_WORKLOG.md)·[10월 원문 아카이브](../history/archive/STATUS_2026-10.md)를 따른다. 이번 Figma 원본 재조회·수정은 하지 않았다.
+
+| 수업 ID | 현재 DA/격리 시험맵 | 현재 결과/다음 연결 |
+|---|---|---|
+| 1-1 | Hover / Lvl_Tutorial_Hover_Test | Forward |
+| 1-2 | Forward / Lvl_Tutorial_Forward_Test | Heading |
+| 1-3 | Heading / Lvl_Tutorial_Heading_Test (원형 코스) | GateFlight |
+| 1-4 | GateFlight / Lvl_Tutorial_GateFlight_Test | FPV |
+| 2 | FPV / Lvl_Tutorial_FPV_Test | Payload |
+| 3 | Payload / Lvl_Tutorial_Payload_Test | UGV.NPC |
+| 4-1 | UGV_NPC / Lvl_Tutorial_UGV_NPC_Test | UGV.Turret |
+| 4-2 | UGV_Turret / Lvl_Tutorial_UGV_Turret_Test | 없음 (전체 완료 판정) |
+
+8개 DA 모두 로컬 유효성 확인. UGV 총/유탄과 수업 목표는 기존 구현이며 수업별 시간·다음·재도전·n/8·전체 완료는 `DroneMissionResultWidget`/Flow가 제공한다. 별도 결과 WBP를 4개 새로 만드는 작업으로 분류하지 않는다. 완료 기록은 이번 실행 동안만 유지하고 영구 저장은 미정이다. 기존 자동검증의 전체 완료는 나머지7개를 테스트용 완료 처리한 후 호버를 클리어한 조건이며 실제8개 수동 완주와 다르다.
+
+Story4 DA/격리 시험맵·M1→M4 순서, 자막/음성 슬롯이 존재한다. 최종 미션2 결말·3/4 수량/실패·콘텐츠·음원은 미완료/미정으로 유지한다. 회의의 로비5개 계약·레이싱 지정코스/랜덤 제외는 [UI 가이드](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md) 0절을 따른다. 회의4개와 문서8개의 단위가 불명확하므로 8→4로 축소하지 않는다. Warehouse와 최종 실기 수치는 별도 결정이다.
+
 ## 2026-09-18 최신 UX 재확인
 
 - 화면 흐름은 `게임 실행 → 타이틀 → 시작 → 미션 선택 → 선택 미션 설명 → 시작 → 로비 → 드론 선택 → 인게임` 순서다. 사람 플레이어 전환 화면은 현재 기준에 넣지 않는다.

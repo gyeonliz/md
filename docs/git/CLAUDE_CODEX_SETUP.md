@@ -13,15 +13,15 @@
 | PC 전용(사용자 홈) | `~/.claude/settings.json`, Claude 메모리(`~/.claude/projects/...`), `~/.codex/config.toml` | 따라가지 않는다. 필요한 규칙은 이미 `CLAUDE.md`(공유)에 있다 |
 | 사용자 공통 규칙 | md 저장소 `docs/git/USER_RULES.md`(공유 원본) → 각 PC `~/.claude/CLAUDE.md`(가져오기 줄) | Pull 후 Unreal 저장소 `.claude/codex-bridge/Test-CollabSetup.ps1 -InstallUserRules` 한 번 |
 
-## 처음 공유할 때 (지금 C PC에서 한 번)
+## 공유 파일 목록 — 최초 공유 2026-10-02 완료
 
-GitHub Desktop으로 `drone` 저장소에서 아래를 Commit/Push한다. `.claude/settings.local.json`, `local.json`, Unreal 저장소 `.claude/codex-bridge/runs/`, `briefs/`는 Git 제외라 목록에 안 뜨는 것이 정상이다.
+기존 공유 파일은 5b03ad3(10/02)로 Commit/Push 완료됐다. 새 `roles/ui.md`·`roles/image.md`는 미추적이며 사용자가 별도 Commit할 때 포함할 대상이다. 아래는 공유 대상 목록으로, 이번 문서 작업에서는 Commit/Push하지 않는다. PC 전용 설정·runs·briefs는 Git 제외다.
 
 - `CLAUDE.md`, `AGENTS.md`, `.mcp.json`, `.gitignore`
 - `.claude/settings.json`, `.claude/skills/codex-handoff/SKILL.md`
 - `.claude/codex-bridge/` 아래 `*.ps1`, `BRIEF_TEMPLATE.md`, Unreal 저장소 `.claude/codex-bridge/roles/`, `.gitignore`
 
-md 저장소도 Codex가 갱신한 문서를 Commit/Push한다. Commit 메시지는 한국어로 쓴다.
+md의 미커밋 문서는 사용자가 명시적으로 지시한 경우에만 Commit/Push한다.
 
 ## 새 PC에서
 
@@ -53,6 +53,12 @@ md 저장소도 Codex가 갱신한 문서를 Commit/Push한다. Commit 메시지
      }
    }
    ```
+
+## Unreal MCP 자동 시작 — Git 공유 Default 설정 (10/04 정정)
+
+자동 시작은 Git 추적 Config/DefaultEditorPerProjectUserSettings.ini의 [/Script/ModelContextProtocolEngine.ModelContextProtocolSettings] bAutoStartServer=True·ServerPortNumber=8000·ServerUrlPath=/mcp로 8월부터 모든 PC에 켜져 있다. PC별 Saved ini는 끄거나 바꿀 때만 사용한다. C PC Saved 설정 완료라는 이전 설명은 오류였고 공유 Default로 충족한다.
+
+Claude 클라이언트는 Unreal 루트 .mcp.json을 사용한다. 연결이 안 되면 자동화 등 다른 Unreal 프로세스가8000포트를 점유했는지 확인한다. 자동화 실행은 -ModelContextProtocolPort=8010으로 사용자Editor8000을 보존한다. 열린Editor 즉시시작은 ModelContextProtocol.StartServer이며 설정 존재와 실제 도구 연결 성공을 구분한다.
 
 ## 알려진 제한
 

@@ -2,7 +2,7 @@
 
 기준일: 2026-09-30 (Asia/Seoul)
 
-이 문서는 `D:\JGY\project\drone`의 현재 코드 기준으로 작성한다. 코스 제작은 `BP_DroneTrainingCourse`에서 관리한다. 권장 자동 편집 방식은 Course Spline과 분리된 `Ring별 Spline Handle`이며, Handle 배열 순서가 곧 Gate 통과 순서다. 생성된 빛나는 선 Component, 자동 Gate Child Actor와 GateIndex를 직접 관리하지 않는다. Production `Lvl_DroneTraining`은 팀원 소유이므로 이번 기능 작업에서 저장·덮어쓰지 않았다. 검증은 `/Game/Drone/Maps/TestMap/Lvl_DroneTrainingRouteSelectionTest`에서 한다.
+이 문서는 저장소 상대 경로(최신 10/04 현재 C PC 41444c2 + 로컬 미커밋) 기준으로 작성한다. 코스 제작은 `BP_DroneTrainingCourse`에서 관리한다. 권장 자동 편집 방식은 Course Spline과 분리된 `Ring별 Spline Handle`이며, Handle 배열 순서가 곧 Gate 통과 순서다. 생성된 빛나는 선 Component, 자동 Gate Child Actor와 GateIndex를 직접 관리하지 않는다. Production `Lvl_DroneTraining`은 팀원 소유이므로 이번 기능 작업에서 저장·덮어쓰지 않았다. 검증은 `/Game/Drone/Maps/TestMap/Lvl_DroneTrainingRouteSelectionTest`에서 한다.
 
 ## 1. 현재 맵과 자산 위치
 
@@ -16,6 +16,8 @@
 과거 `9de1ead` 기준 Production 맵 감사 결과는 Gate Actor 17개, Course Sequence 4개였다. 현재 맵 배치 개수의 증거로 재사용하지 않는다. 수동 배치 Gate를 자동 Handle 방식으로 전환하는 작업은 맵 담당 팀원이 진행한다.
 
 ## 2. 루트 만들기와 Spline 점 추가
+
+Production Lvl_DroneTraining 편집·저장은 맵 소유 팀원만 한다. AI 기능 검증은 TestMap/Lvl_DroneTrainingRouteSelectionTest에서 수행한다. 아래 저장 단계는 해당 TestMap 또는 맵 소유 팀원에게만 적용한다.
 
 1. `Lvl_DroneTraining`을 열고 World Outliner에서 `BP_DroneTrainingCourse`를 선택한다.
 2. Components에서 `CourseSpline`을 선택한다.
@@ -35,18 +37,20 @@ Spline 제어점은 코스 곡선만 만든다. Ring 수와 위치는 별도의 
 
 기존 구현은 Spline 제어점 한 쌍마다 긴 Cube Spline Mesh 한 개만 만들었다. Spline 자체가 Curve여도 제어점 사이가 길면 화면의 단면·Tangent 보간이 거칠게 보여 빛나는 선이 꺾인 것처럼 보일 수 있었다.
 
-현재는 전체 Spline을 거리 기준으로 다시 샘플링한다.
+현재 전체 Spline을 분할하되 상한에 걸리지 않은 짧은 코스(TestMap68·113조각)는 기존 균일 분할을 유지한다. 긴 코스만 같은 조각 수를 sqrt(곡률) 밀도+15% 균일 몫으로 배치한다. 목표 길이 CourseLineSegmentLengthCentimeters 기본200cm와 표시 예산 MaximumCourseLineSegments를 구분한다. 생성 CourseLineSegment_*를 직접 이동·복제하지 않는다.
 
-```text
-기본 목표 길이      CourseLineSegmentLengthCentimeters = 200 cm
-생성 Segment 수    ceil(Spline 전체 길이 / 목표 길이)
-안전 상한           256개
-현재 64.9 m 코스    33개 생성 예상
-```
+### 3-1. 장거리 코스 수정·팀원 조정 — 10/04 C PC Claude
 
-각 구간은 시작·끝 위치뿐 아니라 해당 거리의 Spline 방향으로 Tangent를 계산하고 Smooth Interpolation을 사용한다. 따라서 제어점 6개 사이를 5개의 긴 조각으로 그리지 않고 약 2 m 단위의 33개 조각으로 이어 곡선을 더 매끄럽게 표시한다.
+구현됨·자동 검증됨·수동 확인 대기. Production을 저장하지 않고 측정한 값은 액터Scale2·로컬9.6km(월드19.2km)·92 CurveAuto점이다. 이전 고정256 균일분할은 약75m 조각·실제경로 대비최대7.9m/95%2.3m 오차였다. MountainRange33.8km·Island10.6km도 같은 원인이다.
 
-선이 여전히 거칠면 Course의 `Course Line Segment Length Centimeters`를 `100~150 cm`로 낮춘다. 값이 작을수록 부드럽지만 Component와 렌더 비용이 늘어난다. 생성된 `CourseLineSegment_*`는 Construction 때 지워지고 다시 만들어지므로 직접 이동·복제·저장하지 않는다.
+| 조정 위치 | 값·의미 |
+|---|---|
+| BP_DroneTrainingCourse > Tutorial > Course > Visual | MaximumCourseLineSegments 기본1024·16~4096. 측정으로 고른 시작값·확정값 아님. 긴 코스는 목표길이만 낮춰도 상한에 걸림 |
+| Production 동일경로1024 측정 | 최대약50cm·95%7cm. 더 매끈하게는2048(최대약20cm) 검토 |
+| BP Class Settings | Run Construction Script on Drag Off. 끄는 동안 매프레임 재구성 대신 놓을 때1회, BP만 저장됨 |
+| 재생성 비용 | 256조각46ms·1024조각258ms(로드/BeginPlay1회), Component/렌더 예산 비교 필요 |
+
+CourseLineAdaptiveSegments 자동 검증: 짧은코스 불변·15.2km 시험코스 최대오차 균일256244cm→곡률25640cm→곡률10243cm·상한 변경/감소·BP드래그설정. 근거 Saved/Automation/ClaudeCourse/inspect.log·deviation.log·bp_drag.log·review_fix_test.log(Claude 실행). MCP 급커브 캡처 확인·Production맵 미저장, 팀원 코스 외형과 Editor 편집 체감은 수동 대기다. 원래92점·CurveAuto·Gate/Handle위치·순서·개수·폭·색을 보존하고 기능검증은 TestMap, Production저장은 맵 소유 팀원만 한다.
 
 ## 4. 자동 Spline Ring Gate 배치
 
@@ -95,7 +99,7 @@ Ring별 Spline Handle = Ring 수만큼
 Automatic Gate Class = BP_DroneTrainingGate
 ```
 
-기존 숫자 배치가 필요한 경우에만 `개별 Ring 위치 Handle 사용`을 끄고 `Automatic Gate Count`, 균등 분배 또는 절대 거리 배열을 사용한다. 프로젝트 재설정 도구 `Tools/AssetMigration/ConfigureAutomaticTrainingGates.py`의 설정 실행은 사용자 배치를 기본 4개 숫자 배치로 되돌릴 수 있으므로 현재 맵에는 실행하지 않고 검증 모드만 사용한다.
+기존 숫자 배치가 필요할 때만 개별 위치 Handle을 끄고 Automatic Gate Count/거리 배열을 쓴다. `Tools/AssetMigration/ConfigureAutomaticTrainingGates.py`는 기본 검증만, 저장은 `DRONE_TRAINING_GATE_APPLY=1`일 때만 허용한다. 기존 `DRONE_TRAINING_GATE_VALIDATE_ONLY=1`도 검증만 한다. Production 편집·저장은 맵 담당 팀원만, AI 검증은 TestMap이다.
 
 Ring 사이 간격을 완전히 직접 지정하려면 `Automatic Gate Spline Distances Centimeters` 배열을 Ring 수만큼 만든다. 예를 들어 `500, 1300, 2600, 4100`은 Spline 시작점에서 각각 5m, 13m, 26m, 41m 지점에 Ring 0~3을 둔다. 배열 값은 통과 순서대로 증가시키는 것이 권장되며, 항목이 없거나 음수인 Index는 균등/고정 간격 계산값을 사용한다.
 
@@ -221,7 +225,7 @@ Training Course가 있는 맵에서만 표시되는 구간 정보:
 - `완료 구간 평균 거리`: 완료 구간 거리들의 산술 평균, `m`
 - `완료 구간 평균 시간`: 완료 구간 시간들의 산술 평균, `초`
 
-첫 Gate를 통과하기 전에는 `기록 준비`, Lap 측정 중에는 `코스 측정 중`, 완료 이력이 있으면 `최근 완료 기록` 상태를 표시한다. 이전 Lap 평균·Best 대비 `+/-` 비교와 영구 저장은 별도 TUT-04 후속 범위이며 이번 표기의 완료 항목으로 과장하지 않는다.
+이전 완주 평균·Best·시간/속도 Delta와 저장 최고기록 표시·Best Lap JSON은 구현됨·자동 검증됨·수동 확인 대기다. 평균 History는 실행 중만 유지하며 같은 조건 재실행 복원을 직접 확인한다.
 
 ## 8. 저장·검증 체크리스트
 
