@@ -159,11 +159,11 @@ cd C:\URproject\drone
 ### Smart Object
 
 1. `Lvl_NPCSmartObjectGreybox`를 열고 Play한다.
-2. Hostile Rifle/Shotgun의 순찰, Drone 발견, 수색, 복귀를 본다. 순찰·추적 중 정지/걷기/뛰기 전환·속도 대비 보폭/발 미끄러짐·뒷걸음 방향을 확인한다. AI-LOCOMOTION-01 구현됨·자동 검증됨(2026-10-04 C PC Claude 재생 확인)·수동 확인 대기. 두 AnimBP의 ShouldMove를 속도 > 3만으로 수정: 수정 전 이동 표본41개 중0→수정 후40개(NPC8명) 모두 ShouldMove·걷기/뛰기 BlendSpace 진입. Drone.AI 19개 중18 Success·기존 NPCPerceptionSearchPIE 1 Fail, Shotgun 시선 Success. Claude 지시서 근거(ClaudeNPCWalk/before.log·after.log). 자연스러운 순찰/추적 전환·발 미끄러짐(속도 대비 보폭)·뒷걸음 방향 수동 확인 대기. Epic 마네킹 임시 동작·최종 아님.
+2. Hostile Rifle/Shotgun의 순찰, Drone 발견, 수색, 복귀를 본다. 순찰·추적 중 정지/걷기/뛰기 전환·속도 대비 보폭/발 미끄러짐·뒷걸음 방향을 확인한다. 적의 양손 총 들기·걷기/조준, 총의 오른손 hand_r 추종·왼손 총 위, 손/총 정렬(특히 산탄총)·사격/재장전을 확인한다. AI-LOCOMOTION-01 후속 구현됨·자동 검증됨(2026-10-04 C PC, 작업·검증 Claude)·수동 확인 대기. Mannequin 원본과 Insurgent/Quantum 메시의 스켈레톤 불일치로 양팔을 벌리던 문제를 사용자 선택 IK Retarget으로 수정하고 적 Gun을 hand_r에 부착. 속도 > 3 이동 판정·Gaze 유지. NPCLocomotionAnimPIE 오프스크린 Success: 이동40개(NPC5명) ShouldMove40, 위팔 기본 자세 대비 평균51.7°·40/40, 총 든 NPC 양손 간격 평균34.4cm·24/24, 총 hand_r 추종·왼손 총 위 각각24/24. Drone.AI 19개 중18 Success·기존 NPCPerceptionSearchPIE 1 Fail(state=1 detected=0), 새 실패 없음. 자산 Verify success(ClaudeNPCWalk/rt_tests3.log·ai_suite.log·verify_rt3.log). 걷기/뛰기 전환·발 미끄러짐·뒷걸음 방향·손/총 정렬(특히 산탄총)·사격/재장전은 사용자 수동 확인 대기. CR_Mannequin_FootIK는 Insurgent 계층 차이로 Editor 컴파일 경고 잔존. Epic 마네킹 변환 임시 동작·최종 아님; 최종 애니메이션 미구현·자산 미정, 산탄총 전용 동작 미구현·도입 여부 미정(소총 동작 공유).
 3. Cyan Slot 방향과 NPC 도착 방향이 일치하는지 본다.
 4. 유인 MG 점유와 사수 사망 뒤 생존 NPC 재점유를 확인한다.
 5. 설치형·차량형 자동포탑의 Yaw/Pitch, 장애물 차단, 차량 부모 추종을 확인한다.
-6. Friendly NPC가 적 대응과 섞이지 않고 기지 동선을 유지하는지 본다.
+6. Friendly NPC가 적 대응과 섞이지 않고 기지 동선을 유지하며 팔을 내린 비무장 걷기를 하는지 본다.
 
 ### Shotgun Systems
 

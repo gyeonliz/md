@@ -247,11 +247,20 @@ Hostile Controller가 `ADronePrototypePawn`을 처음 감지하면 현재 Smart 
 
 `AI-VIS-01A` 읽기 전용 감사 결과 Modular Soldier와 Insurgent Skeleton은 현재 Manny Skeleton과 직접 일치하지 않으며, 이식된 두 Root의 Animation Asset은 각각 0개다. 특정 외형을 적·아군으로 확정하지 않았고 Retarget·T Pose·손 위치 검증 전에는 역할 BP에 강제 적용하지 않는다.
 
-현재 프로젝트에는 Manny Skeleton용 Rifle Animation 38개와 FPS Weapon Mesh 70개가 있다. `MM_Rifle_Fire`, `MM_Rifle_Reload`, AR4 Rifle 후보는 정상 로드된다. Hostile Rifle·Shotgun은 프로젝트 소유 `ABP_NPC_Rifle_Greybox`와 `BS_NPC_Rifle_Locomotion`으로 Rifle ADS Idle·8방향 Walk/Jog·Jump를 사용하고, Friendly는 `ABP_NPC_Unarmed_Greybox`와 BS_NPC_Unarmed_Locomotion을 사용한다. Fire/Reload는 `DefaultSlot` Dynamic Montage로 임시 재생하고 Fire 기본 Play Rate는1.0이며 같은 Sequence 재생 중에는 다시 시작하지 않아 연사 떨림을 막는다. Shotgun도 MVP 동안 같은 Manny 동작을 재사용한다. 역할 BP Class Defaults의 `Drone AI NPC Visual Animation`에서 `Use Greybox Weapon Animations`를 끄거나 Fire/Reload Animation·Play Rate를 교체할 수 있다. 이름으로 식별되는 Shotgun Weapon Mesh는 0개이므로 Rifle Mesh를 Shotgun으로 속여 적용하지 않으며 최종 외형·Shotgun Animation은 `AI-VIS-01B` 범위다.
+Hostile Rifle/Shotgun은 Insurgent SK_Preset1/2(SKM_BaseBody_Skeleton)용 `/Game/Drone/AI/Animation/Retargeted/Insurgent/ABP_NPC_Rifle_Greybox_Insurgent`와 변환 BlendSpace·발사/재장전 Sequence를 사용한다. Friendly는 QuantumCharacter(SK_Military_Character_Skeleton)용 `/Game/Drone/AI/Animation/Retargeted/Quantum/ABP_NPC_Unarmed_Greybox_Quantum`와 변환 비무장 BlendSpace를 사용한다. 기존 `/Game/Drone/AI/Animation/ABP_NPC_*_Greybox`는 Mannequin 변환 원본으로만 남긴다. Fire/Reload는 `DefaultSlot` Dynamic Montage로 임시 재생하고 Fire 기본 Play Rate1.0·같은 Sequence 중 재시작 방지를 유지한다. Shotgun은 Fab Model 12 메시와 소총 변환 동작을 공유한다. 최종 NPC 애니메이션 자산·산탄총 전용 동작 도입 여부는 현재 미정이다. 역할 BP Class Defaults의 `Drone AI NPC Visual Animation`에서 `Use Greybox Weapon Animations`를 끄거나 대상 스켈레톤에 맞는 Fire/Reload Animation·Play Rate로 교체할 수 있다.
 
-AI-LOCOMOTION-01 구현됨·자동 검증됨(2026-10-04 C PC Claude 재생 확인)·수동 확인 대기. 두 AnimBP의 ShouldMove를 속도 > 3만으로 수정: 수정 전 이동 표본41개 중0→수정 후40개(NPC8명) 모두 ShouldMove·걷기/뛰기 BlendSpace 진입. Drone.AI 19개 중18 Success·기존 NPCPerceptionSearchPIE 1 Fail, Shotgun 시선 Success. Claude 지시서 근거(ClaudeNPCWalk/before.log·after.log). 자연스러운 순찰/추적 전환·발 미끄러짐(속도 대비 보폭)·뒷걸음 방향 수동 확인 대기. Epic 마네킹 임시 동작·최종 아님.
+AI-LOCOMOTION-01 후속 구현됨·자동 검증됨(2026-10-04 C PC, 작업·검증 Claude)·수동 확인 대기. Mannequin 원본과 Insurgent/Quantum 메시의 스켈레톤 불일치로 양팔을 벌리던 문제를 사용자 선택 IK Retarget으로 수정하고 적 Gun을 hand_r에 부착. 속도 > 3 이동 판정·Gaze 유지. NPCLocomotionAnimPIE 오프스크린 Success: 이동40개(NPC5명) ShouldMove40, 위팔 기본 자세 대비 평균51.7°·40/40, 총 든 NPC 양손 간격 평균34.4cm·24/24, 총 hand_r 추종·왼손 총 위 각각24/24. Drone.AI 19개 중18 Success·기존 NPCPerceptionSearchPIE 1 Fail(state=1 detected=0), 새 실패 없음. 자산 Verify success(ClaudeNPCWalk/rt_tests3.log·ai_suite.log·verify_rt3.log). 걷기/뛰기 전환·발 미끄러짐·뒷걸음 방향·손/총 정렬(특히 산탄총)·사격/재장전은 사용자 수동 확인 대기. CR_Mannequin_FootIK는 Insurgent 계층 차이로 Editor 컴파일 경고 잔존. Epic 마네킹 변환 임시 동작·최종 아님; 최종 애니메이션 미구현·자산 미정, 산탄총 전용 동작 미구현·도입 여부 미정(소총 동작 공유).
 
-9/29 검증은 자산 연결뿐이어서 실제 재생은 확인되지 않았다. ABP_NPC_Rifle_Greybox·ABP_NPC_Unarmed_Greybox는 UE 템플릿 ABP_Unarmed 복제본의 ShouldMove(지면 속도 > 3 AND CurrentAcceleration ≠ 0)를 사용했다. AI 경로 이동은 기본 bUseAccelerationForPaths=false, 개인화기 추적은 9월에 의도한 직접 속도 추종으로 가속도0→Idle이었다. Claude는 이동 코드를 유지하고 UDroneNPCAnimationAuthoringLibrary::UseVelocityOnlyLocomotionGate/ValidateVelocityOnlyLocomotionGate로 두 AnimBP 이벤트 그래프를 속도 조건만으로 수정·두 자산 저장, Rifle Gaze 체인 유지 확인. Tools/AssetMigration/BuildNPCGreyboxAnimationAssets.py·VerifyNPCGreyboxAnimationAssets.py에도 반영해 재생성 유지·검증 통과. 시험은 Drone.AI.NPCLocomotionAnimPIE(TestMap/Lvl_NPCSmartObjectGreybox 순찰 이동), 로그는 C:\URproject\drone\Saved\Automation\ClaudeNPCWalk\before.log·after.log. Codex는 엔진을 실행하지 않았다.
+10/04 첫 수정의 속도 > 3 이동 판정은 유지한다. 후속의 양팔 벌림은 SK_Mannequin 원본과 적 SKM_BaseBody_Skeleton·아군 SK_Military_Character_Skeleton의 불일치가 원인이었다. 사용자가 IK Retarget 방식(선택 1)을 확정했고 Claude가 적용했다. 복제 AnimBP의 Gaze 그래프·속도 판정과 발사 가산(Mesh Space 회전) 설정을 유지하고 그래프 내 모든 동작의 대상 스켈레톤을 검사했다.
+
+도구 실행 순서(Claude 담당; Codex는 이번 문서 작업에서 실행하지 않음):
+
+1. `Tools/AssetMigration/BuildNPCGreyboxAnimationAssets.py`: Mannequin 원본 AnimBP만 생성하며 NPC 연결은 하지 않는다.
+2. `Tools/AssetMigration/RetargetNPCAnimationAssets.py`: `/Game/Drone/AI/Animation/Retarget`에 IK_NPC_Mannequin·IK_NPC_Insurgent·IK_NPC_Quantum(자동 체인·자동 Full Body IK), RTG_NPC_Mannequin_To_Insurgent·RTG_NPC_Mannequin_To_Quantum을 생성한다. Insurgent 24개(소총 AnimBP·BlendSpace·조준 Idle·걷기/뛰기 각8방향·점프·발사·재장전), Quantum 22개(비무장 AnimBP·BlendSpace·Idle·걷기·뛰기·점프)를 변환하고 역할 BP에 연결한다.
+3. `Tools/AssetMigration/AttachNPCWeaponsToHands.py`: 적 BP의 캡슐 고정 Gun을 캐릭터 메시 오른손 Bone `hand_r`에 부착한다. 조준 Idle 첫 프레임 기준으로 기존 총 위치를 환산해 조준 Idle 모습은 유지하고 걷기·사격 때 손을 따라간다. 소총 SK_KA_Val_Y 약 10cm, 산탄총 Fab Model 12 약16cm 상대 오프셋. Editor 전용 `UDroneNPCAnimationAuthoringLibrary::AttachBlueprintComponentToMeshSocket`·`GetBlueprintComponentAttachment`로 부착·조회한다.
+4. `Tools/AssetMigration/VerifyNPCGreyboxAnimationAssets.py`: NPC AnimBP·발사/재장전 Sequence의 스켈레톤 일치와 Gun의 hand_r 부착을 검사한다.
+
+`Drone.AI.NPCGreyboxAssets`에 AnimBP·발사/재장전과 메시 스켈레톤 일치 검사가 추가됐다. `Drone.AI.NPCLocomotionAnimPIE`는 위팔 기본 자세 대비20° 이상, 총 든 NPC 양손 간격60cm 이하, 보이는 총의 hand_r 추종·왼손 총 위를 검사한다. Claude Editor Simulate 화면은 적 양손 총 들기·걷기/조준과 아군 팔 내린 비무장 걷기를 보였다(지시서 근거: `C:\URproject\drone\Saved\Automation\ClaudeNPCWalk\after1_crop.png`·`after_friendly_crop.png`). 사용자 수동 Pass는 대기다.
 
 ## 5. 생성된 Smart Object 지점 확인·사용하기
 
@@ -355,7 +364,7 @@ Spawn Point의 `Spawn On Begin Play` 기본값은 꺼져 있다. 실수로 PIE�
 | `BP_NPC_Friendly_Base` | Friendly / Unarmed / MG 사용 불가 | 2명 |
 | `BP_NPCSpawnPoint` | `ADroneNPCSpawnPoint` Blueprint 자식 | 필요할 때 사용 |
 
-경로는 /Game/Drone/AI/Blueprints다. 적 Rifle/Shotgun은 Insurgent Preset1/2·ABP_NPC_Rifle_Greybox, 아군은 QuantumCharacter·ABP_NPC_Unarmed_Greybox(+BS_NPC_Unarmed_Locomotion)를 사용한다. 최종 아트 완성을 뜻하지 않는다.
+경로는 /Game/Drone/AI/Blueprints다. 적 Rifle/Shotgun은 Insurgent Preset1/2·ABP_NPC_Rifle_Greybox_Insurgent, 아군은 QuantumCharacter·ABP_NPC_Unarmed_Greybox_Quantum(각 Retargeted 폴더의 변환 BlendSpace)를 사용한다. 최종 아트 완성을 뜻하지 않는다.
 
 Controller의 엔진 자동 시작은 꺼져 있고 C++가 Profile에 맞는 Asset을 명시적으로 선택한다. Smart Object Runtime이 준비된 World BeginPlay 뒤 Hostile은 `ST_NPC_HostilePatrol`, Friendly는 `ST_NPC_FriendlyBaseRoutine`을 시작한다.
 
@@ -474,7 +483,7 @@ Blueprint에서는 `NPCWeaponComponent`의 다음 Event에 표현만 연결한�
 - `OnWeaponFired`: `WeaponType`, `TraceStart`, `AimPoint`를 받는다. Rifle은 한 발마다 1회, Shotgun은 Pellet마다가 아니라 Volley마다 1회다.
 - `OnReloadCompleted`: `WeaponType`, `CurrentAmmo`, `MagazineCapacity`를 받는다. 실제 Reload 성공 때만 1회다.
 
-현재 Manny 임시 Animation은 C++이 자동 재생하며, Projectile 충돌·Damage도 C++에서 작동한다. Hostile 역할 BP의 Mesh `Anim Class`는 `ABP_NPC_Rifle_Greybox`, Friendly는 `ABP_NPC_Unarmed_Greybox`가 정상값이다. Blueprint Event Graph에서는 `NPC Weapon Fired Visual`과 `NPC Reload Completed Visual`에 최종 Animation·Niagara·Sound 표현만 연결한다. 최종 Montage를 직접 연결할 때는 `Use Greybox Weapon Animations`를 꺼서 중복 재생을 막는다. Projectile Spawn, Line Trace, Damage, 탄약 감소를 다시 작성하면 이중 발사·피해·소모가 생기므로 넣지 않는다.
+현재 Epic 마네킹 변환 임시 Animation은 C++이 자동 재생하며, Projectile 충돌·Damage도 C++에서 작동한다. Hostile 역할 BP의 Mesh `Anim Class`는 `ABP_NPC_Rifle_Greybox_Insurgent`, Friendly는 `ABP_NPC_Unarmed_Greybox_Quantum`가 정상값이다. Blueprint Event Graph에서는 `NPC Weapon Fired Visual`과 `NPC Reload Completed Visual`에 최종 Animation·Niagara·Sound 표현만 연결한다. 최종 Montage를 직접 연결할 때는 `Use Greybox Weapon Animations`를 꺼서 중복 재생을 막는다. Projectile Spawn, Line Trace, Damage, 탄약 감소를 다시 작성하면 이중 발사·피해·소모가 생기므로 넣지 않는다.
 
 권장 구현 순서는 다음과 같다.
 

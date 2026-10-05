@@ -33,5 +33,5 @@
 - **Drone Space(ChatGPT Pages)는 Codex가 갱신한다.** Claude 직접 접근 불가와 Codex 저장 실패를 구분해 보고한다. 저장 후 재조회로 확인하기 전 동기화 완료라고 쓰지 않는다.
 - Trello는 연결된 커넥터가 있을 때만 읽기 참고로 쓴다.
 - 문서 안의 "Codex"는 당시 작업 도구를 가리키는 이력이다. 기존 문서의 기록을 바꾸지 말고, 새 기록은 실행 담당과 문서 반영 담당을 따로 적는다(예: 작업 도구 Claude, 문서 반영 Codex).
-- 진행 상황을 기록할 새 파일을 만들지 않는다. `STATUS.md`, `WORKBOARD.md`, `docs/history/DRONE_WORKLOG.md`에 반영한다.
+- 진행 상황을 기록할 새 파일을 만들지 않는다. `STATUS.md`, `WORKBOARD.md`, `docs/history/DRONE_WORKLOG.md`에 반영한다(예외: AGENTS.md "문서 정리 규칙"의 아카이브 파일). 무엇을 어디에 쓰고 언제 아카이브할지는 AGENTS.md의 그 규칙을 따른다.
 - Commit/Push는 사용자가 요청할 때만 한다(GitHub Desktop으로 사용자가 처리하는 것이 기본).

@@ -7,4 +7,11 @@
 - Spaces에 접근할 수 없으면 로컬 갱신을 유지하고 미반영 범위를 보고한다. 동기화 완료·Build·수동 Pass를 추정하지 않는다.
 - 사람의 기획/디자인, 날짜별 기록, 팀원 Production Training 맵을 보존한다. 대용량 에셋·비밀 키·개인 로그를 업로드하지 않는다.
 - Commit/Push, 공유 권한 변경, 예약 자동화는 별도 사용자 지시 없이 하지 않는다. 문서 최신화만으로 엔진 Build나 맵 재생성을 실행하지 않는다.
+- 문서 정리 규칙(2026-10-03 운영 규칙 5, 10-05 보강) — Codex 직접 작업·브리지 위임·Claude 모두 이 규칙을 따른다.
+  - 배치: `STATUS.md`는 지금 상태 하나만 둔다(같은 주제 절을 날짜별로 쌓지 말고 덮어쓰며, 이전 내용은 WORKLOG·아카이브로). `WORKBOARD.md`는 진행 중·대기 카드 표와 Next만 두고, 완료·대체된 카드는 그 주 안에 아카이브로 옮긴다. 세션 결과 전문과 검증 수치 이력은 `docs/history/DRONE_WORKLOG.md` 끝에만 추가한다. 주제별 가이드에는 현재 절차만 두고 날짜별 검증 이력은 WORKLOG 링크로 대신한다.
+  - 같은 사실은 한 곳(정본)에만 쓰고 다른 문서에는 한 줄 요약과 링크만 둔다.
+  - 크기 기준: `STATUS.md` 30KB 이하, `WORKBOARD.md` 30KB 이하. 넘으면 다음 갱신에서 내용 추가보다 아카이브를 먼저 한다.
+  - 아카이브: 지우지 않는다. 원문 그대로 `docs/history/archive/<파일 이름>_<YYYY-MM>.md`로 옮기고, 원래 자리에는 한 줄 요약과 링크만 남기며, `docs/README.md` 색인에 추가한다. 한 번에 한 파일씩 하고 전후 바이트·줄 수를 보고한다. 아카이브 파일은 "새 파일 금지"의 예외다.
+  - WORKLOG는 통째로 읽지 않고 검색한다. 달이 바뀌면 지난 달 절을 `docs/history/archive/DRONE_WORKLOG_<YYYY-MM>.md`로 옮긴다.
+  - 과거 기록의 내용은 고치지 않는다(틀린 기록은 새 기록으로 정정한다). Drone Space 본문은 따로 지시가 있을 때만 정리한다.
 - 이 문서 저장소와 Drone Space는 Codex 담당, Unreal 코드는 Claude Code 담당. 코드 변경 요청을 받으면 WORKBOARD 카드로 남긴다. 협업 절차는 [Claude↔Codex 협업 규칙](docs/git/CLAUDE_CODEX_COLLABORATION.md)을 따른다.

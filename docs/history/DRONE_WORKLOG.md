@@ -2765,3 +2765,25 @@ Drone Space: 기존 진행상황과 다음 작업 3개·테스트 맵과 확인 
 AI-LOCOMOTION-01 구현됨·자동 검증됨(2026-10-04 C PC Claude 재생 확인)·수동 확인 대기. 두 AnimBP의 ShouldMove를 속도 > 3만으로 수정: 수정 전 이동 표본41개 중0→수정 후40개(NPC8명) 모두 ShouldMove·걷기/뛰기 BlendSpace 진입. Drone.AI 19개 중18 Success·기존 NPCPerceptionSearchPIE 1 Fail, Shotgun 시선 Success. Claude 지시서 근거(ClaudeNPCWalk/before.log·after.log). 자연스러운 순찰/추적 전환·발 미끄러짐(속도 대비 보폭)·뒷걸음 방향 수동 확인 대기. Epic 마네킹 임시 동작·최종 아님. 기존 전체 회귀 수치와 합산하지 않는다. STATUS·WORKBOARD·NPC 가이드·테스트 가이드 반영. Unreal 수정·Build/PIE·Commit/Push 없음.
 
 Drone Space: 기존 진행상황과 다음 작업·테스트 맵과 확인 가이드의 NPC 걷기 항목 각1개 연산 적용, 저장 후 재조회로 기대 본문 일치 확인. 이번 범위 미반영 없음. 기존 작업트리 변경 보존, 이번 변경 파일은 STATUS.md·WORKBOARD.md·docs/history/DRONE_WORKLOG.md·docs/ai/DRONE_SMART_OBJECT_NPC_GUIDE.md·docs/gameplay/DRONE_TEST_MAP_GUIDE.md 5개.
+
+## 2026-10-04 NPC 소총 IK Retarget·총 오른손 부착 후속 — C PC, Claude 실행·Codex docs 반영
+
+기준: Unreal HEAD `41444c2` + 이번 도구·Editor 작성 함수·검증 시험·변환/연결 자산 미커밋(그 밖의 미커밋은 이전 작업분, Claude 지시서 기준). md HEAD `94f6375`, 작업 전 git status --short 출력 없음. 두 HEAD를 읽기 전용으로 확인했다. 작업·검증 Claude, 문서·Space 반영 Codex. 지시서: `C:\URproject\drone\.claude\codex-bridge\runs\20261004-205005-docs-docs-npc-rifle-retarget\prompt.md`.
+
+사용자 보고의 양팔 벌림은 Mannequin AnimBP/Sequence와 적 Insurgent·아군 Quantum 스켈레톤의 불일치 때문이었다. 사용자가 선택한 IK Retarget으로 IK Rig3개·Retargeter2개, Insurgent 소총24개·Quantum 비무장22개 변환. 적 Rifle/Shotgun은 ABP_NPC_Rifle_Greybox_Insurgent·변환 Fire/Reload, 아군은 ABP_NPC_Unarmed_Greybox_Quantum으로 연결했다. 원본 ABP_NPC_*_Greybox는 변환 원본으로만 남기고 속도 > 3 판정·Gaze 그래프·발사 가산 설정을 유지했다. Gun 캡슐 고정을 hand_r 부착으로 교체하고 조준 Idle 첫 프레임 환산 오프셋(소총 약 10cm, 산탄총 약16cm)으로 Idle 모습과 동작 중 손 추종을 유지했다. Editor 전용 AttachBlueprintComponentToMeshSocket·GetBlueprintComponentAttachment 추가, Build 원본 생성만/Retarget 연결/Attach 손 부착/Verify 검증 순서로 정리했다. 변경 도구: Tools/AssetMigration/RetargetNPCAnimationAssets.py·AttachNPCWeaponsToHands.py(신규), BuildNPCGreyboxAnimationAssets.py·VerifyNPCGreyboxAnimationAssets.py(후속 정리). 시험 NPCGreyboxAssets에 스켈레톤 일치, NPCLocomotionAnimPIE에 위팔20° 이상·양손 간격60cm 이하·보이는 총 hand_r 추종·왼손 총 위 검사를 추가했다(구현 사실은 Claude 지시서 근거).
+
+AI-LOCOMOTION-01 후속 구현됨·자동 검증됨(2026-10-04 C PC, 작업·검증 Claude)·수동 확인 대기. Mannequin 원본과 Insurgent/Quantum 메시의 스켈레톤 불일치로 양팔을 벌리던 문제를 사용자 선택 IK Retarget으로 수정하고 적 Gun을 hand_r에 부착. 속도 > 3 이동 판정·Gaze 유지. NPCLocomotionAnimPIE 오프스크린 Success: 이동40개(NPC5명) ShouldMove40, 위팔 기본 자세 대비 평균51.7°·40/40, 총 든 NPC 양손 간격 평균34.4cm·24/24, 총 hand_r 추종·왼손 총 위 각각24/24. Drone.AI 19개 중18 Success·기존 NPCPerceptionSearchPIE 1 Fail(state=1 detected=0), 새 실패 없음. 자산 Verify success(ClaudeNPCWalk/rt_tests3.log·ai_suite.log·verify_rt3.log). 걷기/뛰기 전환·발 미끄러짐·뒷걸음 방향·손/총 정렬(특히 산탄총)·사격/재장전은 사용자 수동 확인 대기. CR_Mannequin_FootIK는 Insurgent 계층 차이로 Editor 컴파일 경고 잔존. Epic 마네킹 변환 임시 동작·최종 아님; 최종 애니메이션 미구현·자산 미정, 산탄총 전용 동작 미구현·도입 여부 미정(소총 동작 공유).
+
+검증 조건: TestMap/Lvl_NPCSmartObjectGreybox, 렌더 오프스크린. 로그 전체 경로는 `C:\URproject\drone\Saved\Automation\ClaudeNPCWalk\rt_tests3.log`·`ai_suite.log`·`verify_rt3.log`. Codex가 시험 성공·위팔/양손/부착 수치·AI 19개 결과·Verify success를 읽기 전용 대조했다. Claude Editor Simulate의 적 총 들고 걷기·조준/아군 비무장 걷기는 지시서의 after1_crop.png·after_friendly_crop.png 근거이며 Codex 직접 화면 확인이나 사용자 수동 Pass로 쓰지 않는다. 이전 40개(NPC8명) 속도 조건 수정 기록은 당시 이력으로 보존하며 이번 40개(NPC5명) 자세 검증과 합산하지 않는다.
+
+STATUS AI·차량·날씨 행, WORKBOARD AI-LOCOMOTION-01 카드/Next7, NPC 가이드의 변환 AnimBP 경로·도구 순서·검증 기준, 테스트 맵 Smart Object 확인 순서에 손/총 정렬·사격/재장전을 반영했다. 기존 날짜별 기록은 변경하지 않고 끝에 추가했다. 새 파일·문서 다이어트·Unreal 수정·엔진 Build/PIE/도구 실행·Commit/Push·Trello/Figma 수정 없음.
+
+Drone Space: 기존 진행상황과 다음 작업·테스트 맵과 확인 가이드의 NPC 걷기 항목 각1개 연산 적용(진행 sequence22, 테스트 sequence15). 저장 후 두 대상 블록을 다시 읽어 기대 본문과 일치 확인. 이번 범위 미반영 없음. 최종 NPC 애니메이션 자산·산탄총 전용 동작 여부는 현재 미정으로 유지했다.
+
+## 2026-10-05 사용자 결정 D-7·D-9·D-10·D-15 — C PC, Codex 문서 반영
+
+결정 사용자(총괄 세션 경유 전달), 문서 반영 Codex. 지시서 `C:\URproject\drone\.claude\codex-bridge\runs\20261005-180714-docs-docs-decisions-1005\prompt.md` 근거로 WORKBOARD 두 결정 표의 D-7·D-9·D-10 상태 행만 갱신했다. 결정 내용 정본은 [WORKBOARD 결정 표](../../WORKBOARD.md#결정-필요--현재-da-값은-채택-사양이-아님). D-7 비공개 전환은 사용자 직접 확인·처리 대기이며 공개 상태 관찰은 Claude 비로그인 curl HTTP 200(10/05 C PC, 로그 미저장) 전달 근거이고 Codex 재검증은 아니다.
+
+D-15 확정(2026-10-05 사용자 결정): 로컬 미커밋 변경은 커밋만 하고 푸시는 나중에 사용자 지시 시 진행. 커밋 전 묶음별로 나누어 커밋 메시지를 정리하고 사용자 확인 후 Claude가 커밋 실행. 지정된 두 결정 표에는 해당 행이 없어 다른 행·절은 수정하지 않았다. 나머지 D-1~6·8·11~14는 현재 미정 유지. 구현/자동 검증/수동 확인/미구현 분류는 해당 없음(결정 기록).
+
+지시서 기준 Unreal `41444c2` + 미커밋(이번 작업 없음), md `94f6375` + 10/04 NPC Retarget 미커밋 5파일. 실제 작업 전 git status에는 AGENTS.md·CLAUDE.md를 포함한 기존 수정 7파일이 있었으며 보존했다. STATUS·applications·Unreal·Space 수정, Build/PIE, Commit/Push 없음. Space는 지시서에 따라 제외. WORKBOARD는 갱신 전 42,138바이트로 30KB 초과; 다이어트 대상 없음 지시에 따라 아카이브하지 않았다.

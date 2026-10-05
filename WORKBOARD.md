@@ -29,8 +29,8 @@
 | M3/M4 | 타겟·적·드론 수량, 성공/실패, 제한·재출격·결과 카메라 | M4 시험값 표적3·재출격0(무제한)를 회의 확정으로 전용하지 않음 |
 | 조종 입력 표시 | 기본값, 장치 자동 전환, 혼합 입력·연결 해제/재연결 | 수동 ON/OFF 확정·구현, 임시 기본 False·사용자 선택 우선. 정책 미결 유지 |
 | Tutorial | 회의 4개와 수업 ID 8개의 집계 단위, 권장문구/건너뛰기·완료 영구 저장 | 8개 수업 유지, 8→4 축소 안 함 |
-| md 공개 범위·개인정보 | PROJECT_EXPERIENCE_PLAN_HWP_GUIDE의 기업 주소·대표자·팀원 실명·예산·로컬 경로(이미 원격 Push됨) 처리 여부 | 사용자 결정 대기, applications 내용 미수정 |
-| OpenRouter | 9/17 대화의 API 키 폐기 여부 확인 | 사용자 확인 대기, 키 값은 저장소에 없음·읽지 않음 |
+| md 공개 범위·개인정보 | PROJECT_EXPERIENCE_PLAN_HWP_GUIDE의 기업 주소·대표자·팀원 실명·예산·로컬 경로(이미 원격 Push됨) 처리 여부 | D-9 종료(2026-10-05 사용자 결정): 비공개 유지, Git 기록 재작성 없음. applications 내용 미수정 |
+| OpenRouter | 9/17 대화의 API 키 폐기 여부 확인 | D-10 종료(2026-10-05 사용자 결정): 결제수단 없음·미사용으로 무시·삭제. 키 정리는 사용자 직접, 저장소 작업 없음·키 값 읽지 않음 |
 | Bangkok 의존 자산 | ThirdParty/BangkokCity 987개·LFS약11.46GiB 정리 여부 | 맵은 의도된 삭제, 자산 정리 현재 미정 |
 | 콘텐츠/전시 | 캐릭터 메시·관찰 시점 적용 맵·조종기 비치/책임, 기록 등급, 브리핑 실명/납품일, 행사일 | 임의 실명·수치·마감일 없음 |
 
@@ -40,7 +40,7 @@
 
 | 항목 | 필요한 결정/자료 | 현재 처리 |
 |---|---|---|
-| 1. 제3자 구매 자산 약51GB | GitHub 공개 여부 확인 후 비공개 전환 또는 자산 분리·출처 목록 | 라이선스 처리·공개 범위 현재 미정 |
+| 1. 제3자 구매 자산 약51GB | GitHub 공개 여부 확인 후 비공개 전환 또는 자산 분리·출처 목록 | D-7 결정 종료(2026-10-05 사용자 결정): 현재 공개 계획 없음·저장소 비공개 유지 방침. 향후 공개 시 빌드·코드·영상만(구매 에셋 제외). 10/05 C PC Claude 비로그인 curl HTTP 200으로 공개 상태로 보임; GitHub 설정에서 사용자 직접 비공개 전환 필요 |
 | 2. 본인 기여와 AI 활용 설명 | 본인 설계·결정·검증 범위를 먼저 확인하고 README에 정직하게 정리 | C++ Claude 담당 표기의 면접 설명 필요, 본인 담당 미확인 |
 | 3. 포트폴리오 루트 README | 플레이 방법·설계/기여·검증 근거·용량/출처를 담을 범위 결정 | Unreal 루트 README 부재, 이번 신규 작성 안 함 |
 | 4. main 상시 실패 테스트4개 | 별도 그룹 분리 또는 조건부 건너뛰기 여부 | NPCPerception·LobbyLayout 진단·TrainingAssets/TrainingPIESmoke; Shotgun 해결 |
@@ -92,7 +92,7 @@
 | TUT-BEST-01 | Course별 Best Lap 영구 저장 | 구현됨·BestLapPersistence Success(2026-10-02 C PC Claude, ClaudeBestLap/test2.log). 유효 완주 CourseId&#124;DroneId&#124;ControlMode, HandlingPreset 제외. Saved/SaveGames/DroneTrainingBestLaps.json, 없음/구버전/손상 처리·HUD 저장 기록. 자동화 별도 슬롯. 기존 Production Training 2 Fail 보존 | 같은 코스/기체/조작으로 실제 랩 두 번 실행·재실행 복원과 첫 완주 전 저장 HUD 수동 확인. 평균은 실행 History, 정식 레이싱 방식 현재 미정 |
 | TUTORIAL-FIGMA-02 | Figma 8개 훈련 ↔ Test Map 대조 | 8개 기능/DA·독립 시험맵·시간·연속 진행·전체 완료 UI 구현과 기존 자동 검증 보고가 있음. 2026-10-03 DA 순서 재확인; Warehouse 최종 환경은 별도 | 기존 진행 UI의 실제 8수업 연속 완주·결과/로비 복귀를 수동 확인. 4/8 집계 단위와 Warehouse 제작 범위 결정, 결과 UI 중복 구현 금지 |
 | TUTORIAL-GUIDE-03 | 8개 수업 구현·테스트 기준 | 클래스 책임, DA/Tag, 수업별 구현법, Build→Asset→Map→PIE→성능 검증과 문제 확인 순서를 문서화 | 팀원이 문서만 보고 호버/FPV/Payload를 재현하고 Forward 수업을 추가 가능 |
-| AI-LOCOMOTION-01 | 적·아군 NPC 걷기 모션 | AI-LOCOMOTION-01 구현됨·자동 검증됨(2026-10-04 C PC Claude 재생 확인)·수동 확인 대기. 두 AnimBP의 ShouldMove를 속도 > 3만으로 수정: 수정 전 이동 표본41개 중0→수정 후40개(NPC8명) 모두 ShouldMove·걷기/뛰기 BlendSpace 진입. Drone.AI 19개 중18 Success·기존 NPCPerceptionSearchPIE 1 Fail, Shotgun 시선 Success. Claude 지시서 근거(ClaudeNPCWalk/before.log·after.log). 자연스러운 순찰/추적 전환·발 미끄러짐(속도 대비 보폭)·뒷걸음 방향 수동 확인 대기. Epic 마네킹 임시 동작·최종 아님. | Smart Object 맵 정지/걷기/뛰기 전환·발 미끄러짐·뒷걸음 방향 화면 확인 |
+| AI-LOCOMOTION-01 | 적·아군 NPC 걷기 모션 | AI-LOCOMOTION-01 후속 구현됨·자동 검증됨(2026-10-04 C PC, 작업·검증 Claude)·수동 확인 대기. Mannequin 원본과 Insurgent/Quantum 메시의 스켈레톤 불일치로 양팔을 벌리던 문제를 사용자 선택 IK Retarget으로 수정하고 적 Gun을 hand_r에 부착. 속도 > 3 이동 판정·Gaze 유지. NPCLocomotionAnimPIE 오프스크린 Success: 이동40개(NPC5명) ShouldMove40, 위팔 기본 자세 대비 평균51.7°·40/40, 총 든 NPC 양손 간격 평균34.4cm·24/24, 총 hand_r 추종·왼손 총 위 각각24/24. Drone.AI 19개 중18 Success·기존 NPCPerceptionSearchPIE 1 Fail(state=1 detected=0), 새 실패 없음. 자산 Verify success(ClaudeNPCWalk/rt_tests3.log·ai_suite.log·verify_rt3.log). 걷기/뛰기 전환·발 미끄러짐·뒷걸음 방향·손/총 정렬(특히 산탄총)·사격/재장전은 사용자 수동 확인 대기. CR_Mannequin_FootIK는 Insurgent 계층 차이로 Editor 컴파일 경고 잔존. Epic 마네킹 변환 임시 동작·최종 아님; 최종 애니메이션 미구현·자산 미정, 산탄총 전용 동작 미구현·도입 여부 미정(소총 동작 공유). | Smart Object 맵 정지/걷기/뛰기 전환·발 미끄러짐·뒷걸음 방향·손/총 정렬(특히 산탄총)·사격/재장전 화면 확인 |
 | MAP-TEST-01 | 경량 Tutorial Systems TestMap 수동 확인 | 맵·생성 도구·전용 자동화·Map Check 완료 | Gate/Ring/역할/HUD 한·두 Lap 화면 확인 |
 | AI-SO-TUNE-01 | Smart Object·유인 MG·개인화기 추적 확인 | 순찰 최종 슬롯 방향·Pursue 정지점·Capsule 외 VisualOnly 계약을 적용했고 사용자 화면에서 정상 이동을 확인했다. 진단 로그 기본값 Off | 새 `1.0초` 첫 사격 조준 대기를 실제 화면에서 확인. 재발 시 Blueprint에서 `[NPC-STATE]`·`[NPC-MOVE]` 진단을 켜 로그 회수 |
 | AI-OUTDOOR-TUNE-01 | 야외 감지·Smart Object 검색 범위 | Outdoor Controller BP를 Rifle/Shotgun에 연결. Sight 60m/Lose 70m/Search 80m×±10m/직전 회피 15m, BP 조절 가능 | 넓은 야외 맵 화면에서 과도한 원거리 점유·감지 끊김 여부를 확인하고 역할별 수치 확정 |
@@ -154,7 +154,7 @@ Trello 참고를 추가했다. [레이싱 3·2·1 시작](https://trello.com/c/F
 4. `TUT-BEST-01`: JSON 저장·복원·없음/구버전/손상 자동 검증 완료. 같은 코스/기체/조작으로 실제 완주 후 재실행하여 첫 완주 전 저장 기록 HUD를 확인한다. 브리핑 자막 속도·HUD 위치와 BUILD-PACKAGE-01 실제 패키징도 확인 대기다. 평균은 실행 History, 레이싱 3·2·1은 별도 후속이다.
 5. `TUT-PROGRESS-01` 시간·다음 수업·`n/8`·전체 완료 UI는 구현·자동 검증됐다. 실제 8수업 연속 진행/S48·S49·로비 완료 표시를 수동 확인하고, `TUT-BRIEFING-TEXT-01` 미기재 문구와 `TUT-COMPLETION-SAVE-01` 영구 저장 여부는 사람이 결정한다. `UI-LAYOUT-DIAG-01`·`TEST-ORDER-ROUTE-01` 원인 조사는 Claude 담당. AI-SHOTGUN-RENDER-01은 시험 정정 후 해결. Warehouse는 TestMap에서 먼저 검증하고 Production은 합의 뒤 수동 이식한다.
 6. Story M1 선택 정보/화물 파괴 실패 → M2 잔해/Story Fact → M3 재밍 해제/UGV 교대 → M4 장거리 타격/엔딩을 한 미션씩 고도화한다. 충돌하는 기본 스토리안은 임의 확정하지 않는다.
-7. 단계별 수동 회귀로 Gate 최종 자산·1/6 높이/Scale, Route `1~5`, Physics 벽/그물·카메라/피격 Shake, FPV/Drop 하중·Mode 1/2, NPC Smart Object 맵의 순찰/Shotgun·AI-LOCOMOTION-01 걷기/뛰기 전환·발 미끄러짐·뒷걸음 방향, 비 실내 차폐·광섬유/UGV를 확인한다. Shotgun 전용 맵 결과만으로 Smart Object 맵을 완료 처리하지 않는다.
+7. 단계별 수동 회귀로 Gate 최종 자산·1/6 높이/Scale, Route `1~5`, Physics 벽/그물·카메라/피격 Shake, FPV/Drop 하중·Mode 1/2, NPC Smart Object 맵의 순찰/Shotgun·AI-LOCOMOTION-01 걷기/뛰기 전환·발 미끄러짐·뒷걸음 방향·손/총 정렬(특히 산탄총)·사격/재장전, 비 실내 차폐·광섬유/UGV를 확인한다. Shotgun 전용 맵 결과만으로 Smart Object 맵을 완료 처리하지 않는다.
 8. 실제 Chaos 비교 Spike·정식 Rain/젖음/Audio/품질·재밍 Noise·최종 영상/음원·패키징은 Story Vertical Slice 이후다. 맵 이동은 소유권·참조 감사 후 수행하고 `test1`·`test2`는 용도 확인 전 유지한다.
 
 이동 후보·병행 회귀·최근 완료와 종료된 요청은 [10월 보드 아카이브](docs/history/archive/WORKBOARD_2026-10.md), 10/03 UI 준비·진단은 [WORKLOG](docs/history/DRONE_WORKLOG.md)에 보존했다.
