@@ -4,9 +4,8 @@
 
 ## 작업 위치
 
-- 2026-10-01 현재 C 드라이브 PC Unreal: `C:\URproject\drone`
-- 현재 PC 문서: `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6`
-- 이전 D 드라이브 PC의 경로는 Unreal `D:\JGY\project\drone`, 문서 `D:\JGY\project\md`다. 현재 PC에는 해당 D 경로가 없다. PC마다 실제 경로를 확인하고 다른 PC의 절대 경로를 실행 명령에 그대로 복사하지 않는다.
+- 2026-10-06 현재 D PC Unreal: `D:\JGY\project\drone`, 문서: `D:\JGY\project\md`.
+- C PC 경로 `C:\URproject\drone`과 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6`은 이전 인계의 실행 위치다. PC별 절대 경로를 혼용하지 않는다.
 - 새 생산 코드: `Source/Drone`
 - 새 프로젝트 소유 자산: `/Game/Drone`
 

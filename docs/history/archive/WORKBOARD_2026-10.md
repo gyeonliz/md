@@ -263,3 +263,15 @@ Trello 참고를 추가했다. [레이싱 3·2·1 시작](https://trello.com/c/F
 8. 실제 Chaos 비교 Spike·정식 Rain/젖음/Audio/품질·재밍 Noise·최종 영상/음원·패키징은 Story Vertical Slice 이후다. 맵 이동은 소유권·참조 감사 후 수행하고 `test1`·`test2`는 용도 확인 전 유지한다.
 
 이동 후보·병행 회귀·최근 완료와 종료된 요청은 [10월 보드 아카이브](docs/history/archive/WORKBOARD_2026-10.md), 10/03 UI 준비·진단은 [WORKLOG](docs/history/DRONE_WORKLOG.md)에 보존했다.
+
+## 2026-10-06 D PC 그룹 정리로 이동한 카드 (문서 반영 Claude)
+
+2026-10-06 D PC에서 루트 WORKBOARD를 7그룹으로 재배치하며 30KB 규칙에 따라 옮긴 카드다. 행 본문은 당시 그대로이며 RACING-MEETING-01·FIGMA-RACING-02는 RACING-TERRAIN-LINK-01과 결정 필요 레이싱 행, MISSION-FRAMEWORK-01은 STORY-TEST-01·MISSION-RULE-PIE-01, MAP-TEST-01은 TUT-GATE-PRESENTATION-01·TUT-ROUTE-SELECT-01 수동 확인으로 대체했고 TUTORIAL-GUIDE-03은 문서화 완료다. 현재 상태는 루트 WORKBOARD·STATUS를 따른다.
+
+| ID | 작업 | 현재 상태 | 완료 조건 |
+|---|---|---|---|
+| RACING-MEETING-01 | 제품 숫자키·지형 연결 | 제품1~5 차단·TrainingRouteKeyPolicy 자동 검증됨. 지형 조사 근거는 WORKLOG/아카이브 | 직접 시험/Tutorial/Training/Story·랜덤 보존. D-5는 RACING-TERRAIN-LINK-01, 코스4개 지형 결정 후 연결 |
+| TUTORIAL-GUIDE-03 | 8개 수업 구현·테스트 기준 | 클래스 책임, DA/Tag, 수업별 구현법, Build→Asset→Map→PIE→성능 검증과 문제 확인 순서를 문서화 | 팀원이 문서만 보고 호버/FPV/Payload를 재현하고 Forward 수업을 추가 가능 |
+| FIGMA-RACING-02 | Figma 레이싱·UI 요구 | D-5 카운트다운·랩 타이머 자동 검증됨(10/06 C PC Claude), 수동 대기. 상세 RACING-TERRAIN-LINK-01 | Ghost/리플레이·커브·Restart/Quit 범위 결정 |
+| MAP-TEST-01 | 경량 Tutorial Systems TestMap 수동 확인 | 맵·생성 도구·전용 자동화·Map Check 완료 | Gate/Ring/역할/HUD 한·두 Lap 화면 확인 |
+| MISSION-FRAMEWORK-01 | Mission 통합 Blueprint 기반 | Manager/GameMode/Controller, 목표·실패·귀환 Trigger, 체력 100 파괴 표적을 `/Game/Drone/Mission`에 추가. Build와 Mission 자동화 3/3 성공 | Mission 1 Test Map/Definition에서 Delivery→선택 목표→Return과 시간/파괴 실패를 실제 Flow로 확인 |

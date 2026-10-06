@@ -1,14 +1,14 @@
 # 작업컴 시작 가이드
 
-기준일: 2026-10-04 (Asia/Seoul)
+기준일: 2026-10-06 (Asia/Seoul), D PC
 
 최신 상태는 STATUS·WORKBOARD가 기준이며 아래 일부 문단은 당시 기록이다. 아래 D 경로 명령은 **D PC 예시**다. Build·PIE·자동화 테스트는 Claude 담당이다.
 
-이 문서는 PC를 옮겨 Drone 작업을 이어가기 위한 단일 시작점이다. 현재 C 드라이브 PC는 Unreal `C:\URproject\drone`, 문서는 이 작업 폴더이며 이전 D 드라이브 작업컴 경로는 `D:\JGY\project\md`/`drone`다. 아래 D 경로 명령은 해당 작업컴용 예시이므로 다른 PC에서는 실제 경로로 바꾼다. 최신 사실은 `STATUS.md`, 다음 작업은 `WORKBOARD.md`, 경계는 `CONTEXT.md`를 우선한다.
+현재 작업 위치는 Unreal `D:\JGY\project\drone`, 문서 `D:\JGY\project\md`다. 아래 D 경로 명령은 이 PC에서 사용하며 다른 PC에서는 실제 경로로 바꾼다. 최신 사실은 `STATUS.md`, 다음 작업은 `WORKBOARD.md`, 경계는 `CONTEXT.md`를 우선한다.
 
 ## 1. 현재 인계 상태
 
-최신 해시·미커밋 범위는 [STATUS Git 기준 표](STATUS.md)를 따른다. 현재 C PC Unreal C:\URproject\drone에는 10/02~10/04 코드·입력·UI·도구의 로컬 미커밋/미추적이 있으므로 원격 수신만으로 전달 완료를 판단하지 않는다. PC 이동 전 사용자가 변경을 검토하고 공유할 때만 Commit/Push한다. 소스 수신과 최신 바이너리·수동 플레이 Pass는 구분한다. Lvl_BangkokCity는 10/01 의도적으로 삭제됐으며 남은 의존 자산 정리 여부는 미정이다.
+최신 해시·수신/미커밋 범위는 [STATUS Git 기준 표](STATUS.md)를 따른다. 두 저장소 커밋은 최신 수신됐으나 Training 맵 LFS 본문/자산 변경 표시는 확인 대기다. Git 작업이 살아 있을 때 lock을 지우지 않고 변경 파일을 Discard하지 않는다. 소스·LFS 본문·바이너리·자동/수동 Pass는 각각 구분한다. Bangkok 삭제는 과거 LFS 저장량/요금 감소와 별도다.
 
 이전 D PC Build/UI5/5(NullRHI/NoSound)·목록 렌더 Fail의 원시 TrainingLobbySettings 보고서는 현재 C PC에 없다. 최신 검증은 STATUS를 따른다. 인증 파일·API 키·원시 세션을 복사하지 않는다.
 

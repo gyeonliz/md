@@ -1,15 +1,23 @@
 # 현재 작업 상태
 
-기준일: 2026-10-06 D-5 랩 타이머·D-12 이름 변경/컴포넌트 분리·CLAUDE.md MCP 설명 반영 (Asia/Seoul), C PC. 구현·자동 검증 Claude, 문서 Codex. 이번 수치·판정은 Claude 지시서 근거이며 Codex의 엔진 실행 결과가 아니다. Build·PIE·맵 재생성·Commit/Push 미실행, Space 제외.
+기준일: 2026-10-06 12:43 KST D PC. Unreal HEAD=origin/main `0c0ed99`, MD `c5a0524`+미커밋. 사용자 예외 승인으로 Codex가 조작 UI·Drop 집게와 결과창 배치를 수정했다. Editor Build·결과창 집중 자동화6/6 Success(2개 렌더 제한 경고 포함), 실제 화면/패드·집게 체감 수동 확인 대기. 아래 C PC 전체 검증은 별도 인계 근거다. Commit/Push 미실행.
 
 ## Git 기준
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal `C:\URproject\drone` | 원격 `3f02577` + 스테이징 | 10/06 Claude 지시서 기준. 커밋 직전까지 스테이징, 커밋·푸시는 사용자 |
-| 문서 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` | HEAD `76f7a3f` | Codex 읽기 전용 Git 확인(10/06). 기존 미커밋 보존·이번 문서 변경 추가, Commit/Push 미실행 |
+| Unreal 원격 `gyeonliz/drone` | 로컬 origin/main `0c0ed99` | 최신 읽기 기준. C PC 작업 트리 상태는 이 PC에서 확인 불가 |
+| Unreal D PC `D:\JGY\project\drone` | HEAD `0c0ed99` = origin/main, tracked20·untracked6 | 기존 변경 보존·이번 UI/화물/결과창 수정 추가. Training 맵391MB 미저장, 앞서 포인터였던 Payload BP·미션 DA5개는 본문 확인. 전체 자산/패키징 준비 완료와는 구분. 수신·검증 경위 WORKLOG, Commit/Push는 사용자 |
+| 문서 원격 `gyeonliz/md` | origin/main `c5a0524` (10/06 09:05 C PC Push) | 10/04~10/06 Codex 정리·아카이브 포함 |
+| 문서 D PC `D:\JGY\project\md` | HEAD `c5a0524` + 로컬 미커밋 | 10/06 D PC Claude: 250e975→c5a0524 fast-forward. 미커밋은 이번 변경(STATUS·WORKBOARD·WORKLOG·CLAUDE.md·아카이브). 10/02 D PC 진단 원문은 stash@{0} 보존·WORKLOG 재반영. Commit/Push는 사용자 |
+
+현재 D PC는 10/06 CodexGripPose 집중 자동화 6/6 Success와 Editor Build 성공을 확인했다. nullrhi 검사이므로 수동 화면 Pass가 아니며 이전 LobbyLayoutDiagnosticWrapProbe Fail·C PC 전체 검증과 분리한다. 원격 Bangkok 잔여987개 삭제는 과거 LFS 저장량/요금 감소와 다르다. 로그·수신/잠금·Zen 경위는 [WORKLOG](docs/history/DRONE_WORKLOG.md) 참조.
 
 ## 한눈에 보기
+
+현재 우선 확인: `쉬운 조작 / 게임 조작 / FPV 모드 1 / FPV 모드 2` 한 줄 표시·폭 보정과 초기/재픽업 공통 집게 자세 구현·자동 검증됨. 수동 화면/실제 패드·화물 파지 외형은 대기. BP 조정은 Drop Pawn의 `PayloadCarryAnchor`, 화물의 `PayloadVisual`; 절차는 [역할 가이드](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md), 이력은 [WORKLOG](docs/history/DRONE_WORKLOG.md).
+
+`UI-RESULT-LAYOUT-01` 구현·자동 검증됨/수동 대기: 기본 결과창을 중앙 폭680·내용 높이 카드, 여백32/28·청록 버튼·행간12로 수정. 다시하기/로비로 복귀를 짧게 표시하며 다음 미션명·진행/전체 완료 계약은 유지. 결과창만 배율1 고정·색/테두리 강조(옛 BP1.06도 돌출 안 함), 다른 UI 배율은 유지. 12:43 KST ResultLayout·SelectionLayout·Entry·TutorialNext/Complete·GamepadFlow 6/6 Success; native/named fixture의720p/1080p 배치와 실제 NativeTick 검사이며 화면/실물 패드 Pass는 아님. [UI 가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)·WORKLOG 참조.
 
 10/06 C PC Claude: D-5 출발부터 랩 타이머 측정·D-12 Flight 명명과 피격/Acro/지상 주행 컴포넌트 분리 구현됨·자동 검증됨. 화면·FPV/UGV 체감 수동 확인 대기. 기존 NPC/높이 제한/매니저·Legacy 정리 유지, D-13 종료. 코스4개 지형·배터리 시간·높이 제한 수치/경고 연출 현재 미정. 세션 전문은 [WORKLOG](docs/history/DRONE_WORKLOG.md).
 
@@ -66,6 +74,7 @@ ConfigureDroneTitleLobby.py 설명은 현재 DA와 일치(ClaudeCourse/lobby_cmp
 ## 알려진 실패·실행 환경·미정
 
 - AI-SHOTGUN-RENDER-01 해결(2026-10-04 C PC Claude). 표적 고정 시 머리4.2~4.4°(Idle·사격 애니메이션), 표적±1.9° 왕복 시 머리5.2~5.4°·SmoothedDroneLookRotation 1.45°. 9/18 몸 Hysteresis·Bone Gaze 보간(데드존 경계 0 Snap 없음)은 정상, 5~6° 대부분은 9월 하순 Rifle 계열 AnimBP 교체 뒤 애니메이션 흔들림이다. 절대 머리4° 판정(애니메이션 포함)과 미렌더 뼈 정지에 따른 NullRHI 거짓 통과가 원인. 표적 고정0.6초 기준 측정 후 시선 출력≤2.5°·애니메이션 대비 추가 머리 흔들림≤2.5°로 시험 정정(경계0↔±1.9° 튐3.8° 검출). NullRHI·렌더 Success(ClaudeInterview/shotgun3_*.log), known-test-failures에서 제외(Claude 지시서 근거). D-11 구현됨·자동 검증됨(10/05 C PC Claude): 상시 실패4개를 KnownIssues.*로 분리, 기본 Automation RunTests Drone.에서 제외. 실패 해결 아님; 경로 정본은 WORKLOG. 미렌더 패드 포커스6개는 별도 제한이다.
+- **PERF-ZEN-START-01 원인 특정·재측정 대기**(10/06 D PC Claude): Zen 서버가 `CommonZenDatasessions`의 지난 실행 기록 733개 폴더(1,466파일·20MB)를 로드하는 데 약 20초가 걸리고(10/06 20.3초·10/02 22.4초), 엔진은 20초를 넘기면 "Wait for ZenServer?" 모달을 띄운다(ZenServerInterface.cpp). 10/02 473초는 그 모달을 09:30:37까지 누르지 않은 대기 시간이며 캐시·셰이더 원인 아님. 사용자 요청으로 오늘 세션 폴더 1개만 남기고 732개를 `CommonZen_sessions_backup_2026-10-06`로 이동(삭제 아님, Editor 실행 중). 다음 Editor 시작에서 Zen 대기 시간 재측정 대기. Defender 실시간 검사는 사용자 판단.
 - **UI-FOCUS-RACE-01 수정 후 확인 중**: UIOnly WidgetToFocus(화면 루트)의 엔진 지연 처리가 버튼 포커스를 다시 가져갈 수 있음. 5프레임 복원 적용 후 화면 그려진 회귀는 Success 1회(`test3.log`), 수정 전 Fail 1회(`final.log`). 단독 결과 혼재·사람 체감 대기, 안정화 완료 아님. TutorialNextLessonPIE에 강조/Slate 위젯 이름 실패 진단 추가.
 - **TEST-RENDER-UNPAINTED-01 원인 미특정**: 최신 전체101개에서 미렌더 실행의 알려진 패드 포커스6개 실패. LobbyLayout 진단이 기본 회귀에 없으므로 GamepadMissionFlow/GamepadNavigation/TitleFiveMenu/TitleFiveMenuWidget/TutorialComplete/TutorialNextLesson 6개 모두 화면 루트 포커스로 실패하는지로 미렌더를 판단한다(10/05 C PC Claude known-test-failures 갱신). 화면 그려진 포커스·실제 패드 확인 대기.
 - **레이싱 지형 연결 현재 미정**: pull 뒤 팀원 코스는 `MWLandscapeAutoMaterial` 예제 Island/MountainRange 계열에 1개, PlayerStart 없음. 아이템/게이트 자산은 어떤 맵·DA에서도 참조되지 않음. 제품 DA는 기존 `Lvl_DroneRacingTest`; 어느 지형을 제품 맵으로 쓸지·PlayerStart 배치는 사용자/팀원 결정 필요·기존 제품 완주/결과 시간은 D-5 구현 유지. Claude 맵 미수정.
@@ -85,7 +94,7 @@ ConfigureDroneTitleLobby.py 설명은 현재 DA와 일치(ClaudeCourse/lobby_cmp
 
 - 현재 미정: 높이 제한 수치·경고 연출·배터리 시간 값·레이싱 코스4개 지형·D-1(M2)·D-2(M3/M4)는 기획자 내용 대기.
 - 미구현: 코스4개·배터리 시간 설정.
-- 방콕 잔여987개 삭제는 지시서 근거·사용자 커밋·푸시 완료분인지 확인 필요. D-13 나머지 유지 결정으로 종료(정본 WORKBOARD).
+- 방콕 잔여987개 삭제는 원격 `1619b4f` diff에서 확인했다. 로컬 수신과 과거 LFS 객체/요금은 별도이며 D-13 나머지 유지 결정은 종료(정본 WORKBOARD).
 - 기타 기존 기획 미정·수동 대기는 위 기능별 행과 WORKBOARD 참조·applications는 수정하지 않는다.
 
 ## 다음 확인
@@ -93,6 +102,7 @@ ConfigureDroneTitleLobby.py 설명은 현재 DA와 일치(ClaudeCourse/lobby_cmp
 1. Acro Mode1에서 스틱에 엄지를 걸친 채 Space→상승, 키 떼고 스틱→패드 조종·모두 놓으면0을 확인하고 Mode2도 비교한다. 코스 급커브 표시선·끝 연결과 Editor 편집 체감도 확인한다. 키보드 짧게 톡(0.1초, FPV 약65°) 후 자세 유지. W+Space와 Space 단독 구분, Scout/Drop Acro 비행도 실제 장치로 확인. 결과·타이틀 첫 버튼 강조를 반복 관찰.
 2. 추가 자동 회귀 판정 전 화면이 그려졌는지 확인하고 포커스 경쟁·미렌더 실행을 따로 기록. UI-LAYOUT-DIAG-01·AI-PERCEPTION-TEST-01 기존 관찰 유지, AI-SHOTGUN-RENDER-01 해결. Route는 재발 시 순서 조사.
 3. 사용자/팀원은 코스4개 지형/PlayerStart·배터리 시간과 Acro 미정 조작 방식을 결정. 레이싱 카운트다운·랩 타이머·FPV 곡예/UGV 분리 전 동일 체감·풍향 HUD 수동 확인·시간 결정 뒤 배터리 추락 확인. 1280/1920·실제 패드·8수업 연속 진행·Best Lap 재실행·설정/배터리/브리핑·추락 재출격 수동 확인 후 Story 콘텐츠를 고도화.
+4. D PC: `1619b4f` 수신 뒤 Editor Build와 Zen 시작 시간 cold/warm 비교(PERF-ZEN-START-01). 소스 수신은 바이너리/플레이 완료가 아니다. WORKBOARD는 10/06 D PC에서 7그룹으로 재배치했고 카드 본문은 유지했다.
 
 세부 카드와 완료 조건은 [WORKBOARD](WORKBOARD.md), 입력 조정은 [Blueprint 가이드](docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md), 수동 순서는 [테스트 가이드](docs/gameplay/DRONE_TEST_MAP_GUIDE.md)를 따른다. Commit/Push·Trello/Figma 수정·공유 권한·예약 자동화는 수행하지 않는다.
 

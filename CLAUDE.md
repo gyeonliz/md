@@ -6,11 +6,14 @@
 
 ## 이 PC의 경로
 
-| 대상 | 경로 |
-|---|---|
-| 문서 저장소(이 폴더) | `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` |
-| Unreal 저장소 | `C:\URproject\drone` (`gyeonliz/drone`, UE 5.8) |
-| 이전 D PC | `D:\JGY\project\md`, `D:\JGY\project\drone` — 이 PC에는 없음 |
+PC마다 경로가 다르므로 세션 시작 때 실제 폴더를 확인한다.
+
+| PC | 문서 저장소 | Unreal 저장소 (`gyeonliz/drone`, UE 5.8) |
+|---|---|---|
+| D PC | `D:\JGY\project\md` | `D:\JGY\project\drone` |
+| C PC | `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6` | `C:\URproject\drone` |
+
+D PC의 `D:\JGY\project\droner`는 같은 원격의 별도 Clone이며 작업 공간이 아니다(2026-10-02 사용자 확인).
 
 ## 세션 시작 순서
 

@@ -1,6 +1,6 @@
 # 드론 역할·조작 방식·물리 비행 기준
 
-기준일: 2026-09-30 (Asia/Seoul)
+기준일: 2026-10-06 (Asia/Seoul). 조작 표시명·화물 파지 갱신; 검증 이력은 [WORKLOG](../history/DRONE_WORKLOG.md).
 
 ## 기획 자료 사용 원칙
 
@@ -16,7 +16,7 @@
 | 축 | 현재 값 | 의미 |
 |---|---|---|
 | 임무 역할 `EDroneMissionRole` | 정찰, 드랍, FPV 자폭, 광섬유, 지상 UGV, 장거리 타격 | 기체가 임무에서 맡는 기능 |
-| 조작 방식 `EDroneControlMode` | 쉬운 조작, 실제 조작형(제한 자세), FPV Rate/Acro Mode 1, FPV Rate/Acro Mode 2 | 입력 보조와 RC 송신기 스틱 배치 |
+| 조작 방식 `EDroneControlMode` | 쉬운 조작, 게임 조작, FPV 모드 1, FPV 모드 2 | 입력 보조와 송신기 스틱 배치; enum·입력·저장 ID는 기존 유지 |
 | 물리 성능 `FDronePhysicalFlightSettings` | 무적재 최고속도 배율, Dry Mass, 합산 최대 추력, 모터 응답, 제곱 항력, 적재 속도 하한 | 기체 고유 성능과 Payload 하중 |
 
 느림/보통/빠름 사용자 선택은 폐기했다. 각 기체는 Data Asset에 기록된 기준 속도에 `UnloadedMaximumSpeedMultiplier`를 곱한 단일 무적재 성능을 사용한다. 현재 기본 배율 `1.25`는 기존 빠름 수준을 승격한 값이다. `EDroneHandlingPreset`과 `Stable/Balanced/Agile` 이름은 저장 Asset·Blueprint 함수 호환용으로만 남고 모든 런타임 요청을 `Balanced`로 정규화한다. FPV 자폭 역할은 Rate/Acro Mode 2를 기본으로 쓰되 Mode 1과 같은 물리 성능을 가진다.
@@ -27,7 +27,7 @@
 |---|---|---|---|
 | 정찰 드론 | `BP_DroneScoutIntegration`; DroneSpy 본체·카메라·로터 4 | 거리·화각·LOS 유지형 Scan과 Training 표적 구현 | 모델 스케일/방향·Scan 체감, 최종 UI/FX |
 | FPV 자폭 드론 | `BP_DroneFPVIntegration`; FPV 본체·로터 4, FPV 기본 시점 | 명시적 Arm·최소 속도 충돌·1회 폭발, 제공 Niagara/Cue 연결 | 폭발 크기/청감·Mission별 Damage 조정 |
-| 드랍 드론 | `BP_DroneDropIntegration`; Delivery 본체·카메라·로터 6·크레이트 선적재 화물 | 탑뷰·투하·착지 후 잔류·가장 가까운 목표 자동 선택·맵 크레이트 근접 적재·실제 Actor 재투하 구현 | 부착 위치/크기 체감, FX와 Mission별 투하 규칙 |
+| 드랍 드론 | `BP_DroneDropIntegration`; Delivery 본체·카메라·로터 6·Bag 선적재 화물 | 탑뷰·투하·착지 잔류·목표 자동 선택·근접 적재·Actor 재투하, 초기/재픽업 파지 통일 | 집게 외형 수동 확인, FX와 Mission별 투하 규칙 |
 | 광섬유 드론 | `BP_DroneFiberOpticIntegration`; DroneSpy Body·분리 Rotor 4개, 공급 GSU 통, 1인칭 기본 | `JammingImmunity + ImpactDetonation`, 통 상단→지나온 지면 Spline과 처진 마지막 구간 구현 | Spy 본체와 GSU 위치·크기·케이블 굵기 화면 조정, 충돌 자폭·재밍 Zone 면역 확인, Mission 3 교대 연결 |
 | 지상 드론 UGV | `BP_DroneGroundUGVIntegration`; GC Drone 1 Skeletal Visual | W/S 전후·A/D 조향·Q/E 제자리 회전, 최초 장거리 지면 획득, 4점 지면 높이/Pitch/Roll 추종, 공중 바람 Drift 차단 | 높은 Spawn→접지·Mesh 위치·스케일·경사/단차 추종 화면 확인, 무장·연료와 Mission 3 교대는 후속 |
 | 장거리 타격 드론 | 플레이 기체 미등록 | 출격/타격 연출 미구현 | 플레이 가능 여부 확정 뒤 Sequencer 또는 Pawn 결정 |
@@ -43,7 +43,7 @@
 - 고도 입력은 기체가 기울어도 항상 World Up을 사용한다.
 - 충돌 Root와 3인칭 Camera는 수평을 유지하고 `VisualTiltPivot` 외형만 기울인다.
 
-### 실제 조작형(그레이박스)
+### 게임 조작(기존 제한 자세 모드)
 
 - 감속과 Turning Boost를 낮춰 입력을 놓은 뒤 관성이 더 남는다.
 - 전후·좌우 입력으로 충돌 Root의 Pitch/Roll 자세가 변한다.
@@ -205,12 +205,14 @@ Training 역할 시험 표적은 코스 진행 판정과 분리되어 있다.
 ### 맵 배치 화물 BP 사용·조정
 
 1. Content Browser에서 `/Game/Drone/Abilities/Payload/BP_DroneCarryablePayload`를 원하는 Mission Map으로 끌어다 놓는다.
-2. 다른 외형은 Blueprint의 `PayloadVisual > Static Mesh`, `Transform > Scale`에서 바꾼다. 부모는 `ADroneDroppedPayload`를 유지한다.
+2. 화물 외형은 Blueprint의 `PayloadVisual > Static Mesh`·local 위치/회전/크기에서 바꾼다. 현재 `/Game/Item/Bag/Bag`의 최장 변은 약40cm로 맞췄으며 imported pivot을 local 위치로 중심 보정했다. 부모는 `ADroneDroppedPayload`를 유지한다.
 3. 맵에서 처음부터 주울 수 있는 물체는 Class Defaults의 `Starts As Carryable Pickup`을 켠다. 이 Actor는 투하·착지 후 사라지지 않고 다시 적재할 수 있다. `Dropped Payload Lifetime Seconds`는 Carryable이 아닌 일반 1회용 Payload에만 적용된다.
-4. 드론에 붙는 위치·회전은 각 Drop Pawn Blueprint의 Components에서 `PayloadCarryAnchor` Transform을 바꾼다. 이 Anchor는 외형 기울기를 따라가되 Collision Root와 분리된다.
+4. 파지 위치·회전·크기는 `/Game/Drone/Integrations/RoleDrones/BP_DroneDropIntegration`의 Components에서 `PayloadCarryAnchor` Transform으로 조정한다. 현재 위치 `(0,0,-30.5)cm`, 회전 `(Pitch=0,Yaw=0,Roll=90)`·Scale1은 Delivery 집게/카메라 경계를 실측한 시작값이며 최종 아트 확정값은 아니다. Anchor는 외형 기울기를 따라가되 Collision Root와 분리된다.
 5. 적재 거리는 Drop Pawn의 `PayloadDropComponent > Carryable Pickup Range Centimeters`에서 바꾸며 기본값은 300cm다.
 6. 별도 Event Graph 적재 로직이나 Level Blueprint 입력을 추가하지 않는다. Pawn의 공통 Primary 입력과 C++ Component가 검색·부착·투하 상태를 단일 소유한다.
 
-`BP_DroneDropIntegration`의 `PayloadDropComponent > Payload Class`도 이 BP로 연결되어 있다. 따라서 기체가 처음 들고 시작하는 화물과 맵에 미리 배치한 화물이 모두 같은 크레이트·착지 잔류·재적재 규칙을 사용한다.
+`BP_DroneDropIntegration`의 `PayloadDropComponent > Payload Class`도 이 BP로 연결돼 있다. `Sync Carried Visual With Payload Class`가 켜지면 초기 표시와 재픽업은 같은 `PayloadCarryAnchor + PayloadVisual local Transform`을 사용한다. 초기 표시 Mesh를 직접 옮겨도 동기화 시 덮이므로 Anchor를 조정한다. 재투하는 그 순간 world pose를 유지한다. 맵 Instance의 개별 화물 크기/자세는 재픽업 시 유지하며 일반 Actor fallback은 이 Drone 전용 파지 검증 범위 밖이다.
+
+수동 확인: `/Game/Drone/Maps/TestMap/Tutorial/Lvl_Tutorial_Payload_Test`에서 드랍 기체를 고르고 시작 파지→좌클릭/RB 투하→바닥 안착→300cm 이내 재픽업→재투하를 반복한다. 화물이 집게 가운데 가로로 잡히는지, 시작/재픽업 자세·크기가 같은지, 이중 표시와 투하 순간 위치 점프가 없는지 확인한다. 목표 전달로 수업이 끝나기 전 바닥에 내려놓아 반복한다. 팀원 Production Training 맵은 저장하지 않는다.
 
 장거리 타격만 후속이다. 광섬유·UGV는 구현됨·자동 검증됨·수동 확인 대기이며 Mission 내 기체 교대는 후속이다.

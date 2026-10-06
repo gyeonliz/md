@@ -2895,3 +2895,140 @@ STATUS 관련 현재 상태·레이싱·D-12·최신 전체 회귀, WORKBOARD D-
 WORKBOARD는 관련 현재 행을 요약하여 30KB 이하로 맞췄다. 변경 전 30,579바이트·113줄 → 변경 후 29,950바이트·114줄(UTF-8; 끝 개행을 줄로 세지 않음). 이번 지시의 history/archive 수정 금지에 따라 절 이동·아카이브 수정/생성은 하지 않았다. 과거 WORKLOG·감사/인수 보고·당시 계획/모바일 요약·snapshot·handoff·가이드의 명시된 당시 파일 목록/검증 절은 옛 이름까지 원문 보존했다. 현재 이름 정정과 과거 기록 보존 지시가 겹치는 곳은 역사 기록을 보존하고 현재 안내에서 새 이름을 명시했다. BP_DronePrototype*와 /Game/Drone/Prototype/... 자산 이름·경로는 변경하지 않았다.
 
 수동 확인 대기: 레이싱 카운트다운·랩 타이머 화면, FPV 곡예·UGV 주행 분리 전 동일 체감. 현재 미정: 코스4개 지형·배터리 시간 값·높이 제한 수치(경고 연출 등 기존 미정도 유지). Drone Space는 지시서의 “Space 제외”에 따라 갱신하지 않았으며 이번 문서 변경은 Space 미반영. applications·history/archive·Unreal 수정, Build·PIE·패키징·쿠킹·맵 생성/재생성, Commit/Push, Trello/Figma·공유 권한·예약 자동화 수정 없음. 새 파일 없음.
+
+## 2026-10-06 D PC 동기화·WORKBOARD 7그룹 정리·10/02 Editor 시작 지연 진단 재반영 — D PC, 문서 반영 Claude
+
+사용자 요청(md 확인·업데이트·그룹 나누기)으로 D PC(`D:\JGY\project\md`, `D:\JGY\project\drone`)에서 수행했다. 작업 도구·문서 반영 모두 Claude이며 이 PC에 Codex 세션은 없었다. Build·PIE·맵 생성/재생성·Commit/Push·Trello/Figma 수정·Drone Space 갱신은 하지 않았다.
+
+### Git 동기화
+
+- 문서: 로컬 HEAD `250e975` → origin/main `c5a0524` fast-forward(10/04 `94f6375`·10/05 `76f7a3f`·10/06 `c5a0524` 수신, 57파일 변경·STATUS/WORKBOARD 정리·archive 3파일 생성 포함).
+- Unreal: 로컬 HEAD `5b03ad3`(Clean) → origin/main `1619b4f` fast-forward + `git lfs pull origin main`(10/02 `e662cb4`·`41444c2`, 10/05 `3f02577`, 10/06 `1619b4f` 수신, 1,453파일 변경: 방콕 ThirdParty 삭제·Flight 이름 변경·Legacy 템플릿 삭제·NPC Retarget 애니메이션·도구 정리 포함). Unreal Editor·Zen 미실행 상태에서 수행, Editor Build·PIE 미실행이므로 소스 수신이며 플레이 완료가 아니다.
+- 로컬 미커밋 보존: ff 전 D PC의 10/02 미커밋(CLAUDE.md 경로표, STATUS/WORKBOARD/WORKLOG의 10/02 오전 진단)은 `git stash`(stash@{0} "D PC 2026-10-02 PERF-ZEN 진단·CLAUDE.md 경로표 (10/06 ff 전 보존)")와 패치 파일로 보존한 뒤 새 구조에 다시 반영했다. stash pop·Discard·Reset은 하지 않았다.
+- CLAUDE.md: 원격 10/06 본문(WORKLOG 대용량 문구·아카이브 예외) 위에 10/02 D PC 수정분(PC별 경로 표, `D:\JGY\project\droner`는 별도 Clone·비작업 공간)을 다시 적용했다.
+
+### 10/02 오전 진단 원문 (Codex 읽기 전용, 당시 D PC 미커밋 WORKLOG 절)
+
+#### 2026-10-02 오전 — D PC Editor 시작 지연 읽기 전용 진단
+
+- 사용자 실행 로그를 Codex가 읽었다. D PC Unreal HEAD `5b03ad3` 작업 트리 Clean, 문서 HEAD `250e975`는 기존 `CLAUDE.md` 수정 상태를 보존한다. 앞선 C PC ec2e88f 검증을 이번 PC 재검증으로 바꾸지 않는다. Editor/Zen은 사용자 실행 중이며 Codex는 실행·종료·Build·PIE를 하지 않았다.
+- `drone/Saved/Logs/Drone.log`: Zen AutoLaunch 473.350초, 전체 Engine Initialization 532.66초. `Drone-backup-2026.10.01-03.18.07.log`: 3.559초/24.51초. 현재 로그는 대규모 셰이더 재컴파일로 473초를 소모했다는 근거가 아니며, 셰이더 초기화는 Zen 대기 이후 시작했다.
+- 사용자 Zen 로그 `Common/Zen/Data/logs/zenserver.log`는 09:23:08.958 KST에 running, Editor HTTP OK는 09:30:37.590이다. 인덱스 읽기 0~19ms·GC 대기·사용량 약6.89G. 초기 세션 파일 읽기 구간도 있었지만 전체 473초를 설명하지 않는다. 엔진 ZenServerInterface.cpp의 Startup Event 대기/20초 이후 YesNo 확인창/health ready 요청(긴 timeout) 경로를 대조했다. 특정 확인창에 사용자가 응답했는지는 미확인이다. Zen HTTP는 proxy bypass를 사용하며 현재 시스템 proxy 없음이라 일반 proxy를 원인으로 확정하지 않는다.
+- 읽기 전용 현재 `http://[::1]:8558/health/ready` 검사: HTTP200·142ms. C/D는 NVMe, C 약40GiB/D 약801GiB 여유. 정상 응답은 시작 지연 해결 근거가 아니다. 캐시 삭제·경로 변경·보안 설정 변경·엔진 소스/프로젝트 수정은 하지 않았다.
+- Claude 후속 `PERF-ZEN-START-01`: 사용자 저장·종료 후 같은 캐시/맵에서 cold/warm 시작 비교, 확인창 응답 시점/서버 running/Editor status 시간 분리. DDC 유지, 가벼운 시작 맵은 PC 설정 또는 명시 맵 진입으로 비교하고 Production Training을 저장하지 않는다. 새 자산/맵 첫 사용의 캐시 생성 비용은 별개다. [Epic UE5.8 DDC 안내](https://dev.epicgames.com/documentation/unreal-engine/using-derived-data-cache-in-unreal-engine?lang=en-US).
+- STATUS·WORKBOARD와 기존 Drone Space 진행 페이지에 진단 사실/미확정/다음 비교를 반영한다. Commit/Push·Trello/Figma 수정·예약 자동화는 하지 않는다.
+
+당시 STATUS 절·WORKBOARD 카드 원문은 stash@{0}에 있으며 현재 STATUS 알려진 실패 줄과 WORKBOARD PERF-ZEN-START-01 카드로 요약했다.
+
+### WORKBOARD 7그룹 정리
+
+- 회의 후 역할별 카드 표(8)와 본 카드 표(48)를 하나로 합쳐 7그룹으로 재배치했다: 튜토리얼·코스·레이싱 / UI·설정·패드 / 미션·스토리·HUD / 비행 물리·조작·기체 / AI·NPC / 환경·날씨·자산 / 테스트·빌드·성능·동기화. 회의 후 카드는 각 그룹 맨 앞. 결정 필요·면접 대비 표와 Next는 그대로 두었고 카드 행 본문은 바꾸지 않았다.
+- 추가: PERF-ZEN-START-01 카드(테스트·빌드·성능·동기화). SYNC-WORKPC-01 현재 상태 끝에 D PC 수신 한 줄. 결정 필요 레이싱 행에 FIGMA-RACING-02의 Ghost/리플레이·커브·Restart/Quit 범위 결정을 이관.
+- 30KB 규칙(AGENTS 문서 정리 규칙)에 따라 내용 추가 전 아카이브: RACING-MEETING-01·FIGMA-RACING-02(RACING-TERRAIN-LINK-01·결정 행으로 대체), MISSION-FRAMEWORK-01(STORY-TEST-01·MISSION-RULE-PIE-01로 대체), MAP-TEST-01(TUT-GATE-PRESENTATION-01·TUT-ROUTE-SELECT-01 수동 확인으로 대체), TUTORIAL-GUIDE-03(문서화 완료)을 `docs/history/archive/WORKBOARD_2026-10.md` 끝 절로 원문 이동. 루트에는 한 줄 요약·링크.
+- 크기: WORKBOARD.md 29,950바이트·114줄 → 29,999바이트·142줄. 아카이브 61,006바이트·265줄 → 62,958바이트·277줄(UTF-8, wc 기준).
+
+### STATUS 갱신
+
+- 기준일과 Git 기준 표를 D PC 현재로 덮어썼다. 이전 10/06 C PC 표 원문: `| Unreal C:\URproject\drone | 원격 3f02577 + 스테이징 | 10/06 Claude 지시서 기준. 커밋 직전까지 스테이징, 커밋·푸시는 사용자 |`, `| 문서 C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6 | HEAD 76f7a3f | Codex 읽기 전용 Git 확인(10/06). 기존 미커밋 보존·이번 문서 변경 추가, Commit/Push 미실행 |`. 그 스테이징분은 원격 `1619b4f`로 Push된 것으로 보이며 C PC 작업 트리는 이 PC에서 확인 불가.
+- 알려진 실패·미정에 PERF-ZEN-START-01 줄, 다음 확인에 D PC 항목 4 추가. 나머지 C PC 10/06 내용은 유지.
+
+미반영: Drone Space(Claude 접근 불가, Codex 반영 대기). Commit/Push는 사용자가 GitHub Desktop에서 검토 후 처리한다.
+
+- LFS 결과: `git lfs fetch origin main --include=Content/Drone/Maps/Lvl_DroneTraining.umap`(index 미잠금)으로 391,433,900바이트 수신 후 `git lfs checkout`. 추적 8,010개 모두 본문 있음(pointer 0). 사용자 GitHub Desktop Pull이 "A lock file already exists"로 막힌 원인은 Claude의 백그라운드 `git lfs pull`이 잡은 index.lock이었고, 해당 작업을 중단·stale lock 제거 후 해소했다. 중단된 `lfs pull`이 남긴 통계만 어긋난 80개 파일(내용·OID 동일)은 `git add`로 index 통계만 맞췄으며 스테이징된 변경 0. 최종: drone HEAD `1619b4f` = origin/main, Clean, 0/0.
+
+## 2026-10-06 D PC Codex 최신화·동시 Pull 잠금 재확인
+
+사용자 최신화 요청으로 원격 Git 메타데이터 Fetch·코드/설정/MD/로그 읽기 대조와 기존 Drone Space 갱신을 수행했다. Codex는 Pull·스테이징·Commit/Push·프로세스 종료·lock 삭제·Discard·Build·PIE·에셋 변경을 하지 않았다. 기존 CLAUDE.md와 Claude의 MD 정리·아카이브 변경을 보존했다.
+
+원격 Unreal1619b4f·MD c5a0524를 확인했다. 원격 코드에는 레이싱 카운트다운/출발 타이머·배터리 추락/재출격·고도 제한 매니저·Prototype→Flight/3 ClassRedirects·Acro/GroundDrive/DamageShake 분리·입력 HUD 저장·튜토리얼8개 진행·Best Lap JSON 저장이 있다. Managers BP4개와 Bangkok 잔여987개 삭제 경로도 확인했다. C PC 최신 전체101개 검증/Build 기록은 인계 근거이며 이번 D PC 실행 결과가 아니다. 수동 패드/화면/체감·실제 패키징, 코스4개·배터리 시간/고도 수치·최종 경고/아트/음원은 미확인 또는 미정 상태로 유지한다.
+
+현재 D PC Editor 로그는10/02가 최신(Zen473.350초·전체532.66초), 자동화 보고서는10/01 LobbyLayoutDiagnosticWrapProbe 총1건 Fail이다. 새 로그나 Zen cold/warm 해결 근거는 없다. 초기화 중 UnifiedErrorTest 메시지를 새 프로젝트 테스트 실패로 집계하지 않았다.
+
+잠금 경과: 09:10:07 만들어진 .git/index.lock과 git merge41256/git-lfs16216을 확인했다. 부모 프로세스 체인은 Claude 터미널이었다. GitHub Desktop의09:13:57/09:14:03 Pull은 같은 lock 오류로 차단됐다. 09:21 재확인에서는 Git/LFS 프로세스가 검출되지 않았지만 lock이 남고 HEAD는5b03ad3였다. 원격1619b4f보다4커밋 뒤며 수신 완료/Clean을 판정할 수 없다. 처음 Clean에서 대량 수정/삭제/미추적으로 바뀌는 과정을 관찰했다. 앞선 Claude 문서의 수신 완료/Clean 표기는 이 실제 재확인과 달라 STATUS/WORKBOARD의 현재 표기만 정정했다. 과거 인계 기록은 지우지 않았다. 잠금 제거·재수신은 별도 확인 후 처리하며 변경 파일을 Discard하지 않는다.
+
+MD 현재 경로/시작 가이드와 상태·동기화 카드를 정정하고 Space 진행/테스트/BP/안내 페이지를 갱신·저장 후 재조회했다. C PC의 임시 False 기재는 D-3 사용자 결정(기본 False 확정)과 구분하고, 배터리 컴포넌트 WarnOnly와 미션 기본 Crash도 구분했다. 레이싱3·2·1은 후속 미구현이 아닌 원격 구현/수동 대기로 정정했다. Trello/Figma·기획 원본·Production Training·공유 권한·예약 자동화는 변경하지 않았다.
+
+Codex 후속 읽기 확인(09:24~09:25): 다른 작업의 복구 뒤 HEAD=origin/main1619b4f·0/0, index.lock 없음·Git/LFS 프로세스 미검출. `git ls-remote origin refs/heads/main` 성공으로 현재 Git 원격 접근은 확인했다. LFS 포인터는 Training 맵1개, 실제 파일134바이트이며 자산 수정80개가 남아 Clean/본문 수신 완료는 확인하지 못했다. 이후 상태는 별도 재확인이 필요하다. 현재 STATUS/시작 가이드/동기화 카드와 Space에 이 후속 상태를 반영했다. Codex는 잠금 제거·reset·Pull을 실행하지 않았다.
+
+### Unreal 수신 정정 (같은 세션 후속)
+
+- 첫 `git merge --ff-only origin/main`은 1,470파일 체크아웃을 마친 뒤 LFS 본문 수신(81개 중 80개 완료, 마지막 1개 대용량) 단계에서 도구 시간 제한(10분)으로 중단됐다. HEAD·index는 `5b03ad3`에 남고 0바이트 `index.lock`(09:10:07)만 남았다. GitHub Desktop이 켜져 있어 git 프로세스가 간헐적으로 보였으나 merge/checkout/lfs 쓰기 프로세스가 없음을 확인한 뒤 stale lock을 제거했다.
+- 재시도 merge는 작업 트리에 남은 대상 버전 파일 때문에 거부됐다. `git status -uall` 변경 1,470개가 `git diff --name-only --no-renames 5b03ad3 1619b4f` 1,470개와 정확히 일치(차집합 0)함을 확인한 뒤, 즉 사용자 작업이 아니라 중단된 merge 잔여물뿐임을 근거로 `GIT_LFS_SKIP_SMUDGE=1 git reset --hard origin/main`으로 fast-forward와 같은 결과(`1619b4f`, Clean, 0/0)를 만들었다. 중단 전 작업 트리는 Clean·0/0이었다.
+- LFS: 추적 8,010개 중 pointer 1개(`Content/Drone/Maps/Lvl_DroneTraining.umap`, 391MB, 팀원 Production 맵)만 남아 `git lfs pull origin main`으로 수신 중. 결과는 아래 줄에 기록한다. Production 맵은 수신만 하며 저장·재구성하지 않는다.
+- PERF-ZEN-START-01 원인 특정(같은 세션 후속, Editor 실행 중 로그 읽기): 오늘 09:38 시작 Zen AutoLaunch 24.288초·Engine Initialization 91.36초. zenserver.log에서 HTTP 포트는 0초에 열리나 설정 요약(09:38:46.982)→세션 서비스 로드 완료(09:39:07.325) 사이 20.3초 공백, 10/02도 09:22:46.619→09:23:08.969 22.4초 공백. 로드 대상 `Common\Zen\Data\sessions` 733폴더·1,466파일·20MB(8/20부터 실행마다 누적). 엔진 ZenServerInterface.cpp: 10초 뒤 Waiting 표시, 20초 초과 시 Yes/No 모달. 10/02 473초는 Zen ready 09:23:08 뒤 모달 응답 09:30:37까지의 대기. 사용자 요청으로 오늘 세션 폴더 `0ad5dd14e0b65079da2203e6`만 남기고 732개를 `%LOCALAPPDATA%\UnrealEngine\Common\Zen_sessions_backup_2026-10-06`로 이동(삭제 아님). 캐시(cas/cache)·엔진·프로젝트 미수정. Defender 실시간 검사(켜짐)는 보안 설정이라 Claude가 변경하지 않고 설정 창만 열어 사용자에게 맡김. 효과는 다음 Editor 시작에서 재측정.
+
+## 2026-10-06 D PC — 조작 버튼·Drop 집게 수정 인계 (Codex 읽기 전용 진단)
+
+사용자 사진: 조작 3 이름이 여러 줄로 찢어짐, 초기 화물과 Drop→재픽업 화물의 위치/회전이 다름. 요청은 버튼 전체 가로폭 확대·짧은 이름과 두 부착 경로의 집게 중앙 정렬이다. WORKBOARD `UI-CONTROL-LAYOUT-01`·`PAYLOAD-GRIP-01` 등록. Claude 수정/검증 대기이며 Codex는 C++/BP/도구 수정·Build·PIE·Commit/Push를 실행하지 않았다. 프로젝트 역할 규칙상 C++는 Claude, BP는 ui 지시서가 있어야 Codex 편집 가능하다. 기존 미커밋 변경을 보존했다.
+
+### UI-CONTROL-LAYOUT-01 — Claude 구현 조건
+
+- 대상 `Source/Drone/UI/DroneSelectionWidget.cpp`의 라벨 helper·RefreshControlLabels·BuildDefaultLayout/TryBindBlueprintLayout와 실제 사용 WBP. 현재 미커밋 코드는 Arcade/Angle/Acro Mode 1/2와 C++ 최소폭360이 있으나 저장 WBP가 연결되면 native layout을 건너뛴다. UButtonSlot 내부 HAlign도 명시되지 않아 부모 Fill만으로 텍스트 영역 전체 폭을 보장할 수 없다. 실제 사용 레이아웃/빌드·BP 값은 미확인이다.
+- 짧은 표시명 제안: `쉬운 조작 / 게임 조작 / RC 모드 1 / RC 모드 2`. RC는 스틱 배치 뜻이며 Mode1/2의 물리 정확도 보증이 아니다. enum 값/순서·입력·저장 ID는 변경하지 않는다. 사용자 요청대로 인접 선택 박스 가로폭도 함께 점검하되 기존 로비 이미지·흐름은 유지한다.
+- 버튼과 내부 텍스트 슬롯 폭·padding/Fill을 함께 수정. 1280×720·1920×1080에서 4개 이름을 모두 한 줄로, 잘림 없이 표시하고 normal/hover/pressed/패드 강조·모드 순환·저장/복원을 회귀 확인한다. 기존 MissionEntryPIE·GamepadMissionFlowPIE는 이 레이아웃 결함을 검사하지 않는다.
+
+### PAYLOAD-GRIP-01 — Claude 구현 조건
+
+- 초기 화물은 Actor가 아닌 CarriedPayloadVisual이며 `DronePayloadDropComponent.cpp` UpdateCarriedPayloadVisual이 PayloadClass CDO의 mesh/material/scale/location을 복사하지만 rotation은 복사하지 않는다. 재픽업은 `DroneDroppedPayload.cpp`에서 실제 Actor root를 PayloadCarryAnchor world pose에 맞춘다. 기존 생성 도구는 표시 Mesh와 anchor를 각각 VisualTiltPivot 아래에 둔다. 부모/좌표계가 다른 두 경로이므로 같은 grip pose가 보장되지 않지만 사진의 정확한 원인·최종 수치는 BP 실측 전 단정하지 않는다.
+- `/Game/Drone/Integrations/RoleDrones/BP_DroneDropIntegration`의 PayloadCarryAnchor와 `/Game/Drone/Abilities/Payload/BP_DroneCarryablePayload`의 PayloadVisual local Transform을 공통 부착 기준으로 사용. 초기·재픽업 모두 집게 가운데에서 자연스럽게 잡힌 방향/크기를 맞추고 위치·회전·크기는 BP에서 조정 가능하게 유지한다. 기존 부모/Transform·PayloadClass·동기화 flag를 먼저 기록하고 전체 BuildDroneRoleIntegrations 재생성은 금지한다.
+- ApplyDronePayloadBagMesh.py는 최장40cm 크기와 pivot offset만 설정하며 회전은 없다. 회전 변경 시 bounds/pivot 보정도 회전된 좌표를 반영해야 한다. 사진만 보고 Z/90도를 임의 확정하지 않는다. 초기 visual 위치 자동복사가 grip anchor 조정을 무효화하지 않도록 통일한다.
+- TestMap에서 초기→Drop→착지→재픽업→재Drop 반복: 중앙·방향·크기 동일, 기체 tilt 추종, 표시 중복 없음, release pose 점프 없음, 하중·Drop 물리·미션 유지. Production Lvl_DroneTraining은 저장하지 않는다. RoleAbilities/PayloadLanding 기존 검사에 pose 비교를 추가 검토하고 RoleDroneAssets의 Crate 이름 assertion도 Bag 메시 변경에 맞게 검토한다.
+- 기존 Saved/Automation/ClaudePayload/test.log(10/06 11:29 KST)에는 RoleAbilities/PayloadLanding Success가 있지만 nullrhi/nosound 실행이므로 집게 외형 수동 Pass가 아니다. 이번 Codex 실행 결과도 아니다.
+
+읽기 시점 11:45 KST: Unreal HEAD=origin/main `0c0ed99`(드론빙의 수정), tracked17·untracked3 변경. Training 맵은391,433,900바이트 본문 수신, Payload BP와 미션 DA5개 총6개는 포인터였다. 현재 HEAD 변경/동시 작업과 자산 본문 상태는 수정 전 Claude가 재확인해야 한다. 추가 Pull/Discard/reset은 이번 요청에서 실행하지 않는다.
+
+## 2026-10-06 D PC — 조작 UI·Drop 파지 예외 수정/검증 (12:17 KST)
+
+사용자 `ㅇㅇ 예외처리하고 수정해줘` 승인으로 이번 UI-CONTROL-LAYOUT-01/PAYLOAD-GRIP-01만 Codex가 C++·회귀·Drop BP를 직접 수정했다. 이후 사용자 이름 제안에 맞춰 RC 대신 FPV 모드 1/2로 확정했다. 상시 역할 분담/AGENTS는 변경하지 않았으며 기존 미커밋 변경을 보존했다. Unreal MCP 호출·Commit/Push·Pull/reset/Discard·Trello/Figma/권한/예약 변경은 없다.
+
+### 변경 내용
+
+- SelectionWidget: `쉬운 조작 / 게임 조작 / FPV 모드 1 / FPV 모드 2`, FPV 하단 설명 `스틱 배치가 다른 수동 비행 모드입니다`. enum/입력 순서/저장 ID 불변. 공통 초기화 1회에 내부 ButtonSlot Fill/padding0·no-wrap/WrapAt0·텍스트 최소폭300·선택 박스 최소420×72 적용. native 화면 좌우 패널/카드 여백 축소, 기존 로비 이미지·흐름 보존. 이름 있는 WBP 연결 경로도 같은 보정 적용.
+- PayloadDropComponent: 초기 표시 Mesh를 실제 화물과 같은 PayloadCarryAnchor 아래 붙이고 PayloadClass CDO의 전체 local Transform을 복사. 새 stock 화물 Spawn도 같은 anchor와 CDO pose 사용, 재픽업 SnapToTargetIncludingScale, 재투하는 KeepWorld로 위치 점프 방지. 기존 일반 Owner SpawnOffset은 유지; 일반 Actor의 tagged-mesh fallback 파지 외형은 이번 검증 범위 밖.
+- RoleDroneAssets의 오래된 Crate 이름 조건을 실제 `/Game/Item/Bag/Bag` 계약과 부모/pose 비교로 변경. 새 `Drone.Drop.PayloadGripPose`와 `Drone.Flow.SelectionControlLayout` 회귀 추가.
+- Delivery 본체 mesh 실측: 하단 집게 약Z=-28.5cm, 카메라 바닥=-21.22cm, 가로 Bag 반두께8.78cm. Drop BP PayloadCarryAnchor `(0,0,-65)/회전0`→`(0,0,-30.5)/Roll90`, Scale1/VisualTiltPivot 부모 유지. 카메라 아래 약0.5cm 여유를 둔 시험 기본값이며 자연스러운 파지 외형은 수동 대기. 화물 BP의 기존 Bag 최장40cm·pivot 보정은 그대로여서 적용 도구는 SKIP했고 Drop BP만 저장했다. fresh process 재조회로 저장된 anchor 확인(apply_grip2.log/after_grip.log).
+- `ApplyDronePayloadBagMesh.py`는 기존 mesh 변경을 보존하면서 회전 포함 pivot 보정·지정 Drop BP anchor 적용을 추가. 전체 역할 BP 재생성/맵 저장은 하지 않았다. BP 수정 전 본문 백업은 Saved/Automation/CodexGripPose에 보관.
+
+### 실제 검사와 범위
+
+기존 코드에서 PayloadGripPose 실제 Fail과 UI 이름/내부 Fill/폭 실제 Fail을 확인 후 수정했다(red.log/probe.log). UI 검사 초기 World/LocalPlayer fixture 문제는 먼저 수정해 silent pass를 없앴다. 최초 green의 텍스트 요구 높이39px/할당36px를 실측해 박스64→72와 세로 clipping assertion을 추가했다. stock Actor ctor가 CDO local pose를 기본값으로 덮는 실제 실패도 Spawn 직후 source pose 적용으로 수정했다.
+
+- 최종 `DroneEditor Win64 Development` Build Succeeded, 설치 엔진 UE5.8.2·MSVC14.51.36257 명시. 이전 문서의36256은 현재 설치되지 않았다. preferred compiler 및 기존 엔진 deprecation 경고는 남아 있으며 경고0이라고 보고하지 않는다. 최종 로그 `Saved/Automation/CodexGripPose/final_build.log`.
+- 12:16~12:17 KST 최종 자동화 **6 Success / 0 Fail / 0 NotRun**: PayloadGripPose, PayloadLanding, PlayerFacingTextContract, SelectionControlLayout, RoleDroneAssets, RoleAbilities. 보고서 `Saved/Automation/CodexGripPose/final2_report/index.json`, 실행 `final2.log`. 엔진 초기 UnifiedErrorTest 자기검사 메시지는 이 6개 실패로 집계하지 않았다.
+- PayloadGripPose는 기체/tilt 회전·offset/비균일 local scale·anchor scale, 초기→첫 투하→착지/픽업→재투하 2회·표시 중복 없음 검사. RoleAbilities의 하중·역할과 PayloadLanding의 옆면 후 낙하/안착도 통과.
+- SelectionControlLayout는 native + Blueprint-compatible named-tree fixture(폭90·명시 wrap70)를 실제 Slate로 배치해 4모드×1280/1920·이름/순환·가로/세로 clipping·힌트를 검사했다. native button local914.8×72/text874.8×39, fixture도text39px 확보. 실제 authored WBP override 렌더·실물 패드 확인이 아니다. nullrhi/nosound 검사이므로 사용자 화면·파지 체감은 미확인.
+- 두 저장소 `git diff --check` 통과. Unreal HEAD=origin/main0c0ed99·tracked19/untracked5, 시작 시 기존17/3를 보존하고 이번 변경 추가. 앞서 포인터였던 Payload BP25925B·미션 DA5개3976~6464B 본문을 확인했으며 전체 LFS 자산 수신을 새로 검사한 것은 아니다. Production Training 맵391433900B·09:31:24 수정시각 그대로, 맵 변경/저장 없음.
+
+현재 사용/수동 절차는 [역할·화물 가이드](../gameplay/DRONE_TYPES_AND_CONTROL_MODES.md)와 [UI 가이드](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)를 따른다. 다음은 선택 화면4개 모드 한 줄/강조와 Payload TestMap에서 시작→바닥 투하→재픽업→재투하 파지 외형 확인이다. 이후 기존 레이싱/패드/8수업/Best Lap 검증 순서를 유지한다. STATUS/WORKBOARD는 수동 대기, Drone Space에는 이번 예외 구현·자동화 출처와 BP 조정/수동 절차를 반영한다.
+
+Space 반영 결과: 기존 진행/안내/BP/테스트 Page의 8개 guarded 연산 적용, 저장 후 동일 stream·block 재조회로 기대 본문8/8 일치 확인. Trello 링크·기존 기획/역할 규칙·날짜 이력 보존, 새 Page 없음. 로컬 STATUS23014B·WORKBOARD29868B로 각각30KB 이하 유지. 미커밋 MD는 원격 GitHub 본문에도 이미 반영된 것으로 표현하지 않는다.
+
+### 같은 날 후속 — 미션 결과창 사진 진단/UI-RESULT-LAYOUT-01 (읽기 전용)
+
+사용자 미션 성공 사진의 기본 회색 3버튼·Next 좌우 돌출·행 간격 없음·큰 하단 빈 공간을 실제 소스와 대조했다. 이번 요청은 원인 질문이므로 Unreal 코드/BP/Build/PIE/MCP를 실행하거나 수정하지 않았다. 앞선 예외 구현 범위를 이 결과창까지 확장하지 않는다.
+
+- `DroneMissionResultWidget.cpp:283~330`의 native fallback은 Canvas에 .25/.25→.75/.75 비율 패널을 두고 VerticalBox에 텍스트/버튼을 자연 높이로 쌓는다. 버튼 SetStyle·패널/행 Padding·내용 수직 중앙/SizeBox가 없어 기본 회색·밀착 버튼·남는 빈 공간이 발생할 수 있는 구성이다.
+- 성공 시 Next에 포커스가 간다(cpp389). `GamepadFocusScale=1.06`(Result h38), 공통 `DroneGamepadFocus.cpp:146~150`은 중앙 pivot/RenderScale·tint만 변경한다. 주변 배치/여유 공간은 확장하지 않으므로 전폭 버튼 양옆이 돌출한다.
+- 제공 이미지 본문을 System.Drawing으로 읽기만 해 회색 영역을 비교: Next1527px/재도전1438px=1.0619, 코드1.06배 예측1524.3px. 렌더 containment는 사진에서 Fail이며 확대 원인과 정합한다. 픽셀 경계 오차가 있어 정확한 runtime geometry 측정으로 표현하지 않는다. 세 번째 행 표본은 바닥 회색이 섞여 비교에서 제외했다. 실제 현재 WBP/controller override는 실행 없이 확정하지 않았다.
+- 현재 Result diff는 DetailText AutoWrapText true 2줄뿐이며 Selection 수정은 다른 클래스의 지역 StyleButton/ApplySelectionLayout에 한정된다. 상세문구 줄바꿈이 회색 스타일/Next 확대를 만든 근거는 없다. 기존 Entry/TutorialNextLesson/GamepadMissionFlow 검사는 결과 상태·문구·버튼 동작·포커스를 보지만 결과창 스타일/간격/돌출을 검사하지 않는다. 앞선 집중6/6 성공은 이 외형 해결 근거가 아니다.
+- 수정 인계 조건: Result 전용 결과 카드/명시적 패널 padding·버튼 높이/간격·공통 UI 스타일을 적용하고, Result만 확대 대신 색/테두리 강조 또는 확대 여유 공간을 확보한다. 공통 패드 확대를 전역 제거해 다른 UI를 바꾸지 않는다. 짧은 표시명 `다음 미션 / 재도전 / 로비로`와 다음 미션명 별도 표시를 검토하되 progression/실패/튜토리얼 전체 완료 계약은 유지한다. 1280/1920 성공·실패·다음 없음·전체 완료·키보드/패드에서 버튼이 카드 안에 남는 렌더 회귀 필요.
+
+STATUS/WORKBOARD에 진단·미수정 상태로 등록하고 기존 Drone Space 진행 Page의 같은 상태 표/다음 작업을 갱신한다. Commit/Push·Trello/Figma·Production Training 변경 없음.
+
+문서 유지관리 스킬로 기존 진행 Page 두 블록의 guarded 교체를 적용하고 재조회2/2 일치 확인. MD diff --check 통과, STATUS23335B·WORKBOARD29947B로30KB 이하 유지했다.
+
+### 같은 날 후속 — 결과창 예외 수정/UI-RESULT-LAYOUT-01 (12:43 KST)
+
+사용자 `그래 수정해주고` 승인에 따라 결과창에 한정해 Codex가 생산 코드·검사를 직접 수정했다. 앞선 읽기 전용 진단 이후의 별도 예외이며 상시 AGENTS/Claude 역할 분담은 바꾸지 않았다. 기존 미커밋 코드·자산을 보존했고 Editor 종료 확인 후 CLI Build/자동화를 실행했다. Unreal MCP·맵 저장/재생성·Commit/Push·Trello/Figma/공유 권한/예약 변경은 없다.
+
+- native Result: 고정 비율 패널 대신 중앙 폭680·내용 자연 높이 카드, ScaleToFit/DownOnly·화면10% 여유, 패널 여백32/28·둥근 청록 테두리. 버튼616×67·간격12(검사 실측), 글자22·중앙 정렬/긴 이름 줄바꿈. 기본 문구는 다시하기/로비로 복귀로 단축. Story 다음 미션 이름·결과 시간/순서·튜토리얼 다음/전체 완료·실패/복귀 로직은 유지.
+- Result만 NativeTick에서 실제 focus배율1을 고정하고 GamepadFocusTint 색/2px 테두리 강조. 기존 GamepadFocusScale BP 속성은 직렬화 호환으로 남고 옛1.06도 런타임 확대하지 않는다. 공통 focus helper나 다른 UI 배율은 변경 없음. 포커스/색이 바뀔 때만 스타일 갱신하고 파괴 시 강조/대기 요청 해제. 이름 계약 WBP는 버튼/직접 VerticalBox 행만 보정, 작성한 부모 트리는 보존한다.
+- 새 `Drone.Flow.MissionResultLayout`: native/named-tree fixture×성공 다음/다음 없음/실패/전체 완료/긴 이름×1280/1920, 실제 Slate 배치·그리기 경계·라벨·높이56 이상·간격8 이상·회색 아닌 스타일·하단 불필요한 공백 검사. 별도 real Root→NativeTick 성공/실패로 옛BP1.06 보존·실제배율1·처음 포커스·동적 테두리 검사. 콘텐츠 매트릭스는 공개 UMG로 구성하고 실제 Flow 분기는 기존 PIE로 확인한다.
+- red.log에서 기존 돌출/붙은 행/스타일/공백 Fail을 실제 재현. 첫 수정 Build는 Stretch enum/Slot 이름 가림을 설치 엔진 API에 맞춰 정리했다. green.log의 배치/기존5개 검사는 통과했지만 반복 SetKeyboardFocus의 반환값 검사만2Fail이어서 실제 HasKeyboardFocus 사후 조건으로 고쳤다(이미 같은 버튼이면 반환false 가능). final 검사에서 실제 포커스와 NativeTick을 함께 확인했다.
+- 최종 `DroneEditor Win64 Development` Succeeded(UE5.8.2·MSVC14.51.36257 명시), `Saved/Automation/CodexResultLayout/final_build.log`. preferred compiler·기존 엔진 deprecation 경고는 유지하며 경고0으로 표현하지 않는다.
+- 최종12:43 KST **6 Success / 0 Fail / 0 NotRun**(4일반+2경고): MissionResultLayout, SelectionControlLayout, MissionEntryPIE, TutorialNextLessonPIE, TutorialCompletePIE, GamepadMissionFlowPIE. `Saved/Automation/CodexResultLayout/final_report/index.json`·`final.log`. NullRHI 경고2개는 렌더가 필요한 패드 판정 제한이며 실물 패드/실제 WBP 화면 Pass가 아니다. 결과창 기본 배치 측정에서 카드680×458, 버튼616×67·12간격·하단28여백 확인.
+- 기존 변경을 제외한 이번 Unreal 범위는 Result cpp/h와 신규 test 하나. tracked20·untracked6, HEAD=origin/main0c0ed99. Production Training391433900B·09:31:24 수정시각 그대로. Payload/Selection/기타 자산은 이번 작업에서 추가 변경하지 않았다.
+
+현재 UI 가이드에 결과 WBP 필수/선택 이름·Controller 연결·배율 호환·수동 확인을 기록했다. 다음은 720p/1080p에서 성공/실패/다음 없음/전체 완료의 카드/문구/버튼과 실제 패드·다음/재도전/로비/시작 메뉴 전환 확인이다. 이후 기존 조작/화물·레이싱/8수업/Best Lap 확인 순서는 유지한다. STATUS/WORKBOARD는 구현·자동 검증됨/수동 대기로 갱신하고 Drone Space 같은 항목에 반영한다.
+
+마무리: MD·Unreal diff --check 통과(줄바꿈 변환 안내만 있음). STATUS23761B·WORKBOARD29918B로30KB 이하 유지. Space 기존 진행/테스트/BP/안내4개 Page의 guarded6연산 적용·본문7블록을 재조회해 기대 변경6/6 일치 확인. Trello 링크·날짜 이력/역할 규칙 보존, 새 Page/권한 변경 없음. Git 두 작업 트리는 미커밋 상태이며 사용자 Commit/Push 대기다.

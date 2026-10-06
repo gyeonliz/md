@@ -1,6 +1,6 @@
 # 시작 화면 · 로비 탭 · 원형 코스 가이드
 
-기준일: 2026-10-04 현재 C PC. 10/01 이전 D PC UI·Settings 기록은 이후 9f67706/5b03ad3로 커밋됐다. 현재 Git/검증은 STATUS, 세션 원문은 WORKLOG를 따른다. 원본 이미지·Figma는 보존한다.
+기준일: 2026-10-06 D PC 결과창 후속 포함. 각 기능의 이전 C/D PC 근거는 해당 절에서 구분한다. 10/01 이전 D PC UI·Settings 기록은 이후 9f67706/5b03ad3로 커밋됐다. 현재 Git/검증은 STATUS, 세션 원문은 WORKLOG를 따른다. 원본 이미지·Figma는 보존한다.
 
 ## 0. 현재 계약 — 5메뉴·조종 입력 표시 현재 구현과 계약
 
@@ -63,10 +63,20 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 - 5메뉴 API는 OpenLobbyForCategory/OpenStoryLobby/OpenRacingLobby/OpenTutorialLobby/RequestExitGame이며 TitleMenuClass는 WBP_DroneFiveItemMenu의 StoryButton/RacingButton/TutorialButton/SettingsButton/ExitButton과 OnStoryRequested/OnRacingRequested/OnTutorialRequested/OnSettingsRequested/OnExitRequested 계약을 지킨다. FinishOpeningTrailer·OpenTrainingLobby는 호환용. 선택/확정 SelectLobbyMission/ConfirmSelectedMission, 브리핑 FinishMissionBriefing, Back NavigateBack을 유지한다.
 - FrontEnd 필수 이름은 `OpeningPanel / LobbyPanel / MissionBriefingPanel`, `ContinueButton`, `OpeningTitleText / LobbyTitleText / LobbyStatusText`, `MissionSelectButton / MissionSelectButtonText`, `MissionNameText / MissionDescriptionText / MissionMetaText`, `StartMissionButton`, `MissionBriefingTitleText / MissionBriefingBodyText`, `FinishMissionBriefingButton`이다. Back 버튼은 `LobbyBackButton / BriefingBackButton`으로 연결한다.
 - 기체 선택의 필수 이름은 `DroneSelectionPanel`, `MissionNameText`, `DroneNameText / DroneDescriptionText / DroneProfileText`, `DroneButton0`~`DroneButton4`, 각 `DroneButton0Text`~`DroneButton4Text`, `ControlModeButton / ControlModeButtonText`, `LaunchDroneButton`이다. `SelectionBackButton`을 쓰면 기본 Back 처리를 재사용한다. 폐기된 속도 단계의 `HandlingPresetButton / HandlingPresetButtonText`는 호환용으로 숨긴다.
+- 조작 이름은 `쉬운 조작 / 게임 조작 / FPV 모드 1 / FPV 모드 2`다. FPV 1·2는 시점이 아닌 스틱 배치 차이이며 기존 입력·enum·저장 ID는 유지한다. 선택적 `ControlModeHintText` 이름의 TextBlock을 두면 설명을 표시한다. 공통 초기 레이아웃 보정은 Button 내부 슬롯 Fill·padding0, Label no-wrap/WrapAt0·최소폭300, selector 최소420×72를 적용한다. 폭을 고정한 좁은 SizeBox/Canvas를 보정하지만 모든 임의 WBP 부모 제약을 해결하는 것은 아니다. native 화면과 named-tree fixture의 1280/1920 Slate 배치 검증은 렌더된 실제 WBP/패드 수동 확인과 구분한다. 상세 검증은 [WORKLOG](../history/DRONE_WORKLOG.md).
 - 기체 카드 입력은 `Select Drone`, 조작 전환은 `Toggle Control Mode`, 출격은 `Confirm And Launch Selected Drone`이다. `Receive Drone Selection Refreshed`에서 최종 카드/모델 연출을 붙일 수 있으며 실제 승인과 Pawn Spawn은 기존 Flow/Controller가 담당한다.
 - 설정 Host에는 `SettingsPanel`과 `UDroneSettingsWidget` 타입의 `SettingsWidget`을 넣고 `Set Settings Visible`로 열고 닫는다. 설정 위젯 자체의 Designer 노드는 이름만으로 자동 Bind되지 않는다. 기본 native 위젯을 재사용하거나 아래 9절의 공개 API에 직접 연결한다.
 
 ## 4. 탭과 미션 데이터
+
+### 결과창 배치와 확인 (2026-10-06 D PC)
+
+`UDroneMissionResultWidget`의 기본 화면은 중앙 폭680 카드·내용에 맞는 높이·안쪽 여백32/28·버튼 간격12px다. 작은 화면에서만 비율을 유지해 축소한다. 버튼은 어두운 청록색이며 `다시하기 / 로비로 복귀`로 짧게 표시한다. Story의 `다음 미션: 이름`과 튜토리얼 전체 완료 문구/동작은 유지한다. 숨긴 다음/다시하기 버튼은 빈 행을 남기지 않는다.
+
+- 이 화면만 포커스 확대를 없애고 `GamepadFocusTint` 색·테두리로 강조한다. 다른 화면의 배율은 유지. `GamepadFocusScale`은 기존 BP 직렬화 호환으로 남지만 결과창 런타임 배율은1이다(옛 BP의1.06도 적용하지 않음).
+- 자체 WBP 필수 이름: `MissionResultPanel / MissionResultTitleText / RetryMissionButton / ReturnToLobbyButton`. 선택 이름: `MissionResultDetailText / NextMissionButton / NextMissionButtonText / RetryMissionButtonText / ReturnToLobbyButtonText`. 결과 위젯 클래스는 Mission PlayerController의 `MissionResultWidgetClass`에 지정한다.
+- 이름 계약으로 연결하면 버튼 스타일·안쪽 정렬과 직접 VerticalBox 자식의 간격을 초기화한다. 작성한 부모 Canvas/SizeBox/이미지 트리는 교체하지 않으므로 별도 WBP의 과도한 고정 크기는 Designer에서 조절한다. 기본 카드680·여백·스타일은 현재 C++ 시험 기본값이며 새 BP 수치 슬롯을 추가한 것은 아니다.
+- 실제 화면 확인: 1280×720/1920×1080에서 성공·실패·다음 없음·훈련 전체 완료를 확인한다. 버튼이 카드 안에 있고 서로 떨어져 있는지, 긴 다음 미션명이 잘리는지, 키보드/패드 포커스 이동 후 확대 돌출이 없는지 본다. 다음·다시하기·로비/시작 메뉴 전환도 확인한다. 현재 자동 검사와 수동 Pass는 [STATUS](../../STATUS.md)에서 구분한다.
 
 담당 클래스는 `UDroneMissionDefinition`과 `UDroneFrontEndRootWidget`이다.
 
