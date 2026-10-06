@@ -18,7 +18,7 @@
 
 ## 배치형 Weather Manager 사용법
 
-Asset: `/Game/Drone/Weather/Blueprints/BP_DroneRandomWeatherController`
+Asset: `/Game/Drone/Managers/BP_DroneRandomWeatherController`
 
 1. 날씨가 필요한 맵에 이 Blueprint를 한 개 배치한다.
 2. 에디터에서는 위치를 쉽게 찾도록 원뿔 Mesh가 보인다. 이 원뿔은 Editor 전용이며 Play/Package에는 존재하지 않는다.

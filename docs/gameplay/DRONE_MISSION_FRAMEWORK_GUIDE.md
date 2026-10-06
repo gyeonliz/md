@@ -10,7 +10,7 @@ Story Mission을 만들 때 매번 Level Blueprint에 목표 판정을 새로 �
 
 | Blueprint | 역할 |
 |---|---|
-| `Blueprints/Managers/BP_DroneMissionManager` | 선택한 Mission Definition의 순서형 목표, 진행 수량, 제한 시간, 성공·실패, Story Fact를 관리한다 |
+| `/Game/Drone/Managers/BP_DroneMissionManager` | 선택한 Mission Definition의 순서형 목표, 진행 수량, 제한 시간, 성공·실패, Story Fact를 관리한다 |
 | `Blueprints/Managers/BP_DroneMissionPlayerController` | 출격 Drone과 위 Manager를 생성하고 Mission HUD·결과 Flow를 연결한다 |
 | `Blueprints/Managers/BP_DroneMissionGameMode` | Story/Test Mission 맵에서 위 PlayerController를 사용하게 하는 GameMode다 |
 | `Blueprints/Triggers/BP_MissionObjectiveTrigger` | Box Overlap을 Mission Objective Event로 보고한다 |
@@ -24,10 +24,12 @@ Blueprint는 빈 표시용 껍데기가 아니다. 공통 판정은 C++ 부모 �
 ## 폴더 계약
 
 ```text
+/Game/Drone/Managers
+└─ BP_DroneMissionManager
+
 /Game/Drone/Mission
 └─ Blueprints
    ├─ Managers
-   │  ├─ BP_DroneMissionManager
    │  ├─ BP_DroneMissionPlayerController
    │  └─ BP_DroneMissionGameMode
    ├─ Triggers

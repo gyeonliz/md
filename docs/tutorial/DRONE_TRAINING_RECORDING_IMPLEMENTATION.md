@@ -203,7 +203,7 @@ AcceptedWorldLocation
 
 ```text
 Gate 0 정상 승인
-→ PassingActor를 ADronePrototypePawn으로 확인
+→ PassingActor를 ADroneFlightPawn으로 확인
 → Pawn의 UDroneTelemetryComponent 확인
 → Gate 0 승인 시간·이탈 위치를 시작 기준으로 저장
 → Telemetry OnTelemetryUpdated와 Pawn OnDestroyed 구독
@@ -371,7 +371,7 @@ PIE를 끝내면 현재 실행 전용 History는 사라진다. 이는 SaveGame�
 2. `OrderedGates`가 최소 2개인지 확인한다.
 3. 현재 기대 Gate가 Gate 0인지 확인한다.
 4. Gate를 로컬 `+X` 정방향으로 완전히 빠져나왔는지 확인한다.
-5. 통과 Actor가 `ADronePrototypePawn`의 자식인지 확인한다.
+5. 통과 Actor가 `ADroneFlightPawn`의 자식인지 확인한다.
 6. Pawn이 `UDroneTelemetryComponent`를 소유하는지 확인한다.
 7. Course가 `GetLapRecorderComponent()`에서 유효한 Component를 반환하는지 확인한다.
 

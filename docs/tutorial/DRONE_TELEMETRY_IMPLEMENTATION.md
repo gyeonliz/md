@@ -29,10 +29,10 @@ D:\JGY\project\drone\Source\Drone\Telemetry\Tests\DroneTelemetryTest.cpp
 Prototype Pawn과 런타임 회귀 테스트 연결 위치:
 
 ```text
-D:\JGY\project\drone\Source\Drone\Prototype\DronePrototypePawn.h
-D:\JGY\project\drone\Source\Drone\Prototype\DronePrototypePawn.cpp
-D:\JGY\project\drone\Source\Drone\Prototype\Tests\DronePrototypeDefaultsTest.cpp
-D:\JGY\project\drone\Source\Drone\Prototype\Tests\DronePrototypeSpawnPossessTest.cpp
+D:\JGY\project\drone\Source\Drone\Flight\DroneFlightPawn.h
+D:\JGY\project\drone\Source\Drone\Flight\DroneFlightPawn.cpp
+D:\JGY\project\drone\Source\Drone\Flight\Tests\DronePrototypeDefaultsTest.cpp
+D:\JGY\project\drone\Source\Drone\Flight\Tests\DronePrototypeSpawnPossessTest.cpp
 ```
 
 HUD-02 화면·Controller·수명주기 테스트 위치는 저장소 기준 다음과 같다. 이번 검증 PC의 저장소 루트는 `C:\URproject\drone`이다.
@@ -40,11 +40,11 @@ HUD-02 화면·Controller·수명주기 테스트 위치는 저장소 기준 다
 ```text
 Source\Drone\UI\DroneFlightHUDWidget.h
 Source\Drone\UI\DroneFlightHUDWidget.cpp
-Source\Drone\Prototype\DronePrototypePlayerController.h
-Source\Drone\Prototype\DronePrototypePlayerController.cpp
+Source\Drone\Flight\DroneFlightPlayerController.h
+Source\Drone\Flight\DroneFlightPlayerController.cpp
 Source\Drone\UI\Tests\DroneFlightHUDTest.cpp
 Source\Drone\UI\Tests\DroneFlightHUDBlueprintAssetTest.cpp
-Source\Drone\Prototype\Tests\DronePrototypePIEInputLifecycleTest.cpp
+Source\Drone\Flight\Tests\DronePrototypePIEInputLifecycleTest.cpp
 Content\Drone\Prototype\UI\WBP_DroneFlightHUD.uasset
 Content\Drone\Prototype\Blueprints\BP_DronePrototypePlayerController.uasset
 Content\Drone\Prototype\Blueprints\BP_DronePrototypeGameMode.uasset
@@ -97,7 +97,7 @@ Lvl_DronePrototype
 
 공용 Flight HUD는 다음 방식으로 동작한다.
 
-1. `ADronePrototypePlayerController`가 로컬 Player 화면에 `UDroneFlightHUDWidget` 하나를 생성하고 수명 동안 재사용한다.
+1. `ADroneFlightPlayerController`가 로컬 Player 화면에 `UDroneFlightHUDWidget` 하나를 생성하고 수명 동안 재사용한다.
 2. 현재 Possess Pawn에서 `UDroneTelemetryComponent`를 가져온다.
 3. 기존 Source를 해제한 뒤 `OnTelemetryUpdated`를 `AddUniqueDynamic`으로 한 번만 구독한다.
 4. 연결 직후 `GetLatestSnapshot()`을 한 번 적용해 초기 Event를 놓쳐도 빈 화면이 되지 않게 한다.

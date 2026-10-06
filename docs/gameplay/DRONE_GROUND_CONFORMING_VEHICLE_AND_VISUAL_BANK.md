@@ -68,7 +68,7 @@
 
 ## Drone 전후·좌우 이동 외형 기울기
 
-`ADronePrototypePawn`의 `VisualTiltPivot`은 전후 입력을 외형 Pitch, 좌우 입력을 외형 Roll에 사용한다. 실제 Collision과 CameraBoom은 기울이지 않는다.
+`ADroneFlightPawn`의 `VisualTiltPivot`은 전후 입력을 외형 Pitch, 좌우 입력을 외형 Roll에 사용한다. 실제 Collision과 CameraBoom은 기울이지 않는다.
 
 - 전진 입력: 외형 Pitch `-14°` 방향(기수 아래)
 - 후진 입력: 외형 Pitch `+14°` 방향(기수 위)

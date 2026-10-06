@@ -171,7 +171,7 @@ NPC Profile은 아래 User Tag를 자동으로 만든다.
 
 ### 드론 감지
 
-`ADronePrototypePawn`에는 Sight용 `UAIPerceptionStimuliSourceComponent`가 붙어 있고 BeginPlay에 자신을 감지 대상으로 등록한다. Native `ADroneNPCAIController` 기본값은 다음과 같다.
+`ADroneFlightPawn`에는 Sight용 `UAIPerceptionStimuliSourceComponent`가 붙어 있고 BeginPlay에 자신을 감지 대상으로 등록한다. Native `ADroneNPCAIController` 기본값은 다음과 같다.
 
 - Sight Radius: 4000 cm
 - Lose Sight Radius: 4500 cm
@@ -192,7 +192,7 @@ NPC Profile은 아래 User Tag를 자동으로 만든다.
 
 Blueprint Class Defaults의 `Drone > AI > Perception > Sight`, `Drone > AI > Patrol`에서 조정한다. Controller가 Pawn을 점유할 때 Search Radius/Half Height를 Reservation Component에 적용하므로 C++ 상수를 다시 고칠 필요가 없다. 야외 맵이라도 너무 크게 잡으면 멀리 있는 Smart Object로 쏠릴 수 있으므로 `80m`를 시작값으로 두고 맵 구역 크기에 맞춰 줄인다.
 
-Hostile Controller가 `ADronePrototypePawn`을 처음 감지하면 현재 Smart Object 예약을 해제하고 `DroneDetected` 이벤트를 보낸다. 시야를 잃으면 `DroneLost` 이벤트를 보낸다. Friendly와 Neutral은 같은 감지 결과로 전투 StateTree에 진입하지 않는다.
+Hostile Controller가 `ADroneFlightPawn`을 처음 감지하면 현재 Smart Object 예약을 해제하고 `DroneDetected` 이벤트를 보낸다. 시야를 잃으면 `DroneLost` 이벤트를 보낸다. Friendly와 Neutral은 같은 감지 결과로 전투 StateTree에 진입하지 않는다.
 
 ### 개인화기 추적·전투 포기
 
@@ -532,7 +532,7 @@ Cover 분기는 `ClaimCoverSlot → MoveToCover → UseCover` 세 상태다. `Us
 
 - `UDroneHealthComponent`: 기본 100/100, Damage 감소, `OnHealthChanged`, `OnDeath`, 사망 뒤 Damage 무시
 - `ADroneNPCCharacter`: 사망 시 CharacterMovement·충돌·AI 전투를 정지
-- `ADronePrototypePawn`: 사망 시 Input Mapping·이동·충돌을 정지
+- `ADroneFlightPawn`: 사망 시 Input Mapping·이동·충돌을 정지
 - `UDroneFlightHUDWidget`: Possess Drone의 Health Event를 받아 우측 상단 내구도를 표시
 
 Header/CPP 연결:

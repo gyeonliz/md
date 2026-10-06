@@ -54,11 +54,18 @@ md의 미커밋 문서는 사용자가 명시적으로 지시한 경우에만 Co
    }
    ```
 
-## Unreal MCP 자동 시작 — Git 공유 Default 설정 (10/04 정정)
+## Unreal MCP 자동 시작 — PC별 로컬 설정
 
-자동 시작은 Git 추적 Config/DefaultEditorPerProjectUserSettings.ini의 [/Script/ModelContextProtocolEngine.ModelContextProtocolSettings] bAutoStartServer=True·ServerPortNumber=8000·ServerUrlPath=/mcp로 8월부터 모든 PC에 켜져 있다. PC별 Saved ini는 끄거나 바꿀 때만 사용한다. C PC Saved 설정 완료라는 이전 설명은 오류였고 공유 Default로 충족한다.
+공유 `Config/DefaultEditorPerProjectUserSettings.ini`의 `[/Script/ModelContextProtocolEngine.ModelContextProtocolSettings]`는 `bAutoStartServer=False`로 둔다(D-14). MCP가 필요한 PC만 Git 제외 파일 `Saved/Config/WindowsEditor/EditorPerProjectUserSettings.ini`의 같은 섹션에 아래 설정을 넣는다.
 
-Claude 클라이언트는 Unreal 루트 .mcp.json을 사용한다. 연결이 안 되면 자동화 등 다른 Unreal 프로세스가8000포트를 점유했는지 확인한다. 자동화 실행은 -ModelContextProtocolPort=8010으로 사용자Editor8000을 보존한다. 열린Editor 즉시시작은 ModelContextProtocol.StartServer이며 설정 존재와 실제 도구 연결 성공을 구분한다.
+```ini
+[/Script/ModelContextProtocolEngine.ModelContextProtocolSettings]
+bAutoStartServer=True
+```
+
+서버는 8000포트·`/mcp`를 사용한다. 설정 존재와 실제 응답·도구 연결 성공을 구분하고, 다른 PC에서는 로컬 설정 후 실제 연결을 확인한다. C PC 검증 이력은 [WORKLOG](../history/DRONE_WORKLOG.md)의 2026-10-05 D-5·D-6·D-11·D-12(1차)·D-14 반영 절을 따른다.
+
+Claude 클라이언트는 Unreal 루트 `.mcp.json`을 사용한다. 연결이 안 되면 자동화 등 다른 Unreal 프로세스가 8000포트를 점유했는지 확인한다. 자동화 실행은 `-ModelContextProtocolPort=8010`으로 사용자 Editor 8000을 보존한다. 열린 Editor 즉시 시작은 `ModelContextProtocol.StartServer`다.
 
 ## 알려진 제한
 

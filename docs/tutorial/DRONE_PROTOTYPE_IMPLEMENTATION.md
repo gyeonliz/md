@@ -1,6 +1,8 @@
 # Drone Prototype Pawn 구현 및 검증 기록
 
 
+현재 C++ 클래스는 `ADroneFlightPawn`·`ADroneFlightPlayerController`·`ADroneFlightGameMode`, 소스 경로는 `Source/Drone/Flight/`다. BP_DronePrototype*와 /Game/Drone/Prototype/...는 유지한다. 아래 당시 파일 목록·검증 기록의 옛 이름은 역사 자료이며 현재 코드 위치는 [조정 가이드](../reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md#현재-조정-위치와-코드-경계)를 따른다.
+
 현재 C PC Git·검증은 [STATUS](../../STATUS.md), 입력은 [입력 계약](DRONE_PROTOTYPE_INPUT_CONTRACT.md)·[조정 가이드](../reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md)를 따른다. IA 14개·IMC 33매핑이며 아래 D PC/16매핑/여섯 Action/551e287·14/14·TUT-04는 당시 기록이다.
 기준일: 2026-08-24 (Asia/Seoul)
 
@@ -74,7 +76,7 @@ D:\JGY\project\drone\Content\Drone\Prototype\Maps\Lvl_DronePrototype.umap
 
 ## 4. Unreal에서 담당하는 클래스
 
-### `ADronePrototypePawn`
+### `ADroneFlightPawn`
 
 다음 Prototype 구성요소와 동작을 담당한다.
 
@@ -85,13 +87,13 @@ D:\JGY\project\drone\Content\Drone\Prototype\Maps\Lvl_DronePrototype.umap
 - Enhanced Input Action 바인딩
 - 이 Pawn이 직접 추가한 Input Mapping Context의 등록·정리
 
-### `ADronePrototypeGameMode`
+### `ADroneFlightGameMode`
 
-격리 테스트나 native GameMode 직접 실행에서 `ADronePrototypePawn`을 기본 Pawn으로 Spawn하는 native 기본값이다.
+격리 테스트나 native GameMode 직접 실행에서 `ADroneFlightPawn`을 기본 Pawn으로 Spawn하는 native 기본값이다.
 
 주의: native Pawn의 Input Asset과 Mesh 기본값은 계속 `null`이다. 현재 실제 Prototype Map에서는 BP 자식에 자산을 배정하고 BP GameMode의 Default Pawn도 그 BP Pawn으로 바꿨다. native GameMode만 직접 쓰면 BP에 지정한 값이 적용되지 않는다는 경계는 그대로 유지한다.
 
-### `ADronePrototypePlayerController`
+### `ADroneFlightPlayerController`
 
 로컬 화면의 Flight HUD 하나를 생성해 PlayerController 수명 동안 재사용한다. Pawn이 바뀌면 Widget을 새로 만들지 않고 현재 Pawn의 `UDroneTelemetryComponent`만 교체한다. `BP_DronePrototypePlayerController`는 `FlightHUDWidgetClass`에 `WBP_DroneFlightHUD`를 지정하며, Event Graph에서 생성·구독 로직을 중복 구현하지 않는다.
 
@@ -105,7 +107,7 @@ D:\JGY\project\drone\Content\Drone\Prototype\Maps\Lvl_DronePrototype.umap
 
 ## 5. 헤더에 추가된 것
 
-`DronePrototypePawn.h`에는 다음 선언이 있다.
+`DroneFlightPawn.h`에는 다음 선언이 있다.
 
 - 다섯 개의 컴포넌트 `TObjectPtr`
 - Prototype IMC와 여섯 Input Action용 `TObjectPtr`
@@ -116,7 +118,7 @@ D:\JGY\project\drone\Content\Drone\Prototype\Maps\Lvl_DronePrototype.umap
 
 `ClearAllMappings()`는 사용하지 않는다. 다른 시스템이 등록한 Mapping Context까지 지우지 않기 위해서다.
 
-`DronePrototypeGameMode.h`에는 격리 테스트용 `AGameModeBase` 자식만 선언한다.
+`DroneFlightGameMode.h`에는 격리 테스트용 `AGameModeBase` 자식만 선언한다.
 
 ## 6. CPP에 추가된 것
 

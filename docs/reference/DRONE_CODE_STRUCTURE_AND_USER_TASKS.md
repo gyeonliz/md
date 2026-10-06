@@ -22,6 +22,8 @@ NavigationArrows 최소 이식 Commit `5a052c8`은 `fb1d7ad`로 main에 병합�
 
 ## 현재 조정 위치와 코드 경계
 
+현재 C++ 클래스는 `ADroneFlightPawn`·`ADroneFlightPlayerController`·`ADroneFlightGameMode`, 소스는 `Source/Drone/Flight/`다. 피격 흔들림은 `UDroneDamageShakeComponent`, 곡예 비행은 `UDroneAcroFlightComponent`, 지상 주행은 `UDroneGroundDriveComponent`가 계산·실행 상태를 맡는다. BP 조정값·입력 Action·지면 Trace·Pivot과 기존 함수 이름은 Pawn에 유지한다. BP_DronePrototype* 이름과 /Game/Drone/Prototype/... 자산 경로는 유지하고 ClassRedirects로 호환한다. 분리 검증·한계는 [WORKLOG](../history/DRONE_WORKLOG.md), 현재 판정은 [STATUS](../../STATUS.md)를 따른다.
+
 | 조정 위치 | 계약·현재값 | 확인할 것 |
 |---|---|---|
 | Acro 선택 가능한 모든 비행 기체 BP Class Defaults | FPV·Scout·Drop·FiberOptic에 AcroPitchAction/AcroRollAction/AcroYawAction/AcroThrottleAction/AcroGamepadLeftVerticalAction/AcroGamepadRightVerticalAction 6개를 FPV와 같은 Input Action으로 연결 | 하나라도 None이면 Acro 입력 누락 가능. Scout/Drop 누락 수정·컴파일·저장 후 Claude 재조회와 AssetContract로 확인. 지상 UGV 제외 |
@@ -53,7 +55,7 @@ NPC Controller의 HostileStateTree/FriendlyStateTree는 EditDefaultsOnly Soft �
 
 2026-09-03 사용자 결정으로 사람 Operator Character와 NPC 대화 기반 Mission 수령, Operator↔Drone 전환은 폐기됐다. 새 실행 흐름은 `시작 트레일러 → 로비 → 미션 선택/측면 설명 → 미션 트레일러 → Map → Drone 선택 → Mission 시작/측면 목표 UI`다.
 
-현재 Source/Asset에는 FLOW-01~08 전체 상태와 정적 Opening→Lobby→Briefing→Training Map→3종 선택→Drone 한 대 Spawn/Possess→목표→결과→재도전/로비 복귀가 있다. Front-end와 Mission 선택 전에는 비-Drone Spectator만 사용한다. Training 역할 Target 3개와 Event 기반 상태 HUD는 구현됐고 실제 Trailer 영상·최종 WBP/Preview 외형이 남았다. 기존 `ADronePrototypeGameMode`의 즉시 Spawn/Possess는 Training 단독 검증용으로 유지한다. 상세 책임과 작업 순서는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](../planning/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)와 문서 맨 아래 최신 절을 따른다.
+현재 Source/Asset에는 FLOW-01~08 전체 상태와 정적 Opening→Lobby→Briefing→Training Map→3종 선택→Drone 한 대 Spawn/Possess→목표→결과→재도전/로비 복귀가 있다. Front-end와 Mission 선택 전에는 비-Drone Spectator만 사용한다. Training 역할 Target 3개와 Event 기반 상태 HUD는 구현됐고 실제 Trailer 영상·최종 WBP/Preview 외형이 남았다. 기존 `ADroneFlightGameMode`의 즉시 Spawn/Possess는 Training 단독 검증용으로 유지한다. 상세 책임과 작업 순서는 [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](../planning/DRONE_FRONTEND_MISSION_FLOW_PLAN.md)와 문서 맨 아래 최신 절을 따른다.
 
 Mission 선택 출격은 `ADroneMissionPlayerController::StartSelectedDrone()`이 선택 Definition의 `PawnClass`를 그대로 Spawn한다. 2026-09-08 감사에서 확인한 기본 Pawn 오연결과 세 역할 동일 FPV 외형을 모두 수정했다. 현재 정확한 Class는 Scout=`BP_DroneScoutIntegration`, FPV=`BP_DroneFPVIntegration`, Drop=`BP_DroneDropIntegration`이며 Class·Mesh 회귀 테스트와 Build·자동화는 통과했다. 실제 화면 모델 크기·방향과 조작 확인만 수동으로 남는다.
 
@@ -151,7 +153,7 @@ IMC_DronePrototype
 └─ IA_DronePrototype_CameraPitchRate
 
 BP_DroneFPVIntegration
-├─ ADronePrototypePawn native 기능·Input 계약
+├─ ADroneFlightPawn native 기능·Input 계약
 ├─ CollisionComponent (Sphere Root)
 ├─ VisualMeshComponent (FPV Body, NoCollision)
 ├─ FPVRotorA~D (NoCollision)
@@ -200,7 +202,7 @@ ADroneSmartObjectStation
       └─ MGTurret 1-Slot
 ```
 
-Hostile은 `ST_NPC_HostilePatrol`에서 EnemyPatrol을 검색하고 Friendly는 `ST_NPC_FriendlyBaseRoutine`에서 FriendlyBasePatrol/Ambient를 번갈아 검색한다. `ADronePrototypePawn` 감지 시 Hostile은 MG를 우선 Claim하고, 실패한 병사는 Cover 1-Slot으로 이동·점유해 개인 Rifle/Shotgun 사격을 한다. Cover도 없으면 제자리 사격하며 실종 뒤 마지막 위치를 3초 Search한 후 순찰로 복귀한다. 로컬 작업에는 Damage, 사망 뒤 Cover 병사의 MG 재점유, Drone 파괴 교전 종료와 Rifle/Shotgun 탄창까지 있다. Animation·FX·SFX는 아직 없다.
+Hostile은 `ST_NPC_HostilePatrol`에서 EnemyPatrol을 검색하고 Friendly는 `ST_NPC_FriendlyBaseRoutine`에서 FriendlyBasePatrol/Ambient를 번갈아 검색한다. `ADroneFlightPawn` 감지 시 Hostile은 MG를 우선 Claim하고, 실패한 병사는 Cover 1-Slot으로 이동·점유해 개인 Rifle/Shotgun 사격을 한다. Cover도 없으면 제자리 사격하며 실종 뒤 마지막 위치를 3초 Search한 후 순찰로 복귀한다. 로컬 작업에는 Damage, 사망 뒤 Cover 병사의 MG 재점유, Drone 파괴 교전 종료와 Rifle/Shotgun 탄창까지 있다. Animation·FX·SFX는 아직 없다.
 
 Definition·Station Blueprint 6쌍과 역할별 NPC Blueprint 3종, Spawn Point BP, 전용 Greybox 맵, Hostile/Friendly StateTree가 생성됐다. Profile·Possess·역할 Tag·NavMesh 투영에 더해 Hostile 2명과 Friendly 2명이 각각 2회 이상 완료하고 서로 다른 2지점 이상을 방문하도록 자동 검증했다. Friendly는 Base Patrol과 Ambient를 모두 방문한다. 후속 감지·점유 순서는 [`DRONE_SMART_OBJECT_NPC_GUIDE.md`](../ai/DRONE_SMART_OBJECT_NPC_GUIDE.md)를 따른다.
 
@@ -231,9 +233,9 @@ Source/Drone/
 │     ├─ DroneNPCRifleTraceTest.cpp
 │     └─ DroneNPCShotgunTraceTest.cpp
 ├─ Prototype/
-│  ├─ DronePrototypeGameMode.h/.cpp
-│  ├─ DronePrototypePawn.h/.cpp
-│  ├─ DronePrototypePlayerController.h/.cpp
+│  ├─ DroneFlightGameMode.h/.cpp
+│  ├─ DroneFlightPawn.h/.cpp
+│  ├─ DroneFlightPlayerController.h/.cpp
 │  └─ Tests/
 │     ├─ DroneFPVIntegrationAssetTest.cpp
 │     ├─ DronePrototypeDefaultsTest.cpp
@@ -489,7 +491,7 @@ Source/Drone/Variant_SideScrolling/
 ```text
 Drone이 GateTrigger에 들어감
 → BeginOverlap
-→ ADronePrototypePawn인지 확인
+→ ADroneFlightPawn인지 확인
 → 최초 Entry World Location 저장
 
 Drone이 GateTrigger를 완전히 빠져나감
@@ -506,7 +508,7 @@ Drone이 GateTrigger를 완전히 빠져나감
 `TryAcceptTraversal`은 다음 순서로 검사한다.
 
 1. Sequence 구성이 유효한가
-2. 통과 Actor가 `ADronePrototypePawn` 또는 그 BP 자식인가
+2. 통과 Actor가 `ADroneFlightPawn` 또는 그 BP 자식인가
 3. Gate가 현재 Sequence의 `OrderedGates`에 들어 있는가
 4. 이미 완료한 Gate인가
 5. 현재 기대하는 배열 위치의 Gate인가
@@ -784,17 +786,17 @@ Gate는 사각 Greybox Frame4변 표시다. 기존 RingVisualSegment16개는 호
 ### Drone 전체 데이터 흐름까지 이어서 읽을 때
 
 15. `Source/Drone/Mission/DroneDefinition.h/.cpp`
-16. `Source/Drone/Prototype/DroneFlightControlTypes.h`
-17. `Source/Drone/Prototype/DronePrototypePawn.h/.cpp`
+16. `Source/Drone/Flight/DroneFlightControlTypes.h`
+17. `Source/Drone/Flight/DroneFlightPawn.h/.cpp`
 18. `Source/Drone/Health/DroneHealthComponent.h/.cpp`
 19. `Source/Drone/AI/Weapons/DroneNPCWeaponComponent.h/.cpp`
 20. `Source/Drone/AI/DroneSmartObjectStation.h/.cpp`
 21. `Source/Drone/AI/DroneNPCAIController.h/.cpp`
 22. `Source/Drone/Telemetry/DroneTelemetryTypes.h`
 23. `Source/Drone/Telemetry/DroneTelemetryComponent.h/.cpp`
-24. `Source/Drone/Prototype/DronePrototypePlayerController.h/.cpp`
+24. `Source/Drone/Flight/DroneFlightPlayerController.h/.cpp`
 25. `Source/Drone/UI/DroneFlightHUDWidget.h/.cpp`
-26. `Source/Drone/Prototype/DronePrototypeGameMode.h/.cpp`
+26. `Source/Drone/Flight/DroneFlightGameMode.h/.cpp`
 
 이 순서는 `Gate 판정 → 기록 → 기체 역할/조작 설정 → Pawn → Health → 무기 Damage → MG/AI 사망 정리 → Telemetry·HUD` 순으로 책임을 따라가게 한다.
 

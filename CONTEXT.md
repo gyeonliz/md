@@ -69,7 +69,7 @@
 - 복잡한 Visual Rotor마다 독립 강체를 두지는 않는다. 단일 Collision Root 원칙은 유지하되 가벼운 Wing/Rotor Contact Probe 또는 별도 Net Interaction Volume으로 “날개가 걸렸다”는 판정을 보강한다.
 - Chaos Cloth 변형은 화면 표현을 담당한다. 포획·탈출·추락 판정의 단일 기준은 Frame Rate와 Cloth Solver 결과에 직접 의존하지 않는 프로젝트 C++ 상태와 접촉 누적값이 소유한다.
 - 현재 Cube Strand 국소 절단·물리 낙하 기능은 Hit 위치와 물리 반응을 확인하기 위한 Runtime 진단용이다. 일반 Drone 충돌에서는 절단이 기본 Off이고 C++ 얽힘 상태가 감속·조종/추력 저하·완만한 외형 기울기·하강·포획을 결정한다. 접촉 때 피격 Shake를 호출하거나 Root를 반복 회전시키지 않는다. Collision Root 바깥의 네 Wing/Rotor Probe가 벽과 그물 접촉 위치를 보강하며, 실제 Chaos Cloth 변형과 탈출·Crash/Mission 실패 연결은 후속이다.
-- 일반 비행 `ADronePrototypePawn`은 수평에 가까운 Blocking 벽·기둥·구조물 접촉에 공통 반발과 표면 분리를 적용한다. 저속 접촉도 버리지 않고 작은 속도·작은 거리로 밀려나며 충돌 속도가 커질수록 반발·분리·자세 Kick이 연속적으로 커져야 한다. 바닥·천장·Ground UGV는 제외하며, 강한 Crash/Damage 우선순위와 얇은 벽 CCD는 아직 별도 검증 항목이다.
+- 일반 비행 `ADroneFlightPawn`은 수평에 가까운 Blocking 벽·기둥·구조물 접촉에 공통 반발과 표면 분리를 적용한다. 저속 접촉도 버리지 않고 작은 속도·작은 거리로 밀려나며 충돌 속도가 커질수록 반발·분리·자세 Kick이 연속적으로 커져야 한다. 바닥·천장·Ground UGV는 제외하며, 강한 Crash/Damage 우선순위와 얇은 벽 CCD는 아직 별도 검증 항목이다.
 
 ## Training Gate 편집 기준
 
@@ -85,7 +85,7 @@
 - Prototype Drone은 `UDroneWeatherResponseComponent`로 Snapshot 바람을 받는다. 현재 방식은 Sweep 위치 Drift Greybox이며 모터·PID·공기역학 1:1 구현이 아니다.
 - 저장 Profile은 `Clear`, `LightWind`, `RainStorm_Greybox` 3종이다. 강풍 약 10.7m/s는 공개 민간 FPV 참고선이지 최종 내풍 한계가 아니다.
 - 비 On/Off와 Snapshot Override, 카메라 추종 Instanced Mesh 빗줄기, 카메라 위쪽 Visibility Trace 기반 로컬 실내 감쇠는 구현됐다. 정식 Niagara GPU Rain, 젖음 Material/MPC, Splash·Audio와 품질 단계는 아직 구현되지 않았다. 비가 체력·신호·Mission 판정을 자동 변경하지 않는다.
-- Weather 시험 표현은 `/Game/Drone/Weather/Blueprints/BP_DroneWeatherDebugVisualizer`에서 Bead 수·범위·크기·속도 배율·Mesh와 Readout/Hotkey 사용 여부를 조정한다. Gameplay 바람 계산과 분리한다.
+- Weather 시험 표현은 `/Game/Drone/Managers/BP_DroneWeatherDebugVisualizer`에서 Bead 수·범위·크기·속도 배율·Mesh와 Readout/Hotkey 사용 여부를 조정한다. Gameplay 바람 계산과 분리한다.
 - 자연스러운 바람 개선은 Gameplay Snapshot의 저빈도 결정성을 유지한 채 `지속풍 전환`, `돌풍 Attack/Release`, `표시용 보간`을 분리했다. Debug Bead는 풍향 변경 때 누적 이동거리 전체를 새 방향으로 재투영하지 않고, 보간된 순간 속도를 매 Frame 벡터 적분한다.
 
 ## AI·포탑 기준

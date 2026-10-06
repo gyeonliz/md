@@ -135,14 +135,14 @@ cd C:\URproject\drone
 
 ## Weather Systems 시험 맵 배치
 
-- `WeatherSystemsTest_Controller`는 `/Game/Drone/Weather/Blueprints/BP_DroneRandomWeatherController`다. `DA_Weather_LightWind`를 BeginPlay에 적용하고 기본 8방향+무풍, 방향 8~18초, 세기 5~12초, 1~9m/s를 사용한다.
+- `WeatherSystemsTest_Controller`는 `/Game/Drone/Managers/BP_DroneRandomWeatherController`다. `DA_Weather_LightWind`를 BeginPlay에 적용하고 기본 8방향+무풍, 방향 8~18초, 세기 5~12초, 1~9m/s를 사용한다.
 - Manager는 에디터에서 원뿔로 보이지만 Play/Package에는 표시되지 않고 Collision·Overlap·Navigation 영향이 없다.
 - 시작값은 지속풍 `4m/s`, 돌풍 `+0~2m/s`, 풍향 `35°`, 난류 `0.2`다. 최종 밸런스가 아니다.
 - 바닥의 큰 Cube 화살표는 35° 풍향을 가리키며 충돌하지 않는다.
 - `WeatherSystemsTest_Visualizer`는 현재 Snapshot 풍향으로 24개 Bead를 움직이고 화면에 Profile·Cardinal 풍향·m/s·현재 조작 모드를 표시한다.
 - 쉬운 조작은 기본 65%, 제한 자세는 25%, Rate/Acro는 0% 보정을 사용한다. `WeatherResponseComponent` 기본값에서 바꿀 수 있다.
 - Play 중 숫자1/2/3/4 또는 NumPad1/2/3/4로 Easy/Manual/Acro Mode1/Acro Mode2를 즉시 바꿔 같은 바람에서 Drift를 비교한다.
-- Bead 수·범위·크기·재생 속도와 표시/키 사용 여부는 `/Game/Drone/Weather/Blueprints/BP_DroneWeatherDebugVisualizer` 또는 배치 인스턴스에서 조정한다.
+- Bead 수·범위·크기·재생 속도와 표시/키 사용 여부는 `/Game/Drone/Managers/BP_DroneWeatherDebugVisualizer` 또는 배치 인스턴스에서 조정한다.
 - `Weather Profile`을 `DA_Weather_Clear` 또는 `DA_Weather_RainStorm_Greybox`로 교체할 수 있다. 폭우 Profile은 비 수치를 전달하지만 Niagara가 아직 없으므로 빗줄기가 안 보이는 것이 정상이다.
 
 ## 수동 확인 순서

@@ -8,7 +8,7 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 실제 Tutorial을 
 
 맵: `/Game/Drone/Maps/TestMap/Lvl_DronePhysicsSandbox`
 
-이 맵만 Content Browser에서 직접 열어 Play한다. 전용 GameMode가 시험 Drone 한 대를 Spawn하지만 벽 반발 Component 자체는 이제 모든 일반 비행 `ADronePrototypePawn`에서 기본 활성화된다.
+이 맵만 Content Browser에서 직접 열어 Play한다. 전용 GameMode가 시험 Drone 한 대를 Spawn하지만 벽 반발 Component 자체는 이제 모든 일반 비행 `ADroneFlightPawn`에서 기본 활성화된다.
 
 2026-09-29 화면 피드백 수정본의 기본 크기는 그물 `6m × 3m`, 파괴 벽 약 `5.55m × 3.69m`다. 이전 생성본의 약 `13m × 12m` 그물과 약 `12.8m × 9.2m` 벽은 잘못된 시험 크기였으므로 기준으로 사용하지 않는다. 맵이 열린 채 수정됐다면 Editor를 닫았다 다시 열거나 맵을 Reload해야 저장된 축소본을 볼 수 있다.
 

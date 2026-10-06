@@ -65,7 +65,7 @@ Source/Drone/Tutorial/DroneTrainingCourse.cpp
 
 - `BP_DroneTrainingCourse` 한 개
 - `PlayerStart` 한 개
-- 직접 배치된 `ADronePrototypePawn` 없음
+- 직접 배치된 `ADroneFlightPawn` 없음
 - World Settings의 GameMode Override는 `BP_DronePrototypeGameMode`
 - 저장된 RecastNavMesh Actor 존재
 - 배치된 ThirdPerson/Variant 게임플레이 Actor 없음
@@ -223,7 +223,7 @@ Production Lvl_DroneTraining은 열람만 하며 편집·저장은 맵 소유 �
 2. `BP_DroneTrainingCourse`를 선택하고 Spline 점 하나를 움직인다.
 3. 점 사이의 안내선이 새 곡선을 따라 재구성되는지 확인한다.
 4. PIE 또는 Standalone을 시작한다.
-5. 실제 DefaultPawn BP_DroneFPVIntegration(ADronePrototypePawn 자식)과 `WBP_DroneFlightHUD`가 나타나는지 확인한다.
+5. 실제 DefaultPawn BP_DroneFPVIntegration(ADroneFlightPawn 자식)과 `WBP_DroneFlightHUD`가 나타나는지 확인한다.
 6. Drone을 안내선의 한쪽에서 반대쪽으로 통과시킨다.
 7. 안내선에 부딪히거나 멈추거나 밀려나지 않는지 확인한다.
 8. Editor에서 `P`를 눌러 Navigation 표시를 켜고 안내선 때문에 NavMesh가 잘리거나 새 장애물 영역이 생기지 않는지 확인한다.

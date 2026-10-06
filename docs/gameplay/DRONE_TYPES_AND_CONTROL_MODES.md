@@ -103,7 +103,7 @@ DJI 공개값에는 무풍·해수면 등 측정 조건이 붙으며, 현재 프
 
 ## Blueprint에서 바꾸는 방법
 
-대상은 `BP_DroneScoutIntegration`, `BP_DroneFPVIntegration`, `BP_DroneDropIntegration`, `BP_DroneFiberOpticIntegration`, `BP_DroneGroundUGVIntegration` 또는 `ADronePrototypePawn` 파생 Blueprint다.
+대상은 `BP_DroneScoutIntegration`, `BP_DroneFPVIntegration`, `BP_DroneDropIntegration`, `BP_DroneFiberOpticIntegration`, `BP_DroneGroundUGVIntegration` 또는 `ADroneFlightPawn` 파생 Blueprint다.
 
 1. Pawn 참조에서 `Set Control Mode`를 호출한다.
 - `Set Control Mode`: BP 표시명 `쉬운 조작`(AssistedEasy), `실제 조작형 (그레이박스)`(ManualRealisticGreybox), `FPV Rate/Acro Mode 1 (그레이박스)`(AcroRateMode1Greybox), `FPV Rate/Acro Mode 2 (그레이박스)`(AcroRateRealisticGreybox) 중 선택한다.

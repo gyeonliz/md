@@ -2787,3 +2787,111 @@ Drone Space: 기존 진행상황과 다음 작업·테스트 맵과 확인 가�
 D-15 확정(2026-10-05 사용자 결정): 로컬 미커밋 변경은 커밋만 하고 푸시는 나중에 사용자 지시 시 진행. 커밋 전 묶음별로 나누어 커밋 메시지를 정리하고 사용자 확인 후 Claude가 커밋 실행. 지정된 두 결정 표에는 해당 행이 없어 다른 행·절은 수정하지 않았다. 나머지 D-1~6·8·11~14는 현재 미정 유지. 구현/자동 검증/수동 확인/미구현 분류는 해당 없음(결정 기록).
 
 지시서 기준 Unreal `41444c2` + 미커밋(이번 작업 없음), md `94f6375` + 10/04 NPC Retarget 미커밋 5파일. 실제 작업 전 git status에는 AGENTS.md·CLAUDE.md를 포함한 기존 수정 7파일이 있었으며 보존했다. STATUS·applications·Unreal·Space 수정, Build/PIE, Commit/Push 없음. Space는 지시서에 따라 제외. WORKBOARD는 갱신 전 42,138바이트로 30KB 초과; 다이어트 대상 없음 지시에 따라 아카이브하지 않았다.
+
+## 2026-10-05 사용자 결정 2차 — C PC, Codex 문서 반영
+
+결정 사용자(총괄 세션 경유 전달), 문서 반영 Codex. 지시서 `C:\URproject\drone\.claude\codex-bridge\runs\20261005-184640-docs-docs-decisions-1005b\prompt.md` 근거. WORKBOARD 두 결정 표·관련 카드·Next 반영, 결정 정본은 [WORKBOARD](../../WORKBOARD.md)에 둔다. D-1·D-2 보류, D-3 기존 구현과 일치, 후속 구현/실행 대기를 구분했다. 이번 구현·자동 검증 없음. 지시서 기준 Unreal `41444c2` + 미커밋, md `94f6375` + 미커밋이며 현재 HEAD 재검증 결과로 쓰지 않는다. 미사용 자산 판정 출처는 지시서의 unused_packs.json이며 Codex 재검증이 아니다.
+
+STATUS·applications·README·Unreal 수정, 새 파일·아카이브, Build/PIE·Commit/Push 없음. Space는 지시서에 따라 제외. WORKBOARD 30KB 초과는 이번 다이어트 대상 없음에 따라 유지·다음 위임 정리 대기. 배터리 시간·코스 실제 지형·장치 자동 전환·D-1/D-2·D-13 나머지 목록은 현재 미정. 과거 WORKLOG 내용은 보존했다.
+
+## 2026-10-05 D-5·D-6·D-11·D-12(1차)·D-14 반영 — C PC, Claude 작업·검증·Codex 문서
+
+지시서: `C:\URproject\drone\.claude\codex-bridge\runs\20261005-194407-docs-docs-impl-1005\prompt.md`(UTF-8 읽기). 날짜/PC 2026-10-05 C PC, 구현·자동 검증 Claude, 문서 Codex. Unreal HEAD와 origin/main `3f02577`을 Codex가 읽기 전용 확인했다. 사용자 푸시 + 아래 변경 스테이징은 Claude 지시서 근거이며 커밋은 사용자 담당. md 실제 HEAD는 `76f7a3f`로 지시서 기준 `94f6375`와 다르다. 기존 WORKBOARD·WORKLOG 미커밋 2파일을 보존했다. Codex는 엔진 Build·PIE·패키징·쿠킹·맵 생성/재생성·Unreal 파일 수정·Commit/Push를 하지 않았다.
+
+### 구현 사실·남은 범위(Claude 지시서 근거)
+
+- D-14: 공유 `Config/DefaultEditorPerProjectUserSettings.ini`의 MCP `bAutoStartServer=False`. MCP가 필요한 PC만 Git 제외 `Saved/Config/WindowsEditor/EditorPerProjectUserSettings.ini`의 `[/Script/ModelContextProtocolEngine.ModelContextProtocolSettings]`에 `bAutoStartServer=True`. C PC 로컬 설정으로 Editor 실행15초 뒤8000 응답 확인(Claude 지시서, Codex가 Editor를 실행하거나 접속한 결과 아님). 다른 PC의 실제 연결은 별도 확인. 현재 절차 정본은 [협업 세팅 MCP 절](../git/CLAUDE_CODEX_SETUP.md#unreal-mcp-자동-시작--pc별-로컬-설정).
+- D-11: 상시 실패4개 경로를 `KnownIssues.AI.NPCPerceptionSearchPIE`·`KnownIssues.Flow.LobbyLayoutStabilityPIE`·`KnownIssues.Tutorial.TrainingAssets`·`KnownIssues.Tutorial.TrainingPIESmoke`로 변경, 기본 `Automation RunTests Drone.`에서 제외. `.claude/known-test-failures.md` 갱신. 그룹 분리는 실패 원인 해결이 아니다. LobbyLayout 진단이 기본 회귀에 없어 미렌더는 패드 포커스6개 모두 화면 루트 포커스로 실패하는지로 판단한다.
+- D-6 풍향: HUD 방위와 통일(+X=북000°·+Y=동090°), 불어오는 쪽 표기(+X로 부는 바람=풍향 S). 바람 물리는 유지. HUD 표기는 수동 확인 대기.
+- D-6 배터리: 방전 처리 추락 추가(동력 상실→조종 정지→중력 낙하→땅/구조물 접촉 또는8초 뒤 파괴→기존 파괴 실패/재출격). 미션 DA `BatteryLimitSeconds`(0=기체 값)·`BatteryDepletedResponse`(기본 추락). 현재 기체 DA 배터리 시간 모두0으로 시간 값 확정 전 실제 게임 동작 변화 없음. 시간 값 현재 미정·미설정, 확정 뒤 추락 체감 수동 확인 대기. 높이 제한 보류·미구현.
+- D-5: 출격 후 스타트 지점 중앙3·2·1→출발!, 카운트다운 조종 잠금·기체 정지. 출발부터 미션 시간(결과 창 클리어 시간)과 목표 제한 시간 시작. 미션 DA `StartCountdownSeconds`(레이싱=3). 맵 선택은 기존 레이싱 분류 코스 목록, 완주는 기존 게이트 통과, 기록은 결과 창 클리어 시간. 카운트다운 화면/체감 수동 확인 대기. 현재 레이싱1개, 코스4개는 지형 현재 미정·미구현.
+- D-12 1차: Legacy C++ Variant_*39클래스+3인칭 템플릿3클래스, 자산100개(Variant_Combat30·Variant_Platforming10·Variant_SideScrolling18·ThirdPerson4·LevelPrototyping29·Input9) 삭제. 삭제 전 외부 참조0. Characters(마네킹)는 NPC 동작 변환 원본으로 유지. 미사용 UFUNCTION18개 삭제. Prototype Pawn 분리·이름 변경은 미구현·새 이름 결정 대기.
+- D-13 앞선 작업: 방콕 잔여987개 삭제됨(Claude 지시서). 사용자 커밋·푸시 완료분인지 사용자 확인 필요, 완료로 추정하지 않음. D-1·D-2는 기획자 내용 대기·현재 미정.
+
+### 자동 검증 출처·읽기 전용 대조
+
+| 검사 | 결과·판정 | 출처(C:\URproject\drone 아래) |
+|---|---|---|
+| D-12 뒤 Drone.+KnownIssues. 전체 | 99개, 실패는 KnownIssues4개와 미렌더 실행의 알려진 패드 포커스6개뿐(Claude 지시서). Codex 로그 대조89 Success·10 Fail, 다른 실패 경로 없음 | Saved/Automation/ClaudeD12/full2.log |
+| D-6 | Drone.Weather5·Drone.Mission7·Drone.Health.BatteryHUDPIE Success | Saved/Automation/ClaudeD6/t1.log·t4.log |
+| D-5 신규 | Drone.Mission.RacingStartCountdownPIE Success | Saved/Automation/ClaudeD5/t1.log |
+
+구현·자동 검증은 위 Claude 결과이며 사용자 수동 Pass나 이번 Codex 엔진 실행 결과가 아니다. Codex는 지정 로그의 완료 결과를 읽기 전용 대조했다. 이전 전체97/86·11Fail 등은 당시 기록으로 보존하고 이번 전체99개 또는 집중 검사와 합산하지 않는다.
+
+### WORKBOARD 원문 보존·문서 반영
+
+WORKBOARD만 기준2026-10-05로 다이어트했다. 현재 카드의 긴 근거·완료/종료 행·지난 Next를 포함한 이동 전 원문 절을 기존 [WORKBOARD_2026-10 아카이브](archive/WORKBOARD_2026-10.md) 끝에 그대로 보존하고, 루트 보드는 현재 진행/대기 카드·결정 표와 Next로 요약했다. 기존 아카이브 본문은 변경하지 않았다. 완료/종료 AI-SHOTGUN-RENDER-01·AI-SHOTGUN-REGRESS-01·TEST-NPC-COUNT-01·INTERVIEW-CLEANUP-01·MCP-LOCAL-01·D-9·D-10 행은 현재 표에서 제외; 남은 수동 사격/감지/패키징/다른 PC 확인 카드는 유지했다. 이력 보존 후 구현 상태를 갱신했으며 과거 카드 문장을 덮어쓰지 않았다.
+
+- WORKBOARD: 44,648바이트·160줄 → 29,978바이트·111줄(UTF-8, 30,000바이트 이하).
+- WORKBOARD_2026-10 아카이브: 16,196바이트·107줄 → 60,899바이트·265줄.
+- 옮긴 원문 절 제목: `회의 후 역할별 카드`, `결정 필요 — 현재 DA 값은 채택 사양이 아님`, `면접 대비 결정 필요 — 영향 순서(10/05, 결정·구현 대기 구분)`, `사용자가 지금 확인할 맵`, `Next`. 현재 카드·미정 결정은 루트 보드에 요약/링크로 유지했다.
+- STATUS: 현재 Git·레이싱·배터리·풍향·KnownIssues·Legacy/MCP 및 수동/미구현 상태 반영. WORKBOARD: D-5·D-6·D-11·D-12·D-14 관련 행/카드와 D-13 삭제 상태, Next 갱신. CLAUDE_CODEX_SETUP: MCP 자동 시작 절만 PC별 로컬 설정 절차로 교체. docs/README: 기존 아카이브 색인 설명 최신화. WORKLOG: 이번 결과는 이 끝 절에만 추가.
+
+Drone Space는 지시서의 “Space 제외(다음 묶음에서)”에 따라 갱신하지 않았다. 이번 구현/보드 정리의 Space 반영은 다음 묶음 미반영 범위다. applications·Trello·Figma·공유 권한·예약 자동화 수정 없음. 새 파일 없음(기존 아카이브에 추가). 문서 저장소 최종 git status --short로 이번 변경6파일을 확인하고, git diff --check와 30KB 기준·원문 보존을 점검했다.
+
+## 2026-10-05 NPC 다리·높이 제한 매니저·매니저 폴더 정리 — C PC, Claude 작업·검증·Codex 문서
+
+지시서: `C:\URproject\drone\.claude\codex-bridge\runs\20261005-204432-docs-docs-legs-alt-mgr\prompt.md`(UTF-8 읽기). 구현·자동 검증 Claude, 문서 반영 Codex. Unreal 기준은 지시서의 원격 `3f02577` + 스테이징(커밋은 사용자), md 실제 HEAD `76f7a3f`. 기존 미커밋 STATUS·WORKBOARD·README·CLAUDE_CODEX_SETUP·WORKLOG·WORKBOARD_2026-10 아카이브 변경을 보존했다. 이번 수치·판정은 Claude 지시서 근거이며 Codex가 엔진이나 테스트를 실행한 결과가 아니다.
+
+### NPC 다리 정지 수정·검증
+
+사용자 보고 “상체는 나아졌는데 다리가 안 움직인다”의 원인은 IK Retarget 체인에 없는 ik_foot_l/r가 기본 자세에 남고 AnimBP의 CR_Mannequin_FootIK가 발을 그 뼈로 끌어당긴 것이다. 걷기 데이터 자체의 다리 움직임은 있었다. Retargeter Pin Bone 단계(ik_foot ← foot, ik_hand ← hand, ik_hand_gun ← hand_r) 추가로 아군 Quantum 해결. 적 Insurgent는 Pin 뒤에도 IK 뼈가 기본 자세에 남아 원인 미특정이며, 적 AnimBP에서 발 IK Control Rig 노드를 우회·삭제했다. 적 NPC는 경사면 발 맞춤이 없다. 양손 총 파지·총 hand_r 부착은 유지했다.
+
+Drone.AI.NPCLocomotionAnimPIE에 걷는 동안 두 발 앞뒤 간격 변화(2초 이상 표본) 보폭 판정을 추가했다. 수정 전 NPC8명 모두0cm → 수정 후155~200cm, 2회 연속 Success(10/05 C PC Claude 지시서 근거). 이전 상체/부착 검증과 이번 보폭 검증은 별도 기록이며 사용자 수동 Pass로 간주하지 않는다.
+
+### D-6 높이 제한
+
+사용자 요청 “매니저를 깔고 BP에 값을 넣으면 적용되게 구현만”에 따라 ADroneAltitudeLimitManager와 `/Game/Drone/Managers/BP_DroneAltitudeLimitManager` 구현됨·자동 검증됨. 레벨 배치 위치 Z + MaxAltitudeMeters가 천장이다. MaxAltitudeMeters 시험값120m·WarningMarginMeters5m, 천장에서 위치 되돌림·상승 속도 제거, OnAltitudeLimitReached 이벤트 제공(경고 연출은 BP). 높이 제한 수치·경고 연출은 현재 미정이며 시험값을 확정 사양으로 쓰지 않는다. Drone.Flight.AltitudeLimitPIE Success(10/05 C PC Claude).
+
+### D-13 종료·매니저 폴더 정리
+
+D-13 사용자 결정 정본은 [WORKBOARD](../../WORKBOARD.md)의 Bangkok 행이다. 방콕만 삭제하고 나머지 폴더 유지로 종료했으며, 커밋·푸시 완료를 추정하지 않는다.
+
+사용자 요청 매니저 폴더 정리 구현됨·자동 검증됨. `/Game/Drone/Managers`로 BP_DroneMissionManager(이전 `/Game/Drone/Mission/Blueprints/Managers`), BP_DroneRandomWeatherController·BP_DroneWeatherDebugVisualizer(이전 `/Game/Drone/Weather/Blueprints`)를 이동했다. 참조 자산 BP_DroneMissionPlayerController 및 TestMap/Lvl_DroneWeatherSystemsTest를 다시 저장한 뒤 옛 경로 Redirector를 삭제했다. 팀원 Production 맵 참조 없음. GameMode·PlayerController BP와 BP_DroneRainVisual은 이동하지 않았다. 목록 원본: `C:\URproject\drone\Saved\Managers_Move_List_20261005.md`(Claude 지시서 근거).
+
+매니저 이동 뒤 전체 회귀100개, 알려진 실패만(KnownIssues4·미렌더 포커스6). 로그: `C:\URproject\drone\Saved\Automation\ClaudeAltitude\full.log`. 수치·판정은 10/05 C PC Claude 결과이며 KnownIssues 해결·수동 검증 완료를 뜻하지 않는다.
+
+### 문서 반영·수동 확인 대기
+
+STATUS 현재 AI·미션·날씨/환경·전체 회귀 상태, WORKBOARD AI-LOCOMOTION-01·D-6 높이 제한·D-13 종료·MANAGERS-FOLDER-01 및 Next를 갱신했다. CONTEXT·Mission 프레임워크 가이드(폴더 트리 포함)·테스트 맵 가이드·날씨 계획의 지정 BP 경로를 새 경로로 정정했다. 상세 결과는 이 WORKLOG 끝에만 추가하고 이전 기록은 변경하지 않았다.
+
+수동 확인 대기: Lvl_NPCSmartObjectGreybox NPC 걷기 다리·발 미끄러짐(속도 대비 보폭), 높이 제한 체감, 날씨 시험 맵 정상 동작. 현재 미정: 높이 제한 수치·경고 연출·Pawn 새 이름·배터리 시간·코스4개 지형. Space는 지시서에 따라 제외·이번 변경 미반영. applications·history/archive 수정, 아카이브/새 파일 생성, Unreal 수정·Build·PIE·Commit/Push·Trello/Figma 수정 없음. 기존 아카이브 미커밋 변경은 이전 작업분이다.
+
+DOC_SIZES: STATUS.md 20,982바이트·101줄, WORKBOARD.md 30,579바이트·113줄. WORKBOARD는 운영 기준30,000바이트 초과 경고이며 이번 지시의 ‘다이어트 없음’에 따라 아카이브하지 않았다. git diff --check 오류 없음, 최종 git status --short 변경10파일 중 이번 변경7파일·이전 작업만의 변경3파일(README·CLAUDE_CODEX_SETUP·WORKBOARD_2026-10 아카이브)을 구분했다.
+
+## 2026-10-06 D-5 랩 타이머·D-12 Flight 이름 변경/분리·CLAUDE.md MCP 반영 — C PC, Claude 작업·검증·Codex 문서
+
+지시서: `C:\URproject\drone\.claude\codex-bridge\runs\20261006-013613-docs-docs-d12-split\prompt.md`(UTF-8 읽기). 구현·자동 검증 Claude, 문서 반영 Codex. Unreal 기준은 지시서의 원격 `3f02577` + 스테이징이며, **커밋 직전까지 스테이징, 커밋·푸시는 사용자**. md HEAD `76f7a3f`는 Codex가 읽기 전용 Git 확인했다. 기존 미커밋 10파일을 보존했다. 아래 수치·판정은 Claude 지시서 근거이며 Codex가 엔진이나 자동화를 실행하거나 지정 로그를 재검증한 결과가 아니다.
+
+### D-5 랩 타이머
+
+사용자 보완 지시 반영 구현됨·자동 검증됨(2026-10-06 C PC Claude). 3·2·1 동안 타이머를 숨기고 기록하지 않는다. 출발 순간부터 0초로 측정하여 화면 위 가운데 `00:00.00` 형식으로 표시한다. 첫 게이트를 통과할 때 다시 시작하지 않고 첫 구간으로 이어간다. `Drone.Mission.RacingStartCountdownPIE`에 해당 판정 추가 후 Success. 이번 집중 검사 로그 경로는 지시서 미제공이며 기존 10/05 로그로 대체하지 않았다. 실제 카운트다운·랩 타이머 화면 수동 확인 대기. 코스4개 지형은 현재 미정·코스4개 미구현.
+
+### D-12 2차 이름 변경·피격 흔들림 분리
+
+구현됨·자동 검증됨(2026-10-06 C PC Claude). `ADronePrototypePawn`→`ADroneFlightPawn`, `ADronePrototypePlayerController`→`ADroneFlightPlayerController`, `ADronePrototypeGameMode`→`ADroneFlightGameMode`; C++ 파일 경로 `Source/Drone/Prototype/`→`Source/Drone/Flight/`. `DefaultEngine.ini`의 `[CoreRedirects]` ClassRedirects 3줄로 옛 이름의 BP·맵이 열린다. 팀원 Production 맵이 GameMode BP를 사용하므로 BP_DronePrototype* 자산 이름과 /Game/Drone/Prototype/... 경로는 재저장 없이 유지한다. 피격 흔들림은 `UDroneDamageShakeComponent`로 분리. 2차 뒤 전체 회귀100개는 알려진 실패만(Claude 지시서; 별도 로그 경로 미제공).
+
+### D-12 3차 Acro·지상 주행 분리 및 검증
+
+구현됨·자동 검증됨(2026-10-06 C PC Claude). 곡예 비행을 `UDroneAcroFlightComponent`, 지상 주행을 `UDroneGroundDriveComponent`로 분리했다. 계산과 실행 중 상태만 이동했으며 BP 조정값·입력 Action·지면 Trace·Pivot은 Pawn 유지, 기존 Pawn 함수 이름도 유지했다. Pawn cpp 2,454→2,090줄.
+
+- 분리 전후 비교 `Drone.Flight.FlightGolden`: 6개 시나리오, 기준값 `Source/Drone/Flight/Tests/FlightGoldenBaseline.txt`, 60줄 0건 불일치.
+- 3차 뒤 전체 회귀101개: 실패는 KnownIssues4개·미렌더 패드 포커스6개뿐. 로그 `C:\URproject\drone\Saved\Automation\ClaudeSplit\full_after.log`.
+- Claude 지시서의 에이전트 교차 검토(동작 동일성·수명·호환성)에서 확인된 결함0. 이번 Codex docs 작업에서는 에이전트 검토를 새로 실행하지 않았다.
+- 한계: 골든은 위치 이동을 기록하지 않는다. 위치 이동은 Claude PIE 회귀로 확인한 범위이며 골든 자체의 검증 범위로 확대하지 않는다.
+
+2차100개·3차101개·과거 전체 회귀는 각각 당시 결과이며 합산하지 않는다. 알려진 실패 해결·새 수동 Pass로 쓰지 않는다. FPV 곡예 비행·UGV 주행이 분리 전과 같은지는 사용자 수동 확인 대기.
+
+### CLAUDE.md MCP 설명·사용자 커밋 준비
+
+사용자 직접 지시에 따라 Unreal `CLAUDE.md`의 MCP 자동 시작 설명을 D-14와 일치하도록 수정됨(Claude 지시서 근거). 공유 설정은 끄고 사용자 PC 로컬만 켠다. 팀원은 불필요하다. Codex는 Unreal CLAUDE.md나 설정을 직접 수정하지 않았다.
+
+Claude가 준비한 커밋 메시지 안은 `C:\URproject\drone\Saved\CommitDraft_D12b_RenameAndShake.txt`, `C:\URproject\drone\Saved\CommitDraft_D12c_AcroGroundSplit.txt`, `C:\URproject\drone\Saved\CommitDraft_D5_RacingCountdown.txt`(랩 타이머 포함). 커밋 직전까지 스테이징, 커밋·푸시는 사용자. Codex Commit/Push·스테이징 미실행.
+
+### 문서 반영·보존·미반영
+
+STATUS 관련 현재 상태·레이싱·D-12·최신 전체 회귀, WORKBOARD D-5 결정 행·RACING 카드·D-12 결정 행·MCP 설명·Next를 갱신했다. CONTEXT와 현재 AI/주행/물리/로비/기체/코드 구조/입력/Telemetry/Training 가이드의 C++ 이름·경로를 정정했다. 상세 구현·검증 이력은 이 WORKLOG 끝 항목을 정본으로 삼고 현재 문서는 요약·링크를 유지한다.
+
+WORKBOARD는 관련 현재 행을 요약하여 30KB 이하로 맞췄다. 변경 전 30,579바이트·113줄 → 변경 후 29,950바이트·114줄(UTF-8; 끝 개행을 줄로 세지 않음). 이번 지시의 history/archive 수정 금지에 따라 절 이동·아카이브 수정/생성은 하지 않았다. 과거 WORKLOG·감사/인수 보고·당시 계획/모바일 요약·snapshot·handoff·가이드의 명시된 당시 파일 목록/검증 절은 옛 이름까지 원문 보존했다. 현재 이름 정정과 과거 기록 보존 지시가 겹치는 곳은 역사 기록을 보존하고 현재 안내에서 새 이름을 명시했다. BP_DronePrototype*와 /Game/Drone/Prototype/... 자산 이름·경로는 변경하지 않았다.
+
+수동 확인 대기: 레이싱 카운트다운·랩 타이머 화면, FPV 곡예·UGV 주행 분리 전 동일 체감. 현재 미정: 코스4개 지형·배터리 시간 값·높이 제한 수치(경고 연출 등 기존 미정도 유지). Drone Space는 지시서의 “Space 제외”에 따라 갱신하지 않았으며 이번 문서 변경은 Space 미반영. applications·history/archive·Unreal 수정, Build·PIE·패키징·쿠킹·맵 생성/재생성, Commit/Push, Trello/Figma·공유 권한·예약 자동화 수정 없음. 새 파일 없음.
