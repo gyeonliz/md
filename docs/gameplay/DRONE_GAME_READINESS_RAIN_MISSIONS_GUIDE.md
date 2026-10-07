@@ -68,6 +68,35 @@ Preview 원본 비는 `NS_sky_Rain` 6개, `NS_Rain_Fast` 14개, `NS_Rain_Slow` 5
 4. 비를 끈 상태도 느리면 메시/머티리얼 슬롯·Tick·조명/그림자·오션·PostProcess를 먼저 조사한다. 반복 메시는 ISM/HISM 후보이나 충돌/재질/LOD 요구를 검증한 뒤 프로젝트 소유 사본에 적용한다.
 5. 실내 판정은 간단한 Rain Occlusion Volume으로 대체할 수 있다. 단, 원본 천장의 차폐 테스트를 유지한 채 검증한다.
 
+### 비 품질 설정과 조정
+
+날씨 매니저를 유지하고 원본 팩의 젖음·물결 머티리얼과 소리를 프로젝트 자산으로 연결한다. 원본 Niagara는 맵 전체 배치 대신 **낮음·중간·높음 모두 카메라 주변 1개**를 사용한다. 원본 ThirdParty와 원본 맵은 수정하지 않는다. 검증·실측은 [10/07 C PC Claude 작업 이력](../history/DRONE_WORKLOG.md#2026-10-07--비-연출-도입비-품질-옵션-c-pc-claude)을 따른다.
+
+설정 화면 성능 항목의 `비 품질`은 자동·끔·낮음·중간·높음이며 기존 설정 SaveGame에 저장·복원한다. 자동은 엔진 효과 품질을 따른다(0→낮음, 1→중간, 2 이상→높음). 단계별 값은 `BP_DroneRainVisual`의 `QualityLevels`에서 조정한다. 아래는 현재 값이며 최종 튜닝값은 현재 미정이다.
+
+| 단계 | 현재 동작 |
+|---|---|
+| 끔 | 비 연출 전부 끔 |
+| 낮음 | Niagara1개·입자0.3배·생성 범위0.7배·물결0·Simple 젖음·빗소리 |
+| 중간 | Niagara1개·입자0.6배·생성 범위0.85배·물결0.5 |
+| 높음 | Niagara1개·입자1.0배·생성 범위1.0배·물결1.0 |
+
+판 빗줄기는 전 단계 기본0(사용 안 함)이다. 예전 단일 사본 `NS_DroneRain_NearCamera`·`NET_DroneRain`은 삭제됐다. 원본 Niagara에는 지붕 차폐가 없어 실내에서는 끈다. 빗소리는 실내에서 35%로 줄인다. 카메라 비 오프셋 600cm는 시험값이며 전 단계 입자 크기·모양(픽셀 여부)·위치·양은 수동 확인 대기다.
+
+프로젝트 소유 자산은 `/Game/Drone/Weather` 아래에 있다.
+
+| 자산 | 역할·현재 조정 |
+|---|---|
+| `Niagara/NS_DroneRain_Low/Medium/High` | 단계별 `NS_Rain_Fast` 사본 |
+| `Niagara/NET_DroneRain_Low/Medium/High` | Effect Type: 입자0.3/0.6/1.0배·효과 품질 낮으면 추가 감소·최대2개(실제 사용1개와 구분) |
+| `Audio/SCON_DroneRain` | 빗소리 동시 재생1개 |
+| `Materials/MPC_DroneWeather` | `RainWetness`, `RainDetail` |
+| `Materials/M_DroneWetSurface` | 원본 `MF_Wetness`·`MF_WaterRipples` 사용. Detail/Simple 인스턴스, 끔·낮음은 맵 표면을 Simple로 교체 |
+
+생성 도구는 `Tools/AssetMigration/BuildDroneRainQualityAssets.py`다. 문서 확인을 위해 재실행하지 않는다. `Lvl_DroneWeatherSystemsTest` 바닥에 젖음 머티리얼이 적용돼 있다. 비 프리셋으로 젖음·물결 외형을 확인한다. 빗소리는 원본 `SC_Ambience`(`SW_Ambience`, 230초 반복)를 사용하지만 실제 내용이 빗소리인지와 해당 음원 채택은 미확인·현재 미정이다.
+
+수동 확인 순서: 전 단계 입자 크기·모양(픽셀 여부)·카메라 비 위치·양 → 날씨 시험 맵의 젖음·물결 → 실외/실내 음원 내용·감쇠 → 설정 비 품질의 실제 패드 조작. 화면 물방울·바닥 Splash는 미구현이다. 젖음 머티리얼은 품질 실측 장면에 없어 그 비용은 아직 측정하지 못했다.
+
 ## 3. 시작 화면과 버튼 점검
 
 소스 6장(배경·오버레이·로고·Normal/Hover/Pressed)을 조합한다. 완성 참고이미지 자체를 클릭 배경으로 쓰지 않는다. 원본 1920×1080 오버레이 크기, 로고 734×429, 메뉴 위치/글자 크기를 시안 기준으로 보완했다. 현재는 `스토리 / 레이싱 / 튜토리얼 / 설정 / 종료` 5메뉴에서 분류로 직접 진입한다(10/04 C PC).
@@ -159,6 +188,6 @@ Tutorial 8 + Story 4 + Racing 1 + 비 비교 1, **14개 시험맵 Map Check 오�
 
 이 **통제된 한 시점**에서는 원본 비가 주요 추가 비용이었다. 원본 대비 근거리 제한은 평균 프레임 비용 약 48%, 프로젝트 비는 약 53% 낮았다. 이는 원본 동등 화질/모든 비행 위치/패키징 결과를 보장하는 수치가 아니다. 비를 껐을 때도 장면의 렌더링 비용이 남는다. 수집 CSV는 Tick 간격이므로 GPU/CPU 분해 결과로 표현하지 않는다. 현장 `stat unit` 관찰과 후속 Insights로 원인을 추가 분해한다.
 
-기상 기능의 범위: Wind/Rain Snapshot·강우 강도·카메라 비·지붕 차폐·On/Off는 존재한다. `SurfaceWetness / ScreenDroplet / Audio / GroundSplash` 값은 전달되지만 프로젝트의 완성형 wetness 재질·화면 물방울·빗소리 consumer까지 연결 완료는 아니다. OilRig 원본 젖은 표면/오션은 Profile과 별개이며 위 On/Off 비교에서도 남겨 두었다.
+기상 기능의 범위: Wind/Rain Snapshot·강우 강도·카메라 비·지붕 차폐·On/Off는 존재한다. 비 품질·젖음/물결 머티리얼·Audio consumer가 연결됐으며 설정·조정은 [비 품질 설정과 조정](#비-품질-설정과-조정)을 따른다. 젖음/물결 외형·음원 내용/실내 감쇠·패드는 수동 확인 대기, 화면 물방울·바닥 Splash는 미구현이다. OilRig 원본 젖은 표면/오션은 Profile과 별개이며 위 과거 On/Off 비교에서도 남겨 두었다. 날짜별 실측·자동 검증은 [WORKLOG](../history/DRONE_WORKLOG.md#2026-10-07--비-연출-도입비-품질-옵션-c-pc-claude)에 기록한다.
 
 검증 파일: `Saved/Automation/GameReadiness/oilrig_audit.json`, `isolated_mission_maps.json`, `oilrig_rain_frame_times.csv`, `GameReadinessRainBenchmark.log`, `GameReadinessFinalize.log`. 반복 도구는 `AuditDroneGameReadiness.py / BuildDroneIsolatedMissionMaps.py / BuildDroneRainComparisonMap.py / FinalizeDroneGameReadiness.py`다. 이미 생성된 독립 맵은 재생성하지 않고 연결/필수 Actor만 검증한다. 원본 공유 맵·Production Training은 저장하지 않는다.

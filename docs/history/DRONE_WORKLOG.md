@@ -3089,3 +3089,58 @@ STATUS/WORKBOARD에 진단·미수정 상태로 등록하고 기존 Drone Space 
 - 크기: STATUS24610→24901B, WORKBOARD29980→29819B(30KB 이하). Claude 확인 필요: 지시서17/18·18/18과 report4 실제16/17 집계 대조. 코드 작업 새 요청은 없음.
 
 - 10/07 집계 정정(Claude 직접 기록): interlink-buttons 지시서의 "17/18·18/18"은 Claude 집계 실수다. `ClaudeInterLink/test4.log`는 17개 중 16 Success·1 Fail(PIEInputLifecycle, ArmSwitch 미등록), 테스트 수정 뒤 `test5.log` 3/3 Success. 실패했던 테스트는 재실행으로 통과했고 나머지 16개는 test4 결과를 그대로 쓴다.
+
+## 2026-10-07 — 비 연출 도입·비 품질 옵션 (C PC Claude)
+
+작업·검증: Claude, C PC `C:\URproject\drone`. 문서 반영: Codex, 지시서 `20261007-110533-docs-rain-quality-docs/prompt.md` 기준. 아래 실행·캡처·실측은 Claude가 전달한 결과이며 Codex 재실행 결과가 아니다. Unreal HEAD `cb77c0d`, 이번 변경은 스테이징 상태. 커밋 메시지 안 `Saved/CommitDraft_RainQuality.txt`. **스테이징까지, 커밋·푸시는 사용자**. Codex는 Unreal 수정·Build/PIE/맵 생성·Commit/Push·문서 스테이징을 실행하지 않았다.
+
+### 승인·구현
+
+- 10/07 사용자 승인: 비 연출 도입과 최적화. 날씨 매니저 유지, 원본 팩 젖음·물결 머티리얼과 소리 도입, 원본 Niagara는 맵 전체 배치 대신 높음에서 카메라 주변1개만 사용.
+- 설정 성능 항목 `비 품질` 자동/끔/낮음/중간/높음 추가·기존 설정 SaveGame 저장/복원. 자동은 엔진 효과 품질0→낮음, 1→중간, 2 이상→높음. Claude가 1280×720 캡처로 화면 안에 들어감을 확인했다. 실제 패드 조작 Pass는 아니다.
+- `BP_DroneRainVisual.QualityLevels`: 끔은 비 연출 전부 Off, 낮음은 빗줄기 절반·단순 젖음·빗소리, 중간은 빗줄기 전부·물결 절반, 높음은 카메라 주변 원본 Niagara1개 추가. 원본 Niagara는 지붕 차폐가 없어 실내 Off, 빗소리는 실내35%로 감쇠.
+- 새 자산 `/Game/Drone/Weather`: `Niagara/NS_DroneRain_NearCamera`는 `NS_Rain_Fast` 복제. `Niagara/NET_DroneRain` Effect Type은 효과 품질 낮음 입자0.35배·중간0.6배·최대2개. `Audio/SCON_DroneRain`은 동시 재생1개. `Materials/MPC_DroneWeather`는 RainWetness/RainDetail. `Materials/M_DroneWetSurface`는 원본 MF_Wetness/MF_WaterRipples 사용, Detail/Simple 인스턴스가 있고 끔·낮음에서는 맵 표면을 Simple로 교체.
+- 생성 도구 `Tools/AssetMigration/BuildDroneRainQualityAssets.py`. `Lvl_DroneWeatherSystemsTest` 바닥에 젖음 머티리얼 적용. 원본 ThirdParty·원본 맵은 수정하지 않았다.
+- 빗소리는 원본 `SC_Ambience`(`SW_Ambience`, 230초 반복). 실제로 빗소리인지는 미확인.
+
+### 자동 검증·렌더 확인
+
+- 새 `Drone.Weather.RainQualityLevels` Success.
+- 전체 회귀128개 중 실패는 알려진 미렌더 패드 포커스6개뿐. 알려진 실패 해결이나 실제 패드 Pass로 해석하지 않는다.
+- Niagara 실제 활성화는 Claude 렌더 실측에서1개 확인. Effect Type 최대2개 예산과 구분한다.
+
+### 품질 실측
+
+C PC, RTX3080·i5-13600KF·32GB, `-game` Development, 1280×720 창 모드, VSync·FPS 제한 Off, 엔진 효과 품질 최고(3), `Lvl_OilRigRainComparisonTest` 고정 카메라. 단계마다10초 안정화 후10초 측정, 정순·역순2회. 품질 측정 중 원본 맵 배치 비는 Off.
+
+| 모드 | 평균 프레임(ms) 2회 | FPS |
+|---|---|---|
+| 끔 | 10.061 / 10.549 | 약97 |
+| 낮음 | 10.195 / 10.722 | 약96 |
+| 중간 | 10.291 / 10.593 | 약96 |
+| 높음 | 10.316 / 11.025 | 약94 |
+| 원본 맵 배치25개 | 30.358 / 31.972 | 약32 |
+
+앞선 실측은 **판 빗줄기 버전(폐기)**: 끔9.919/10.022·낮음9.867/10.401·중간9.884/9.995·높음10.109/10.106·원본25개27.702/27.430ms; 당시 구성은 아래 정정 항목으로 대체한다.
+
+재실측 조건은 위와 같다. 첫 단계30.2ms는 준비 구간으로 제외했고 단계 간 차이는0.4ms 안쪽이다. 젖음 머티리얼 비용은 별도 미측정이며 입자 모양의 수동 Pass를 뜻하지 않는다.
+
+### 수동 확인 대기·현재 미정·미구현
+
+- 높음 카메라 주변 원본 비 위치·양의 자연스러움(오프셋600cm는 시험값).
+- `Lvl_DroneWeatherSystemsTest` 비 프리셋의 젖음·물결 외형.
+- 빗소리 내용·실내 감쇠, 설정 비 품질의 실제 패드 조작.
+- 단계별 수치의 최종값·원본 Ambience를 빗소리로 확정할지는 현재 미정. 화면 물방울·바닥 Splash는 미구현.
+
+현재 설정·자산·확인 절차는 [비 가이드](../gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md#비-품질-설정과-조정)가 정본이다. STATUS 날씨 행·WORKBOARD WTH-03/Next 갱신. Space는 이번 지시에서 제외하여 미반영. docs/applications·docs/history/archive와 과거 WORKLOG 본문은 수정하지 않았다.
+
+## 2026-10-07 — 비 품질 정정·원본 Niagara 기반 (C PC Claude)
+
+작업·검증: Claude, C PC. 문서 반영: Codex, `20261007-112159-docs-rain-quality-fix/prompt.md` 기준. 사용자 피드백: 낮음·중간 판 빗줄기(카메라 주변 ISM)가 네모·픽셀처럼 보임. 앞선 구성·단일 사본 설명은 폐기하며 현재 절차는 [비 가이드](../gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md#비-품질-설정과-조정)가 정본이다.
+
+- 낮음·중간·높음 모두 원본 NS_Rain_Fast 사본을 카메라 주변1개 사용한다. 단계별 자산·입자/생성 범위/물결 값은 가이드 참조. 판 빗줄기 전 단계 기본0, 끔·낮음 Simple 머티리얼. 젖음·빗소리(실내35%)·실내 Niagara Off 유지. 예전 NS_DroneRain_NearCamera·NET_DroneRain 삭제.
+- 자동 검증: Weather 전체·SettingsContract Success. RainPerformanceBudget은 빗줄기를 명시적으로 켜서 검사하도록 조정. Claude 전달 결과이며 Codex 재실행이 아니다. 이번 개수·새 전체 회귀 결과는 미제공.
+- 위 실측 표를 새 값으로 교체했다. RTX3080·1280×720·-game·VSync Off·효과 품질 최고·고정 카메라·10초+10초·정순/역순. 첫 단계30.2ms 제외·단계 차이0.4ms 안쪽. 새 CSV 경로는 미제공.
+- 단계별 캡처: `E:\기획안\06_드론_메인\비품질_캡처\`. 고정 원거리 정지 화면이라 비가 잘 보이지 않는다. 입자 크기·모양(픽셀 여부), 위치·양, 젖음·물결, 빗소리·실내 감쇠, 실제 패드 조작은 수동 확인 대기. 최종 수치·음원 채택 현재 미정, 화면 물방울·바닥 Splash 미구현.
+
+STATUS 날씨 행·WORKBOARD WTH-03/Next·비 가이드 정정. Space 지시상 제외. Unreal 수정·엔진 실행·Commit/Push·archive·applications 수정 없음.

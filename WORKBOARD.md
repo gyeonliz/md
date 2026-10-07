@@ -121,7 +121,7 @@
 |---|---|---|---|
 | ASSET-OILRIG-PREVIEW-01 | OilRig 실제 Preview 환경 이식 | Preview 이식·외부/누락0/0·Map Check0/0·원격 반영의 이전 근거 아카이브/WORKLOG. 기존 Overview·사람 환경 보존 | Editor에서 문/문틀 위치, 재질·조명·충돌·오션·비·첫 로드와 FPS를 수동 확인 |
 | MANAGERS-FOLDER-01 | 사용자 요청: 매니저 폴더 정리 | 구현됨·자동 검증됨(10/05 C PC Claude). MissionManager·RandomWeatherController·WeatherDebugVisualizer를 `/Game/Drone/Managers`로 이동·Redirector 정리. 상세 WORKLOG | 날씨 시험 맵 정상 동작 수동 확인 대기. GameMode·PlayerController·RainVisual 기존 위치 유지 |
-| WTH-03 | 비 표현 Vertical Slice | OilRig `T_rain_Mask` 참조 전용 Material, 최대 112개 짧은 Plane 빗줄기, 파란 Debug 기본 Off, 표면별 천장/지면 차단·0.35초 실내 감쇠 구현. Weather 4/4·Map Check 0/0 | 실외→지붕 아래→실외, 긴 잔상 감소·천장 침투 차단, RainStorm→Clear/비 Off 화면 확인 후 Niagara·MPC·Audio·품질 단계 범위 결정 |
+| WTH-03 | 비 품질·연출 | 구현됨·자동 검증됨(10/07 C PC Claude). 전 단계 원본 Niagara1개·판 빗줄기 기본0·Weather 전체/SettingsContract Success; [가이드](docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md#비-품질-설정과-조정)·검증 WORKLOG | 입자 크기/모양·위치/양·젖음/물결·음원/실내 감쇠·패드 수동 확인. 수치/음원 확정 미정; 화면 물방울/Splash 미구현 |
 
 #### 테스트·빌드·성능·동기화
 
@@ -142,5 +142,5 @@
 1. 레이싱 카운트다운·출발0초 타이머·상단 중앙 표시·첫 게이트 재시작 없음과 풍향 HUD를 수동 확인한다. 배터리 시간 결정 뒤 추락/재출격 확인.
 2. 실제 패드 첫 강조·전체 UI·1280/1920 가독성·8수업 연속 진행·Best Lap 재실행·설정 저장을 확인한다. KnownIssues4개 분리는 실패 해결이 아니다. 미렌더는 포커스6개 모두 화면 루트 포커스로 실패하는지로 판단한다.
 3. 코스4개 지형·배터리/고도 수치·경고 연출 미정. D-1·D-2 기획자 대기, D-13 종료. D-12 FPV/UGV 체감 수동 대기; 검증/Git은 STATUS 참조.
-4. DR-INTERLINK-INPUT-01 실기 확인 후 Acro 혼합 입력·코스 표시선·NPC 다리/속도 대비 보폭·총 정렬·이동 뒤 날씨 시험 맵·비 차폐·벽/그물·광섬유/UGV 수동 회귀를 이어간다. 팀원 Production Training 보존; 실제 패키징·Chaos 비교·최종 Rain/음원은 별도 후속이다.
+4. DR-INTERLINK-INPUT-01 실기 확인 후 Acro 혼합 입력·코스 표시선·NPC 다리/속도 대비 보폭·총 정렬·이동 뒤 날씨 시험 맵·비 차폐·벽/그물·광섬유/UGV 수동 회귀를 이어간다. WTH-03 비 입자 크기/모양·위치/양·젖음/물결·빗소리/실내 감쇠·패드를 가이드대로 확인한다. 팀원 Production Training 보존; 실제 패키징·Chaos 비교·최종 Rain/음원은 별도 후속이다.
 5. Git·Space는 STATUS. Commit/Push는 사용자.
