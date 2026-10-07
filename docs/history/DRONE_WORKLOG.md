@@ -3032,3 +3032,60 @@ STATUS/WORKBOARD에 진단·미수정 상태로 등록하고 기존 Drone Space 
 현재 UI 가이드에 결과 WBP 필수/선택 이름·Controller 연결·배율 호환·수동 확인을 기록했다. 다음은 720p/1080p에서 성공/실패/다음 없음/전체 완료의 카드/문구/버튼과 실제 패드·다음/재도전/로비/시작 메뉴 전환 확인이다. 이후 기존 조작/화물·레이싱/8수업/Best Lap 확인 순서는 유지한다. STATUS/WORKBOARD는 구현·자동 검증됨/수동 대기로 갱신하고 Drone Space 같은 항목에 반영한다.
 
 마무리: MD·Unreal diff --check 통과(줄바꿈 변환 안내만 있음). STATUS23761B·WORKBOARD29918B로30KB 이하 유지. Space 기존 진행/테스트/BP/안내4개 Page의 guarded6연산 적용·본문7블록을 재조회해 기대 변경6/6 일치 확인. Trello 링크·날짜 이력/역할 규칙 보존, 새 Page/권한 변경 없음. Git 두 작업 트리는 미커밋 상태이며 사용자 Commit/Push 대기다.
+
+## 2026-10-07 InterLink DX 조종기 입력과 메뉴 연결 — D PC Claude
+
+- 작업 도구/실행: Claude(D PC). 문서·Space 반영: Codex. 통합 지시서 `20261007-123213-docs-interlink-all`의 1차 입력 연결→2차 실측/메뉴 순서 반영, 충돌은 2차 우선. 1차 run은 미실행이어서 이번에 함께 반영했다.
+- Git 기준: Unreal `cb77c0d`, MD `6558cca`(작업 전 Clean), 이번 문서는 미커밋. Codex가 읽기 전용 HEAD/설정/성공 로그를 대조했다. Unreal 쓰기·Build/PIE·패키징·맵 생성·Commit/Push·Trello/Figma 수정 없음.
+- 장치: Spektrum InterLink DX, USB HID VID 0x1781/PID 0x0E5A, 축8·버튼27. PnP·joy.cpl OEM·HID value caps로 Claude가 식별(장치 식별 로그 파일 없음). XInput이 아니므로 기존 Gamepad 33매핑은 이 장치에서 무반응이었다.
+- 1차 구현: 프로젝트 `Plugins/RawInput/`에 UE5.8 엔진 Experimental/Deprecated RawInput 복사본을 두고 축24키 등록에 Axis1D를 추가(IsAnalog=false로 PlayerInput이 버리던 문제), uplugin DeprecatedEngineVersion 제거. `Drone.uproject` RawInput Win64 활성화, 프로젝트 플러그인 우선 로드 로그 확인. `DefaultInput.ini` 축8·버튼27 장치 설정, IMC 기존33+InterLink8=41. 쉬운/제한 자세4축+Acro4축·기존 쉬운 조작 Dead Zone Lower0.2/Upper1.0/Radial 복사. 상세 배치는 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md) 정본.
+- 도구/계약: 신규 `BuildDroneInterLinkInput.py`는 InterLink 매핑 교체 방식. `BuildDroneAcroInput.py`는 매핑 수 검사에서 GenericUSBController 제외(변경 후 미실행). AcroInputAssetContract의 조종기4축 Dead Zone 계약, PIEInputLifecycle ExpectedMappingCount 33→41.
+- 2차 실측: 사용자가 조작한 12:21·12:23 HID 기록 2회(100초). 앞/위/오른쪽으로 밀면 0..4096 값 증가. 초기 Axis6/8 bInverted=True 가정을 정정해 축8개 전부 False, bGamepadStick=True 정규화. 실물 Mode2(왼쪽 세로 비복귀 스로틀·오른쪽 세로 중앙 복귀)와 게임 기본 배치 일치. scratchpad interlink_sample.log/interlink_sample2.log는 저장소 밖 Claude 근거이며 개인 로그 업로드 없음.
+- 사용자 확정(10/07): 실제 콘솔 InterLink DX 사용, 구현 방식 Claude 위임. Select 노브 회전=위/아래·딸깍=확인·Cancel=뒤로. 실측 Button17/18 회전 펄스·16 딸깍·15 Cancel. 회전 어느 방향이17인지는 미확인.
+- 2차 구현: 신규 `DroneInterLinkNavigationSubsystem.h/.cpp`(GameInstanceSubsystem·Config=Game), 시작 시 기본 키보드/패드 Slate FNavigationConfig 보존+조종기4키 추가, 종료 복원·Slate 없는 Commandlet 생성 제외. `DefaultGame.ini` 설정: 17 Up/18 Down/16 Accept/15 Back, 방향 반대면 KnobUpKey/KnobDownKey 맞바꿈. FrontEndRootWidget/SelectionWidget Back에 IsBackKey 추가. 신규 Drone.UI.InterLinkNavigationContract는 조종기4키와 기본 규칙 보존 검사.
+
+| 검증 | 조건/판정 | Claude 근거(루트 D:/JGY/project/drone/Saved/Automation/ClaudeInterLink/) |
+|---|---|---|
+| 장치 식별 | PnP·joy.cpl·HID, 축8·버튼27 | Claude 세션·별도 식별 로그 없음 |
+| Build 1차 | Editor 종료 후 Succeeded 2회 | build.log, build2.log |
+| IMC 패치 | replaced=0·added=8·mappings=41, 프로젝트 플러그인 우선 로드 | imc.log |
+| Prototype 전체+ControlInputDisplayPIE 1차 | NullRHI 11/12 Success·PIEInputLifecycle Fail(기대33 고정) | test.log |
+| 수정 후 집중 | PIEInputLifecycle/AcroInputAssetContract/AcroInputBehaviorPIE 3/3 Success | test2.log, report2/ |
+| 1차 최종 판정 | Prototype+ControlInputDisplay 12/12 판정은 11/12+수정 후3/3의 조합; 수정 후 전체12개 일괄 재실행과 구분 | Claude 통합 지시서, test.log/test2.log |
+| RawInput 장치 등록 | VID1781/PID0E5A 연결 등록 로그 | test.log, test2.log |
+| Build 2차 | build3 테스트 플래그 오타 실패→build4 Succeeded | build3.log, build4.log |
+| 메뉴 후속 집중 | NullRHI 5/5 Success: InterLinkNavigationContract, GamepadNavigationPIE, GamepadMissionFlowPIE, PIEInputLifecycle, PlayerFacingTextContract | test3.log, report3/ |
+
+- 구현됨/자동 검증됨: 축 연결·전부 반전 해제·Mode2 실측 반영·메뉴 Subsystem/키 설정/Cancel 연결·계약 테스트. 1차 Prototype12/12 판정 유지, 후속은PIEInputLifecycle 재확인이며 새 전체 회귀 합산 아님. Codex가 build/build2/build4 성공·imc41·test2 3/3·test3 5/5 로그를 직접 대조했다. HID 실측 자체는 Claude 지시서 근거다.
+- 수동 확인 대기: 비행 축 배치/부호·Dead Zone·쉬운 조작 비복귀 스로틀 고도 유지·게임 Mode2 호버/피치, 노브 방향·딸깍/Cancel이 타이틀/로비/기체 선택/설정/결과 전부 동작·첫 강조·기존 패드 포커스 영향. HID 방향 확인은 실기 게임 체감 Pass가 아니다.
+- 미구현/미완료: 조종기 좌우 이동·LB/RB 탭·브리핑 넘김·시점 전환·역할 기능 버튼·CameraPitchRate, 미인식 안내 UI, 다른 송신기 설정·전시 PC 배포 플러그인 포함 확인. 필요 조작은 키보드·마우스 사용.
+- 현재 미정: 노브 물리 회전 방향 대응, 미연결 버튼 배치, 미인식 안내 문구, 쉬운 조작 비복귀 스로틀 처리(중앙=고도 유지 Claude 가안), 전시 조종기 정책·멀티 송신기 지원. 원래 1차 세로축 최종값 미정은 2차 실측 설정으로 대체하되 실기 체감은 대기.
+- 로컬 반영: STATUS 최신 요약/입력 자산/Acro/다음 확인, WORKBOARD 신규 DR-INTERLINK-INPUT-01·DR-FPV-ACRO-INPUT-02·UI-PAD-01/Next, 입력 계약/기획 답변 2·3절. 상세 계약은 입력 가이드, 검증 이력은 본 절에 모았다. 새 파일/아카이브 없음.
+- Unreal 미커밋 대상(Claude 통합 지시서): `Drone.uproject`, `Config/DefaultInput.ini`, `Config/DefaultGame.ini`, 신규 `Plugins/RawInput/`, 신규 `Tools/AssetMigration/BuildDroneInterLinkInput.py`, `Tools/AssetMigration/BuildDroneAcroInput.py`, `Source/Drone/Flight/Tests/DroneAcroInputAssetContractTest.cpp`, `Source/Drone/Flight/Tests/DroneFlightPIEInputLifecycleTest.cpp`, `Content/Drone/Prototype/Input/IMC_DronePrototype.uasset`, 신규 `Source/Drone/UI/DroneInterLinkNavigationSubsystem.h/.cpp`, 신규 `Source/Drone/UI/Tests/DroneInterLinkNavigationContractTest.cpp`, `Source/Drone/UI/DroneFrontEndRootWidget.cpp`, `Source/Drone/UI/DroneSelectionWidget.cpp`. 본 목록은 위임 사실이며 이번 Codex 변경 파일 목록과 구분한다.
+- Space 반영: pages:write-page 스킬로 기존 [진행상황과 다음 작업](https://chatgpt.com/space/page_a81d11314f60819188530a4ea2ed4663)(sequence30)·[테스트 맵과 확인 가이드](https://chatgpt.com/space/page_ba2823e59d7c8191b0ea8bab809367dc)(sequence19, 자동 근거 요약 후속20)에 축/메뉴 구현·자동 검증·수동 순서/미정 반영. 저장 연산6건의 적용/거부없음·본문 재조회 확인, 새 Page/공유/예약 없음. 전체 사용자 화면 폭에서 렌더 배치는 미검증.
+
+## 2026-10-07 InterLink DX 버튼·ArmSwitch·노브 전용 메뉴 이동 — D PC Claude
+
+- 작업 도구/실행: Claude(D PC), 문서·Space 반영: Codex. 지시서 `20261007-125357-docs-interlink-buttons`, 이전 interlink-all 미커밋 반영 위 후속. 기준 Unreal `cb77c0d`·MD `6558cca`; 기존 미커밋 변경 보존. 이번 Codex는 Unreal 수정·Build/PIE·패키징·맵 생성·Commit/Push를 실행하지 않았다.
+- 사용자 확정(10/07): 버튼3개는 좌클릭/우클릭/P 역할, 자폭1=온·0=오프, 메뉴는 좌우 없이 노브 위/아래만으로 전부 이동. Claude 사용자 HID 실측12:40에서 Button1/12/13 확인; scratchpad `interlink_sample4.log`는 저장소 밖 근거이며 Codex가 읽거나 업로드하지 않았다.
+- 구현됨: IMC41→45(기본33+축8+버튼4), Button1 PrimaryAbility와 신규 Boolean ArmSwitch·Button12 SecondaryAbility·Button13 ToggleView. Pawn ArmSwitchAction Started=ArmImpactDetonation/Completed=Disarm, 비행BP4종 연결. 자폭 없는 Scout/Drop/FiberOptic/UGV는 무시·마우스 무장/해제 유지. RawInput ButtonProperties27→32(28~32 상태 포함). 축 재생성 도구는 버튼 보존. 상세 계약은 [입력 가이드](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md) 정본.
+- 구현됨: StepFocus 강조 목록 이전/다음·끝 순환, FrontEndRoot/Selection/Settings Preview 노브 처리, 결과창 기존 위/아래. 설정 열린 콤보 Slate 위/아래·확인으로 슬라이더 잠금 후 노브 조절·KnobSliderStep0.05(BP 조정 가능), GetKnobStep 추가. 패드·키보드 규칙 유지.
+- 테스트 계약: 신규 InterLinkButtonAssetContract 추가4/기존6매핑 보존·BP4종 ArmSwitchAction, InterLinkNavigationContract GetKnobStep, PIEInputLifecycle 매핑45·ArmSwitch2바인딩.
+
+| 검증 | 판정과 범위 | 근거(루트 D:/JGY/project/drone/Saved/Automation/ClaudeInterLink/) |
+|---|---|---|
+| Build | 지시서 build5 Live Coding 실패(Editor 켜짐)→build6·build7 Succeeded; Codex가 두 성공 로그 대조 | build5~7.log |
+| IMC·BP 패치 | OK·replaced=0·added=4·mappings=45·pawns=4 직접 대조 | buttons.log |
+| 전체+UI/Flow | 지시서17/18이나 실제 report4는 succeeded14+warnings2·failed1·notRun0, 즉16/17; PIEInputLifecycle Fail | test4.log, report4/index.json |
+| 수정 후 집중 | PIEInputLifecycle/InterLinkButtonAssetContract/RoleAbilities 3/3 Success 직접 대조 | test5.log, report5/index.json |
+| 최종 판정 차이 | 지시서18/18(실패1건 수정 재실행 포함)과 실제 보고서 집계 차이 Claude 재확인 대기. 전체 일괄 재실행 아님·18/18을 직접 확인한 것으로 쓰지 않음 | 지시서와 report4/5 대조 |
+
+- 자동 검증됨: Build·버튼 매핑/BP 연결·IMC45·노브 계약·수정 후 집중3/3. report4 Success 중 경고2개는 별도 분류하며 실기 Pass로 산정하지 않는다.
+- 수동 확인 대기: 기존 축 부호/Dead Zone·Mode2 호버/피치·비복귀 스로틀, Button1 무장/해제 체감·12/13 동작, 노브만으로 타이틀→로비→탭→미션→브리핑→기체 선택→출격→결과 이동·첫 강조·확인/Cancel, 설정 슬라이더 잠금/조절·콤보 목록·노브 방향. 훈련 로비 탭은 코드상 목록 포함·실기 확인 대기이며 미구현 확정으로 쓰지 않는다.
+- 미구현/미연결: 브리핑 대사 넘김 조종기 버튼·미인식 안내 UI·CameraPitchRate. 현재 미정: 노브 회전 방향 대응·Button1 물리 종류(누름 버튼이면 누르고 있는 동안 무장될 수 있음)·브리핑 넘김/탭 전용 버튼·안내 문구·전시 정책; 기존 비복귀 스로틀/다기종 미정 유지.
+- Unreal 추가 미커밋 대상(Claude 지시서): 신규 `Content/Drone/Prototype/Input/Actions/IA_DronePrototype_ArmSwitch.uasset`, IMC_DronePrototype.uasset, 비행BP4종(FPV/Scout/Drop/FiberOptic), 신규 `Tools/AssetMigration/BuildDroneInterLinkButtons.py`, BuildDroneInterLinkInput.py, `Source/Drone/Flight/DroneFlightPawn.h/.cpp`, Flight/Tests/DroneFlightPIEInputLifecycleTest.cpp·신규 DroneInterLinkButtonAssetContractTest.cpp, `Source/Drone/UI/DroneGamepadFocus.h/.cpp`·DroneInterLinkNavigationSubsystem.h/.cpp·DroneFrontEndRootWidget.cpp·DroneSelectionWidget.cpp·DroneSettingsWidget.h/.cpp·Tests/DroneInterLinkNavigationContractTest.cpp, Config/DefaultInput.ini. 이전 목록에 추가된 인계 사실이며 Codex 변경 파일과 구분한다.
+- 로컬 반영: STATUS 현재 요약/입력/미정/다음 확인, WORKBOARD 기존 DR-INTERLINK-INPUT-01·UI-PAD-01 압축 갱신과 DR-FPV-ACRO-INPUT-02 매핑 수 정정, 입력 가이드 버튼 표/메뉴 규칙/6절45매핑·Action15. 본 WORKLOG 끝에만 이력 추가. 기존 기획 답변 파일 변경은 이전 run 결과로 보존·이번 미수정. 새 파일/아카이브 없음.
+- Space 반영: pages:write-page 스킬 적용, 기존 [진행상황과 다음 작업](https://chatgpt.com/space/page_a81d11314f60819188530a4ea2ed4663)(sequence31)·[테스트 맵과 확인 가이드](https://chatgpt.com/space/page_ba2823e59d7c8191b0ea8bab809367dc)(sequence21)의6연산 적용/거부없음, 저장 본문 재조회6/6 일치. 버튼/무장/노브 이동·실기 순서·미정·집계 차이 반영. 새 Page·권한/예약 변경 없음, 사용자 화면 렌더 배치는 미검증.
+- 크기: STATUS24610→24901B, WORKBOARD29980→29819B(30KB 이하). Claude 확인 필요: 지시서17/18·18/18과 report4 실제16/17 집계 대조. 코드 작업 새 요청은 없음.
+
+- 10/07 집계 정정(Claude 직접 기록): interlink-buttons 지시서의 "17/18·18/18"은 Claude 집계 실수다. `ClaudeInterLink/test4.log`는 17개 중 16 Success·1 Fail(PIEInputLifecycle, ArmSwitch 미등록), 테스트 수정 뒤 `test5.log` 3/3 Success. 실패했던 테스트는 재실행으로 통과했고 나머지 16개는 test4 결과를 그대로 쓴다.

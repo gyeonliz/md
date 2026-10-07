@@ -1,6 +1,6 @@
 # 현재 작업 상태
 
-기준일: 2026-10-06 12:43 KST D PC. Unreal HEAD=origin/main `0c0ed99`, MD `c5a0524`+미커밋. 사용자 예외 승인으로 Codex가 조작 UI·Drop 집게와 결과창 배치를 수정했다. Editor Build·결과창 집중 자동화6/6 Success(2개 렌더 제한 경고 포함), 실제 화면/패드·집게 체감 수동 확인 대기. 아래 C PC 전체 검증은 별도 인계 근거다. Commit/Push 미실행.
+기준일: 2026-10-07 KST D PC. InterLink DX 축·버튼·ArmSwitch·노브 전용 메뉴 이동은 Claude 구현·자동 검증됨, Codex 문서 반영. 실측 Mode 2·반전 해제 확인, 실기 비행/메뉴 체감 수동 대기. Unreal cb77c0d·MD 6558cca 기준+미커밋. 기존 C PC 검증은 별도 인계 근거이며 Commit/Push 미실행.
 
 ## Git 기준
 
@@ -26,7 +26,7 @@
 | 시작·로비 | 스토리/레이싱/튜토리얼/설정/종료 5메뉴, 분류 직접 진입, 상하 순환·Back/포커스 복원, 저장 `WBP_DroneFiveItemMenu` 연결 | 실제 패드·1280/1920 배치 확인 대기. 로비 Tutorial/Racing 탭·LB/RB는 현재 유지, 최종 유지 여부 미정 |
 | 조종 입력 표시 | 설정 수동 ON/OFF·선택 저장, 저장 `WBP_DroneControlInputDisplay` 연결. 아래 중앙 스틱 표시·OFF 갱신 중지, 고도계 독립 | D-3 기본 False 확정, 장치 자동 전환/분리·재연결 정책 미정. 실제 화면/패드 확인 대기 |
 | 코스 표시선 | 긴 코스만 sqrt(곡률) 밀도+15% 균일 몫, 짧은 TestMap68/113조각 기존 균일 분할 유지. MaximumCourseLineSegments 노출·기본1024(시작값·미확정), BP 드래그 재구성 Off | 팀원 Production 코스 외형·Editor 편집 체감 수동 대기. Production 맵 미저장 |
-| Acro | 비행 기체 FPV/Scout/Drop/FiberOptic 6개 입력 연결, 패드 축 4개 Dead Zone, 정확 자세 적분. 키보드·패드 입력원 분리·절댓값 큰 쪽 사용·키 해제 시 패드 인계, Space 단독 자세 불변·Mode 1/2 키보드 동일·FPS 무관 자동 검증 | 실제 패드/키보드 체감·Scout/Drop 비행 대기. 키보드 각속도 배율·Angle 모드·마우스 Yaw·회의 “좌우 스틱 반전” 뜻 미정 |
+| Acro | InterLink DX Acro 4축 추가·Mode 2 실측·세로축 반전 해제(10/07 D PC Claude), [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md). 비행 기체 FPV/Scout/Drop/FiberOptic 6개 입력 연결, 패드 축 4개 Dead Zone, 정확 자세 적분. 키보드·패드 입력원 분리·절댓값 큰 쪽 사용·키 해제 시 패드 인계, Space 단독 자세 불변·Mode 1/2 키보드 동일·FPS 무관 자동 검증 | 실제 패드/키보드 체감·Scout/Drop 비행 대기. 키보드 각속도 배율·Angle 모드·마우스 Yaw·회의 “좌우 스틱 반전” 뜻 미정 |
 | 패드 첫 포커스 | `FDroneGamepadFocus`가 포커스 부여 후 5프레임 감시·루트/없음으로 이탈 시 복원, 다른 강조 버튼 이동은 보존 | UI-FOCUS-RACE-01 **수정 후 확인 중**. 화면 그려진 수정 전 Fail/후 Success 각 1회, 간헐적 첫 버튼 강조 수동 확인 대기 |
 | 튜토리얼·Story 순서 | 독립 Tutorial 8수업·Story 4·Racing 1, 로비 Tutorial 9/Racing 1/Story 4. 호버→전진→회전→게이트→자폭→드랍→UGV NPC→포탑. 시간·다음·n/8·전체 완료·로비 완료 표시 | 실제 8수업 연속 완주/S48·S49·로비 확인 대기. 완료 영구 저장 미정(D-4 수업1~8 유지·회의4는 레이싱 코스4개); 조작키 브리핑 미입력 |
 | Best Lap | `CourseId|DroneId|ControlMode`별 JSON 저장/복원·없음/구버전/손상 처리·HUD, HandlingPreset 제외. 평균은 실행 History | 같은 조건 실제 랩 후 재실행 복원 확인 대기. D-5 레이싱 시작/완주/결과 시간 구현, 코스4개 지형 미정 |
@@ -42,7 +42,7 @@
 
 - **10/04 사용자 보고 Mode1 Space 하강/뒤집힘**: 키보드와 패드 세로축 Action이 한 변수를 나중 값으로 덮는 원인을 재현했다. Space+오른쪽 -0.5→스로틀 -0.38, W+왼쪽 -0.5→피치 -0.38(Mode2도 같은 구조). 키보드·패드 입력원을 분리하고 절댓값이 큰 쪽을 사용하도록 수정. 키를 누르면 키보드가 이기고 떼면 패드가 조종한다. Space 단독 자세 불변 검사는 패드 혼합 입력 결함이 없다는 근거가 아니었다. 실제 패드 체감은 수동 대기.
 - **Mode 1/2**: 키보드 키/결과 동일, 패드 세로축만 RC 표준에 따라 다름. Mode 2 LeftY=Throttle·RightY=Pitch, Mode 1 LeftY=Pitch·RightY=Throttle. 회의 “좌우 스틱 반전”이 이 배치인지 축 부호 등 다른 문제인지 **현재 미정**.
-- **결함 1, 패드+키보드 동시 입력**: Enhanced Input은 DefaultInput.ini 축 데드존을 사용하지 않음. Acro 패드 매핑에 Dead Zone이 없어 0.05 쏠림이 키보드 스로틀을 덮고 손을 떼도 각속도가 누적됐다. IMC 4개 축 매핑 맨 앞에 쉬운 조작 패드 매핑 값을 그대로 복사(Lower 0.2·Upper 1.0·Radial). 새 수치 결정 아님, 매핑 33개·키/Action/순서 유지.
+- **결함 1, 패드+키보드 동시 입력**: Enhanced Input은 DefaultInput.ini 축 데드존을 사용하지 않음. Acro 패드 매핑에 Dead Zone이 없어 0.05 쏠림이 키보드 스로틀을 덮고 손을 떼도 각속도가 누적됐다. IMC 4개 축 매핑 맨 앞에 쉬운 조작 패드 매핑 값을 그대로 복사(Lower 0.2·Upper 1.0·Radial). 새 수치 결정 아님, 기본 매핑 33개·키/Action/순서 유지(현재 InterLink 축8+버튼4 추가·총45).
 - IMC 수정 담당 구분: Codex MCP는 Instanced Modifier 하위 객체 생성 실패(None)로 **저장 없이 원상복구**. Claude가 Editor 종료 후 headless Unreal Python으로 IMC만 패치·저장·재조회(`ClaudeAcro/patch_dz.log`).
 - **결함 2, Scout/Drop Acro 입력 누락**: 두 BP의 Acro 입력 6개가 None이었다. Codex ui run `20261004-001325-ui-ui-acro-input-assets`에서 FPV와 같은 6개 Action을 Class Defaults에 연결·컴파일·저장. 모델 용량 오류로 result.md 없이 종료했으나 Claude 재조회/테스트로 저장 자산 확인(`assign_bp.log`). FPV/FiberOptic은 기존 연결, 지상 UGV 제외.
 - **정확도 수정(C++)**: `ADroneFlightPawn::UpdateControlAttitude`의 각속도 1차 응답을 `Target·dt + (Start−Target)·τ·(1−e^(−dt/τ))`로 정확 적분하고 Pitch/Yaw/Roll을 단일 축-각 회전으로 합성. 같은 입력의 30/60/240fps 최종 자세 일치. 기존 Data Asset `FlightProfile.AcroRateSettings`의 응답 시간·최대 각속도 유지.
@@ -54,11 +54,11 @@ Production 읽기 전용 측정: Scale2·로컬9.6km(월드19.2km)·92 CurveAuto
 
 ConfigureDroneTitleLobby.py 설명은 현재 DA와 일치(ClaudeCourse/lobby_cmp.log). md NPCGreybox 도구는 TestMap·현재 역할별 메시/AnimBP·기존 맵이면BP를 건드리기 전Create거부, Validate통과. HostileCoverResponse도TestMap으로 정정(Claude수정/실행, Codex도구미수정). 코드 리뷰 낮음4건 모두 수정(테스트 초기화 누수·입력 해제 검사·드래그 비용·엄폐 경로), 제품 동작 버그 없음은 Claude 리뷰 판정이다.
 
-## 최신 검증 근거 — 2026-10-06 C PC, Claude 실행(이전 기능 검증은 날짜 구분)
+## 최신 검증 근거 — 입력은 2026-10-07 D PC, 나머지는 10-06 C PC Claude 실행
 
 | 검사 | 조건·결과 | 출처 |
 |---|---|---|
-| 입력 자산 | Dead Zone 4개·매핑 33·재조회 일치; Scout/Drop 같은 입력 6개 확인 | `Saved/Automation/ClaudeAcro/patch_dz.log`·`assign_bp.log` |
+| 입력 자산 | 기본33+축8+버튼4=45·ArmSwitch·노브 전용 메뉴 이동 구현/자동 검증됨(10/07 D PC Claude), 실기 대기. 집계 정정(10/07 Claude): test4는 17개 중 16 Success·1 Fail, 테스트 수정 후 test5 3/3 | [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)·[WORKLOG](docs/history/DRONE_WORKLOG.md#2026-10-07-interlink-dx-버튼armswitch노브-전용-메뉴-이동--d-pc-claude) |
 | Build | Editor 종료 후 Succeeded | Claude 지시서; 별도 Build 로그 경로 미제공 |
 | Drone.Prototype 전체 + Drone.UI.ControlInputDisplayPIE | RenderOffScreen 1920×1080, **12/12 Success** | `Saved/Automation/ClaudeAcro/test_after_dz.log` |
 | 최신 집중 회귀 | Drone.Prototype + Drone.Tutorial + Drone.UI.ControlInputDisplayPIE **32개 중30 Success·2 Fail(팀원 Production 맵 의존, 변경 전 메시지 동일)** | Saved/Automation/ClaudeCourse/review_fix_test.log |
@@ -68,7 +68,7 @@ ConfigureDroneTitleLobby.py 설명은 현재 DA와 일치(ClaudeCourse/lobby_cmp
 | D-6 풍향·미션 배터리 | Drone.Weather 5·Drone.Mission 7·Drone.Health.BatteryHUDPIE Success(10/05 C PC Claude) | Saved/Automation/ClaudeD6/t1.log·t4.log |
 | D-5 레이싱 시작·랩 타이머 | RacingStartCountdownPIE 랩 타이머 판정 추가 Success(10/06 C PC Claude) | Claude 지시서; 이번 집중 로그 경로 미제공 |
 
-경로 루트는 C:\URproject\drone. 새벽12/12·90/94, 코스 후속30/32·전체95개2회는 당시 기록이며 최신10/06 전체101개와 합산하지 않는다. AcroInputBehaviorPIE D구역8시나리오는 키+패드-0.5·키 해제 후 인계·전체 해제0·패드만 스로틀/피치를 확인했다. 자동 입력 주입은 실제 장치 수동 Pass가 아니다.
+입력 자산 행의 최신 근거는 D:\JGY\project\drone\Saved\Automation\ClaudeInterLink이며 나머지 경로 루트는 C:\URproject\drone. 새벽12/12·90/94, 코스 후속30/32·전체95개2회는 당시 기록이며 최신10/06 전체101개와 합산하지 않는다. AcroInputBehaviorPIE D구역8시나리오는 키+패드-0.5·키 해제 후 인계·전체 해제0·패드만 스로틀/피치를 확인했다. 자동 입력 주입은 실제 장치 수동 Pass가 아니다.
 
 
 ## 알려진 실패·실행 환경·미정
@@ -92,6 +92,7 @@ ConfigureDroneTitleLobby.py 설명은 현재 DA와 일치(ClaudeCourse/lobby_cmp
 
 결정/카드 정본은 [WORKBOARD](WORKBOARD.md). D-5·D-6·D-11·D-14와 D-12 Legacy 정리·Flight 이름 변경/분리는 위 구현·검증 상태를 따른다.
 
+- InterLink DX 실제 콘솔·노브/Cancel 메뉴 사용 확정. 버튼3개=좌클릭/우클릭/P·자폭1=온/0=오프·노브 위/아래만으로 메뉴 이동 확정. 구현/자동 검증됨·실기 대기. 노브 회전 방향·Button1 물리 종류·브리핑 넘김/탭 전용 버튼·미인식 안내·비복귀 스로틀 처리·전시 정책/다기종 지원 현재 미정. [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md).
 - 현재 미정: 높이 제한 수치·경고 연출·배터리 시간 값·레이싱 코스4개 지형·D-1(M2)·D-2(M3/M4)는 기획자 내용 대기.
 - 미구현: 코스4개·배터리 시간 설정.
 - 방콕 잔여987개 삭제는 원격 `1619b4f` diff에서 확인했다. 로컬 수신과 과거 LFS 객체/요금은 별도이며 D-13 나머지 유지 결정은 종료(정본 WORKBOARD).
@@ -99,7 +100,7 @@ ConfigureDroneTitleLobby.py 설명은 현재 DA와 일치(ClaudeCourse/lobby_cmp
 
 ## 다음 확인
 
-1. Acro Mode1에서 스틱에 엄지를 걸친 채 Space→상승, 키 떼고 스틱→패드 조종·모두 놓으면0을 확인하고 Mode2도 비교한다. 코스 급커브 표시선·끝 연결과 Editor 편집 체감도 확인한다. 키보드 짧게 톡(0.1초, FPV 약65°) 후 자세 유지. W+Space와 Space 단독 구분, Scout/Drop Acro 비행도 실제 장치로 확인. 결과·타이틀 첫 버튼 강조를 반복 관찰.
+1. InterLink DX의 비행 축·Dead Zone·Mode 2 호버/피치·쉬운 조작 비복귀 스로틀 체감, Button1 무장/해제 체감·Button12/13, 노브만으로 타이틀→로비→탭→미션→브리핑→기체 선택→출격→결과 이동·첫 강조, 설정 슬라이더 잠금/조절·콤보·노브 방향/확인/Cancel을 확인한다. Acro Mode1에서 스틱에 엄지를 걸친 채 Space→상승, 키 떼고 스틱→패드 조종·모두 놓으면0을 확인하고 Mode2도 비교한다. 코스 급커브 표시선·끝 연결과 Editor 편집 체감도 확인한다. 키보드 짧게 톡(0.1초, FPV 약65°) 후 자세 유지. W+Space와 Space 단독 구분, Scout/Drop Acro 비행도 실제 장치로 확인. 결과·타이틀 첫 버튼 강조를 반복 관찰.
 2. 추가 자동 회귀 판정 전 화면이 그려졌는지 확인하고 포커스 경쟁·미렌더 실행을 따로 기록. UI-LAYOUT-DIAG-01·AI-PERCEPTION-TEST-01 기존 관찰 유지, AI-SHOTGUN-RENDER-01 해결. Route는 재발 시 순서 조사.
 3. 사용자/팀원은 코스4개 지형/PlayerStart·배터리 시간과 Acro 미정 조작 방식을 결정. 레이싱 카운트다운·랩 타이머·FPV 곡예/UGV 분리 전 동일 체감·풍향 HUD 수동 확인·시간 결정 뒤 배터리 추락 확인. 1280/1920·실제 패드·8수업 연속 진행·Best Lap 재실행·설정/배터리/브리핑·추락 재출격 수동 확인 후 Story 콘텐츠를 고도화.
 4. D PC: `1619b4f` 수신 뒤 Editor Build와 Zen 시작 시간 cold/warm 비교(PERF-ZEN-START-01). 소스 수신은 바이너리/플레이 완료가 아니다. WORKBOARD는 10/06 D PC에서 7그룹으로 재배치했고 카드 본문은 유지했다.

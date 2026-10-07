@@ -1,6 +1,6 @@
 # Droner 기준 문서 v0.1 — [개발 확인 필요] 답안 초안 (2026-10-06)
 
-근거: `D:\JGY\project\drone` 소스·Config·IMC 자산(origin/main `1619b4f`), `D:\JGY\project\md` STATUS/CONTEXT/WORKBOARD/docs. D PC에서 Build·PIE는 실행하지 않았다. "자동 검증됨"은 C PC 기록이다.
+근거: `D:\JGY\project\drone` 소스·Config·IMC 자산(origin/main `1619b4f`), `D:\JGY\project\md` STATUS/CONTEXT/WORKBOARD/docs. 이 답안의 최초 자동 검증 근거는 C PC 기록이며, InterLink 항목은 10/07 D PC Claude 구현·Build/자동화 결과(cb77c0d+미커밋)를 반영했다. Codex는 문서 반영·읽기 대조만 수행했다.
 상태 표기는 기준 문서 규칙(확정 / 가안 / 미정)을 따른다. 기획 답 칸이나 확정 상자는 건드리지 않고, [개발 확인 필요] 칸에만 옮겨 적는다.
 
 ---
@@ -15,13 +15,13 @@
 
 | 답 | 상태 |
 |---|---|
-| **기종**: Windows가 표준 게임패드로 인식하는 Xbox 호환(XInput) 패드. 기기 전용 코드 없음(엔진 표준 Gamepad 키만 사용). DualSense 등 XInput 외 패드는 미검증. **연결 방식**: USB 유선·무선 동글·블루투스 모두 Windows가 인식하면 동작. **버튼 배치**: 왼/오른 스틱, RT 상승 / LT 하강, Y 시점 전환, RB 역할 기능1, LB 역할 기능2, 메뉴 B 뒤로, 브리핑 Y 넘김, 훈련 로비 LB/RB 탭. **미구현**: 연결 감지, 미연결 안내, 장치 자동 전환. 실기 패드 체감은 수동 확인 대기. | 가안 |
+| **기종**: Windows가 표준 게임패드로 인식하는 Xbox 호환(XInput) 패드. 기기 전용 코드 없음(엔진 표준 Gamepad 키만 사용). DualSense 등 XInput 외 패드는 미검증. **연결 방식**: USB 유선·무선 동글·블루투스 모두 Windows가 인식하면 동작. **버튼 배치**: 왼/오른 스틱, RT 상승 / LT 하강, Y 시점 전환, RB 역할 기능1, LB 역할 기능2, 메뉴 B 뒤로, 브리핑 Y 넘김, 훈련 로비 LB/RB 탭. **미구현**: 연결 감지, 미연결 안내, 장치 자동 전환. 실기 패드 체감은 수동 확인 대기. InterLink DX는 별도 HID 조종기로 메뉴 위/아래·확인·뒤로를 연결했으며 좌우·탭·브리핑 버튼은 미연결([입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)). | 가안 |
 
 ## 3. 4-1 — 지원 드론 조종기
 
 | 답 | 상태 |
 |---|---|
-| **현재 미구현.** RawInput 등 USB HID 조이스틱 플러그인 없음, 미인식 안내 없음. 현재 "Mode 1/2"는 RC 송신기 축 배치를 게임패드로 흉내 낸 것. 지원하려면 교수님 대여 기종(USB 모드 지원 여부) 확인 → RawInput 플러그인으로 축 4개를 Acro 입력(`SetAcroRateInputGreybox`/`SetAcroThrottleInputGreybox`)에 연결 필요. 미인식 시 안내 문구는 UI 담당과 함께 정함. | 미정 (기종 확인 후, 10/13 결정 제안) |
+| **Spektrum InterLink DX(USB 전용 시뮬레이터 조종기) 확인 완료·실제 조종 콘솔 사용 확정.** RawInput 축·Acro/쉬운 조작·노브 위/아래·딸깍 확인·Cancel 뒤로 구현됨·자동 검증됨(10/07 D PC Claude). Mode 2·세로축 반전 해제는 실측 반영. 실기 비행·전체 메뉴·노브 회전 방향은 수동 확인 대기. 좌우·탭·브리핑·시점·역할 버튼과 미인식 안내 UI는 미구현, 안내 문구·전시 정책은 현재 미정. 배치·범위 정본은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md), 검증 이력은 [WORKLOG](../history/DRONE_WORKLOG.md#2026-10-07-interlink-dx-조종기-입력과-메뉴-연결--d-pc-claude). | 기종·사용 확정 / 실기 수동 대기 / 후속 정책 미정 |
 
 ## 4. 4-1 — 키보드·게임패드 동시 입력
 

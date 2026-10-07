@@ -71,7 +71,7 @@
 | UI-CONTROL-DISPLAY-01 | Claude 설정/축/HUD·Codex 입력 표시 BP 연결 | 구현됨·자동 검증됨·수동 확인 대기(2026-10-03 밤 C PC). 조종 입력 표시 수동 ON/OFF·적용/취소/기본값·SaveGame, ControlInputDisplayClass 저장 연결·ControlInputDisplayPIE Success. D-3 기본값 결정은 아래 결정 표 참조(기존 False와 일치) | 실제 패드·1280/1920 위치·저장/재실행·기본값 복원 확인, 고도계 독립. 장치 자동 전환·혼합 입력·분리/재연결 정책 결정 필요. 자동화 슬롯은 DroneAudioSettings_Automation |
 | UI-LAYOUT-DIAG-01 | 로비 레이아웃 진단 판정 변동 조사 | 진단 판정 변동·기존 Fail 유지. D-11로 KnownIssues.Flow.LobbyLayoutStabilityPIE 분리됨(10/05 C PC Claude), 안정화 완료 아님 | Claude가 표본/대기·레이아웃 원인을 구분하고 반복 렌더 검사 판정 안정화, 1280/1920 수동 확인 별도 |
 | UI-LAYOUT-01 | 목록 진입·선택 시 한 프레임 재배치 | 구현됨·자동 검증됨·수동 확인 대기. 줄바꿈·상시 스크롤바·폭270 후속 포함. 최신 진단 분리는 UI-LAYOUT-DIAG-01 참조, 이전 근거 아카이브/WORKLOG | 1280/1920 실제 화면 가독성, Story 4개 목록의 상시 스크롤바 칸 확인 후 수동 완료 |
-| UI-PAD-01 | 패드만으로 전체 UI 선택 | 구현됨·자동 검증 완료·수동 확인 대기(2026-10-01 밤 후속, C PC, Claude). 첫 활성 위젯 포커스·강조·방향/A/B·훈련 LB/RB·명시 이동·선택/스크롤 복원. RenderOffScreen 1920×1080 GamepadNavigationPIE 11단계·GamepadMissionFlowPIE 16단계·LobbyLayoutStabilityPIE 최대 0.255px Success(ClaudePad/render6.log) | 실제 PS4 패드만으로 타이틀/로비/브리핑/기체 선택/설정/결과·복귀 확인, 강조 가독성. 카드 A 선택 뒤 ↑출격, 설정 슬라이더 A 잠금 뒤 좌우. NullRHI 패드 2개 건너뜀을 실기 Pass로 간주하지 않음 |
+| UI-PAD-01 | 패드만으로 전체 UI 선택 | 구현/자동 검증됨·실기 대기(10/07 D PC Claude). InterLink 노브만으로 전체 이동(좌우 불필요)·패드 규칙 유지. [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md) | 전체 흐름·탭/첫 강조·가독성·복귀, 설정 노브 잠금/조절·콤보 실기 확인. NullRHI는 실기 Pass 아님 |
 | UI-SETTINGS-01 | 사운드·화면·성능 설정 | Master 음량 미리보기/SaveGame, 창·전체화면/해상도, 품질·VSync·FPS, 적용/기본값/뒤로 취소 구현. PIE 창·해상도 차단. 설정 계약과 FrontEnd PIE 성공 | Standalone에서 실제 소리/창·해상도, Apply와 Back 취소·재실행 복원 확인. 음악/SFX/음성 분리 라우팅은 후속 |
 | UI-FLOW-PROTOTYPE-01 | Mission/Drone 선택 임시 UI 확인 | 후속 첨부 시안으로 로비 3열·브리핑 이미지/설명·기체 상단 도식/상세·하단 가로 카드 갱신, `FrontEndPIE`와 계약 성공 | 16:9 1280/1920 가독성/스크롤·선택/출격 확인 뒤 최종 WBP·Thumbnail/3D Preview 범위 결정 |
 
@@ -94,7 +94,8 @@
 |---|---|---|---|
 | PAYLOAD-GRIP-01 | 집게 부착 통일 | Codex 예외 수정·자동 Pass; WORKLOG | 시작→투하→재픽업 외형 확인 |
 | ACRO-MEETING-01 | Mode1 Space 하강·반전 및 키보드/패드 겹침 수정 | 구현됨·자동 검증됨·수동 확인 대기(10/04 C PC Claude). 입력원 분리·절댓값 큰 쪽·키 해제 시 패드 인계, 기존 Dead Zone·정확 적분 유지. 근거 STATUS | Mode1 스틱에 엄지를 걸친 채 Space→상승, 키 떼고 스틱→패드 조종, 모두 놓으면0을 실제 장치로 확인. Mode2도 혼합 입력 확인. W/S·A/D·Q/E·Space/Ctrl은 두 Mode 동일; 키보드 배율·Angle·마우스Yaw·회의 반전 뜻 현재 미정 |
-| DR-FPV-ACRO-INPUT-02 | Acro 키보드·패드 Mode 1/2 | 의미축4개+패드세로2개, IMC33매핑·4축 Dead Zone·비행BP4종 연결. 10/04 C PC Space 불변/Mode 키보드 동일/쏠림 보호/자산 계약 자동 Success(ClaudeAcro/test_after_dz.log), 상세 ACRO-MEETING-01 | 기존 W/S Pitch·A/D Roll·Q/E Yaw·Space/Ctrl Throttle, Mode1 LeftY Pitch/RightY Throttle·Mode2 반대 배치와 실제 혼합 입력 수동 확인. 반전 뜻/조작 정책 미정 |
+| DR-FPV-ACRO-INPUT-02 | Acro 키보드·패드 Mode 1/2 | InterLink Acro 4축 추가·총45매핑·Dead Zone 계약 자동 검증됨(10/07 D PC Claude). [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md), 혼합 입력은 ACRO-MEETING-01 | Mode 1/2 실기 혼합 입력·비행 체감 확인. 조작 정책/회의 반전 뜻 미정 |
+| DR-INTERLINK-INPUT-01 | InterLink DX 입력·메뉴 | 구현/자동 검증됨·실기 대기(10/07 D PC Claude): 45매핑·ArmSwitch·노브 전체 이동. [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md) | 축/DZ·Mode2·Button1 무장/해제 체감·12/13, 노브 전체 이동/탭·방향·설정 확인. 전체 테스트 집계 재확인 |
 | DR-FPV-ACRO-PIE-01 | FPV Rate/Acro 실제 조작 체감 | Mode 1/2 축 분리와 각속도·무수평복귀에 공통 질량·추력·모터 응답·중력·Body Up 추진·선형/제곱 항력 v2 연결. 별도 속도 단계는 제거 | 키보드/패드로 Nose-down 전진력, 호버·상승·무추력 하강, Roll/Loop와 650°/s 체감, Mode 1/2가 축 배치 외 비행 성능이 같은지 확인 후 수치 조정 |
 | DR-FLIGHT-PHYS-02 | 단일 고속 기준·질량/추력·Payload 하중 | 단일 무적재 고속 기준·질량/추력/모터/항력·Drop kg 하중 구현/자동 검증. Mode1/2 공통·투하 즉시 복구·이전 근거 WORKLOG | FPV/Drop 수동 비행으로 무적재 속도, 모터 추력 지연, 적재 전후 호버·가속·선회 차이와 Mode 1/2 축만 달라지는지 확인. 실제 기체 스펙이 정해지면 Definition별 질량·추력·항력 교정 |
 | PHY-CAMERA-01 | 벽·그물 접촉 화면 안정화 | 구현됨·자동 검증됨·수동 확인 대기. 연속 접촉 제약·외형/FPV 카메라 분리·그물 Camera Ignore, 피해 Shake 유지. 검증 WORKLOG | Physics Sandbox에서 1/3인칭 저속/고속/지속 벽 접촉·그물 감속/포획 때 화면 떨림 감소와 충돌 유지 확인. NPC 맵에서 총알 피격 화면 흔들림이 남는지 확인. 자동화만으로 체감 Pass 처리하지 않음 |
@@ -141,5 +142,5 @@
 1. 레이싱 카운트다운·출발0초 타이머·상단 중앙 표시·첫 게이트 재시작 없음과 풍향 HUD를 수동 확인한다. 배터리 시간 결정 뒤 추락/재출격 확인.
 2. 실제 패드 첫 강조·전체 UI·1280/1920 가독성·8수업 연속 진행·Best Lap 재실행·설정 저장을 확인한다. KnownIssues4개 분리는 실패 해결이 아니다. 미렌더는 포커스6개 모두 화면 루트 포커스로 실패하는지로 판단한다.
 3. 코스4개 지형·배터리/고도 수치·경고 연출 미정. D-1·D-2 기획자 대기, D-13 종료. D-12 FPV/UGV 체감 수동 대기; 검증/Git은 STATUS 참조.
-4. Acro 혼합 입력·코스 표시선·NPC 다리/속도 대비 보폭·총 정렬·이동 뒤 날씨 시험 맵·비 차폐·벽/그물·광섬유/UGV 수동 회귀를 이어간다. 팀원 Production Training 보존; 실제 패키징·Chaos 비교·최종 Rain/음원은 별도 후속이다.
+4. DR-INTERLINK-INPUT-01 실기 확인 후 Acro 혼합 입력·코스 표시선·NPC 다리/속도 대비 보폭·총 정렬·이동 뒤 날씨 시험 맵·비 차폐·벽/그물·광섬유/UGV 수동 회귀를 이어간다. 팀원 Production Training 보존; 실제 패키징·Chaos 비교·최종 Rain/음원은 별도 후속이다.
 5. Git·Space는 STATUS. Commit/Push는 사용자.
