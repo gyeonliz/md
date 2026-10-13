@@ -34,7 +34,7 @@
 - [DRONE_NPC_BEHAVIOR_AUDIT_2026-09-17.md](ai/DRONE_NPC_BEHAVIOR_AUDIT_2026-09-17.md): 9/17 NPC 동작 감사 당시 기록
 - [DRONE_NPC_WALK_BACKWARD_HANDOFF_2026-09-18.md](ai/DRONE_NPC_WALK_BACKWARD_HANDOFF_2026-09-18.md): 9/18 걷기 인계 당시 기록
 - [`DRONE_NPC_GAZE_TRACKING_PLAN.md`](ai/DRONE_NPC_GAZE_TRACKING_PLAN.md): 감지 뒤 시선·고개 회전
-- [`DRONE_MG_TURRET_3PART_GUIDE.md`](ai/DRONE_MG_TURRET_3PART_GUIDE.md): 유인 MG 3분할 Mesh와 사수 Anchor
+- [`DRONE_MG_TURRET_3PART_GUIDE.md`](ai/DRONE_MG_TURRET_3PART_GUIDE.md): 유인 MG 3분할·사수 Anchor, 패트리어트 접합부 회전 BP
 - [`DRONE_AUTOMATIC_TURRET_GUIDE.md`](ai/DRONE_AUTOMATIC_TURRET_GUIDE.md): 설치형·차량형 무인 자동포탑
 
 ## Gameplay·Physics
@@ -91,7 +91,7 @@
 
 - [`DRONE_WORKLOG.md`](history/DRONE_WORKLOG.md): 날짜별 개발 기록
 - [STATUS_2026-09.md](history/archive/STATUS_2026-09.md): 이전 상태 원문 아카이브
-- [WORKBOARD_2026-10.md](history/archive/WORKBOARD_2026-10.md): 날짜별 보드·완료/종료 카드·장문 근거·지난 Next 원문 아카이브(10/05 정리 포함)
+- [WORKBOARD_2026-10.md](history/archive/WORKBOARD_2026-10.md): 날짜별 보드·완료/종료 카드·장문 근거·지난 Next 원문(10/13 이전 비교표·PC 인계 보존 포함)
 - [`DRONE_PROGRESS_REPORT_2026-09-17_TO_2026-09-30.md`](history/DRONE_PROGRESS_REPORT_2026-09-17_TO_2026-09-30.md): 9월 17일 이후 작업·현재 상태·다음 계획을 교수님·팀원 공유용으로 정리한 보고서
 - [`DRONE_TRELLO_BOARD_2026-09-09.md`](history/DRONE_TRELLO_BOARD_2026-09-09.md): 2026-09-09 Trello 입력본
 - [`DRONE_PROJECT_AUDIT.md`](history/DRONE_PROJECT_AUDIT.md): Prototype 구현 전 감사

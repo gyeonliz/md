@@ -275,3 +275,28 @@ Trello 참고를 추가했다. [레이싱 3·2·1 시작](https://trello.com/c/F
 | FIGMA-RACING-02 | Figma 레이싱·UI 요구 | D-5 카운트다운·랩 타이머 자동 검증됨(10/06 C PC Claude), 수동 대기. 상세 RACING-TERRAIN-LINK-01 | Ghost/리플레이·커브·Restart/Quit 범위 결정 |
 | MAP-TEST-01 | 경량 Tutorial Systems TestMap 수동 확인 | 맵·생성 도구·전용 자동화·Map Check 완료 | Gate/Ring/역할/HUD 한·두 Lap 화면 확인 |
 | MISSION-FRAMEWORK-01 | Mission 통합 Blueprint 기반 | Manager/GameMode/Controller, 목표·실패·귀환 Trigger, 체력 100 파괴 표적을 `/Game/Drone/Mission`에 추가. Build와 Mission 자동화 3/3 성공 | Mission 1 Test Map/Definition에서 Delivery→선택 목표→Return과 시간/파괴 실패를 실제 Flow로 확인 |
+
+## 2026-10-13 최신화로 옮긴 10/06 비교표·PC 인계 원문
+
+WORKBOARD가30KB를 넘어서 날짜가 지난 비교표와 PC 인계 행을 원문 보존했다. 남은 결정은 루트 보드에 요약하고, 현재 수신/검증은 STATUS를 따른다. 이 이동은 기능·수동 확인 완료 판정이 아니다.
+
+### 면접 대비 결정 필요 — 영향 순서(10/06, 결정·구현 대기 구분)
+
+| 항목 | 필요한 결정/자료 | 현재 처리 |
+|---|---|---|
+| 1. 제3자 구매 자산 약51GB | GitHub 공개 여부 확인 후 비공개 전환 또는 자산 분리·출처 목록 | D-7 결정(2026-10-05 사용자): 비공개 전환 방향, 사용자가 GitHub에서 직접 전환. 팀원 접근 가능 여부는 GitHub 설정에서 확인 필요(이 PC gh 없음). 향후 공개 시 빌드·코드·영상만(구매 에셋 제외). 10/05 C PC Claude 비로그인 curl HTTP 200 공개 상태 관찰은 이전 전달 근거 |
+| 2. 본인 기여와 AI 활용 설명 | 본인 설계·결정·검증 범위를 먼저 확인하고 README에 정직하게 정리 | D-8 결정(2026-10-05 사용자): 본인 기여·AI 활용 README는 md 저장소에만 둠, drone 저장소에는 넣지 않음. 작성 대기·이번 결정만 기록, 본인 담당 범위 미확인 |
+| 3. 포트폴리오 루트 README | 플레이 방법·설계/기여·검증 근거·용량/출처를 담을 범위 결정 | D-8 위치 결정은 위 2번 참조. Unreal 루트 README 부재, 이번 신규 작성 안 함 |
+| 4. main 상시 실패 테스트4개 | 별도 그룹 분리 또는 조건부 건너뛰기 여부 | D-11 구현됨·자동 검증됨(10/05 C PC Claude): KnownIssues.* 분리·기본 Automation RunTests Drone.에서 제외. 실패 해결 아님; 상세 WORKLOG |
+| 5. Flight Pawn 분리·명명 | 분리 전 동일 체감 확인 | D-12 2·3차 구현됨·자동 검증됨(10/06 C PC Claude): Flight 명명·Shake/Acro/Ground 컴포넌트 분리, BP 유지. FPV/UGV 수동 확인 대기; 상세 WORKLOG |
+| 6. Legacy 템플릿 | 정리 후 수동 회귀 | D-12 1차 구현됨·자동 검증됨(10/05 C PC Claude). Characters 변환 원본 유지; 삭제 목록·근거 WORKLOG |
+| 7. 방콕·미사용 자산 | 정리 범위 | D-13 종료·사용자 결정 정본은 위 Bangkok 행. 상세 [WORKLOG](docs/history/DRONE_WORKLOG.md) |
+| 8. 풍향 기준 | HUD 방위와 거울상 불일치, 불어오는 쪽 기상 관례 채택 여부 | D-6 구현됨·자동 검증됨(10/05 C PC Claude): HUD 방위 통일·불어오는 쪽 풍향·미션별 배터리 제한/추락. 바람 물리 유지·수동 확인 대기. 시간 값 미정·높이 제한은 아래 D-6 행 참조. 상세 STATUS |
+| 9. 공유 Config MCP | PC별 연결 확인 | D-14 공유 끔·사용자 PC 로컬만 켬, 팀원 불필요. CLAUDE.md 설명 수정됨(10/06 Claude). 절차 [협업 세팅](docs/git/CLAUDE_CODEX_SETUP.md#unreal-mcp-자동-시작--pc별-로컬-설정) |
+| 10. BP/Legacy API | 호출 없는 함수19개·1회 접근자71개가 디자이너용인지, 핸들링 Legacy 정리 | 미사용 UFUNCTION18개 삭제됨(D-12 1차)·나머지 접근자/Legacy 범위는 별도 결정 대기 |
+
+### PC 인계 행 원문
+
+| ID | 작업 | 현재 상태 | 완료 조건 |
+|---|---|---|---|
+| SYNC-WORKPC-01 | PC별 즉시 재개 인계 | 10/06 09:32 D PC: MD c5a0524·Unreal 1619b4f 일치, LFS 8,010개 본문 수신·Clean·lock 없음, 정본 STATUS/WORKLOG | Training 맵 본문/자산 변경 표시를 확인. 소스/LFS 본문·바이너리·자동/수동 Pass 구분, Discard 금지 |

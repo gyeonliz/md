@@ -1,6 +1,6 @@
 # 시작 화면 · 로비 탭 · 원형 코스 가이드
 
-기준일: 2026-10-06 D PC 결과창 후속 포함. 각 기능의 이전 C/D PC 근거는 해당 절에서 구분한다. 10/01 이전 D PC UI·Settings 기록은 이후 9f67706/5b03ad3로 커밋됐다. 현재 Git/검증은 STATUS, 세션 원문은 WORKLOG를 따른다. 원본 이미지·Figma는 보존한다.
+기준일: 2026-10-13 D PC 수신 코드2a10c3de 대조. 현재 결과창/레이싱/저장 설명을 정정했으며 이번 Build·PIE·수동 확인은 없다. 과거 검증은 WORKLOG, 현재 Git/미확인은 STATUS를 따른다. 원본 이미지·Figma는 보존한다.
 
 ## 0. 현재 계약 — 5메뉴·조종 입력 표시 현재 구현과 계약
 
@@ -69,14 +69,16 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 
 ## 4. 탭과 미션 데이터
 
-### 결과창 배치와 확인 (2026-10-06 D PC)
+### 현재 결과창 배치와 확인
 
-`UDroneMissionResultWidget`의 기본 화면은 중앙 폭680 카드·내용에 맞는 높이·안쪽 여백32/28·버튼 간격12px다. 작은 화면에서만 비율을 유지해 축소한다. 버튼은 어두운 청록색이며 `다시하기 / 로비로 복귀`로 짧게 표시한다. Story의 `다음 미션: 이름`과 튜토리얼 전체 완료 문구/동작은 유지한다. 숨긴 다음/다시하기 버튼은 빈 행을 남기지 않는다.
+`UDroneMissionResultWidget`의 native 기본 화면은1920×1080 기준 화면·왼쪽 그라데이션/제목/상자 버튼열·오른쪽 정보 카드다. `TitleKit`의 팀원 버튼 자산을 사용한다. 이전 중앙680/청록 카드 설명은 현재 native 화면이 아니라 과거 기록이다. 이름 계약의 자체 WBP 경로는 유지한다.
 
-- 이 화면만 포커스 확대를 없애고 `GamepadFocusTint` 색·테두리로 강조한다. 다른 화면의 배율은 유지. `GamepadFocusScale`은 기존 BP 직렬화 호환으로 남지만 결과창 런타임 배율은1이다(옛 BP의1.06도 적용하지 않음).
+- 결과창 실제 포커스 배율은1이다. native+유효TitleKit은 버튼 자산의 선택 상태를 사용하며, 자체 WBP/카드 fallback은 색·테두리 강조다. `GamepadFocusScale`은 직렬화 호환으로 남고 옛1.06도 런타임 확대하지 않는다.
+- Class Defaults → `Drone | Mission Result | Layout`: `TitleKit`, `TitlePosition / TitleFontSize`, `FirstButtonPosition / ButtonPitch / ButtonFontSize`, `InfoPanelPosition / InfoPanelWidth`로 조절한다. 현재 정보 폭900은 소스 기본값이며 저장된 개별 WBP override는 따로 확인한다.
 - 자체 WBP 필수 이름: `MissionResultPanel / MissionResultTitleText / RetryMissionButton / ReturnToLobbyButton`. 선택 이름: `MissionResultDetailText / NextMissionButton / NextMissionButtonText / RetryMissionButtonText / ReturnToLobbyButtonText`. 결과 위젯 클래스는 Mission PlayerController의 `MissionResultWidgetClass`에 지정한다.
-- 이름 계약으로 연결하면 버튼 스타일·안쪽 정렬과 직접 VerticalBox 자식의 간격을 초기화한다. 작성한 부모 Canvas/SizeBox/이미지 트리는 교체하지 않으므로 별도 WBP의 과도한 고정 크기는 Designer에서 조절한다. 기본 카드680·여백·스타일은 현재 C++ 시험 기본값이며 새 BP 수치 슬롯을 추가한 것은 아니다.
-- 실제 화면 확인: 1280×720/1920×1080에서 성공·실패·다음 없음·훈련 전체 완료를 확인한다. 버튼이 카드 안에 있고 서로 떨어져 있는지, 긴 다음 미션명이 잘리는지, 키보드/패드 포커스 이동 후 확대 돌출이 없는지 본다. 다음·다시하기·로비/시작 메뉴 전환도 확인한다. 현재 자동 검사와 수동 Pass는 [STATUS](../../STATUS.md)에서 구분한다.
+- 이름 계약 WBP는 작성한 부모 Canvas/SizeBox/이미지 트리를 교체하지 않는다. 과도한 고정 크기는 Designer에서 조절한다. native+Kit은 자체 WBP/카드용 예전 스타일 보정을 건너뛴다.
+- 시드 도시 결과의 일반 다시하기는 새 시드, `Same Seed`는 같은 조건 재도전이라는 코드 계약이다. 실제 결과/기록 재현은 아직 확인해야 한다.
+- 실제 화면 확인: 1280×720/1920×1080에서 성공·실패·다음 없음·훈련 전체 완료·시드 레이싱 결과를 본다. 버튼열/정보/긴 글자 잘림·선택 상태와 다음·재도전·로비/시작 메뉴 전환을 확인한다. 옛680 fixture 검사 통과를 현재 팀원 자산 화면 Pass로 대신하지 않는다.
 
 담당 클래스는 `UDroneMissionDefinition`과 `UDroneFrontEndRootWidget`이다.
 
@@ -85,7 +87,12 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 - 미션 목록은 Flow Catalog 등록 항목에서 읽는다. `DefaultMissionPaths`와 함께 `/Game/Drone/Data/Missions`의 유효 Definition을 Asset Registry로 자동 등록하는 코드가 있다. DA 생성/유효성만으로 실제 제품 맵의 Gate·GameMode·완주가 보장되지는 않는다.
 - 분류와 맵은 독립적이다. `Lobby Category`를 바꾸면 표시 탭만 바뀌고 실제 이동 맵은 `Mission Map`이 결정한다.
 - 기존 8개 수업과 Story 4개는 보존했고, 새 `DA_Mission_Racing_Circuit_Test`만 Catalog에 추가했다.
-- 스토리→Mission(4), 레이싱→Racing(1), 튜토리얼→Tutorial(9)로 직접 진입한다. Back은 분류·선택과 진입 메뉴 포커스를 복원한다.
+- 현재 소스/DA 계약은 스토리→Mission(4), 레이싱→Racing(2: Circuit.Test/Procedural.Test), 튜토리얼→Tutorial(9) 직접 진입이다. Back은 분류·선택과 진입 메뉴 포커스를 복원한다. 현재HEAD의 실제 목록 검사는 미실행이다.
+- 완료 미션·Story Fact·튜토리얼 권장문구 표시 여부는 Flow의 `Saved/SaveGames/DroneMissionProgress.json`로 저장/복원한다. 성공 결과와 권장 표시 변경 때 저장하며 실패하면 이번 실행 동안만 유지 경고를 낸다. 실제 성공→종료→재실행 후 로비 완료 표시/Story Fact 복원을 확인하고 사용자 기록을 임의 삭제하지 않는다.
+
+### 시드 레이싱·로딩·일시정지 확인
+
+`ADroneProceduralCityGenerator`는 도시·날씨·코스를 단계 생성하고 같은 시드를 다시 사용할 수 있다. 지정/무작위 시드·난도별 기록을 확인하되 팀원 고정4코스 완성으로 표시하지 않는다. 미션 Controller는 생성/Story 준비 중 로딩과 취소, 미션 중 Esc/Start 일시정지·재개·재시작·타이틀 복귀를 연결한다. 일시정지 재시작은 같은 도시 시드를 예약한다. 로딩/기체 선택/결과 화면은 미션 중 Pause와 별도 뒤로 처리를 사용한다. 실제 프레임 정지/취소 복귀/재생성·첫 포커스는 현재HEAD Build/회귀 뒤 확인한다.
 
 ## 5. 회전 = 원형 코스 비행
 

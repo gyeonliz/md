@@ -1,8 +1,8 @@
 # Drone Training 게이트·루트 배치 가이드
 
-기준일: 2026-09-30 (Asia/Seoul)
+현재 조정 기준: 2026-10-13 (Asia/Seoul)
 
-이 문서는 저장소 상대 경로(최신 10/04 현재 C PC 41444c2 + 로컬 미커밋) 기준으로 작성한다. 코스 제작은 `BP_DroneTrainingCourse`에서 관리한다. 권장 자동 편집 방식은 Course Spline과 분리된 `Ring별 Spline Handle`이며, Handle 배열 순서가 곧 Gate 통과 순서다. 생성된 빛나는 선 Component, 자동 Gate Child Actor와 GateIndex를 직접 관리하지 않는다. Production `Lvl_DroneTraining`은 팀원 소유이므로 이번 기능 작업에서 저장·덮어쓰지 않았다. 검증은 `/Game/Drone/Maps/TestMap/Lvl_DroneTrainingRouteSelectionTest`에서 한다.
+코스 제작은 `BP_DroneTrainingCourse`에서 관리한다. 권장 자동 편집 방식은 Course Spline과 분리된 `Ring별 Spline Handle`이며, Handle 배열 순서가 곧 Gate 통과 순서다. 생성된 빛나는 선 Component, 자동 Gate Child Actor와 GateIndex를 직접 관리하지 않는다. 현재 공용 Gate/Course BP에 제공 RaceRing·상태 재질을 연결했고 Production `Lvl_DroneTraining`의 사용 중 자동 Gate78개에도 기본값 승계로 적용된다. 원본 맵 파일은 저장하지 않았다. 비사용 Gate20개의 기존 Trigger/Visual 연결 문제는 별도 보존 정리 대상이다. 기능/외형 시험은 `/Game/Drone/Maps/TestMap/Lvl_DroneTrainingRouteSelectionTest`에서 한다. 상세 실행 이력은 [WORKLOG](../history/DRONE_WORKLOG.md).
 
 ## 1. 현재 맵과 자산 위치
 
@@ -61,8 +61,8 @@ CourseLineAdaptiveSegments 자동 검증: 짧은코스 불변·15.2km 시험코�
 | `Use Automatic Spline Gates` | 자동 Ring 생성 사용 여부 |
 | `개별 Ring 위치 Handle 사용` | 권장 직접 편집 모드. Course Spline은 유지하고 Ring 전용 Handle을 사용 |
 | `Ring별 Spline Handle` | Viewport에 표시되는 Ring별 독립 3D 위치점. 배열 Index가 통과 순서 |
-| `Automatic Gate Count` | 독립 Handle 모드를 끈 경우의 Ring 수, 최소 2개·최대 64개 |
-| `Automatic Gate Class` | 기본 Native Gate 또는 외형을 가진 `BP_DroneTrainingGate` |
+| `Automatic Gate Count` | 독립 Handle 모드를 끈 경우의 Ring 수, 최소2·최대512. UI 슬라이더 범위2~128, 그 이상은 수치 직접 입력 |
+| `Automatic Gate Class` | 공용 Course BP 기본은 `BP_DroneTrainingGate`. Native/다른 개별 override는 별도로 확인 |
 | `Evenly Distribute Automatic Gates` | 켜면 시작 거리~끝 여백 사이 균등 분배 |
 | `Automatic Gate Start Distance Centimeters` | 첫 Ring을 Spline 시작점에서 띄우는 거리 |
 | `Automatic Gate End Padding Centimeters` | 균등 배치 시 마지막 Ring과 Spline 끝의 여백 |
@@ -179,11 +179,25 @@ Gate BP의 `On Gate Passed` 이벤트에 자막/연출을 붙일 수 있다. 사
 
 메시 보정 Scale은 외형만 바꾸므로 통과 영역 크기는 자동으로 추측하지 않는다. BP의 `통과 영역 반쪽 크기`를 실제 Mesh 안쪽 크기에 맞춘 뒤 Course의 Gate 전용 스케일로 외형과 판정을 함께 키운다. 원형 메시도 현재 판정은 정사각형 Box/aperture이므로 원형 모서리 판정이 꼭 필요하면 별도 요구사항으로 처리한다.
 
-### 이 변경의 수동 확인
+#### 현재 제공 RaceRing 설정
 
-2026-09-30 Editor Build와 관련 회귀 8/8(오류·경고 0), 실제 Gate/Course BP Compile 각각 0/0을 통과했다. Test World 종료 경고도 최종 재실행에서 0건이다. Production 맵/Asset 저장 없이 검증했다.
+| 항목 | 현재 연결·조정 |
+|---|---|
+| 전체 메시 | `/Game/Item/Gate/RaceRing` 하나. 같은 폴더 `Center/Inner/Outter`는 Material Instance이며 조립용 메시가 아님 |
+| GateAssetLocalTransform | Rotation **Yaw/Z=90°**, Scale `(1.75,1.75,1.75)`, Location `(-2.21339,0,0)`cm. 원본 XZ 평면을 Gate YZ에 맞추고 중심 보정 |
+| 크기 기준 | 원본 개구부 반쪽100cm → 현재 TriggerHalfSize175cm에 맞춤. Gate 반쪽 크기를 바꾸면 Visual Scale=반쪽크기/100, X 중심 보정도 같은 배율로 조절 |
+| 상태 적용 슬롯 | `[1]`(Center). 슬롯0 검정·2 흰색은 메시 원본 재질 유지 |
+| 통과 전 / 목표 / 통과 후 | `M_BLUE / m_green / M_BLUE`, Vector Parameter 이름 `Param`. 기존 세 상태 색을 유지하므로 어두운 파랑 / 초록 / 밝은 청록·파랑으로 구분 |
 
-`Lvl_DroneTrainingRouteSelectionTest`에서 Gate 음원과 교체 메시를 지정한 BP로 확인한다. (1) 선이 중앙 하단 1/6 위치를 지나는지, (2) Gate Scale을 키워도 선 두께/코스 크기는 유지되는지, (3) 순서대로 정방향 통과하면 음성이 한 번씩 나오는지, (4) 세 상태 머티리얼이 바뀌고 미지정 슬롯은 그대로인지 확인한다. 음원·최종 Gate Mesh는 사용자가 지정하므로 실제 가청성·최종 외형은 자동화 성공과 별도로 확인한다.
+변경 위치는 공용 `BP_DroneTrainingGate`의 Class Defaults다. Material 슬롯을 준비한 것과 실제 상태 부모/Vector Parameter를 연결한 것을 구분한다. 원본 `/Game/Item/Gate` 메시와 `/Game/Material` 재질은 수정하지 않았다. 공용 BP의 상태 슬롯·색상·통과 음원을 바꾸면 해당 BP를 쓰는 자동 Gate에 승계되지만, Native 또는 개별 override를 가진 기존 수동 Gate까지 일괄 변경되지는 않는다.
+
+Main의 비사용20개는 사용 Sequence에 포함되지 않는다. 이를 임의 삭제하거나 기존 `ConfigureAutomaticTrainingGates.py` apply로 재배치하지 않는다. 현재 지정 Gate 적용 도구도 누락된 native Trigger/Visual을 만나면 맵 변경·저장 전 중단한다. 복구/정리는 맵 담당자와 범위를 정한 별도 작업이다.
+
+### 수동 확인
+
+현재 자동 검사와 과거 결과의 날짜·PC·경고는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 자동 성공을 실제 화면·가청성·코스 완주 Pass로 표시하지 않는다.
+
+`Lvl_DroneTrainingRouteSelectionTest`에서 `AutomaticGateClass=BP_DroneTrainingGate`인지 확인하고 시험한다. (1) 선이 중앙 하단 1/6 위치를 지나는지, (2) Gate Scale을 키워도 선 두께/코스 크기는 유지되는지, (3) 정방향·정순서 통과 음성이 한 번씩 나오는지, (4) RaceRing의 세 상태 색이 바뀌고 검정·흰색 슬롯은 그대로인지 본다. 실제 음원은 아직 별도 지정이며, 실제 가청성·최종 외형은 자동 검사와 구분한다. 팀원은 Main78 링의 외형과 기존 배치를 읽기 확인하며 이 시험 때문에 맵을 덮어쓰지 않는다.
 
 ## 5. 수동 Gate 설치와 순서 지정
 

@@ -105,3 +105,68 @@ StationRoot
 Base 고정, Body Yaw 정상, Barrel Pitch 정상, Muzzle 방향 정상, 정렬 후 발사 정상,
 NPC 몸/고개/포탑 간섭 없음, 사망 교대 정상
 ```
+
+## 6. 패트리어트 미사일 포대: 접합부 회전축 조정
+
+대상 Blueprint는 `/Game/Drone/AI/Blueprints/Turrets/BP_PatriotMissileLauncher`다. 기존 MG·Smart Object와 별개의 **Actor Blueprint**이며, 이 절은 현재 조정 방법을 설명한다. 생성·저장·재로드 회전 검사와 수동 외형 확인을 구분한 근거는 [STATUS](../../STATUS.md)와 [WORKLOG](../history/DRONE_WORKLOG.md)를 확인한다.
+
+### 6.1. 원본 메시 대신 Scene Component를 회전축으로 사용
+
+원본 세 메시의 원점이 전체 포대 하단에 있으므로 메시 자체를 회전시키면 접합부가 아니라 하단을 중심으로 크게 돌 수 있다. 원본 `/Game/Item/missile/Missile_Lower`, `Missile_Middle`, `Missile_Upper`는 수정하지 않고, 접합부에 배치한 별도 Scene Component를 회전시킨다.
+
+```text
+FixedSceneRoot             포대 전체 위치·방향·크기
+├─ LowerMesh               고정 하단부
+└─ YawPivot                하단/중단 접합부, 좌우 회전축
+   ├─ MiddleMesh           좌우로 도는 중단부
+   └─ PitchPivot           중단/상단 접합부, 상하 회전축
+      └─ UpperMesh         상하로 도는 발사부
+```
+
+Components에서 아래 상대 Location을 초기값으로 사용한다. 단위는 `cm`이며 초기 상대 Rotation은 모두 `0`, Scale은 모두 `1`로 맞춘 상태에서 위치를 조정한다.
+
+| Component | 부모 | 상대 Location (X, Y, Z) | 연결할 Static Mesh |
+|---|---|---|---|
+| `LowerMesh` | `FixedSceneRoot` | `(0, 0, 0)` | `/Game/Item/missile/Missile_Lower` |
+| `YawPivot` | `FixedSceneRoot` | `(0.315, -4.35, 13.33)` | 없음: Scene Component |
+| `MiddleMesh` | `YawPivot` | `(-0.315, 4.35, -13.33)` | `/Game/Item/missile/Missile_Middle` |
+| `PitchPivot` | `YawPivot` | `(-0.315, -7.15, 47.07)` | 없음: Scene Component |
+| `UpperMesh` | `PitchPivot` | `(0, 11.50, -60.40)` | `/Game/Item/missile/Missile_Upper` |
+
+회전축을 접합부로 옮긴 만큼 자식 메시를 반대 방향으로 보정해 원래 조립 위치를 유지하는 방식이다. 접합부 초기값은 메시 받침과 몸체 어깨 형상을 기준으로 잡은 값이므로, 최종 외형에서 이음새를 보며 소폭 조정한다. 메시 원점을 영구 변경하거나 원본 에셋을 다시 저장할 필요는 없다.
+
+### 6.2. Blueprint에서 좌우·상하 움직이기
+
+1. 좌우 회전: `YawPivot`을 그래프로 가져와 `Set Relative Rotation`에 연결한다. `Make Rotator`의 **Yaw / Z**만 변경한다.
+2. 상하 회전: `PitchPivot`을 가져와 `Set Relative Rotation`에 연결한다. 이 에셋은 발사부 길이 방향이 Y이므로 **Roll / X**만 변경한다. 이름이 `PitchPivot`이어도 `Make Rotator`의 Pitch / Y로 회전시키지 않는다.
+3. 메시 Component나 Actor 전체에 조준 회전을 넣지 않는다. Actor Rotation은 포대 설치 방향, 두 Pivot의 상대 Rotation은 포대 가동에만 사용한다.
+4. 순차 조준이 필요하면 현재 상대 Rotation에서 목표 Rotation으로 보간한 결과를 위 노드에 연결한다. 회전 한계·속도·입력·추적 로직은 별도로 설계하며 이 조립 기준에 포함하지 않는다.
+
+편집기에서만 자세를 잡을 때도 Components에서 해당 Pivot을 선택하고 Details의 상대 Rotation을 조정한다. 원본 발사부가 향하는 `+Y` 기준으로 Roll을 음수로 바꾸면 올리고, 양수로 바꾸면 내리는 방향이다. 설치 방향에 따라 화면에서 보이는 방향은 달라지므로 작은 각도로 먼저 확인한다.
+
+### 6.3. 접합부 위치·크기·머터리얼 바꾸기
+
+축 위치를 조정할 때는 먼저 두 Pivot Rotation을 `0`으로 돌려놓는다. 아래 보정은 이 기본 조립 자세에서 적용한다.
+
+| 변경 | 함께 보정할 위치 | 이유 |
+|---|---|---|
+| `YawPivot` Location에 `Δ` 더하기 | `MiddleMesh`와 `PitchPivot` Location에서 각각 같은 `Δ` 빼기 | 조립된 중단·상단의 위치는 유지하고 좌우 축만 옮김 |
+| `PitchPivot` Location에 `Δ` 더하기 | `UpperMesh` Location에서 같은 `Δ` 빼기 | 상단 위치는 유지하고 상하 축만 옮김 |
+
+예를 들어 상하 축을 기본 자세 기준 Z로 `2 cm` 높이면 `PitchPivot.Z`에 `2`를 더하고 `UpperMesh.Z`에서 `2`를 뺀다. Pivot만 옮기면 메시 전체가 따라 이동하므로 반드시 짝으로 보정한다.
+
+- 전체 크기: 원본 조립 크기는 대략 `1 m`다. 맵에 놓은 **Actor 전체 Scale**로 크기를 조정한다. 메시마다 서로 다른 Scale을 주면 이음새와 축 위치가 틀어질 수 있다.
+- 머터리얼: 각 Mesh Component의 `Materials > Element 0`에 `/Game/Item/missile/Missile_M`을 지정한다. Blueprint Component의 오버라이드로 연결하고 원본 Static Mesh 머터리얼은 수정하지 않는다.
+- 원본 메시 교체: 대응하는 세 Mesh Component의 `Static Mesh`에서 바꾼다. 새 메시가 같은 공통 조립 좌표를 사용하는지 먼저 확인하고, 다르면 위 상대 위치 보정을 다시 맞춘다.
+
+### 6.4. 수동 외형 확인
+
+TestMap에 별도로 배치한 후 다음을 확인한다. 기존 MG나 팀원 Production Training 맵을 이 시험 때문에 변경하지 않는다.
+
+1. 두 축이 `0°`일 때 세 메시가 원래 조립 위치로 맞물리는지 본다.
+2. `YawPivot`을 `-90° / +90°`로 돌려 Lower는 고정되고 Middle·Upper만 하단 접합부를 중심으로 도는지 본다.
+3. `PitchPivot`의 **Roll**을 작은 각도부터 `-30° / +30°`로 바꿔 Upper만 상단 접합부를 중심으로 움직이는지 본다.
+4. 좌우·상하를 동시에 바꿔도 접합부가 벌어지거나 전체 하단을 중심으로 공전하지 않는지 본다.
+5. 전체 Actor Scale을 바꿔도 조립 간격과 축 위치가 함께 유지되는지 본다.
+
+이 Blueprint 범위는 **메시 조립·회전축·머터리얼 연결**이다. AI 인식·조준, 미사일 발사, 조작 입력, 충돌·물리, 네트워크, 차량 부착이나 맵 배치 기능을 구현 완료로 간주하지 않는다.
