@@ -1,17 +1,17 @@
 # 현재 작업 상태
 
-기준일: 2026-10-14 KST D PC. Unreal `bb6233c8`·MD `b38fc84` + Gate/Rain/City/UI·문서 미커밋. 앞선 구현은 현재 Unreal 커밋에 포함. 오늘 승인으로 Codex 직접 구현(상시 역할 변경 아님). 자동/수동은 WORKLOG로 구분하며 Fetch/Pull·Commit/Push는 하지 않았다.
+기준일: 2026-10-14 KST D PC. Unreal `3cb9c184` 수신·MD `5ab41d6` + Gate/Rain/City/UI·문서 미커밋. Drone만 요청대로 Fetch/FF 수신하고 로컬 수정72개를 원래 바이트로 복원했다. 충돌·Stash0, 복구 백업 유지. 오늘 직접 구현 승인은 상시 역할 변경이 아니며 Commit/Push는 하지 않았다.
 
 ## Git 기준
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal 원격 `gyeonliz/drone` | 로컬 origin/main `bb6233c8`(10/14) | 실시간 원격/다른 PC 작업 트리는 이번 미조회 |
-| Unreal D PC `D:\JGY\project\drone` | HEAD `bb6233c8` = 로컬 origin/main + Gate/Rain/City/UI 미커밋 | Gate 크기/방향·도시/비 수정, Build·실제RHI21/21·Production 보존 |
+| Unreal 원격 `gyeonliz/drone` | Fetch origin/main `3cb9c184`(10/14) | 수신31경로 LFS SHA/삭제 검증, 다른 PC 작업 트리 미조회 |
+| Unreal D PC `D:\JGY\project\drone` | HEAD `3cb9c184` = origin/main + Gate/Rain/City/UI 미커밋 | 팀원 맵/BP 수신·로컬 수정 보존. 수신 후 Build/실기 미실행 |
 | 문서 원격 `gyeonliz/md` | 로컬 origin/main `b38fc84`(10/13 커밋) | 이전 BP 작업 문서 수신. 이번 추가 Fetch/Pull 없음 |
-| 문서 D PC `D:\JGY\project\md` | HEAD `b38fc84` = 로컬 origin/main + 이번 문서 미커밋 | 현재 상태/카드·가이드·이력과 Space 갱신. Commit/Push는 사용자 |
+| 문서 D PC `D:\JGY\project\md` | HEAD `5ab41d6`·로컬 origin보다1커밋 앞 + 문서 미커밋 | 사용자 기존 커밋/편집 보존. MD Fetch/Pull 미실행, Commit/Push는 사용자 |
 
-최신 검증: Final3 Build 성공26.40초(MSVC14.51.36257, 기존 경고 유지), 새 실제RHI21 Success/0 Warning/0 Fail·46.56초. 시드194849 도시9장·별도3품질/3뷰+Off10장과 화면9분할 입자 분포를 확인했다. 중간실패19/1은 WORKLOG에 보존한다. 앞선18개·14개와 합산하지 않으며 전체 회귀·실제 패드/비행·FPS·패키징 Pass는 아니다. 상세 [WORKLOG](docs/history/DRONE_WORKLOG.md).
+직전 `bb6233c8` 위 로컬 수정의 Final3 Build26.40초·RHI21 Success/0 Warning/0 Fail·46.56초, 도시9장/비10장·입자 분포 확인은 유효한 당시 근거다. **이후 수신된 `3cb9c184`의 Gate/Course BP·맵 실행 검증은 아직 하지 않았다.** 이전21개를 새 저장본 Pass로 재사용하지 않으며 전체 회귀·패드/비행·FPS·패키징도 별도다. 상세 [WORKLOG](docs/history/DRONE_WORKLOG.md).
 
 ## 한눈에 보기
 

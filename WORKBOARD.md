@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-10-14 D PC — Drone bb6233c8·MD b38fc84 + Gate/Rain/City/UI·문서 미커밋. 오늘 승인으로 Codex 직접 구현·검증, 상시 역할은 유지. Commit/Push는 사용자.
+마지막 갱신: 2026-10-14 D PC — Drone3cb9c184 FF 수신·MD5ab41d6 + 미커밋. 로컬72개 바이트 보존·충돌/Stash0. 수신 후 실행 검증은 대기, 직전21개와 구분. 상시 역할 유지·Commit/Push는 사용자.
 
 ## Now
 

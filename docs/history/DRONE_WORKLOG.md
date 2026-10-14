@@ -3488,3 +3488,13 @@ Niagara Ready는 NullRHI 및 -AllowCommandletRendering 없는 commandlet에서 �
 Build/테스트는 UE5.8.2·MSVC14.51.36257·D3D12_SM6이다. Final Build22.03초 및 Final2 Build35.60초 성공. 첫 FinalReport는18 Success/1 Fail, Final2Report는 신규MaterialOverrides 포함19 Success/1 Fail(20개)이다. 단위/정적 회귀가 통과해도 actual-city 비는 여전히 화면 좌측에 쏠려 우측 화면1/3 두 시점 검사가 실패했다. 이 결과를 숨기거나 assertion을 완화하지 않았다. Rain 위치보정만으로 부족해 by-emitter 실제 position/velocity/age/lifetime·카메라 projection을 JSON으로 추가 기록했다(ParticleProbe Build14.15초 성공). source NS는 ObjectExporterT3D로 읽기만 내보냈으며 저장하지 않았다.
 
 현재 캡처: Saved/Automation/CityAppearance/S194849/gate_rain_city_fix2/Capture_98CD6C3742A6BE9D21D7F6B9113ACFA6/. 실제 좌표 JSON/PNG: particle_probe/Capture_5BC80B324206CAAD53F1659FD9324868/. 중간 실패를 전체 완료/사용자 체감 Pass로 바꾸지 않는다. 최종 추가 수정/새 프로세스 검증 결과는 아래에 이어 기록한다.
+
+## 2026-10-14 — 팀원 커밋3cb9c184 수신·로컬 작업 보존
+
+사용자 Pull 요청·Editor 종료 확인 후 Drone origin만 Fetch, bb6233c8→3cb9c184를 FF 수신했다(1커밋·31경로, 0/0). 수정/삭제51개·미추적50개를 먼저 Saved/Backups/GitPull_20261014_164500에 백업했다(101레코드·실파일98개·710,189,004B, SHA 확인·manifest.json). 실제 겹침6개/새파일23개는 원격과 SHA 또는 삭제 상태가 같아 선택 충돌이 없었다. Gate/Course BP2개는 clean이던 이전 파일에서 원격 새 버전으로 정상 수신했다. MilitaryBase/Island·차량BP, Tutorial8맵·Driving/Car/LOS·RC Controller/Traffic Cone을 받았다. 옛 Training1/2/training1_1 삭제는 이미 로컬에서도 삭제 상태였고 커밋으로 확정됐으며 이전 Git 커밋에서 회복 가능하다.
+
+임시 Stash51bd8d3a로 전체 로컬 변경을 보관한 뒤 수신하고, incoming 밖 tracked45개/미추적27개 총72개를 백업의 원래 바이트로 복원·SHA 검증했다. 이전 Gate/Rain/City/UI 코드/자산63개 상태 항목은 그대로 보존했다. 수신31경로의 LFS 실제 데이터 SHA/삭제 상태도 전부 확인했다. 새 Stash만 정확한SHA를 대조해 제거했고 현재Stash0·unmerged0·staged0·main/origin0/0이다. 사용자 데이터는 백업+manifest에 남아 있으며 Source/맵 임의 폐기나 reset--hard는 사용하지 않았다. 초기 백업/manifest의 Git CRLF 경고가 stdout JSON과 섞이는 도구 처리 문제는 경고와 JSON을 분리해 보완했으며 작업 파일 손실은 없다.
+
+MD는 사용자 HEAD5ab41d6(로컬origin b38fc84보다1앞)·기존 편집을 보존하고 Fetch/Pull하지 않았다. STATUS/WORKBOARD의 현재커밋과 검증 경계만 갱신한다. 이번 수신 후 Build/PIE/Unreal 맵 저장은 하지 않았다. 직전 실제 Saved/Automation/GateRainCity/Final3Report/index.json의21/21·Build26.40초·도시9장/Rain10장은 bb6233c8 위 로컬 수정 검증이며 새 Gate/Course BP·Island 저장본 Pass가 아니다. 전체마지막 결과 전문이 현재 WORKLOG에 없더라도 실제 보고서는 Saved에 유지된다. Commit/Push·Trello/Figma·공유/예약·모델 설정 변경은 없다.
+
+Space 기존 진행상황41·시험가이드28의2블록에 새 수신/로컬 보존과 이전21검증 경계를 반영하고 동일본문 재조회로 확인했다. BP/기획/지침/루트·새Page/권한은 미변경. 최종 main/origin0/0·stash/unmerged/staged0·Unreal63개 미커밋 유지, MD diff --check는 원문CRLF 허용 설정으로0이며 STATUS27,076B·WORKBOARD29,644B다. byte 백업/manifest/result는 위 Saved 폴더에 보존했다. 스태시 제거는 복원·수신 SHA 검증 뒤 수행했으며 사용자 작업을 폐기한 것이 아니다.
