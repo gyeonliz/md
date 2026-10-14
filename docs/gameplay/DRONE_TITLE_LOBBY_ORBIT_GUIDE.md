@@ -1,10 +1,10 @@
 # 시작 화면 · 로비 탭 · 원형 코스 가이드
 
-기준일: 2026-10-13 D PC 수신 코드2a10c3de 대조. 현재 결과창/레이싱/저장 설명을 정정했으며 이번 Build·PIE·수동 확인은 없다. 과거 검증은 WORKLOG, 현재 Git/미확인은 STATUS를 따른다. 원본 이미지·Figma는 보존한다.
+현재 절차 기준: 2026-10-14 D PC. 기존5메뉴·결과·훈련/레이싱을 유지하면서 제공 `Select_UI`를 Story 선택에만 적용하는 코드/슬롯을 설명한다. 구현과 새 자산 저장·자동 검증·수동 화면 확인은 구분하며 현재 결과는 STATUS·WORKLOG를 따른다. 원본 이미지·Figma·기존 타이틀 아트는 보존한다.
 
 ## 0. 현재 계약 — 5메뉴·조종 입력 표시 현재 구현과 계약
 
-현재 C PC Unreal 41444c2 + 로컬 미커밋. C++·Build·자동 검증 Claude, BP 연결 Codex(ui)→Claude 검증, 문서 Codex. 구현됨·자동 검증됨·수동 확인 대기. 10/01~10/03 세션 근거는 WORKLOG에 보존한다.
+기존5메뉴·조종 입력 표시 계약은 유지한다. 10/01~10/03 당시 구현/검증과 담당 구분은 WORKLOG에 보존하며, 새 Story Select_UI 변경까지 그 당시 Pass에 포함하지 않는다. 실제 패드/화면 확인은 별도다.
 
 - 타이틀 순서: **스토리 / 레이싱 / 튜토리얼 / 설정 / 종료**. `UDroneFrontEndRootWidget::OpenLobbyForCategory(Category)`가 먼저 분류를 정한 뒤 첫 목록/포커스부터 표시한다. `OpenStoryLobby`=Mission, `OpenRacingLobby`=Racing, `OpenTutorialLobby`=Tutorial, 종료=`RequestExitGame`. 기존 `FinishOpeningTrailer`=스토리·`OpenTrainingLobby`=튜토리얼은 호환 유지. 시작 뒤 중간 화면 없음, 브리핑·기체 선택·출격·결과·복귀는 기존 흐름 재사용.
 - `WBP_DroneFrontEndRoot` Class Defaults `TitleMenuClass = WBP_DroneFiveItemMenu`로 **저장 연결 완료**. 위젯 필수 버튼 `StoryButton / RacingButton / TutorialButton / SettingsButton / ExitButton`, 필수 Dispatcher `OnStoryRequested / OnRacingRequested / OnTutorialRequested / OnSettingsRequested / OnExitRequested`, 선택 `OnBackRequested`. 이름 계약을 확인해 연결하며 틀리면 `[TITLE-MENU]` 경고 후 C++ 기본 5버튼. 위젯 디자인은 유지하고 호버/클릭 효과음만 붙인다.
@@ -25,9 +25,9 @@
 
 1. 새 C++ 코드가 포함되므로 Editor를 닫고 `DroneEditor Win64 Development`를 빌드한다. Live Coding만으로 새 UPROPERTY/enum 변경을 확인하지 않는다.
 2. `/Game/Drone/Maps/Lvl_DroneFrontEnd`를 열어 Play한다. 프로젝트 `GameDefaultMap`도 이 맵이다. Editor 첫 맵은 기존 Production Training 설정을 유지한다.
-3. 스토리·레이싱·튜토리얼·설정·종료 5개 문구를 확인한다. 스토리는 M1 맨 위 Story 목록, 레이싱은 현재 1개 Racing 목록, 튜토리얼은 호버 맨 위 수업 목록으로 첫 화면부터 진입해야 한다. 로비에서 B/Esc로 돌아온 메뉴·설정 닫은 뒤 설정(3) 포커스, 위↑/아래↓ 끝 순환과 키 반복 한 화면 Back을 확인한다.
-4. 로비의 튜토리얼/레이싱 탭·LB/RB는 현재 유지다(최종 유지 여부 미정). 3열 선택 화면과 스크롤을 확인한다. Story에서는 훈련 탭이 숨겨져야 하고 브리핑에서 돌아오면 분류와 선택이 복원되어야 한다.
-5. 목록 선택 → 하단 미션 시작 → 브리핑 → 작전 지역 이동 → 하단 기체 카드 선택 → 조작 설정 → 출격을 진행한다. 기체 선택의 버튼/Esc/패드 B는 해당 미션의 브리핑으로 돌아간다.
+3. 스토리·레이싱·튜토리얼·설정·종료5개 문구를 확인한다. 스토리는 M1 맨 위4개 Story 목록, 레이싱은 Circuit/Procedural2개, 튜토리얼은 `기초 조종` 맨 위 수업 목록으로 처음부터 진입해야 한다. B/Esc 메뉴 복귀·설정 닫은 뒤 설정(3) 포커스, 위/아래 끝 순환과 키 반복 한 화면 Back을 확인한다.
+4. Story는 아래 Select_UI 절의 왼쪽 목록·가운데 이미지·오른쪽 설명·하단 START 배치를 확인한다. 훈련 탭은 숨기고 브리핑 복귀 시 분류/선택을 복원해야 한다. 튜토리얼/레이싱의 기존3열·스크롤·탭/LB/RB는 보존한다(최종 탭 유지 여부 미정).
+5. Story 카드 클릭은 선택만 하며 하단 `START MISSION`에서 기존 MissionTrailer/브리핑 흐름을 시작한다. 이후 작전 지역 이동→기체 카드→조작 설정→출격을 진행한다. 튜토리얼/레이싱 카드의 기존 즉시 확인 동작은 바꾸지 않는다. 기체 선택의 뒤로/Esc/패드B는 해당 브리핑으로 돌아간다.
 6. 튜토리얼 `1-3 원형 코스 비행`은 `/Game/Drone/Maps/TestMap/Tutorial/Lvl_Tutorial_Heading_Test`, 레이싱은 `/Game/Drone/Maps/TestMap/Lvl_DroneRacingTest`로 이동한다.
 
 
@@ -57,6 +57,38 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 - 직접 Designer를 만들면 `TitleBackgroundImage / TitleOverlayImage / TitleLogoImage / MissionThumbnailImage`라는 `Image` 이름을 쓰면 C++ 연결을 재사용한다. 추가 배경 이름은 `LobbyBackgroundImage / BriefingBackgroundImage / SettingsBackgroundImage`, 브리핑 이미지 이름은 `BriefingThumbnailImage`다. 기존 필수 패널·버튼·텍스트 이름도 유지한다.
 - 훈련 하위 탭 컨테이너 이름은 `TrainingCategoryTabs`, 버튼 이름은 `TutorialTabButton / RacingTabButton`이다. `MissionTabButton` 이름/API는 기존 WBP 호환용으로 남고 런타임에는 숨긴다. 동적 목록은 `MissionButtonsColumn`이라는 VerticalBox에 자동 구성할 수 있다. 자체 카드 UI라면 `Get Visible Mission Ids`로 목록을 만들고 `Select Lobby Mission`을 호출한다. 우측 목표 텍스트는 `MissionObjectiveSummaryText`다.
 - `Receive Lobby Category Changed`, `Receive Lobby Mission Selection Changed` 이벤트에서 자체 탭/카드 애니메이션을 붙일 수 있다. 이 이벤트 안에서 Flow를 중복 전환하지 않는다.
+
+### Story 선택 화면: 제공 Select_UI 연결·배치
+
+원본은 `C:\Users\Metacon_41\Downloads\새 폴더\Select_UI`, 생산 Texture는 `/Game/Drone/FrontEnd/UI/SelectUI`다. **배경1개와 미션 프리뷰4개만 이미지로 쓰고 글자는 모두 Pretendard의 실제 `UTextBlock`으로 표시한다.** Back·제목·미션 이름·상세/무전·START를 글자 PNG로 대체하지 않는다. 첨부 시안의 빨강/노랑/초록 영역은 배치 설명용 표시이지 실제 컬러 패널이 아니다. 기존 타이틀 아트와 훈련·레이싱 동작/그림은 보존한다.
+
+`WBP_DroneFrontEndRoot > Class Defaults > Drone > Front End > Select UI`:
+
+| 속성 | 사용법 |
+|---|---|
+| `bUseStorySelectUI` | Story 전용 배치·배경/프리뷰 사용. 끄면 기존 배치로 복귀하며 글자는 계속 동적 텍스트 |
+| `StorySelectAssets.Background / Thumbnails` | 배경1개·M1~M4 순서의 프리뷰4개. 글자가 들어간 다른 Texture 슬롯은 사용하지 않음 |
+| `InterfaceFont` | 일반 글자용 `/Game/Drone/UI/Fonts/Pretendard/Pretendard_Regular_Font` |
+| `InterfaceBoldFont` | 제목·강조용 `/Game/Drone/UI/Fonts/Pretendard/Pretendard_Bold_Font` |
+| `StorySelectLayout` | 1920×1080 기준 좌표/크기. `ListPosition / ListWidth`, `ThumbnailPosition / ThumbnailSize`, `DetailsPosition`, `StartPosition / StartSize`, `BackArtworkPosition / HeadingPosition` 조정 |
+
+시작 배치는 목록 `(117,321)`·폭389, 프리뷰 `(556,350)`·`584×543`, 설명 `(1248,321)`, START `(695,980)`·`530×58`이다. 제목/설명도 실제 글자의 폭·줄바꿈을 사용하므로1280/1920에서 겹침·끝 잘림을 보고 Layout/텍스트 박스를 조정한다. 텍스트가 길다는 이유로 부모 전체 Scale을 늘리거나 글자를 이미지로 굳히지 않는다.
+
+기존 MissionId로4개 프리뷰를 찾으며 M3도 `Mission.Story.VeilBreaker.Test` ID를 유지한다. 이름·영문명·설명·목표·무전은 Mission DA의 동적 값을 사용하므로 기획 문구 수정 때 텍스트PNG를 다시 만들 필요가 없다. Back/Heading/MissionLabel/Start·Selected/Unselected·Details의 구형 필드와 원본/이미 임포트한 텍스트PNG16개는 호환·원본 보존을 위해 삭제하지 않지만 화면에는 쓰지 않는다. 프리뷰 미지정 시 기존 DA/배경 fallback과 Tooltip 계약을 유지한다.
+
+`Tools/AssetMigration/ImportDroneSelectUI.py`는 배경/프리뷰5개와 위 Story WBP 기본값만 가져온다. 다른 PC 원본 위치는 `DRONE_SELECT_UI_SOURCE`로 지정하고, `DRONE_SELECT_UI_VERIFY_ONLY=1`은 기존 임포트/기본값을 읽기 검사한다. 타이틀8개 기본값·Designer 트리·맵·Mission DA는 변경하지 않는다. 보고서 위치는 `Saved/Automation/SelectUI/ImportDroneSelectUI.json`이다.
+
+폰트 설치/연결 도구는 `Tools/AssetMigration/ImportDronePretendard.py`다. **일반 Editor의 `-ExecutePythonScript`로 실행한다.** FontFactory는 Slate 서비스가 필요하므로 `-run=pythonscript` commandlet로 가져오지 않는다. 공식 [orioncactus/pretendard@v1.3.9](https://github.com/orioncactus/pretendard/tree/v1.3.9)의 변형하지 않은 Regular/Bold를 사용하고 원본 해시를 대조한다. 다운로드 원본은 임포트용 `Saved/Automation/SelectUI/FontSource`에 두며 다른 위치는 `DRONE_PRETENDARD_SOURCE`로 지정한다. `DRONE_PRETENDARD_VERIFY_ONLY=1`은 저장된 연결을 읽기 검사하고 보고서는 `Saved/Automation/SelectUI/PretendardImport.json`이다. FontFace는 **Inline으로 프로젝트 자산에 포함**하므로 팀원/실행 PC의 OS에 폰트를 따로 설치할 필요가 없다. OFL 고지는 `Content/Drone/UI/Fonts/Pretendard/License/Pretendard-LICENSE.txt`를 보존하고 `DefaultGame.ini`의 NonUFS 스테이징으로 배포에 포함한다. 새 USTRUCT/UPROPERTY가 있어 Editor 종료 후 Build가 먼저이며 Live Coding만으로 가져오지 않는다. 현재 빌드/임포트/검증 완료 여부는 STATUS·WORKLOG를 따른다.
+
+확인 순서: FrontEnd→스토리→M1~M4 선택→프리뷰·DA의 글자/무전 교체·선택 강조→START→뒤로 복귀 순으로 본다. 일반/굵은 한글에 Pretendard가 적용되고 긴 문구가 잘리지 않는지, 텍스트PNG Image가 숨겨졌는지도 확인한다. 마우스뿐 아니라 키보드/패드 첫 강조·목록 이동·START·Back을 확인한 뒤 튜토리얼/레이싱·타이틀 아트가 그대로인지 본다. 자동화 대상은 `Drone.UI.SelectUILayoutContract / SelectUIPresentationPIE`, 캡처는 `Saved/Automation/SelectUI/story_m1~4.png`이며 생성/통과 여부는 STATUS·WORKLOG를 따른다. 캡처나 계약 테스트가 실제 패드/화면 수동 Pass를 대신하지 않는다.
+
+### 프로젝트 공통 Pretendard
+
+메뉴뿐 아니라 비행 HUD·미션 목표/결과/일시정지·기체 선택·설정·시드 입력·로딩·카운트다운의 일반 글자는 같은 임베드 Regular/Bold를 쓴다. `Source/Drone/UI/DroneUIFont`가 글꼴만 교체하고 크기·굵기·간격·외곽선·색·배치는 유지한다. `UDroneUserWidget`은 생성/Preview/속성 동기화 때 Designer 글꼴과 입력칸·Combo의 실제 표시 글자를 반영하며 매 Tick 전체 트리를 순회하지 않는다. 동적으로 자식 UI를 추가한 뒤에는 BP `RefreshProjectFonts`로 반영한다. 폰트 폴더는 AlwaysCook, OFL 고지는 NonUFS로 포함한다. OS 설치나 엔진 CoreStyle 변경은 하지 않는다.
+
+`Drone|Typography`의 `bUnifyDesignerFonts`는 기본 True다. 합의된 특수 서체만 False 또는 `FontOptOutWidgetNames`의 정확한 위젯 이름으로 제외한다. 아이콘 글꼴·Vendor/Legacy 위젯·Editor/디버그 글씨는 변경하지 않는다. 숨김 기본인 시험 오브젝트의 `TextRender` 월드 라벨은 Offline/거리필드 폰트가 필요하므로 Runtime UFont를 억지로 연결하지 않는다. RichText는 기본 스타일을 통일하며 별도 태그별 스타일표를 새로 도입한다면 해당 표도 조정해야 한다.
+
+선택 목록 이름 끝의 `(시험)` 등 괄호 부연은 표시할 때만 제거한다. DA 원문·설명/툴팁·영문 부제·MissionId·맵 경로·기록 키는 유지한다. `Drone.UI.FontContract / PlayerWidgetFontsPIE / SelectionDisplayLabelContract`와 `Tools/Validation/AuditDroneUIFontSources.py`가 이 경계를 확인하며 실행 결과는 WORKLOG를 따른다.
 
 ### 직접 WBP를 만들 때 유지할 API와 이름
 

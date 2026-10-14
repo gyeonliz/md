@@ -123,7 +123,7 @@ FixedSceneRoot             포대 전체 위치·방향·크기
       └─ UpperMesh         상하로 도는 발사부
 ```
 
-Components에서 아래 상대 Location을 초기값으로 사용한다. 단위는 `cm`이며 초기 상대 Rotation은 모두 `0`, Scale은 모두 `1`로 맞춘 상태에서 위치를 조정한다.
+아래는 생성 도구의 상대 Location 초기값이다. 이후 BP가 편집·재저장됐으므로 **현재 BP Details를 우선**하며 이 표로 기존 조정을 덮어쓰지 않는다. 생성 당시 단위는 `cm`, 상대 Rotation은 모두 `0`, Scale은 모두 `1`이다. 현재 저장본 검증 범위는 STATUS/WORKLOG를 따른다.
 
 | Component | 부모 | 상대 Location (X, Y, Z) | 연결할 Static Mesh |
 |---|---|---|---|

@@ -1,5 +1,35 @@
 # Drone 개발 진행 기록
 
+
+
+### 최종 축 보정과 실제 새 프로세스 검증
+
+원본 export의 RapidIterationParameterData를 해독하고 실제 particle JSON과 교차했다. Rain Box=(500,5,5), Lifetime=2초, Velocity Min=(0,200,-980)/Max=(1,400,-3000)였다. 실제 rawX 약-250..249는 생성 폭, rawY 약-2..1017은 나이별 이동이었다. Y-age 상관0.625/Y-Z 상관-0.542를 확인했으며 Y 범위를 생성 폭으로 보고 -1650cm만 옮긴 중간 가설은 틀렸다. 이 실패/진단은 위 기록으로 보존한다.
+
+최종은 카메라 quaternion × simulation basis(Yaw=-90°), 위치는 카메라 quaternion × Offset(1150,0,600)으로 분리했다. 원본 X→화면 가로(-Y), 원본 Y 이동→카메라 전방(+X), 원본 Z→화면 세로다. BP에 CameraRainLayerRotationOffset을 노출했다. 비기본 camera/basis의 pitch/yaw/roll과 위치 offset을 섞어도 합성 순서가 유지되는 회귀를 추가했다. 원본 Niagara 그래프/velocity·프로젝트 mask/density는 이 보정에서 변경하지 않았다.
+
+| 마지막 검사 | 실제 결과 | Saved 기준 근거 |
+|---|---|---|
+| DroneEditor Win64 Development Build | Succeeded·26.40초, MSVC14.51.36257·기존 경고 유지 | Logs/Build_20261014_GateRainCity_Final3.log |
+| 실제 D3D12 RHI 집중 자동화 | **21 Success / 0 SuccessWithWarnings / 0 Fail / 0 NotRun**, 46.5602초 | Automation/GateRainCity/Final3Report/index.json·final3_render.log |
+| 실제 생성기·시드194849 도시/비 | 9 PNG 모두1274×716, 정면/90°이동/75°상향 이동에서 가로3·세로3뿐 아니라 실제9칸 전부 입자 존재, Off/Disable/Clear0 | Automation/CityAppearance/S194849/gate_rain_city_final/Capture_6F09F85349AAB75E6F2A4395B5FE79A7/ |
+| 별도3품질·카메라 캡처 | 낮음/중간/높음 × 정면/90°/75° + Off=10 PNG | Automation/RainCameraPresentation/gate_rain_city_final/Capture_46B32C8A4547D1300D9C628F740FBC1E/ |
+| Palette 재실행 | 성공·추가 재질 생성0·Type51 유지. BP/TestMap만 저장, m_green 재저장0·복제 parent/class/HISM guard 통과 | Automation/GateRainCity/city_reapply_verified.log·CityAppearance/20261014T062349_880961Z/report.json |
+| 원본/팀원 보존 | Island 재로드 SHA 불변/저장0, Production Training/FC/MOUT/ThirdParty pack 경로 Git diff0 | IslandGateSize/report.json·최종 경로별 Git 확인 |
+
+최종21개는 Diagnostics 실제도시/별도Rain캡처2개, Procedural Appearance5개, Tutorial Course/Gate6개, Weather5개, UI Font/선택명2개, Settings1개다. 엔진 startup/PSO·VSM/드라이버 경고까지0이라는 뜻은 아니다. 전체 Drone.*·패키징·실제 패드·실내 복귀/FPS·모든 시드/완주/기록 검증도 아니다. 기존 CourseManyGates 경고100을 수정 완료로 바꾸거나 전체 회귀에 포함하지 않았다.
+
+최종 실제 도시 Rain frustum 입자수는 정면377/90°이동383/75°상향388이다. 각9칸 최소8/14/12개로 한쪽 빈 화면 문제를 재현한 동일 검사가 통과했다. root가 최종3뷰 PNG를 직접 열어 화면 좌우 분포/얇은 빗줄기를 확인했고, 앞선 도로·닫힌 컨테이너·콘크리트 골조·중복 없는 완성 창고도 확인했다. 이는 사용자 플레이 체감 Pass가 아니다. 원본 Rain/Island/Production 맵을 덮는 생성 도구는 실행하지 않았다.
+
+### 문서·Space와 인계
+
+기존 STATUS/WORKBOARD/CONTEXT·비/저작/시험 가이드를 갱신했고 새 주제 MD는 만들지 않았다. STATUS 크기 확보는 이전 Acro 회의·코스 표시선 상세 원문만 기존 STATUS_2026-10.md로 이동했다. 원문 이동 당시 STATUS29,829B/126줄→26,167B/113줄, 아카이브56,297B/206줄→60,489B/228줄이었다. 이동 raw CRLF 텍스트 SHA256=6658E3B4010F6A25B784208A91798D6C2C1FA9A1308BD66B907FE8936704E033, 이전 아카이브 prefix를 보존했고 기존 색인 링크를 사용했다. 최종 현재 상태 갱신 뒤 크기는 아래 마감 확인을 따른다.
+
+Drone Space 기존 진행상황 Sequence40(3블록)·BP가이드26(2블록)·시험가이드27(2블록) 총7연산을 적용했다. 각 블록을 같은 content stream에서 다시 읽어 기대 Markdown과 전부 정확히 일치함을 확인했다. 기획3·지침9·루트는 변경하지 않았으며 새 Page·공유 권한 변경·예약은 없다. 사람의 기존 기획/보드 링크·이전 검증 출처를 보존하고 현재 수정·자동 검사/수동 대기를 구분했다. GitHub MD 링크는 사용자 Commit/Push 뒤에야 새 본문이 반영된다.
+
+다음 실기: 새 Editor에서 Island Gate 폭/방향·3상태색, Lvl_ProceduralCityRaceTest 또는 로비 랜덤 레이싱 시드194849의 콘크리트·도로/차선·컨테이너 지지·지붕 중복 없음과 Rain3품질/회전/이동/실내/실외/Off를 확인한다. 팀원 Gate 저장 재시험·InterLink/8수업/완주/기록·Observer/물리/재밍 체감·Patriot는 기존 후속이다. Commit/Push는 사용자가 한다.
+
+마감 확인: 변경 Python9개 UTF-8 AST 구문 검사 통과·플레이어 UI 기본 폰트 감사 위반0, Unreal diff --check 오류0(일부 CRLF 알림). MD는 이동 원문의 CRLF 보존 때문에 git -c core.whitespace=cr-at-eol diff --check로 확인하며 오류0이다. STATUS27,028B·WORKBOARD29,610B로30,000B 이하, 기존 STATUS 아카이브60,489B 보존. Unreal63개·MD12개 상태 항목은 앞선 변경을 포함한 의도된 미커밋 목록이다. Editor/Commandlet/Build 프로세스0, HEAD/로컬 origin은 그대로다. 처음 AST stdin 검사는 Windows 기본 인코딩 때문에 중단됐고 UTF-8 명시 후9개 모두 통과했으며 소스 구문 결함은 아니었다. 사용자 수동 Pass·Commit/Push는 실행/추정하지 않았다.
 기준일: 2026-10-04 (Asia/Seoul)
 
 기존 날짜별 기록의 배열은 보존하고 새 기록은 끝에 날짜순으로 추가한다. 현재 상태는 [STATUS](../../STATUS.md)를 따른다.
@@ -3231,3 +3261,230 @@ WORKBOARD가 30KB를 넘어서 10/06 면접 비교표·옛 PC 인계 행을 원�
 이번 MD는 기존 STATUS/WORKBOARD·주제가이드/색인·WORKLOG에 반영했다. 신규 진행 문서·삭제·원격 GitHub 반영은 없으며 변경 파일은 사용자 Commit/Push 대상이다. Space 관련 페이지의 저장 결과는 최종 동기화 확인 기록을 따른다.
 
 최종 동기화 확인: 기존 Space의 진행상황·Blueprint 가이드·테스트 가이드 3개에 6연산을 적용했고, 저장 후 대상 블록 재조회로 기대 본문과 일치를 확인했다(Sequence32/20/22). 과거 날짜별 기록과 링크·기획/안내·Root/권한은 보존했고 새 Page는 만들지 않았다. 페이지 렌더의 모든 화면 폭은 미검증이다. 로컬 MD8개 변경, STATUS27,439B·WORKBOARD28,820B로30KB 이하; 두 저장소 diff --check 통과(CRLF 예고만), Unreal은 BP2개 변경+BP1개/도구2개 신규 상태다. 맵 SHA/원본 자산·Source 미변경, Editor 프로세스 종료 유지. Commit/Push는 하지 않았다.
+
+## 2026-10-14 — 수신 기준·Gate/Patriot 검증 경계 최신화 (D PC Codex)
+
+사용자 “업데이트”에 따라 Git·소스/도구·기존 로그를 읽고 STATUS/WORKBOARD·관련 가이드·Space를 정리했다. Unreal 실행·MCP·Build·새 자동화·맵/자산 저장·Fetch/Pull·Commit/Push는 하지 않았다. 점검 시 UnrealEditor 프로세스는 관찰되지 않았다. 문서 최신화는 기능 구현/수동 Pass를 뜻하지 않는다.
+
+### 수신 기준과 변경 범위
+
+- Unreal HEAD `a57a4444`=로컬 `origin/main`, MD HEAD `b38fc84`=로컬 `origin/main`; 두 저장소 점검 시작 Clean. 실제 원격 서버와 타 PC 작업 트리는 미조회다.
+- Unreal `965b993a..a57a4444`는 2커밋·19파일 변경. `454a982f`에 이전 Gate/Course BP·Patriot BP·적용/생성 도구가 커밋 수신됐고 `a57a4444`에 Training·MWLandscapeAutoMaterial Island/MountainRange·Demonstration 맵과 Anim 추가/이동이 있다. Source·Config·Plugins·uproject 차이는 없다. Anim 이동 후 참조 무결성은 Engine에서 새로 검사하지 않았다.
+- 팀원 커밋 본문 “레이싱콘텐츠 미션3까지 완료”를 보고 수신으로 기록했다. 실제 진입 맵/DA 연결·시작점·완주/기록·4코스 전체 진행도는 미확인이다. 이전 “4코스 미구현”·아이템/Gate 무참조·단일 지형 조사 결과를 현재 판정처럼 쓰던 문장을 정정했다. 이번 diff에 미션 DA 변경은 없다.
+- 현재 Training 파일은 394,745,474B로 이전 검사본394,031,686B와 다르다. 체크아웃 파일 시각을 오늘 맵 편집의 증거로 사용하지 않는다. 10/13 당시 Main 자동78개/비사용 Native20개 참조 조사는 역사적 근거이며 현재 개수/연결 재검증이 아니다.
+
+### 기존 Editor 로그에서 새로 확인한 경계
+
+근거는 `D:\JGY\project\drone\Saved\Logs\Drone.log`의 10/13 UE5.8.2 세션이다. 로그 내부 UTC를 KST로 환산했으며 해당 세션의 Git HEAD는 로그에 없어 단정하지 않는다.
+
+- 12:41:48(`LogMaterial`·`MapCheck`, 약2049행): `/Game/Material/m_green`에 Nanite 사용 플래그 누락, Editor 밖 렌더링을 위해 재저장 필요 경고. Map Check 오류0/경고1. 이 세션에서 해당 재질 저장/해결 근거를 찾지 못했으므로 **해결 여부 미확인**으로 기록했다. 지금 재질이 반드시 깨진다고 단정하지 않으며 이번 수정하지 않았다.
+- 12:49~12:50(약2446행 이후): Patriot BP Editor 열기·트랜스폼 Undo·12:50:14 BP 저장과 이후 Compile 로그가 있다. 현재 BP35,958B는 초기 생성본31,030B와 다르다. 초기 생성/새 프로세스 재로드의 각7회 검사 후 저장된 버전이므로 **현재 저장본의 Pivot 위치/회전·이음새/크기는 재검증 대기**다. Compile 로그만으로 오류/경고0을 선언하지 않는다. 현재 BP Details 우선·기존 조정 보존·생성 도구 덮어쓰기 금지를 가이드에 명시했다.
+- 이후 FrontEnd PIE→RacingTest 진입·DroneMissionGameMode·Pawn 생성/빙의·MISSION-COUNTDOWN 로그2회, 12:51 정상 Editor 종료가 있다. 진입/카운트다운 근거이며 랩 완주·최고 기록 저장/복원·Gate/Patriot 수동 Pass 증거는 아니다.
+- `UE::UnifiedErrorTest` 인접 `LogAutomationTest: Error: Condition failed`15행은 이름 있는 Drone 테스트 결과와 구분했다. 이를 신규 Drone15개 실패로 집계하지 않는다.
+- `Saved/Automation`의 최신 근거는 10/13까지이며 10/14 새 Build/테스트 결과는 없다. 이전 Build/Gate5/5·Patriot7+7과 Claude 결과를 현재 HEAD 전체 통과로 재사용하거나 합산하지 않는다. CourseManyGates 정리 경고100건도 해결된 것으로 바꾸지 않았다.
+
+### 정리 결과·다음 순서
+
+STATUS/WORKBOARD와 Training 배치·MG/Patriot 가이드·이력 총5파일만 수정했다. 현재 정보는 교체하고 과거 이력은 보존했으며 신규 진행 문서를 만들지 않았다. 다음은 현재 Patriot BP 축/이음새·복합 회전 → 변경 Main의 Gate 개수/참조·세 상태색/m_green 경고 해결 및 Editor 밖 렌더 → 팀원 레이싱 보고와 실제 맵/완주/기록 대조 순서다. Production 덮어쓰기·삭제와 새 구현은 이번 범위가 아니다.
+
+Space 기존 진행상황·Blueprint 가이드·테스트 가이드3개에 총9연산을 적용하고 대상9블록 재조회로 기대 본문 일치를 확인했다(Sequence33/21/23). 안내/기획·Root·권한/예약·Trello·Figma는 변경하지 않았다. 유지관리 스킬에 따라 현재 근거와 과거 검증을 분리해 기존 블록만 갱신했다. 페이지 전체 화면 폭/렌더는 미검증이다.
+
+최종 점검: STATUS28,027B·WORKBOARD28,839B로30KB 이하. 두 저장소 diff --check 통과, Unreal Clean·HEAD a57a4444 유지, MD5파일만 로컬 변경이다. Commit/Push는 사용자 담당으로 남겼다.
+
+## 2026-10-14 — 후속: 고정 조종자 첫 수업·미션 박스 치환·실제 그물/공통 접촉 요구
+
+사용자 요청을 현재 코드와 읽기 전용 대조하고 Claude 인계 카드4개를 정리했다. 역할 규칙에 따라 Codex는 C++/BP/맵을 수정하거나 Unreal·MCP·Build·자동화를 실행하지 않았다. 앞선 문서 미커밋 변경을 보존했고 신규 기능은 구현 완료가 아니다.
+
+### TUT-OBSERVER-01 — 첫 수업 교체 기준
+
+- 해석/기준: 기존 첫 `Mission.Tutorial.Hover`를 기초 수업으로 확장한다. 9번째 수업 추가나 취소된 사람 캐릭터 조작 부활은 아니다. 기존8수업 ID·저장 키·다음 수업 연결은 보존한다. 새 독립 수업 추가가 필요하면 번호/기존 완료 기록 정책을 따로 정한다.
+- 카메라는 지상 사람 눈높이의 고정 관찰 시점(LOS)이며 드론 FPV와 다르다. 카메라 월드 위치·회전은 고정하고 드론 소유/Possess와 입력은 유지한다. 수업 한정 ViewTarget 정책으로 구성하고 출격/재출격에 재적용·종료/다음 수업에서 해제한다. P 시점 전환 등으로 해당 수업 카메라가 덮어써지지 않아야 한다.
+- 순서: 바닥 출발 → 이륙/목표 높이 유지 → 전진 구역 → 후진해 출발 패드 복귀 → 실제 접지·정지. 전/후진은 초기 방향·기체 방향과 이동을 함께 확인해 옆길/180°회전 후 전진으로 후진 수업이 완료되지 않게 한다. 패드 공중 통과만으로 착지 성공 처리하지 않는다.
+- 착지: 패드 안·바닥 접촉 또는 짧은 하향 지면 확인·허용 수평/수직 속도·안정 유지 시간을 함께 판정한다. 목표 높이/거리·허용 오차/속도·유지시간·카메라 높이/FOV는 BP/DA 조절값이며 최종 숫자는 이번 임의 확정하지 않았다. 안내 UI는 현재 단계와 완료 이유를 표시한다.
+- 실제 대상: `Source/Drone/Flow/DroneMissionPlayerController.cpp:390,777` 출격/재출격 Possess, `Source/Drone/Flight/DroneFlightPawn.cpp:1154` 드론 시점 분기, `Source/Drone/Tutorial/DroneTutorialHoverZone.*`, `Tools/AssetMigration/BuildDroneTutorialMissionTest.py:87`, `BuildDroneIsolatedMissionMaps.py:21`, `DA_Mission_Tutorial_Hover`와 `TestMap/Tutorial/Lvl_Tutorial_Hover_Test`.
+- 현재 생성 도구의 첫 수업은 3초 호버→귀환뿐이다. `DroneMissionReturnZone.cpp:59`는 단순 Overlap으로 ReturnToBase를 보고하므로 착지 판정으로 그대로 쓰면 안 된다. 전용 목표 Event를 추가한다면 기존 enum 직렬화 숫자는 보존한다. 화면/자동화 기준은 고정 카메라+입력 정상·기체1대·단계 순서/건너뛰기 방지·공중 귀환 미완료·착지 완료·재출격/다음 수업 시점 복원이다.
+
+### MISSION-MARKER-01 — 배치 박스를 실제 콘텐츠로 치환
+
+팀원 보고상 미션맵에 net/적 등 박스가 있으나 실제 맵별 위치/수량/라벨·대상 미션 DA는 아직 Engine에서 읽지 않았다. 이름만 보고 적 무기/역할을 임의 선택하지 않는다. Claude가 DA→MissionMap과 각 Actor 경로·라벨·종류·Transform/Bounds·Tags/TargetId·폴더·외부 참조를 목록화해 교체 BP 매핑을 확정한다. 미매핑/중복/목적 불명 항목은 보류하고 원본을 보존한다.
+
+Net 박스의 크기는 그물 폭/높이·고정점으로 변환하며 무조건 Actor Scale로 복사하지 않는다. 적은 종류·바닥/Nav 배치·순찰/목표 참조를 유지한다. 검증된 BP만 시험 복사본에서 먼저 치환하고 원본/교체/보류 수 일치·미션 목표·재시작·그물 크기를 확인한 뒤 승인된 맵을 개별 반영한다. 기존 생성 도구로 팀원 맵을 재생성하거나 Production Training을 시험 저장하지 않는다. 외형만 바꾸고 목표 Tags를 잃는 변경은 불합격이다.
+
+### PHY-NET-03 / PHY-COL-01 — 실제 차이와 구현 대상
+
+- 그물: `Source/Drone/Physics/DroneNetPlacementRig.cpp:24,30,321`은 Tick 없는 Cube ISM·계산 처짐이며 `:264`의 파단 조각만 SimulatePhysics다. 현재 전체 그물이 중력·접촉으로 늘어지는 물리는 아니다. 고정점 유지·중력 처짐·접촉 국소 변형·복원/감쇠를 실제 Cloth/Dataflow로 Sandbox에서 검증한다. 크기/간격·고정점·강성/감쇠 등 BP 조정과 Reset을 포함한다. 기존 포획 게임 규칙은 보존하고 일반 접촉 즉시 절단은 금지한다.
+- 상호작용: `DroneCollisionResponseComponent.cpp:332,499`가 NetPlacementRig를 직접 Cast하므로 새 Cloth 표현과 기존 포획의 호환 계약을 유지/분리해야 한다. Cloth 표시만 바꿔 포획이 사라지거나 고정 ISM/새 대리 충돌이 중복 반응하는 상태를 피한다. 줄/구멍과 실제 판정 대리 형상 차이·성능 제한은 검증으로 밝혀야 한다. 기술 근거는 Epic [Panel Cloth Editor Overview](https://dev.epicgames.com/documentation/en-us/unreal-engine/panel-cloth-editor-overview)의 Cloth Asset/Dataflow·Runtime Component·Weight Map/Collision 제작 흐름을 읽기 확인했으며 프로젝트 자산 제작 성공을 뜻하지 않는다.
+- 벽: `Flight/DroneFlightPawn.cpp:200`의 공통 CollisionResponseComponent와 `Physics/DroneCollisionResponseComponent.cpp:29,341`의 OnActorHit/일반 OtherActor 처리에 이미 특정 시험벽 제한이 없다. 새 특수벽 코드를 만들기보다 옆면 범위를 보강하는 작업이다.
+- 빈틈: `DroneFlightPawn.cpp:85,104`의45cm Root구/외형 NoCollision, `DroneCollisionResponseComponent.cpp:17,475`의 대각4점(±95,±95,0)·12cm Probe와 `.h:172`의 Visibility 채널 때문에 모델 옆면/날개·충돌 채널별 누락 가능성이 있다. 현재 위치의 중심→끝 검사만으로 고속 이전 위치부터의 외곽 이동 Sweep을 보장하지 않는다. 실제 맵 증상을 확인한 뒤 BP별 외곽 범위·공통 환경 채널·이동 Sweep을 보강한다. 현재 증상을 재현·원인 확정한 것은 아니다.
+- 수락 기준: 일반 StaticMesh 벽/기둥의 전후좌우·로터 끝, 서로 다른 드론 크기, Pawn Block/Visibility Ignore 조합, 저속<고속 반발량, 모서리·연속 압박·고속 얇은 벽을 확인한다. 카메라는 부드럽고 안정적으로 유지하며 총알 피해 Shake는 남긴다. 바닥 착륙·천장·UGV 제외 정책은 기존 유지, 강한 Crash/Damage·Landing 통합은 기존 후속과 대조한다. 충돌 형상이 없는 장식 메시까지 감지한다고 약속하지 않는다.
+
+진행 순서: 1번 수업 → 미션 박스 목록/매핑 → Sandbox에서 실제 그물·옆면 공통 접촉 검증 → 검증된 Actor로 맵별 치환. 상세 물리 절차는 기존 `DRONE_CHAOS_DATAFLOW_PLAN.md`에 갱신했다. Build·자동 회귀·수동 화면 검증은 모두 구현 담당의 후속이며 이번 Pass는 없다. MD와 Space 반영/최종 상태는 아래 확인 기록을 따른다.
+
+반영 확인: Space 기존 진행상황·BP 가이드2개/3블록을 수정하고 재조회로 기대 본문 일치를 확인했다(Sequence34/22). 새 Page·예약·권한·Trello 변경 없음. 기존 미커밋 포함 MD6파일, STATUS28,673B·WORKBOARD29,430B로30KB 이하. 두 저장소 diff --check 통과·Unreal Clean 유지. 코드/맵 구현과 실제 박스 인벤토리는 미실행이며 Commit/Push는 하지 않았다.
+
+## 2026-10-14 — 후속: Story 표시명 확정·박스 후보 맵 조사 범위
+
+사용자 확정명은 M1 골든 타임/GOLDEN TIME, M2 길목 차단/INTERCEPT, M3 보급 차단/SUPPLY BREAK, M4 최종 타격/ENDGAME이다. CONTEXT에 정본 표를 두고 STATUS/미션 가이드에서 연결했다. MISSION-NAME-01은 Claude 담당 DA DisplayName/EnglishTitle·화면 검증 대기로 남겼다. 내부 MissionId·StoryFact·저장 키·맵/DA 경로·미션 목표는 변경하지 않는다. M3 내부 VeilBreaker는 호환용으로 보존한다.
+
+읽기 확인: `SetStoryMissionTexts.py`의 M1/M2/M4 문구는 요청과 같고 M3는 장막 돌파/VEIL BREAKER다. 도구상 기본값 확인이며 현재 DA 본문 재조회가 아니다. 이 도구는 설명/무전/목표 요약/팁도 쓰므로 이름만 바꾸려고 전체 실행하면 안 된다. 구형 RenameDroneMissionDisplayNames·Story 빌더의 표시 기본값도 역덮어쓰기 방지를 위해 동기화 대상이다. 결과 Widget은 EnglishTitle을 M3 SupplyBreak처럼 자동 축약하는 기존 계약이 있어 로비/부제/브리핑/로딩/기체 선택/HUD/결과 표시를 대조해야 한다. 이번 이름 변경만으로 UI 포맷·게임플레이를 임의 변경하지 않는다.
+
+Space 기획·진행 Page2개/2블록 저장 및 재조회 일치를 확인했다(Sequence2/35). 실제 Unreal DA/UI 수정·Build·화면 검증은 하지 않았다.
+
+이후 사용자 지정 후보는 `/Game/Drone/Maps/Lvl_Battlefield`, `Lvl_MilitaryBase`, `Lvl_MilitaryCamp`다. 각각 파일73,233,451B/215,783,918B/50,378,631B 존재를 확인했다. 기존 도구·Saved 로그/자동화·브리지·문서에서 현재 박스 Actor 인벤토리는 찾지 못했다. 과거 이식/MapCheck·강/지형 기록은 플레이스홀더 목록으로 재사용하지 않았다.
+
+보조적으로 파일 내부 ASCII/UTF-16 문자열을 읽었으나 boxContainer/Cube/GuardTower 등은 ActorLabel·실제 배치/역할/박스 크기의 검증이 아니다. net/enemy 후보 문자열이 검출되지 않았다고 배치가 없다고 판정하지 않는다. 광범위 문자열 나열의 첫 읽기 보조 세션은 중단했고 이후 제한 검색2개는 완료했다. 파일은 수정하지 않았다.
+
+확정된 후속 절차: 세 맵 실제 Actor 목록(맵/경로/표시명/클래스·메시/Transform/Bounds/Tags/참조)을 읽기 전용으로 확보 → 교체 후보/불명 항목 표를 사용자에게 제시·질문 → 답변 후에만 승인된 치환. 사용자 확인 전에 그물/적 종류를 임의 결정하거나 삭제·저장하지 않는다. 현재 역할 규칙상 Unreal 도구 실행은 Claude 담당이므로 실제 맵 인벤토리 단계는 미실행/담당 인계 대기다.
+
+후속 확인: 진행 Page의 후보3맵·사용자 확인 후 치환 경계를 저장/재조회 확인했다(Sequence36). STATUS28,894B·WORKBOARD29,717B로30KB 이하, MD diff --check 통과·Unreal Clean 유지. 이름/후보 맵 문서만 갱신했고 실제 박스 발견/개수 확정·맵 로드/수정·커밋/푸시는 하지 않았다.
+
+## 2026-10-14 — 사용자 승인 직접 구현·미션 치환·Pretendard UI·Gate 저장 수리 (D PC Codex)
+
+사용자 “너가 작업다해 오늘은”으로 오늘 C++/자산/엔진 실행을 직접 승인받았다. 기존 Codex/Claude 상시 분담·AGENTS는 변경하지 않았다. Unreal `a57a4444`·MD `b38fc84`에서 시작한 로컬 미커밋 작업이며 Fetch/Pull·Commit/Push·MCP·Trello/Figma·공유 권한·예약은 실행하지 않았다. 현재 PC 엔진은 UE5.8.2, 빌드는 DroneEditor Win64 Development·MSVC14.51.36257이다. 실행 결과와 수동 체감은 구분한다.
+
+### 구현과 승인된 자산 반영
+
+- 첫 `Mission.Tutorial.Hover`를 지상 고정 사람 눈높이 카메라에서 이륙/안정→전진→방향 유지 후진→실제 접지 착지4단계로 확장했다. 드론 소유/입력·8개 ID/Next/저장 호환 유지, P 시점 전환이 관찰 카메라를 덮어쓰지 않으며 재출격은 단계 초기화·다음 수업은 시점 복원한다. 거리/높이·방향/속도 오차·유지시간·카메라 BP 조절. `BP_TutorialObserverLesson`과 `TestMap/Tutorial/Lvl_Tutorial_Observer_Test`를 만들고 Hover DA만 새 수업으로 연결했다. 기존 Hover/공용/Production Training 맵은 미저장. 과거 생성 도구가 이 DA를 역덮어쓰지 않도록 보호했다.
+- NetPlacementRig를 공유 매듭 PBD 중력·구조/전단 제약·감쇠·국소 충격·드론/지면 접촉으로 변경했다. Top Corner/Top Edge 고정, 하단 자유·Slack/강성/충돌 예산 BP 조절, 기존 포획/해제/파단/Reset 유지. 일반 접촉 자동 절단은 금지다. **실제 Chaos Cloth/Dataflow 제작을 완료한 것이 아니다.** 벽 반발은 몸체·로터 외곽 자동 범위와 시간/방사 Sweep·Pawn 충돌 채널을 보강했다. 카메라 안정화·총알 피해 Shake·착륙/천장/UGV 예외는 유지한다.
+- 새 `BP_DroneJammingRadar`는 빈 RadarMesh 슬롯과 기지 중심 Offset/범위/중심 강도 반경을 조절한다. 화면 Noise→NO SIGNAL/조종 입력 차단·이탈 복구, 약한 신호는 영상만 방해한다. 입력 손실/복구 때 이전 입력 캐시를 지우되 실제 속도/비행 물리를 배율로 늦추지 않는다. 광섬유 드론은 노이즈·연결 차단에 면역이다.
+- Story DA4개의 확정 표시명을 확인했고 M3만 보급 차단/SUPPLY BREAK로 새 저장했다. 내부 VeilBreaker·ID/Next/Story Fact/맵/목표는 유지했다. 이름 전용 도구와 과거 생성 기본값을 동기화했으며 설명을 다시 쓰는 전체 도구는 실행하지 않았다.
+
+실제 세 맵 로드 목록은 Battlefield1828·MilitaryBase3061·MilitaryCamp4593 Actor였다(로드된 Actor 기준, 미로드 Partition 전체 증명 아님). 사용자 승인 후 Battlefield M_net~M_net8 전부→물리 그물8, M_Target→M1 전달1; MilitaryBase M_Turret1→설치 무인1, 숫자 없는 M_Radar→재밍1을 저장했다. 원본11박스는 삭제하지 않고 Drone/ArchivedMarkers·비표시/무충돌로 보존했고 두 원본 umap bytes를 Saved에 백업했다. 그물 원래 폭/높이·상단 고정/하단 자유, 기존 NPC/포탑과 주변 Actor를 보존했다. 레이더는 빈 Mesh·기지 범위 반경159.67m/반높이50m·최대 강도30m로 시험 배치했다(채택 최종 수치 아님). 숫자 레이더/타워5개·MilitaryBase M_Target·MilitaryCamp·Production Training은 미변경이다.
+
+환경 배정은 사용자 확정 Battlefield=M1·MilitaryBase=M2/3·MilitaryCamp=M4다. **Story DA의 실제 진입은 아직 기존4개 TestMap**이며 제품 맵 시작/목표/실패 연결 완료라고 쓰지 않는다. MilitaryBase M_Target의 역할은 사용자도 미확정이므로 보류한다. 기존 M1 PayloadTarget Actor는 이동/삭제하지 않았다.
+
+### Select_UI와 실제 Pretendard 텍스트
+
+Select_UI 원본21PNG를 처음 연결한 뒤, 사용자 후속 “텍스트 이미지 대신 Pretendard 실제 텍스트”에 맞춰 최종 사용은 배경1+사진4개뿐이다. 제목/한영 목록/설명/목표·방식·제약/무전/START는 실제 UTextBlock·기존 DA 값이며 PNG 문장으로 미션 기획을 덮어쓰지 않았다. 카드 강조·선·화살표는 코드 도형이다. 원본/이미 임포트한 텍스트PNG16개는 삭제하지 않고 참조만 해제했다. Story 목록 선택→하단 START→기존 브리핑/Back, 훈련/레이싱 기존 동작·타이틀 아트는 유지한다. 목록 첫 버튼의 중복 포커스 후보 때문에 노브가 M4→M1로 반복되던 경로를 제거했다. 실제 렌더에서 발견한 START 축소는 Fill 슬롯·텍스트/화살표 실제 크기로 보정하고 기하 검사에 포함했다.
+
+공식 Pretendard v1.3.9 Regular/Bold 원본 해시를 고정해 프로젝트 UFontFace/UFont로 Inline 포함했다. Root InterfaceFont/InterfaceBoldFont 연결·글꼴이 실제로 달라질 때만 갱신, 타이틀/권장 팝업 포커스 스타일이 기본 글꼴로 역덮던 경로도 보정했다. OS 글꼴 설치 불필요, OFL 고지와 NonUFS 동봉 설정 추가. 폰트 최초 commandlet 임포트는 Slate 미초기화 Assert로 실패했고 Gate 사고와 무관하다. 일반 Editor `-ExecutePythonScript`로 변경해 정상 임포트/종료했다. 가이드/도구에 해당 실행 전제를 명시했다.
+
+### 검증 근거와 경계
+
+| 범위 | 결과 | Saved 근거 |
+|---|---|---|
+| 최종 UI/기능 Build | Succeeded, 기존 deprecation/비권장 컴파일러 경고 있음 | Logs/Build_20261014_Pretendard_Final.log |
+| 첫 수업 자산 설치 | 성공·0 errors/0 warnings | Automation/ObserverTutorial/setup_verified.log·setup.json |
+| 표시명 전용 적용 | 성공·M3만 변경·ID/Next/Map 보존 | Automation/CodexMissionNames/20261014T012335Z/report.json |
+| 승인 맵11치환 | 적용0errors/62warnings, 별도 재로드0errors/39warnings | Automation/CodexStoryActors/apply4.log·verify.log·20261014T015703Z/report.json |
+| 원본 맵 복원 백업 | 두 umap bytes 보존 | Automation/CodexStoryActors/20261014T015458Z/ |
+| UI/폰트 연결 | 5text-free Texture·WBP·UFont2개 검증 | Automation/SelectUI/textfree_import.log·ImportDroneSelectUI.json·font_import_editor.log·PretendardImport.json |
+| 새 집중 렌더 자동화 | **18 Success / 0 warnings / 0 Fail(테스트 집계)** | Automation/CodexOct14Features/final_render.log·FinalReport/index.json |
+| 실제 UI 캡처 | 1920×1080 M1~4 모두 열어 글꼴/배치/START 확인 | Automation/SelectUI/story_m1~4.png |
+
+집중18개는 물리7·Signal3·Observer3·MissionLessonsTestMap1·StoryDisplayNames1·FlightHUD1·SelectUI2다. 초기 NullRHI16개 중 ControlLink/ObserverPIE2개는 fixture 오류로 Fail했다. ControlLink는 World BeginPlay만 호출해 동적 Delegate가 actor 초기화 가드에 막혔고 정식 BeginPlayInTestWorld로 수정했다. Observer는 재출격 후 파괴된 이전 Pawn 가드 때문에 새 Pawn 회수를 못 했고 순서를 수정했다. 실제 런타임 차단/재출격 코드를 억지로 바꾸거나 assertion을 낮추지 않았다. 최종18개는 새 RHI 프로세스에서 재실행했다. 보고서 경고0은 테스트 집계이며 엔진의 기존 startup/self-test·렌더/환경 경고까지 0이라는 뜻이 아니다. 승인 맵 경고는 Landscape collision 및 외부 MilitaryBase WireFence Construction 등 기존 환경 경고를 포함한다.
+
+### Gate BP 저장 오류 — 재현→수정→동일 저장 경로 재검증
+
+사용자가 팀원 PC의 자동 Gate 생성/기존 위치 수정→저장 크래시와 정확 BP_DroneTrainingGate 경로를 보고했고, 진단 뒤 수정까지 명시 승인했다. 팀원 정확한 콜스택·커밋/엔진 버전은 아직 미수신이다. 로컬에서 새 격리 맵의 BP 자동4개+독립1개 저장이 거부됐고, **Course/Spline을 모두 뺀 BP Gate1개도 동일하게 실패**했다. Native Gate1개의 첫 저장/재로드는 성공했다. 로컬은 SavePackage의 저장 거부이며 프로세스 크래시가 아니므로 팀원 동일 사고 완치로 단정하지 않는다.
+
+명시 오류는 BP CDO의 `MID_M_BLUE_1.MID_M_BLUE_1EditorOnlyData` private 객체를 맵 Gate의 MID가 참조하는 것이었다. 기존 ApplyDroneGateItemAsset의 CDO 상태 재질/색 setter→RefreshStateMaterial→MID 생성→OverrideMaterials 직렬화 경로와 일치했다. 세그먼트 개수/자동 모드는 실패 필요조건이 아니었다. 수정은 템플릿에 정적 재질만 연결, 인스턴스 MID의 안전한 원본/Outer/native Archetype 확인·고유 이름 사용, 동적 부모만 풀고 작성된 MaterialInstanceConstant는 보존하는 것이다. 숨긴 링과 완성형 메시 모두 처리했다. 기존16개 컴포넌트를 삭제하지 않았다.
+
+Gate.cpp·적용 도구/회귀 검사와 **Gate BP 한 개만** 수리 저장했다. Repair 도구는 원본 uasset bytes 백업 후 메시/보정 Transform/Scale/Trigger/3상태 재질/색·사운드/기존 컴포넌트 전후 동일을 검사한다. Course BP·Production 맵 저장/Compile·전체 이식/재생성은 하지 않았다.
+
+| Gate 수리 검증 | 결과 | 근거 |
+|---|---|---|
+| 새 코드 Build | Succeeded18.89초(기존 경고 포함) | Saved/Logs/Build_20261014_GateSave.log |
+| Gate BP targeted repair | 0errors/0warnings·기하/설정 exact 동일·MID참조17곳→0·Legacy16→16 | Saved/Automation/GateTemplateRepair/20261014T024251_430296Z/report.json·원본 BP 백업 |
+| 새 프로세스 verify | 0errors/0warnings·템플릿 MID0 | Saved/Automation/GateTemplateRepair/20261014T024322_025356Z/report.json |
+| 원래 실제 저장 루프 | 자동BP4+독립1 생성·Spline/Handle/위치 수정 포함 저장→unload/reload3회 성공 | Saved/Automation/GateSaveDiagnostic/20261014_114345_75775e4a/journal.json(stage COMPLETE) |
+| Gate 회귀5개 | 5/5 Success, 집계4Success+1SuccessWithWarnings·Fail0 | Saved/Automation/GateTemplateRepair/regression.log·RegressionReport/index.json |
+
+Gate5개는 TrainingGateBlueprint/Presentation/Sequence·TrainingCourse·CourseManyGates다. 마지막 정리 경고100건은 기존 이슈이며 해결된 것으로 바꾸지 않는다. 실제 저장 루프의 Spline 편집 뒤 선분 수32→33→34는 예상 수와 매회 같고 Child/live Gate4대 유지, 잔존 세그먼트 무한 증가 근거는 없었다. commandlet에서 EditorActorSubsystem 이동이 false인 경우 Actor API 대체를 journal에 기록하고 실제 위치를 검사했다. 이 검사와 실제 Editor 드래그/팀원 크래시 재시험은 구분한다.
+
+진단 중 새로 만든 미참조 임시 umap5개와 성공 fixture1개는 소유 journal·Git 미추적·절대경로 확인과 bytes/SHA256 백업 대조 후 Saved/Automation/GateSaveDiagnostic/FixtureBackups로만 보관했다. 로그/journal/cleanup manifest·도구는 유지하며 Content Diagnostics에는 진단 맵을 남기지 않았다. 제품/팀원 자산 삭제가 아니고 복원 가능하다. 중간 Python API/진단 assertion 오류는 실제 저장 실패 재현으로 집계하지 않았다.
+
+팀원은 **Gate C++ 수정과 수리 BP를 함께** 받고 Editor 종료 후 Build→같은 자동 생성/위치 수정/저장을 재시험한다. 자체 수정 BP는 먼저 보존·대조하며 새 코드에서 targeted Repair 도구를 사용한다. 세그먼트/Production 맵·DDC·Intermediate를 지울 이유는 없다. 실제 패드·1280 UI·Observer 조작·벽/그물/재밍 체감·제품 Story 시작/목표 연결·패키징은 후속이다. MD·Space 최종 동기화/작업 트리 점검은 아래 확인 기록을 따른다. Commit/Push는 사용자다.
+
+최종 확인: Space 기존 진행상황 Sequence38·BP 가이드24·시험 가이드25·기획3에 오늘 증거와 미확인 경계를 반영했다. 마지막 Gate 수정5블록도 재조회하여 기대 본문 일치를 확인했다. 두 저장소 diff --check 오류 없음(일부 LF→CRLF 알림만 있음), STATUS29,777B·WORKBOARD29,770B로30KB 이하. Production Training·MilitaryCamp·Course BP에 diff 없음, Unreal Editor/빌드 프로세스0개다. Unreal67개·MD10개 상태 항목이 남은 의도된 미커밋 변경이며 Commit/Push·사용자 수동 Pass는 실행/추정하지 않았다.
+
+## 2026-10-14 — 랜덤 레이싱 비 정면/픽셀 수정·플레이어 UI 공통 Pretendard
+
+### 기준과 범위
+
+사용자는 랜덤 레이싱에서 평면 옆면/픽셀처럼 보이던 대상이 비라고 명확히 했다. 도시·도로·코스 생성은 수정하지 않았다. 이전 Observer/물리·재밍·Gate 수리 등은 사용자가 커밋한 Unreal `bb6233c8`(로컬 origin/main 동일)에 포함되어 있으며, 이번에는 그 위에서 Rain/UI만 변경했다. MD 기준 `b38fc84`와 앞선 문서 변경을 보존했다. Fetch/Pull·Commit/Push·Trello/Figma/공유 권한/예약 변경은 하지 않았다. 오늘 전작업 승인 범위 내 Codex 직접 구현이며 상시 협업 역할 변경이 아니다.
+
+### 비 원인과 수정
+
+1. 실제 저장된 프로젝트 NS 사본3개·Sprite Renderer6개의 `VelocityAligned`가 `FacingMode=Automatic` 설정과 함께 사용됐다. 엔진 정의상 속도 정렬은 FacingMode를 무시한다. `Unaligned + FaceCameraPlane`으로 바꾸고 CPU/World Space 낙하는 유지하여 카메라를 기울여도 중력 방향까지 회전시키지 않았다.
+2. 사용자 Drone.log에는 두 프로젝트 비 재질의 `Sampler type is Masks, should be Linear Color` 및 PCD3D_SM6 컴파일 실패→Default Material 대체가 있었다. 원본 OilRig T_rain_Mask의 실제 인코딩에 맞춰 **프로젝트 재질2개만 Linear Color 샘플러**로 수리했다. 원본 텍스처는 수정하지 않았다.
+3. 위 두 수정 후에도 실제 캡처에는 짧은 흰 사각형이 남았다. 원본 마스크를 읽기 전용 PNG로 내보내 확인한 결과 4×512 RGBA에서 R은 짧은 밝은 머리, A가 긴 투명 꼬리였다. 현재 사용 재질 M_DroneRainSprite의 투명도를 **A 채널**로 연결하고 좌우 폭·상하 끝을 부드럽게 감쇠했다. `RainStreakHalfWidth=0.10`; 기존 ParticleColor/밝기·Opacity 파라미터·근거리 깊이 감쇠는 보존했다. 최종 캡처를 직접 열어 가는 빗줄기로 바뀐 것을 확인했다.
+
+낮음/중간/높음의 기존 입자 수·밀도·Bounds·낙하 속도·커버 범위·천장 검사·젖음/빗소리·기상 프로필은 바꾸지 않았다. 비 켜짐=카메라 주변 Niagara1개·legacy ISM0, 끔=0개 유지. 전체 성능/FPS 개선율은 이번 측정하지 않았다.
+
+`ConfigureDroneRainPresentation.py`는 기본 읽기 전용 inventory이며 자체 보고서에도 화면 검증이 아니라고 명시한다. 명시 Apply 때만 정확히 프로젝트 NS3개/재질2개를 허용하고 변경 전 bytes/SHA256을 백업한다. C++ DroneRainAssetLibrary도 같은 패키지 허용 목록을 사용한다. `DroneRainMaterialProfile.py`는 기존 Opacity 하위 그래프를 보존하는 멱등 처리·기존 마커 업그레이드와 A 연결을 공유한다. 이후 재생성 도구도 같은 규칙을 따르도록 수정했지만 광범위 맵/에셋 생성 도구는 실행하지 않았다.
+
+### Pretendard·선택 이름
+
+Native 기본 글꼴44곳을 DroneUIFont로 통일하고 프로젝트 DroneUserWidget 공통 기반에서 Native/Designer UI 10종의 일반 텍스트·입력칸·Combo/생성 행·Rich 기본 스타일을 처리했다. 기존 크기/굵기/자간/외곽선/색·레이아웃·아트는 유지한다. Initialize/PreConstruct/Construct/Sync 때 적용하며 Tick마다 전체 트리를 순회하지 않는다. `bUnifyDesignerFonts`, `FontOptOutWidgetNames`, 동적 추가 후 `RefreshProjectFonts` 예외를 제공한다. 기존 Regular/Bold UFont 임베드·OFL 동봉을 유지하고 폰트 폴더 AlwaysCook을 추가했다. 글꼴 자산/WBP 대량 재저장은 하지 않았다.
+
+아이콘·명시 opt-out·Vendor/Legacy·엔진 Editor/디버그 글꼴과 기본 숨김인 월드 TextRender 라벨은 범위 밖이다. Rich 태그별 스타일 테이블을 강제로 바꾸는 작업도 아니다. 기존 Story 배경/사진·로고 아트는 보존한다.
+
+선택 목록 두 경로는 표시 전용 formatter로 `랜덤 도시 레이싱(시험)` 같은 **끝 괄호 부연만 숨긴다**. 중간 괄호/불완전 괄호·DA 원문·ID·상세/툴팁·맵/저장키·진행 순서는 바꾸지 않는다. 중첩/전각/복수 끝 괄호 등13개 사례를 회귀 검사했다.
+
+### 검증과 재현 이력
+
+검증 환경: UE5.8.2, MSVC14.51.36257, DroneEditor Win64 Development, 실제 D3D12_SM6 RHI. 로그/보고서는 아래 `D:\JGY\project\drone\Saved` 기준이다.
+
+| 검사 | 실제 결과 | 근거 |
+|---|---|---|
+| 최종 Build | Succeeded, 12.20초·기존 컴파일러/엔진 경고 유지 | Logs/Build_20261014_RainFont_Final6.log |
+| 실제 RHI 집중 자동화 | **14 Success / 0 SuccessWithWarnings / 0 Fail / 0 NotRun**, 39.555초 | Automation/RainCameraFacing/SoftAlphaReport/index.json·soft_alpha_render.log |
+| 비 화면·실제 컴포넌트 | 3품질×정면/90°/75°상향 + Off=10장, 실제1280×720. 켜짐 Niagara1개·ISM0, Off0 | Automation/RainCameraPresentation/soft_alpha/Capture_BEB211AC46588D5AC65D0380FA51364E/ |
+| UI 렌더·글꼴 | Story4장·설정 화면 직접 확인, 10 native+기존WBP2개·Designer 크기37/자간143/외곽선2/색 유지 회귀 | Automation/SelectUI/story_m1~4.png·Automation/Settings/settings_main.png·settings_open.png |
+| UI 소스 기본 글꼴 감사 | 위반0 | Tools/Validation/AuditDroneUIFontSources.py |
+| 마지막 대상 적용 | Sprite 알파/soft profile 변경, 기타 허용 대상 기존 수리 유지·원본/Rain BP SHA 보존 | Automation/RainCameraFacing/20261014T035631_137046Z/report.json |
+
+14개는 RainCameraPresentation/Follow/QualityLevels/PerformanceBudget, UI FontContract/PlayerWidgetFontsPIE/SelectionDisplayLabelContract/SelectUILayoutContract/SelectUIPresentationPIE/FlightHUDTelemetryBinding/FlightHUDBlueprintAsset, Flow.SettingsContract, Diagnostics Weather.RainCameraCapture/UI.SettingsCapture다. 앞선18개/Gate5개와 별도 실행이며 전체 Drone.* 또는 실제 플레이 Pass로 합산하지 않는다. 테스트 경고0은 엔진 startup/self-test·환경 경고까지 0이라는 뜻이 아니다.
+
+RED 단계에서 실제 정렬12·샘플러6 문제를 재현했다(BeforeFinalReport). 초기 NullRHI GetUsedTextures와 BeginPlay/플레이어 등록 fixture는 실제 렌더/정식 GameWorld로 바로잡았다. 첫 수리 배치의12성공/2실패 중 Rich 기본 스타일의 초기화 전 조회는 새 UI helper 결함으로 수정했다. 이어13성공/1실패는 화면 캡처 fixture가 OS 창 테두리 차이(클라이언트1280×722/PNG1280×720)를 동일값으로 가정한 문제였다. 첫 실제 PNG가 최소960×540이고 이후9장이 정확히 같은 크기여야 한다는 조건으로 바꿨으며 사용자 비/입력 검사를 약화하지 않았다. 마지막 새 프로세스에서14개 전부 재실행했다. 정적 검사 통과만으로 픽셀 해결을 판정하지 않고 첫 수리 캡처의 사각형을 발견해 A/soft profile까지 후속 수정했다. 진단 조명 변경은 캡처 fixture만이며 제품 맵 조명을 수정하지 않았다. 따라서 전후 이미지를 동일 조명 성능/측광 비교로 해석하지 않는다.
+
+처음 수리의 NS3개/재질2개 원본 bytes 백업은 Automation/RainCameraFacing/20261014T033748_069008Z/, 이후 soft/alpha 변경 백업은 035349_590873Z·035631_137046Z 폴더에 있다. 원본 마스크 검사 PNG는 MaskInspection/T_rain_Mask.png에만 보존했다. Content diff는 기존 프로젝트 Weather 자산5개만이며 맵·Gate/Rain BP·ThirdParty 원본은 미변경이다.
+
+### 남은 수동 확인·인계
+
+랜덤 도시 레이싱의 비 날씨에서 낮음/중간/높음→좌우90°/상향/이동, 실내 차단/실외 복귀, 비 품질 Off를 확인한다. 선택 목록 끝 괄호 숨김·HUD/설정/결과/로딩 Pretendard와 실제 패드·1280/1920 가독성을 확인한다. 실제 랜덤 레이싱 플레이·사용자 화면 체감·전체 회귀/패키징·FPS 측정은 미완료다. Gate 팀원 동일 저장 재시험·기존 Observer/물리/재밍 실기 대기는 유지한다.
+
+MD STATUS/WORKBOARD/CONTEXT·UI/비 가이드를 갱신했다. Space 기존 진행39·BP25·시험26에8블록을 반영하고 모두 재조회하여 기대 본문 일치를 확인했다. 기획3·지침9·루트는 미변경. 두 저장소 diff --check 오류 없음(일부 CRLF 알림), STATUS29,829B·WORKBOARD29,798B로30KB 이하이며 Unreal Editor/Build 프로세스0개다. Unreal46개·MD11개 상태 항목은 의도된 미커밋 변경이며 Commit/Push는 사용자다.
+
+## 2026-10-14 — Island Gate 크기·랜덤 Gate 방향·도시 외형과 Rain 볼륨 후속
+
+### 기준·승인과 조사
+
+같은 D PC, Unreal HEAD/로컬 origin/main bb6233c8·MD b38fc84와 앞선 Rain/UI·문서 변경을 보존했다. 사용자가 Island의 좁은 Gate, 랜덤 레이싱의 돌아간 Gate·화면 한쪽 비, 콘크리트/컨테이너/도로/지붕 위 건물 중복을 지적해 해당 수정까지 승인했다. Editor PID1468이 남아 있던 첫 확인 뒤 사용자의 본창 종료 답변과 실제 프로세스0을 확인하고 Build했다. 오늘 전작업 승인에 따른 Codex 직접 구현이며 상시 역할 분담 변경은 아니다. Fetch/Pull·Commit/Push·Trello/Figma/권한·예약 변경은 하지 않았다.
+
+고립된 비 fixture의 앞선14/14 통과는 실제 랜덤 레이싱 전체 화면 분포 검증이 아니었다. 이번에는 실제 저장 맵/생성기·사용자 시드194849를 별도 프로세스/PIE에서 읽고 재현했다. 원본 팩·Island·Production Training은 저장하지 않고 실제 테스트 복제본으로만 생성/캡처했다.
+
+### Gate 원인과 수정
+
+- Island 읽기 전용 조사: 전체464개 중 live BP112개가 모두 좁았고 나머지352개는 숨김/Trigger 비활성인 옛 Native였다. 이 잔존물을 삭제하지 않았다. Course AutomaticGateScale=(1,2,2), RaceRing 작성 Yaw90°·Scale1.75의 조합에서 visible Y/Z=197.4/394.8cm, Trigger span350/350cm였다. 메모리에서만 Actor X scale1→2→1 A/B로 폭394.8→197.4 재현, 디스크 bytes는 불변이었다.
+- 작성 GateAssetLocalTransform은 그대로 보존하고 Native visual의 파생 relative scale만 회전축/부모 비균등 scale에 맞춰 보상했다. Root transform 갱신·등록/Construction/BeginPlay·ChildActor 후배치에서 적용하며 Tick은 추가하지 않았다. Trigger/Actor transform·3색/재질·16개 기존 컴포넌트·MID 저장 수리는 보존한다. 90°/180° 축 정렬·signed scale 회귀를 추가했다. 임의 각도의 shear는 FTransform으로 완전 표현할 수 없으므로 이 범위는 축 길이 정합으로 제한한다.
+- 실제 seed194849의 두 CurveClamped knot에서 derivative가 정확히0이어서 spline quat이 Identity로 돌아갔다. RaceRing의 필수 작성 Yaw90°가 원인은 아니었다. GetSegmentDistance의 실제 거리로 재측정하고 직선/모서리/폐곡선 seam 3개 RED를 만들었다. 유효 접선/roll/회전 offset은 그대로, 0/비정상 접선에서만 유한 차분·loop wrap/open clamp·outgoing fallback을 사용한다.
+- 최종 코드로 Island를 다시 읽은 report.json은 NO_SMALL_FRAME_REPRO, live112개 좁음0, before/after SHA 동일·saved_packages0이다. 맵 재생성/저장 없이 적용된다. 도구/보고서: Saved/Automation/IslandGateSize/InspectIslandGateSize.py·report.json·engine_probe.log·engine_after_fix.log·procedural_report.json·procedural_tangent.log.
+- 사용자 재질 /Game/Material/m_green의 Nanite 누락은 별도 byte 백업 후 used_with_nanite 플래그만 보강했다. 색/파라미터/그래프 변경 호출은 없다. Final2 RHI에서 이 재질의 missing usage 경고는 없으며 세 상태색/사용자 게임 체감은 별도 수동 대기다.
+
+### 도시 생성·재질
+
+완성 SourceBlueprint/지붕 포함 건물은 MaxStackLevels 값과 관계없이 한 구조물만 배치한다. 명시 bStackableModule인 독립 SingleMesh만 반복하고 같은 XY/Yaw·실제 Z bounds/바닥 pivot으로 지지한다. 층마다180° 뒤집던 처리와 완성 지붕 위에 다시 얹는 구조를 없앴다. 원본 BP 내부의 진짜 층은 보존하며 전역 MaxStack=1 우회가 아니다. GetBuildingSpecs 재생성 때 캐시도 갱신한다.
+
+깨끗한 닫힌 /Game/FC_MilitaryCamp/Models/MilitaryModels/SM_Container_01만 적층 모듈로 추가했다(bounds1356.978×389.051×384cm·bottom0). 변형/문 돌출 bounds의02/03과 완성 컨테이너 건물 BP는 이를 대체하지 않는다. SingleMesh의 MaterialOverrides는 슬롯 인덱스별 적용하고 비거나 null이면 원본 슬롯으로 fallback한다. 원본 mesh slot은 수정하지 않는다.
+
+차선은 도로와 분리한 비충돌 HISM이며 중앙 점선·가장자리 실선을 생성하고 교차로를 피한다. BP에서 폭/점선 길이·간격/가장자리 inset·On/Off를 조정한다. 원본 M_Concrete1은 없는 Substance parent, 기존 도로는 RVT/타이어 자국, 바닥은 금속 격자였다. 프로젝트 소유 standalone 콘크리트/아스팔트/포장/지면/차선 재질을 만들고 콘크리트는 world-normal triplanar로 늘어짐을 줄였다. MI_DroneCity_Asphalt의 TextureWorldSizeCm=12cm로 미세 입자 크기를 조정한다.
+
+실제 RHI 첫 캡처에서 FC 원본 Container MI가 InstancedStaticMeshes usage 부족으로 DefaultMaterial로 바뀌는 문제가 추가로 드러났다. 원본을 수정하는 대신 MIC3개와 M_Master_Props parent를 /Game/Drone/Procedural/Materials/CityContainer_*로 복제하고 소유 parent에만 HISM 지원을 넣었다. 새 프로세스에서3개 MIC의 scalar/vector/texture arrays 및 노출 static switch 값이 원본과 같고 복제 parent HISM=true임을 확인했다(rain_palette_inventory.json). static_parameters 직접 조회는 API에 없어 처음에는 미확인으로 기록했고, 설치 엔진 MaterialEditingLibrary의 static-switch 조회로 보완했다.
+
+ConfigureDroneCityAppearance.py는 기본 read-only audit, 명시 DRONE_CITY_APPEARANCE_APPLY=1에서만 소유 재질·기존 Generator BP·기존 TestMap 생성기1개를 수정한다. m_green은 위 플래그 예외만 허용한다. 원본 팩/Island/Production은 저장하지 않으며 기존 BP·맵·재질은 bytes/SHA 백업한다. 재실행은 기존 소유 재질의 아티스트 그래프를 덮지 않고 class/parent/HISM 상태 불일치 시 중단한다. 승인 Container01을 재실행 때 일반 건물로 되돌리지 않으며 Type51개를 유지한다. 별도 도시를 생성해 맵에 저장하는 도구가 아니다.
+
+적용: Saved/Automation/CityAppearance/20261014T054933_738398Z/report.json(기본5재질/BP/TestMap), 20261014T060813_156373Z/report.json(Asphalt MIC·컨테이너 parent/MIC3·m_green flag·BP/TestMap). 기존 타깃 백업은 같은 폴더다. 초기 도구의 없는 Material.desc와 UV 입력명 Coordinates 실패는 metadata 태그/설치 엔진 UVs 조회로 수정했고 실패본은 새 재질 저장0이었다(city_apply.log·city_apply2.log). 수정 후 city_apply3/4는 exit0·Python script success와 실제 saved 목록을 확인했다.
+
+### Rain 후속·중간 검증(최종 결과는 아래 후속 기록)
+
+Sprite 정면 정렬만으로는 근거리 생성 볼륨이 카메라 시야를 따라가지 않았다. 프로젝트 사본 NS3개만 camera-local로 바꾸고 전체 카메라 pose를 PostUpdateWork에 따른다. SceneRoot/천장 Trace는 월드 위쪽을 유지한다. 원본 OilRig World Space와 mask/낙하/밀도·품질/젖음·오디오는 보존한다. LocalSpace bool만 변경하지 않고 versioned emitter PostEditChange와 Niagara VM compile/Ready 완료 후 저장하도록 보강했다. 명시 품질Off·맑음·SetRainEnabled(false)는 DeactivateImmediate, 실내 노출 감소는 기존 자연 소멸 경로로 구분한다.
+
+Niagara Ready는 NullRHI 및 -AllowCommandletRendering 없는 commandlet에서 성립하지 않는다. 두 초기 시도는 NS 저장0으로 차단됐다. -AllowCommandletRendering -RenderOffscreen으로 실행한 rain_apply_render_allowed.log와 RainCameraFacing/20261014T054838_105151Z/report.json은 compiled_ready·NS3개 저장 성공, 원본/Rain BP SHA 보존이다.
+
+최초 actual-city 캡처는 첫 viewport가961×335였고 이후1274×716이었다. 기준을 낮추지 않고 실제 client viewport >=960×540·6프레임/0.5초 안정 후 첫 shot을 시작하게 고쳤다. Final2 9장 모두1274×716이며 root가 도로/컨테이너/콘크리트 골조/완성 창고 PNG를 직접 열었다. 기본 재질 체크무늬와 지붕 위 완성 건물 중복이 사라진 범위만 확인했고 모든 시드/도시 동선 최종 완성을 판정하지 않았다.
+
+Build/테스트는 UE5.8.2·MSVC14.51.36257·D3D12_SM6이다. Final Build22.03초 및 Final2 Build35.60초 성공. 첫 FinalReport는18 Success/1 Fail, Final2Report는 신규MaterialOverrides 포함19 Success/1 Fail(20개)이다. 단위/정적 회귀가 통과해도 actual-city 비는 여전히 화면 좌측에 쏠려 우측 화면1/3 두 시점 검사가 실패했다. 이 결과를 숨기거나 assertion을 완화하지 않았다. Rain 위치보정만으로 부족해 by-emitter 실제 position/velocity/age/lifetime·카메라 projection을 JSON으로 추가 기록했다(ParticleProbe Build14.15초 성공). source NS는 ObjectExporterT3D로 읽기만 내보냈으며 저장하지 않았다.
+
+현재 캡처: Saved/Automation/CityAppearance/S194849/gate_rain_city_fix2/Capture_98CD6C3742A6BE9D21D7F6B9113ACFA6/. 실제 좌표 JSON/PNG: particle_probe/Capture_5BC80B324206CAAD53F1659FD9324868/. 중간 실패를 전체 완료/사용자 체감 Pass로 바꾸지 않는다. 최종 추가 수정/새 프로세스 검증 결과는 아래에 이어 기록한다.

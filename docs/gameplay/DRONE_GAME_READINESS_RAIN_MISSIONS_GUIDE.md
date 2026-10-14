@@ -77,23 +77,34 @@ Preview 원본 비는 `NS_sky_Rain` 6개, `NS_Rain_Fast` 14개, `NS_Rain_Slow` 5
 | 단계 | 현재 동작 |
 |---|---|
 | 끔 | 비 연출 전부 끔 |
-| 낮음 | Niagara1개·입자0.3배·생성 범위0.7배·물결0·Simple 젖음·빗소리 |
-| 중간 | Niagara1개·입자0.6배·생성 범위0.85배·물결0.5 |
-| 높음 | Niagara1개·입자1.0배·생성 범위1.0배·물결1.0 |
+| 낮음 | Niagara1개·낮은 밀도·동일 생성 범위·물결0·Simple 젖음·빗소리 |
+| 중간 | Niagara1개·중간 밀도·동일 생성 범위·물결0.5 |
+| 높음 | Niagara1개·높은 밀도·동일 생성 범위·물결1.0 |
 
-판 빗줄기는 전 단계 기본0(사용 안 함)이다. 예전 단일 사본 `NS_DroneRain_NearCamera`·`NET_DroneRain`은 삭제됐다. 원본 Niagara에는 지붕 차폐가 없어 실내에서는 끈다. 빗소리는 실내에서 35%로 줄인다. 카메라 비 오프셋 600cm는 시험값이며 전 단계 입자 크기·모양(픽셀 여부)·위치·양은 수동 확인 대기다.
+판 빗줄기는 전 단계 기본0(사용 안 함)이다. 품질별 NearCameraRainScale은 모두1.0, 공통 가로 Coverage 기본3.0으로 생성 범위·품질별 밀도는 유지한다. 예전 단일 사본 `NS_DroneRain_NearCamera`·`NET_DroneRain`은 삭제됐다. 원본 OilRig의 CPU/World Space는 그대로 보존하고 프로젝트 근거리 NS 사본3개만 **Local Space + 카메라 위치/전체 회전 추종 표시층**으로 사용한다. Sprite는 `FaceCameraPlane + Unaligned`; VelocityAligned는 FacingMode를 무시하므로 함께 쓰지 않는다. 물리적인 월드 강우·중력 회전을 정밀 재현하는 모드가 아니라 화면 전체에 안정적으로 보이는 근거리 연출이다.
+
+`BP_DroneRainVisual`의 `bCameraRelativeRainLayer` 기본True다. `CameraRainLayerOffsetCentimeters`는 카메라 기준 앞/오른쪽/위 위치, `CameraRainLayerRotationOffset`은 그 위치와 별개인 입자 좌표축 보정이다. 기본 위치 `(1150,0,600)`cm·보정 Yaw=-90°로 원본의 넓은 X 생성축을 화면 좌우, 나이별 Y 이동을 카메라 전방에 놓는다. 원본 Box `(500,5,5)`의 얇은 생성면을 옆으로 보는 것이 이전 쏠림 원인이며, 위치 Y만 옮기는 방식으로 고치지 않는다. Tick은 카메라 갱신 뒤다. False는 고정 방향 표시층이지만 사본은 여전히 Local Space라 원본 World Space 복원 옵션은 아니다. 입자 크기/양·오프셋은 최종 튜닝 대기다.
+
+지붕 검사는 회전된 표시층이 아닌 월드 위쪽 Trace를 유지한다. 실내 진입은 기존 노출량/입자 자연 소멸로 차단하고 빗소리는35%로 줄인다. 반면 품질 끔·맑음·`SetRainEnabled(false)`는 잔여 입자까지 즉시 제거한다.
 
 프로젝트 소유 자산은 `/Game/Drone/Weather` 아래에 있다.
 
 | 자산 | 역할·현재 조정 |
 |---|---|
 | `Niagara/NS_DroneRain_Low/Medium/High` | 단계별 `NS_Rain_Fast` 사본 |
+| `Materials/M_DroneRainSprite` | OilRig `T_rain_Mask`의 **A 채널 꼬리**·근접 페이드·가로/끝 Soft Profile. `RainStreakHalfWidth` 기본0.10, 실제 텍스처에 맞는 Linear Color 샘플러 사용 |
 | `Niagara/NET_DroneRain_Low/Medium/High` | Effect Type: 입자0.3/0.6/1.0배·효과 품질 낮으면 추가 감소·최대2개(실제 사용1개와 구분) |
 | `Audio/SCON_DroneRain` | 빗소리 동시 재생1개 |
 | `Materials/MPC_DroneWeather` | `RainWetness`, `RainDetail` |
 | `Materials/M_DroneWetSurface` | 원본 `MF_Wetness`·`MF_WaterRipples` 사용. Detail/Simple 인스턴스, 끔·낮음은 맵 표면을 Simple로 교체 |
 
 생성 도구는 `Tools/AssetMigration/BuildDroneRainQualityAssets.py`다. 문서 확인을 위해 재실행하지 않는다. `Lvl_DroneWeatherSystemsTest` 바닥에 젖음 머티리얼이 적용돼 있다. 비 프리셋으로 젖음·물결 외형을 확인한다. 빗소리는 원본 `SC_Ambience`(`SW_Ambience`, 230초 반복)를 사용하지만 실제 내용이 빗소리인지와 해당 음원 채택은 미확인·현재 미정이다.
+
+평면이 옆으로 보이거나 흰 픽셀/사각형이면 비를 판 ISM으로 대체하지 않는다. Sprite의 평면 정렬과 **재질의 실제 셰이더 컴파일**을 각각 검사한다. `Sampler type is Masks, should be Linear Color`는 기본 재질 대체를 일으키므로 Mask Texture 원본을 바꾸는 대신 샘플러 타입을 맞춘다. 원본4×512 텍스처의 RGB는 짧은 밝은 부분, A가 긴 반투명 꼬리다. 투명도에 R 대신 A를 쓰고 가로 경계/상하 끝을 부드럽게 곱한다. 원본 텍스처나 낙하/밀도를 바꾸지 않는다. `M_DroneRainStreak_OilRigMask`는 타입만 수리하고 옛 판은 다시 켜지 않는다.
+
+표적 수리는 Editor 종료·새 코드 Build 후 `Tools/AssetMigration/ConfigureDroneRainPresentation.py`를 사용한다. 기본은 읽기 인벤토리이며 `DRONE_RAIN_PRESENTATION_APPLY=1`에서만 사본 NS3개·재질2개를 bytes/SHA 백업 후 개별 저장한다. Sprite의 기존 Opacity/색·페이드와 A 채널/Soft Profile을 보존하고 Local Space 전환 뒤 VM 재컴파일 완료/Ready를 확인해 저장한다. Commandlet은 **`-AllowCommandletRendering -RenderOffscreen` 필수**, NullRHI에서는 Ready 조건이 성립하지 않아 저장이 차단된다. BP·밀도/범위·음원·원본 팩·맵은 이 도구로 변경하지 않는다. 보고서 success는 저장 성공이지 외형 Pass가 아니다.
+
+검증은 `Drone.Weather.RainCameraPresentation / RainCameraFollow / RainViewAnchoredVolume / RainQualityLevels`와 실제 RHI 캡처로 한다. `Diagnostics.Procedural.CityAppearanceCapture`는 TestMap의 실제 생성기·시드194849·카메라 정면/90°/75°상향/이동에서 SimCache의 화면 좌/중/우·상/중/하 입자 분포와 Off0을 검사한다. 고립된 비 fixture 통과만으로 실제 랜덤 레이싱의 전체 화면 분포를 판정하지 않는다. 현재 결과와 캡처는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
 
 수동 확인 순서: 전 단계 입자 크기·모양(픽셀 여부)·카메라 비 위치·양 → 날씨 시험 맵의 젖음·물결 → 실외/실내 음원 내용·감쇠 → 설정 비 품질의 실제 패드 조작. 화면 물방울·바닥 Splash는 미구현이다. 젖음 머티리얼은 품질 실측 장면에 없어 그 비용은 아직 측정하지 못했다.
 

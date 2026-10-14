@@ -1,6 +1,12 @@
 # Drone 기능 시험 맵 가이드
 
-2026-10-01 후속: 튜토리얼 8개를 `TestMap/Tutorial/Lvl_Tutorial_*_Test`로 분리하고 Story 4/Racing 1과 함께 직접 Play 기본 Mission Entry를 설치했다. OilRig 비 4모드 비교 맵과 Title 시안 보완도 추가했다. 최신 위치·테스트 절차는 [통합 점검 가이드](DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md)를 우선한다. 아래 9월 맵 설명은 당시의 기록이다.
+현재 첫 수업은 `TestMap/Tutorial/Lvl_Tutorial_Observer_Test`의 고정 사람 눈높이 관찰 시점에서 이륙→전진→후진→실제 착지를 확인한다. 기존 Hover ID·8수업 순서는 유지한다. 조정·검사 순서는 [Training 저작 가이드](../tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md)의 Observer 절을 따른다. 실제 접지 전에는 착지가 완료되면 안 된다.
+
+Story 선택은 `Lvl_DroneFrontEnd`에서 Select_UI 배치·Pretendard 실제 문구·4개 목록→START→브리핑/Back을 확인한다([UI 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)). 물리 Sandbox에서는 공유 매듭 PBD 그물의 중력/국소 접촉과 일반 벽의 로터 외곽 반발을 시험한다([물리 가이드](DRONE_CHAOS_DATAFLOW_PLAN.md)). 적용·자동 검증·수동 대기 결과의 정본은 [STATUS](../../STATUS.md)다.
+
+팀원 환경 역할은 Battlefield=M1/MilitaryBase=M2·M3/MilitaryCamp=M4이며, 승인된 그물·전달 지점·무인 포탑·재밍 레이더 배치와 실제 Story DA의 제품 맵 연결 완료는 별개다. 재밍은 영상 Noise→NO SIGNAL·입력 차단이고 속도 배율은 바꾸지 않는다. 광섬유 면역·구역 이탈 복원은 [Mission 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md)를 따른다. Production Training은 시험 저장하지 않는다.
+
+기존 튜토리얼8개·Story4개·Racing 시험맵은 보존한다. 아래 날짜가 붙은 예전 맵 설명/검증은 당시 기록이며 최신 위치·정책은 위 가이드와 STATUS를 우선한다.
 
 기준일: 2026-09-29
 
@@ -56,8 +62,32 @@ Weather TestMap은 최신 Editor 빌드 후 Play에서 숫자열 **7 Clear / 8 L
 | `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest` | 실제 Mission GameMode에서 Figma Tutorial 8개 수업을 각각 선택해 시험 | Mission Definition 8개, Map Check 0/0·집중 회귀 9/9 통과 |
 | `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest` | 샷건 NPC 감지·산탄 분포·투사체·탄약·정면 시선 안정화 검증 | 발광 Pellet 8개+짧은 Tracer 실제 BP, 몸/고개 3° 데드존, Map Check 0/0·Asset/PIE 자동화 2/2 통과 |
 | `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest` | 8방향+무풍 Random Weather, 조작 모드별 Drone 보정, 강우 데이터/디버그 프리뷰 체감 | Manager 원뿔 Editor 전용·무충돌, 이동 Bead 24개·Cardinal/m/s Readout·1/2/3/4 키·7/8/9 날씨 키. 비 선분은 TestMap 전용 DrawDebug 프리뷰이며 Niagara가 아님 |
+| `/Game/Drone/Maps/TestMap/Lvl_ProceduralCityRaceTest` | 랜덤 도시의 단일 모듈 적층·도로 차선·프로젝트 소유 재질 조정 | 아래 현재 저작 절차를 사용한다. 최종 렌더·플레이 판정은 STATUS의 검증 상태와 구분한다 |
 
 Production `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 제작 중인 실제 Tutorial 맵이다. 시험 Actor 추가, 자동 재구성, 저장 대상으로 사용하지 않는다.
+
+## 랜덤 도시 레이싱 외형·모듈 조정
+
+공통 기본값은 `/Game/Drone/Procedural/BP_DroneProceduralCityGenerator`의 Class Defaults, 시험별 값은 `Lvl_ProceduralCityRaceTest`에 배치된 Generator의 Details에서 조정한다. Source 수정 뒤 Editor를 종료하고 빌드한 후 새 항목을 확인한다. 기존 지형·Production Training·원본 공급팩을 시험 때문에 다시 저장하지 않는다.
+
+- `BuildingTypes > SingleMesh`: 독립된 닫힌 컨테이너처럼 위아래 면적이 맞는 메시만 `적층 가능한 단일 메시 모듈`(`bStackableModule`)을 켜고 `MaxStackLevels`로 단수를 정한다. 야적장 대상일 때만 `bYardContainer`도 켠다.
+- `SourceBlueprint`로 지정한 완성형 건물은 이미 층·지붕·돌출물이 있는 한 동으로 취급한다. 높은 건물을 만들려고 완성 BP 전체를 반복 적층하지 않는다. 반복 적층은 명시한 SingleMesh 모듈만 같은 방향으로 포개며, 층마다 180°를 돌리지 않는다.
+- 현재 승인한 닫힌 모듈은 `/Game/FC_MilitaryCamp/Models/MilitaryModels/SM_Container_01`이다. 변형된 `_02/_03`이나 MOUT 완성 건물 BP로 대체하지 않는다. 적용 도구 재실행에서도 `_01`을 중복 추가하거나 적층·야적장 설정을 끄지 않는다.
+- `BuildingTypes > 단일 메시 슬롯별 재질`(`MaterialOverrides`)은 같은 항목의 `SingleMesh`에 적용하며 배열 Index는 원본 메시 Material Slot 번호다. 지정된 슬롯만 프로젝트 재질로 바꾸며, `None` 또는 배열 밖 슬롯은 **그 슬롯의 원본 메시 재질**을 사용한다. 이 설정은 SourceBlueprint 전체를 일괄 재질 교체하는 기능이 아니며 원본 메시·공급팩 재질도 수정하지 않는다.
+
+재질 조정 위치:
+
+| Generator 항목 | 용도·프로젝트 소유 자산 |
+|---|---|
+| `SkeletonMaterial` | 뼈대 건물 콘크리트, `M_DroneCity_Concrete` |
+| `RoadMaterial` | 아스팔트, `MI_DroneCity_Asphalt`; `TextureWorldSizeCm`으로 잔골재 크기 조절 |
+| `BlockGroundMaterial` / `SidewalkMaterial` | 블록 바닥·보도, `M_DroneCity_Paving` |
+| `GroundMaterial` | 도시 지면, `M_DroneCity_Ground` |
+| `RoadMarkingMaterial` | 차선 도색, `M_DroneCity_Marking` |
+
+위 자산과 컨테이너용 소유 재질 사본은 `/Game/Drone/Procedural/Materials`에서 편집한다. 지면은 World XY, 콘크리트는 World-normal triplanar로 반복 크기를 정하며 원본 Substance/RVT 머티리얼을 직접 바꾸지 않는다. 차선은 `Procedural > City > Road Markings`의 `bGenerateRoadMarkings`, `RoadMarkingWidthCentimeters`, `RoadDashLengthCentimeters`, `RoadDashGapCentimeters`, `RoadEdgeLineInsetCentimeters`로 켜짐·폭·점선 길이/간격·가장자리 여백을 조절한다. 표시용 차선은 충돌·그림자를 만들지 않는다.
+
+`Tools/AssetMigration/ConfigureDroneCityAppearance.py`는 기본 인벤토리 확인이며 적용 모드와 구분한다. 설정을 바꾼 뒤 같은 시드로 다시 생성해 원래 건물 한 동 유지·컨테이너 접합면·슬롯별 재질·차선 정렬을 비교한다. 최종 자동/렌더/수동 검증 결과는 [STATUS](../../STATUS.md)에 기록하며 이 가이드만으로 완료 판정하지 않는다.
 
 ## Mission Systems 시험 맵 배치
 

@@ -1,8 +1,10 @@
 # Mission 통합 프레임워크·NPC 이동 애니메이션 가이드
 
-기준일: 2026-10-02 새벽(C PC). Catalog·직접 Play 연결을 최신화했고 아래 기존 2026-09-24 자산/검증 기록은 당시 범위로 보존한다. 로컬 구현 상태이며 커밋·푸시는 수행하지 않았다. Production `/Game/Drone/Maps/Lvl_DroneTraining`은 수정하지 않았다.
+현재 절차 기준: 2026-10-14 D PC. Mission 규칙·승인된 맵 배치·재밍 Radar·첫 수업 계약을 소스와 대조한다. 과거 날짜의 검증 기록은 당시 범위로 보존하며 새 변경의 실제 검증은 [STATUS](../../STATUS.md)·[WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. Production `/Game/Drone/Maps/Lvl_DroneTraining`은 시험용으로 수정하지 않는다.
 
 2026-10-02 새벽 후속(C PC, ec2e88f + 로컬 미커밋, Claude 구현·Codex 문서 반영): Mission DA `Mission Definition|Progression → NextMissionId`로 Story M1 골든타임→M2 인터셉트→M3 베일브레이커→M4 엔드게임(끝)을 연결했다. 성공 결과 [다음]·로비 순서가 연결을 따르며 M2→M3 결과 분기는 현재 미정이다. 튜토리얼 8개 연결·시간·완료 UI는 [튜토리얼 가이드 5절](DRONE_TUTORIAL_IMPLEMENTATION_TEST_GUIDE.md#5-tutorial-전용-ui-구현)을 따른다.
+
+현행 Story 표시명은 [CONTEXT의 확정 명칭](../../CONTEXT.md#story-미션-표시명)을 따른다. `DisplayName`·`EnglishTitle` 정리 도구는 이름만 갱신하며 GoldenTime/Intercept/VeilBreaker/Endgame 내부 ID·경로·Story Fact·저장·목표를 보존한다. M3의 내부 `VeilBreaker`는 표시명 `보급 차단 / SUPPLY BREAK`와 달라도 정상이다. 적용·화면 검증 상태는 STATUS를 따르며 명칭 변경만으로 목표·분기를 바꾸지 않는다.
 
 ## 이번에 준비된 것
 
@@ -18,6 +20,7 @@ Story Mission을 만들 때 매번 Level Blueprint에 목표 판정을 새로 �
 | `Blueprints/Triggers/BP_MissionReturnZone` | 현재 출격한 플레이어 Drone의 귀환을 보고한다 |
 | `Blueprints/Targets/BP_MissionDamageTarget` | 기본 체력 100, 피해·사망 Delegate와 파괴 연출 Event를 가진 교체 가능한 Greybox 표적이다 |
 | `Blueprints/Tutorial/BP_TutorialHoverZone` | 영역 안에서 저속·수평 상태를 연속 유지하면 `Hover Maintained` 목표를 보고한다 |
+| `Blueprints/Tutorial/BP_TutorialObserverLesson` | 첫 수업만 고정 관찰 시점에서 이륙→전진→후진→실제 착지4단계를 보고한다 |
 
 Blueprint는 빈 표시용 껍데기가 아니다. 공통 판정은 C++ 부모 클래스에 있고 각 BP는 맵 배치와 기본값 조정을 위한 프로젝트 자산이다. Mesh, VFX, Sound, 최종 Mission 수치와 연출은 파생 BP 또는 Instance에서 설정한다.
 
@@ -39,13 +42,16 @@ Blueprint는 빈 표시용 껍데기가 아니다. 공통 판정은 C++ 부모 �
    ├─ Targets
       └─ BP_MissionDamageTarget
    └─ Tutorial
-      └─ BP_TutorialHoverZone
+      ├─ BP_TutorialHoverZone
+      └─ BP_TutorialObserverLesson
 
 /Game/Drone/Data/Missions
 └─ DA_Mission_...              # 목표 순서와 Mission 데이터
 
 /Game/Drone/Maps/TestMap       # 기능 시험 맵
-/Game/Drone/Maps/Story         # 향후 실제 Story 맵 후보; 최종 명칭은 현재 미정
+/Game/Drone/Maps/Lvl_Battlefield   # M1 역할 확정
+/Game/Drone/Maps/Lvl_MilitaryBase  # M2·M3 공용 지역 확정
+/Game/Drone/Maps/Lvl_MilitaryCamp  # M4 역할 확정
 ```
 
 Mission의 규칙과 맵 배치를 분리한다. 예를 들어 “차량 파괴 1회”는 Mission Definition의 Objective Rule이고, 어떤 차량·경로·위치인지는 맵 Actor와 Actor Tag가 담당한다.
@@ -122,7 +128,7 @@ NullRHI `Drone.Flow.BriefingLinesPIE` Success(첫 줄·화자, 자동 진행, Y/
 | `Use Overlapping Actor As Event Actor` | 켜면 들어온 차량/Drone의 Tag를 Rule `TargetId`와 대조하고, 끄면 Trigger 자신의 Actor Tag를 대조한다 |
 | `Trigger Once` | 기본 On. 같은 Actor가 Box 경계에서 흔들려도 한 번만 보고한다 |
 
-현재 Objective Event는 `Training Lap`, `Recon Scan`, `Payload Delivered`, `Target Destroyed`, `Jamming Exited`, `Jammer Disabled`, `Return To Base`, `Hover Maintained`, `Manual`이다. 미션에 새 종류가 필요하면 기존 Event를 억지로 재사용하지 않고 `EDroneMissionObjectiveEvent`와 실제 발생 지점을 함께 확장한다.
+기존 Objective Event `Training Lap`, `Recon Scan`, `Payload Delivered`, `Target Destroyed`, `Jamming Exited`, `Jammer Disabled`, `Return To Base`, `Hover Maintained`, `Manual`을 유지하고, 첫 고정 관찰 수업 전용으로 `Tutorial Take Off / Tutorial Forward / Tutorial Backward / Tutorial Landed`를 추가했다. 이4개는 `BP_TutorialObserverLesson`이 순서·조건을 확인해 보고한다. 수업을 단순 Overlap으로 완료시키거나 다른 미션 Event를 억지로 재사용하지 않는다.
 
 Box Overlap 없이 Sequencer나 다른 BP에서 진행할 때는 `Try Activate Mission Trigger`를 호출한다. Director를 이미 들고 있는 시스템은 `Activate Mission Trigger With Director`를 사용할 수 있다.
 
@@ -156,6 +162,8 @@ Box Overlap 없이 Sequencer나 다른 BP에서 진행할 때는 `Try Activate M
 | `MaxCheckpointRestarts` | 같은 미션 DA | 0 = 제한 없음, 횟수를 다 쓰면 기존 실패 결과 화면 |
 
 기체 파괴·현재 목표 제한 시간 초과·실패 Trigger는 같은 실패 경로를 쓴다. 재출격은 맵을 다시 열지 않고 완료 목표·부서진 표적을 유지한다. 마지막 체크포인트(없으면 처음 출격 위치)에 같은 기체 종류·조작 방식으로 새 기체를 띄워 빙의하고 Director를 재연결하며 옛 기체를 제거한다. 현재 목표 제한 시간만 다시 센다.
+
+예외: 새 첫 `기초 조종` 수업(`Mission.Tutorial.Hover`)은 고정 시점·출발점으로 재출격하고 전용4목표를 처음부터 다시 시작한다. 후진/착지 단계만 남긴 채 이륙하지 않은 상태에서 시작하지 않도록 한 수업 전용 규칙이며 다른 미션의 진행 보존 정책은 바꾸지 않는다.
 
 | DA 분류 | 확정 실패 처리(Figma 기준, Claude 지시서) | 재출격 제한 |
 |---|---|---|
@@ -206,19 +214,51 @@ Box Overlap 없이 Sequencer나 다른 BP에서 진행할 때는 `Try Activate M
 
 2026-09-24 당시 기록(현재 Catalog 14개·Tutorial 8수업 독립 맵이며 현행 가이드를 우선): 현재 Production 성격의 저장 Mission Definition은 기존 Training 하나이고, 별도로 호버링·물자 전달·FPV 표적 타격용 Test Tutorial Definition 3개를 추가했다. Story Mission 1~4가 플레이 가능한 상태가 된 것은 아니다. 다음 Story 개발은 Mission 1의 작은 Vertical Slice부터 진행한다.
 
+### 실제 미션맵 역할·승인된 박스 치환
+
+| 지역 맵 | 확정 역할·작업 대상 | 보존/보류 |
+|---|---|---|
+| `/Game/Drone/Maps/Lvl_Battlefield` | M1 골든 타임. `M_net`~`M_net8` 모두8개를 원래 위치·폭·높이 기준의 물리 그물로, `M_Target`을 구급품 전달 지점으로 사용 | 기존 적·차량포탑·별도로 배치된 PayloadTarget은 보존 |
+| `/Game/Drone/Maps/Lvl_MilitaryBase` | M2 길목 차단·M3 보급 차단. `M_Turret1`은 설치형 무인 자동포탑, **숫자 없는 `M_Radar` 한 개만** 재밍 Radar | `M_Target` 역할 미확정으로 원래 박스 보존. `M_Radar2/3`·`M_Radar_Tower`3개·기존 적/포탑도 임의 삭제/교체하지 않음 |
+| `/Game/Drone/Maps/Lvl_MilitaryCamp` | M4 최종 타격 | 확인된 박스 치환 대상 없음. 최종 타격 목표/Sequence는 별도 조립 |
+
+승인 배치 도구는 `Tools/AssetMigration/ApplyStoryMapActors.py`다. 기본 `DRONE_STORY_ACTORS_MODE=audit`는 읽기 목록이며, `apply`만 승인된 Actor를 생성/저장하고 `verify`는 재조회한다. 원본 박스는 삭제하지 않고 `Drone/ArchivedMarkers` 폴더·`Drone.Marker.Archived` Tag로 옮겨 숨김/비충돌 보존한다. 새 Actor는 `Drone.StoryActors.V1`·`SourceMarker.<원래라벨>` Tag로 소유권을 표시해 재실행 중복을 막으며 원본 맵 백업은 `Saved/Automation/CodexStoryActors`에 둔다. 실제 저장·재조회 성공 여부는 STATUS·WORKLOG를 확인한다.
+
+그물은 원래 박스 Scale을 Actor Scale로 복사하지 않고 폭/높이→Corner로 바꾼다. 조정/수동 시험은 [물리 가이드](DRONE_CHAOS_DATAFLOW_PLAN.md#현재-pbd-그물-배치조정)를 따른다. 설치형은 `/Game/Drone/AI/AutomaticTurrets/Blueprints/BP_AutoTurret_Emplaced`로 **병사가 점유하는 MG와 별개**다. Battlefield 전달 표적 Tag는 `Story.M1.Payload.Target`이며 최종 Rule의 TargetId도 정확히 일치시켜야 한다.
+
+**맵 역할 확정과 실제 MissionMap 전환은 별개다.** 박스 치환 도구는 Story DA의 `MissionMap`·목표·GameMode·PlayerStart를 변경하지 않는다. 기존4개 격리 Story TestMap 연결을 유지하며, 실제 지역으로 바꿀 때 M1 전달/귀환, M2 차량 Route/도착 실패, M3 Radar/귀환, M4 파괴 목표와 출격 지점까지 함께 확인한다. MilitaryBase의 미확정 `M_Target`을 차량 도착지라고 추정하지 않는다.
+
+### 재밍 Radar BP 설정·시험
+
+`/Game/Drone/Signal/Blueprints/BP_DroneJammingRadar`는 **외형 슬롯이 비어 있는 배치형 Radar**다. BP Components의 `RadarMesh`에 Static Mesh를 넣고 Component 위치·회전·크기를 조정한다. 시설 위치와 기지 범위 중심을 분리하므로 Actor Scale로 범위를 키우지 말고 `Drone > Jamming > Radar`의 아래 값을 쓴다.
+
+| 값 | 조정 방법 |
+|---|---|
+| `CoverageCenterOffset` | Actor 로컬 기준 기지 범위 중심(cm). Viewport 위치 Widget으로 조정 |
+| `JammingRadiusCm` | 수평 원형 영향 반경. 기본15000cm=150m |
+| `JammingHalfHeightCm` | 영향 범위 중심 위/아래 높이. 기본3000cm |
+| `FullStrengthRadiusCm` | 실제 Radar 시설에 가까워 최대 세기가 되는 반경. 기본2500cm |
+| `RefreshIntervalSeconds` | 겹친 Drone 갱신 주기. 기본0.1초 |
+
+맵 Instance 값이 BP 기본값보다 우선이다. MilitaryBase 치환은 표식 분포에서 계산한 기지 중심/반경을 사용하므로 기본150m와 다를 수 있다. 런타임 범위 변경은 `Configure Coverage`, 강도는 부모 `Set Normalized Jamming Strength`, 전원은 `Set Jammer Active`, Mission 무력화는 `Disable Jammer`를 사용한다. 마지막 두 함수의 Off/무력화는 기존 `Jammer Disabled` Event를 보고하므로 단순 외형 토글로 쓰지 않는다. 이 BP에 최종 메시를 넣는 것만으로 자동 파괴/피격 체력이 생기는 것은 아니며, 파괴가 필요하면 별도 피해 처리에서 `Disable Jammer`를 호출하도록 연결한다.
+
+재밍은 **느려지는 효과가 아니다.** 원거리→근거리로 화면 Noise가 강해지고 링크 손실 때 `NO SIGNAL`과 조종 차단을 표시한다. 잔여 속도·중력 등 실제 물리를 강제로0으로 만들지 않는다. 손실/복원 경계는 Drone의 Signal Component `ConnectionLossThreshold`(기본0.95)·`ConnectionRecoveryThreshold`(0.88)로 구분해 경계 떨림을 줄인다. FiberOptic은 재밍 면역이라 Noise/링크 차단을 받지 않는다.
+
+일반 Drone으로 범위 밖→가장자리→시설 근처→범위 밖을 이동해 Noise·NO SIGNAL·복원을 확인한다. 이어 Radar Off→On, FiberOptic 같은 경로를 시험하고 이동 속도 배율이 줄지 않는지 확인한다. 자동화 대상은 `Drone.Signal.StageContract / RadarCoverage / ControlLink`이며 현재 Pass 여부와 화면 검증은 STATUS·WORKLOG를 따른다. 화면/실제 입력은 수동 확인 대기다.
+
 ## Tutorial Mission 시험 맵
 
-`/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`는 새 Mission BP 기반을 실제 Flow로 확인하는 공용 Greybox 맵이다. Production Training 맵과 분리되어 있다.
+`/Game/Drone/Maps/TestMap/Lvl_DroneTutorialMissionTest`는 보존된 공용 Greybox 맵이며 Production Training과 분리되어 있다. 현재 첫 수업은 아래 Observer 전용 맵으로 바뀌었고 나머지 수업은 기존 독립 맵을 사용한다. 공용 시험장의 과거 호버 Zone을 고쳐 새 수업을 덮어쓰지 않는다.
 
 | Mission Definition | 허용 기체 | 목표 순서 |
 |---|---|---|
-| `DA_Mission_Tutorial_Hover` | Scout | 3초 안정 호버 → 귀환 |
+| `DA_Mission_Tutorial_Hover` | Scout | 고정 관찰 시점 이륙→전진→후진→착지 (`TestMap/Tutorial/Lvl_Tutorial_Observer_Test`) |
 | `DA_Mission_Tutorial_Payload` | Drop | 지정 표적 물자 투하 → 귀환 |
 | `DA_Mission_Tutorial_FPV` | FPV Strike | Arm 후 표적 파괴; 자폭 기체이므로 별도 귀환 없음 |
 
-호버링 기본 판정은 속도 `75cm/s` 이하, 수직속도 `40cm/s` 이하, Pitch/Roll `15°` 이하를 `3초` 연속 유지하는 것이다. 영역을 나가거나 조건을 벗어나면 기본적으로 시간이 0으로 초기화된다. 이는 최종 난도가 아니라 `BP_TutorialHoverZone`의 Class Defaults 또는 배치 Instance에서 조정할 Greybox 값이다. 상시 Tick은 사용하지 않으며 플레이어 Drone이 Box와 겹친 동안에만 기본 `0.1초` Timer가 동작한다.
+기존 `BP_TutorialHoverZone`의3초 호버 판정은 별도 기능 시험용으로 보존한다. 새 첫 수업의 BP 위치·4단계 판정값·고정 카메라·접지/후진/재출격 확인은 [Training 가이드의 첫 수업 절](../tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md#첫-수업-고정-관찰-시점-기초-조종)을 따른다. 이전 Hover Zone 수치나 과거 공유맵 수동 순서를 새 첫 수업의 완료 기준으로 재사용하지 않는다.
 
-로비 Mission 목록에는 기존 Training과 위 세 Test Tutorial이 모두 표시된다. 각 Tutorial은 허용 기체가 하나뿐이라 Drone 선택 화면에서 해당 역할만 선택할 수 있다.
+현재 로비는8수업 ID/순서와 기존 Training을 유지하며 첫 항목을 `기초 조종`으로 표시한다. 허용 기체는 각 DA의 AllowedDroneIds를 따르고 기존 첫 수업 ID를 바꾸거나9번째 수업으로 중복 추가하지 않는다.
 
 ### 수동 플레이 순서 — 2026-09-24 당시 기록(현재 수업은 독립 TestMap/Tutorial 맵, [현행 가이드](DRONE_TUTORIAL_IMPLEMENTATION_TEST_GUIDE.md) 5절·[테스트 순서](DRONE_TEST_MAP_GUIDE.md) 우선)
 

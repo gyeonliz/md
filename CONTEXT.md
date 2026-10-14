@@ -23,7 +23,7 @@
 - `/Game/Drone/Maps/TestMap/Lvl_NPCSmartObjectGreybox`: NPC·Smart Object·유인/무인 포탑·차량 전용 시험 맵이다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneMissionSystemsTest`: 재밍·귀환·역할 Event 배치 전용 시험 맵이다. 직접 실행은 Prototype Flow이므로 Mission 완료 판정은 후속 Test Mission 진입에서 확인한다.
 - `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest`: 기존 AI 맵의 순찰·MG 경합을 건드리지 않고 추가 Shotgun NPC의 감지·실제 8개 산탄 Projectile·탄약을 보는 독립 시험 맵이다. 작은 탄두/Tracer 교체 지점은 `/Game/Drone/AI/Blueprints/Projectiles/BP_ShotgunPelletProjectile`이다.
-- `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`: LightWind 지속풍·돌풍, 조작 모드별 보정, RainStorm과 실내 감쇠 전용 맵이다. 이동 Bead·화면 수치·조작 키와 DrawDebug 비 선분은 TestMap 판독용이고, `BP_DroneRainVisual`은 카메라 추종 Instanced Mesh Greybox다. 정식 Niagara GPU Rain으로 표현하지 않는다.
+- `/Game/Drone/Maps/TestMap/Lvl_DroneWeatherSystemsTest`: 바람·RainStorm·실내 감쇠 시험맵이다. Bead/수치는 진단용, 파란 비 Debug 선은 기본 Off다. `BP_DroneRainVisual`은 카메라 주변 OilRig 기반 CPU Niagara 사본1개를 품질별 사용하며 옛 ISM 판은 기본0이다. GPU Rain으로 표현하지 않는다.
 - `test1`, `test2`: 용도를 확인하기 전 이동하거나 이름을 바꾸지 않는다.
 - 자산 이동은 파일 탐색기가 아니라 Unreal AssetTools로 수행하고 Redirector·Soft Reference·하드코딩 경로를 검증한다.
 
@@ -38,6 +38,23 @@
 사람 Operator 직접 조작, NPC 대화로 임무 수령, 플레이어와 Drone 간 실시간 화면 전환 기획은 폐기했다. NPC·Smart Object·전투 기능은 Mission 내부 요소로 유지한다.
 
 2026-09-16 Figma 읽기 전용 확인 기준 Story 화면은 `골든 타임/인터셉트/베일 브레이커/엔드게임` 4개다. 이후 Story DA·독립 TestMap 4개와 전달/차량 요격·목적지 실패/재밍 이탈/UGV 표적·귀환 시험을 구현했다. 최종 제작 맵·선택 목표·미션 중 기체 교대·장거리 타격·영상은 후속이며 시험 구현을 스토리 완성으로 판정하지 않는다. Mission 2 차량이 미끼인지 실제 표적 탑승인지 Figma 내부 문구가 충돌하므로 코드는 양쪽 Story Fact를 지원하고 기본안은 사용자 결정 전 확정하지 않는다. Figma 원본은 수정하지 않는다. Android 개발은 현재 범위가 아니다.
+
+### Story 미션 표시명
+
+사용자 확정 명칭은 다음과 같다. 이전 Figma 조사에서의 이름보다 이 표를 우선하며 Figma 원본·과거 기록은 수정하지 않는다.
+
+| 순서 | 한글 표시명 | 영문 부제 |
+|---|---|---|
+| 미션 1 | 골든 타임 | GOLDEN TIME |
+| 미션 2 | 길목 차단 | INTERCEPT |
+| 미션 3 | 보급 차단 | SUPPLY BREAK |
+| 미션 4 | 최종 타격 | ENDGAME |
+
+변경 범위는 사용자에게 보이는 이름이다. 기존 MissionId·DA/맵 경로·Story Fact·저장 키·순서/분기/목표는 유지한다. M3 내부 `VeilBreaker`는 호환용이다. DA 표시명 반영 상태와 화면 검증은 STATUS·`MISSION-NAME-01`을 따른다.
+
+사용자 확정 환경 배정: **Battlefield=M1, MilitaryBase=M2·M3, MilitaryCamp=M4**. 실제 DA의 MissionMap/시작점·목표 연결 완료와는 구분한다. Battlefield M_Target은 M1 구급품 전달 지점이고 MilitaryBase M_Target은 역할 확인 전 보존한다. MilitaryBase의 숫자 없는 M_Radar만 재밍 레이더, M_Turret1은 설치형 무인 포탑으로 사용한다.
+
+Story 선택 화면은 Select_UI 시안을 따르되 배경·미션 사진만 이미지로 사용한다. 제목·목록·설명·무전·버튼 문구는 **Pretendard 실제 텍스트**로 구성하고 DA 문구와 연동한다. 이미지에 적힌 문장을 새로운 미션 규칙으로 채택하거나 기존 DA 문구를 임의 덮어쓰지 않는다.
 
 ## 구현 책임
 
@@ -83,7 +100,7 @@
 - World 기상 원본은 `UDroneWeatherProfile`과 `UDroneWeatherWorldSubsystem`, Level 연결은 `ADroneWeatherController`가 담당한다.
 - Prototype Drone은 `UDroneWeatherResponseComponent`로 Snapshot 바람을 받는다. 현재 방식은 Sweep 위치 Drift Greybox이며 모터·PID·공기역학 1:1 구현이 아니다.
 - 저장 Profile은 `Clear`, `LightWind`, `RainStorm_Greybox` 3종이다. 강풍 약 10.7m/s는 공개 민간 FPV 참고선이지 최종 내풍 한계가 아니다.
-- 비 On/Off와 Snapshot Override, 카메라 추종 Instanced Mesh 빗줄기, 카메라 위쪽 Visibility Trace 기반 로컬 실내 감쇠는 구현됐다. 정식 Niagara GPU Rain, 젖음 Material/MPC, Splash·Audio와 품질 단계는 아직 구현되지 않았다. 비가 체력·신호·Mission 판정을 자동 변경하지 않는다.
+- 비 On/Off·품질별 OilRig CPU Niagara 사본·카메라 추종·위쪽 Trace 실내 차폐·젖음 MPC/Detail·Audio 연결은 구현됐다. 원본 World Space는 보존하고 프로젝트 근거리 사본3개만 camera-local 표시층으로 사용한다. 화면 정렬·오프셋·품질/현재 검증은 [비 가이드](docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md#비-품질-설정과-조정)를 따른다. GPU Rain·화면 물방울/Splash는 미구현, 최종 음원·체감은 미확인이다. 체력·신호·Mission 판정을 자동 변경하지 않는다.
 - Weather 시험 표현은 `/Game/Drone/Managers/BP_DroneWeatherDebugVisualizer`에서 Bead 수·범위·크기·속도 배율·Mesh와 Readout/Hotkey 사용 여부를 조정한다. Gameplay 바람 계산과 분리한다.
 - 자연스러운 바람 개선은 Gameplay Snapshot의 저빈도 결정성을 유지한 채 `지속풍 전환`, `돌풍 Attack/Release`, `표시용 보간`을 분리했다. Debug Bead는 풍향 변경 때 누적 이동거리 전체를 새 방향으로 재투영하지 않고, 보간된 순간 속도를 매 Frame 벡터 적분한다.
 
