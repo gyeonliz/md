@@ -1,17 +1,27 @@
 # 현재 작업 상태
 
-기준일: 2026-10-14 KST D PC. Unreal `3cb9c184` 수신·MD `5ab41d6` + Gate/Rain/City/UI·문서 미커밋. Drone만 요청대로 Fetch/FF 수신하고 로컬 수정72개를 원래 바이트로 복원했다. 충돌·Stash0, 복구 백업 유지. 오늘 직접 구현 승인은 상시 역할 변경이 아니며 Commit/Push는 하지 않았다.
+기준일: 2026-10-16 저녁 KST D PC. Unreal HEAD·origin/main·실제 원격 main은 833c1c5f, main 0/0·Clean 확인. 팀원 52594d0f·62f77024 수신 후 맵은 팀원, 그 외 중복은 로컬 우선으로 통합하고 d0c24f90(126파일)·833c1c5f(동시 로컬 테스트 수정)를 Commit/Push했다. MD HEAD95beefa·기존 미커밋3개 보존. 구현·실행 Claude(일부 하위 에이전트), 교차 리뷰 Codex 2회, 이번 Git·문서 Codex. 통합 후 Build·PIE·전체 회귀는 미실행.
 
 ## Git 기준
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal 원격 `gyeonliz/drone` | Fetch origin/main `3cb9c184`(10/14) | 수신31경로 LFS SHA/삭제 검증, 다른 PC 작업 트리 미조회 |
-| Unreal D PC `D:\JGY\project\drone` | HEAD `3cb9c184` = origin/main + Gate/Rain/City/UI 미커밋 | 팀원 맵/BP 수신·로컬 수정 보존. 수신 후 Build/실기 미실행 |
-| 문서 원격 `gyeonliz/md` | 로컬 origin/main `b38fc84`(10/13 커밋) | 이전 BP 작업 문서 수신. 이번 추가 Fetch/Pull 없음 |
-| 문서 D PC `D:\JGY\project\md` | HEAD `5ab41d6`·로컬 origin보다1커밋 앞 + 문서 미커밋 | 사용자 기존 커밋/편집 보존. MD Fetch/Pull 미실행, Commit/Push는 사용자 |
+| Unreal 원격 gyeonliz/drone | 실제 main·origin/main 833c1c5f | 팀원2커밋 수신·로컬2커밋 Push, LFS46개/7.8MB 업로드 확인 |
+| Unreal D PC D:\JGY\project\drone | HEAD 833c1c5f | main 0/0·Clean·충돌0. 맵4개 팀원본·중복 PayloadTarget BP 로컬본 보존, 수신 자산 SHA 확인 |
+| 문서 원격 `gyeonliz/md` | origin/main `95beefa`(10/14·1014) | STATUS/WORKBOARD/WORKLOG 커밋·푸시 확인 |
+| 문서 D PC D:\JGY\project\md | HEAD 95beefa = origin/main | 오전·오후 문서 미커밋 3개 보존·저녁 추가 |
 
-직전 `bb6233c8` 위 로컬 수정의 Final3 Build26.40초·RHI21 Success/0 Warning/0 Fail·46.56초, 도시9장/비10장·입자 분포 확인은 유효한 당시 근거다. **이후 수신된 `3cb9c184`의 Gate/Course BP·맵 실행 검증은 아직 하지 않았다.** 이전21개를 새 저장본 Pass로 재사용하지 않으며 전체 회귀·패드/비행·FPS·패키징도 별도다. 상세 [WORKLOG](docs/history/DRONE_WORKLOG.md).
+이전 Gate/Rain/City 검증·팀원 수신은 [WORKLOG](docs/history/DRONE_WORKLOG.md)에 보존한다. 오후 UI 검증은 아래 범위이며 수신 맵 전체·패키징·실제 패드 Pass로 확대하지 않는다.
+
+## UI·WBP·UGV 현재 상태
+
+- **구현됨(10/16 D PC Claude)**: WBP 15개를 /Game/Drone/UI/WBP/{FrontEnd,Mission,HUD}로 정리하고 이동 참조 3건 복구. FrontEnd 6·Mission 7·HUD 2(구 FlightHUD 프로토타입/입력 표시). 저녁에 `WBP_DroneFlightHUDKit`(242위젯) 생성·Mission PC 연결 완료. 화면 UI·HUD는 WBP 편집 가능(로비 카드 버튼 개별 위젯·런타임 로비 좌표 예외). `HudKit*` 이름 바인딩으로 Designer 위치/글꼴/색 유지·값/상태색만 코드 갱신.
+- 로비 3분류를 MISSION BRIEFING 형식·Select_UI 배경으로 통일, 카드는 선택만·START로 확정. 브리핑은 시안8의 사진/정보3칸·CONTROLS 3탭(패드/키보드·마우스/조종기, LB/RB). 기체 선택은 시안6·이미지4종·조작 모드·SELECTED·고정 높이 상세/능력치. 시작 버튼 START·받은 화살표로 통일.
+- 기본 훈련 출격 직후 일시정지·이름/목표/진행/역할 조작/전체 목표·[시작](A/Enter) 안내 구현. 레이싱·스토리는 BP 옵션. HUD Kit은 미션/진행·부드러운 나침반·타이머·기체 상태·속도·고도/VS·UGV 전용 조준/무장, Paint 공간 좌표로 창 위치 오프셋 수정·나침반/고도 매 프레임 갱신. 나침반 시안3·고도 시안2·UGV 조준선 시안 반영, UGV ONLY·속도 세로 눈금 제거. 첫 LOS 수업은 판정 구역과 같은 출발/전방 3D 테두리 상자2개로 변경.
+- UGV 기관총 유지 연사·200발/2초 재장전(빈 탄창 자동·R/□ 수동), 유탄6발(연사/재장전 없음). UGV 전용 L2/R2 무장 IMC·Space/Ctrl 포탑 상하 조준(60°/초·BP 조정). 체크 값은 바뀌지만 검정 전경 때문에 그림이 같던 원인을 흰색 고정·Settings WBP 재생성으로 수정, 콤보 복구, 드랍 목표 SM_Pallet·메시 크기 자동 LandingCollision. 그레이박스/시험 표기 제거·역할 설명·기획 문구 반영, 레이싱 이름 스카이드론(외형 미연결).
+- **자동 검증됨(저녁·Codex 로그 대조)**: DroneEditor Build 성공·HUD WBP 242위젯 생성/연결 changed=1 failed=0. RenderOffScreen UI/HUD 19건 중18 Success·FlightHUDKitLayout 1 Fail, 가이드 보고서5/5·체크박스2/2 Success. 오후 집계 차이는 WORKLOG에 보존·실행별 합산 없음. [상세/출처](docs/history/DRONE_WORKLOG.md#2026-10-16--저녁-hud-wbp화가이드-상자좌표체크박스).
+- **수동 확인 대기**: 새 로비/브리핑/기체 선택/조작 안내 패드·마우스, 시작 안내, 체크박스, UGV 무장/조준, 팔레트 착지, 실제 해상도별 HUD, HUD WBP Designer 변경 반영·창 이동 후 눈금 정합·첫 수업 상자 가시성. **알려진 문제**: FlightHUDKitLayout 테스트 World 초기화 실패(2회 수정 후 중단), 미렌더 패드 포커스4건 재실행 통과는 Claude 인계이며 안정화 완료 아님.
+- **현재 미정**: 드랍 집기 패드 L2(시안)/R1(실제), 비행 범례 FPV 모드2 기준 처리, 키보드 UGV 범례 번호, 스카이드론 외형, 기획 훈련8개↔UGV NPC 수업 매핑, 결과 [다음] 동작. Codex 리뷰8건 수정은 인계 기준·수동 Pass 아님.
 
 ## 한눈에 보기
 
@@ -19,7 +29,7 @@
 
 Story4개 DA 표시명은 [CONTEXT](CONTEXT.md#story-미션-표시명)에 맞췄다. Battlefield=M1·MilitaryBase=M2/3·MilitaryCamp=M4는 확정 배정이며 **Story DA 진입은 아직 기존 TestMap**이다. Battlefield 그물8개/전달1개·MilitaryBase 무인포탑1개/재밍1개를 치환했다. 원본11박스는 ArchivedMarkers에 비표시·무충돌로 보존. 숫자 레이더/타워·MilitaryBase M_Target·기존NPC는 그대로다. 레이더 Mesh 빈 슬롯·범위 BP조절, Noise→NO SIGNAL/조종 차단·광섬유 면역이며 속도는 낮추지 않는다.
 
-Story Select_UI는 배경/사진5개+실제 텍스트/DA이며 기존 아트 유지. HUD·설정·결과·로딩 등 10종 UI/Designer까지 **Pretendard 공통 적용**, 크기·굵기·외곽선 보존·임베드/OFL 유지. 선택 목록의 끝 괄호 부연만 숨기며 ID/DA/저장키는 그대로다. 이전UI/Rain14개 검사와 화면 캡처는 당시 근거이며 실제 패드·가독성 실기는 대기다. [UI 가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md).
+UI 현재 상태는 아래 요약을 따른다. Pretendard 공통 적용·기존 아트/ID/저장키 보존 유지. [UI 가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md), 상세는 [오후 WORKLOG](docs/history/DRONE_WORKLOG.md#2026-10-16--오후-ui-전면-개편wbp-전환ugv-무장).
 
 OilRig 근거리 사본3개만 camera-local·생성축Yaw-90°로 화면 가로에 맞추고 위치 보정을 분리했다. Billboard만 돌리거나 위치Y만 옮기던 방식의 실제 도시 쏠림은 수정·렌더 검증됨. A 마스크/부드러운 폭·품질별 Niagara1개/ISM0·차폐/원본 유지, Off/Clear/Disable 즉시0과 실내 자연 소멸은 구분한다. 실기·실내 복귀/FPS는 대기. [비/BP 조정](docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md).
 
@@ -41,14 +51,14 @@ OilRig 근거리 사본3개만 camera-local·생성축Yaw-90°로 화면 가로�
 
 | 영역 | 구현·자동 검증 | 수동 확인 대기·미구현·현재 미정 |
 |---|---|---|
-| 시작·로비 | 스토리/레이싱/튜토리얼/설정/종료 5메뉴, 분류 직접 진입, 상하 순환·Back/포커스 복원, 저장 `WBP_DroneFiveItemMenu` 연결 | 실제 패드·1280/1920 배치 확인 대기. 로비 Tutorial/Racing 탭·LB/RB는 현재 유지, 최종 유지 여부 미정 |
+| 시작·로비 | 5메뉴·WBP 연결 유지, 현재 로비/브리핑/기체 선택은 위 UI 요약 | 실제 패드·마우스·1280/1920 대기, 미정은 위 요약 |
 | 조종 입력 표시 | 설정 수동 ON/OFF·선택 저장, 저장 `WBP_DroneControlInputDisplay` 연결. 아래 중앙 스틱 표시·OFF 갱신 중지, 고도계 독립 | D-3 기본 False 확정, 장치 자동 전환/분리·재연결 정책 미정. 실제 화면/패드 확인 대기 |
 | 코스 표시선 | 긴 코스만 sqrt(곡률) 밀도+15% 균일 몫, 짧은 TestMap68/113조각 기존 균일 분할 유지. MaximumCourseLineSegments 노출·기본1024(시작값·미확정), BP 드래그 재구성 Off | 팀원 Production 코스 외형·Editor 편집 체감 수동 대기. Production 맵 미저장 |
 | Acro | InterLink DX Acro 4축 추가·Mode 2 실측·세로축 반전 해제(10/07 D PC Claude), [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md). 비행 기체 FPV/Scout/Drop/FiberOptic 6개 입력 연결, 패드 축 4개 Dead Zone, 정확 자세 적분. 키보드·패드 입력원 분리·절댓값 큰 쪽 사용·키 해제 시 패드 인계, Space 단독 자세 불변·Mode 1/2 키보드 동일·FPS 무관 자동 검증 | 실제 패드/키보드 체감·Scout/Drop 비행 대기. 키보드 각속도 배율·Angle 모드·마우스 Yaw·회의 “좌우 스틱 반전” 뜻 미정 |
 | 패드 첫 포커스 | `FDroneGamepadFocus`가 포커스 부여 후 5프레임 감시·루트/없음으로 이탈 시 복원, 다른 강조 버튼 이동은 보존 | UI-FOCUS-RACE-01 **수정 후 확인 중**. 화면 그려진 수정 전 Fail/후 Success 각 1회, 간헐적 첫 버튼 강조 수동 확인 대기 |
 | 튜토리얼·Story 순서/저장 | Tutorial8·Story4 유지. Racing은 Circuit/Procedural 2항목(DA파일/소스 계약, 실행 미확인). 완료 미션·Story Fact·권장문구 표시를 `Saved/SaveGames/DroneMissionProgress.json`로 저장/복원하는 코드 확인 | 실제8수업·전체 완료·로비 확인과 성공→종료→재실행 복원 대기. 저장 실패는 실행 중만 유지 경고. 조작키 브리핑 미입력·정식 건너뛰기 정책 확인 별도 |
 | Best Lap | `CourseId|DroneId|ControlMode`별 JSON. 수신 코드에 최고 랩 구간 시간 `bestLapSegments` 저장/복원·구간 대비의 저장 최고 우선 사용 추가. 평균은 실행 History | 현재HEAD 실행 미확인. 같은 조건 완주/재실행 후 Best와 구간 대비 복원 확인. 고정4코스 지형과 시드 레이싱 생성은 별개 |
-| 허브·HUD | Story 허브 브리핑·Voice 슬롯·기체명/신호 대역/배터리 HUD. D-6 미션 DA BatteryLimitSeconds(0=기체 값)·BatteryDepletedResponse(기본 추락), 동력 상실→조종 정지→중력 낙하→접촉 또는8초 뒤 파괴→기존 실패/재출격 구현됨·자동 검증됨(10/05 C PC Claude) | 풍향 HUD/배터리 가독성 수동 확인 대기. 기체 DA 시간 모두0·시간 값 현재 미정, 확정 전 실제 게임 동작 변화 없음·확정 뒤 추락 체감 확인. 음원/튜토리얼 대사·신호 대역·분기/재출격 브리핑 미정 |
+| 허브·HUD | 현재 HUD Kit은 위 요약. 기존 배터리 제한/방전 추락 구현·이전 자동 검증 유지 | 실제 HUD·배터리/풍향 체감 대기. 기체 시간0·최종 시간/음원·신호 대역/분기·재출격 브리핑 미정 |
 | 미션·실패 | DA 자동 등록·Definition/Rule/Trigger·체크포인트 재출격 유지. D-6 높이 제한 매니저 구현됨·자동 검증됨(10/05 C PC Claude): `/Game/Drone/Managers/BP_DroneAltitudeLimitManager` 배치·BP 값 설정으로 적용. Mission/Weather 매니저 BP도 같은 폴더로 정리됨. 상세 [WORKLOG](docs/history/DRONE_WORKLOG.md) | 높이 제한 체감·날씨 시험 맵 수동 확인 대기, 높이 제한 수치·경고 연출 현재 미정. 체크포인트 미배치·첫 출격 위치 재출격. 추락 체감·새 DA 등록 및 Story M1~4 콘텐츠/분기 고도화 확인 |
 | 레이싱 | Circuit와 Procedural 2항목 유지. 완성BP1체/모듈 적층·슬롯별 재질·차선·소유 팔레트, 실제 도시 비 화면 분포 수정/검증됨 | 지정/무작위·같은 시드·로딩 취소·완주·결과/기록 실기 대기. 팀원 고정4코스와 별개 |
 | 물리·역할 | 질량·추력·모터 응답·선형/제곱 항력·Drop kg 하중, Mode 1/2 공통. 속도 단계 제거. 벽/날개 접촉·그물 포획 Greybox·접촉 카메라 분리, 피해 Shake 유지 | Acro는 게임용 근사 모델, 실기체 교정 미완료. 수동 속도/하중/접촉·실제 Chaos 비교 필요 |

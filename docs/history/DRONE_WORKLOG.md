@@ -3498,3 +3498,137 @@ Build/테스트는 UE5.8.2·MSVC14.51.36257·D3D12_SM6이다. Final Build22.03�
 MD는 사용자 HEAD5ab41d6(로컬origin b38fc84보다1앞)·기존 편집을 보존하고 Fetch/Pull하지 않았다. STATUS/WORKBOARD의 현재커밋과 검증 경계만 갱신한다. 이번 수신 후 Build/PIE/Unreal 맵 저장은 하지 않았다. 직전 실제 Saved/Automation/GateRainCity/Final3Report/index.json의21/21·Build26.40초·도시9장/Rain10장은 bb6233c8 위 로컬 수정 검증이며 새 Gate/Course BP·Island 저장본 Pass가 아니다. 전체마지막 결과 전문이 현재 WORKLOG에 없더라도 실제 보고서는 Saved에 유지된다. Commit/Push·Trello/Figma·공유/예약·모델 설정 변경은 없다.
 
 Space 기존 진행상황41·시험가이드28의2블록에 새 수신/로컬 보존과 이전21검증 경계를 반영하고 동일본문 재조회로 확인했다. BP/기획/지침/루트·새Page/권한은 미변경. 최종 main/origin0/0·stash/unmerged/staged0·Unreal63개 미커밋 유지, MD diff --check는 원문CRLF 허용 설정으로0이며 STATUS27,076B·WORKBOARD29,644B다. byte 백업/manifest/result는 위 Saved 폴더에 보존했다. 스태시 제거는 복원·수신 SHA 검증 뒤 수행했으며 사용자 작업을 폐기한 것이 아니다.
+
+## 2026-10-16 — 커밋 51bf2629·95beefa 확인, 팀원 6c07afa5 수신
+
+사실 확인은 Claude(D PC, Git log/status·파일 크기·세션 기록), 문서·Space 반영은 Codex이며, Codex도 두 저장소의 HEAD·origin/main 일치와 작업 시작 Clean을 읽기 전용 Git으로 대조했다: Unreal `6c07afa5`, MD `95beefa`(이번 문서 반영분 제외).
+10/14 16:56 사용자 커밋 `51bf2629`(1014 픽스, 72파일·3,482+/151-)로 Gate/Rain/City/UI·DefaultGame.ini 로컬 작업이 커밋·푸시됐고 MD도 `95beefa`(1014, STATUS/WORKBOARD/WORKLOG)로 커밋·푸시됐으며, Final3 Build·RHI21 Success는 같은 작업의 당시 근거이고 커밋 후 재검증은 없었다.
+10/15 14:16 Yook34의 `6c07afa5`(261015, Content142파일·420+/12-) 수신은 Battlefield·MilitaryBase·TUT_Delivary·TUT_FreeGate·TUT_UGV_Turret 맵5개 및 M_net 수정과 Fab `Content/Fab/Military_Supplies__30+_/` 보급품136파일 추가이며, Claude가 LFS 본문 크기 Battlefield73,711,089B·TUT_Delivary35,273,709B·VV_MedicalCrates_M73,107B를 확인했다(포인터 아님).
+Content만 바뀐 수신 뒤 Build·PIE·자동화는 미실행(최신 Editor 로그10/14 16:40·자동화 폴더10/14 15:28 RainCameraPresentation)이고 이번 세션의 신규 구현됨·자동 검증됨은 없음, 미구현은 해당 없음이며, 맵5개·M_net의 Editor 열기·PIE는 수동 확인 대기이고 실제 변경 내용·의도·검증 책임, Fab 의료 상자의 드랍 화물 사용 여부, 전체 회귀 시점은 현재 미정이다.
+STATUS 지정 Git 구간·WORKBOARD 갱신일/SYNC-WORKPC-01만 갱신하고 기존 기능 판정·과거 기록은 보존했으며, Drone Space 기존 진행상황 페이지 Git/수신 관련2블록의 편집2건(sequence42) 적용 및 재조회 일치를 확인했고 새 파일·Build·PIE·맵 저장·Commit/Push는 없다.
+
+## 2026-10-16 — D PC 저장공간 점검·중복 백업 정리
+
+사용자의 "용량 확인·쓸모없는 과거 백업 정리" 및 "백업의 백업이면 정리" 요청으로 C/D 파일 크기와 백업 사본을 대조했다. 삭제한 파일 길이 합계는 49,241,318,304B(45.860GiB)이며, 보존 사본의 존재·삭제 대상 부재를 다시 확인했다. 폴더 크기는 논리 크기 기준이고 링크는 따라가지 않았으며 C 접근 오류286건·D3건으로 보호 영역 전체 크기를 확정한 측정은 아니다.
+
+| 정리 대상 | 확인·보존 근거 | 삭제량 |
+|---|---|---|
+| `D:\JGY\00\FRACTURED.zip` 중복1개 | `D:\JGY\programing\FRACTURED.zip`와 SHA-256 동일(`B79EFC88376CB0213FED5F4CEF3C152EE920E02CBC5B9A0B48DABA27B65BBFF9`), programing 사본 유지 | 11,219,540,912B / 10.449GiB |
+| `D:\JGY\programing\0414\backup\0608`, `0609` 안의 Windows 실행 묶음7개 / 457파일 | 각 상대경로·개수·크기·모든 파일 SHA-256 동일 확인. `0414\Windows`와 `0414\Build\001/002/003\Windows` 원본4개 유지. 검증된 중복 파일만 개별 삭제 후 빈 폴더 제거 | 22,686,439,575B / 21.128GiB |
+| 0418일·0501 과거 백업의 PCH2개와 0418일 `.vs` DB/WAL3개 | 재생성 가능한 컴파일·검색 캐시만 개별 삭제. Source/Config/Content/uproject와 나머지 백업 보존 | 6,444,540,648B / 6.002GiB |
+| C 사용자 Temp의 `_CL_*` 1,155파일 | 2026-09-16 이전 수정, 실제 최신8/26. 루트 직속·일반 파일·크기/수정일 재검증 후 개별 삭제 | 8,890,797,169B / 8.280GiB |
+
+측정 여유 공간은 시작 C10.85GiB·D786.07GiB → 종료 C20.59GiB·D824.23GiB이며 실행 중 다른 프로세스의 사용량 변동도 포함한다. C의 큰 사용처는 Epic Games 설치73.23GiB, Twinmotion 로컬 라이브러리49.36GiB, Unreal 공통 캐시26.73GiB, 시스템 최대절전 파일25.49GiB다. Temp45.72GiB는 정리 전 스캔 값(이후 `_CL_*` 8.28GiB 삭제)이며 Adobe Temp19.44GiB에는 당일 갱신 파일이 있다. D의 `programing`546.05GiB·과거 backup129.53GiB도 정리 전 값이다. 설치 프로그램·라이브러리·현재 Zen 캐시·최대절전 설정·휴지통·고유 버전의 소스/에셋은 유지했다.
+
+폴더 전체 재귀 삭제는 자동 승인 정책에서 차단됐고 적용0이었다. 범위를 검증된 중복 파일과 명시한 재생성 캐시 파일로 줄여 개별 삭제했고 위 수치를 검증했다. 프로젝트 Unreal 소스·Content·Git/LFS·현재 Saved/Backups·실행 검증 보고서는 정리하지 않았으며 새 Build/PIE·기능/수동 검증·Commit/Push·Trello 수정·공유/예약 변경은 없다. 기존 미커밋 작업과 과거 기록을 보존했다.
+
+증거는 현재 PC `C:\Users\Metacon_41\Documents\ChatGPT\드론\output\storage-audit-20261016\`의 cleanup-summary.json, duplicate-hashes.json, build-copy-comparisons.json, duplicate-build-cleanup-result.json, compiler-temp-cleanup-result.json, old-backup-cache-files.json이다. 원시 전체 스캔은 로컬 Temp/codex-storage-audit-20261016에 있으며 개인 파일이나 대용량 데이터를 Space에 업로드하지 않는다. Drone Space 기존 진행 페이지에 같은 정리 요약을 반영하며 상세 MD는 로컬 미커밋이다.
+
+Space 반영 확인: 기존 진행상황 페이지에 정리 요약1블록을 추가(sequence43)했고 같은 블록 재조회에서 본문 전체 일치를 확인했다. 다른 기능 판정·과거 기록은 수정하지 않았다.
+
+## 2026-10-16 — 오후 UI 전면 개편·WBP 전환·UGV 무장
+
+작업·실행 담당 Claude(일부 구현 Claude 하위 에이전트), 교차 리뷰 Codex 2회, 문서·Space Codex. Asia/Seoul 2026-10-16 D PC, Unreal D:\JGY\project\drone·md D:\JGY\project\md. 오전 미커밋 STATUS/WORKBOARD/WORKLOG와 기존 저장공간 점검 기록을 보존해 끝에 추가했다. 이 절은 오후 세션 변경·검증 상세 정본이며 STATUS는 현재 요약, WORKBOARD는 현재 카드/Next다.
+
+Codex 읽기 전용 Git 조회: Unreal HEAD 6c07afa5·로컬 origin/main 52594d0f(팀원 커밋 미수신), 미커밋 102개(인계 약100개와 부합). Source/Tools/Config diff --stat는 추적49파일·3,838추가/655삭제이며 미추적 자산까지 포함한 수치가 아니다. md HEAD95beefa, 시작 미커밋3개. Git 소유권 경고는 명령 한정 safe.directory로 읽기 조회했고 전역 설정을 쓰지 않았다. Codex는 Unreal 파일 수정·Build·PIE·자동화·맵/에디터 도구 실행·Commit/Push·Trello/Figma/권한/예약 변경을 하지 않았다.
+
+아래 변경 사실·사용자 확정 범위는 Claude 지시서 인계다. Codex가 이번 문서 작업에서 코드를 재구현하거나 모든 자산/캡처를 독립 검증했다는 뜻이 아니다. 검증 표는 인계 원문을 보존하며, 직접 읽은 원시 보고서와의 차이는 바로 다음 정정 절을 우선한다.
+## 변경 사실
+1. WBP 전환·정리: 코드로만 그리던 위젯을 WBP로 내보내는 Editor 도구(`Source/Drone/UI/Tools/DroneWidgetBlueprintExport`, 자동화 `Drone.Tools.ExportWidgetBlueprints`)와 확인 테스트(`Drone.UI.NativeWidgetBlueprintAssets`). 모든 WBP를 `/Game/Drone/UI/WBP/{FrontEnd,Mission,HUD}`로 이동(AssetTools, `Tools/AssetMigration/OrganizeDroneWidgetBlueprints.py`). 이동 때 참조 고침 누락 3건(FrontEnd→설정·시드, FlightHUD→입력 표시, FrontEndRoot TitleMenuClass)을 `FixMovedWidgetReferences.py`·`WireDroneWidgetBlueprints.py`로 복구.
+   - WBP 목록: FrontEnd(WBP_DroneFrontEndRoot, WBP_DroneFrontEnd, WBP_DroneFiveItemMenu, WBP_DroneSettings, WBP_DroneSeedInput, WBP_DroneControlsGuide), Mission(WBP_DroneSelection, WBP_DroneMissionObjective, WBP_DroneMissionResult, WBP_DroneMissionPause, WBP_DroneProceduralLoading, WBP_DroneStartCountdown, WBP_DroneMissionStartPrompt), HUD(WBP_DroneFlightHUD(구 프로토타입), WBP_DroneControlInputDisplay).
+   - **아직 코드만**: 미션 맵 비행 HUD 본체(HUD Kit: 나침반·고도·속도·상태·UGV 조준선/무장), 로비 미션 카드 버튼, 로비 배치 좌표(실행 시 코드가 다시 잡음). 다음 작업 후보: HUD Kit WBP화.
+2. 프론트엔드: 레이싱·훈련 로비를 캠페인과 같은 MISSION BRIEFING 형식(번호 목록·가운데 사진·오른쪽 정보 3칸, Select_UI 배경)으로 통일. 카드 클릭은 선택만, START로 확정(세 분류 공통). 카드 제목 한 줄 고정(완료 표시는 부제로). 정보 칸 높이 글에 맞게.
+   - 브리핑 화면(작전 지역으로 이동) → 시안 8.webp 형식: TRAINING/RACING/MISSION BRIEFING 제목, 사진·정보 3칸, 오른쪽 CONTROLS 3탭(게임패드/키보드·마우스/드론 조종기, 장치 그림·번호·3열 범례, LB/RB 전환), START.
+   - 모든 시작 버튼 글자 "START", 화살표는 받은 이미지(T_UI_StartChevrons).
+3. 기체 선택 화면: 시안 6.webp 형식(큰 미리보기, DRONE 상세·능력치, 작은 ‹ 조작 모드 › 버튼, SELECTED 카드, START). 기체 이미지 4종(Figma 렌더) 연결. 특징·안내 줄 제거, 설명/능력치 칸 높이 고정.
+4. 훈련 시작 안내창: 훈련 출격 직후 게임 멈춤 + 미션 이름·현재 목표·진행·역할 조작 안내·전체 목표 + [시작](A/Enter). 기본 훈련만 켬(레이싱·스토리 BP 옵션). 테스트 `Drone.Flow.MissionStartPromptPIE`.
+5. 비행 HUD(시안 5.webp, 코드): 왼쪽 위 미션 패널(MISSION NN · 이름, 목표, 역할 안내, 진행 막대), 맨 위 나침반(가로 눈금 + "355°" 상자, 매 프레임 부드럽게), 타이머(남은 시간·TIME LIMIT), 오른쪽 위 기체 상태(내구도·배터리·신호·바람·조작 모드), 왼쪽 속도 상자(세로 눈금 제거), 오른쪽 고도 사다리 + 뾰족한 지시 상자 + VS(수직 속도). UGV만 조준선·무장 패널(MG 탄창·GL 잔탄·재장전). 해상도와 무관하게 맞게 그리기 좌표 수정.
+6. UGV 무장: 기관총 누르고 있으면 연사, 탄창 200·재장전 2초(빈 탄창 자동, R/□ 수동), 유탄 6발 제한(연사·재장전 없음). UGV일 때만 L2 기관총·R2 유탄 IMC(`IMC_DroneGroundWeapons`, `IA_DroneGround_Reload`). Space/Ctrl은 UGV에서 포탑 위아래 조준. 테스트 `Drone.Weapons.GroundUGV.Ammo`.
+7. 설정 체크박스 버그 수정: 수직 동기화·조종 입력 표시 체크박스가 켜짐/꺼짐 모두 검은 네모로 보이던 문제(체크 스타일 전경색 검정) → 흰색 고정. 타이틀·일시정지 양쪽 마우스·키보드 재현 테스트(`Drone.UI.SettingsCheckboxClickPIE`, `Drone.UI.PauseSettingsCheckboxClickPIE`, 캡처 `Saved/Automation/SettingsCheckbox/`). 설정 콤보 항목이 WBP 경로에서 비던 문제도 수정.
+8. 드랍 목표: `BP_RoleTest_PayloadTarget` 외형 SM_Pallet(Battlefield 자산, 수정 안 함), 메시 크기에 맞춘 충돌 상자 자동(LandingCollision), Target Visual Mesh를 바꾸면 바로 적용.
+9. 문구: 기체·미션의 "(그레이박스)·시험" 표기 제거, 역할별 기체 설명, 레이싱 기체 이름 "스카이드론"(외형 자산은 팀원 미푸시로 미연결), 기획서 기준 미션·훈련 문구(오전).
+10. Codex 교차 리뷰 2회 지적 8건 모두 Claude가 코드 대조 후 수정(콤보 항목, 시드 칸, 로딩 단계 줄, 첫 수업 완료 색, 기체 카드 바인딩, 정리 스크립트 API, 시작 안내창 버튼 누락 시 멈춤, 입력 자산 쿠킹 → DefaultGame.ini DirectoriesToAlwaysCook 추가).
+
+## 검증 출처
+| 검사 | 조건 | 결과 | 보고서·로그 경로 |
+|---|---|---|---|
+| Build | DroneEditor Development | Succeeded(마지막 16:5x) | `Saved/Automation/ClaudeCheckbox/` |
+| UI·Flow 등 회귀 | RenderOffScreen 1920×1080 | 80건 중 73 → 재실행 후 실패 1(테스트 하네스 문제) | `Saved/Automation/ClaudeUIOverhaul3`, `ClaudeUIOverhaul4` |
+| 체크박스 재현 | RenderOffScreen | 2/2 Success + 캡처 | `Saved/Automation/ClaudeCheckbox/report2` |
+| HUD 캡처 | 1920·1600·1280 | 정상 배치 | `Saved/Automation/HUD`, `ClaudeHUDRes` |
+| 드랍·능력 | NullRHI | 3/3 | `Saved/Automation/ClaudeHUD5/report3` |
+
+- 구현됨: 위 1~10
+- 자동 검증됨: 위 표
+- 수동 확인 대기: 새 로비·브리핑·기체 선택·조작 안내 실제 조작(패드·마우스), UGV 연사·재장전·유탄·Space/Ctrl 조준, 훈련 시작 안내창, 체크박스 실사용, 팔레트 투하 착지, HUD 실제 해상도별 배치
+- 미구현/알려진 문제: HUD Kit WBP화 미착수, `Drone.UI.FlightHUDKitLayout` 테스트는 테스트 World에서 위젯 초기화가 돌지 않아 실패(제품 HUD는 PIE 캡처로 정상, 2회 수정 후 중단), 스카이드론 외형 미연결, 패드 포커스 PIE 4건은 미렌더 실행 시 알려진 실패(UI-FOCUS-RACE-01, 재실행 통과)
+
+### Codex 원시 보고서 대조·인계 수치 정정/확인 대기
+
+- ClaudeUIOverhaul3/verify_report/index.json: 성공73·경고 동반 성공2·실패5, 합계80. 실패는 Drone.Flow.GamepadMissionFlowPIE, Drone.Flow.GamepadNavigationPIE, Drone.Flow.KeyboardStoryFlowPIE, Drone.Flow.PauseMenuRacingPIE, Drone.UI.FlightHUDKitLayout.
+- ClaudeUIOverhaul4/report/index.json: 성공4·경고 동반 성공1·실패2, 합계7. 실패는 Drone.UI.FlightHUDKitLayout 및 KnownIssues.Flow.LobbyLayoutStabilityPIE. 이 파일만으로 인계 “재실행 후 실패1”을 확인할 수 없다. 포커스4건 재실행 통과·하네스 원인은 Claude 인계이며 전체80건 최종 재통과로 확대하지 않는다. 최종 로그/집계와 KnownIssues 포함 여부는 Claude 재확인 필요(TEST-HUD-LAYOUT-01).
+- ClaudeCheckbox/report2/index.json: 성공2·경고0·실패0(타이틀/일시정지 체크박스). ClaudeHUD5/report3/index.json: 성공3·경고0·실패0. 앞선 HUD5/report는 3성공/1실패, report2는 2/2이며 최종 report3와 합산하지 않는다.
+- Build Succeeded(마지막16:5x)·HUD 1920/1600/1280 정상 배치·캡처 내용은 Claude 인계 근거다. Codex 이번 Build 재실행·이미지 전수 열람·실제 장치 수동 Pass 없음. FlightHUDKitLayout 실패는 알려진 테스트 World 위젯 초기화 문제로 인계됐고 2회 수정 후 중단 원칙을 유지한다.
+- 구현됨은 위 변경1~10, 자동 검증됨은 위 출처/조건 한정. 수동 확인 대기는 새 로비/브리핑/기체 선택/CONTROLS의 패드·마우스, 훈련 시작 안내, 체크박스 실사용, UGV 연사/재장전/유탄/Space·Ctrl, 팔레트 투하 착지, HUD 실제 해상도 배치다. 미구현은 HUD Kit WBP화·스카이드론 외형 연결이다.
+- WORKBOARD 기존 관련 카드를 갱신하고 UI-WBP-EXPORT-01(구현·수동 대기), UI-HUD-WBP-01(미착수), UI-CONTROLS-DECISION-01(미정), ASSET-SKYDRONE-01(팀원 푸시 대기), TEST-HUD-LAYOUT-01(하네스/집계 확인)을 추가했다. 완료 구현을 수동 완료 카드로 닫지 않았다.
+- 아카이브 대상/기준 날짜가 지정되지 않아 절 이동·아카이브 파일 생성은 하지 않았다. 현재 관련 요약/카드만 갱신해 크기를 STATUS 27,227→28,515B, WORKBOARD 29,848→28,466B로 유지했다(모두 보수적30,000B 미만). 과거 WORKLOG 본문은 수정하지 않았다.
+## 확정·미정
+- 사용자가 확정한 것: 위 변경 사실 전부(시안 이미지·Figma Slide 102 기준), 유탄은 발수 제한만·기관총만 연사, 훈련·레이싱 테마를 캠페인과 통일, START 통일, 그레이박스·시험 문구 제거, 레이싱 기체 = 스카이드론.
+- 현재 미정(결정 쓰지 말 것): 게임패드 드랍 집기 버튼(시안 L2, 실제 R1), 게임패드 비행 범례가 FPV 모드 2 기준인 점, 키보드 UGV 범례 번호, 스카이드론 외형 자산(팀원 푸시 대기), 훈련 목록과 구현 수업 매핑(기획서 8개 vs UGV NPC 수업), 결과 화면 [다음] 동작.
+
+### Space 반영·최종 문서 확인
+
+기존 페이지 3개에 편집6건을 적용했다: 진행상황과 다음 작업 sequence44(4건, 현재 Git/UI·작업판/Next), 테스트 맵과 확인 가이드 sequence29(1건, UI·무장 수동 확인/검증 경계), Blueprint 조정과 팀원 가이드 sequence27(1건, WBP·HUD·UGV/조작·팔레트). 각 결과의 affected_blocks 총27개를 같은 페이지에서 다시 읽어 저장 hash 전부 일치·선택 완전성을 확인했다. 새 페이지 생성·기획/날짜별 기존 기록 삭제·공유/예약 변경 없음. 이번 대상 Space 미반영 없음. 기존 기획/지침/루트 페이지는 변경하지 않았다.
+
+최종 로컬 변경 대상은 STATUS.md·WORKBOARD.md·docs/history/DRONE_WORKLOG.md 3개이며 Commit/Push는 하지 않는다. 문서 검사는 Git diff --check(CRLF 허용)·크기/변경 범위 대조로 마무리하며 엔진 Build·PIE·수동 Pass를 추가하지 않는다.
+
+## 2026-10-16 — 저녁 HUD WBP화·가이드 상자·좌표·체크박스
+
+작업·실행 Claude(HUD 바인딩 Claude 하위 에이전트), 문서·Space Codex. 2026-10-16 저녁 KST D PC, Unreal `D:\JGY\project\drone`·md `D:\JGY\project\md`. Codex 읽기 전용 Git 조회 HEAD6c07afa5·미커밋102개, 원격 기준 로컬 origin/main52594d0f(팀원 커밋 미수신·이번 Fetch 없음). MD 오전·오후 미커밋3개와 과거 기록을 보존했다. 아래 구현 사실은 Claude 지시서 인계이며 Codex는 지정 로그/보고서를 읽어 대조했다. 엔진 Build·PIE·자동화 재실행·Unreal 수정·Commit/Push 없음.
+
+### 추가 구현·사용자 확정
+
+1. `/Game/Drone/UI/WBP/HUD/WBP_DroneFlightHUDKit` 내보내기 생성(242위젯), `BP_DroneMissionPlayerController.FlightHUDWidgetClass` 연결 완료. `HudKit*` 고정 이름·`TryBindHudKitLayout`으로 중복 생성 없이 바인딩한다. Designer 위치·글꼴·색은 유지하고 코드는 값·상태색만 갱신한다. 코드가 그리는 나침반·고도 눈금은 `HudKitCompass`·`HudKitAltitudeLadder` 틀 위치·크기를 따른다. 화면 UI·HUD WBP 편집 가능, 예외는 로비 미션 카드 개별 버튼과 실행 중 코드가 다시 잡는 로비 배치 좌표. 프로토타입 맵의 구 `WBP_DroneFlightHUD`는 유지한다. 오후의 HUD WBP화 미착수 기록은 당시 상태이며 현재 구현 완료로 정정한다.
+2. Tick 공간 좌표로 창의 바탕화면 위치만큼 눈금이 오른쪽 아래로 밀리던 문제를 `GetPaintSpaceGeometry`로 수정했다. 나침반·고도는 텔레메트리0.1초 간격 대신 매 프레임 기체 값으로 갱신한다. 나침반 시안3(가로 눈금·방위 상자·화면 최상단), 고도 시안2(사다리·뾰족한 지시 상자·VS), UGV 조준선 시안 반영. UGV ONLY와 왼쪽 속도 세로 눈금 제거.
+3. 첫 LOS 수업 막대·화살표를 판정 구역과 같은 3D 테두리 상자2개(출발·전방, 각각12모서리)로 변경. 높이1.25~4m, 착지 단계 출발 상자 바닥~1.25m로 하강. 노랑/초록/흐림 색·두께8cm(BP 조정).
+4. 설정 체크 값은 바뀌지만 체크 스타일 검정 전경 때문에 켜짐/꺼짐 그림 모두 검은 네모로 보이던 원인 확정·흰색 고정, `WBP_DroneSettings` 재생성. 타이틀·일시정지 양쪽 마우스·키보드·0.5초 유지 재현과 켜짐 ✓ 캡처 확인은 Claude 인계(`Saved/Automation/SettingsCheckbox/`); Codex 캡처 직접 열람·실사용 확인은 없음.
+5. UGV Space/Ctrl 포탑 상하60°/초(BP 조정). 기체 설명/능력치 높이 고정, 로비 정보 칸은 글에 맞춰 증가·카드 제목 한 줄/완료 부제, 훈련·레이싱 로비 배경/사진 틀 캠페인과 통일, 드랍 목표 팔레트+LandingCollision 유지.
+
+### 검증 출처 — D PC Claude 실행·Codex 원시 로그 대조
+
+아래 경로는 Unreal `Saved/Automation/` 기준이며 온라인 업로드하지 않았다.
+
+| 검사 | 조건 | 대조 결과 | 경로 |
+|---|---|---|---|
+| Build | DroneEditor Development | Result: Succeeded | `ClaudeHUDWBP/build.log` |
+| HUD WBP 내보내기·연결 | Export·Wire | widgets=242 saved=1, changed=1 failed=0 | `ClaudeHUDWBP/export.log`, `wire.log` |
+| UI·HUD 회귀 | RenderOffScreen | 성공18·경고0·실패1/총19, FlightHUDKitLayout Fail | `ClaudeHUDWBP/report/index.json` |
+| 가이드·수업 | RenderOffScreen | 성공5·경고0·실패0: Mission·ObserverGuide·ObserverLessonPIE·HoverMissionPIE·MissionLessonsTestMap | `ClaudeGuideBox/report/index.json` |
+| 체크박스 | RenderOffScreen | 성공2·경고0·실패0: 타이틀/일시정지 | `ClaudeCheckbox/report2/index.json` |
+
+가이드 지시서는 수업4개를 나열했으며 원시 보고서는 Mission을 포함해5개다. 오후80개/후속7개 집계 차이를 이19개 결과로 해결 처리하거나 실행들을 합산하지 않는다. FlightHUDKitLayout 원인은 기존 테스트 하네스로 인계됐고2회 수정 후 중단 상태 유지.
+
+구현됨: 추가분1~5. 자동 검증됨: 위 조건·보고서 범위. 수동 확인 대기: HUD WBP Designer 위치/글꼴/색 실행 반영, 창 위치를 옮긴 후 나침반/고도 눈금 정합, 첫 LOS 상자 가시성·색/착지 하강, 체크박스 실사용. 기존 로비/브리핑/기체 선택/조작 안내 패드·마우스, 훈련 안내·UGV 무장/조준·팔레트/해상도·이전 수동 항목도 유지한다. 알려진 미해결: FlightHUDKitLayout 하네스·스카이드론 외형(팀원 푸시 대기).
+
+사용자 확정: HUD WBP화·첫 미션 테두리 상자·나침반/고도 시안·UGV Space/Ctrl 조준, Commit은 사용자 직접. 현재 미정 유지: 드랍 집기 패드 L2/R1, 비행 범례 FPV 모드2 기준 처리, 키보드 UGV 번호, 스카이드론 외형, 훈련8개↔UGV NPC 매핑, 결과 [다음].
+
+### 문서·Space 반영
+
+STATUS 현재 요약과 WORKBOARD 관련 카드/Next를 고쳤고 HUD WBP화는 구현 완료·수동 대기로 유지한다. 별도 아카이브 대상/기준 날짜가 없어 절 이동·새 파일 생성은 하지 않았다. 과거 WORKLOG는 수정하지 않고 이 절만 추가했다.
+
+Drone Space 기존 진행상황 sequence45(5블록), 테스트 가이드 sequence30(3블록), Blueprint 가이드 sequence28(4블록)을 갱신했다. 수정12블록을 같은 페이지에서 재조회하여 저장 hash 일치를 확인했다. HUD 틀 위치/크기로 눈금 조정·상태색 코드 갱신·수동 경계를 반영했고 이번 대상 미반영 없음. 새 페이지·공유/예약·Trello/Figma 수정 없음. GitHub 본문 반영은 사용자 Commit/Push 후다.
+## 2026-10-16 — 사용자 우선순위로 Drone 수신·Commit/Push
+
+사용자 요청은 "맵은 팀원 자산 우선, 다른 겹침은 로컬 우선으로 Pull 후 Commit/Push"다. 실행은 Codex(D PC), Unreal 시작 HEAD6c07afa5·문서 HEAD95beefa이며 Git 작업 전 MD의 기존 미커밋3개와 기능 판정을 보존했다. 원격은 origin(gyeonliz/drone)만 Fetch했다.
+
+로컬125상태(실파일121·삭제4·미추적46, 9,163,759B)를 Saved/Backups/GitSync_20261016_184841에 원시 바이트·SHA-256·index·diff와 함께 백업했다. Fetch 결과 팀원52594d0f·62f77024의2커밋/16경로가 incoming이었다. 실제 겹침은 Content/Drone/Abilities/RoleTargets/BP_RoleTest_PayloadTarget.uasset 한 개라 로컬 원시 바이트를 우선했다. 로컬 맵 수정은0개였다. Lvl_Battlefield·Lvl_MilitaryBase·Lvl_MilitaryCamp·TestMap/Lvl_NPCSmartObjectGreybox 맵4개와 그 밖의 팀원 자산은 원격본으로 수신했고, LFS14파일의 SHA-256 및 원격삭제1경로(M_Rador_Tower)를 확인했다. Fab 팔레트5자산·M_militaty_pallaet·포탑/그물/재밍/차량 BP도 포함된다.
+
+첫 Stash는 별도 Claude의 UnrealEditor-Cmd(PID19324, ClaudeViewGuide 검증)가 자산을 잡아 미추적 정리 단계에서 실패했다. Stash와 바이트 백업은 생성됐고, 빠진28파일만 원본 백업에서 복원해125상태/121SHA 일치를 확인했다. 사용자가 해당 검증 프로세스 종료를 명시 승인해 PID/명령을 대조한 후 그 프로세스만 종료했다. 기존 로그는 백업에 보존했다. 해당 실행은 FlightGolden6개 비교 불일치·DefaultViewModeSetting 진행 중 정체 기록이 있어 완료/전체 Pass로 취급하지 않는다.
+
+다시 임시 보관 후6c07afa5→62f77024를 FF 수신하고 로컬121파일을 바이트 그대로, 삭제4개를 복원했다. 맵을 Editor로 저장하거나 자동 병합하지 않았다. 동시 Claude 작업의 DefaultViewModeSettingTest 최신 수정 및 FlightGoldenBaseline.txt 변경도 커밋 직전에 별도 스냅샷해 d0c24f90(126파일·8,284+/758-)에 포함했다. staged Unreal 자산46개의 LFS pointer·실파일 SHA·로컬 LFS 객체 존재와 diff --check를 확인하고 origin/main Push 및 LFS46/46·7.8MB 업로드 성공을 확인했다.
+
+첫 Push 후 Claude가 같은 테스트의 임시 PlayerController/LocalPlayer와 위젯 초기화를 추가 수정해 다시 로컬1파일이 남았다. 이 최신 수정도 별도 백업·diff 확인 후833c1c5f(1파일·17+/1-)로 Commit/Push했다. 최종 HEAD=origin/main=실제 ls-remote main 833c1c5f23c5d5b1ef56ec5da3ccc3ac719fc7f7, ahead/behind0/0·미커밋0·미추적0·unmerged0이다. 이번에 만든 Stash2개는 Push/복원 검증 후 SHA를 대조해 정확히 제거했으며 사용자 기존 Stash는 없었다. 바이트 백업과 manifest·integration/commit/push 증거는 위 Saved 폴더에 유지했다.
+
+이번 작업은 사용자 로컬 변경의 수신/통합/공유이며 Codex가 새 생산 코드를 작성하거나 Build·PIE·전체 회귀를 실행한 것은 아니다. 별도 Claude 검증이 계속된 결과를 이번 통합 커밋의 Pass로 확대하지 않는다. 통합 뒤 기능/맵·전체 회귀·실제 패드·패키징은 후속이다. MD는 STATUS Git 구간·WORKBOARD 갱신일/SYNC-WORKPC-01·이 기록만 갱신하며 문서 저장소 Commit/Push는 이번 Drone Git 요청에 포함하지 않았다. Trello·공유 권한·예약·다른 원격은 변경하지 않았다. Drone Space 기존 현재 기준 블록의 Git/수신 요약도 갱신한다.
+
+Space 최종 확인: 기존 진행상황과 다음 작업의 현재 Git 기준·문서 기준2블록을 sequence46으로 저장하고 같은 블록 재조회에서 전체 본문 일치를 확인했다. 19:01 KST 최종 실제 원격/HEAD833c1c5f·0/0·Clean·unmerged0·Stash0을 재확인했다. STATUS29,440B·WORKBOARD28,706B이며 MD diff --check는 원문CRLF 허용 기준으로 통과했다.

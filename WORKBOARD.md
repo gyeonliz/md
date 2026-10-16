@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-10-14 D PC — Drone3cb9c184 FF 수신·MD5ab41d6 + 미커밋. 로컬72개 바이트 보존·충돌/Stash0. 수신 후 실행 검증은 대기, 직전21개와 구분. 상시 역할 유지·Commit/Push는 사용자.
+마지막 갱신: 2026-10-16 저녁 D PC — Drone 팀원2커밋 수신·로컬 우선 통합 후 d0c24f90·833c1c5f Commit/Push, 실제 main 일치·Clean 확인. 기능 검증 범위는 [STATUS](STATUS.md), 상세는 [WORKLOG](docs/history/DRONE_WORKLOG.md).
 
 ## Now
 
@@ -43,12 +43,12 @@
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
-| TUT-OBSERVER-01 | 고정 조종자 첫 수업 | 구현·새 Observer 맵/DA 저장. Hover ID·8수업 유지; 검증 WORKLOG | 이륙→전진→방향 유지 후진→실제 착지, 고정 카메라·재출격/다음 수업 복원 수동 확인 |
+| TUT-OBSERVER-01 | 고정 조종자 첫 수업 | 구현·Observer 맵/DA·LOS 테두리 상자2개, 자동 검증 WORKLOG | 이륙→전진→방향 유지 후진→실제 착지, 고정 카메라·상자 가시성/착지 단계 하강·재출격/다음 수업 복원 수동 확인 |
 | TUT-GATE-SAVE-01 | Gate BP 저장 사고 | CDO MID 참조 원인 수정·Gate BP 수리, 재로드3회·Gate5/5 성공(기존 경고100) | 팀원 Source+BP 수신/종료 후 Build·같은 저장 실기. 기하/색·16개 유지, Production 미수정 |
 | TUT-COURSE-SMOOTH-01 | 장거리 코스 표시선 곡률 분할·BP 표시 예산 | 구현됨·자동 검증됨·수동 확인 대기(10/04 C PC Claude). 긴 코스 곡률 분할·기본1024(시작값·미확정), BP 드래그 재구성 Off. 수치·근거 STATUS/WORKLOG | 팀원 Production 코스 외형·급커브/끝 연결·Editor 편집 체감 수동 확인. BP2048(측정 최대20cm) 검토 가능. 짧은 TestMap68/113조각 기존 균일 분할 유지·Production 저장/재생성 금지 |
 | RACING-TERRAIN-LINK-01 | 레이싱 흐름·지형 연결 | D-5 기존 구현. a57a4444에 팀원 미션3 완료 보고·Training/Island/MountainRange/Demonstration 변경 수신. Editor 로그는 Racing 진입/카운트다운까지만 확인 | 실제 진입 맵·시작점·완주/기록·4코스 진행도 대조. 팀원 보고를 수동 Pass로 확대하지 않음·Production 보존 |
 | TUT-PROGRESS-01 | 튜토리얼 시간·연속 진행·전체 완료 | 이전 자동 검증 WORKLOG. 수신 코드의 완료 미션/Story Fact JSON 저장은 TUT-COMPLETION-SAVE-01 | 실제8수업·현재 결과창·로비 완료 표시/재진입 확인. Production Training 보존 |
-| TUT-BRIEFING-TEXT-01 | 튜토리얼 조작키 브리핑 문구 결정·입력 | 미구현·문구 현재 미정. Codex research 2026-10-02: 8수업 키보드 키, 자폭/드랍/UGV NPC/포탑 패드 키·대사, 튜토리얼 화자 Figma 미기재. 호버/전진/회전/게이트 패드 브리핑 원문 있음. 이번 조작키 브리핑 미입력 | 사람이 미기재 문구·화자를 결정한 뒤 Claude가 DA/UI 연결·검증, Story 허브를 튜토리얼 화자로 추정하지 않음 |
+| TUT-BRIEFING-TEXT-01 | 훈련 문구·시작 안내 | 기획 문구·역할 조작·기본 훈련 시작 안내 구현(Claude), 수동 대기 | 패드/Enter 시작·목표/안내 확인. 기획8개↔UGV NPC 매핑·미기재 화자/키 결정 |
 | TUT-COMPLETION-SAVE-01 | 미션 진행도 영구 저장 | 10/13 수신 소스 확인: 완료 미션·Story Fact·권장문구 표시 여부 JSON 저장/복원 구현. Best Lap 저장과 별개 | Claude가 현재HEAD 회귀 확인 후 실제 성공→종료→재실행 복원·저장 실패 처리 확인. 수신만으로 자동/수동 Pass 아님 |
 | TUT-ORBIT-02 | 회전 수업 = 원형 코스 한 바퀴 | Heading DA ID 호환 유지, Closed Spline·9 Gate, Tag별 Recorder·HUD, 다른 코스 비활성. 독립 Heading 수업 맵으로 연결 | 실제 비행 제자리 Yaw/다른 코스/7⁄8 바퀴 미완료, 결승→귀환→성공 확인 |
 | TUT-GATE-PRESENTATION-01 | Gate 크기·진행 방향 | Island112개 정합·숨김Native 보존/원본 무저장. 비균등Scale·0접선 수리, m_green Naniteflag 수리; STATUS | 새Source Build 후 Island 크기/방향·3상태색 실기. 잔존 삭제·맵 재생성 금지, Main 참조 별도 |
@@ -62,18 +62,23 @@
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
+| UI-WBP-EXPORT-01 | WBP 정리 | 15개 이동·참조3건 복구 구현, 상세 WORKLOG | 실제 흐름/참조 수동 확인. 로비 버튼/좌표는 코드 |
+| UI-HUD-WBP-01 | HUD Kit WBP화 | 구현 완료·242위젯/연결 검증, 수동 대기 | Designer 위치/글꼴/색 실행 반영·창 이동 후 눈금 정합 확인 |
+| UI-CONTROLS-DECISION-01 | 조작·흐름 결정 | STATUS 미정6항목 보존 | 사람 결정 후 Claude 연결. L2/R1·FPV2 범례·UGV 번호·수업 매핑·결과 다음 확정 금지 |
+| ASSET-SKYDRONE-01 | 스카이드론 외형 | 이름 반영·외형 미연결, 팀원 푸시 대기 | 수신 뒤 Claude 연결·외형 확인 |
+| TEST-HUD-LAYOUT-01 | HUD 하네스·회귀 집계 | World 초기화 실패·2회 중단, 원시2실패/인계1실패 차이 | Claude 최종 로그 대조·하네스 수리/회귀. 제품 실기와 분리 |
 | UI-SELECT-ART-01 | 전체 Pretendard·선택명 | Native/Designer 10종 공통 적용·기존 크기/굵기 보존, 목록 끝 괄호만 숨김. 추가 렌더14/14·Story/설정 캡처 확인 | 실제 패드·1280/1920 가독성. DA/ID·아트 보존, 아이콘/명시 Opt-out 제외 |
 | UI-CONTROL-LAYOUT-01 | 조작 이름·가로폭 | Codex 예외 수정·자동 Pass; WORKLOG | 1280/1920·패드 수동 확인 |
 | UI-RESULT-LAYOUT-01 | 결과창 | 현재 native TitleKit 좌측 버튼/우측 정보 카드, 소스 확인; 옛680 검증은 WORKLOG | 현재 화면·패드·다음/재도전/복귀 확인 |
 | UI-LOADING-PAUSE-01 | 로딩·일시정지 | Story/Procedural 로딩·취소, 미션 일시정지/재시작/타이틀 복귀 연결을 소스로 확인 | 현재HEAD Build/회귀→Esc/Start·재개·같은 시드/취소 실기 확인. Pause 포커스 관찰은 UI-FOCUS-RACE-01 |
-| UI-FOCUS-RACE-01 | UIOnly 첫 포커스 경쟁 | 이전5프레임 복원·관찰은 WORKLOG. 수신 목록에 PauseMenuRacingPIE Resume 포커스 전체Fail/단독Pass 혼재 추가; STATUS | 현재 결과/일시정지/타이틀 첫 강조·패드 이동 수동 확인. 실제PC/로그 대조 전 안정화 완료 아님 |
-| UI-MEETING-LOBBY-01 | Claude 5메뉴/포커스 계약·Codex BP 연결 | 구현됨·자동 검증됨·수동 확인 대기(2026-10-03 밤 C PC). Story/Racing/Tutorial 진입 전 분류·중간 화면 없음, TitleMenuClass 저장 연결. TitleFiveMenuPIE/WidgetPIE·패드 흐름 Success, 이전 남은 C++ 연결 닫음 | 실제 패드 상하 순환·5개 진입/설정3·진입 메뉴 복귀·B/Esc 반복, 1280/1920 위젯 크기 확인. 종료 자동화는 Dispatcher 연결만 검사. 로비 탭/LB·RB 유지 여부 현재 미정 |
-| UI-CONTROL-DISPLAY-01 | Claude 설정/축/HUD·Codex 입력 표시 BP 연결 | 구현됨·자동 검증됨·수동 확인 대기(2026-10-03 밤 C PC). 조종 입력 표시 수동 ON/OFF·적용/취소/기본값·SaveGame, ControlInputDisplayClass 저장 연결·ControlInputDisplayPIE Success. D-3 기본값 결정은 아래 결정 표 참조(기존 False와 일치) | 실제 패드·1280/1920 위치·저장/재실행·기본값 복원 확인, 고도계 독립. 장치 자동 전환·혼합 입력·분리/재연결 정책 결정 필요. 자동화 슬롯은 DroneAudioSettings_Automation |
+| UI-FOCUS-RACE-01 | UIOnly 첫 포커스 | 미렌더4건 재실행 통과는 Claude 인계. 원시 집계 차이 WORKLOG | 실제 패드 첫 강조·렌더 여부 대조, 안정화 확정 금지 |
+| UI-MEETING-LOBBY-01 | 5메뉴·WBP 연결 | 이동 참조/TitleMenuClass 복구·구현, 상세 WORKLOG | 패드 순환·진입/복귀·B/Esc·해상도 확인 |
+| UI-CONTROL-DISPLAY-01 | 조종 입력 표시 | WBP 참조 복구·설정/저장 구현, 기본 False 유지 | 위치·저장/재실행·기본값 복원. 장치 전환/분리 정책 미정 |
 | UI-LAYOUT-DIAG-01 | 로비 레이아웃 진단 판정 변동 조사 | 진단 판정 변동·기존 Fail 유지. D-11로 KnownIssues.Flow.LobbyLayoutStabilityPIE 분리됨(10/05 C PC Claude), 안정화 완료 아님 | Claude가 표본/대기·레이아웃 원인을 구분하고 반복 렌더 검사 판정 안정화, 1280/1920 수동 확인 별도 |
 | UI-LAYOUT-01 | 목록 진입·선택 시 한 프레임 재배치 | 구현됨·자동 검증됨·수동 확인 대기. 줄바꿈·상시 스크롤바·폭270 후속 포함. 최신 진단 분리는 UI-LAYOUT-DIAG-01 참조, 이전 근거 아카이브/WORKLOG | 1280/1920 실제 화면 가독성, Story 4개 목록의 상시 스크롤바 칸 확인 후 수동 완료 |
 | UI-PAD-01 | 패드만으로 전체 UI 선택 | 구현/자동 검증됨·실기 대기(10/07 D PC Claude). InterLink 노브만으로 전체 이동(좌우 불필요)·패드 규칙 유지. [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md) | 전체 흐름·탭/첫 강조·가독성·복귀, 설정 노브 잠금/조절·콤보 실기 확인. NullRHI는 실기 Pass 아님 |
-| UI-SETTINGS-01 | 사운드·화면·성능 설정 | Master 음량 미리보기/SaveGame, 창·전체화면/해상도, 품질·VSync·FPS, 적용/기본값/뒤로 취소 구현. PIE 창·해상도 차단. 설정 계약과 FrontEnd PIE 성공 | Standalone에서 실제 소리/창·해상도, Apply와 Back 취소·재실행 복원 확인. 음악/SFX/음성 분리 라우팅은 후속 |
-| UI-FLOW-PROTOTYPE-01 | Mission/Drone 선택 임시 UI 확인 | 후속 첨부 시안으로 로비 3열·브리핑 이미지/설명·기체 상단 도식/상세·하단 가로 카드 갱신, `FrontEndPIE`와 계약 성공 | 16:9 1280/1920 가독성/스크롤·선택/출격 확인 뒤 최종 WBP·Thumbnail/3D Preview 범위 결정 |
+| UI-SETTINGS-01 | 설정·체크박스 | 검정 전경 원인 수정·흰색 고정/Settings WBP 재생성, 재현2/2 성공 | 타이틀/일시정지 실사용·적용/취소·재실행·Standalone 소리/해상도 확인 |
+| UI-FLOW-PROTOTYPE-01 | 로비·브리핑·기체 선택 개편 | 3분류 통일·선택 후 START·시안6/8·CONTROLS 3탭·이미지4종 구현 | 패드/마우스 전체 흐름·START·1280/1920 가독성 수동 확인 |
 
 #### 미션·스토리·HUD
 
@@ -83,7 +88,7 @@
 | MISSION-NAME-01 | Story4개 표시명 | DA 한/영 반영·ID/진행 보존, 검증 WORKLOG | 로비/브리핑/HUD/결과 수동 확인. M3 내부 VeilBreaker는 호환용 |
 | MISSION-CHECKPOINT-01 | 실패 시 시작/중간 지점 재출격 | 구현됨·자동 검증됨·수동 확인 대기(C PC Claude). 파괴/시간/Trigger 통합 재출격, 맵·목표·표적 유지. 실제 체크포인트 미배치·첫 출격 위치 재출격 | 맵 체크포인트 배치, M1 픽업 지점은 정보단말 회수 구현 뒤. 재출격 브리핑 재생은 MISSION-BRIEFING-02 뒤(여부 현재 미정). 튜토리얼 추락→동일 기체/조작·현재 목표 시간 재설정·목표/표적 유지·재출격 체감 수동 확인. Production Training 보존 |
 | MISSION-BRIEFING-02 | HUB 보이스·자막 브리핑·진입 1회 시네마틱 | 자막·Voice 슬롯·자동 진행/Y·Tab/정지 구현·BriefingLinesPIE Success(2026-10-02 C PC Claude, ClaudeBriefing/test2.log). Story M1 4·M2 4·M3 5(조건 없으면 4)·M4 6줄 원문 입력, 화자 허브. M3 첫 줄 Story.TargetEliminated 조건 | 자막 가독성·속도 수동 확인. 음원 없음·튜토리얼 대사 미입력·1회 시네마틱 완료 근거 없음. 반대 분기 M3 첫 대사와 M2→M3 분기·재출격 재생 여부 현재 미정 |
-| HUD-FIGMA-01 | HUD 배터리·기체명·신호 대역·풍향 | D-6 구현됨·자동 검증됨(10/05 C PC Claude). HUD 방위 통일·불어오는 쪽 풍향, 미션별 배터리 제한/방전 추락 추가. 상세 STATUS/WORKLOG | 풍향 HUD·배터리/HUD 가독성 수동 확인. 배터리 시간 모두0·현재 미정·값 확정 뒤 추락 체감 확인. 높이 제한은 아래 D-6 행 참조·신호 대역 미정 |
+| HUD-FIGMA-01 | 시안5 HUD Kit | WBP화·Paint 좌표/매 프레임 눈금 수정, 저녁 검증 WORKLOG | 실제 해상도·미션/나침반/타이머/상태/속도/고도/VS·UGV 표시 수동 확인. 배터리 시간 미정 |
 | D-6 높이 제한 | 배치 매니저·BP 값으로 적용 | 구현됨·자동 검증됨(10/05 C PC Claude). BP_DroneAltitudeLimitManager 배치·값 설정, 상세 [WORKLOG](docs/history/DRONE_WORKLOG.md) | 천장 체감 수동 확인 대기. 높이 제한 수치·경고 연출 현재 미정 |
 | STORY-TEST-01 | Story Mission별 격리 TestMap 4개 | GoldenTime Drop/Return, Intercept Spline 차량·목적지 실패, VeilBreaker 재밍 이탈/Return, Endgame UGV 표적 3개/Return과 DA 4개 존재. 4맵 직접 Play Entry 및 FrontEnd Catalog 총 14개 연결. Oct 1 다른 PC의 14맵 점검에 포함 | 각 맵 FrontEnd/직접 Play에서 목표·실패·귀환 수동 확인. 미구현 후보를 이 카드에 합침(Claude 지시서·Figma 매트릭스 Mission 1~4): M1 정보단말 회수·요원 NPC, M2 잔해 Scan·반전, M3 한 미션 내 기체 교대·MANPADS/베일 카운트, M4 장거리 타격·엔딩 시네마틱. 스토리 충돌·MANPADS/베일 표기는 현재 미정, Production Training 보존 |
 | MISSION-RULE-PIE-01 | 새 목표 Rule의 실제 맵 Vertical Slice | 귀환·Jammer·역할 Actor 시험 배치 완료, 직접 실행은 Prototype Flow | Test Mission DA/진입 경로에서 Scan/Delivery/Destroy/Return/Jamming Event·Tag·시간 규칙 확인 |
@@ -105,7 +110,7 @@
 | PHY-NET-03 | 늘어지는 그물 장애물 | 공유 매듭 PBD·상단 고정/중력·제약/접촉·BP 예산 구현. Chaos Cloth는 별도 후속 | 포획·국소 변형/감쇠·Reset·크기/FPS 수동 확인. 일반 접촉 자동 절단 금지 |
 | PHY-COL-01 | 드론 외곽 환경 반발 | 몸체/로터 크기 자동 범위·시간/방사 Sweep·Pawn 충돌 채널 보강, 검증 WORKLOG | 벽/기둥 전후좌우·고저속/얇은 벽·연속 압박 수동 확인. 안정 카메라·피격Shake·착륙/UGV 보존 |
 | DRONE-FIBER-01 | 광섬유 Drone 기반 | DroneSpy·GSU 통·Rotor·재질·다점 케이블·재밍 면역/ImpactDetonation·1인칭 기반 구현/자동 검증. 상세 아카이브/WORKLOG | TestMap에서 Spy 본체·통 크기/위치, 본체/카메라 비간섭, Rotor 회전, 통 상단 케이블 출발과 곡률, 조작·자폭·재밍 면역을 화면 확인하고 BP Transform/굵기·간격을 최종 조정 |
-| DRONE-GROUND-01 | 지상 UGV 기반 | 기존 주행·4점 접지·상부 독립 조준에 `UDroneGroundWeaponComponent` 연결. 좌클릭 직사 총탄 25 피해, 우클릭 중력 유탄 100 반경 피해, 수명/쿨다운 적용 | 시험맵에서 상부 방향과 실제 탄도·4발 처치·유탄 낙차/반경을 수동 확인하고 수치 조정 |
+| DRONE-GROUND-01 | UGV 무장 | 연사/탄수/재장전·전용 IMC·포탑 조준 구현, 규칙 STATUS | 패드/마우스 연사·빈 탄창/수동 재장전·유탄6발·Space/Ctrl·탄도 실기 |
 
 #### AI·NPC
 
@@ -134,16 +139,16 @@
 | TEST-ORDER-ROUTE-01 | 전체 렌더 회귀 Route 키 순서 의존 관찰 | 2026-10-04 C PC ClaudeAcroFull 전체5회(test.log/test2.log/final.log/final2.log/test3.log) TrainingRouteSelectionPIE 모두 Success(Codex 로그 대조). 그중3회 화면 미렌더이므로 화면 검증과 구분. 지난 Fail은 날짜별 기록 보존, 원인 미특정·해결 확정 아님 | 재발 시 선행 테스트/입력 처리 순서 재현·Claude 조사. Production 맵 보존 |
 | BUILD-PACKAGE-01 | 패키징 쿠킹 설정 | 정적 자동 검증됨(10/02 C PC Claude). Mission/Drone DA AlwaysCook·MissionMap Soft 참조. 실제 패키징 미실행; 검증 WORKLOG | 실제 패키징 미실행. 패키지에서 DA 자동 등록·모든 MissionMap 진입 확인, Production Training 보존 |
 | PERF-ZEN-START-01 | D PC Editor 시작 지연(Zen 대기) 조사 | 원인 특정(10/06 D PC Claude): Zen 세션 기록 733개 로드 약 20초 + 엔진 20초 초과 모달. 10/02 473초는 모달 미응답 대기. 세션 폴더 732개 백업 이동 완료, 재측정 대기. 상세 STATUS/WORKLOG | Claude가 같은 맵·캐시로 cold/warm 시작 로그 비교, 확인창 응답·Zen running→Editor 확인 시간 분리. 캐시 삭제·엔진 소스 수정·보안 해제 금지, Production Training 보존 |
-| SYNC-WORKPC-01 | PC 재개 | 10/14 Drone bb6233c8=로컬 origin/main·MD b38fc84 + Rain/UI·문서 미커밋; STATUS | 사용자 Commit/Push 후 팀원 Pull·Build/실기 확인. 과거 Pass 재사용 금지 |
+| SYNC-WORKPC-01 | PC 재개 | Drone833c1c5f·실제 원격 일치/0·0/Clean. 팀원2커밋 수신·로컬2커밋 Push·맵4개 팀원 우선 확인. [STATUS](STATUS.md#git-기준) | 통합 뒤 Build/회귀·다른 PC 수신/실기 후속. 과거 Pass 재사용 금지 |
 | SYNC-COLLAB-01 | 협업·다른 PC 세팅 | 공유 파일 최초 5b03ad3(10/02) Commit/Push 완료. ui/image 역할 파일과 이번 변경은 미추적/미커밋. 다른 PC 실제 세팅 미구현 | 사용자 명시 지시 후 남은 파일 Commit/Push→다른 PC Pull·COLLAB_READY→첫 Space 저장 확인 |
-| SYNC-SPACES-01 | MD·Space 연결 | 10/14 구현/검증·Gate 저장 수리를 기존4 Page에 반영, 결과 WORKLOG | 사용자 Commit/Push/Pull 후 타 PC 수신. 새 Page·예약·권한·Trello 변경 없음 |
+| SYNC-SPACES-01 | MD·Space 연결 | 저녁 반영 결과는 WORKLOG | 사용자 Commit/Push 후 타 PC 수신. 새 Page·예약·권한·Trello 변경 없음 |
 
 ## Next
 
 최신 구현·검증은 [STATUS](STATUS.md), 세션별 수치·로그는 [WORKLOG](docs/history/DRONE_WORKLOG.md)를 따른다. 이전 완료/종료 카드와 Next는 [10월 아카이브](docs/history/archive/WORKBOARD_2026-10.md)에 보존했다.
 
-1. 실제 도시 비 방향 정렬 수리→새RHI 검증 후3품질·회전/이동·차폐/Off 실기. Island Gate 크기/방향·도시 모듈/재질·Pretendard/목록명도 확인. 팀원 Gate 저장은 Source+BP/Build 후 동일 저장 재시험. Production 보존.
-2. 실제 패드 첫 강조·전체 UI·1280/1920 가독성·8수업 연속 진행·Best Lap 재실행·설정 저장을 확인한다. KnownIssues4개 분리는 실패 해결이 아니다. 미렌더는 포커스6개 모두 화면 루트 포커스로 실패하는지로 판단한다.
-3. 레이싱4코스 전체 진행도/지형은 팀원 보고와 대조 대기. 배터리/고도 수치·경고 연출, D-1·D-2 기획자 대기. D-13 종료·D-12 FPV/UGV 체감 수동 대기; STATUS 참조.
+1. 새 로비→브리핑/CONTROLS→기체 선택→START·훈련 안내·HUD·설정과 UGV 무장을 패드/마우스로 확인한다. 자동 성공을 수동 Pass로 대체하지 않는다.
+2. HUD WBP Designer 반영·창 이동 눈금·LOS 상자·체크박스를 수동 확인하고, FlightHUDKitLayout 하네스와 오후 집계는 Claude가 대조한다. 스카이드론은 팀원 푸시 후 연결. 조작/수업/결과 미정은 UI-CONTROLS-DECISION-01.
+3. 기존 Gate 저장·Island·도시/비·8수업/Best Lap 재실행·NPC/물리 수동 대기를 이어간다. 배터리/고도·M2/M3/M4 기획 대기, 레이싱4코스 진행도 대조.
 4. DR-INTERLINK-INPUT-01 실기 확인 후 Acro 혼합 입력·코스 표시선·NPC 다리/속도 대비 보폭·총 정렬·이동 뒤 날씨 시험 맵·비 차폐·벽/그물·광섬유/UGV 수동 회귀를 이어간다. WTH-03 비 입자 크기/모양·위치/양·젖음/물결·빗소리/실내 감쇠·패드를 가이드대로 확인한다. 팀원 Production Training 보존; 실제 패키징·Chaos 비교·최종 Rain/음원은 별도 후속이다.
 5. 제품 맵 배정은 Battlefield=M1·MilitaryBase=M2/3·MilitaryCamp=M4. 실제 DA 맵/시작/목표 연결은 미완료·MBase M_Target 보류. Git·Space는 STATUS, Commit/Push는 사용자.
