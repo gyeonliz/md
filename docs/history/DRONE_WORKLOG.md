@@ -3632,3 +3632,370 @@ Drone Space 기존 진행상황 sequence45(5블록), 테스트 가이드 sequenc
 이번 작업은 사용자 로컬 변경의 수신/통합/공유이며 Codex가 새 생산 코드를 작성하거나 Build·PIE·전체 회귀를 실행한 것은 아니다. 별도 Claude 검증이 계속된 결과를 이번 통합 커밋의 Pass로 확대하지 않는다. 통합 뒤 기능/맵·전체 회귀·실제 패드·패키징은 후속이다. MD는 STATUS Git 구간·WORKBOARD 갱신일/SYNC-WORKPC-01·이 기록만 갱신하며 문서 저장소 Commit/Push는 이번 Drone Git 요청에 포함하지 않았다. Trello·공유 권한·예약·다른 원격은 변경하지 않았다. Drone Space 기존 현재 기준 블록의 Git/수신 요약도 갱신한다.
 
 Space 최종 확인: 기존 진행상황과 다음 작업의 현재 Git 기준·문서 기준2블록을 sequence46으로 저장하고 같은 블록 재조회에서 전체 본문 일치를 확인했다. 19:01 KST 최종 실제 원격/HEAD833c1c5f·0/0·Clean·unmerged0·Stash0을 재확인했다. STATUS29,440B·WORKBOARD28,706B이며 MD diff --check는 원문CRLF 허용 기준으로 통과했다.
+
+## 2026-10-19 — 드론 최신화와 면접 자료 반영
+
+C PC `C:\URproject\drone`의 HEAD·origin/main·실제 원격 main이 `0d5f039d`로 일치함을 확인했다. 현재 작업 트리는 `DA_Mission_Racing_Circuit_Test` 수정 1개와 `DA_Mission_Racing_Map1/2/3` 미추적 3개가 있어 Clean이 아니다. 사용자 작업으로 판단해 내용을 덮어쓰거나 Stash·Commit·Push하지 않았다.
+
+10/16 기준 문서 이후 변경을 코드에서 대조했다. Mission DA에 로비 숨김/준비 중 상태와 Runtime Placement(시작 Transform, 클래스별 태그, 실행 중 Actor 생성, M_Start·M_Target 표시 큐브 숨김), 코스별 `RecordCourseId`가 추가됐다. Flow는 준비 중 미션의 출격을 거절하고 다음 수업에서 숨김/준비 중 항목을 건너뛴다. PlayerController는 팀원 맵을 저장하지 않고 DA의 실행 배치를 적용한다. 튜토리얼 TUT 맵·HUD 해상도 캡처 자동화와 구성 도구도 추가됐다.
+
+이번에는 Git·코드·자산 존재만 확인했다. 최신 HEAD Build·PIE·전체 회귀·수동 플레이는 실행하지 않았으며, Map1~3 DA는 아직 GitHub에 없다. STATUS·WORKBOARD와 Drone Space의 진행/Blueprint 가이드, 넥토리얼 면접 준비 Word 문서를 이 경계에 맞춰 최신화한다. Commit/Push·Trello/Figma·공유 권한·예약은 변경하지 않는다.
+
+## 2026-10-19 후속 — Codex 직접 실행 제한 해제·레이싱 검증 대기
+
+- 사용자 결정: Codex 직접 작업의 이전 Claude 전담/문서 전용·읽기 전용/Unreal 실행 금지 해제. 정본은 USER_RULES의 「Codex 직접 작업 기준」이다. md AGENTS·협업 규칙과 Unreal AGENTS/CLAUDE에 반영했으며 과거 세션 기록·브리지 위임 범위는 보존했다. 기존 변경/팀원 맵·인증정보 보호와 커밋/푸시 금지는 유지한다.
+- 레이싱 요청은 DA 4개→3맵 진입/완주→코스별 기록 재실행 복원이다. 기존 DA 4개를 변경하지 않고 Git 상태와 ConfigureRacingTeamMaps.py/기존 카운트다운 시험을 읽었다. 실제 DA 로드·빌드·PIE·새 검증은 아직 미실행이다.
+- Editor PID38056, 프로젝트 unreal-mcp 설정과 127.0.0.1:8000 Listen을 확인했다. 현재 노출된 Codex 도구에는 Unreal MCP가 없으며 프로토콜 초기화/실제 도구 호출은 아직 하지 않았다. 서버 Listen을 MCP 도구 연결 완료로 쓰지 않는다.
+- 사용자가 직접 Editor를 켜서 확인하겠다고 하여 엔진 조작·빌드·PIE를 중지했다. 확인 종료 신호 뒤 Codex가 직접 레이싱 검증을 재개한다. 이번 로컬 규칙 결정의 Space 반영은 검증 결과와 묶어 후속 처리할 예정이며 아직 미반영이다. Commit/Push·맵/자산 저장·계정/권한/예약 변경 없음.
+
+## 2026-10-19 — 훈련 사진·시작 카메라·레이싱 전체 뷰·실제 입력 가이드·오프닝
+
+실행: C PC Codex, UE5.8.3 CL58210709. Unreal HEAD `0d5f039d`, MD HEAD `792e6079` 위 로컬 작업이다. 최초 사용자 변경인 Circuit DA 수정과 미추적 Map1/2/3 DA를 보존했다. 변경 대상 DA/WBP/그림은 `C:/URproject/drone/Saved/Automation/CodexTrainingUI`에 적용 전 사본을 남겼다. Commit/Push·Stash·맵 저장·전체 쿠킹/패키징은 하지 않았다.
+
+### 훈련 사진과 실제 맵 시작 연결
+
+- `UDroneMissionDefinition.BriefingImage`를 추가하고 비면 Thumbnail로 fallback한다. 제공한 선택8장·브리핑8장을 별도 Texture로 가져와8개 Tutorial DA에 연결했다. 원본 PNG·기존 Title 아트·MissionId/Rule은 유지했다. 재사용/적용 도구는 `SourceArt`, `Tools/AssetMigration/ApplyTrainingPresentationImages.py`에 있다.
+- `ADroneTutorialObserverLesson`은 첫 LOS의 배치된 BP_LOS Actor Eyes Viewpoint(카메라 컴포넌트 없음)에 전방18cm를 더한다. 실측 카메라 `(62069.65,-19980.08,153.78)`, 패드 상단 `(62070,-20360,55.47)`이다. `SM_helicopter_base` 상단+기체 충돌 반경을 시작으로 쓰며 LOS 가이드/출발, Hovering/Return 판정을 실행 중 맞춘다. 없으면 기존 DA 시작값을 쓴다. 다른 비행 훈련은 드론1인칭으로 시작하되 저장된 시점 선호를 바꾸지 않는다.
+- 실제 TUT_LOS/Hover/Forward_Gate/Circle_Gate/FPV_Target5개에서 진입·카메라/시작 자동 검사 통과. LOS 캡처의 초기 재질/노출·검정 안내선 외형은 최종 품질 Pass로 보지 않는다. 나머지 준비 중3수업을 강제 활성화하거나8수업 연속 완주로 확대하지 않았다.
+
+### 레이싱 사진과 미해결 기록 경계
+
+- `Drone.UI.RacingEditorOverview`는 Map1 Island·Map2 Production Lvl_DroneTraining·Map3 MountainRange를 **Editor에서 직접 열어 전체 뷰**를 촬영했다. Map3는 Landscape뿐 아니라 CourseSpline 경계도 포함한다. HUD/기즈모 없는1920×1080 원본은 `Saved/Automation/CodexTrainingUI/RacingMap{1,2,3}_editor_overview.png`, 재사용본은 `SourceArt/Racing`이다. `ApplyRacingMapThumbnails.py`로3개 DA의 Thumbnail/BriefingImage만 백업 후 연결했고 MissionMap/RecordCourseId는 유지했다. UI는 ScaleToFit으로 사진 전체를 보인다.
+- 실제 Gate overlap을 자동 위치 이동으로 통과한 Map1 112개/Map3 187개는 각각7.003781초/7.896341초 기록·미션 완료가 됐다. 테스트 전용 `CodexRacingValidation_20261019` 슬롯으로 사용자 기록을 보호했다. **실제 연속 조종 완주 기록이 아니다.**
+- Map2는102 GateSequence의 통과와 달리 최고 기록0/미션 미완료다. 분리 NullRHI 로그: `[RACING-RECORD-LOST] RacingMap2 accepted=100 next=100 state=0 segments=0 time=12.290061 drone=(-156040.80,24972.36,-1258.22) health=100`. Gate99/100 인접 중첩·자동 위치 이동의 같은 시각 통과가 후보이나 미확정이다. 0 이하 구간시간 보호를 풀지 않았고, world time 가드0.04초도 해결하지 못해 반복 수정을 중단했다. 다음은 두 Gate 기하/이벤트 순서 조사다. 새 프로세스 기록 복원 검사는 미실행이다.
+- 초기 렌더 보고서는10 Success/1 Fail(Map2), 이후 별도 `FinalPresentationReport`는 레이싱 UI3개+ControlsGuide4/4다. 서로 다른 실행을 합쳐 전체 Pass로 쓰지 않는다. 이 렌더 결과는 **이후 교체한 최종 키할당 그림 외형 검증이 아니다**.
+
+### 실제 입력에 맞는 가이드와 MCP 사용
+
+- 사용자가 장치 몸체가 아닌 **실제 키할당 가이드**를 원한다고 정정해 번호/키/안내선이 포함된 전체 그림으로 교체했다. 패드는 실제 비행/UGV 매핑으로, RC는 원래 제공한 시뮬레이터 컨트롤러의 형태·스틱/버튼 위치를 기준으로 생성했다. 일반 라디오 조종기의 새 화면/스위치를 덧붙이지 않았다.
+- 실제 Unreal MCP JSON-RPC 초기화→도구 조회/호출을 확인했다. 127.0.0.1:8000 Listen만으로 연결 완료라고 하던 이전 한계를 해소했다. MCP로 `IMC_DronePrototype.defaultKeyMappings.mappings`45개(구 deprecated mappings는 비어 있음), 지상 무장4개와 Scout/UGV CDO 참조를 읽었다. UGV CDO의 일부 None은 런타임 기본 자산 로드 경로와 대조했다.
+- 범례는 쉬운 비행으로 한정·FPV 별도·고정 LOS 시점 예외를 명시한다. R1/L1은 비행 역할만, UGV는 L2 기관총/R2 유탄, □는 UGV 재장전, ○는 메뉴 뒤로다. 없는 기능은 안내하지 않는다. 기존 R1/L1 UGV 대체 바인딩 등 **입력 자체는 변경하지 않았다**.
+- 최종 WBP `/Game/Drone/UI/WBP/FrontEnd/WBP_DroneControlsGuide`: `GamepadDiagramImage=T_Controls_Gamepad_Guide_Verified_20261019`, `RCDiagramImage=T_Controls_RC_Guide_20261019`, `bArtworkIncludesGuideLabels=true`를 MCP로 저장·Compile·재조회했다. 동일 이름 import는 덮어쓰기 미지원이라 기존 그림을 지우지 않고 Verified 별도 자산을 사용했다. 비율 보존·하단 범례 공간 보정, 한글 범례/탭은 UMG다. Native fallback과 제품 WBP override를 구분한다. 최종 생성 그림은 원본 해상도에서 확인했으나 새 게임 화면은 미확인이다.
+- 사용자 마우스 제어 중단 요청 이후 화면/키보드 조작을 멈추고, 숨김 `UnrealEditor-Cmd -nullrhi`를 MCP 서버로만 사용했다. 보이는 Editor/PIE를 다시 열지 않았다. 실제 입력 장치 시험/영상 재생은 수동 대기다.
+
+### 오프닝 영상
+
+- `E:/새 폴더 (4)/Main_cinematic.mp4`를 `Content/Movies/Main_cinematic.mp4`로 복사했다. ffprobe: H.264/AAC·1920×1080·30fps·79.433333초·148,658,835B. 양쪽 SHA-256 `C8391DFBA106DBBA7D95D48AAE8E0890D04308570F40314D0DC57A88E1AE8755` 동일하다. MP4 LFS와 NonUFS 동봉 설정을 추가했고 StartupMovies 중복 재생은 하지 않는다.
+- 새 `UDroneOpeningMovieWidget`이 MediaPlayer/MediaTexture/MediaSound로 재생한다. FrontEnd PC가 새 Boot에서만 표시하며 정상 종료/Esc/패드 ○·파일/열기 실패/시간 초과가 같은 정리→타이틀 경로를 쓴다. 종료 때 소리·미디어·타이머·델리게이트 정리, 타이틀 포커스 복원. 로비/미션 복귀 시 재재생하지 않는다. BP 조절값은 PC `bPlayOpeningMovie/OpeningMovieWidgetClass`, 위젯 `MovieFilename/OpenTimeoutSeconds`다.
+- DroneEditor Win64 Development Build 성공(최종30.73초). MCP로 `Drone.UI.ControlsGuide`, `Drone.UI.GamepadGuideInputContract`, `Drone.UI.OpeningMovieContract` **3/3 Success·경고/오류0**. 마지막 로그 `Saved/Automation/CodexTrainingUI/headless_final_verify.log`의2026.10.19-04.44.21 UTC(13:44 KST) 확인. 테스트는 안내/실자산 매핑·완료/스킵 키·새 실행 조건·파일/포장 설정 계약이며, NullRHI/자동화는 영상을 의도적으로 건너뛴다. **실제 영상 화상/소리·패키지 배포판 Pass가 아니다.**
+
+### 보호·인계
+
+Production Training·Island·MountainRange와 Tutorial8맵의 원시 SHA-256은 작업 전후 동일하다. 최종 Git에서 `.umap` 수정 없음, UE diff --check 통과(CRLF 변환 안내만 있음). 미디어·소스·DA·WBP 변경은 로컬에만 있다. 계정/비밀 키·Trello/Figma·외부 권한·예약은 변경하지 않았다. 현재 상태/Next는 STATUS·WORKBOARD, 설정/실행 절차는 `docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md`가 정본이다. Space는 같은 기존 진행/시험/BP/안내 페이지를 갱신하며 아래 최종 영수증으로 확인한다.
+
+최종 Space 반영: 진행 sequence49·시험32·BP31·안내11, 수정5연산/최종6블록 모두 적용 영수증과 재조회 hash 일치 확인. 새 Page·권한 변경·영상/대용량 자산 업로드는 없다. STATUS30,460B·WORKBOARD29,141B로30KiB 이하이며 MD diff --check도 CRLF 허용 기준 통과했다. 우리 숨김 검증 엔진 PID39532는 명령줄/프로젝트/로그를 대조한 뒤 종료했다. 현재 MCP 서버를 계속 켜 둔 상태가 아니며, 보이는 Editor/PIE는 시작하지 않았다.
+
+## 2026-10-19 — 차량 후방 직격·자동 자폭·NPC 래그돌·호버 표시·UI/레이싱 사진 수정
+
+요청: 차량 뒤쪽 타격 누락, 자폭 기본 무장/On·Off 잠금, 적 NPC 사망과 쓰러짐, 기본 피해/체력, 키보드와 같은 패드/RC 안내, 호버 구역 식별, 더 가까운 레이싱 사진/랜덤도시 임시 카드. 실행은 C PC Codex, UE5.8.3이며 기존 로컬 변경 위에서 작업했다. 원본 자산은 `C:/URproject/drone/Saved/Automation/CodexCombatFix/AssetBackups_20261019`에 보존했다. Commit/Push·맵 저장·Trello/Figma 수정은 하지 않았다.
+
+### 원인과 구현
+
+- 실제 TUT_FPV_Target의 BP_GroundConformingVehicle_Greybox를 MCP로 읽었다. HealthComponent가 없었고 이동 Root Box 반경은(200,100,100), 차체는 SM_CAR·상대Z=-86.24였다. 이동용 Box와 실제 차체 경계가 별개라 후방 누락 가능성이 있으며, 자폭도 직접 표적 없이 범위 피해의 Visibility 차폐에 의존하고 있었다.
+- Vehicle Native에 공통 Health300과 차체 전체 DamageCollision을 추가했다. 원본 메시/Root/지면 추종은 유지한다. 사망→주행/Route 중지·NS_Expl_Tank_1/Cue_Explosion01 폭발·부착 포탑 Tick 정지·무충돌 잔해/30초 정리다. MissionDirector는 같은 Health 사망을 목표 Tag와 함께 받는다.
+- 자폭은 기능이 있는 FPV/Fiber만 시작부터 무장하고 입력/스위치 해제를 잠갔다. 최소 속도100cm/s·피해600. 이동 전 속도와 Rotor Sweep까지 같은 접촉 경로로 묶고 반발 이전에 처리한다. 접촉 Actor에는 확정 피해, 범위 피해에서는 제외해 중복/차체 자체 차폐 누락을 막았다. Owner Health 사망/폭발 이벤트는 한 번이다. 원래 입력/API는 호환용 보존, HUD/브리핑/가이드의 무장/해제 지시는 제거했다.
+- UGV는 기관총25·유탄150(차량에12발/2발), 200발·2초 재장전·유탄6발은 유지한다. 유탄도 접촉 확정 피해/범위 중복 제외다. 수치는 BP에서 조정 가능하며 임시 기준이다.
+- NPC는 기존 Health100을 사용한다. AI/SmartObject 예약·사격/이동 정리 후 Capsule만 무충돌, PhysicsAsset 전체 시뮬레이션/블렌드·작은 수평 충격으로 쓰러진다. 원본 본/Skeleton은 삭제하지 않았다. PhysicsAsset가 없으면 숨김 fallback, 시체25초 정리다. 초기 물리 활성 상태만 확인하던 검사에 실제 골반20cm 이상 낙하를 추가해 '서 있는 사체'를 구분했다.
+- 호버 구역이 Pad 메시 Forward와 출격 Yaw의 차이로 뒤/옆에 놓이던 것을 출격 정면6m·패드 위 중심3m로 맞췄다. 12변 테두리·진행 라벨·완료 색과 구체적 목표 문구를 추가했다. BeginPlay 내부 HasActorBegunPlay=false 때문에 재질 초기화를 건너뛰는 조건을 GameWorld로 고쳤다. 첫 Shader 준비 전 검정 프레임을 확인해 준비 시간을 둔 캡처로 구분했다. 신규 전용 M_HoverGuide_Visible의 Brightness1000은 과발광이라 MCP로3으로 낮추고 재컴파일/저장·실제 TUT_Hover 청록 테두리 화면을 확인했다. 원래 M_DroneTrainingGuide는 보존했다.
+- 패드/RC 안내는 생성 PNG를 반복 편집하지 않고 `bUseUnifiedNativeDiagrams=true`의 UMG 키캡/테두리/번호로 통일했다. 원래 RC 형태·키 배치는 유지한다. 저장된 이전 도형도 한 번 갱신하고 미지원 ✕ 문자를 ASCII X로 교체해 최종 UI 글리프 경고를 없앴다. 옛 PNG/Texture 참조는 보존하되 현재 표시하지 않는다.
+- 레이싱 사진은 활성 코스 경계/FOV8꼭짓점에12% 여백으로 맞춰 기존4.2반경 원거리를 줄였다. SetGameView 뒤 촬영 때만 Fog/Atmosphere/Cloud를 숨겼다가 원복한다. Map1/2/3의1920×1080 Editor 사진과 '?'·RANDOM CITY 임시 카드(실제 랜덤 지형 사진 아님)를 새 Close/Random Texture로 가져와 Thumbnail/BriefingImage에 연결했다. 원래 사진/DA 맵/RecordCourseId는 보존했다.
+
+### 검증과 경계
+
+- 최종 DroneEditor Build 성공8.14초, `Saved/Automation/CodexCombatFix/build_final.log`. 초기 로컬 변수 Mesh의 상속 멤버 가림 오류를 고친 뒤 성공했으며 엔진 API 사용 중단 예고/권장 컴파일러 경고는 별도다.
+- `acceptance.log`/`acceptance_before_settle.json`: 집중14/14 Success. 전투/역할/통신·실제 FPV/Hover·Editor 사진3·요청 해상도1280/1920 UI·가이드/입력·랜덤카드 검사다. NavMesh 초기화 경고2건은 SmartObjectDeathPIE/RoleAbilities이며 기존 MOUT 배열 경고는 맵 검사 필터 밖 원본 문제다. 전체 프로젝트 무오류 Pass가 아니다.
+- 후속 `settled_verify.log`/`settled_acceptance.json`: 최신 C++의 DamageAndDeath·SmartObjectDeathPIE·FPV·Hovering·RacingMap2 레이아웃 **5/5 Success**. 실제 FPV 수업에서 뒤쪽 이동 Sweep→무장 키 없이 차량0HP→MissionResult와 LastMissionOutcome=Success 확인. 전후좌우4면 Trace·직격 중복/유탄150×2·NPC25×4 사망도 검사했다. 실제 SmartObject 적의 전체 물리/골반 낙하·바닥에 누운 화면을 확인했다(Shotgun 전용 맵으로 대체하지 않음).
+- 발광 조정 뒤 Hovering 별도1/1, `hover_brightness_final.json`. `Saved/Automation/TUT/Hovering.png`는 준비 후 청록 구역이 보이는 최종 사진이며 `SmartObject_NPC_Death.png`는 실제 시험 맵 사체다. 자동 위치/피해 주입 검사로, 실제 패드·연속 조종 호버3초/귀환·폭발 음량·잔해30초/시체25초 실시간 정리·전체 회귀/패키징 Pass는 아니다.
+- UI의1280/1920은 요청 설정/범례 경계 검사이며 창/디스플레이 배율을 포함한 모든 실제 해상도 Pass가 아니다. RacingMap2 캡처에서는 초기 카드 포커스 영향으로1번 프리뷰가 남는 도구 한계를 관찰했다. 선택별 실제 UI 확인은 대기다. 사진4종의 **저장 DA 연결**은 재실행 MCP `saved_asset_facts.json`으로 직접 대조했고 MissionMap/RecordCourseId 유지 확인. GroundUGV 기본 테스트는 같은 이름 아래 Ammo 자식 보고서와 충돌해 Not Run이므로14개 집계에 넣지 않았다. 별도 Ammo 실행 로그는 Success이나 전체 무장 회귀라고 확대하지 않는다.
+- 레이싱 사진/범례 수정은 기존 Map2 Gate100 부근 랩 기록 소실이나 새 프로세스 복원 대기를 해결한 것이 아니다. 사용자 기본 저장 슬롯은 바꾸지 않았다.
+
+### 파일·인계
+
+코드는 `Source/Drone/{Abilities,AI,Physics,Tutorial,Vehicles,Weapons,UI,Flow}`, 적용 도구는 `ApplyCombatHoverPresentation.py`·`ApplyRacingMapThumbnails.py`다. 새 재사용 그림은 `SourceArt/Racing/*Close*`·`RacingRandomCity_20261019.png`, 생산 Texture는 `/Game/Drone/UI/Textures/Racing`이며 호버 BP/재질과 DA만 저장했다. 사진/VFX/캐릭터 원본·Production Training/Island/MountainRange와 TUT 맵을 덮어쓰지 않았다. 최종 Git .umap 변경0, 보호 맵 SHA 동일·diff --check 통과(CRLF 안내 별도). 검증 엔진은 명령줄을 대조한 자기 프로세스만 종료했다. 자동 마우스/키보드·보이는 Editor/PIE 조작·비밀 키 복사·외부 자산 업로드는 없다.
+
+정본 절차는 차량/피해 가이드·타이틀/로비 가이드, 현재 작업은 STATUS/WORKBOARD다. 기존 Drone Space 진행50·시험33·Blueprint32·안내12를 갱신했고 아래 최종 재조회로 보존/저장을 확인한다. 미커밋이라 다른 PC/GitHub 반영은 사용자의 Commit/Push/Pull 뒤다.
+
+최종 확인: Space8개 연산의8블록 모두 적용·재조회 hash 일치. 보호 맵12개(Production/Island/MountainRange/SmartObject/TUT8)는 HEAD의 LFS SHA-256과 현재 원시 바이트가 전부 일치했다. STATUS30,630B·WORKBOARD29,413B로30KiB 이하, 문서 diff --check 통과. 두 HEAD는 그대로이며 우리 마지막 검증 PID39032 종료 뒤 UnrealEditor 프로세스가 남지 않았다. 이번 대상 Space 미반영은 없다.
+
+## 2026-10-19 — 전체 문제 검증·코스/AI/UI/로딩 수정 (C PC Codex)
+
+요청: 전체 문제를 검사하고 재현되는 오류 수정. Unreal `0d5f039d`·MD `792e6079` 위 기존 변경을 보존했다. 실제 UE5.8.3, 숨김 RenderOffScreen·로컬 MCP·정상 Editor Build를 사용했다. 커밋/푸시·패키징/전체 쿠킹·자동 마우스/키보드·보이는 Editor 조작은 하지 않았다. 아래 결과는 실행별이며 합산해 단일 전체 Pass로 쓰지 않는다.
+
+### 확인한 원인과 수정
+
+1. 레이싱2: 실제 Production 코스에서 92~99번 링이 위치·방향까지 같아 한 번의 overlap에서 `accepted=92→100`이 됐다. 같은 시각에 승인된 구간 때문에 Recorder가 유효하지 않은 0초 기록을 폐기했다. 검사 이동 속도만의 문제가 아니었다. `DroneTrainingCourse`는 자동 링의 연속 동일 위치(0.1cm 이내)·회전/크기 중복을 실행 중만 숨김·무충돌로 제외한다. 원본 Component 순서를 유지하며 실행 GateIndex를 다시 매긴다. 맵과 원본 링은 삭제/저장하지 않고 Recorder의 0초 거부도 유지했다. 실제 Map2는93개 실행 Gate로 완주·Mission Success·별도 키 저장 통과. 정상 간격·반복 Route 활성/비활성·나중에 출발점으로 돌아오는 링 보존 회귀도 통과했다.
+2. UI: `SelectLobbyMission`이 Flow만 바꾸고 Preview/예약 포커스는 첫 카드에 남겨 다른 사진/START 대상이 될 수 있었다. 성공한 선택의 세 상태를 함께 맞추고 실제 DA 사진의 리소스 동일성까지 검사했다. 오프닝 뒤에는 루트만이 아니라 현재 타이틀 버튼 포커스를 재예약한다. 실제 파일 디코딩/재생 시간 진행·1920×1080 트랙·영상 화면·Unreal 내부 Esc→타이틀 버튼 복귀를 검사했다. 실제 장치 입력/음성 청감은 아니다.
+3. MG: 저장된 Station BP의 Yaw/Aim Pivot이 Static이라 짧은 검사 중 이동 경고가1천 건 넘게 발생했다. `DroneMGTurretStation`에서 생성/Construction/BeginPlay의 회전 계층만 Movable로 보장했다. 고정 하단·맵은 보존했고 같은 실제 SmartObject 검사에서 이동 경고0을 확인했다.
+4. 기존 AI 실패: `lost=0, disengaged=1`을 추가 추적했다. 자동 Sight가 초기 드론 `(-3000,2400,180)`을 먼저 보고 Rifle의 원점 `(900,-650,90)`에서30m 리시를 넘어 포기했으며, 이어진 수동 검사 자극은 무시 대상/쿨다운에 걸렸다. 범위 설정만 앞당긴 시도는 원인 해결이 아니었다. PIE에서만 자동 Sight를 끄고 재소유해 선행 교전을 정리한 뒤 MG 경합·점유자 사망/재점유·수색/순찰 복귀·재교전/드론 파괴까지 통과했다. 제품 리시/감지 규칙은 바꾸지 않았다. `Drone.AI.NPCPerceptionSearchPIE`를 기본 회귀로 복귀하고 known-test-failures에서 해결 행을 뺐다. 자동 실제 시야와 사용자 조종 비교는 별도다. 추격 포기 이유는 LogDrone Verbose의 `[NPC-DISENGAGE]`로 확인할 수 있다.
+5. 기타: 호버 진행 라벨을 판정 뒤 즉시 갱신하고 이탈 초기화도 표시한다. 부모 테스트와 충돌해 누락되던 UGV 기본 검사를 `GroundUGV.Contract`로 바꿔 Ammo와 둘 다 실행했다. 옛 Circuit 선택/레이싱2개 전제 검사도 현재 팀원3맵+별도 도시 목록으로 고쳤다. DA3개의 ‘원형·7개’ 안내와 Map2 옛 거리 문구를 수정했으며 맵/기록 키는 재조회로 보존 확인. 원본 DA는 `Saved/Backups/CodexFullAudit_RacingText`에 보존하고 `ConfigureRacingTeamMaps.py`도 같은 문구로 맞췄다.
+6. 마지막 전역 회귀에서 도시 로딩이0.94초에 닫히는 새 실패를 잡았다. 벽시계로 대기 시간을 계산하고 게임 시간 Timer로만 종료하던 혼용 문제다. 종료 콜백이 Wall clock 마감 시각을 다시 확인하도록 해 최소 표시/ReadyHold를 보장했다. 허용치를 낮추지 않았고 취소 시 마감도 정리한다. 수정 뒤 도시1.24초·Story1.02초, 로딩/취소/일시정지/재출격 등11개 통과.
+
+### 실행 근거와 범위
+
+모든 원시 결과는 Unreal `Saved/Automation/CodexFullAudit/` 아래이며 Git 제외다.
+
+| 실행 | 결과 | 근거 |
+|---|---|---|
+| 최초 핵심 기능 | 136개 중134 Success·2 Fail(Map2 기록, 옛 레이싱2개 검사) | `core_before.json`, `full.log` |
+| 최초 Flow/기존 문제 | 일반29개 중28 Success·옛 Circuit 선택1 Fail, KnownIssues4 Fail | `flow_before.json` |
+| 등록 맵 진입 | 26개 중14 Success·12 미완료 | `full.log`; 중간15개 보고는 집계 오류로 정정 |
+| 수정 집중 | 9개 중7 Success·Map2/AI 원인 추적2 Fail | `fixes1.json`, `fixes.log` |
+| 코스 수정 | 24개 중23 Success·AI 격리 전1 Fail | `course_final.json`, `final.log`; Map2 93 Gate·전용 슬롯9.771385초(사용자 실제 기록 아님) |
+| 새 엔진 복원 | 레이싱1·2·3 및 중복 링 검사4 Success·격리 전 AI1 Fail | `restore.json`, `restore.log`; 전용 슬롯 Map1 7.003781/Map2 9.771385/Map3 7.896341초 복원 |
+| AI 격리 | 1/1 Success·경고0 | `ai_isolated.json`; 이후 전역/최종 관련 검사에서도 통과 |
+| 전역 기능/UI | **172개 중171 Success·CityRacePIE 최소 표시1 Fail** | `regression_before_clock.json`, `regression.log` |
+| 로딩 수정 후 관련 흐름 | **11/11 Success** | `clock_final.json`, `clock_final.log`; 전체172를 이 수정 뒤 다시 돌린 것은 아님 |
+| 최종 Build | Success34.51초 | `build_clock.log`; 엔진 API/비권장 컴파일러 안내는 별도 |
+
+`summary.json`이 실행 색인이다. 전역 대상204개에서 고비용 맵 진입26·별도 실제 레이싱3·사진 촬영3을 제외한172개를 실행했다. 별도 레이싱 완주/복원과 맵 진입 결과를 섞어204/204라고 보고하지 않는다. 최종 후속11개에는 CityRace·LoadingCancel·LobbySeed·StoryLoading·PauseRacing/Tutorial·MissionEntry·CheckpointRestart·OpeningMovie·NPCPerceptionSearch·Map2 UI가 포함된다.
+
+### 남음·보호·다음 시작
+
+- MilitaryCamp 로딩 중 PC 여유 RAM이 약340MB로 내려가 자기 검사 엔진을 종료했다. 나머지12개 맵 진입은 통과 아님. 최종 제한 회귀는 여유 약6GB를 유지했다. 고비용 맵은 메모리 확보 뒤 격리 실행한다.
+- KnownIssues의 구 Production 구조 검사2개는 기본 역할 타겟/저장 NavMesh/구 링 개수를 전제로 한다. 구 Native Lobby 진단1개는 현재 Designer WBP를 받지 않는다. 현재 대상과 다른 전제를 해결하려고 팀원 맵/디자인을 덮지 않았다.
+- 최종11개는 Success지만 MissionEntry의 Recast 초기화 경고1·PauseTutorial에서 외부 `MOUT_Fabrication/Demo/FirstPersonBP` 미등록 입력 경고24가 남는다. 원본 팩을 고치거나 숨기지 않았다. 무경고 전체 Pass 아님.
+- 실제 패드/RC·연속 조종 완주/호버·청감·영상 자연 종료·시체25초/잔해30초 정리 체감·패키징은 별도다. 사진 전체 뷰/여백 가독성도 사용자 확인 대상이다. 검사는 실제 TUT/SmartObject/Production 대상에서 수행했지만 자동 위치/피해 주입을 실제 조종 Pass로 바꾸지 않는다.
+- 보호 맵12개(Production·Island·MountainRange·SmartObject·TUT8)는 HEAD LFS SHA-256과 모두 같았고 `.umap` diff0이다. 최종 검사 PID55748을 명령줄 대조 후 종료해 남은 UnrealEditor가 없는 것을 확인했다. 비밀 파일/키는 읽거나 복사하지 않았다.
+- 현재 조정/시험 절차는 코스 배치·타이틀/로비·자동포탑 가이드에 반영했다. 현재 상태는 STATUS/WORKBOARD를 따른다. 다른 PC의 새 코드/DA는 사용자의 Commit/Push/Pull 뒤이며 Space 갱신과 Git 배포는 별개다.
+
+최종 문서/동기화 확인: 기존 Space 진행51·테스트34·Blueprint33·안내13의6개 연산을 적용하고 대상6블록의 본문/receipt를 재조회해 모두 일치했다. 새 Page/권한 변경/예약은 없다. STATUS30,548B·WORKBOARD29,430B로30KiB 이하, 두 저장소 diff --check 통과(CRLF 안내 별도), HEAD 유지·남은 UnrealEditor0·맵 diff0이다. 이번 대상 Space 미반영은 없다. 다음 담당자는 `Saved/Automation/CodexFullAudit/summary.json`과 `clock_final.json`부터 읽고 사용자 수동 체크/메모리 확보 후 남은 맵만 이어간다. 이미 끝난 전체 회귀를 이유 없이 반복하지 않는다.
+
+## 2026-10-19 C PC — 남은 맵 격리 검사·외부팩 경계 수리
+
+사용자 요청: 남은12개를 메모리 안전하게 하나씩 검증하고 고칠 수 있는 외부팩 경고 수리, 기존 변경 보존·Commit 금지. Unreal `0d5f039d`·MD `792e6079` 유지, UE5.8.3/Win64. 이전172개 전체 회귀는 반복하지 않았다. 이번 최종 Editor Build16.34초 성공(`Saved/Automation/CodexExternalPackAudit/build_standalone.log`), 일반 하네스 변경 빌드18.07초는 `build.log`다.
+
+### 맵별 결과 — 통과/삭제/메모리 제한을 분리
+
+`Tools/Validation/Test-RemainingMapsIsolated.ps1`이 맵마다 별도 UnrealEditor-Cmd PID를 실행·종료한다. 960×540 숨김 D3D12 렌더/NoSound, 최소 물리 RAM3GB·커밋4GB 보호, 기본300초 제한, PID·실행 파일·자신의 로그 경로 일치 확인 후 자기 프로세스만 종료한다. 다른 Editor가 Drone을 열면 거부한다. 실제 마우스/키보드 자동 조작·맵 저장은 하지 않았다. CLI 이름 양끝(^/$)을 고정해 OilRig가 Preview/Comparison까지 함께 실행되는 것을 수정했다(초기 OilRig 보고서만3개 포함, Final은 정확히1개).
+
+| 남은 목록의 맵 | 결과 | 최소 여유 RAM(MB) | 근거 폴더/summary.json |
+|---|---|---:|---|
+| Lvl_NPCSmartObjectGreybox | PIE 시작·FPV 빙의 통과 | 8893 | CodexIsolatedMaps_20261019_Greybox |
+| Lvl_OilRigPreview | 수리 뒤 정확한 단독 PIE 통과 | 7710 | CodexIsolatedMaps_20261019_Final |
+| Lvl_OilRigRainComparisonTest | PIE 통과 | 8002 | CodexIsolatedMaps_20261019_Remaining |
+| Lvl_ProceduralCityRaceTest | 수리 뒤 선택 흐름/PIE 통과 | 8479 | CodexIsolatedMaps_20261019_Final |
+| Lvl_Tutorial_Hover_Test | PIE/선택 흐름 통과·초기 포커스 경고 잔존 | 8601 | CodexIsolatedMaps_20261019_Final |
+| test1 | PIE·FPV 빙의 통과 | 8679 | CodexIsolatedMaps_20261019_Remaining |
+| test2 | PIE·FPV 빙의 통과 | 8790 | CodexIsolatedMaps_20261019_Remaining |
+| Lvl_OilRig | 수리 뒤 정확한 단독 PIE 통과 | 8318 | CodexIsolatedMaps_20261019_Final |
+| Training1 / training1_1 / Training2 | 이미 삭제된3개, 검증 대상 없음 | — | git 3cb9c184(10/14) 삭제·현재 파일/참조 대조 |
+| Lvl_MilitaryCamp | 독립 게임1회 통과·재현 안정성 미완료 | 아래 참조 | CampStandalone / CampFinal |
+
+위 폴더 루트는 Unreal `Saved/Automation`이다. 기존14개와 이번8개를 합산해 최종 동일 빌드23개 일괄 Pass로 쓰지 않는다. `DroneMapStartPossessionPIETest.cpp`의 삭제된 옛3개를 제거해 현행 목록23개로 정정했다. 패키지 존재·LoadMap 반환값·실제 PIE 월드/GameMode/Controller 준비도 검사한다. 없는 맵의 이전 월드나 null을 ‘선택 화면’으로 오인하는 거짓 통과를 막는다. 맵은 복구/대체하지 않았고 TUT 수업별 전용 검사는 별도다.
+
+MilitaryCamp: Editor+PIE 렌더는96.7초/최소3058MB·Private13071MB에서 보호 중단(Remaining). NullRHI도59.0초/2940MB·Private12601MB에서 PIE 복제 단계 보호 중단(CampNull)했다. 월드 이중 복제를 피한 `-game` 독립 렌더는54.2초/최소4655MB·Private18119MB에서 요청 맵 일치·BeginPlay·FPV 빙의 검사2.03초 Success(CampStandalone)였다. 그러나 최종 재실행은40.9초/2940MB·Private20244MB에서 자동 중단(CampFinal)됐다. ‘독립 게임이면 안정적으로 해결’로 판정하지 않는다. 반복을 멈추고 Camp 시작 전 여유 RAM20GB를 요구하도록 하네스를 강화했다. 실제 PreflightMemory 검사에서 엔진0회 실행으로 대기 처리(Preflight). 사용자 앱을 닫거나 페이지파일/품질·원본 맵을 임의 변경하지 않았다. 여유를 확보한 뒤 한 번만 재검증할 후속 대상이다.
+
+독립 검사 `Drone.Flow.StandaloneMapStartPossession`은 ClientContext이며 Editor PIE와 다른 테스트다. `-DroneExpectedMap`을 요구해 잘못된 시작 월드는 거부한다. Editor 바이너리 -game에서 MCP용 Python Editor API가 없어 생기는 시작 스크립트 오류는 검사 프로세스 한정 `-DisablePython`으로 분리했다. 이 옵션이 메모리 개선을 보장하지는 않는다(최종 보호 중단). 렌더 실행도 화면 육안·실제 패드/비행/임무 완주를 검증한 것은 아니다.
+
+### 외부팩 — 수리4자산·원본 백업·실제 흐름 재검증
+
+`InspectExternalPackWarnings.py`로 그래프/하드·소프트 역참조를 조사했다(`CodexExternalPackAudit/graphs_before.json`). `FixExternalPackWarnings.py`가 다음4개만 저장했다. 원본은 `Saved/Backups/CodexExternalPackWarnings_20261019`, 최초SHA 영수증은 `CodexExternalPackAudit/fixes.json`이다. 중간 도구 API/로캘 보정 실패 로그도 보존했으며 최종 적용은 `fix5.log` exit0이다.
+
+- MOUT `BP_MountedLadder_Slider`: Add가 반환한 첫 인덱스0에서 ‘이전 인덱스’ -1을 읽던 사다리/덮개2곳의 Attach 앞에 IsValidIndex/Branch. 유효 구간은 원래 연결, 첫 조각의 원래 실패 Attach만 생략한다. 새 조각을 자기 자신에게 붙이는 Clamp로 덮지 않았다.
+- MOUT `BP_ElectricityPole`: 마지막 기둥 인덱스+1이 배열 길이와 같아지는데 Get 뒤의 IsValid만 있어 범위 오류가 났다. Get을 소비하는 IsValid 실행 전 범위를 검사한다. 끝의 없는 다음 기둥만 건너뛴다.
+- `/Game/Drone/ThirdParty/{OilRig,OilRigPreview}/Assets/Cluster_Wall/Static_Mesh/SM_CL_wall_1`: 반투명 MI_Glass_windows가 Nanite와 비호환이므로 벽2종만 Nanite Off. 재질·다른 메시·전역 품질·맵은 유지한다. 자동 주석의 GUID 경고는 로드 시 생성된 GUID를 재저장해 정리했고, 최종 LOS 로그에서0이다. 재발 원인인 AddCommentToNodes 호출은 수리 도구에서 제거했다.
+
+수리 뒤 실제 `Drone.Flow.PauseMenuTutorialPIE`(LOS 진입 포함)는 Success/오류0/경고8, 최소 RAM7019MB였다(`CodexIsolatedMaps_20261019_Tutorial/TUT_LOS/report/index.json`). 이전24건은 전부 입력 경고가 아니라 입력8개+배열 Script Msg/문맥16건이었다는 정정이다. 배열 범위/NodeGuid 경고는0으로 줄었고, 정확한 OilRig/Preview 단독 렌더 검사에서도 Invalid material/Nanite 경고0이었다. 숨긴 타이틀의 포커스 요청은 다른 상태에서 취소하도록 보강했지만 호버 시험맵의 대상None 초기 포커스 경고까지 해결한 것은 아니다.
+
+남음: MOUT 외부 Demo FirstPersonCharacter의 옛 입력 참조8개는 보존했다. 전역에 사용하지 않는 입력을 만들어 숨기거나 데모 노드를 삭제하지 않았다. Modular_Insurgents의 SKM_BaseBody_Skeleton이 더는 없는 `/Engine/EngineMeshes/Humanoid`를 참조하는 로드 메시지가 있으며, 리그/애니메이션을 임의 대입·삭제하지 않았다. Camp의 VSM Non-Nanite Marking Queue overflow 및 시작 프레임 CharacterMovement 최대 반복 경고는 별도 성능 측정 대상이다. 기존 NavMesh 초기화/호버 포커스 경고도 잔존한다. 엔진 셀프테스트/인터넷 연결 확인/에디터 도구의 시작 로그는 제품 assertion 실패와 구분했다. 무경고·전체 게임 완료 보고가 아니다.
+
+### 보존·다음 작업
+
+수리4개 외 새 외부 자산 저장 없음, 모든 검사 대상 맵 SHA 동일·`.umap` diff0. 기존 코드/DA/아트와 Production Training 보존, Commit/Push·팀 권한/기획 수정 없음. 현재 절차는 `DRONE_TEST_MAP_GUIDE`에 통합했다. 더 무거운 반복/전체172 재실행 대신 Camp 메모리 확보 후 격리 재현, 남은 데모 입력/옛 리그 처리 판단·VSM/포커스 측정, 사용자 실제 패드/조종 확인을 이어간다. 현재 상태는 STATUS/WORKBOARD 정본이다.
+
+마무리 확인: 보호 보고서6묶음의 맵 SHA 변경0, 수리4파일의 백업SHA가 모두 HEAD LFS 원본과 일치했다. 하네스 PowerShell 구문 오류0·남은 UnrealEditor0, 두 저장소 diff --check 통과(CRLF 안내 별도). STATUS30,465B·WORKBOARD29,568B로30KiB 이하, 아카이브 추가 없이 현재 상태를 교체했다. 기존 Space 진행52·테스트35·Blueprint34·안내14의4개 블록을 guarded 수정하고 본문/영수증 재조회까지 일치 확인했다. 미반영 Page 없음·새 Page/권한/예약 없음. 다음 담당자는 Unreal `Saved/Automation/CodexIsolatedMaps_20261019/index.json`부터 읽는다. 최신 Camp는 안정성 미완료이며 이전1회 Pass만으로 완료 처리하지 않는다.
+
+## 2026-10-20 — MilitaryCamp 준비 메모리·스트리밍 및 외부팩 경고 정리 (C PC Codex)
+
+요청: MilitaryCamp 메모리 원인 우선 확인·줄일 수 있는 부분 수정, 무거운 재실행 반복 금지, 외부팩 잔여 경고 수리. Unreal `0d5f039d`·MD `792e6079` 위 이전 변경을 보존했다. 실제 UE5.8.3 CL58210709·32GB C PC이며 로그 UTC10/19 15시대는 KST10/20이다. 맵 저장·Commit/Push·전체172 재검사·패키징/전체 쿠킹·DDC 삭제/대량 재생성·자동 마우스/키보드는 하지 않았다. 이번 결과를 Camp 전체 로드 안정성 Pass로 확대하지 않는다.
+
+### 원인 조사 — 확인한 것과 아직 모르는 것
+
+- AssetRegistry만으로 Camp 하드 의존성748패키지·디스크6.69GiB, Texture2D385개 중4096×4096이242개를 확인했다. StaticMesh136종이며 저장 Actor 메타데이터에는 StaticMeshActor4175개가 있다. 이 수는 디스크/저장 메타데이터이지 실제 동시 상주 메모리/실행 Actor 계측이 아니다. Base는1662패키지9.27GiB, Battlefield는821패키지3.59GiB이므로 파일 용량만으로 Camp의 RAM 문제를 설명할 수 없다.
+- Camp 월드를 열거나 AI·PIE를 시작하지 않는 NullRHI 패키지 로드 진단을 **1회만** 했다. 40.7초에 가용 RAM3033MB·프로세스 Private10421MB에서 보호 중단했다. 최종 패키지 통계 파일은 생성되지 않았다. 준비/로드 단계에도 큰 메모리 증가가 있으며 AI 틱·화면 렌더링만의 문제라고 볼 수 없다. 다만 전체20GB 사용의 실제 배분·지배적인 할당·수정 후 전체 맵 피크 감소는 아직 미확정이다.
+- 위 로그의 SkinnedAsset `[SkinnedAsset]|hpp` 예약4608MiB는 엔진 소스의 기본 SkeletalMesh 컴파일 예약량4096MiB 등에 따른 **스케줄러 추정치**다. 특정 `hpp` 메시가 실제4.5GB를 먹는다는 측정이 아니며, 파일/의존성에서도 해당 이름의 자산을 특정하지 못했다. 예약 추정치를 실측 메모리로 쓰지 않는다.
+- Landscape/Foliage의 저장 bounds가 IsValid=false라 이 자료만으로 NavMesh/지형 크기·폴리지 인스턴스 수·실제 버퍼 용량을 단정하지 않았다. VSM Non-Nanite Queue overflow·시작 CharacterMovement 반복 경고는 이번 전체 Camp 렌더로 재현/수정하지 않았다.
+
+### 수정 — 준비 동시성과 실제 스트리밍 장애
+
+`Config/DefaultEngine.ini`의 `[SystemSettingsEditor]`에 자산/텍스처/스킨드 준비 동시성2/2/1, 추정 예산6GB를 설정했다. 처음2GB로 제한했으나 단일 작업 예약4608MiB도 넘지 못하게 하는 RAM 상한은 아니었고, 엔진이 단일 작업을 강제 진행하는 경고를 확인해6GB로 보정했다. 이 값은 전체 프로세스 RAM6GB 제한이 아니다. 초기 준비가 느려질 수 있으며 최종 게임 해상도/품질 설정을 낮춘 것은 아니다. 최종 실제 Editor CVar 검사에서2/2/1/6과 Camp 월드 미로드를 확인했다. Commandlet의 미초기화 Console 기본값(-1/0)과 실제 Editor 설정은 구분한다. 독립 -game 검사에도 동시성2/2/1을 명령줄로 전달한다.
+
+원본 백업 후 산 텍스처2개만 수정했다. Source 픽셀 크기/GUID를 보존하고 새 엔진 RHI에서 다시 읽었다.
+
+| 자산 | 수정 전 실제 준비 리소스 | 수정 후 | 해석 |
+|---|---|---|---|
+| FC_MilitaryCamp `T_Mountain_BC` | 4097²·Mip1·B8G8R8A8·NeverStream, 전체 Mip69,533,696B(66.3125MiB) | 원본4097² 유지, 빌드4096²·Mip13·DXT1·스트리밍, 11,206,656B(10.6875MiB) | 전체 Mip 리소스55.625MiB 감소. PC/맵 전체 피크 절감량은 아님. 1픽셀 빌드 리샘플/압축의 최종 질감은 수동 확인 |
+| FC_MilitaryCamp `T_Mountain_N` | 원본/최고8K·Mip1·BC5·NeverStream, 67,108,864B(64MiB) | 원본/최고8K 유지·Mip14·BC5·스트리밍, 전체 Mip89,522,176B(85.375MiB) | 전체 Mip 용량은 증가하지만 거리별 Mip 상주 선택이 가능해짐. 실제 맵 상주 절감량은 아직 미측정 |
+
+노멀은 NeverStream만 끈 첫 적용에서 Mip1이 남아 충분하지 않았다. FromTextureGroup으로 Mip 생성도 복구했으며 최종 두 텍스처 모두 `streamingMipChainReady=true`다. 해상도를 일괄 절반으로 줄이거나 외부팩 전체를 재저장하지 않았다.
+
+### 외부팩 — 명확한 연결만 수리
+
+1. MOUT Demo `FirstPersonCharacter`: 기존8개 입력이 실제 그래프에 연결돼 있음을 확인했다. 의미가 명확한 카메라4축만 MouseX/MouseY/Gamepad_RightX/Gamepad_RightY 원시 축 이벤트로 교체했다. 실행/AxisValue 연결·스케일 처리·입력 소비/일시정지/부모Override·노드 위치는 보존하고 주석을 남겼다. Blueprint 컴파일 오류0, 새 엔진 rawAxes4·remainingNamedAxes2다. 이동2축과 Jump/PrimaryAction은 원래 키 정책을 알 수 없어 유지했다. 사용하지 않는 전역 매핑을 만들거나 살아 있는 노드를 지워 경고를 숨기지 않았다.
+2. Modular_Insurgents `SKM_BaseBody_Skeleton`: 현재 엔진에 더는 없는 옛 Rig 직렬화 참조를 같은 엔진 재저장만으로 정리했다. 다른 리그/애니메이션을 대입하지 않았다. 본68개·Skeleton GUID·본 이름/부모/참조변환·translation retargeting·virtual bone·compatible skeleton·retarget source/pose fingerprint `ac9c79dbc8efda24be1d4fbf4926d14b`가 원본과 새 엔진에서 같다. 새 검증 로그의 `/Engine/EngineMeshes/Humanoid` 로드 메시지0이다.
+3. 실제 `Drone.Flow.PauseMenuTutorialPIE`(LOS 흐름 포함) 성공/오류0/경고4로 이전8→4를 확인했다. 남은4건은 Demo 이동2축/Jump/PrimaryAction이다. 전날 수리한 배열/NodeGuid·OilRig 유리/Nanite 경고0도 유지했다. 호버의 초기 포커스None/일시적 Recast 경고와 Camp의 VSM/시작 이동 경고까지 무경고가 된 것은 아니다.
+
+이번 저장4자산과 원본 Config는 `Saved/Backups/CodexCampMemory_20261020/`에 있다. 자산 백업4개의 SHA-256은 HEAD LFS 원본과 전부 일치했다. 전날의 사다리/전신주·OilRig2벽 수정과 사용자 코드/DA/아트·팀원 맵은 그대로 보존했다.
+
+### 실행 근거와 재실행 경계
+
+`Saved/Automation/CodexCampMemory_20261020/index.json`이 이번 인계 색인이다. 원시 보고서/로그는 Saved에만 두며 Space에 대량 업로드하지 않았다. 아래 프로세스 피크는 **서로 다른 격리 검사**이며 전후 Camp 메모리 비교가 아니다.
+
+| 실행 디렉터리 접미사 | 결과/시간 | 가용 RAM 최소 / Private 피크(MB) | 범위 |
+|---|---|---|---|
+| `_Readonly` | Pass27.8초 | 8681 / 2852 | NullRHI 자산 기준값, 텍스처 RHI 용량0은 실제 비교에 쓰지 않음 |
+| `_Apply` | Pass45.3초 | 5593 / 7174 | RHI 자산4개 첫 수리, 원래 컬러 값은 assets_initial_applied.json |
+| `_Mips` | Pass35.8초 | 6441 / 6644 | 노멀 Mip 생성까지 복구, assets_applied.json |
+| `_Package` | **MemoryGuard40.7초** | 3033 / 10421 | 유일한 무거운 Camp 패키지 진단, AI/PIE 전 중단·최종 package_memory.json 없음 |
+| `_Verify` | Pass35.8초 | 8443 / 5943 | 별도 새 엔진 RHI로 두 텍스처·Skeleton/카메라 축 보존 확인 |
+| `_LOS` | Pass54.0초 | 8026 / 9435 | 실제 LOS 흐름 Success·오류0·경고4 |
+| `_ProfilePreflight` | PreflightMemory | 시작 가용14608 / 요구20480 | 엔진 미실행, 무거운 진단 재시도가 아님 |
+| `_Budget` | Pass33.7초 | 9850 / 5838 | 최종 실제 Editor 설정2/2/1/6·Camp 월드 미로드 |
+
+최종 Build18.31초 성공(`build_budget.log`). 중간 Build/도구 보정 로그도 보존했다. 일반 Engine 셀프테스트의 시작 로그와 제품 테스트 assertion 결과는 구분한다. 전체172·Camp 전체 플레이·인간 조작/패드·최종 질감 육안 검증은 이번에 수행하지 않았다.
+
+추가한 `DroneCampAssetAuditTest.cpp`의 진단3종은 Editor/dev-test 전용이다. `Diagnostics.Camp.MemoryAssetsAndWarnings`는 기본 자산 읽기 전용이며 명시적 `-DroneRepairCampAssets` 때만 백업/4자산 저장한다. 패키지 진단에는 별도 `-DroneProfileCampPackage`가 필요하다. `Diagnostics.Camp.EditorBudget`는 설정만 검사한다. `AuditMilitaryCampDependencies.py`는 AssetRegistry만 읽으며 `get_asset`/월드 로드/저장을 하지 않는다. 재조회한 registry.json은 태그 허용목록으로 불필요한 대형 Actor 메타데이터를 덜었고 최초 원시 registry_initial.json은 로컬 보존했다. 설명 주석 추가만을 위해 다시 엔진을 돌리지는 않았다.
+
+`Test-RemainingMapsIsolated.ps1`은 Camp 전체 검사와 패키지 진단 모두 가용 RAM20GB 사전 검사를 적용한다. 실행 중 가용 RAM3GB/커밋4GB 보호·타임아웃·정확한 exe/로그를 확인한 자기 PID만 종료하며 다른 앱/엔진·페이지파일은 건드리지 않는다. 여유 확보 후 전체 Camp를 **한 번 계측할 후속 일**은 남기되 이번 세션에서는 더 무겁게 반복하지 않았다. 현재 실행 절차는 `DRONE_TEST_MAP_GUIDE`, 현재 상태/다음 작업은 STATUS/WORKBOARD 정본이다.
+
+마무리: 자산 백업4개=HEAD LFS 원본, 모든 이번 검사 mapUnchanged=true·Git .umap 변경0, 하네스 PowerShell 구문 오류0·두 저장소 diff --check 통과(CRLF 안내 별도). STATUS30,516B·WORKBOARD29,596B로30KiB 이하이고 아카이브는 필요하지 않았다. 기존 Space 진행53·테스트36·Blueprint35·안내15의4개 블록을 guarded 수정해 모두 적용, 본문/hash 재조회 일치·미반영 없음을 확인했다. 새 Page/권한/예약/비밀값 복사/외부 자산 업로드 없음. 두 HEAD 그대로·검증 엔진 종료 상태를 최종 재확인한다. 수리 후 Camp 전체 안정성은 여전히 미검증이며 이전1회 Pass나 가벼운 자산 검사 Pass를 대신 쓰지 않는다.
+
+최종 재확인 완료: Unreal HEAD0d5f039d·MD HEAD792e6079 유지, .umap Git 상태 변경0·UnrealEditor/UnrealEditor-Cmd 프로세스0, 두 저장소 diff --check 오류0. 이번 index.json 구문과 연결된 Budget/자산 검증/LOS/보호중단/Preflight 근거5경로의 존재를 확인했다. 추가 엔진 실행은 하지 않았다.
+
+## 2026-10-20 — 사용자 훈련·미션·전투/UI 피드백 반영 (C PC Codex 직접)
+
+### 범위와 보존
+
+사용자가 PIE 피드백 중에는 이미지/코드 준비만, “엔진 껐으니까 싹 작업시작” 이후 Build·자산 적용·격리 검증을 승인했다. 이어진 방 배정/휴식/상점 메시지는 다른 기획안 대화용이라 무시하라는 최신 지시를 따랐다. 기존 미커밋을 보존하고 Commit/Push·원격 동기화·마우스/키보드 자동 조작·전체172 회귀·패키징·대량 DDC 재생성을 하지 않았다. Unreal HEAD0d5f039d·MD HEAD792e6079 위 로컬 변경이다.
+
+### 이번 구현
+
+- `DroneMissionFeedbackAssetTest.cpp`는 기본 읽기 전용이고 명시적 `-DroneApplyMissionFeedback`에서만 DA 원본을 백업한 뒤 저장한다. 원본14개는 `Saved/Backups/CodexMissionFeedback_20261020/Drone/Data/Missions/`에 있다. 기존 ID/Story Fact·분기/제한시간·기체·사람 BriefingLines는 보존했다. Tutorial/Story의 추가 ReturnToBase 규칙·Tutorial.Return.Zone 배치를 제거하되 첫 LOS(Hover 호환ID)의 이륙/전진/후진/착지는 유지했다. 귀환이 포함된 로비 요약만 남은 실제 목표로 수정했다.
+- `TUT_Delivary`·`TUT_UGV_Turret`의 준비 중을 해제하고 DA Runtime Placement를 연결했다. 물자는 빈 집게로 시작→가까이 접근/실제 화물 집기→투하 적중, 포탑은 실제 자동포탑200HP 파괴로 완료한다. 새 Spawn 구조의 상대 시작점/지면 맞춤/이미 같은Tag 대상이 충분하면 생략 옵션은 BP/DA에서 조정 가능하다. 디버그 Arrow/SmartObject 전체 Bounds가 아닌 실제 보이는 StaticMesh Bounds로 지면을 맞췄다.
+- Story DA는 확정 배정 M1 Battlefield·M2/3 MilitaryBase·M4 MilitaryCamp로 연결했다. 기존 목표 Tag/수량을 쓰는 Runtime 표적을 보충하고 M3 기존 레이더를 재사용한다. 시작은 배치된 M_Start 표식을 읽어 지면으로 보정한다. M2 경로 미지정 차량의 직선60m는 **데모용 임시 경로**이며 실제 도로/장애물/실패 동선은 검증 전이다. 맵4개의 모든 콘텐츠/스토리를 완성하거나 제품 전체 플레이를 통과한 것이 아니다. 기존 그물·ArchivedMarkers·M_Target·NPC·팀원 Production Training은 저장하지 않았다.
+- `ADroneMGTurretStation` 공용 Health/DamageCollision·200HP를 추가했다. 사망은1회만 처리하고 조작자 사용/SmartObject 등록·추적/사격 Tick을 정리한다. 실제 연결 Base/Body/Barrel만 원본 메시/재질의 단순 Box 물리 잔해로 분리·15초 정리한다. 현재 `BP_AutoTurret_Emplaced`는 Base=model_part2_L·Body=model_part1_L·Barrel=None이므로 잔해2개다. 3단 신규 모델·Chaos 파쇄라고 표현하지 않는다. 원본 메시 Collision/재질은 보존했다.
+- `ADronePlayerProjectile` 유탄 충돌에 ArmyVFX `NS_Expl_Tank_1`·InfantrySFX `Cue_Explosion01_Cue`를 연결했다. Projectile BP의 `GrenadeExplosionEffect/Sound/Scale`(0.25)로 조정하며 공유 자산 준비·Niagara AutoRelease 풀/자동 정리를 사용한다. 직격150→해당Actor 범위 중복 제외, MG25/200발·유탄6발은 유지했다. 현재 프레임 캡처에는 폭발이 선명하지 않아 **효과 생성 계약 통과와 최종 가시성/청감은 구분**한다.
+- LOS는 BP_LOS 눈높이에서 뒤400·옆120·위80cm로 카메라를 빼고 수업 구간을 바라보게 했다. 다른 비행 수업은 드론1인칭이며 출격 SpringArm 초기 지연을 정리하고 자기 메시만 OwnerNoSee 처리했다. 외부 LOS/충돌/저장 카메라 선호는 보존한다. 시작 안내는 미션 BriefingImage(없으면 Thumbnail) 불투명 배경으로 초기3D 준비 프레임을 가리고 기존 WBP/버튼·정지/재개를 유지한다. Overlay Fill 보정 뒤 중앙 사진/목표1/1 화면을 확인했다. Lumen cached-lighting pre-exposure 경고 원인을 없앤 것은 아니며 전역 품질/노출 CVar로 숨기지 않았다.
+
+### 장치 이미지 — 생성/연결/보류 구분
+
+내장 imagegen 스킬/도구로 기기 외형만 있는 투명 RGBA PNG3개를 버전명으로 만들고 원본을 보존했다. `SourceArt/Controls/*_Device_20261020.png`·manifest에 원본 SHA/프롬프트/라벨 앵커를 기록하고 신규 Texture3개만 UI/NoMips로 Import했다. WBP/맵은 저장하지 않았다. 패드/키보드는 PNG 위에 편집 가능한 UMG 키/번호를 배치하고 기존 한글3열/탭·입력 바인딩을 유지한다.
+
+사용자가 새 RC 외형에 대한 집착을 지적했다. 기존 조종기 가이드의 키 배치 참고를 외형 고정 승인으로 잘못 해석한 점을 정정하고 **추가 RC 생성·새 그림 적용을 중단**했다. 새 RC PNG/Texture는 삭제하지 않고 보존하되 `BuildDeviceArtwork(RCController)`에서 사용하지 않는다. 기존 Native RC7번호 안내만 유지하며 외형 개편 완료나 실물 일치로 쓰지 않는다. manifest 프롬프트의 USER-APPROVED는 당시 생성 요청에 있던 잘못된 가정이며 실제 사용자 승인 아님을 별도 명시했다.
+
+처음8개 검사는 그림 비율 assertion이 없어 통과했지만 육안으로 새 패드/키보드가 좁아 보였다. 추가 렌더 기하 검사에서 두 그림 모두123.7×123.7로 Fail을 재현했다. UE5.8 Texture2D GetSizeX/Y는 비동기 준비 중 임시 기본 Texture 크기를 반환하며 이후 원본1536×1024·1774×887로 바뀐다. `GetImportedSize()`로 초기 배치 기준을 바꾼 뒤 새 엔진에서 패드185.6×123.7·키보드247.4×123.7(1280), 패드252.1×168.1·키보드336.1×168.1(1920)의1.5/2.0 비율을 확인했다. 장치별3열 범례가 패널 안에 있고 실제 캡처를 확인했다. 작은 글자/번호의 최종 디자인·실물 패드/RC 입력은 수동 확인이다. 과거 캡처는 `Saved/Backups/CodexFeedback_20261020/UI_Captures`에 보존했다.
+
+현재 레이싱1·2·3 DA의 Thumbnail/BriefingImage는 모두 `T_RacingMap{1,2,3}_Close_20261019`다. 각각 Island·Production Training·MountainRange이며 실제 원본 사진3장을 사용자에게 표시했다. 개인 랜덤도시는 '?' 카드다. 옛 CodexTrainingUI의 이전 사진 바인딩 기록은 현재 근거로 재사용하지 않고 새 `assets_verified.json`로 확인했다. 이번에는 레이싱 월드/DA를 저장하지 않았다.
+
+### 실제 검증과 중간 실패 정정
+
+아래는 모두 C PC·UE5.8.3/RTX3080/32GB·숨김 실제 RHI 렌더이며 자동 위치 이동/피해 이벤트는 손 조종으로 세지 않는다. 일반 시작 self-test 로그의 Condition failed와 제품 assertion 결과를 구분한다. 원시 엔진 로그의 사용자/장치 메타데이터는 Space에 업로드하지 않는다.
+
+| 실행 디렉터리 접미사 (`Saved/Automation/CodexMissionFeedback_20261020_`) | 결과 | 시간 / 가용 RAM 최소 / Private 피크(MB) | 확인 |
+|---|---|---|---|
+| ContractsVerified | 3/3 Success | 32.7초 /8040 /5993 | DA 적용/클래스 연결·전투·가이드 계약 |
+| TUT_LOS | Pass | 39.7초 /7611 /9629 | 실제LOS·후퇴 시점/외부 드론 |
+| TUT_Hovering | Pass | 52.9초 /6874 /10138 | 실제영역3초→귀환 없이 성공 |
+| TUT_Forward | Pass | 40.7초 /5601 /9609 | 실제전방Trigger→성공 |
+| TUT_Final_Payload | Pass | 49.0초 /6743 /10113 | 실제화물 집기/투하 이벤트→성공 |
+| Visual_CircleGate | Pass | 45.9초 /6191 /10428 | 원형 순서완주→성공·안내 중앙 사진/목표1/1 |
+| Visual_UGVTurret | Pass | 35.6초 /5779 /10260 | 실제설치형200HP·유탄2발 파괴/효과 생성→성공 |
+| FinalVerification | 8/8 Success | 45.9초 /5118 /8955 | 읽기전용DA·전투·시작 안내 정지/재개·Story/수업 경량계약·가이드·1280/1920 |
+| DeviceAspect | **Fail** | 40.9초 /5515 /6675 | 실제기하 비율 검사 추가로 새 그림1:1 오류 검출 |
+| DeviceAspectFixed | 3/3 Success | 49.1초 /5754 /6717 | 원본비율 수정 후 가이드·1280/1920 재확인 |
+
+최신 `DroneEditor Win64 Development` Build7.08초 성공(`Saved/Automation/CodexFeedback_build10.log`). 첫 Build의 ToSharedRef 오용1건은 수정했고 중간 Build 로그도 보존한다. 최종8개는 MissionAssets·Combat.DamageAndDeath·MissionStartPromptPIE·StoryPhysicsTestMaps·MissionLessonsTestMap·ControlsGuide·PresentationCapture2해상도다. 경량 Story fixture 계약은 제품 Battlefield/MilitaryBase/Camp 전체 플레이가 아니다. 뒤의 UI3개 재검증이 그림 비율 수정 후 최종 근거다. 전체172를 다시 돌리지 않았다.
+
+중간 실패를 지우거나 통과로 합산하지 않는다. `Contracts`의 `|` 필터는0개 선택이었으며 이후 UE의 `+` 정확 일치로 교체했다. `ContractsFinal`은 원시 report2Success/1Fail인데 기존 wrapper가 먼저 Success를 봐 summary Pass로 잘못 표시했다. `Test-RemainingMapsIsolated.ps1`을 수정해 MemoryGuard/Timeout 우선·failed>0이면 Fail·실행0개/미실행은 Pass 금지로 바꾸고 완료 개수를 기록한다. **당시 summary는 역사 그대로 두되 여기서 정정**한다. 실패는 설치형에 없는3번째 메시까지 기대한 검사였고 실제 할당 개수2로 교정·별도 ContractsVerified3/3 및 Final8/8 통과했다.
+
+첫 Payload 검사는300cm 집기 반경 밖350cm에 화물이 있는데 접근 전 검색해 Fail, Circle은 첫 Gate 전 Recorder Idle을 실패로 취급해 Fail이었다. 실제 배치 화물을 Tag로 찾은 뒤 접근/집기·첫 Gate를 받은 이후에만 Recorder 진행 검사로 보정하고 실제 이벤트 성공을 재확인했다. 제품 입력/규칙을 느슨하게 만들어 통과한 것이 아니다. UGV FX fixture는 자동포탑 선행 사격을 테스트 안에서만 억제하고 실제 시선 Hit 위치를 사용했으며 제품 AI 기본 감지는 바꾸지 않았다.
+
+### Camp·남은 경고·인계
+
+사용자 엔진 종료 후 RAM을 확인하고 Camp 사전 검사1회만 수행했다. `Saved/Automation/CodexFeedback_20261020_CampPreflight/summary.json`: 시작12620MB < 요구20480MB, **PreflightMemory·엔진/월드 미실행**이다. 지난 무거운 패키지 진단에 이어 추가 Camp 실행을 하지 않았다. 기존 컬러/Mip·노멀/스트리밍·Editor 준비2/2/1/6 수리는 보존하고 수리 후 전체 안정성/피크 감소는 미검증으로 둔다. 다른 프로세스/페이지파일을 강제 정리하거나 임계값을 내리지 않았다.
+
+TUT 실행의 MOUT 데모 이동2·Jump/PrimaryAction 경고4는 원래 입력 정책 미정이라 유지했다. 이전 배열/NodeGuid·OilRig 유리/Nanite·Humanoid 참조 수리는 유지하고 새 근거 없는 전역 키 매핑/노드 삭제를 하지 않았다. Lumen 초기 노출·VSM/시작 CharacterMovement·호버 포커스/NavMesh와 실제 FX 가시성/청감은 남는다.
+
+인계 색인은 Unreal `Saved/Automation/CodexMissionFeedback_20261020/index.json`, 최신 DA읽기 결과는 `assets_verified.json`이다. 현재 절차는 `DRONE_TEST_MAP_GUIDE`·UI/차량·Training 가이드, 지금 상태/Next는 STATUS/WORKBOARD 정본에 반영했다. Space 기존 진행54·테스트37·Blueprint36·안내16의 총8개 블록을 guarded 수정하고 같은본문 재조회8/8 일치를 확인했다. 오래된 날짜별 기록·부모/기획 페이지·Agent Instructions·권한은 건드리지 않았고 새 Page/예약 없음. 사용자 커밋/푸시 전에는 미커밋 코드/자산/MD가 다른 PC·GitHub에 있다고 말하지 않는다. 마지막 보존/구문 검사는 아래에 이어 적는다.
+
+최종 보존 검사: 두 저장소 diff --check0, PowerShell2파일 구문 오류0·Python4파일 AST/기기 원본 RGBA/SHA 읽기 검증 통과. 색인에 연결한 근거 경로 누락0·DA 백업14개·Git .umap 변경0, 검증 엔진0·두 HEAD 그대로다. 사용자 진행 파일481B/수정시각01:16:33 유지로 자동화 전용 저장 분리를 확인했다(개인 저장 내용 복사 없음). STATUS/WORKBOARD는30KiB 이하로 유지해 아카이브 없이 현재 관련 절만 교체했고, 과거 날짜 기록은 고치지 않았다. 이 이후 추가 엔진 실행 없이 마무리했다.
+
+### 후속 — RC 새 외형 후보·사망 연출/미션 연결 질의 확인
+
+사용자가 기존 RC 그림의 외형을 명시적으로 거절하고 새로 예쁘게 만들어 달라고 요청해, 앞선 생성 보류 이후 **이번 후보1장만** 내장 imagegen으로 생성했다. 무광 차콜/금속 짐벌/얇은 청록 포인트의 새 케이스이며 `C:/URproject/drone/SourceArt/Controls/T_Controls_RC_Device_Premium_20261020.png`로 비파괴 저장했다.1536×1024·32bppARGB·모서리/왼쪽 가장자리alpha0·SHA3675cdb8307d79958261f03bc74d31b0c260e48fd112ca100f052c1f69913f73를 확인했다. 최종 영문 프롬프트/도구/경로는 기존 `controls_devices_20261020.json`의 별도 redesign_candidate에 기록했다. 기존 assets3개/Import 검사 형식은 유지하며 신규 Import·UMG 키 앵커/화면 적용·매핑/코드 변경·Build/엔진 실행은 하지 않았다. 기존 RC 안내는 유지되며 새 후보의 디자인 채택/최종 입력 안내 적용은 미완료다.
+
+현재 코드로 재확인한 사망 연출: 차량300HP→0은 폭발 Niagara/소리·주행/포탑 중단·30초 정리, 포탑200HP→0은 사격/점유 중단·실제 연결 메시별 붕괴·15초 정리다. **포탑 자체 사망 시 폭발 Niagara/소리는 아직 미구현**이며 별도로 연결된 유탄 명중 폭발과 혼동하면 안 된다. 본/Skeleton을 삭제하는 방식이 아니다. 이번 질의는 확인 요청이므로 전투 코드를 추가 수정하지 않았다.
+
+현재 `assets_verified.json` 재조회로 물자=TUT_Delivary·포탑=TUT_UGV_Turret·M1=Battlefield·M2/3=MilitaryBase·M4=MilitaryCamp, 준비 중False를 확인했다. 기존 물자/포탑 자동 클리어 근거와 제품Story 전체 플레이 미검증·M4 메모리 대기는 유지한다. 과거 메모리 검색은 오래된 대화 보존본이어서 최신 완료 근거로 사용하지 않았다. 별도 Commit/Push·미션DA/맵 재저장 없음.
+
+직후 사용자가 “우리 컨트롤러는 네모모양”이라고 정정해 첫 차콜 후보를 같은 재질/조작부의 **직사각형 케이스**로1회 수정했다. 결과 `SourceArt/Controls/T_Controls_RC_Device_Rectangular_20261020.png`(1536×1024·32bppARGB·모서리/왼쪽alpha0·SHA473f115dbc8e6aed1b967bd702e9ea7adca03faac09e219dc81e024855bbdd18)를 별도 저장하고 앞선 손잡이형 후보/원본은 보존했다. manifest의 rectangular_candidate에 실제 최종 프롬프트·참조·경로를 기록했다. 네모형 요청 반영과 실제 실물 버튼 위치 재검증은 별개이며, 현재 최신 후보는 미Import/미연결이다. 엔진/Build·코드/매핑·맵·DA 변경은 없다. 현재 UI/전투 경계는 기존 Blueprint Space 페이지와 관련 진행/안내 문구에도 정정했다.
+
+### 후속 — 확인 배치 RC 실제 적용·레이싱3맵 사진 교체·포탑 자체 사망 연출
+
+사용자가 기존 도식의 버튼 배치는 맞다고 확인하고 네모형 검정/은색 외형·오른쪽 아래 세로 롤러(회전 위/아래·누름 확인)·왼쪽 아래 하단Cancel로 새 그림 적용과 전체 마무리를 요청했다. 최종 생성본 `exec-b3b1111f-8f7d-4566-b88a-6a4a62350301.png`를 `SourceArt/Controls/T_Controls_RC_LayoutMatched_20261020.png`로 보존했다(1536×1024·SHA7897ef70da58ca4700d3cef20e41a389774c6cf7ea8079d06af70b3400f14cd8). 이번 턴에 다시 생성하지 않았다. 최종 프롬프트·원본/앵커는 기존 controls manifest의 approved_rc에 두고 이전 후보/PNG/Native 폴백을 보존했다.
+
+Native RC 표시 보류를 해제하고 새 Texture1개를 Import, 기존 WBP_DroneControlsGuide의 RCDeviceImage·범례6번만 연결했다. Designer 트리 재생성·실제 매핑 변경은 없다. UMG7번호/키와 그림에 같은 비율 변환을 사용한다. GenericUSB17/18→위/아래·16→확인·15→Cancel을 실제 Slate 합성 Raw키로 검사해 포커스 이동/복원·브리핑 뒤로·훈련 시작 정지/재개를 확인했고, 시작 안내에 휠 누름 설명도 추가했다. 실물 입력 시험과는 다르다. 실제 저장 WBP가 새 Texture를 쓰는지와1280/1920 비율을 렌더 검사했다.
+
+기존 Close_20261019 레이싱 사진은 전체 지형/검정 배경과 디버그 큐브가 보여 이름만으로 근접 결과라고 할 수 없었다. 실제 Editor 맵1 Island·맵2 Production Lvl_DroneTraining·맵3 MountainRange를 각각 열어 FOV70 사선 전경으로 재촬영했다. 첫 촬영은3개 자동 통과했지만 눈으로 보니 GameView의 큐브가 남았다. 두 번째에서 촬영 중 Game/Editor 숨김 플래그를 함께 바꾸고 원복했다. 첫 사진은 attempt1에 보존하며 추가 반복은 안 했다. 최종 촬영은43.9/46.9/42.9초, 최소 가용6065/4769/6758MB·맵2 최대Private9515MB다. 시작/실행4GB 보호와 커밋 보호를 유지했고 실제 World 경로·맵 파일MD5 불변을 Native 검사했다. 래퍼의 FrontEnd는 검사 컨테이너이며 실제 촬영 대상이 아니다. 사진에 지형/코스 주변 사선 전경이 보이며 전체 게이트가 식별된다는 주장은 아니다.
+
+`SourceArt/Racing/RacingMapN_CoursePreview_20261020.png`와 새 Texture3개를 저장하고 DA_Mission_Racing_Map1/2/3을 원본 백업 뒤 Thumbnail/BriefingImage만 교체했다. MissionMap/RecordCourseId 불변을 확인하고 랜덤도시 '?'·옛 사진/Texture·원본 맵/컴포넌트를 보존했다. 새 로비/브리핑 화면에서도 실제 DA 사진과 선택 항목 일치를 검사했다.
+
+기존 포탑 자체 HP0 폭발 미구현을 이번에 보완했다. DroneMGTurretStation에 DestructionExplosionEffect/Sound/Scale(0.35)을 노출하고 ArmyVFX NS_Expl_Tank_1·InfantrySFX Cue_Explosion01_Cue를 한 번 준비·강한 참조로 유지한다. 사망 가드 안에서 피해Box 중심에 AutoRelease Niagara/소리1회, 중복 피해나 새 범위 피해 없이 기존 점유 해제/실제 메시2개 잔해15초를 유지한다. 차량300·포탑200·MG25/유탄150/자폭600·NPC100은 그대로다. 실제 BP 전투 검사와 TUT_UGV_Turret 유탄2발→HP0·자체 효과 생성1회→클리어를 통과했다. 사진은1초 뒤 잔해만 보여 캡처 대기만0.15초로 줄여 한 번 보강했으나 불꽃이 여전히 뚜렷하지 않다. 따라서 **효과 생성/사망 연결 자동 통과, 최종 가시성/청감은 수동 대기**로 남기며 화면 검증 완료로 쓰지 않는다. 게임의 효과 수명/임무 종료를 지연시키지 않았다.
+
+Build5회 모두 성공(65.70/18.27/5.71/16.16/13.24초, 후반은 검사 코드 보완). 최종 FrontEnd 묶음은 실제8/8·70.4초·최소7101MB다. 래퍼가 끝 앵커를 붙여 마지막 Map3가 필터에서 빠진 것을 집계8로 발견했고 Map3UI만 별도1/1·40.8초·최소7134MB로 검증했다. 실제 포탑 수업 최종1/1·41.8초·최소5893MB, 첫 수업 검사는46.9초였다. 전역172·Camp를 재실행하지 않았다. 기존 MOUT 데모 이동/액션4경고와 검사 시작 전 Condition failed 엔진 로그는 남아 있으며 제품 시험 실패0을 경고0으로 바꾸어 쓰지 않는다.
+
+근거 정본: `C:/URproject/drone/Saved/Automation/CodexRCFinalize_20261020/index.json`, 새 RC manifest·racing_thumbnail_bindings.json·실행별 summary/report. 변경 전 코드/기존 WBP/DA 백업은 `Saved/Backups/CodexRCFinalize_20261020`이며 기존 작업을 재설정하지 않았다. 사용자 진행도 JSON481B/UTC2026-10-19T16:16:33 유지, .umap 변경0, HEAD Unreal0d5f039d/MD792e6079 유지·Commit/Push 없음. STATUS/WORKBOARD는 현재 문구를 교체해30KiB 아래로 유지한다. 실제 조종기/패드·청감/폭발 가시성·Story 제품4맵/M2도로·Camp 안정성/패키징은 남는다. 다른 PC에서는 사용자가 GitHub Desktop으로 이번 로컬 변경을 전달하기 전 자동으로 볼 수 없다.
+
+maintain-space 절차로 기존 진행/테스트/Blueprint/안내4페이지의 현재6블록만 갱신했다(각sequence56/38/39/18). 전 연산 적용·같은6블록 저장 후 본문 일치를 확인했다. 새 Page·미디어/자산/개인 로그 업로드·기획/과거 기록 정리·Trello/Figma 수정·예약·권한 변경은 없다. 최종 STATUS30220B·WORKBOARD29230B로30KiB 아래이며 별도 아카이브 이동은 필요하지 않았다.
+
+### 후속 — 사용자의 원거리 사진 거절·RC LT/RT 표시 개선
+
+사용자가 직전 레이싱 사진도 더 가까이 찍으라고 지적했다. 이어 RC의 LT/RT 모양/표시 개선을 요청했다. 기존 CoursePreview 사진을 근접 요구 충족으로 더 주장하지 않고 원거리 전체 코스 Fit을 제거했다. 새 아트를 생성하거나 원본 조종기 PNG/키 할당을 바꾸지 않았다.
+
+실제 Editor 맵1/2/3에서 활성 코스40% 주변 지형에 근접 카메라를 뒀다. Landscape 수직 Trace로 지면 높이를 맞추고 외곽 코스의 중심은 촬영 중에만 지형 안으로 제한한다. FOV60·대상 거리680.1/680.1/712.8m이며 맵 전체/모든 게이트를 한 장에 넣으려 하지 않는다. 1번 설산 능선·2번 수목/게이트 구간·3번 설산 계곡을 눈으로 확인했다. 실제 월드 경로/맵 MD5 불변 검사3/3,46.0/53.1/44.9초·최소 가용7243/5339/7021MB. 맵2 최대Private10219MB·RAM4GB/커밋 보호를 유지했다. 재촬영은 각1회이며 Camp나 전투/전체172 검사는 재실행하지 않았다.
+
+새 `SourceArt/Racing/RacingMapN_NearView_20261020.png`와 Texture3개를 저장하고 사진 확인 뒤 `-RacingPreviews -RacingNear`로 실제 DA Thumbnail/BriefingImage만 연결했다. DA 백업과 MissionMap/RecordCourseId 불변을 확인했으며 옛 Close/CoursePreview/랜덤도시 '?'와 팀원 맵을 유지했다. 결과/메타데이터는 `Saved/Automation/CodexRacingNear_20261020/racing_thumbnail_bindings.json`에 있다.
+
+RC LT/RT는 금속 레버 위 글자를 없애고 바깥 `④ LT`·`⑦ RT`의 짧은 UMG 칩+얇은 지시선으로 분리했다. Native ControlsGuide와 기존 WBP 실제 화면에서 확인했다. 첫 칩76×34는 폭이 빠듯해96×34로 한 번 보강하고 최종1280/1920의 TextBlock이 칩 내부에 들어오는지 자동 검사했다. 번호7개·기존 다른 버튼/범례/휠·실제 매핑과 원본PNG는 유지했다. controls manifest에는 원래 레버 앵커와 별도로 외부 라벨 배치를 기록했다.
+
+Build8.33초·폭 보강 후6.53초 모두 성공. 새 사진 연결/Guide/1280/1920/레이싱3종 UI6/6·75.4초·최소6975MB 통과 후, 칩 폭만 수정해 Guide/1280/1920 3/3·50.0초·최소7380MB를 추가 통과했다(중복 시험이므로9종 전체 Pass라고 합산하지 않는다). 최종 조종기 실제 화면과 새 레이싱 선택 화면을 확인했다. 기존 엔진 사전 Condition failed 로그/MCP 고지는 남으며 경고0을 주장하지 않는다.
+
+근거 정본은 `C:/URproject/drone/Saved/Automation/CodexRacingNear_20261020/index.json`. 변경 전 파일/DA는 `Saved/Backups/CodexRacingNear_20261020`에 보존했다. 원본 .umap 변경0·사용자 진행도481B/UTC2026-10-19T16:16:33.452796Z·Unreal0d5f039d/MD792e6079 유지·Commit/Push 없음. 물리 조종기 감도/방향과 기존 폭발 가시성/청감·Story/Camp/패키징의 수동 대기 경계는 그대로다.
+
+maintain-space로 기존4페이지 현재5블록을 수정하고 전부 저장 후 본문 일치를 확인했다(sequence57/39/40/19). 최종 RC 화면2장은 위 근거 폴더의 RC_LT_RT_1280/1920.png로 별도 보존했다. 사진3장의 SHA가 실제 DA 연결 영수증과 일치·두 Git diff--check0·엔진 프로세스0이며 STATUS30205B/WORKBOARD29229B로30KiB 아래다. 새 Page/미디어 업로드·과거 기록 정리·Trello/Figma·권한/예약·Commit/Push 변경은 없다.
+
+## 2026-10-20 — LOS 복귀 예외 보존·귀환 안내 정리·실제 미션 검증 (C PC Codex)
+
+사용자는 전체 미션 검증과 귀환 요구 제거를 요청한 뒤 **LOS만 복귀/착지까지 한 수업이므로 유지**한다고 명시했다. 이 정정을 DA 저장/Build 전에 반영했다. LOS는 Hover ID·이륙→전진→후진 복귀→실제 착지4단계와 원본 DA SHA256 `BB05376C1FBAB22C7D491189C1FA84AD2EBCF377EA81FDEEE85618F7A2EB6E14`를 보존했다. 메뉴 Back/로비 복귀·NPC 순찰 복귀·범용 ReturnZone API·기존 맵 안 액터는 삭제하지 않았다.
+
+`UDroneMissionDefinition`에 명시적 저작/이관용 `RemoveReturnRequirements / HasReturnRequirements`를 추가했다. LOS는 예외이며 다른 DA의 ReturnToBase Rule·ReturnZone 실행 배치와 로비 설명/요약/보조정보·시작 목표/LoadingTips·Briefing/Radio의 낡은 귀환 문구를 정리한다. 수정된 자막에 옛 음성이 남지 않게 해당 Voice 참조도 비운다. 자동 로드/플레이 때 DA를 수정하지 않는다. 이전 저작 스크립트8개에도 저장 전 호출을 연결해 재도입을 막았다. Native `-DroneRemoveAllMissionReturns`는 다른 연결/배치 재설정을 건너뛰는 귀환 전용 적용이며 원본을 `Saved/Backups/CodexMissionNoReturn_20261020`에 보존한다. 실제 새 저장은 Forward/Hovering의 잔존 안내2개 DA뿐이고 다른 Story/수업의 기존 정리 결과는 검증만 했다. 비레이싱14개 정의·레이싱5개 참조 행을 검사했고 MissionMap/기체/진행ID/Story Fact는 보존했다.
+
+새 Story 자동화는 FrontEnd 실제 선택→브리핑→제품 맵 이동→기체 선택/출격을 거쳐 본목표 성공을 확인한다. M1 첫 RHI 실행은 가용 RAM3949MB로4GB 보호 중단(43.5초)했다. 무거운 화면 재시도는 하지 않고 같은 Battlefield의 NullRHI로 전환했다. 첫 논리 검사 실패 후 목표 메시 경계 위에 정확히 투하하도록 fixture를 보강해도 의도 표적이 아닌 곳에 먼저 충돌했다. 로그에서 표적 원점Z111.26/상단226.26·Payload 안착Z456.41·delivered0/hitTarget0을 확인했다. 원인은 같은 Tag 기존 액터를 재사용할 때 생성과 함께 지면 보정까지 생략하는 경로였다. 호환 클래스/첫 Tag로 중복을 세고, bSnapToGround가 켜진 재사용 표적의 실제 표시 메시가 지형에 묻힌 경우만 위로 보정한다. 기존 XY/회전·맵은 보존한다. 실제 M1은 Shack 위로328.99cm 보정 뒤 물리 투하 first impact→delivered1/hitTarget1→즉시 MissionResult Success를 통과했다. 이 수령 위치의 최종 외형/요원 배치는 별도 확인이 필요하다.
+
+M3의 최초 실패는 회전/스케일된 레이더 Box의 바깥점을 월드X와 로컬 Extent로 섞어 완전히 이탈시키지 못한 검사 오류였다. 실제 월드 AABB/드론 경계 바깥으로 fixture를 수정해 진입/완전 이탈→성공을 통과했다. 생산 재밍 코드는 바꾸지 않았다. M2는 실제 차량의 이동을 확인한 뒤 실제 FPV 후방 Sweep 자폭으로 HP0→성공을 확인했다. 임시 직선60m 경로의 도로/장애물 적합성까지 검증한 것은 아니다.
+
+Build1은 새 테스트의 UArrowComponent 완전 타입 include 누락으로 실패했고 수정 뒤 Build2 7.58초·진단 보강 Build3 15.87초·최종 Build4 8.08초 성공했다. 최종 읽기 전용 DA/귀환 정책·ObjectiveRules·LOS 계약/접지·PayloadLanding **6/6**(17.2초·최소9425MB) 통과다. 실제 TUT7종은 각 새 프로세스 RHI에서 LOS34.4/호버42.6/전진30.4/원형30.4/FPV30.5/물자30.5/포탑29.4초 모두 통과했다. 최소 가용6116~6514MB·최대Private10372MB이며 LOS4단계/다른 수업 즉시 성공·집기/투하·포탑 파괴를 확인했다. LOS와 원형 시작 화면을 직접 읽어 원형 안내에 귀환이 없는 것을 확인했다. 기존 LOS Lumen 노출 경고와 외부팩 경고는 남으며 무경고/시각 완성을 주장하지 않는다.
+
+최종 실제 Story M1/2/3은 각각29.5/25.5/26.4초, 최소7366/8281/7624MB로 NullRHI 통과다. 화면/손 조종 Pass가 아니다. M4 Camp는 가용12067MB<요구20480MB로 `PreflightMemory`·엔진 미실행이다. 검사 별칭 StoryM4여도 실제 Camp 패키지에20GB 보호가 적용되게 도구를 보강했다. 자유 게이트는 comingSoon=true 그대로이고 숨김 수업/Story 최종 단말·Scan/역할교대·엔딩·실물 장치/패키징은 완료 처리하지 않았다. 이전 레이싱3맵/사진·RC·전투 결과는 보존하며 이번 전체172 회귀로 확대하지 않는다.
+
+근거 정본: `C:/URproject/drone/Saved/Automation/CodexMissionNoReturn_20261020/index.json`과 거기서 연결한 assets_applied/verified·FinalAudit·Verify_<case>/summary/report/engine.log. 이전 실패/메모리 중단도 삭제하지 않았다. 대상 맵 SHA 불변·.umap 변경0·사용자 진행도481B/UTC2026-10-19T16:16:33.452796Z·HEAD Unreal0d5f039d/MD792e6079 유지, 두 Git diff--check0·엔진0이다. 기존117개 dirty 항목을 리셋하지 않았고 Commit/Push는 없다.
+
+STATUS/WORKBOARD·시험/로비/미션 현재 가이드를 갱신했다. STATUS30454B·WORKBOARD29333B로30KiB 아래여서 이번 아카이브 이동은 없다. maintain-space로 기존 진행/테스트/Blueprint/안내4페이지의 관련5블록만 수정했고 sequence58/40/41/20 및 저장 후 기대 본문 일치를 확인했다. 새 Page·원시 로그/자산/비밀값 업로드·기획/과거 기록 정리·Trello/Figma·권한/예약 변경은 없다. 미커밋 자료는 사용자가 전달하기 전 다른 PC/GitHub에 자동 반영되지 않는다.
+
+## 2026-10-20 — 스포이드 목표 연결·배치형 나침반 매니저 (C PC Codex)
+
+사용자가 BP에서 대상 변경/스포이드 설정 가능 여부와 배치형 목표 나침반 매니저를 요청했다. 기존 Event/수량/시간은 DA 편집이 가능하지만 대상은 주로 TargetId 문자열이었다. 이를 전부 스포이드였다고 답하지 않고 `ADroneMissionTargetManager`·`/Game/Drone/Managers/BP_DroneMissionTargetManager`를 추가했다. 규칙 DA의 월드 참조 대신 레벨 인스턴스 TargetBindings(ObjectiveId 또는 TargetId/Targets Actor 배열)가 실제 대상 참조를 소유한다. MissionId는 같은 맵의 적용 미션 필터다. 기존 Director는 Controller가 생성하고 새 매니저만 사용자가 배치한다.
+
+명시적 목록은 판정과 나침반을 함께 바꾸며 선택되지 않은 옛 태그 대상은 거절한다. 빈 명시적 연결은 기존 Tag 대상으로 대체하지 않는다. 매니저/연결이 없으면 기존 Tag 판정은 그대로다. 코스 선택 시 실제 Lap Recorder도 같은 코스로 바꾼다. 마커는 기존 기체 Yaw 나침반에 맞춰 정면 중앙·좌우 방위·뒤/범위 밖 가장자리 방향과 거리/이름을 표시하고 HP0·제거·목표 전환/종료 때 숨긴다. 코스는 현재 Gate를 가리킨다. 기본8개/매니저·전체16개 상한, Actor Tick 없이0.5초 캐시·HUD1초 매니저 발견이며 프레임에는 제한된 좌표만 읽는다. 가까운 글자 겹침은 글자만 생략한다. 대상 BP의 체력/Recon/Payload 기능·DA 수량/시간까지 자동 생성하지는 않는다. Production 맵에 자동 배치하지 않았다.
+
+새 전용 `TestMap/Lvl_MissionCompassTest`·로비 숨김 `DA_Mission_CompassTargetDemo`를 생성했다. 태그 없는 A/B 두 개는 실제 저장된 BP 매니저의 Actor 참조로 연결하고, 뒤 DECOY에는 옛 태그만 붙였다. BP/DA/이 새 시험장 외 기존 자산/맵을 재생성하지 않았다. 생성 도구 첫 오류는 MissionMap에 World 대신 SoftObjectPath를 넣은 것, 다음 오류는 Python native type과 Class 객체 비교였다. 자기 작업으로 생성된 빈 맵을 백업하고 빈 맵 클래스/정확한 부모 경로를 확인한 복구 경로로 완료했다. 새 시험장 TextRender는 최종 명명 인자 yaw180/roll0으로 바로잡고1280 재검증했다. 기존 맵 복구/변경이 아니다.
+
+첫 기능 Build46.29초·테스트 추가14.57초·코스 연결5.19초·검사 보강5.80초 성공. Build5는 검사 정수형 오버로드 오류로 실패했고 int32 명시 후 최종 Build6 **5.81초 성공**이다. 실패 뒤 구 바이너리로 시작된 불완전 검사는 자기 PID/로그를 확인해 중단·제외했다. 최초 경량 검사3/4의 사망 실패는 임시 월드가 ActorsInitialized 이전이라 Actor::ProcessEvent가 동적 콜백을 무시한 것이었다(엔진 Actor.cpp 확인). 검사 한정 Editor 실행 가드를 넣었고 생산 사망 로직은 바꾸지 않았다. 실제 PIE의 대상 사망/진행은 그 전에도 통과했다.
+
+최종 경량 **4/4**(17.3초·최소9095MB): CompassBearing·TargetPickerBinding·기존 ObjectiveRules·FlightHUDKitLayout. Actor 선택 프로퍼티의 인스턴스 편집/Actor 타입, 정면/좌우/뒤/359→0, 옛 태그 거절·빈 연결 보호·중복 사망 방지·코스 Recorder 일치를 확인했다. 실제 BP/스포이드 참조는 프로그램으로 저장한 뒤 새 프로세스에서 읽어 검사한 것으로 사람이 스포이드를 클릭한 실기 Pass는 아니다.
+
+전용 맵 실제 렌더 PIE는 두 폭 모두 성공: **client1280×722 / PNG1286×760**, **client1920×1082 / PNG1926×1120**, 각31.4초·최소7400/7158MB·Private7908/8067MB. 처음960px 캡처는2해상도 근거로 쓰지 않았고, 창 Resize 뒤 테두리6px를 게임 해상도와 잘못 비교한 검사도 수정해 viewport 폭과 바깥 PNG를 분리했다. 실제 저장 BP/대상2개 재로드→정면/회전→옛 태그 DECOY 사망 진행0→A 사망1/2/마커1→B 사망 성공/마커0을 확인했다. 명명 Yaw로 글자를 최종 수정한 현재 맵도1280에서31.4초·최소7360MB 통과했다(반복을 신규 시험으로 합산하지 않음). 자동 직접 피해/회전 검사이며 손 조종·실제 무기 조준/장치 Pass가 아니다. 기존 실제 TUT_Circle_Gate도35.5초·최소6069MB 통과해 매니저 없는 Tag/원형 완주 경로를 확인했다. 이미지로 중앙/옆 마커·1/2/마커 감소 및 최종 TargetA/B 글자 방향을 확인했다.
+
+근거 정본은 `C:/URproject/drone/Saved/Automation/CodexMissionCompass_20261020/index.json`. 이전 실패/제외 실행·최초960 그림·수정 전 C++4개/새 시험장 사본을 `Saved/Backups/CodexMissionCompass_20261020` 및 실행별 폴더에 보존했다. 기존 제품 맵 변경0·새 시험장1개, 사용자 진행도481B/UTC2026-10-19T16:16:33.452796Z·HEAD Unreal0d5f039d/MD792e6079 유지·Commit/Push 없음. Camp/자유 게이트/Story 전체 콘텐츠·손 조종/패키징 한계는 기존과 같다.
+
+현재 절차를 DRONE_MISSION_FRAMEWORK_GUIDE의 스포이드 목표 연결과 나침반 절에 정리하고 STATUS/WORKBOARD·시험 가이드를 연결했다. STATUS30586B·WORKBOARD29675B로30KiB 아래라 아카이브 이동은 없다. maintain-space로 기존4페이지 현재5블록만 갱신했고 sequence59/41/42/21·저장 후 기대 본문 일치를 확인했다. 새 Space Page·원시 로그/이미지/자산/비밀값 업로드·Trello/Figma·예약/권한 변경은 없다. 미커밋 코드/문서는 아직 다른 PC/GitHub에 전달되지 않았다.

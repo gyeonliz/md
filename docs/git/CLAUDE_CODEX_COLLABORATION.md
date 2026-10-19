@@ -5,17 +5,19 @@
 
 2026-10-03 사용자 결정: Claude가 허브이며 Codex를 한 번에 하나씩 호출하고 결과를 검증한다. 역할 계약은 Unreal .claude/codex-bridge/roles/docs.md·ui.md·image.md를 따른다. Codex→Claude CLI는 이PC에 없어 사용하지 않는다.
 
+현재 결정(2026-10-19): 위 내용은 이전 분담 이력이다. Codex 직접 대화에서는 Claude 전담/Codex 문서 전용·읽기 전용·Unreal 실행 금지를 해제한다. Codex가 요청한 코드/자산/MCP·빌드·PIE·자동화·재실행 검증을 직접 수행하고 카드는 작업 추적에 사용한다. Claude 재위임은 필수가 아니다. 명시적으로 브리지에 맡긴 작업에만 지시서 범위를 적용한다. 기존 변경·팀원 Production 맵·인증정보 보존과 별도 요청 없는 Commit/Push 금지는 유지하며, 사용자가 엔진을 확인하는 동안 임의 조작하지 않는다.
+
 ## 1. 역할
 
 | 영역 | 담당 | 비고 |
 |---|---|---|
-| `Source/Drone` C++, Build, 자동화 테스트, Unreal 도구·맵 생성 스크립트 실행 | **Claude** | Codex는 샌드박스상 Unreal 저장소를 쓸 수 없다 |
-| Blueprint·UMG 구성·연결·컴파일·저장 | **Codex(ui)** | 켜진 Editor MCP로 지시서가 지정한 /Game/Drone 자산만·개별 패키지 저장. Source/Config/맵 직접 셸 수정·PIE/Build/테스트 실행 금지. Production이 열린 상태면 중단·레벨 전환/모두 저장 금지 |
+| `Source/Drone` C++, Build, 자동화 테스트, Unreal 도구·맵 생성 스크립트 실행 | **현재 요청을 받은 Codex 또는 Claude** | Codex 직접 작업 가능. 소유 파일·엔진 동시 사용을 피하고 기존 변경 보존·전체 빌드 전 Editor 종료 |
+| Blueprint·Data Asset·UMG 구성·연결·컴파일·저장 | **Codex 직접 / 브리지 ui** | 직접 작업은 사용자 요청 범위에서 수행. 브리지 ui만 지시서의 지정 자산/도구 계약 적용. Production 시험 저장·모두 저장 금지 |
 | 이미지 시안·참고·자리표시 | **Codex(image)** | 실행 폴더 images에만 PNG 저장, 최종 아트 아님. 캐릭터·애니메이션·최종 UI/로고·음원은 사람/팀원/외부 자산 |
 | md 저장소(STATUS·WORKBOARD·WORKLOG·가이드) | **Codex** | Claude는 사실을 담은 지시서로 맡긴다 |
 | Drone Space 페이지 5개 | **Codex** | Claude 도구로는 접근 불가 |
 | Figma·Trello 대조, 보고서·제출 서류, 기획 선택지 정리 | **Codex** | Figma·Trello는 읽기만 |
-| Claude 변경 교차 리뷰, 원인 조사 의견 | **Codex** | 읽기 전용. 반영 여부는 Claude가 검증 후 결정 |
+| Claude 변경 교차 리뷰, 원인 조사 의견 | **Codex** | 리뷰만 요청되면 읽기 전용. 수정/검증 요청이면 Codex가 직접 수행 가능 |
 | Commit/Push, Trello 카드 수정, 공유 권한 변경 | **사용자** | 둘 다 요청 없이는 하지 않는다 |
 
 ## 2. 흐름
@@ -31,12 +33,12 @@
                 사용자 보고 (Codex가 한 일 / Claude 검증 결과 구분)
 
 사용자 ──요청──▶ Codex 앱(직접 대화)
-                   └─ 코드 변경 요청이면 직접 고치지 않고 WORKBOARD 카드로 남김 → Claude가 다음 세션에서 처리
+                   └─ 요청 범위 코드·자산·Build·PIE·자동화 직접 수행 → 결과/미확인과 MD·Space 반영
 ```
 
 - Claude → Codex: Unreal 저장소 `.claude/codex-bridge/Invoke-CodexTask.ps1` (절차는 `codex-handoff` 스킬).
 - Codex → Claude: 결과 보고의 "Claude에게 넘길 코드 작업", 또는 WORKBOARD 카드(아래 5절).
-- Unreal 셸 파일 변경은 Claude만 수행한다. Codex ui는 Claude 지시서 범위의 켜진 Editor 자산 도구만 사용한다. 이미지 참고 자산은 AI 사용 금지 메타데이터를 먼저 확인한다.
+- Codex 직접 작업은 Unreal 셸 파일 변경·도구 실행이 가능하다. 브리지 ui로 명시 위임된 경우에만 지시서의 켜진 Editor/지정 자산 계약을 적용한다. 이미지 참고 자산은 AI 사용 금지 메타데이터를 먼저 확인한다.
 - ui MCP 연결 실패 시 임의로 스크립트 방법으로 전환하지 않고 Claude에게 보고한다. image 재생성은 첫 생성 뒤 최대2회(총3장), 산출물은 실행 폴더만 사용한다.
 
 ## 3. 지시서 고정 칸 (Codex 요청 반영)

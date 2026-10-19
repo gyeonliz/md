@@ -14,4 +14,5 @@
   - 아카이브: 지우지 않는다. 원문 그대로 `docs/history/archive/<파일 이름>_<YYYY-MM>.md`로 옮기고, 원래 자리에는 한 줄 요약과 링크만 남기며, `docs/README.md` 색인에 추가한다. 한 번에 한 파일씩 하고 전후 바이트·줄 수를 보고한다. 아카이브 파일은 "새 파일 금지"의 예외다.
   - WORKLOG는 통째로 읽지 않고 검색한다. 달이 바뀌면 지난 달 절을 `docs/history/archive/DRONE_WORKLOG_<YYYY-MM>.md`로 옮긴다.
   - 과거 기록의 내용은 고치지 않는다(틀린 기록은 새 기록으로 정정한다). Drone Space 본문은 따로 지시가 있을 때만 정리한다.
-- 이 문서 저장소와 Drone Space는 Codex 담당, Unreal 코드는 Claude Code 담당. 코드 변경 요청을 받으면 WORKBOARD 카드로 남긴다. 협업 절차는 [Claude↔Codex 협업 규칙](docs/git/CLAUDE_CODEX_COLLABORATION.md)을 따른다.
+- 2026-10-19 사용자 결정: Codex에서 직접 작업할 때는 옛 Claude 전담/Codex 문서 전용·읽기 전용 제한을 적용하지 않는다. Codex가 요청 범위의 Unreal 코드·Blueprint/Data Asset·MCP·빌드·PIE·자동화·재실행 검증을 직접 수행한다. 카드만 남기거나 Claude로 다시 넘기지 않는다. 기존 변경/팀원 맵 보존, 별도 요청 없는 Commit/Push 금지, 인증정보·외부 전송 보호는 유지한다. 다른 작업자가 엔진을 사용하는 동안 임의로 조작하지 않는다.
+- Claude가 명시적으로 브리지에 위임한 작업은 그 지시서의 범위·산출물 계약을 따른다. 브리지 전용 제한을 Codex 직접 작업에 확대하지 않는다. [현재 협업 규칙](docs/git/CLAUDE_CODEX_COLLABORATION.md)을 따른다.

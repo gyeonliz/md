@@ -1,6 +1,6 @@
 # 4점 지면 추종 차량·Drone 외형 기울기 가이드
 
-기준일: 2026-09-04 (Asia/Seoul)
+현재 절차: 2026-10-20 C PC. 실행별 결과·이전 기록은 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
 
 ## 구현 범위
 
@@ -14,6 +14,33 @@
 - 차량 포탑: `AutoTurret_Vehicle_A`, 차량의 `TurretMount`에 Attach
 
 차량은 Query 전용 Box Collision, 임시 Cube Body, Cylinder Wheel 네 개와 `TurretMount`를 가진다. 완전한 질량·타이어 마찰·스프링 힘을 계산하지 않고 지형에 맞는 차체 자세와 탑재 포탑 추종을 먼저 검증한다.
+
+## 차량 피해·자폭·NPC 사망
+
+필요한 이유: 이동용 차량 Root Box만으로는 교체한 차체 메시의 뒤쪽을 덮지 못하고, 범위 피해만 쓰면 직접 닿은 차체의 Visibility 차폐로 직격 피해가 빠질 수 있다. 이동과 피격을 분리하고 접촉 표적에는 피해를 정확히 한 번 준다.
+
+| 조정 대상 | 기본값 | 적용 위치 |
+|---|---:|---|
+| 차량 최대 체력 | 300 | Vehicle BP Class Defaults → Drone/Vehicle/Damage → MaximumHealth |
+| 유인/자동 포탑 체력 | 200 | `DroneMGTurretStation` 파생 BP → Drone/AI/MG/Damage → MaximumHealth |
+| UGV 기관총 | 25/발 | `BP_DroneGroundUGVIntegration`의 GroundWeaponComponent → PrimaryDamage |
+| UGV 유탄 | 150/발 | 같은 컴포넌트 → SecondaryDamage |
+| 자폭 | 600/직격 | FPV·Fiber BP의 ImpactDetonationComponent → ExplosionDamage |
+| NPC 체력 | 100 | Hostile Rifle/Shotgun BP의 HealthComponent → MaxHealth |
+
+현재 임시 밸런스는 차량에 기관총12발·유탄2발·자폭1회, 포탑에 기관총8발·유탄2발·자폭1회, NPC에 기관총4발·유탄/자폭1회다. 거리/명중/차폐를 제외한 순수 피해 기준이며 최종 밸런스가 아니다. 인접 표적의 범위 피해는 차폐 검사를 유지한다.
+
+- 담당 클래스/헤더: `ADroneGroundConformingVehicle`에 HealthComponent·DamageCollision·MaximumHealth·ExplosionEffect/Sound·WreckLifetimeSeconds. CPP BeginPlay가 실제 VehicleBodyMesh 경계로 피격 Box를 맞추며 이동용 Root와 지면 추종은 유지한다. 사망 때 주행/경로 추종 중지·폭발 VFX/Cue·부착 포탑 Tick 중지·무충돌 잔해 후30초 정리다. `ReceiveVehicleDestroyed`로 추가 연출을 붙인다. 원본 차량 메시/맵은 바꾸지 않는다.
+- 자폭은 `UDroneImpactDetonationComponent`: 기능이 있는 기체만 출격부터 무장하고 버튼/조종기 스위치 해제를 막았다. 표준 Hit와 Rotor Sweep를 함께 받으며 반발 전 속도를 사용한다. 직접 닿은 Actor에 확정600을 주고 범위 피해 대상에서 제외해 중복 피해를 막는다. 같은 충돌은 한 번만 폭발한다. MinimumImpactSpeed 기본100cm/s이며 정지 이륙 패드에서는 폭발하지 않는다. 기존 API/입력 자산은 호환을 위해 남겼지만 무장 On/Off는 현재 비활성이다.
+- 유탄은 `ADronePlayerProjectile`: 접촉 Actor에 확정150을 먼저 주고 해당 Actor는 범위 피해에서 제외한다. 충돌 위치에 `NS_Expl_Tank_1` Niagara와 `Cue_Explosion01_Cue`를 한 번 재생한다. 최초 발사 준비 때 공유 자산을 읽어 충돌 시 동기 로드를 줄이고 Niagara AutoRelease 풀/자동 정리를 사용한다. Projectile BP `Drone/PlayerWeapon/Effects`의 `GrenadeExplosionEffect / Sound / Scale`(0.25)로 교체/조절한다. 피해 반경과 효과 크기는 별개다. 기관총25·200발/2초 재장전·유탄6발 정책은 유지한다.
+- 포탑은 `ADroneMGTurretStation`의 `TurretHealth / TurretDamageCollision`이 담당하며 유인/자동형이 공유한다. BeginPlay에서 실제 연결 메시 경계에 피격 Box를 맞춘다. 사망 시 사용자를 내리고 SmartObject 등록/예약·사격/추적 Tick을 정리한다. 연결된 Base/Body/Barrel만 같은 메시/재질의 단순 Box 물리 잔해로 만들어 무너뜨리고 `DebrisLifetimeSeconds`(15초) 뒤 정리한다. 원본 메시/Collision 자산은 수정하지 않으며 잔해는 Pawn·Visibility를 막지 않는다. **현재 BP_AutoTurret_Emplaced는 Base/Body 2개만 연결돼 잔해도2개**다. 3개 메시가 실제 연결된 포탑만3개로 분리된다. Chaos 파쇄/신규3단 모델 제작 완료가 아니다.
+- NPC는 `ADroneNPCCharacter`: AI/사격·SmartObject 점유/이동을 정리하고 Capsule 충돌만 끈 뒤 SkeletalMesh 전체 물리 블렌드로 쓰러진다. **본/Skeleton을 삭제하는 방식이 아니다.** `bRagdollOnDeath`와 `CorpseLifetimeSeconds`(25초)를 BP에서 조절한다. PhysicsAsset가 없으면 서 있는 사체 대신 숨김 처리한다. 생전 보행·총 부착·애니메이션 자산은 보존한다.
+
+Editor 시험: FrontEnd→FPV 실제 `TUT_FPV_Target`에서 무장 키 없이 차량 전/후/측면을 타격한다. UGV로 차량 기관총12발/유탄2발, 포탑 기관총8발/유탄2발 파괴·Niagara/소리·잔해를 확인한다. `TUT_UGV_Turret`는 파괴 즉시 클리어해야 한다. 실제 `Lvl_NPCSmartObjectGreybox`에서 NPC 래그돌·사후 사격 없음·시체 정리를 확인한다. 다른 Shotgun 맵으로 대체하지 않는다. 자동 검사는 `Drone.Combat.DamageAndDeath`, `SmartObjectDeathPIE`, `Drone.Tutorial.TUTMapLaunchPIE.{FPV,UGVTurret}`이며 실제 발사 감각/효과 크기·청감은 수동 대기다.
+
+포탑 자체 HP0 사망 폭발은 `ADroneMGTurretStation`의 `DestructionExplosionEffect / DestructionExplosionSound / DestructionExplosionScale`로 조정한다. 기본은 ArmyVFX `NS_Expl_Tank_1`·InfantrySFX `Cue_Explosion01_Cue`·크기0.35다. BeginPlay에서 한 번 준비하고 강한 참조로 유지한다. 사망 중복 방지 안에서 피해 Box 중심에 풀링 Niagara/소리를 한 번 재생하며 추가 범위 피해를 중복 생성하지 않는다. 유탄 명중 폭발과 별도이며 기존 정지/점유 해제·연결 메시2개 붕괴/15초 정리와 차량300HP 폭발은 유지한다. 실제 TUT 검증·사진/청감의 확인 경계는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
+
+문제가 있으면 실제 Actor 클래스·HealthComponent/Can Be Damaged·차체 전체 DamageCollision·목표 Tag/Director 등록·충돌 당시 속도·PhysicsAsset/물리 블렌드 순서로 본다. Blueprint 값을 바꾼 뒤에는 체력300 기준 설명도 함께 조정한다.
 
 ## Blueprint 조정값
 

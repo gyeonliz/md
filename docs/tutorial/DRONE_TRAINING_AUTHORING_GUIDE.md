@@ -1,6 +1,6 @@
 # Drone Training 게이트·루트 배치 가이드
 
-현재 조정 기준: 2026-10-14 (Asia/Seoul)
+현재 조정 기준: 2026-10-20 (Asia/Seoul)
 
 코스 제작은 `BP_DroneTrainingCourse`에서 관리한다. 권장 자동 편집 방식은 Course Spline과 분리된 `Ring별 Spline Handle`이며, Handle 배열 순서가 Gate 통과 순서다. 생성된 빛나는 선 Component, 자동 Gate Child Actor와 GateIndex를 직접 관리하지 않는다. 공용 BP의 RaceRing·상태 재질 연결은 반영됐다. Main 자동78개 승계·비사용20개 참조 문제는 이전 조사 결과이며 이후 맵 변경 수신으로 현재 개수/참조를 재확인해야 한다. 기능/외형 시험은 `/Game/Drone/Maps/TestMap/Lvl_DroneTrainingRouteSelectionTest`에서 하고 팀원 Production은 덮어쓰지 않는다. 과거 측정·실행 근거는 [WORKLOG](../history/DRONE_WORKLOG.md).
 
@@ -21,11 +21,13 @@
 
 | 무엇을 여나 | 위치 |
 |---|---|
-| 첫 수업 전용 시험 맵 | `/Game/Drone/Maps/TestMap/Tutorial/Lvl_Tutorial_Observer_Test` |
+| 첫 수업 제품 맵 / 보존 경량 시험 맵 | `/Game/Drone/Maps/Tutorial/TUT_LOS` / `TestMap/Tutorial/Lvl_Tutorial_Observer_Test` |
 | 배치/조정 BP | `/Game/Drone/Mission/Blueprints/Tutorial/BP_TutorialObserverLesson` |
 | 목표4개·목록·다음 수업 | `/Game/Drone/Data/Missions/DA_Mission_Tutorial_Hover` |
 
 BP Components에서 `ObserverCamera`의 위치·회전·FOV를 조절한다. 기본 높이는165cm이며 자동 추적/회전하지 않는다. `LaunchPoint` 화살표는 **바닥 출발점과 기체 전방**을 정한다. Actor를 옮기거나 회전하면 수업 기준도 함께 옮겨진다. 카메라를 포함한 Actor 전체 Scale을 키우기보다 Component Transform과 아래 수치로 조정한다.
+
+제품 TUT_LOS는 `bUsePlacedSceneAnchors`로 BP_LOS/이륙 패드를 읽어 실행 배치한다. 카메라 후퇴/옆/높이 기본400/120/80cm와 조정 위치는 [UI 가이드](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#훈련-사진조작-장치-그림시작-위치)를 따른다. 맵/원본 사람 Actor를 저장하지 않는다. LOS 후진→접지는 유지하지만 **그 외 Tutorial/Story의 별도 귀환 목표는 없다**. 원형은 결승 즉시 클리어이며 옛 Return Zone 배치를 다시 추가하지 않는다.
 
 Class Defaults 또는 배치 Instance의 `Drone > Tutorial > Observer`:
 
@@ -241,6 +243,8 @@ RaceRing의 작성값 **Yaw90°·Scale1.75는 유지**한다. Gate 전용 Scale�
 `Lvl_DroneTrainingRouteSelectionTest`에서 `AutomaticGateClass=BP_DroneTrainingGate`인지 확인하고 시험한다. (1) 선이 중앙 하단 1/6 위치를 지나는지, (2) Gate Scale을 키워도 선 두께/코스 크기는 유지되는지, (3) 정방향·정순서 통과 음성이 한 번씩 나오는지, (4) RaceRing의 세 상태 색이 바뀌고 검정·흰색 슬롯은 그대로인지 본다. 실제 음원은 아직 별도 지정이며, 실제 가청성·최종 외형은 자동 검사와 구분한다. Main은 현재 저장본의 배치/참조를 먼저 읽기 확인하며 이 시험 때문에 맵을 덮어쓰지 않는다.
 
 ## 5. 수동 Gate 설치와 순서 지정
+
+자동 Gate는 실행할 때만 **연속한 위치(0.1cm 이내)·회전·크기가 모두 같은 중복**을 하나로 취급한다. Spline 끝으로 Clamp된 여러 링을 한 프레임에 통과하면 0초 구간 때문에 랩이 취소되기 때문이다. 원본 맵/Component/Editor 배치는 삭제·저장하지 않고 중복 런타임 링만 숨김·무충돌로 둔다. 실행 GateIndex는 다시 매기되 원본 Component 순서는 별도로 유지한다. 나중에 출발점으로 돌아오는 비연속 Gate는 보존한다. Map2의 완주/새 프로세스 복원 근거는 [WORKLOG](../history/DRONE_WORKLOG.md)다. 제작자가 배치를 정리할 때는 원본을 백업하고 중복 Handle·끝점 초과 간격을 확인한다.
 
 1. Content Browser에서 `BP_DroneTrainingGate`를 맵으로 끌어오거나 기존 Gate를 복제한다.
 2. Gate 중심을 Spline 위 통과시키고 싶은 위치에 배치한다.

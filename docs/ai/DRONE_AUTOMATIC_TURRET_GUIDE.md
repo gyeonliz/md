@@ -1,8 +1,10 @@
 # 무인 자동포탑 배치·조정 가이드
 
-기준일: 2026-09-04 (Asia/Seoul)
+기준일: 2026-10-19 (Asia/Seoul)
 
 ## 현재 구현
+
+공용 `ADroneMGTurretStation`은 생성/Construction/BeginPlay에서 Yaw·Aim·Muzzle·사수 Anchor·몸체/포신의 `Mobility=Movable`을 보장한다. 옛 BP/맵이 회전부를 Static으로 저장해도 실행 중 보정하므로 반복 이동 경고와 조준 정지를 막는다. 하단·맵은 저장하거나 움직이지 않는다. Smart Object MG와 자동포탑이 같은 회전 계층을 사용한다. 실제 Greybox 검사와 경고 수는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
 
 자동포탑은 기존 유인 기관총의 3분할 구조와 발사 기능을 재사용한다.
 

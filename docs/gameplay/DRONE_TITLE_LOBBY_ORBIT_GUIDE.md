@@ -1,6 +1,6 @@
 # 시작 화면 · 로비 탭 · 원형 코스 가이드
 
-현재 절차 기준: 2026-10-14 D PC. 기존5메뉴·결과·훈련/레이싱을 유지하면서 제공 `Select_UI`를 Story 선택에만 적용하는 코드/슬롯을 설명한다. 구현과 새 자산 저장·자동 검증·수동 화면 확인은 구분하며 현재 결과는 STATUS·WORKLOG를 따른다. 원본 이미지·Figma·기존 타이틀 아트는 보존한다.
+현재 절차 기준: 2026-10-20 C PC. 기존5메뉴·결과·훈련/레이싱을 유지한다. 훈련/레이싱 사진은 DA 슬롯, 장치 그림은 조작 안내 WBP에서 조정한다. 사용자 확인 배치의 네모형 RC 그림을 실제 WBP에 연결했다. 실제 검증 범위는 [STATUS](../../STATUS.md), 실행별 근거는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 원본 이미지·Figma·기존 타이틀 아트는 보존한다.
 
 ## 0. 현재 계약 — 5메뉴·조종 입력 표시 현재 구현과 계약
 
@@ -14,8 +14,8 @@
 - `WBP_DroneFlightHUD` Class Defaults `ControlInputDisplayClass = WBP_DroneControlInputDisplay`로 저장 연결 완료. 화면 아래 가운데 `ControlInputDisplayOffset=(0,-24)`, 월드 타이머 `ControlInputDisplayUpdateInterval=1/30초`, 설정 ON·기체 있음일 때만 `SetControlInputDisplayVisible`·`UpdateStickAxes` 이름 호출(축은 값이 바뀔 때만). OFF는 숨김·갱신 중지, 다른 HUD는 유지.
 - `ADroneFlightPawn::GetControlInputSnapshot()` BlueprintPure의 X 오른쪽+, Y 위+, [-1,1]은 스틱 물리 위치. 쉬운/실제 조작형: 왼쪽 이동·오른쪽 X 회전/Y 카메라·트리거 고도. Acro Mode 2: 왼쪽 Yaw/스로틀·오른쪽 Roll/Pitch, Mode 1: 왼쪽 Yaw/Pitch·오른쪽 Roll/스로틀. 지상: 왼쪽 조향/전후. 키보드도 같은 액션 위치로 표시되며 입력 매핑 추가 없음. UI 커서는 중심±38px·화면 Y 반전. 장치 자동 구분/전환·혼합 입력·분리/재연결 정책은 현재 미정이다.
 - 저장 BP 연결을 검사하며 테스트 메모리 Class Defaults 덮어쓰기는 인스턴스 연결 근거로 쓰지 않는다. 제품 연결은 구현됨·자동 검증됨·실제 패드/1280·1920 수동 대기다.
-- 제품 Racing `TestMap/Lvl_DroneRacingTest`에는 RouteSelector 없어 숫자키 미노출 확인. Selector `bAllowPlayerRouteKeys=true / bBlockRouteKeysInRacingMissions=true`: 로비 Racing 미션 1~5 바인딩·키 안내 없음. 시험맵 직접 실행·Tutorial/Training/Story는 기존대로, 랜덤 기능 보존. 팀원 지형 LFS 수신됨(10/04), 제품 연결/PlayerStart·완주 규칙은 현재 미정.
-- 최신 검증은 STATUS를 따른다. 팀원 지형 LFS는 10/04 수신됐으나 제품 Racing 연결·PlayerStart·완주/복귀는 현재 미정(RACING-TERRAIN-LINK-01), 결정 전 완주 확인 대상으로 두지 않는다.
+- Racing에서는 RouteSelector의 `bBlockRouteKeysInRacingMissions=true`로1~5 임의 코스 전환/키 안내를 막는다. 시험맵 직접 실행·Tutorial/Training/Story의 허용 옵션과 랜덤 기능은 보존한다. 기본 레이싱은 팀원1·2·3이며 옛 Circuit Test와 개인 랜덤도시는 별도다.
+- 팀원 레이싱3맵 진입/완주·전용 슬롯 기록 복원은 자동 검증됐고 실제 조종/패드는 대기다. Map2 동일 위치 연속 링은 실행 중만 제외하며 원본 맵은 보존한다. 현재 검사 근거는 STATUS·WORKLOG를 따른다.
 
 ## 1. 이전 4메뉴 구현 기록 (2026-10-01)
 
@@ -25,20 +25,20 @@
 
 1. 새 C++ 코드가 포함되므로 Editor를 닫고 `DroneEditor Win64 Development`를 빌드한다. Live Coding만으로 새 UPROPERTY/enum 변경을 확인하지 않는다.
 2. `/Game/Drone/Maps/Lvl_DroneFrontEnd`를 열어 Play한다. 프로젝트 `GameDefaultMap`도 이 맵이다. Editor 첫 맵은 기존 Production Training 설정을 유지한다.
-3. 스토리·레이싱·튜토리얼·설정·종료5개 문구를 확인한다. 스토리는 M1 맨 위4개 Story 목록, 레이싱은 Circuit/Procedural2개, 튜토리얼은 `기초 조종` 맨 위 수업 목록으로 처음부터 진입해야 한다. B/Esc 메뉴 복귀·설정 닫은 뒤 설정(3) 포커스, 위/아래 끝 순환과 키 반복 한 화면 Back을 확인한다.
+3. 스토리·레이싱·튜토리얼·설정·종료5개를 확인한다. 스토리는 M1 맨 위4개, 기본 레이싱은 팀원1·2·3, 튜토리얼은 LOS 첫 수업부터 표시돼야 한다. B/Esc 복귀·설정 닫은 뒤 설정(3) 포커스·위/아래 끝 순환과 키 반복 한 화면 Back을 확인한다.
 4. Story는 아래 Select_UI 절의 왼쪽 목록·가운데 이미지·오른쪽 설명·하단 START 배치를 확인한다. 훈련 탭은 숨기고 브리핑 복귀 시 분류/선택을 복원해야 한다. 튜토리얼/레이싱의 기존3열·스크롤·탭/LB/RB는 보존한다(최종 탭 유지 여부 미정).
-5. Story 카드 클릭은 선택만 하며 하단 `START MISSION`에서 기존 MissionTrailer/브리핑 흐름을 시작한다. 이후 작전 지역 이동→기체 카드→조작 설정→출격을 진행한다. 튜토리얼/레이싱 카드의 기존 즉시 확인 동작은 바꾸지 않는다. 기체 선택의 뒤로/Esc/패드B는 해당 브리핑으로 돌아간다.
-6. 튜토리얼 `1-3 원형 코스 비행`은 `/Game/Drone/Maps/TestMap/Tutorial/Lvl_Tutorial_Heading_Test`, 레이싱은 `/Game/Drone/Maps/TestMap/Lvl_DroneRacingTest`로 이동한다.
+5. 카드는 선택만 하고 하단 START로 확정한다. 기존 브리핑→작전 지역 이동→기체 카드→조작 설정→출격을 진행한다. 기체 선택의 뒤로/Esc/패드B는 해당 브리핑으로 돌아간다.
+6. 원형 코스는 `/Game/Drone/Maps/Tutorial/TUT_Circle_Gate`, 레이싱1=Island Example·2=Lvl_DroneTraining·3=MountainRange Example로 진입한다. 보존된 옛 Heading/Circuit Test와 혼동하지 않는다.
 
 
 7. 설정 > 조종 > 조종 입력 표시 ON→적용→출격하여 아래 가운데 스틱 커서를 확인한다. 위쪽 입력은 화면 위로, 해제하면 중심, Mode 1/2 축 위치가 맞아야 한다. OFF→적용은 입력 표시만 숨기고 고도계·비행 HUD는 유지한다. 적용 전 취소·기본값 복원→취소/적용·저장 후 재실행도 확인한다. 임시 기본 OFF를 최종 사양으로 판정하지 않는다.
-8. 1280×720·1920×1080에서 5메뉴 크기/간격·입력 표시 위치/가림을 실제 패드로 확인한다. Bluetooth 분리/재연결·키보드/패드 혼합 현상은 기록하되 미정 정책을 Pass 기준으로 만들지 않는다. 로비 Racing 출격에서 1~5 안내/전환 없음, 시험 Route 맵에서 기존 1~5/랜덤 유지 확인. 팀원 지형은 LFS 수신됐지만 제품 연결·PlayerStart·완주/복귀 결정 전에는 완주 확인 항목이 아니다(RACING-TERRAIN-LINK-01).
+8. 1280×720·1920×1080에서 메뉴/입력 표시 위치·가림을 실제 패드로 확인한다. 분리/재연결·혼합 입력은 미정 정책을 Pass 기준으로 만들지 않는다. 로비 Racing의1~5 안내/전환 없음·시험 Route 맵의 기존 전환/랜덤 유지와 팀원3맵 실제 완주/기록을 확인한다. 자동 이동 완주를 손 조종 Pass로 쓰지 않는다.
 
 통합 로비/맵 이동은 FrontEnd에서 확인한다. 독립 Tutorial 8맵·Story 4맵·Racing 1맵은 Boot 상태에만 적용되는 기본 Mission Entry가 있어 직접 Play도 가능하다. 선택 Mission이 없는 보존된 공유 시험장은 별도 기능 종합 시험장이다.
 
 ## 3. Blueprint에서 이미지 교체
 
-`/Game/Drone/FrontEnd/UI/WBP_DroneFrontEndRoot`를 열고 **Class Defaults → Drone → Front End → Artwork**에서 아래 슬롯에 Texture를 드래그한다. C++를 수정하거나 PNG 파일 절대 경로를 입력할 필요가 없다.
+`/Game/Drone/UI/WBP/FrontEnd/WBP_DroneFrontEndRoot`를 열고 **Class Defaults → Drone → Front End → Artwork**에서 아래 슬롯에 Texture를 드래그한다. C++를 수정하거나 PNG 파일 절대 경로를 입력할 필요가 없다.
 
 | 슬롯 | 제공 자산 | 역할 |
 |---|---|---|
@@ -53,10 +53,32 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 
 - 현재 WBP Designer는 C++ 기본 화면을 사용하는 구조다. WBP Class Defaults에서 외형을 바꾸면 기본 화면에도 적용된다. 모든 Designer 노드를 수작업 배치한 최종 UI 제작 완료라고 표현하지 않는다.
 - 런타임에 Texture 변수를 바꿀 때 `Refresh Artwork`를 호출한다.
-- 미션별 썸네일은 해당 `DA_Mission_*`의 `Thumbnail`에 넣는다. 레이싱은 임시로 제공 배경을 지정했고, 선택한 수업/Story에 Thumbnail이 없으면 `TitleBackgroundTexture`를 사용한다. 기체 Definition의 `PreviewMesh / PreviewActorClass`는 유지하지만 이번 역할 도식에는 실제 모델을 렌더하지 않는다.
+- 미션별 선택 사진은 해당 `DA_Mission_*`의 `Thumbnail`, 출격 전 조작 안내 왼쪽 사진은 `BriefingImage`에 넣는다. 후자가 비면 Thumbnail을 재사용한다. 두 사진이 모두 없으면 타이틀 배경을 사용한다. 레이싱 사진은 전체 지형을 자르지 않도록 Scale To Fit, 훈련 사진은 제공 시안처럼 Scale To Fill로 표시한다. 기체 Definition의 `PreviewMesh / PreviewActorClass`는 유지한다.
 - 직접 Designer를 만들면 `TitleBackgroundImage / TitleOverlayImage / TitleLogoImage / MissionThumbnailImage`라는 `Image` 이름을 쓰면 C++ 연결을 재사용한다. 추가 배경 이름은 `LobbyBackgroundImage / BriefingBackgroundImage / SettingsBackgroundImage`, 브리핑 이미지 이름은 `BriefingThumbnailImage`다. 기존 필수 패널·버튼·텍스트 이름도 유지한다.
 - 훈련 하위 탭 컨테이너 이름은 `TrainingCategoryTabs`, 버튼 이름은 `TutorialTabButton / RacingTabButton`이다. `MissionTabButton` 이름/API는 기존 WBP 호환용으로 남고 런타임에는 숨긴다. 동적 목록은 `MissionButtonsColumn`이라는 VerticalBox에 자동 구성할 수 있다. 자체 카드 UI라면 `Get Visible Mission Ids`로 목록을 만들고 `Select Lobby Mission`을 호출한다. 우측 목표 텍스트는 `MissionObjectiveSummaryText`다.
 - `Receive Lobby Category Changed`, `Receive Lobby Mission Selection Changed` 이벤트에서 자체 탭/카드 애니메이션을 붙일 수 있다. 이 이벤트 안에서 Flow를 중복 전환하지 않는다.
+
+### 훈련 사진·조작 장치 그림·시작 위치
+
+- 훈련 DA 8개: `/Game/Drone/Data/Missions/DA_Mission_Tutorial_*`. 원본의 `훈련선택창규격이미지` 8장을 Thumbnail, `훈련진입전조작가이규격이미지` 8장을 BriefingImage로 연결했다. Texture는 `/Game/Drone/UI/Textures/Training/T_Training{Select,Briefing}_<수업>_20261019`이며 원본 PNG는 수정하지 않는다. `Hover`=LOS, `Heading`=원형 코스, `Payload`=배달(원본 Delivary 철자 유지)이다.
+- `/Game/Drone/UI/WBP/FrontEnd/WBP_DroneControlsGuide`의 `bUseDeviceArtwork=true`는 패드/키보드의 새 기기 전용 PNG 위에 **UMG 키 이름·번호**를 겹친다. `GamepadDeviceImage / KeyboardDeviceImage` 기본은 `/Game/Drone/UI/Textures/Controls/T_Controls_{Gamepad,KeyboardMouse}_Device_20261020`다. 한글 범례/탭은 `GamepadGuide / KeyboardGuide / RCControllerGuide`, 그림 높이는 `DiagramHeight`(기본300, 적용220~300)에서 조정한다. PNG는 글자 없는 외형만 담당한다. 비동기 Texture 준비 중 임시 정사각형 크기를 쓰지 않고 `GetImportedSize()`로 비율을 유지한다. 예전 PNG·Designer 트리·입력은 보존했다.
+- `RCDeviceImage`는 `/Game/Drone/UI/Textures/Controls/T_Controls_RC_LayoutMatched_20261020`에 연결했다. SourceArt 동명 PNG는 사용자가 확인한 기존 버튼 배치를 보존한 검정/은색 네모형 외형이며, 번호7개·키 이름은 편집 가능한 UMG다. 오른쪽 아래 세로 롤러 `SELECT 휠`은 **회전: 위/아래 · 누름: 확인**, 왼쪽 아래 하단 버튼 `CANCEL`은 뒤로다. 기존 GenericUSB 버튼17/18→위/아래·16→확인·15→취소 매핑은 바꾸지 않았다. 실제 휠 방향·감도/작은 글자 가독성은 실물 확인 대상이다. 옛 네온/손잡이형/Rectangular 후보와 Native 폴백은 보존한다. 원본/최종 프롬프트·SHA·앵커는 Unreal `SourceArt/Controls/controls_devices_20261020.json`을 따른다.
+- 패드 안내는 MCP로 실제 `IMC_DronePrototype.defaultKeyMappings.mappings`·`IMC_DroneGroundWeapons` 및 Scout/UGV BP 연결을 읽어 확인했다. 비행은 **쉬운 조작 기준**으로 표기하며 FPV는 별도, 첫 LOS의 시점 전환은 고정 예외다. R1/L1 설명은 비행 역할에 한정하고 UGV 무장은 L2/R2로 안내한다(기존 R1/L1 대체 바인딩은 삭제하지 않음). ○는 메뉴 뒤로, □는 UGV 재장전만 표시한다. 기능 없는 버튼은 설명에서 제외했다. RC 그림은 사용자가 준 기존 시뮬레이터 조종기 형태·버튼 위치를 유지했다. 실제 입력 바인딩 자체는 변경하지 않았다.
+- 첫 LOS 수업만 `ADroneTutorialObserverLesson`이 `BP_LOS` 눈높이를 읽어 **뒤400cm·옆120cm·위80cm** 보정하고 훈련 구간을 바라본다. Observer BP의 `bUsePlacedSceneAnchors`, `ObserverEyeForwardOffsetCentimeters`(기존18), `ObserverCameraBackOffsetCentimeters / ObserverCameraSideOffsetCentimeters / ObserverCameraHeightOffsetCentimeters`에서 조정한다. BP_LOS/맵은 저장하지 않는다. LOS 드론은 외부에서 보이게 하고 다른 비행 수업은 1인칭으로 시작한다. 출격 시 SpringArm 초기 지연을 한 번 정리하며 1인칭에서는 자기 본체/로터를 소유자에게만 숨긴다. 저장 카메라 선호값·충돌은 유지한다.
+- 비행 출발은 가장 가까운 `SM_helicopter_base` 상단이다. 호버 구역은 **출격 Yaw 정면6m·패드 위 중심3m**, 청록12변 테두리에서3초 유지하면 바로 클리어한다. `BP_TutorialHoverZone`의 ShowHoverGuide/GuideThicknessCentimeters/GuideMaterial과 `M_HoverGuide_Visible` Brightness(3)로 조정한다. **LOS를 제외한 Tutorial·Story의 추가 ReturnToBase 목표/귀환 표적·낡은 로비/브리핑 문구를 제거**했다. LOS 자체의 후진→실제 착지는 수업 목표이므로 유지하며 LOS DA 원본도 보존했다. 전진/원형/물자도 본목표 성공 즉시 결과로 간다. 저장 도구의 재도입 방지·검사 방법은 [귀환 정책](DRONE_TEST_MAP_GUIDE.md#귀환-정책을-유지하는-방법)을 따른다.
+- 시작 안내의 배경은 `UDroneMissionStartPromptWidget::bUseStableMissionBackdrop=true`로 `BriefingImage`(없으면 Thumbnail)를 쓴다. 기존 WBP 안내/버튼을 보존한 채 초기 카메라/조명 준비 프레임을 불투명 배경으로 가린다. [시작] 전 시간/입력 정지·확인 후 재개를 검사한다. Lumen 노출 경고 자체를 없애거나 전체 렌더 품질을 낮춘 수정은 아니다.
+- 물자/포탑 수업은 준비 중 표시를 해제했다. `TUT_Delivary`는 빈 집게로 시작→실제 화물 접근/집기→표적 위 투하, `TUT_UGV_Turret`는 체력200 포탑 파괴로 완료한다. 시작/표적은 DA `Runtime Placement`이며 맵을 덮지 않는다. 제품 Story 연결/제한은 [시험 가이드](DRONE_TEST_MAP_GUIDE.md#현재-미션-연결과-확인-순서)를 따른다.
+- 확인 순서: Editor 종료 후 Build → FrontEnd Play → Tutorial에서 각 사진 선택 → START → 세 장치 탭/하단 범례 확인 → LOS 사람 시점·다음 수업 드론 시점/패드 상단 확인. `Drone.UI.TrainingPresentationCapture`는 1280/1920 실제 화면과 범례 경계, `Drone.Tutorial.TUTMapLaunchPIE`는 실제 TUT 맵 시작을 검사한다. 실제 패드 비행·연속 완주는 별도다.
+- RC LT/RT는 금속 레버 위에 글자를 겹치지 않고, 각각 바깥의 짧은 `④ LT`·`⑦ RT` UMG 칩과 얇은 지시선으로 표시한다. 원본 PNG의 레버·앵커·실제 입력은 바꾸지 않는다. `DroneControlsGuideWidget::BuildDeviceArtwork`의 Lever 배치와 controls manifest의 lever_label_presentation을 참고한다.
+- 레이싱 사진 재촬영: `Drone.UI.RacingEditorOverview.Map1/2/3`은 각 실제 Editor 맵의 활성 코스40% 주변을 **약680m·FOV60 근접 전경**으로 촬영한다. 전체 코스 bounds Fit은 더 사용하지 않는다. 수직 Landscape Trace로 지면 높이를 맞추고 원본 World 경로·맵 해시를 확인한다. 촬영 중 Fog와 시작/목표 디버그 표시를 Editor/Game 양쪽에서만 숨기고 모두 원복하며 Atmosphere/Cloud는 표시한다. 맵은 저장하지 않는다. 결과는 `Saved/Automation/CodexRacingNear_20261020/RacingMapN_near.png`, 재사용 PNG는 `SourceArt/Racing/RacingMapN_NearView_20261020.png`다. 사진 확인 뒤 `Tools/Validation/Invoke-ControlDeviceArtworkImport.ps1 -RacingPreviews -RacingNear`가 기존 DA를 백업하고 새 `T_RacingMapN_NearView_20261020`을 Thumbnail/BriefingImage에만 연결한다. MissionMap/RecordCourseId·랜덤도시 '?'는 유지한다. 옛 Close/CoursePreview 사진과 Texture도 삭제하지 않는다.
+
+### 시작 오프닝 영상
+
+- 프로젝트 `Content/Movies/Main_cinematic.mp4`는 사용자 제공 원본과 SHA-256이 동일한 복사본이다. H.264/AAC·1920×1080·30fps·약79초·148,658,835B. 외부 E드라이브 경로를 런타임에서 참조하지 않는다.
+- `ADroneFrontEndPlayerController`가 새 GameInstance의 Boot에서 `UDroneOpeningMovieWidget`을 타이틀 위에 한 번 표시한다. 정상 종료·Esc·패드 ○는 영상/소리를 정리하고 타이틀 포커스를 복원한다. 로비/미션에서 타이틀로 돌아올 때는 다시 재생하지 않는다. 파일 없음·디코더 실패·열기 시간 초과도 타이틀로 넘어간다.
+- FrontEnd PlayerController Class Defaults의 `bPlayOpeningMovie`로 켜고 끈다. `OpeningMovieWidgetClass`에 해당 C++ 클래스의 BP 자식을 지정하면 `MovieFilename`(Content/Movies 안 파일명), `OpenTimeoutSeconds`(기본10초)를 조정할 수 있다. 영상은 16:9 비율 유지, 남는 화면은 검정 여백이다.
+- `Drone.Build.cs`에 MediaAssets/AudioMixer, `.gitattributes`에 MP4 LFS, `DefaultGame.ini`에 `bSkipMovies=False`·`NonUFSMovies=Main_cinematic`을 설정했다. StartupMovies에는 등록하지 않아 중복 재생을 피한다. 다른 PC는 사용자 Commit/Push 후 LFS 영상까지 받아야 한다. 실제 패키징/배포판은 미검증이다.
+- `Drone.UI.OpeningMoviePIE`는 실제 파일 디코딩·재생 시간 진행·1920×1080 트랙·Unreal 내부 Esc 입력→타이틀 버튼 포커스 복귀를 검사한다. 숨김 렌더 캡처로 실제 영상도 확인했다. 무음 실행이므로 청감·자연 종료까지의 전체 재생·실제 패드는 별도다. 사용자 시험은 새 Play → 영상/소리·비율 → Esc/○ → 타이틀 입력, 다음 새 Play의 자연 종료·로비 복귀 시 재재생 없음이다. 자동 마우스/키보드나 보이는 Editor 조작은 사용하지 않는다.
 
 ### Story 선택 화면: 제공 Select_UI 연결·배치
 
@@ -91,6 +113,8 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 선택 목록 이름 끝의 `(시험)` 등 괄호 부연은 표시할 때만 제거한다. DA 원문·설명/툴팁·영문 부제·MissionId·맵 경로·기록 키는 유지한다. `Drone.UI.FontContract / PlayerWidgetFontsPIE / SelectionDisplayLabelContract`와 `Tools/Validation/AuditDroneUIFontSources.py`가 이 경계를 확인하며 실행 결과는 WORKLOG를 따른다.
 
 ### 직접 WBP를 만들 때 유지할 API와 이름
+
+외부 WBP의 미션 선택은 `SelectLobbyMission(MissionId)`를 사용한다. 이 API가 Flow 선택·사진 미리보기·예약된 패드 포커스를 함께 맞추므로, 브리핑 전에 이전 카드로 되돌아가지 않는다. 미리보기와 선택을 따로 손대지 않는다. 레이싱 DA의 `SecondaryInfoText`도 해당 코스에 맞게 적고 숨김 Circuit_Test의 옛 ‘7개 체크포인트’ 문구를 복사하지 않는다.
 
 - 5메뉴 API는 OpenLobbyForCategory/OpenStoryLobby/OpenRacingLobby/OpenTutorialLobby/RequestExitGame이며 TitleMenuClass는 WBP_DroneFiveItemMenu의 StoryButton/RacingButton/TutorialButton/SettingsButton/ExitButton과 OnStoryRequested/OnRacingRequested/OnTutorialRequested/OnSettingsRequested/OnExitRequested 계약을 지킨다. FinishOpeningTrailer·OpenTrainingLobby는 호환용. 선택/확정 SelectLobbyMission/ConfirmSelectedMission, 브리핑 FinishMissionBriefing, Back NavigateBack을 유지한다.
 - FrontEnd 필수 이름은 `OpeningPanel / LobbyPanel / MissionBriefingPanel`, `ContinueButton`, `OpeningTitleText / LobbyTitleText / LobbyStatusText`, `MissionSelectButton / MissionSelectButtonText`, `MissionNameText / MissionDescriptionText / MissionMetaText`, `StartMissionButton`, `MissionBriefingTitleText / MissionBriefingBodyText`, `FinishMissionBriefingButton`이다. Back 버튼은 `LobbyBackButton / BriefingBackButton`으로 연결한다.
@@ -134,14 +158,14 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 
 - Actor: 보존된 공유 시험장의 `TutorialMissionTest_OrbitCourse` (`BP_DroneTrainingCourse`)를 바탕으로 독립 Heading 맵의 Orbit Station을 구성했다. 현재 DA는 독립 맵을 사용하며 기존 공유 Hover/다른 배치는 보존했다.
 - Spline: 반지름 약 10m, 닫힌 곡선. 위치/반경/고도는 시험용 값이며 최종 난이도가 아니다.
-- 순서: 시작 Gate 0 → 체크포인트 1~7 → 결승 Gate 8 → Return Zone.
+- 순서: 시작 Gate 0 → 체크포인트 1~7 → 결승 Gate 8 → 즉시 클리어(별도 귀환 없음).
 - 결승은 Spline 전체 길이 L에 두어 **7/8 바퀴를 돌고 완료하는 오류를 막는다**. 시작 Gate와 겹치지 않도록 결승만 진행 방향으로 2.5m 떨어뜨렸다.
 - Rule Event: `TrainingLap`, TargetId: `Tutorial.Orbit.Course`. 기존 게이트 수업은 `Tutorial.GateFlight.Course`다.
 - Director가 Tag에 맞는 코스 Recorder만 구독하고 다른 코스 선/Trigger를 끈다. HUD도 동일한 Recorder를 사용한다.
 - 원순서 건너뛰기, 역방향 통과, 제자리 Yaw, 다른 코스 완주는 이 목표를 완료시키지 않는다.
 - Course Spline, Automatic Gate Count/배치, Gate Scale/크기와 Rule Time Limit은 BP/맵 Details에서 조절한다. 변경 후 순서·결승 위치를 다시 테스트한다.
 
-구현 책임: Course가 경로와 Gate 생성, Gate Sequence가 순서/정방향, Lap Recorder가 시간·거리·평균 속도, Mission Director가 Lap→귀환→결과 전환을 맡는다.
+구현 책임: Course가 경로/Gate 생성, Gate Sequence가 순서/정방향, Lap Recorder가 시간·거리·평균 속도, Mission Director가 Lap→결과 전환을 맡는다. 옛 Return Zone은 이 수업 완료 조건이 아니다.
 
 ## 6. 실제 드론 Mode 1 / Mode 2는 물리 모드인가
 

@@ -26,7 +26,7 @@
 | 역할 | 현재 Pawn/제공 모델 | 역할 고유 기능 | 다음 확인·구현 |
 |---|---|---|---|
 | 정찰 드론 | `BP_DroneScoutIntegration`; DroneSpy 본체·카메라·로터 4 | 거리·화각·LOS 유지형 Scan과 Training 표적 구현 | 모델 스케일/방향·Scan 체감, 최종 UI/FX |
-| FPV 자폭 드론 | `BP_DroneFPVIntegration`; FPV 본체·로터 4, FPV 기본 시점 | 명시적 Arm·최소 속도 충돌·1회 폭발, 제공 Niagara/Cue 연결 | 폭발 크기/청감·Mission별 Damage 조정 |
+| FPV 자폭 드론 | `BP_DroneFPVIntegration`; FPV 본체·로터 4, FPV 기본 시점 | 출격 시 자동 무장·해제 잠금·유효 충돌1회 폭발, 제공 Niagara/Cue 연결 | 실제 비행 체감·폭발 크기/청감 조정 |
 | 드랍 드론 | `BP_DroneDropIntegration`; Delivery 본체·카메라·로터 6·Bag 선적재 화물 | 탑뷰·투하·착지 잔류·목표 자동 선택·근접 적재·Actor 재투하, 초기/재픽업 파지 통일 | 집게 외형 수동 확인, FX와 Mission별 투하 규칙 |
 | 광섬유 드론 | `BP_DroneFiberOpticIntegration`; DroneSpy Body·분리 Rotor 4개, 공급 GSU 통, 1인칭 기본 | `JammingImmunity + ImpactDetonation`, 통 상단→지나온 지면 Spline과 처진 마지막 구간 구현 | Spy 본체와 GSU 위치·크기·케이블 굵기 화면 조정, 충돌 자폭·재밍 Zone 면역 확인, Mission 3 교대 연결 |
 | 지상 드론 UGV | `BP_DroneGroundUGVIntegration`; GC Drone 1 Skeletal Visual | W/S 전후·A/D 조향·Q/E 제자리 회전, 최초 장거리 지면 획득, 4점 지면 높이/Pitch/Roll 추종, 공중 바람 Drift 차단 | 높은 Spawn→접지·Mesh 위치·스케일·경사/단차 추종 화면 확인, 무장·연료와 Mission 3 교대는 후속 |
@@ -187,10 +187,12 @@ FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조�
 | 역할 | 좌클릭 / 패드 RB: Primary | 우클릭 / 패드 LB: Secondary |
 |---|---|---|
 | 정찰 | 거리·화각·LOS를 만족하는 가장 가까운 미완료 Target Scan | 진행 중 Scan 취소 |
-| FPV 자폭 | 충돌 자폭 Arm | Disarm |
+| FPV 자폭 | 변경 없음(출격부터 자동 무장) | 해제 불가(현재 잠금) |
 | 드랍 | 적재 중이면 투하, 비어 있으면 300cm 안의 가장 가까운 운반 화물 적재 | 탑뷰 진입/복귀 |
 
 이 키는 기능 검증용 임시값이다. 최종 키보드·마우스·Gamepad 배치는 현재 미정이다.
+
+자폭 On/Off는 현재 사용자 결정으로 막았다. 무장 키 없이 차량을 직접 타격하며, 기본 피해·차량/NPC 사망 처리는 [차량·피해 가이드](DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md#차량-피해자폭npc-사망)를 따른다. 정찰/드랍의 Primary·Secondary와 UGV 무장은 유지한다.
 
 역할 표적 `RoleTest_*`는 `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`에 있다. 직접 Play로 확인하거나 FrontEnd 타이틀 메뉴→로비 선택→브리핑→기체 선택→출격 흐름을 사용한다. Production `Lvl_DroneTraining`에는 해당 표적이 없다.
 

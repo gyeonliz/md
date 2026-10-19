@@ -1,14 +1,85 @@
 # Drone 기능 시험 맵 가이드
 
-현재 첫 수업은 `TestMap/Tutorial/Lvl_Tutorial_Observer_Test`의 고정 사람 눈높이 관찰 시점에서 이륙→전진→후진→실제 착지를 확인한다. 기존 Hover ID·8수업 순서는 유지한다. 조정·검사 순서는 [Training 저작 가이드](../tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md)의 Observer 절을 따른다. 실제 접지 전에는 착지가 완료되면 안 된다.
+현재 첫 수업은 `Tutorial/TUT_LOS`의 BP_LOS 뒤쪽 고정 관찰 시점에서 이륙→전진→후진→실제 착지를 확인한다. 기존 `Mission.Tutorial.Hover` ID는 유지한다. 보존된 Observer TestMap은 별도 경량 회귀용이다. [Training 저작 가이드](../tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md)의 Observer 절을 따르며 실제 접지 전에는 완료되면 안 된다. 다른 수업/Story의 추가 귀환은 제거했다.
 
 Story 선택은 `Lvl_DroneFrontEnd`에서 Select_UI 배치·Pretendard 실제 문구·4개 목록→START→브리핑/Back을 확인한다([UI 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)). 물리 Sandbox에서는 공유 매듭 PBD 그물의 중력/국소 접촉과 일반 벽의 로터 외곽 반발을 시험한다([물리 가이드](DRONE_CHAOS_DATAFLOW_PLAN.md)). 적용·자동 검증·수동 대기 결과의 정본은 [STATUS](../../STATUS.md)다.
 
-팀원 환경 역할은 Battlefield=M1/MilitaryBase=M2·M3/MilitaryCamp=M4이며, 승인된 그물·전달 지점·무인 포탑·재밍 레이더 배치와 실제 Story DA의 제품 맵 연결 완료는 별개다. 재밍은 영상 Noise→NO SIGNAL·입력 차단이고 속도 배율은 바꾸지 않는다. 광섬유 면역·구역 이탈 복원은 [Mission 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md)를 따른다. Production Training은 시험 저장하지 않는다.
+Story DA는 Battlefield=M1/MilitaryBase=M2·M3/MilitaryCamp=M4로 연결했고 기존 목표 Tag/수량에 맞는 Runtime Placement를 추가했다. 승인 표식/NPC/맵은 보존한다. **제품4맵 전체 플레이 검증은 아직 아니다.** 재밍 Noise→NO SIGNAL·입력 차단/광섬유 면역·이탈 복원은 [Mission 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md)를 따르며 속도 배율은 유지한다. Production Training은 시험 저장하지 않는다.
 
 기존 튜토리얼8개·Story4개·Racing 시험맵은 보존한다. 아래 날짜가 붙은 예전 맵 설명/검증은 당시 기록이며 최신 위치·정책은 위 가이드와 STATUS를 우선한다.
 
-기준일: 2026-09-29
+현재 절차 기준: 2026-10-20 C PC. 과거 수행 수치/실패 정정은 WORKLOG 정본이다.
+
+## 현재 미션 연결과 확인 순서
+
+목표를 스포이드로 교체하고 나침반에 표시하려면 새 `BP_DroneMissionTargetManager`를 배치한다. `/Game/Drone/Maps/TestMap/Lvl_MissionCompassTest`의 A/B·DECOY 예제를 직접 Play할 수 있다. 설정·원래 MissionManager와의 차이는 [미션 연결 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md#스포이드-목표-연결과-나침반)를 따른다. 기존 제품 맵에는 자동 배치하지 않았다.
+
+FrontEnd → 튜토리얼/스토리 → 미션 선택 → 브리핑/기체 → 출격으로 확인한다. `Diagnostics.Feedback.MissionAssets -DroneNoReturnAudit`는 월드를 열지 않는 읽기 전용 DA 계약 검사다. `-DroneApplyMissionFeedback / -DroneRemoveAllMissionReturns`는 DA 백업/저장 옵션이므로 재검증에는 붙이지 않는다. 이번 원본은 Unreal `Saved/Backups/CodexMissionNoReturn_20261020`, 이전 연결 원본은 `Saved/Backups/CodexMissionFeedback_20261020`에 있다.
+
+| 수업/미션 | 현재 연결 | 클리어/확인 경계 |
+|---|---|---|
+| LOS | `Tutorial/TUT_LOS` | 후퇴한 관찰 시점, 이륙/전진/후진/접지 수업 유지 |
+| 호버/전진/원형 | `TUT_Hover / TUT_Forward_Gate / TUT_Circle_Gate` | 3초 유지/Trigger/완주 뒤 즉시 성공, 별도 귀환 없음 |
+| 물자 운반 | `Tutorial/TUT_Delivary` | 준비 중 해제. 빈 집게→접근/집기→표적 투하 성공, 귀환 없음 |
+| 포탑 파괴 | `Tutorial/TUT_UGV_Turret` | 준비 중 해제. 실제 자동포탑200HP, 유탄2발 파괴→성공 |
+| M1 GoldenTime | `Lvl_Battlefield` | 기존 물자 전달 목표/Tag 유지·실행 중 표적 보충 |
+| M2 Intercept | `Lvl_MilitaryBase` | 기존 차량 파괴 목표, 미지정 경로만 임시 직선60m. 실제 도로/장애물 검증 필요 |
+| M3 VeilBreaker | `Lvl_MilitaryBase` | 기존 재밍/정찰·파괴 규칙 유지, 기존 레이더 Tag 재사용 |
+| M4 Endgame | `Lvl_MilitaryCamp` | 기존 지휘표적3개 규칙 유지·실행 배치. RAM 부족으로 월드 검사 미실행 |
+
+Runtime Spawn의 `bRelativeToMissionStart / bSnapToGround / TaggedActorCountToSkip`를 DA에서 조정한다. 같은 클래스와 첫 Tag가 충분하면 중복 생성하지 않는다. `bSnapToGround`가 켜진 재사용 표적은 지형에 묻힌 경우만 위로 보정하며 XY·회전은 보존한다. M1은 재사용 표적이 보정에서 빠져 위쪽 Shack에 투하물이 먼저 닿던 문제를 이 경로로 수정했다. 시작 표식은 읽기만 하고 Production 맵을 저장하지 않는다. 미션 ID·Story Fact·분기·제한시간/기체 선택은 보존했다. 미구현 단말 회수/요원·잔해 Scan·한 미션 기체교대·최종 엔딩까지 완성한 것은 아니다.
+
+실제 TUT 자동 검사는 `Drone.Tutorial.TUTMapLaunchPIE.{LOS,Hovering,Forward,CircleGate,FPV,Payload,UGVTurret}`다. LOS는 4단계·실제 접지, 물자는 집기/투하 이벤트, 원형은 Gate 순서 통과, 포탑은 피해/파괴 이벤트로 성공을 확인한다. 같은 검사 경로의 `StoryM1 / StoryM2 / StoryM3 / StoryM4`는 실제 제품 맵을 연다. M1은 물리 투하, M2는 이동 차량 후방 Sweep 자폭, M3는 실제 Overlap 진입/완전 이탈, M4는 지휘표적3개 피해/파괴 경로다. `-NullRHI` 실행은 목표·결과 로직만 검증하며 화면 Pass가 아니다. 자동 위치 이동은 손 조종 완주와 다르다. 최신 판정은 STATUS/WORKLOG, 화면·장치 조정은 [UI 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#훈련-사진조작-장치-그림시작-위치)를 따른다.
+
+### 귀환 정책을 유지하는 방법
+
+- LOS(`Mission.Tutorial.Hover`)만 이륙→전진→후진 복귀→실제 착지의 4단계를 유지한다. 완료 전 출발점 접지가 필요하다.
+- 다른 Tutorial·Story는 본목표를 마치면 바로 성공한다. 별도 ReturnToBase Rule·ReturnZone 실행 배치·로비/브리핑/시작 안내의 낡은 귀환 문구를 넣지 않는다. 메뉴의 뒤로가기/로비 복귀와 NPC 순찰 복귀는 별개로 유지한다.
+- `UDroneMissionDefinition::RemoveReturnRequirements()`는 이관/저작 도구가 저장 전에 명시적으로 호출한다. 자동 로드 중 DA를 고치는 기능이 아니며 LOS는 변경하지 않는다. `HasReturnRequirements()`는 **금지된** 귀환 요구 검사이므로 LOS에서는 false여도 후진/착지가 남아 있는 것이 정상이다.
+- 옛 저작 스크립트8개의 Mission 저장 경로에도 정리를 연결했다. 기존 맵 안의 범용 ReturnZone은 삭제하지 않으며 현재 DA에서 요구하지 않으면 클리어 조건이 아니다. 자유 게이트 수업은 여전히 준비 중이다.
+
+## 대형 맵을 메모리 보호 상태로 검사하기
+
+Unreal 저장소에서 `Tools/Validation/Test-RemainingMapsIsolated.ps1`을 사용한다. 기존 Editor가 Drone을 열고 있으면 실행을 거부한다. 각 맵마다 숨김 렌더 검사 엔진을 새로 만들고 종료를 확인한 뒤 다음 맵으로 넘어간다. 맵/전체 자산 저장·Commit/Push는 하지 않는다.
+
+```powershell
+# Unreal 저장소 위치에서 실행. 한 맵만 먼저 검사한다.
+& ./Tools/Validation/Test-RemainingMapsIsolated.ps1 -MapNames Lvl_NPCSmartObjectGreybox
+# Editor+PIE 복제로 메모리 한계에 걸리는 MilitaryCamp의 독립 게임 진입 검사.
+& ./Tools/Validation/Test-RemainingMapsIsolated.ps1 -MapNames Lvl_MilitaryCamp -Standalone
+```
+
+물리 RAM 여유 3GB 또는 커밋 여유 4GB 미만이면 **자신이 만든 PID/로그 경로가 일치하는 검사 엔진만** 중단한다. MilitaryCamp는 시작 전에 물리 RAM20GB 여유를 요구하며 부족하면 엔진을 띄우지 않고 `PreflightMemory`로 남긴다. 독립 렌더도 한 번 통과 후 재실행에서 보호 중단되어 이 방식의 안정성이 보장된 것은 아니다. 맵당 기본 300초 제한이며 임계값을 낮춰 억지로 통과시키지 않는다. 일반 PIE와 `-Standalone`의 독립 게임 월드는 다른 검사이며, `-NullRHI`는 화면을 그리지 않으므로 시각 검증으로 세지 않는다. 독립 게임 검사는 요청 맵 일치·BeginPlay·드론 빙의를 확인하며 실제 조종/완주는 별도다.
+
+`Saved/Automation/CodexIsolatedMaps_*/summary.json`에서 Pass/MemoryGuard/Timeout/MissingPackage, 최소 여유 메모리, 최대 프로세스 메모리, 맵 SHA 불변, 빙의 로그를 확인한다. 원시 `engine.log`의 외부팩 경고도 함께 본다. 이 검사에서 로그 경고를 별도 수집하므로 빙의 Pass가 무경고를 뜻하지 않는다. 현재 결과와 수치는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
+
+삭제된 옛 `Tutorial/Training1`, `Training2`, `training1_1`은 현재 맵이 아니다. 검사 목록의 오래된 경로 때문에 이전 월드를 대신 검사하지 않도록 패키지 존재·LoadMap 성공·PIE 준비를 확인한다. 현재 수업별 TUT 맵은 해당 전용 테스트로 검사한다.
+
+### 외부팩 경고를 확인할 때
+
+- MOUT `BP_MountedLadder_Slider`는 첫 사다리/덮개 조각의 이전 인덱스가 -1일 때 Attach를 건너뛰고, `BP_ElectricityPole`은 마지막 기둥 뒤의 없는 기둥을 읽지 않도록 소비자 앞에 `IsValidIndex → Branch`를 둔다. Get 뒤의 IsValid만으로는 순수 Get의 범위 오류를 막지 못한다. 유효 구간·원본 맵·인스턴스 설정은 보존한다.
+- OilRig/Preview의 `SM_CL_wall_1`만 Nanite를 끄고 원래 유리/벽 재질과 LOD를 사용한다. 반투명 유리는 이 메시의 Nanite와 호환되지 않는다. 다른 메시·전체 렌더 품질·기상 설정은 바꾸지 않는다. 무조건 빨라진다는 뜻은 아니며 최종 화면/성능은 별도 확인한다.
+- 수리 도구는 `Tools/AssetMigration/FixExternalPackWarnings.py`, 읽기 전용 그래프/참조 조사 도구는 `Tools/Diagnostics/InspectExternalPackWarnings.py`다. 최초 원본4파일은 `Saved/Backups/CodexExternalPackWarnings_20261019`, 수리 영수증은 `Saved/Automation/CodexExternalPackAudit/fixes.json`에 있다. 전체 폴더를 덮거나 맵을 재저장하지 않는다.
+- 실제 LOS 흐름의 `Drone.Flow.PauseMenuTutorialPIE`에서 배열 Script Msg/NodeGuid 경고가 없는지, OilRig/Preview의 정확한 단독 맵 검사에서 `Invalid material ... Nanite`가 없는지 확인한다. 최신 결과는 WORKLOG 정본이다.
+- MOUT 데모의 마우스 X/Y·패드 오른쪽 X/Y 시점4개는 실제 raw axis 이벤트로 연결했다. 기존 후속 노드/배율·입력 소비/일시정지/부모 바인딩 정책은 보존하고 전역 입력을 추가하지 않는다. 남은 이동2·Jump/PrimaryAction2의 입력 정책은 추측하지 않는다. 데모 노드를 삭제해 경고를 숨기지 않는다.
+- Modular Insurgents 스켈레톤의 옛 `/Engine/EngineMeshes/Humanoid` import는 현 엔진 재저장으로 정리했다. 본68개·기준 포즈·리타깃 모드/소스·GUID/호환 스켈레톤을 지문 비교해 새 프로세스에서 확인했다. 다른 리그를 대입하거나 본/애니메이션을 재제작한 것이 아니다. VSM 큐 초과·시작 프레임 CharacterMovement·호버 초기 포커스/NavMesh 경고는 별도 측정 대상이다.
+
+### MilitaryCamp에서 줄인 부분과 남은 분석
+
+게임/PIE·BeginPlay 없이 패키지 준비만으로도 메모리 보호에 걸렸으므로 AI 행동 반복이나 VSM만을 원인으로 단정하지 않는다. AssetRegistry만 읽는 `Tools/Diagnostics/AuditMilitaryCampDependencies.py`로 참조 수·텍스처 태그를 먼저 조사한다. 디스크 용량/텍스처 원시 처리량 추정은 실측 RAM이 아니다. 과거 20GB 전체를 자산별로 분해한 결과는 아직 없으며 상세 수치는 WORKLOG에만 둔다.
+
+- `DefaultEngine.ini [SystemSettingsEditor]`: Asset/Texture 준비 동시2·SkinnedAsset1·추정 작업 예산6GB다. 전체 프로세스 RAM 상한이 아니며 최종 품질 대신 준비 속도를 양보한다. 엔진의 단일 스킨 작업 예약치보다 낮은 예산은 오히려 강제 단독 실행 경고를 낼 수 있다. 검증 러너는 -game에서도 작업 동시성 플래그를 적용한다.
+- `T_Mountain_BC`: Source4097×4097은 보존하고 빌드에서만4096×4096으로 정규화한다. 원래 비압축/Mip1을 DXT1/Mip13·스트리밍으로 복구했다. Source GUID 불변이며 한 픽셀 리샘플링/압축의 최종 화면은 수동 확인 대상이다.
+- `T_Mountain_N`: Source/최상위8K를 유지하면서 Mip1→14·스트리밍을 복구한다. 전체 Mip을 모두 올리면 크기는 늘 수 있지만 원거리에서 최상위 Mip을 강제 상주시키지 않는다. 두 텍스처를 합친 고정 RAM 절감량으로 과장하지 않는다.
+
+적용 원본은 `Saved/Backups/CodexCampMemory_20261020`, 보고서는 `Saved/Automation/CodexCampMemory_20261020`다. 확인은 아래처럼 맵을 열지 않는 자산/설정 검사부터 한다. `-DroneRepairCampAssets`는 명시 저장 옵션이므로 일반 재검증에는 붙이지 않는다.
+
+```powershell
+& ./Tools/Validation/Test-RemainingMapsIsolated.ps1 -MapNames CampAssetVerify -MapPackage /Game/Drone/Maps/Lvl_MilitaryCamp -TestOverride Diagnostics.Camp.MemoryAssetsAndWarnings
+& ./Tools/Validation/Test-RemainingMapsIsolated.ps1 -MapNames CampBudget -MapPackage /Game/Drone/Maps/Lvl_MilitaryCamp -TestOverride Diagnostics.Camp.EditorBudget
+```
+
+`Diagnostics.Camp.PackageMemoryOnly`는 패키지만 읽어도 무거우므로 명시 `-DroneProfileCampPackage`와 여유20GB를 요구한다. 보호 중단 시 같은 실행을 반복하거나 DDC를 지우지 않는다. 일반 Python commandlet의 ConsoleVariable 기본값은 실제 Editor 적용값과 다를 수 있어 설정 확인은 `EditorBudget`을 사용한다. 실제 Camp의 렌더/PIE·장시간 안정성·피크 감소율은 메모리 확보 후 후속1회 검증이며 아직 Pass가 아니다.
 
 ## Shotgun 시선 안정화 확인 — 2026-10-04 C PC
 
@@ -104,16 +175,16 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 제작 중인 실�
 
 ## Tutorial Mission 시험 맵 배치
 
-`Lvl_DroneTutorialMissionTest`는 `BP_DroneMissionGameMode`를 사용하며 로비에서 선택한 다음 8개 Definition이 같은 맵을 공유한다.
+`Lvl_DroneTutorialMissionTest`는 보존된 종합 시험장이다. 로비 DA는 위 수업별 맵을 사용하며 아래는 현재 목표의 요약이다. 첫 LOS와 별도 호버 수업은 구분한다.
 
-- `DA_Mission_Tutorial_Hover`: Scout, Hover Zone 3초 → Return Zone
-- `DA_Mission_Tutorial_Forward`: Scout, 전방 Trigger 통과 → Return Zone
-- `DA_Mission_Tutorial_Heading`: Scout, 원형 코스의 시작·체크포인트 7개·결승을 정방향 완주 → Return Zone (2026-10-01 정정)
+- `DA_Mission_Tutorial_Hover`: LOS, 이륙→전진→후진→실제 착지. 별도 `Hovering`은 Zone3초 유지 즉시 완료
+- `DA_Mission_Tutorial_Forward`: Scout, 전방 Trigger 통과 즉시 완료
+- `DA_Mission_Tutorial_Heading`: Scout, 원형 시작·체크포인트7개·결승 정방향 완주 즉시 완료
 - `DA_Mission_Tutorial_GateFlight`: Scout, Gate 4개를 순서·정방향으로 통과
-- `DA_Mission_Tutorial_FPV`: FPV Strike, Arm 뒤 체력 100 표적 파괴
-- `DA_Mission_Tutorial_Payload`: Drop, Payload Target 적중 → Return Zone
+- `DA_Mission_Tutorial_FPV`: FPV Strike, 기본 무장 상태로 차량300HP 표적 파괴
+- `DA_Mission_Tutorial_Payload`: Drop, 실제 화물 집기/투하→Payload Target 적중 즉시 완료
 - `DA_Mission_Tutorial_UGV_NPC`: Ground UGV, 체력 100의 정지 적 NPC 처치
-- `DA_Mission_Tutorial_UGV_Turret`: Ground UGV, 체력 100 고정 포탑 Greybox 파괴
+- `DA_Mission_Tutorial_UGV_Turret`: Ground UGV, 체력200 자동포탑 파괴 즉시 완료
 
 맵 직접 Play보다 `/Game/Drone/Maps/Lvl_DroneFrontEnd` 로비에서 Mission을 선택해 들어가야 Director·목표 HUD·성공/실패 화면까지 확인할 수 있다. 배치 재생성은 다음 명령만 사용한다.
 
@@ -129,7 +200,7 @@ cd C:\URproject\drone
 
 2026-09-24 Figma `Project:Droner`의 Tutorial 상세를 읽기 전용으로 다시 확인했다. 기획상 전체 수업은 `호버링 → 전진 → 회전 → 게이트 자유비행 → 자폭 드론 → 드랍 드론 → UGV 적 NPC 처치 → 고정형 포탑 처치`의 8개다. 각 수업은 조작키·목표 브리핑, 시작, 플레이, 클리어 타임 UI를 반복하고 마지막에 전체 완료 UI가 나온다.
 
-현재 `Lvl_DroneTutorialMissionTest`에는 8개 수업의 독립 Mission Flow와 Station이 모두 있다. 회전과 게이트는 서로 다른 Tag의 `BP_DroneTrainingCourse`로 구분하고, UGV는 상부 조준 Pivot을 따르는 총·유탄 Projectile을 사용한다. UGV 총은 좌클릭/패드 Right Shoulder, 유탄은 우클릭/패드 Left Shoulder다. 독립 `Lvl_DroneRacingTest`는 로비 레이싱 탭에서 들어간다. [시작 화면·탭·원형 코스 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)를 함께 본다.
+보존된 종합 시험장의 Station과 현재 수업별 맵은 구분한다. 회전/게이트는 서로 다른 Tag의 `BP_DroneTrainingCourse`, UGV는 상부 Pivot을 따르는 총/유탄 Projectile을 쓴다. 현재 안내는 **총=좌클릭/L2, 유탄=우클릭/R2**, 기존 Shoulder 대체 입력은 삭제하지 않았다. 기본 레이싱은 팀원 맵1·2·3이며 옛 Circuit Test는 별도다. [UI/원형 코스 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)를 함께 본다.
 
 기능 판정과 독립 재시도는 구현됐지만 단계별 클리어 타임·8개 연속 진행·전체 완료 UI는 아직 없다. Figma의 Warehouse 사용 메모도 반영하지 않은 평면 Greybox다. 이 시험장에서 수동 체감을 확인한 뒤 검증된 Station만 팀원 Tutorial 환경에 수동 이식한다.
 
@@ -137,14 +208,14 @@ cd C:\URproject\drone
 
 항상 `/Game/Drone/Maps/Lvl_DroneFrontEnd`에서 Play하고 로비의 해당 수업을 선택한다. 맵을 직접 Play하면 선택 Mission이 없어 Director 전체 흐름을 확인할 수 없다.
 
-1. 호버링: Zone 안에서 속도와 자세를 안정시키고 3초 유지한 뒤 Return Zone으로 돌아간다.
-2. 전진: 시작점 앞 `TutorialMissionTest_ForwardGoal` Box를 통과한 뒤 Return Zone으로 돌아간다.
-3. 회전: 원형 안내선을 따라 Gate 0 → 1~7 → 결승 8을 순서대로 한 바퀴 통과한 뒤 Return Zone으로 돌아간다. 제자리 Yaw나 다른 코스 완주로 완료되면 안 된다.
+1. 호버링: Zone에서 속도/자세를 안정시키고3초 유지하면 즉시 성공한다. LOS 후진/착지 수업과 다르다.
+2. 전진: 해당 TUT의 전방 목표 Box를 통과하면 즉시 성공한다.
+3. 회전: Gate0 → 1~7 → 결승8을 순서대로 한 바퀴 통과하면 즉시 성공한다. 제자리 Yaw/다른 코스 완주로 완료되면 안 된다.
 4. 게이트: 네 Ring을 번호 순서와 Ring 로컬 `+X` 방향으로 통과한다.
-5. FPV: 좌클릭으로 Arm하고 충분한 속도로 `TutorialMissionTest_FPVTarget`에 충돌한다.
-6. 드랍: 좌클릭으로 화물을 투하해 Payload Target에 맞힌 뒤 Return Zone으로 돌아간다.
+5. FPV: 별도 무장 키 없이 충분한 속도로 TUT_FPV_Target 차량의 전/후/측면에 충돌한다.
+6. 드랍: 실제 화물 가까이 접근해 좌클릭 집기→표적 위에서 다시 좌클릭 투하한다. 적중 즉시 성공해야 한다.
 7. UGV NPC: 차체는 이동 입력으로, 상부는 시점 입력으로 조준하고 좌클릭 총 4발 이상을 적중시킨다.
-8. UGV 포탑: 좌클릭 총 또는 우클릭 유탄으로 고정 표적을 파괴한다. 유탄은 중력 낙차가 있으므로 포신을 위로 보정한다.
+8. UGV 포탑: 총8발 또는 유탄2발로200HP 포탑을 파괴한다. 중력 낙차를 보정하고 Niagara/소리·메시 잔해/정리·즉시 성공을 확인한다.
 
 ## Shotgun Systems 시험 맵 배치
 

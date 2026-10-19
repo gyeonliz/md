@@ -1,6 +1,6 @@
 # Mission 통합 프레임워크·NPC 이동 애니메이션 가이드
 
-현재 절차 기준: 2026-10-14 D PC. Mission 규칙·승인된 맵 배치·재밍 Radar·첫 수업 계약을 소스와 대조한다. 과거 날짜의 검증 기록은 당시 범위로 보존하며 새 변경의 실제 검증은 [STATUS](../../STATUS.md)·[WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. Production `/Game/Drone/Maps/Lvl_DroneTraining`은 시험용으로 수정하지 않는다.
+현재 절차 기준: 2026-10-20 C PC. Mission 규칙·스포이드 대상 연결/나침반·맵 배치·재밍 Radar·첫 수업 계약을 소스와 대조한다. 날짜별 실행 결과는 [STATUS](../../STATUS.md)·[WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. Production `/Game/Drone/Maps/Lvl_DroneTraining`은 시험용으로 수정하지 않는다.
 
 2026-10-02 새벽 후속(C PC, ec2e88f + 로컬 미커밋, Claude 구현·Codex 문서 반영): Mission DA `Mission Definition|Progression → NextMissionId`로 Story M1 골든타임→M2 인터셉트→M3 베일브레이커→M4 엔드게임(끝)을 연결했다. 성공 결과 [다음]·로비 순서가 연결을 따르며 M2→M3 결과 분기는 현재 미정이다. 튜토리얼 8개 연결·시간·완료 UI는 [튜토리얼 가이드 5절](DRONE_TUTORIAL_IMPLEMENTATION_TEST_GUIDE.md#5-tutorial-전용-ui-구현)을 따른다.
 
@@ -13,6 +13,7 @@ Story Mission을 만들 때 매번 Level Blueprint에 목표 판정을 새로 �
 | Blueprint | 역할 |
 |---|---|
 | `/Game/Drone/Managers/BP_DroneMissionManager` | 선택한 Mission Definition의 순서형 목표, 진행 수량, 제한 시간, 성공·실패, Story Fact를 관리한다 |
+| `/Game/Drone/Managers/BP_DroneMissionTargetManager` | 맵에 직접 배치. 스포이드로 고른 대상과 실제 미션 판정·나침반 마커를 연결한다 |
 | `Blueprints/Managers/BP_DroneMissionPlayerController` | 출격 Drone과 위 Manager를 생성하고 Mission HUD·결과 Flow를 연결한다 |
 | `Blueprints/Managers/BP_DroneMissionGameMode` | Story/Test Mission 맵에서 위 PlayerController를 사용하게 하는 GameMode다 |
 | `Blueprints/Triggers/BP_MissionObjectiveTrigger` | Box Overlap을 Mission Objective Event로 보고한다 |
@@ -28,7 +29,8 @@ Blueprint는 빈 표시용 껍데기가 아니다. 공통 판정은 C++ 부모 �
 
 ```text
 /Game/Drone/Managers
-└─ BP_DroneMissionManager
+├─ BP_DroneMissionManager
+└─ BP_DroneMissionTargetManager
 
 /Game/Drone/Mission
 └─ Blueprints
@@ -54,7 +56,48 @@ Blueprint는 빈 표시용 껍데기가 아니다. 공통 판정은 C++ 부모 �
 /Game/Drone/Maps/Lvl_MilitaryCamp  # M4 역할 확정
 ```
 
-Mission의 규칙과 맵 배치를 분리한다. 예를 들어 “차량 파괴 1회”는 Mission Definition의 Objective Rule이고, 어떤 차량·경로·위치인지는 맵 Actor와 Actor Tag가 담당한다.
+Mission의 규칙과 맵 배치를 분리한다. “차량 파괴 1회”는 DA의 Objective Rule, 어떤 차량인지는 맵의 스포이드 연결 또는 기존 Actor Tag가 담당한다. Data Asset은 여러 맵에서 공유되므로 맵 액터 스포이드를 DA 안에 넣지 않는다.
+
+## 스포이드 목표 연결과 나침반
+
+필요한 이유는 DA의 Tag 문자열과 맵의 실제 대상을 따로 고치다가 서로 달라지는 일을 줄이기 위해서다. 규칙은 DA에, 월드 액터 참조는 배치한 매니저에 둔다.
+
+담당 클래스는 `ADroneMissionTargetManager`(선택 대상/표시 캐시) → `ADroneMissionDirector`(선택 대상 사건 검증/코스 연결) → `UDroneFlightHUDWidget`(나침반 렌더)다. 헤더에는 편집 가능한 TargetBindings·MissionId·색/표시 옵션을, CPP에는 캐시 갱신·기존 Tag 폴백·방위 계산/마커 숨김을 추가했다. 아래 BP 설정에는 C++ 수정이 필요 없다.
+
+### 바로 사용하는 순서
+
+1. 사용할 미션 맵에 `/Game/Drone/Managers/BP_DroneMissionTargetManager`를 **1개 배치**한다. 기존 `BP_DroneMissionManager`(Director)는 Controller가 만들므로 추가로 배치하지 않는다. 팀원 Production 맵을 시험용으로 저장하지 않는다.
+2. 배치한 인스턴스의 **Details → Drone → Mission Targets → Target Bindings**에서 `+`를 누른다. BP Class Defaults가 아닌 레벨 인스턴스에서 설정해야 스포이드가 나온다.
+3. DA `ObjectiveRules`에서 바꿀 목표의 **ObjectiveId**를 복사한다. 또는 기존 **TargetId**로 연결해도 된다. 둘 다 쓰면 둘 모두 일치해야 한다. 맵을 여러 미션이 공유하면 매니저의 `MissionId`도 지정한다.
+4. 그 항목의 **Targets → + → 스포이드**로 차량/포탑/배달 받침/Trigger/레이더/코스 등 **실제 사건을 보고하는 액터**를 찍는다. 여러 대상이면 배열에 각각 추가한다. 선택 액터에 같은 Tag를 따로 붙이지 않아도 된다.
+5. 기본 `bOverrideMissionTarget=True`면 그 목록만 실제 미션 대상으로 인정한다. 이전 Tag를 가진 다른 물체를 파괴해도 진행하지 않는다. 명시적 항목의 Targets가 비어 있으면 잘못된 옛 대상으로 대체하지 않고 진행을 막는다.
+6. 출격하면 HUD 상단 나침반에 금색 마름모·거리/이름이 나온다. 정면=중앙(12시), 오른쪽/왼쪽=해당 방위, 표시 범위 밖/뒤=가장자리 방향 표시다. 기체 Yaw 기준으로 기존 나침반 눈금과 같은 좌표계를 쓴다.
+7. 대상을 움직이면 마커도 따라가고, HP0/액터 제거·목표 변경/미션 종료 때 해당 마커가 사라지거나 다음 대상으로 바뀐다. 코스 액터는 코스 중심 대신 현재 통과할 Gate를 가리킨다. 코스 스포이드 교체는 실제 Lap Recorder도 같은 코스로 연결한다.
+
+### 모드와 조정값
+
+| 목적 | 설정 |
+|---|---|
+| 기존 미션 대상으로 나침반만 빠르게 추가 | 매니저만 배치·TargetBindings는 비움. 기본 Follow Current Objective가 현재 Rule TargetId를 자동 해석 |
+| 현재 목표를 스포이드 목록으로 교체 | 해당 ObjectiveId/TargetId + Targets, Override Mission Target=True |
+| 판정은 유지하고 참고 마커만 표시 | Override Mission Target=False. ObjectiveId/TargetId 둘 다 비우면 미션 진행 중 상시 참고 표식 |
+| 미션 없는 별도 시험에서도 수동 마커 표시 | Follow Current Objective=False, MissionId/항목의 ObjectiveId·TargetId 비움, Targets 지정 |
+| 이름/색/거리 | 각 항목 MarkerLabel·MarkerColor, 매니저 ShowDistance |
+| 표시 수·검색 간격 | 매니저 MaximumMarkers 기본8(1~16), RefreshIntervalSeconds 기본0.5초. HUD 전체16개 상한·중복 대상 제외 |
+| HUD 표시/간격 | 실제 HUD WBP Class Defaults: ShowCompassTargets, CompassTargetVerticalOffset. 나침반 가로 배율은 기존 CompassPixelsPerDegree |
+
+명시적 연결은 선택한 액터를 바꾸는 기능이지 임의 StaticMesh에 체력/정찰/투하 기능을 자동 생성하는 기능이 아니다. 파괴 대상에는 `UDroneHealthComponent`·피해 충돌이, 정찰/투하 대상에는 각각 기존 Recon/Payload Target Component가 필요하다. Trigger는 `bUseOverlappingActorAsEventActor`에 따라 자기 자신/진입 액터 중 누가 사건을 보고하는지 맞춰 찍는다. LOS 특수 수업은 복귀/접지 규칙을 그대로 유지한다.
+
+DA에서 **Event·RequiredProgress·TimeLimitSeconds·순서/분기**를 조정한다. 대상3개를 찍어도 RequiredProgress가1이면 하나로 끝난다. RuntimeSpawnActors는 별개라 기존 기본 표적 생성도 끄려면 해당 DA 배치를 함께 조정한다. BP로 런타임 Targets를 바꿨으면 `RefreshTargets()`를 호출하고, 새로 Spawn한 일반 표적의 체력 이벤트는 `Director.RegisterObjectiveTarget()`에 연결한다. 배치형 기존 표적은 출격 때 자동 구독한다.
+
+### 구조·검증·문제 확인
+
+- 헤더/CPP: `ADroneMissionTargetManager`가 레벨 액터 참조/표시 캐시를 소유하고 `ADroneMissionDirector`가 같은 목록으로 사건을 검증한다. `UDroneFlightHUDWidget`의 HudKit Paint가 기존 나침반 위에 그린다. 맵/DA/배치 액터의 Tags를 몰래 수정하지 않는다.
+- 테스트 맵: `/Game/Drone/Maps/TestMap/Lvl_MissionCompassTest`. 직접 Play→UGV 선택/출격. 앞 A/B는 태그 없이 스포이드로 연결됐고 뒤 DECOY는 옛 태그가 있지만 대상이 아니다. A/B 파괴 시 진행1/2→성공, 별도 귀환 없음. 데모 DA는 로비 숨김·기존 수업/Story 진행과 분리했다.
+- 정상: A 정면 마커·B 우측 마커, 90° 돌면 A는 좌측, A 파괴 후 B만 남고 B 파괴 후 성공/마커0. 실제 손 조종·사격 감도 확인은 자동 순간이동/직접 피해 검사와 별개다.
+- 표시가 없으면 Enabled·MissionId/ObjectiveId 철자·Targets(None 여부)·Follow Current Objective·현재 미션 Active 여부·실제 HUD의 HudKit 사용을 확인한다. 대상 삭제/HP0도 표시하지 않는다. 자동 방식은 TargetId가 비어 있으면 임의로 맵의 첫 액터를 고르지 않는다.
+- 성능: Actor Tick 없이 목표 사건/Spawn 알림과0.5초 타이머로 캐시한다. HUD는 매니저를1초 간격으로 찾고, 프레임에는 제한된 대상 좌표만 읽는다. 가까운 방향의 이름은 겹치는 글자를 생략하고 마커는 유지한다. 전체 맵 매 프레임 검색·Trace/거리별 재질 생성은 하지 않는다.
+- 자동 검사: `Drone.Mission.CompassBearing / TargetPickerBinding / CompassTargetMapPIE.1280 / CompassTargetMapPIE.1920`. 실제 판정·수치는 WORKLOG 정본이다. 생성 도구 `BuildDroneMissionCompassTest.py`는 새 BP/DA/시험장만 만들고 기존 맵/BP를 재생성하지 않는다.
 
 ## 새 Mission 맵 연결 순서
 
@@ -62,7 +105,7 @@ Mission의 규칙과 맵 배치를 분리한다. 예를 들어 “차량 파괴 
 2. `World Settings → GameMode Override`를 `BP_DroneMissionGameMode`로 지정한다.
 3. Mission Definition DA를 `/Game/Drone/Data/Missions`(하위 폴더 포함)에 만들고 고유 `MissionId`, `MissionMap`, `LobbyCategory`, 허용/기본 기체와 `ObjectiveRules`·시작/성공/실패 규칙을 지정한다. **C++ 기본 목록을 수정하지 않아도 로비 Catalog에 자동 등록된다.**
 4. 맵에 필요한 Trigger와 Damage Target을 배치한다.
-5. Rule에 `TargetId`를 썼다면 대상 Actor의 `Details → Actor → Tags`에 정확히 같은 Name을 넣는다.
+5. 위 매니저에 스포이드로 대상을 지정하거나, 기존 방식이면 Rule `TargetId`와 같은 Tag를 대상 Actor에 넣는다.
 6. Front-end에서 해당 Mission을 선택해 맵에 진입하고 Drone을 선택한다.
 7. PlayerController가 Drone과 `BP_DroneMissionManager`를 자동 생성한다. Manager를 맵에 따로 배치하지 않는다.
 8. 시험 맵을 직접 Play하려면 `ADroneMissionTestEntry`를 부모로 하는 BP를 맵에 배치하고 `DefaultTestMission`에 DA를 지정한다. 이 Entry는 로비에서 선택한 활성 미션을 덮어쓰지 않는다. **Production 맵에서는 사용하지 않는다.** 직접 Play 목표·결과와 Front-end 선택/출격 흐름을 각각 확인한다.
