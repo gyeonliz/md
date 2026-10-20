@@ -15,9 +15,27 @@
 
 과거 `9de1ead` 기준 Production 맵 감사 결과는 Gate Actor 17개, Course Sequence 4개였다. 현재 맵 배치 개수의 증거로 재사용하지 않는다. 수동 배치 Gate를 자동 Handle 방식으로 전환하는 작업은 맵 담당 팀원이 진행한다.
 
+### 세 상태 색과 머터리얼 조정
+
+자유 게이트 수업은 `DA_Mission_Tutorial_GateFlight` → `/Game/Drone/Maps/Tutorial/TUT_FreeGate`에 연결돼 로비에서 출격할 수 있다. 이 맵의 `BP_DroneMissionTargetManager_목표연결`에서 코스를 스포이드로 바꾸고, 아래 MI로 코스의 현재/대기/완료 상태 색을 편집한다.
+
+기존 재질과 같은 `/Game/Drone/Tutorial/Materials`에 모았다. 부모 `M_DroneTrainingGate_States`를 열면 Color/EmissiveStrength와 Fresnel 테두리 노드를 편집할 수 있다. 일반 색 조절은 아래 MI를 더블클릭한다.
+
+| 상태 | 머터리얼 인스턴스 | 기본 색 / 발광 |
+|---|---|---|
+| 앞으로 통과할 게이트 | `MI_DroneTrainingGate_01_Waiting` | 흐린 청회색 `#68889F` / 0.35 |
+| 지금 통과할 게이트 | `MI_DroneTrainingGate_02_Current` | 노랑 `#FFD54F` / 3 |
+| 이미 통과한 게이트 | `MI_DroneTrainingGate_03_Passed` | 초록 `#56B896` / 0.75 |
+
+MI의 Color/EmissiveStrength를 바꾼다. Gate BP와 튜토리얼 배치 Gate는 **색상·발광은 머터리얼 인스턴스에서 조정**을 켜 두었다. 이를 끄면 BP의 Upcoming/Current/Completed Color·상태별 EmissiveStrength로 조정한다. 실제 통과 순서에 따라 상태 재질이 바뀌며, 새 MID를 자산 CDO에 저장하지 않는 기존 저장 수리는 유지한다. 팀원 Production Training 맵은 이번 작업에서 저장하지 않았다.
+
+### 헬기포트 외곽 프레임
+
+공용 메시 `/Game/Drone/ThirdParty/OilRig/Assets/helicopter_base/Static_Mesh/SM_helicopter_base_01`을 그대로 쓴다. Nanite가 아닌 표시 경로에서도 외곽 격자 프레임이 보이도록 Static Mesh Editor의 Nanite 설정을 `Generate Fallback=Enabled / Fallback Target=Percent Triangles / Fallback Percent Triangles=1.0 / Fallback Relative Error=0`으로 저장했다. Nanite는 켜 두며 원본 메시·재질·배치 Transform을 보존한다. Auto로 돌리거나 fallback을 크게 단순화하면 얇은 외곽 프레임이 사라질 수 있다.
+
 ### 첫 수업: 고정 관찰 시점 기초 조종
 
-첫 수업의 표시명은 `기초 조종 / BASIC FLIGHT`, 호환 ID는 기존 `Mission.Tutorial.Hover`다. 기존8수업 연결을 유지하면서 **사람 눈높이의 고정 카메라로 드론을 바라보고** 이륙→전진→후진→실제 착지를 연습한다. 사람 캐릭터를 새로 빙의하거나 드론 FPV로 바꾸는 수업이 아니다. 입력·빙의는 Drone에 남고 카메라만 Observer Actor를 사용한다.
+첫 수업의 표시명은 `LOS 시점`, 호환 ID는 기존 `Mission.Tutorial.Hover`다. 기존8수업 연결을 유지하면서 **사람 눈높이의 고정 카메라로 드론을 바라보고** 이륙→전진→후진→실제 착지를 연습한다. 사람 캐릭터를 새로 빙의하거나 드론 FPV로 바꾸는 수업이 아니다. 입력·빙의는 Drone에 남고 카메라만 Observer Actor를 사용한다.
 
 | 무엇을 여나 | 위치 |
 |---|---|
@@ -42,7 +60,7 @@ Class Defaults 또는 배치 Instance의 `Drone > Tutorial > Observer`:
 
 수동 확인 순서:
 
-1. FrontEnd→튜토리얼 첫 `기초 조종` 또는 전용 맵 직접 Play로 진입한다. 드론1대가 지면에 놓이고 사람 시점 카메라가 고정되는지 확인한다.
+1. FrontEnd→튜토리얼 첫 `LOS 시점` 또는 전용 맵 직접 Play로 진입한다. 드론1대가 지면에 놓이고 사람 시점 카메라가 고정되는지 확인한다.
 2. 쉬운 조작으로 이륙해 출발점 위 지정 높이에서1초 멈춘다. 전방 패드까지 이동해 멈춘다.
 3. **기체 방향을 돌리지 않고 후진**해 출발점 위로 돌아온다. 180° 돌고 전진해서 돌아오는 방식은 후진 성공이 아니어야 한다.
 4. 출발점에 낮은 속도로 실제 바닥에 착지해 멈춘다. 높이만 낮거나 공중에 멈춘 상태로 완료되면 안 된다.

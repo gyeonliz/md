@@ -4021,3 +4021,111 @@ Camp 실행 전 승인받은 Chrome·Discord·Steam·Epic·Claude·NexonPlug·�
 근거 정본은 `C:/URproject/drone/Saved/Automation/CodexMissionLayout_20261020/index.json`, 실제 시작/목표8장은 같은 폴더 Screenshots/StoryM1~4_Start/Target.png다. 마지막 M4 시작 캡처에는 실제 피격 흔들림이 있으므로 예쁜 무피격 사진/플레이 완성 근거로 쓰지 않는다. 실패/중간 실행은 형제 CodexMissionLayout 폴더에 보존하고 중복을 고유 통과 수로 합산하지 않는다. 한 맵 감사가 DA soft World를 읽으며 여러 맵을 로드하던 메모리 문제도 수정해 명시 단일 맵 감사는 DA World 읽기를 건너뛴다. 초기 보호 중단과 수정 뒤 단일 감사 결과를 구분한다.
 
 사용자의 수동 시작점 질문에 현재 코드의 패드 우선·DA Yaw 우선·여러 패드일 때 DA 근처 선택을 설명하고 Mission 배치 가이드에 절차를 추가했다. Camp 에디터는 켜 둔 채 M04_SM_helicopter_base_01을 선택했고 추가 무거운 검사는 하지 않는다. 초기900초 러너 보호를 같은 소유 PID의 ContinueGuard.ps1로 먼저 넘겼으며 RAM/커밋4GiB 보호는 유지한다. 원본 Base/Training·진행 저장 보존, Commit/Push 없음. STATUS30,559B·WORKBOARD29,578B로30KiB 아래라 이번 아카이브 이동은 없다. maintain-space는 기존 진행/시험/BP 페이지의 현재4블록만 갱신·읽기 재확인(sequence61/42/43)하고 수동 시작점 절차만 BP44로 보강·재확인했다. 별도 페이지·원시 로그/자산/이미지 업로드·공유 권한·Trello/Figma 변경은 없다. 미커밋 코드/맵/MD는 아직 다른 PC/GitHub에 전달되지 않았다.
+
+## 2026-10-20 D PC — 조작 그림·기체 사진·튜토리얼 권장창 개선
+
+- 사용자 요청: 최신화 후 겹치는 키 글자를 없애고 번호/아래 범례로 정리, RC LT/RT를 세로 스틱 형태로 변경, 바닥 있는 기존 사진 교체·없는 정찰 사진 촬영/연결, 튜토리얼 권장 안내 한글화. Codex가 직접 수행했다.
+- 기준: 실제 D:\JGY\project\drone HEAD=origin/main `6553f72f`, MD `dd16749`. Fetch 후 양쪽 ahead/behind0/0으로 추가 수신 없음. 현재 변경은 로컬 미커밋이며 새 Commit/Push·Trello·공유 권한 변경 없음. 수신 전 C PC 검증을 이번 실행으로 세지 않는다.
+- 조작 안내: `BuildDeviceArtwork`의 L/R·OPTIONS·LT/RT 등 글자/외부 칩/지시선을 제거, 26px 번호 배지로 정리했다. `FitDiagramArea`가 저장된 WBP의 옛 그림 자식도 갱신한다. 하단 키/동작 범례·입력 매핑·다른 Designer 설정은 유지한다. 새 실제 위젯 트리 번호 전용 검사는 수정 전 Fail을 재현(red.log), 수정 후 ControlsGuide Success다.
+- RC: 기존 LayoutMatched 원본을 built-in image_gen으로 편집, 본체/버튼 배치 유지·양 어깨에 세로 금속 토글/검정 손잡이를 적용했다. 실제 RGBA alpha 모서리0을 확인하고 `SourceArt/Controls/T_Controls_RC_StickSwitch_20261020.png`와 최종 prompt 파일/manifest SHA·앵커를 보존했다. 새 Texture와 WBP_DroneControlsGuide.rc_device_image를 연결, 옛 PNG/Texture는 보존했다.
+- 기체 사진: 기존 T_SelectDrone_FPV를 PNG로 읽기 전용 Export해 사용자 첨부의 바닥 사진과 일치함을 확인했다. 정찰은 BP_DroneScoutIntegration(보이는 메시6), FPV는 BP_DroneFPVIntegration(메시5)을 각 실제 DA의 PawnClass로 불러왔다. 바닥 없는 격리 PreviewScene·푸른 unlit 배경·3/4 카메라에서1536×864로 촬영했다. 첫 검정/체커 배경 결과는 채택하지 않았고, 물리 노출 해제/배경 보강 뒤 파란 배경 픽셀 검사·육안 확인을 통과했다. 제품 맵 촬영/저장은 없다. 새 `T_SelectDrone_{Scout,FPV}_Studio_20261020`을 두 DA.SelectImage에 연결했다. 재사용 원본/SHA/클래스 근거는 SourceArt/Selection과 studio.log, 가져오기 결과는 apply-presentation.json이다. 다른 기체의 기존 사진은 유지한다.
+- 권장창: Native/저장된 Designer 바인딩 두 경로에서 제목 "튜토리얼을 먼저 해 보세요", 본문, "튜토리얼로 이동"/"계속 진행" 버튼에 NSLOCTEXT를 적용했다. 패드 이동·확인·1회만 표시 정책은 유지한다. 최초 실행은 phase2 시간 초과 Fail이며 렌더 준비 영향은 추정이다. 소스 수정 없는 warm 재실행과 최종 UI 실행에서 성공했다.
+- 검증: DroneEditor Win64 Development 최종 Build 성공10.32초(build-final.log, 엔진 기존 경고 별도). 실제 D3D11 RHI 최종 UI4/4 Success·테스트 경고/오류0(final-ui-report/index.json): ControlsGuide, TutorialHintPIE, TrainingPresentationCapture.1280/1920. 사진 진단1/1 Success(studio-report, 엔진 r.MotionVectorSimulation 경고1). 일반 시작 로그의 UE 자체 오류 테스트 메시지는 제품 테스트 Fail로 세지 않는다. 첫 UI 실행3/4와 warm1/1을 최종4/4에 합산하지 않는다.
+- 해상도: PIE 창이 모니터에 맞춰 줄어드는 것을 확인해 캡처/측정을 FWidgetRenderer의 실제1280×720/1920×1080 타깃으로 변경했다. PNG 크기/번호 겹침0·그림 비율·범례 경계 확인. 캡처 읽기 감마 옵션만 보강 후 두 크기2/2 재검사(capture-report), 중복을6종으로 합산하지 않는다. 원시 근거는 Saved/Automation/ControlsRefresh_20261020, 그림은 Saved/Automation/CodexTrainingUI와 Title/tutorial_hint.png다. 실제 패드/비행·청감·제품 맵 전체·패키징 Pass는 아니다.
+- 보존: 시작 전 PayloadTarget BP·TUT_Delivary 맵 등 관련 자산을 Saved/Automation/ControlsRefresh_20261020/before에 백업했다. 기존 사용자 수정2개는 작업 후 SHA256 일치, Production Training 미저장. 초기 열린 Editor는 D3D12 GPU 크래시 로그로 종료됐으며 이번 작업이 GPU 문제 전체를 해결한 것은 아니다. 후속 검증은 D3D11로 수행했다.
+- 문서: STATUS의 이전 면접/참조0 절 원문을 기존 docs/history/archive/STATUS_2026-10.md에 보존했다. 정리 전30559B/140줄→정리 후29050B/134줄, 최종 현재 상태 반영29160B. WORKBOARD 최종29541B, 두 문서30KB 이하. 기존 docs/README 색인 링크 유지. 주제 가이드는 현행 번호/사진/한글 경로로 갱신했다.
+- Drone Space: 기존 진행상황과 다음 작업(sequence62)·Blueprint 조정과 팀원 가이드(sequence45)를 해당 ID/hash로 갱신했다. 모든 연산 적용 후 content 스트림 재조회 hash 일치 확인. 새 페이지 생성/권한 변경 없음. 링크: https://chatgpt.com/space/page_a81d11314f60819188530a4ea2ed4663 , https://chatgpt.com/space/page_90d36613770c819182701fa5869ba17a . 로컬 미커밋 파일/로그를 GitHub나 다른 PC에 배포한 것은 아니다.
+
+- 마무리: 진행 Page sequence63에서 최초 시간 초과 원인 문구를 추정으로 명시하고 재조회 일치를 확인했다. 최종 근거 묶음은 Saved/Automation/ControlsRefresh_20261020/final-evidence.json. D3D11 Editor를 FrontEnd로 다시 열었다(PID6276).
+
+## 2026-10-20 — HUD Designer 한 WBP 통합 (D PC Codex)
+
+사용자 요청: HUD 간격/배치와 이미지 파츠를 WBP에서 쉽게 조정하도록 분산 구조 정리. 작업 시작 Unreal HEAD/origin/main a645c793 Clean, MD dd16749와 앞선 UI 작업 문서 변경 보존. 작업 중 외부 Git 변경으로 HEAD/origin/main 547efd1f·0/0이 됐음을 재조회했다. a645c793..547efd1f는 Content 변경이며 Source/Config 차이 없음. Codex는 이번 작업에서 Fetch/Pull·Commit/Push를 실행하지 않았다.
+
+구현: WBP_DroneFlightHUDKit 한 트리에316위젯·01~13 표시명 구역과99 접힌 호환 그룹. MissionObjective/Countdown/조종 입력을 실제 주 트리 파츠에 연결하고 별도 뷰포트 중첩을 없앴다. 기존 이벤트/시간/기록/입력 API와 독립 WBP 폴백 유지. UGV 조준선13개·화면 모서리·고도 값 테두리4개·나침반 기준선/포인터를 UImage로 분리. 이동 눈금은 WBP Template Brush/크기/색/Font를 읽고, 간격 배율은 기존 Class Defaults를 사용한다. 좌우/하단 안전 여백32px·나침반680px. Designer 글자 최소 크기 강제는 native fallback에만 남겨 사용자 크기/색/배치를 보존한다. 일반 native Controller도 SharedHUDWidgetClass로 주 WBP 사용. Countdown 해제 시 두 타이머와 표시를 정리한다. 고도 테두리 Canvas의 Overlay 수직 Fill도 수정했다.
+
+자산 저장: 주 HUD WBP 하나만 저장. 기존 FlightHUD/ControlInputDisplay/Objective/Countdown4개는 before-manifest SHA256 일치, Production Training 등 맵 저장 없음. 이전242위젯 상태의 STATUS 문구는 당시 기록으로 보존: “**구현됨(10/16 D PC Claude)**: WBP 15개를 /Game/Drone/UI/WBP/{FrontEnd,Mission,HUD}로 정리하고 이동 참조 3건 복구. FrontEnd 6·Mission 7·HUD 2(구 FlightHUD 프로토타입/입력 표시). 저녁에 `WBP_DroneFlightHUDKit`(242위젯) 생성·Mission PC 연결 완료. 화면 UI·HUD는 WBP 편집 가능(로비 카드 버튼 개별 위젯·런타임 로비 좌표 예외). `HudKit*` 이름 바인딩으로 Designer 위치/글꼴/색 유지·값/상태색만 코드 갱신.” 현재 편집 절차는 DRONE_MISSION_FRAMEWORK_GUIDE의 HUD 편집 정본으로 옮겼다.
+
+검증(각 보고서는 별도 실행이며 합산 통과 수로 쓰지 않음):
+- DroneEditor Win64 Development 마지막 build-verified.log Succeeded12.24초. Editor가 없는 상태에서 전체 Build.
+- 최초 read-only 계약 검사는 파츠 누락으로 의도대로 Fail. 첫 적용2회는 UE5.8 위젯 GUID/복사 Panel Outer 문제로 handled ensure가 나서 Fail. 명시적 루트+하위 위젯 이관·폐기 위젯 transient 이동·GUID 매핑 갱신 후 organized-report5/5 Success, 경고/오류0(자산·KitLayout·Telemetry·Designer·정리도구).
+- 최초 D3D11 render-report에서 시작 안내·레이싱 Countdown·기존 입력3종 Success. Designer 캡처는 테스트의 abstract UUserWidget 생성 문제로 Fail, MissionEntry는 재출격/복귀30초 시간 초과 Fail. 캡처를 RootWidget 직접 렌더·Slate 강참조·LDR 타깃으로 수정했다. 제품 Flow 규칙/판정은 바꾸지 않았다.
+- final-render-report5/5 Success, 경고/오류0: 시작 안내·레이싱 Countdown·기존 입력·Designer 계약·정리도구. 최종 Brush/프레임 보정 뒤 parts-final-report2/2 Success, 경고/오류0.
+- Designer 계약은 저장 트리에 중첩 UserWidget이 없고, 변경한 위치/9px Font/색이 Initialize·데이터 갱신 후 유지됨을 검사했다. 실제 주 HUD 임무/Countdown 텍스트 갱신·입력 커서와1280×720/1920×1080 UGV 렌더, Designer 전체 미리보기를 확인했다.
+- MissionEntry 단독 NullRHI는 Success35.83초(HTTP 연결 경고3), 이어 단독 D3D11은 Success39.10초(같은 HTTP 경고1). 재출격·실패 후 로비 복귀3회 시나리오가 통과했다. 최초 RHI 실패 원인은 확정하지 않았으며 준비/시간 영향이라는 추정을 제품 결함 없음의 증명으로 쓰지 않는다. 초기 실패 보고서도 보존한다.
+
+증거는 Unreal Saved/Automation/HudDesigner_20261020의 before-manifest.json·hierarchy-after.tsv·각 report/index.json·build-verified.log·runtime-ugv-1280.png·runtime-ugv-1920.png·designer-master-1920.png다. 실제 사용자의 패드 조종·창 이동·전체 플레이·패키징 Pass는 아니다. 원본 맵·기체 입력 매핑·미션 규칙·Trello·공유 권한·예약 자동화는 변경하지 않았다. MD/기존 Drone Space 갱신 후 읽기 확인은 아래 마무리 기록을 따른다.
+
+마무리: Drone Space 진행상황/Blueprint 가이드 기존2개 Page의 관련4블록을 ID/hash 보호로 수정(각 sequence64/46), 같은 content stream 읽기 재조회로 기대 본문 일치 확인. 새 Page 없음. STATUS29,146바이트·WORKBOARD29,650바이트로30KB 이하 유지. 상세 편집 절차는 가이드에만 두고 완료 이력은 이 절에 기록했다.
+
+Editor 마무리: /Engine/Maps/Entry로 GUI Editor를 열고 WBP_DroneFlightHUDKit의 Designer·01~13/99 계층 표시를 실제 창에서 확인했다. 자산 탭은 저장 완료 상태이며 편집할 수 있도록 열어 두었다. 이 확인은 실물 조종 Pass가 아니다.
+
+## 2026-10-20 — 전체 WBP 편집 정본·목표 매니저 배치·게이트 재질·M1 영상 (D PC Codex)
+
+사용자 요청: HUD처럼 로비부터 모든 화면을 Designer에서 찾고 문구/간격/이미지 파츠를 조정, 한글·미선택 투명도/선택 강조, 목표 스포이드/조건 +와 Tutorial/Story 실제 배치, 게이트3상태 MI 정리, 배달 TUT_Delivary_2 연결, 헬기포트 외곽/9시 정리 후 자료 누락 확인. 후속으로 시작 버튼4곳 우하단·제공 UGV JPG·M1 MP4/Esc·사진 상자/레이싱 Fill을 추가 승인했다. 사용자가 미저장 배달2 맵을 직접 저장/종료한 뒤 Build/자산 작업을 진행했다. Unreal HEAD/origin/main547efd1f·로컬0/0, MD dd16749. 이번 후속 Fetch/Pull·Commit/Push·Trello·공유/예약 변경 없음.
+
+**구현과 자산**
+
+- `/Game/Drone/UI/WBP`22개를 정리했다. FrontEnd Root/Entry는15개 호스트이며 별도 TitleScreen/Lobby/Briefing/TutorialRecommendation/MissionListItem/Cinematic을 실제 연결했다. 제공 Select_UI/TitleKit 아트와 기존 그래프/내부 이름·진입 API를 보존한다. 목록 번호가 모두01이던 문제·권장창이 계속 뜨던 문제·저장 화면 배경/폰트/위치가 런타임에 재작성되던 예외를 수정했다. 정적 TextBlock·Canvas/SizeBox/Slot Padding·Image Brush·버튼 Style로 편집하며 동적 문구는 DA 또는 TextOverrides로 조정한다. 일반 포커스/호버·선택1, 미선택0.55, 반복 줄 ListItemPadding. HUD 외 간격은4px/글자 최소12로 명시적1회 정리, 이후 강제하지 않는다.
+- 조작 안내는 세 장치의 Diagram/Legend를 모두 저장했다. 번호만 그림 위에, 키/한글 설명은 아래 범례이며 RC 세로 스틱 그림을 유지한다. 탭 전환 시 파츠를 다시 만들지 않는다. 기존 HUD Kit13구역/이미지 파츠·사용자 위치는 보존했다. 이번 시작/종료 HUD inventory는312위젯이며 이전316 기록은 당시 이력으로 남긴다.
+- 시작4곳(로비/브리핑/기체 선택/출격 안내)은 앵커/정렬(1,1), 위치(-80,-40),300×80. 사진3곳 외곽600×360·안쪽14px·모서리24×2 이미지8개, 레이싱/훈련 사진은 Fill. UGV 큰 사진은 전체 기체를 보이게 Fit 옵션을 둔다. 캡처 검토에서 기체 선택 루트가 저장된 Collapsed 상태 때문에 검게 나오던 문제를 찾아 상태 갱신이 authored Root도 보이게 수정했다. 이미지 Brush 크기는 비동기 기본32가 아닌 실제 ImportedSize를 사용한다. 영문 ‹ Back 잔존도 한글로 고쳤다.
+- Tutorial 폴더9맵(TUT_LOS/Hover/Forward_Gate/Circle_Gate/FreeGate/FPV_Target/Delivary/Delivary_2/UGV_Turret)·Story4맵에 매니저1개씩, Outliner 이름 BP_DroneMissionTargetManager_목표연결/폴더 Drone/Managers. 목표 문구·Event·횟수·시간·Story 조건/ID 배열과 대상 스포이드·+를 노출했다. 조건 적용 버튼은 연결된 DA를 갱신, 대상 참조는 맵에 저장한다. 전역 실패/재출격은 DA에서 조정한다. 준비 버튼은 기존 비어 있지 않은 대상/Transform을 보존하고 RuntimeSpawnActors를 미리 배치·중복 생성 생략을 연결한다. 기존 클래스별 runtime tag도 Course/FPV 실제 액터에 반영했다. Drone.EditorPlaced는 runtime 지면 스냅/호버 재배치를 건너뛴다.
+- 배달 DA MissionMap은 사용자 결정 `/Game/Drone/Maps/Tutorial/TUT_Delivary_2`. 직전 사용자 저장본을 백업한 뒤 목표만 보완했다. 옛 Delivary·자유 게이트 준비 중·숨김 시험 항목·기존 ID를 유지한다. Production Lvl_DroneTraining은 작업 대상/시험 저장에서 제외했다.
+- `/Game/Drone/Tutorial/Materials`의 기존 재질 옆 `M_DroneTrainingGate_States` 노드 그래프(Color/EmissiveStrength/Fresnel)와 MI_DroneTrainingGate_01_Waiting/02_Current/03_Passed. 청회색#68889F/0.35, 노랑#FFD54F/3, 초록#56B896/0.75. BP/배치 Gate는 MI 색 모드이며 수동 MI 변경은 반복 도구가 덮어쓰지 않는다. 기존 private MID 저장 수리 유지.
+- UGV 제공 원본 `Downloads/1792467754744.jpg`는 SourceArt/Selection/UGV_User_20261020.jpg로 보존·Texture `FrontEnd/UI/SelectUI/Drones/T_SelectDrone_UGV_User_20261020`를 DA_Drone_GroundUGV_Greybox.SelectImage에 연결했다. MP4는 byte 동일 `Content/Movies/Mission_briefing1.mp4`(28,004,924B), FileMediaSource `FrontEnd/Media/MS_Mission01_Briefing`의 상대경로 ./Movies/Mission_briefing1.mp4를 DA_Mission_Story_GoldenTime_Test.BriefingAsset에 연결했다. M1 로비 확정→영상→기존 브리핑이며 Esc/B·실제 종료/오류 시 복귀한다. 재생 중 기존 대사/포커스를 멈추고 브리핑을 재개한다. WBP_DroneCinematic·Controller 하드 참조·Movies 패키징 목록 저장, 실제 패키징은 미실행.
+
+**헬기포트와 누락 조사**
+
+SM_helicopter_base_01·MI_helicopter_01·MI_exterior_chunk_01·M_Master는 수리 전 HEAD LFS 원본 SHA와 일치했다. Nanite/원본441,028 triangles에 외곽이 있지만 Auto fallback9,423 triangles가 얇은 프레임을 없앴다. RelativeError0만 설정한 첫 가설은 Auto에서 효과가 없어 원본 복원, transient source/noNanite와 명시적 전체 fallback 렌더를 비교했다. 최종 기존 메시 경로에 Nanite 유지·GenerateFallback Enabled/Target PercentTriangles/Percent1.0/Error0 저장. 새 프로세스 fallback441,028==source441,028 및 helipad-repaired.png 외곽 전체를 확인했다. 원본 geometry/material/배치 Transform 수정 없음.
+
+file-presence-audit.json(14:04 KST): 추적 Unreal 자산9753개 누락0·LFS 포인터0·추적 삭제0. 이번 작업에서 삭제하지 않았다. 10/16 storage-audit-20261016 manifest의45.860GiB 정리는 다른 프로젝트 중복 백업/컴파일 캐시였고 현재 Drone Source/Content/Saved/Git 삭제가 아니었다. 10/16 stash 복구/푸시 근거도 이전 WORKLOG에 있다. 이 조사는 파일 존재·기존 원본 일치 범위이며 ‘9시 메모리 정리’의 모든 상태 변화를 단정하지 않는다. 이번에 발견한 런타임 레이아웃 덮어쓰기/미반영/비표시를 수리했다. 백업은 Saved/Automation/AllWbp_20261020/before와 manifest들이다.
+
+**빌드/자동 검사 — 실행별 별도 근거, 통과 수 합산하지 않음**
+
+증거 루트 `D:\JGY\project\drone\Saved\Automation\AllWbp_20261020`. GUI Editor 저장/종료 상태에서 DroneEditor Win64 Development Build18 Succeeded16.33초(직전 Build17 12.71초·Build16 12.20초). MSVC14.51 preferred-version 경고는 유지한다. Build12의 delegate 이름/헤더 컴파일 오류는 Build13에서 수리한 이력이다.
+
+| 보고서 | 결과/검사 범위 |
+|---|---|
+| organized-report | 2/2 Success·0 errors/0 warnings, 저장/Designer 계약. 초기 UE5.8 GUID·transient delegate/navigation 복사 실패는 보존 후 수리 |
+| final-ui-report | 11/11 Success·0/0, Gate5·조작 안내·정리/자산·목표 편집·현재 UI 계약 |
+| corner-render-report | 5/5 Success·0/0, 시작4곳/조작 위치·SelectionControlLayout/SelectUI·포트 비교. Selection 검정 캡처를 이후 검토에서 발견했으므로 이 보고서를 기체 선택 외형 Pass로 쓰지 않음 |
+| presentation-final-report | 11/11 Success·0/0, 포트 영구 수리 재로드/렌더·UGV DA/사진/프레임·Gate·OpeningMovie 연결. 당시 검정 Selection 캡처 한계 동일 |
+| movie-final | 미리보기 도구가 CreateNewMap GC 뒤 raw Flow를 참조해 access violation. 실제 영화 검사 시작 전 실패·자산 저장 전이며 로그 보존. StrongObjectPtr로 Instance/Flow 수명 보장 후 재검사 |
+| movie-final-2-report | 3/3 Success·0/0: OrganizeAllDesigners/AllDesignerContract/Mission01MoviePIE. 실제 WBP 루트 Visible·ImportedSize·UGV/지도 프레임·1280/1920 캡처, 실제 디코더1920×1080/14.356초·Slate Esc down/up·끝0.3초 seek 뒤 실제 end event→기존 브리핑/조기 맵 로드0 확인. mission01-cinematic-playing.png·UGV 캡처 시각 확인 |
+| mapped-final-report | 4 Success/2 Fail(6개): 원형7Gate 실제 통과·FPV 실제 충돌 파괴·WBP 정리/계약 Success. Hover/Payload는 목표 완료 검사는 통과하고 옛 ‘runtime 새 생성 수=1/2’만0으로 Fail. 미리 배치한 목표를 세지 않는 검사였음 |
+| mapped-final-2-report | Hovering/Payload 2/2 Success·0/0. 기존 검사에 계획 클래스/Tag 일치·Drone.EditorPlaced 액터와 runtime 추가를 함께 세어 누락/중복을 검사하도록 수정했다. 배달 실제 로비→TUT_Delivary_2→기체 선택→빈 집게/실제 집기/투하/성공, 호버3초 완료를 확인. 기존 두 Fail 보고서는 보존 |
+
+맵 PIE 하네스는 팀원 외부팩 로그 경고/오류를 검사 사건에서 제외하고 명시적 assertion으로 판정한다. 위0/0은 해당 보고서 사건 수이며 엔진 전체 raw 로그에 경고가 없다는 뜻이 아니다. 실제 조종 대신 위치/피해/키 이벤트 주입을 사용했다. 사용자 패드·손 조종/전체8수업/Story 최종 분기·청감·패키징 Pass는 아니다. 마지막 Source/Config/Tools·MD `git diff --check` 오류 없음(일부 LF→CRLF 안내).
+
+**편집창/문서 마무리**
+
+기본 RHI GUI Editor를 TUT_Delivary_2로 재실행해 매니저 선택·Selection/Briefing/Lobby 자산 열기를 editor-review.json으로 확인했다. 열기 직후 dirty map/content0, 실제 Lobby Designer/계층·제공 아트 확인. 이후 사용자가 LobbyBackLine 위치를 직접 편집해 WBP_DroneLobby*가 된 것을 관찰했으므로 추가 UI/저장/재내보내기를 중단했다. 사용자 새 편집은 보존한다.
+
+편집 절차는 UI/미션/게이트 가이드 정본, STATUS29,074B·WORKBOARD29,455B(각30KB 이하). Drone Space 기존 진행/Blueprint/테스트3개 Page에8연산 적용(sequence65/47/43)·동일 content stream 재조회에서 대상8블록 기대 본문 전부 일치. 새 Page·공유 변경 없음. 미커밋 코드/자산/MD와 Git 제외 Saved 보고서는 다른 PC/GitHub에 자동 배포되지 않는다.
+
+## 2026-10-20 — 후속 UI·Pull·배달2·사진, 사용자 중간 확인 인계
+
+- D PC `D:/JGY/project/drone`: 사용자 저장/종료 뒤119파일 약1.135GB를 before/post-save로 보존하고547efd1f→fc27eb7b fast-forward. stash5488ea0be62383d8f572967ee5ec866c873950a9 보존. 맵 충돌5개는 사용자 정책대로 수신본, 나머지 로컬 변경 복원. 미해결 충돌 없음·Commit/Push 없음. Production Training 저장 없음.
+- 실제 저장 WBP의 직접 OnClicked 검사는 처음부터 통과했으나 실제 마우스 재현에서 타이틀 Back hit-test 차단/일시정지 두 번째 열기 Back 구독 소실을 별도로 재현했다. SettingsPanel Z 순서/NativeConstruct 재연결로 ui-applied-report4/4 통과(실제 마우스 Title·Pause2회 포함). 한글 CDO/정적 문구·작은 번호10·고도 흰 프레임·입력 십자선·허브 박스 기본 숨김을22WBP에 제한 적용, 사용자 배치/기존 주 HUD 보존.
+- 회색 사진 띠는 테두리 포함 옛 Story Override를 저장된 새 프레임에 덧씌우던 원인. 새 화면은 DA의 테두리 없는 Thumbnail/BriefingImage 사용. 스카이드론은 지정 실제 SM_Drone01Body 촬영; 최초 사진은 컴파일 중 체커 재질이라 재촬영했다. 재질 재컴파일/AssetCompiling 완료 대기 뒤 실제 사진을 DA Racer.SelectImage로 저장. 원본 메시/비행 Pawn 변경 없음.
+- Tutorial9·Story4에 기존 매니저/태그/재질 설정을 수신 맵 위 재적용. mission-apply2/2·cylinder-apply1/1 저장 성공. 배달2의 VV_grenades1/VV_highcaliber1/VV_WeaponBox2를 원래 메시·위치의 Carryable BP로 바꾸고 Cylinder의 허용 액터3개/고유3회·DA 목표3회를 연결. 옛 가방/팔레트와 대체된 정적 액터만 이 레벨에서 제거, 공용 자산 파일은 삭제하지 않음. FreeGate 준비 중/숨김 해제·실제 TUT_FreeGate13게이트 완주 Success.
+- 배달 실제 낙하1차 실패: M_Target 재질 목적지까지 marker 정리가 숨김/충돌 OFF. PayloadTargetComponent가 붙은 목적지는 정리에서 제외하고 Cylinder BlockAll 복구. 재검사 첫 화물 전달은 성공했으나 두 번째는 첫 화물 위에 놓여 미집계. 이 **실패는 미해결**이며 사용자 확인 뒤 적재 위 전달 판정을 고치고3개 완료 PIE를 다시 돌린다. 계약 UniqueCargoDelivery 통과만으로 실제 완료라 쓰지 않는다.
+- final-ui-tutorial-report는 D3D12 SM6 8성공/1실패: UniqueCargoDelivery·허브 숨김·FPV·Hovering·LOS·AllDesignerContract(실제1280/1920 사진/로비/브리핑/조작/스카이/UGV/일시정지/결과)·FlightHUDTelemetryBinding·HudDesignerContract 성공, Payload 실패. 렌더에서 회색 띠 제거/한글/번호10/HUD 십자선·고도 흰 박스 제거 확인. 직접 조종/실물 패드/청감/패키징은 별도.
+- 전체 NPC Nav14맵 순차 도구/범위 보완·정식 Build/타일·전원 NPC 투영/저장 후 재로드 검사 소스 준비. **이번 배치는 아직 실행하지 않음**. 원본 Base/Production Training 보호, 다른 엔진 실행 차단·RAM/커밋/5분 보호·자기 PID 종료. 초기 RHI 맵 저장 보조는 잔디 생성 대기로 자기 PID25488만 중단, 뒤 NullRHI 저장 성공. 도구/검사 컴파일 실패와 사진 진단 API 오류는 원시 로그에 보존하고 수정 Build와 구분.
+- 사용자 중간 확인 요청: 제공 Downloads/1792480499269.png를 픽셀 변경 없이 SourceArt/Selection/DropDrone_User_20261020.png로 복사, SHA2566488D3DF49DFCE54D6D3F0047DCD5CCD7FF7C6981F16BB77C7AE754EC15DEBB3 일치. T_SelectDrone_Drop_User_20261020·DA_Drone_Drop_Greybox.SelectImage 저장/메모리 참조 확인. bFitDropDronePhoto로 날개 전체 비율 표시. 이 새 사진은 사용자 실화면 확인 단계다. 마지막 Build 결과는 build-user-drop-photo.log를 따르며 성공을 추정하지 않는다.
+- 이어갈 순서: 사용자 확인/에디터 종료 확인→배달 적재 판정 수리와 실제3상자 완료→NPC Nav14맵 실행/재로드→최종 회귀·자산/Git 보존 검사·MD/Space 마무리. 자동 예약/다른 작업자 엔진 조작 없음. 원시 자료 Saved/Automation/UiMissionFixes_20261020.
+
+- 중간 확인 직전 최종 확인: build-user-drop-photo.log의 Result Succeeded/50.00초를 확인했다. Drone Space 진행/Blueprint/테스트3페이지에 같은 완료/미완료 경계를 반영하고 저장 뒤 본문 일치를 확인한다.
+
+
+## 2026-10-20 — 중간 확인 후속: 실제 M1 선택창·배달 적재·NPC Nav 마무리
+
+- D PC, Unreal HEAD/origin `fc27eb7b`, MD `dd16749` + 로컬 변경. 사용자 요청의 FrontEnd→1번 미션→드랍드론 선택 경로로 실제 PIE를 열어 촬영했다. `Saved/Automation/UiMissionFixes_20261020/m1-selection-city.png`를 사용자에게 전달했다. 초기 선택창 촬영은 도시 배경이 검게 나와 사용자 지적 뒤 원래 T_Select_Background의 저장 Image Brush/전체 앵커/Z0~3를 복구했다. 사진 안쪽 DronePreviewBackdrop만 alpha0이며 도시 배경/모서리 프레임은 유지한다. 예전 검은 스샷은 최종본이 아니다.
+- 실제 Mission travel이 native Controller 기본 클래스를 사용해 저장 Designer를 우회하던 것을 DropSelection 빨간 검사로 재현했다. BeginPlay에서 native 기본값에만 Mission WBP7종을 연결하고 명시 BP override는 보존했다. Mission WBP 폴더 AlwaysCook 추가(실제 패키징은 미실행). 실제 선택 클래스는 WBP_DroneSelection_C·한글/저장 배치/사용자 원본 Drop 사진이다. 한정 수리 플래그 -DroneRepairSelectionBackdrop은 선택 WBP만 저장한다. Title/Pause 실제 마우스/Back2회 왕복도 이 경로에서 통과했다.
+- 배달2 적재 실패를 실제 물리 투하로 재현했다. 이미 같은 목표에 전달된 화물의 안정된 윗면도 원래 목적지로 판정한다. Director의 목적지 Actor 중복 방지가 같은 Cylinder의 두 번째/세 번째를 막던 원인은 목적지 검증과 진행 신원을 분리해 수리했다. 고유 화물을 진행 신원으로 사용하고 일반 이벤트의 중복 방지는 보존했다. Cylinder가 M_Target marker 정리로 숨김/충돌 비활성이 되던 것도 PayloadTargetComponent 제외로 수리했다. 실제 세 상자 집기/적재 투하 뒤1/2개에서는 미완료·3개에서 성공, 중복/비허용/다른 목표 거부 검사 통과. 마지막3번째 뒤 결과를 기다리는 테스트 상태 오류도 수정했다.
+- `m1-final-report` 4/4 Success: UniqueCargoDelivery·선택 배경 수리·실제 M1Selection·Payload. `delivery-gate-report` 실제 FreeGate13게이트 완료 통과. 앞선 실패 보고서는 덮어쓰지 않았다. LOS는 실제 후진 복귀→접지까지 검사한 `final-ui-tutorial-report` LOS Success이며 사용자 재확인대로 그 조건을 유지했다.
+- Nav14맵을 격리 프로세스로 점검했다. Tutorial9맵 NPC0은 저장 없이 skip Success. UGV NPC 시험장1/1·20타일, Story Battlefield9/9·977타일, Story02 8/8·581타일, Story03 8/8·581타일, Camp27/27·1,874타일로 5맵53명·4,033타일 빌드/저장/재로드 후 시작점 투영을 통과했다. 최종 근거는 `NavigationVerified/Lvl_Tutorial_UGV_NPC_Test-report`와 `NavigationReadyVerified/summary.json`이다. Story4개 실행63.1/59.5/46.3/102.3초, 보호 중단0·오류0, 기존 경고57/5/5/1(UGV1)이다. NPCless9맵은 `Navigation/summary.json` 해당9행이다.
+- Nav 재로드 초기 타일0은 Dynamic/ForceRebuildOnLoad 진행 중 상태여서 ready까지 기다리도록 했다. Battlefield의 서쪽 NPC4 투영 실패는 단순 Bounds 크기/위치만으로 해결되지 않았다. AsyncLoadLock 상태에서 Build가 실제 실행되지 않고 낡은 Nav가 남는 것을 로그/엔진 코드로 확인했다. 전용 도구가 명시 로드한 자체 월드에서 FlushAsyncLoading/전체 AssetCompilation 완료0 뒤 AsyncLoadLock만 해제하고 Bounds 갱신/실제 Build→저장→새 월드 재로드/대기한다. NPC/돌 충돌/지형은 옮기거나 제거하지 않았다. BSP pivot 대신 실제 Bounds 중심으로 보정하며 모든 NPC 범위 포함도 assert한다. 임시 NPC_NAV_PROBE/SELECTION_BACKGROUND 계측은 제거했다. 실패·probe 보고서는 보존했다.
+- 최종 Build-clean16.41초 성공 뒤 집중 회귀 `final-regression-report`는13 Success/원형1 Fail이었다. 오류2개는 오래된 시험이 원형 완주 후 ReturnToBase/InMission을 요구한 것으로, 현행 원형 완주 즉시 성공 규칙과 불일치했다. 제품/LOS DA는 바꾸지 않고 시험에 원형 단일 목표/귀환 없음·완주 결과 성공을 검증하도록 수정했다. 최종 Build `build-circular-contract.log`32.35초 Success, `circular-current-contract-report` 원형 계약+실제 CircleGate2/2 Success. 기존13통과는 그대로이며 광범위 전체/실물 Pass로 확대하지 않는다. 사용자에게14통과로 성급히 보고한 뒤13/1로 즉시 정정하고 위 재검사를 수행했다. 중간 컴파일 실패 incomplete type은 DroppedPayload include 추가로 수리해 후속 Build 성공이다.
+- `final-asset-audit.json`: 추적 Content 바이너리9,755개(Drone2,228) 누락0/LFS 포인터0·삭제/충돌/스테이징0, Production Training SHA256=HEAD LFS oid `6f297e405bc6d924ab345b60d55816c2fb3d1e6c718fc1fc2597734292fb6ed2` 일치. Pull 보존119파일/복구 stash는 유지한다. 신규 Commit/Push·Trello·공유·예약 변경 없음. NPC 전체 순찰/실물 패드/손 조종·청감·정상 화질 Camp 장시간·패키징은 수동/후속 경계다. 원래 맵의 Substance/MOUT 의존·Convex/zero-scale 경고를 새로 해결했다고 주장하지 않는다.
+- Drone Space 기존 진행/Blueprint/테스트3개 Page의5개 수정 연산 적용 확인, 저장 뒤 동일 content stream 재조회5개 본문 모두 기대값과 일치(최종 sequence67/49/45). 새 Page/권한/예약 변경 없음. 수신/수정 receipt는 Saved/Automation/UiMissionFixes_20261020/space-final-sync.json. STATUS28,907B·WORKBOARD29,503B로30KB 이하 유지, source/docs diff --check 통과(줄바꿈 안내만 있음).

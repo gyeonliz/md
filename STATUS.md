@@ -1,24 +1,24 @@
 # 현재 작업 상태
 
-기준일: 2026-10-20 KST C PC. Unreal `2a7b0418`·MD `e160207c` 위 Story 배치/맵 분리·나침반·NavMesh 수정. 원본 Base/Production Training·기존 변경 보존, Commit/Push 없음. 상세는 [WORKLOG](docs/history/DRONE_WORKLOG.md).
+기준일: 2026-10-20 KST D PC. Unreal `fc27eb7b`·MD `dd16749`, Pull 후 UI/배달2/사진 변경은 로컬 미커밋. 후속 UI·배달2·NPC Nav 수리/자동 검증 완료. 실제 장치/전체 플레이는 별도. 상세는 [WORKLOG](docs/history/DRONE_WORKLOG.md).
 
 ## Git 기준(원격 최종 확인10/20)
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal 원격 gyeonliz/drone | 실제 main·origin/main `2a7b0418` | 사용자 Push 수신·로컬 HEAD 일치 |
-| Unreal C PC `C:\URproject\drone` | HEAD `2a7b0418` | Story DA/맵·코드/검사 도구 로컬 변경, Clean 아님 |
-| 문서 원격 `gyeonliz/md` | origin/main `e160207c` | 실제 원격·로컬 HEAD 일치 |
-| 문서 C PC | HEAD `e160207c` | 상태/가이드 로컬 변경, Commit/Push 안 함 |
+| Unreal 원격 gyeonliz/drone | main·origin/main `fc27eb7b` | Fetch/fast-forward 완료·로컬 참조0/0 |
+| Unreal D PC `D:\JGY\project\drone` | HEAD `fc27eb7b` | 기존 변경 백업/복원·맵 충돌은 수신본 우선·후속 변경 미커밋 |
+| 문서 원격 `gyeonliz/md` | origin/main `dd16749` | Fetch 후 로컬과 0/0 |
+| 문서 D PC | HEAD `dd16749` | 상태/가이드 로컬 변경, Commit/Push 안 함 |
 
 ## 10/18~20 최신 구현과 확인 경계
 
 - **기반 구현**: DA 숨김/준비 중·다음 수업 건너뛰기·맵 비저장 Runtime Placement·미션별 RecordCourseId. 튜토리얼 TUT 맵/DA·HUD WBP/캡처 도구는 현재 커밋에 있다.
-- **UI/훈련**: 사진16장·LOS 예외·네모형 RC/UMG7번호·LT/RT 외부 칩 유지. 합성 입력 검사와 실물 대기 구분. [조정](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#훈련-사진조작-장치-그림시작-위치).
+- **UI/훈련**: 그림 위는 번호만·키/동작은 아래 범례로 정리. RC 세로 토글 스틱·Scout/FPV 바닥 없는 실제 모델 사진·튜토리얼 권장창 한글 적용. D PC Build·UI4/4·사진1종 자동 검사 통과, 1280×720/1920×1080 렌더 확인. 실물 조종은 별도. [조정](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#훈련-사진조작-장치-그림시작-위치).
 - **목표 매니저**: 배치형 BP_DroneMissionTargetManager로 스포이드 대상 교체/판정·나침반 방향/거리 연결. 새 경량 시험장 제공. [설정](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#스포이드-목표-연결과-나침반).
 - **전투**: 차량300·포탑200·MG25·유탄150·자폭600. 직격 중복 방지·자폭 잠금·NPC 래그돌 유지. 포탑 자체 HP0 폭발/소리1회·점유 해제·연결 메시 잔해15초 정리 구현, 실제 TUT 파괴/클리어 검사 통과. 청감/밸런스 수동 대기. [조정](docs/gameplay/DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md#차량-피해자폭npc-사망).
 - **오프닝**: Main_cinematic.mp4를 새 실행에 재생·종료/Esc로 타이틀, 실패 시에도 복귀. MP4는 LFS·패키징 NonUFS 설정. [설정/시험](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#시작-오프닝-영상).
-- **검증**: 최신 Build5.11초 성공. Story4맵의 출격/목표→결과·나침반·NPC Nav 투영 자동 통과, 시작/목표 촬영. Camp는 승인된 임시 저메모리 설정만 검증(일반 화질/장시간 Pass 아님). Lumen 캐시 초과·출발 피격/흔들림은 잔존. 손 조종·전역172·패키징은 별도. [근거](docs/history/DRONE_WORKLOG.md).
+- **이전 C PC 검증**: Build5.11초 성공. Story4맵의 출격/목표→결과·나침반·NPC Nav 투영 자동 통과, 시작/목표 촬영. Camp는 승인된 임시 저메모리 설정만 검증(일반 화질/장시간 Pass 아님). Lumen 캐시 초과·출발 피격/흔들림은 잔존. 손 조종·전역172·패키징은 별도. [근거](docs/history/DRONE_WORKLOG.md).
 - **이번 수정**: API 선택/미리보기/포커스 일치, 호버 진행 지연, UGV 검사 이름 충돌, MG Static 경고, 로딩 최소 표시/ReadyHold의 시계 혼용을 수정했다. AI 검사는 선행 자동 교전을 격리해 점유/사망·재점유/수색·복귀 통과·기본 회귀 복귀. 제품 리시 규칙 유지.
 - **레이싱**: Map2 중복 링 실행 제외93개 완주/3맵 기록 복원 근거 유지. 원거리 전체 Fit 대신680~713m 근접 지형/코스 사진 NearView_20261020으로 교체. DA의 맵/기록ID·랜덤도시 '?'·맵 원본 보존. 실제 조종 완주는 별도다.
 
@@ -26,13 +26,13 @@
 
 ## UI·WBP·UGV 현재 상태
 
-- **구현됨(10/16 D PC Claude)**: WBP 15개를 /Game/Drone/UI/WBP/{FrontEnd,Mission,HUD}로 정리하고 이동 참조 3건 복구. FrontEnd 6·Mission 7·HUD 2(구 FlightHUD 프로토타입/입력 표시). 저녁에 `WBP_DroneFlightHUDKit`(242위젯) 생성·Mission PC 연결 완료. 화면 UI·HUD는 WBP 편집 가능(로비 카드 버튼 개별 위젯·런타임 로비 좌표 예외). `HudKit*` 이름 바인딩으로 Designer 위치/글꼴/색 유지·값/상태색만 코드 갱신.
-- 로비 3분류를 MISSION BRIEFING 형식·Select_UI 배경으로 통일, 카드는 선택만·START로 확정. 브리핑은 시안8의 사진/정보3칸·CONTROLS 3탭(패드/키보드·마우스/조종기, LB/RB). 기체 선택은 시안6·이미지4종·조작 모드·SELECTED·고정 높이 상세/능력치. 시작 버튼 START·받은 화살표로 통일.
-- 기본 훈련 출격 직후 일시정지·이름/목표/진행/역할 조작/전체 목표·[시작](A/Enter) 안내 구현. 레이싱·스토리는 BP 옵션. HUD Kit은 미션/진행·부드러운 나침반·타이머·기체 상태·속도·고도/VS·UGV 전용 조준/무장, Paint 공간 좌표로 창 위치 오프셋 수정·나침반/고도 매 프레임 갱신. 나침반 시안3·고도 시안2·UGV 조준선 시안 반영, UGV ONLY·속도 세로 눈금 제거. 첫 LOS 수업은 판정 구역과 같은 출발/전방 3D 테두리 상자2개로 변경.
-- UGV 기관총 유지 연사·200발/2초 재장전(빈 탄창 자동·R/□ 수동), 유탄6발(연사/재장전 없음). UGV 전용 L2/R2 무장 IMC·Space/Ctrl 포탑 상하 조준(60°/초·BP 조정). 체크 값은 바뀌지만 검정 전경 때문에 그림이 같던 원인을 흰색 고정·Settings WBP 재생성으로 수정, 콤보 복구, 드랍 목표 SM_Pallet·메시 크기 자동 LandingCollision. 그레이박스/시험 표기 제거·역할 설명·기획 문구 반영, 레이싱 이름 스카이드론(외형 미연결).
-- **자동 검증**: 현재 C PC에서 FlightHUDKitLayout·HUD 자산/바인딩·패드/설정·미션 선택 화면을 실행했다. 과거19건 집계/World 실패는 [WORKLOG](docs/history/DRONE_WORKLOG.md)에 보존하며 현재 실패로 재사용하지 않는다.
-- **수동 대기**: 실제 패드·연속 조종, UGV 무장/팔레트 착지, 해상도/창 이동 HUD 눈금·Designer 반영, 첫 수업 가시성·청감. 숨김 렌더 검사와 실제 장치 체감은 구분한다.
-- **현재 미정**: 드랍 집기 패드 L2(시안)/R1(실제), 비행 범례 FPV 모드2 기준 처리, 키보드 UGV 범례 번호, 스카이드론 외형, 기획 훈련8개↔UGV NPC 수업 매핑, 결과 [다음] 동작. Codex 리뷰8건 수정은 인계 기준·수동 Pass 아님.
+- **편집 정본**: `/Game/Drone/UI/WBP` 화면22종·시작4곳 우하단·사진600×360·모서리8파츠·선택 강조를 유지한다. Native Mission 출격도 저장된 Mission WBP7종을 사용해 Designer 수정이 실제 화면에 반영된다. 명시적 BP 클래스 지정은 보존한다. [편집](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#화면별-wbp-편집-정본).
+- **설정/HUD/문구**: 타이틀 설정 Z 순서·일시정지 재오픈 Back 구독을 수리해 실제 마우스 진입/뒤로2회 왕복 통과. 한글 CDO/정적 문구·번호10·사진 회색 띠·허브 박스 숨김·고도 흰 테두리 제거·입력 십자선 반영, HUD13구역/사용자 배치 보존. [정본](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#hud-편집-정본).
+- **사진/배경**: UGV·사용자 원본 드랍 PNG·지정 메시 스카이 실제 사진을 DA에 연결했다. 드랍/UGV 전체 비율 보존. 원래 도시 배경은 유지하고 선택 사진 안쪽 회색만 투명화했다. 실제 FrontEnd→M1→드랍 선택 촬영을 사용자에게 전달했다. M1 영상/Esc 자동 검사도 통과.
+- **목표/튜토**: Tutorial9·Story4에 검색 가능한 BP_DroneMissionTargetManager 유지. FreeGate 실제 맵/13게이트 완주 통과. 배달2 지정3상자→Cylinder는 겹쳐 적재해도 고유3개를 집계하며 실제 집기/물리 투하3회→성공 통과. 옛 가방/팔레트는 해당 레벨에서만 제거했다. **LOS의 이륙→전진→후진 복귀→실제 착지는 그대로 유지한다.** [편집](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#이미-배치된-맵에서-바로-찾기).
+- **게이트/포트/Nav**: 기존 Materials 옆3상태 MI·헬기포트 전체 fallback 유지. Nav14맵 점검 중 NPC5맵53명 전원 시작점 투영·빌드/저장/재로드 통과, 나머지9맵은 NPC 없음. NPC를 옮기지 않았다. Production Training은 저장하지 않았다. [조정](docs/tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md).
+- **최종 검증**: Development Build32.35초 성공. 회귀14개 중13통과/원형의 낡은 귀환 기대값1실패를 보존하고, 검사만 현행 규칙으로 고쳐 원형 계약+실제 CircleGate2/2 통과. 실제 M1 선택/배달·고유 화물·선택 배경4/4도 통과했다. 실행별 근거는 [WORKLOG](docs/history/DRONE_WORKLOG.md).
+- **확인 경계**: 추적 자산9,755개 누락/LFS 포인터/삭제/충돌0·Production 해시 일치. 기존 맵 경고는 남아 있다. 실물 패드·손 조종 전체 경로·청감·패키징은 별도이며 Commit/Push는 하지 않았다.
 
 ## 한눈에 보기
 
@@ -56,7 +56,7 @@ OilRig 근거리 사본3개만 camera-local·생성축Yaw-90°로 화면 가로�
 
 `AI-PATRIOT-PIVOT-01`: `/Game/Drone/AI/Blueprints/Turrets/BP_PatriotMissileLauncher` 생성·초기 회전 검사 완료 뒤 10/13 12:50 Editor 재저장(현재35,958B)이 확인됐다. 현재 저장본의 축/이음새·복합 회전은 재검증 대기다. 생성 구조는 Lower 고정→YawPivot→Middle/PitchPivot→Upper, Yaw/Z·Roll/X 조절. 기존 편집을 보존하고 생성 도구로 덮어쓰지 않는다. 원본3메시·Missile_M, AI/발사/입력/충돌·차량 배치 미포함. [MG·패트리어트 가이드](docs/ai/DRONE_MG_TURRET_3PART_GUIDE.md#6-패트리어트-미사일-포대-접합부-회전축-조정).
 
-`UI-RESULT-LAYOUT-01` 현재 native는1920×1080 기준 TitleKit 상자 버튼·좌측 버튼열/우측 정보 카드로 변경됐다(수신 소스 확인). 옛 중앙680 카드/청록 테두리·10/06 집중6/6은 당시 기록이며 현재 외형 검증이 아니다. named WBP 부모/이름 계약과 배율1은 유지. [UI 가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)·WORKLOG 참조, 실제 화면/패드는 대기.
+`UI-RESULT-LAYOUT-01`은 저장된 Mission/WBP_DroneMissionResult Designer에서 좌측 버튼/우측 정보 카드를 편집한다. 실행 시 작성한 배치를 유지하며 옛 중앙680 기록은 현재 외형의 근거로 재사용하지 않는다. [UI 가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)·WORKLOG 참조, 실제 화면/패드는 대기.
 
 10/06 C PC Claude: D-5 출발부터 랩 타이머 측정·D-12 Flight 명명과 피격/Acro/지상 주행 컴포넌트 분리 구현됨·자동 검증됨. 화면·FPV/UGV 체감 수동 확인 대기. 기존 NPC/높이 제한/매니저·Legacy 정리 유지, D-13 종료. 레이싱은 아래 팀원 변경 수신 상태를 따르며 배터리 시간·높이 제한 수치/경고 연출은 현재 미정. 세션 전문은 [WORKLOG](docs/history/DRONE_WORKLOG.md).
 
@@ -107,13 +107,7 @@ OilRig 근거리 사본3개만 camera-local·생성축Yaw-90°로 화면 가로�
 - **외부팩**: 기존 배열/유리 수리 유지. 시점축4개 직결·옛Rig import 정리·68본/포즈 불변, LOS 경고4. 컬러66.3→10.7MiB·노멀8K Mip/스트리밍 복구. 이동/Action4·VSM/호버 포커스/NavMesh는 잔존. [상세](docs/history/DRONE_WORKLOG.md).
 - 기획 미정 보존: Acro 키보드 각속도 배율/Angle 모드/마우스 Yaw·회의 반전 뜻, 입력 표시 장치 정책, 로비 탭 유지, 레이싱 연결, Production Training 테스트2건. M2 결말·M3/M4 표적 수량/규칙, 브리핑/배터리 수치·최종 아트/메시·완료 저장도 기존 미정이다.
 
-## 면접 대비·참조 0 정리 — Claude, 현재 C PC
-
-- NPC Controller HostileStateTree/FriendlyStateTree(EditDefaultsOnly Soft 참조, 기본 기존 ST2개)·BP 변경 가능·로드 실패 에러 로그. StateTreeCookContract 통과, 패키징 미실행.
-- Moderate HUD는 신호 불안정(영상 Noise 미연결), Scout 프리셋 전환/FPV27m/s/Drop 안정 기본 광고 문구 삭제. VeilBreaker 목표는 광섬유 드론으로(끊김 규칙 미정). PlayerFacingTextContract 통과.
-- Rifle/MG 디버그 선 기본 Off, 상수 TestTrue4건을 실제 조건으로 교체, 기체6개 이상 [DRONE-SELECT] 경고(동적 목록 후속). FrontEndContract·FlightProfiles·StateTreeCookContract·PlayerFacingTextContract Success, AI/UI NullRHI22개 중20 Success·당시 NPCPerception/Shotgun2Fail(후속 Shotgun 해결).
-- 참조0 검증된 프리셋 튜닝·미사용 API/include/Build.cs 주석 정리, HoverThrottleNormalized는 도구3개 호환 유지·런타임 미사용. Tools/AssetMigration 낡은 도구12개 삭제됨(Git 이력), 게이트 도구 기본검증·APPLY=1일 때만 저장, 타이틀 임포트 경로 명시 필수. md tools 변경은 Claude 기존 수정이며 Codex 미수정.
-- D-12 1차 Legacy 정리와 D-14 MCP 로컬 설정 전환은 구현됨·자동 검증됨(10/05 C PC Claude). MCP 공유 Default bAutoStartServer=False·필요 PC Saved 로컬 True·C PC 실행15초 뒤8000 응답 확인. CLAUDE.md MCP 설명도 D-14와 일치하도록 수정됨(10/06 Claude): 공유 끔·사용자 PC 로컬만 켬·팀원 불필요. 설정 절차는 [협업 세팅](docs/git/CLAUDE_CODEX_SETUP.md#unreal-mcp-자동-시작--pc별-로컬-설정)·삭제 상세는 WORKLOG.
+면접 대비·참조0 정리의 구현/검증 상세는 [10월 STATUS 원문](docs/history/archive/STATUS_2026-10.md)에 보존했다. 최신 기획 미정과 수동 대기는 WORKBOARD를 따른다.
 
 ## 사용자 결정·확인 대기
 

@@ -1,6 +1,6 @@
 # Mission 통합 프레임워크·NPC 이동 애니메이션 가이드
 
-현재 절차 기준: 2026-10-20 C PC. Mission 규칙·스포이드 대상 연결/나침반·맵 배치·재밍 Radar·첫 수업 계약을 소스와 대조한다. 날짜별 실행 결과는 [STATUS](../../STATUS.md)·[WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. Production `/Game/Drone/Maps/Lvl_DroneTraining`은 시험용으로 수정하지 않는다.
+현재 절차 기준: 2026-10-20 D PC. Mission 규칙·스포이드 대상 연결/나침반·HUD Designer·맵 배치·재밍 Radar·첫 수업 계약을 소스와 대조한다. 날짜별 실행 결과는 [STATUS](../../STATUS.md)·[WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. Production `/Game/Drone/Maps/Lvl_DroneTraining`은 시험용으로 수정하지 않는다.
 
 2026-10-02 새벽 후속(C PC, ec2e88f + 로컬 미커밋, Claude 구현·Codex 문서 반영): Mission DA `Mission Definition|Progression → NextMissionId`로 Story M1 골든타임→M2 인터셉트→M3 베일브레이커→M4 엔드게임(끝)을 연결했다. 성공 결과 [다음]·로비 순서가 연결을 따르며 M2→M3 결과 분기는 현재 미정이다. 튜토리얼 8개 연결·시간·완료 UI는 [튜토리얼 가이드 5절](DRONE_TUTORIAL_IMPLEMENTATION_TEST_GUIDE.md#5-tutorial-전용-ui-구현)을 따른다.
 
@@ -14,9 +14,9 @@ Story M1은 `Maps/Lvl_Battlefield`, M2·M3는 원본 MilitaryBase를 보존해 �
 
 - 출격은 배치된 `SM_helicopter_base*`의 표시 경계 중심 XY·윗면+52cm다. DA `RuntimeStartTransform`은 패드 선택 기준과 출격 Yaw를 제공하며, 패드가 없을 때만 기존 DA/시작 표식/PlayerStart 경로를 사용한다. 첫 LOS의 관찰 시점·후진/착지 예외는 보존한다.
 - 맵의 `Drone/MissionStart`에서 패드를 이동하면 다음 출격이 따라간다. M3 사본의 패드만 원래 `M_Start_Mission3` XY의 지면으로 옮겼다. M2·원본 기지를 함께 옮기지 않는다.
-- `Drone/MissionTargets/M01`의 `M01_MainTarget_Delivery`는 기존 M_Target XY를 유지하고 Shack의 충돌뿐 아니라 표시 지붕 높이까지 확인해 위로 올렸다. DROP 표기와 나침반으로 찾는다. `Drone/Defense/M01`의 포탑2개는 기존 M_Turret 위치다. 기존 병사6명은 보존했다.
+- `Drone/MissionTargets/M01`의 `M01_MainTarget_Delivery`는 기존 M_Target XY를 유지하고 Shack의 충돌뿐 아니라 표시 지붕 높이까지 확인해 위로 올렸다. DROP 표기와 나침반으로 찾는다. `Drone/Defense/M01`의 포탑2개는 기존 M_Turret 위치다. Pull 후 현재 병사9명을 보존하며 NPC 위치를 바꾸지 않고 NavMesh를 연결했다.
 - M2는 `M02_MainTarget_Convoy`에 기존 `BP_DroneVehicleSplineRoute`를 직접 연결한다. 옛 임시 직선60m 차량을 추가하지 않는다. M3는 `M03_MainTarget_Jammer`를 연결하며 기존 재밍 완전 이탈 규칙을 유지한다. 역할 교대·최종 시나리오를 완성한 것은 아니다.
-- `Drone/Managers`의 `M01/02/03/04_TargetCompassManager` 인스턴스에서 TargetBindings의 실제 대상 Actor를 스포이드로 교체한다. 목표 판정·표시가 같은 대상을 따른다. 배치 매니저가 전혀 없는 Story에만 런타임 Tag 기반 매니저를 보완 생성한다.
+- `Drone/Managers`의 `BP_DroneMissionTargetManager_목표연결` 인스턴스에서 실제 대상 Actor를 스포이드로 교체한다. [배치된 매니저 편집](#이미-배치된-맵에서-바로-찾기)을 따른다. 목표 판정·표시가 같은 대상을 따르며, 배치 매니저가 전혀 없는 Story에만 런타임 Tag 기반 매니저를 보완 생성한다.
 - M4는 기존 고정 포탑 `BP_AutoTurret_Emplaced_C_24/18/14`를 `M04_MainTarget_Turret_01/02/03`으로 구분해 연결했다. 기존 3개 파괴 규칙/제한시간은 현재 기준안이며 최종 기획 수량 확정은 아니다. 새 상대좌표 표적3개를 중복 생성하지 않는다. 기존 NPC27·포탑18개를 보존한다.
 - Camp 원본에는 헬기포트가 없어 같은 `SM_helicopter_base_01`을 추가했다. 사용자 확인 위치 `(9700,6500,6105.43cm)`·회전0·Scale0.3을 유지하며 DA 기준 출격점은 `(9700,6500,6212.90cm)`다. 재밍 회피를 위해 포트를 옮기지 않는다. 크기 조정 후 펜스와의 시각적 겹침은 줄였지만 UGV 실제 주행/출발 피격·카메라 흔들림은 수동 확인한다.
 - Camp 재밍은 **해당 맵의 Radar8개 인스턴스만** `JammingRadiusCm=2000`(20m), `FullStrengthRadiusCm=400`(4m)로 조정했다. `JammingHalfHeightCm=3000`·출력1·활성 상태는 유지한다. 기존 150m/최대25m의 과도한 중첩을 줄인 기준안이며 M3와 BP 기본값은 바꾸지 않았다. Details → Drone → Jamming → Radar에서 변경하고 실제 JammingBounds·시작 신호100%·시설 근접/이탈을 시험한다.
@@ -25,7 +25,9 @@ Story M1은 `Maps/Lvl_Battlefield`, M2·M3는 원본 MilitaryBase를 보존해 �
 
 `Tools/AssetMigration/ConfigureStoryMissionLayout.py`는 Editor 종료 후 한 프로세스·한 미션만 처리한다. `DRONE_STORY_LAYOUT_MISSION=1/2/3/4`, Nav 로드 정책만 고칠 때 `DRONE_STORY_LAYOUT_NAV_ONLY=1`을 사용한다. 원본/기존 자산은 `Saved/Backups/CodexMissionLayout_20261020`에 보존한다. M4는 배치 재료 확인을 통과하기 전 저장하지 않으며 메모리 보호를 우회하지 않는다. 팀원 Production Training은 이 도구 대상이 아니다.
 
-Nav 저장 도구는 `Diagnostics.StoryLayout.BakeNavigation`이며 명시적 `-DroneApplyStoryNavigation -DroneLayoutBakeMap=/Game/Drone/Maps/...`가 필요하다. 승인된 Story 한 맵만 Build/EnsureBuildCompletion하고 타일·NPC 투영이 유효할 때 저장한다. 일반 검증에 저장 플래그를 붙이지 않는다. MCP 장시간 요청의 socket_send_failure가 함께 기록된 실행은 기능 assert가 맞아도 전체 Pass로 쓰지 않는다. 최신 실행 수치/정정은 WORKLOG를 따른다.
+Nav 저장 도구는 `Diagnostics.StoryLayout.BakeNavigation`이며 명시적 `-DroneApplyStoryNavigation -DroneLayoutBakeMap=/Game/Drone/Maps/...`가 필요하다. Tutorial9·Story4·UGV NPC 시험장 중 지정한 한 맵만 Build/EnsureBuildCompletion하고 실제 타일·전원 NPC 시작점 투영이 유효할 때 저장한다. `Tools/Validation/Bake-MissionNpcNavigation.ps1`은 이14맵을 한 프로세스씩 순차 실행하며 `PrepareMissionNavigation.py`가 NPC 범위와 기존 Volume을 합쳐 준비한다. NPC 없는 맵은 저장을 건너뛴다. Camp 시작20GiB·일반8GiB, 실행 RAM3GiB/남은 커밋4GiB·5분 보호와 자기 PID 종료만 사용한다. 원본 Base/Production Training은 허용 목록에 없다. 일반 검증에 저장 플래그를 붙이지 않는다. 최신 실행 수치/정정은 WORKLOG를 따른다.
+
+Nav 도구는 먼저 자산 비동기 로드/컴파일 완료를 확인한다. 완료0개 확인 뒤 이 작업 월드의 AsyncLoadLock만 해제하며 다른 종류의 잠금은 해제하지 않는다. 스크립트로 바꾼 Bounds는 NavigationSystem에 갱신 통지 후 Build한다. 재로드도 Dynamic/ForceRebuildOnLoad의 비동기 빌드를 `EnsureBuildCompletion`으로 기다린 뒤 실제 타일/전원 NPC 시작점 투영을 확인한다. 처음 열린 프레임의 타일0과 완료 후 결과를 구분한다. `Bake-MissionNpcNavigation.ps1 -ReportSet <이름>`은 재검사 보고서를 분리해 실패 원본을 보존한다.
 
 Story Mission을 만들 때 매번 Level Blueprint에 목표 판정을 새로 짜지 않도록 `/Game/Drone/Mission`에 재사용 Blueprint 묶음을 만들었다.
 
@@ -95,7 +97,25 @@ Mission의 규칙과 맵 배치를 분리한다. “차량 파괴 1회”는 DA�
 
 담당 클래스는 `ADroneMissionTargetManager`(선택 대상/표시 캐시) → `ADroneMissionDirector`(선택 대상 사건 검증/코스 연결) → `UDroneFlightHUDWidget`(나침반 렌더)다. 헤더에는 편집 가능한 TargetBindings·MissionId·색/표시 옵션을, CPP에는 캐시 갱신·기존 Tag 폴백·방위 계산/마커 숨김을 추가했다. 아래 BP 설정에는 C++ 수정이 필요 없다.
 
-### 바로 사용하는 순서
+### 이미 배치된 맵에서 바로 찾기
+
+튜토리얼 폴더의9맵(`TUT_LOS`, `TUT_Hover`, `TUT_Forward_Gate`, `TUT_Circle_Gate`, `TUT_FreeGate`, `TUT_FPV_Target`, `TUT_Delivary`, `TUT_Delivary_2`, `TUT_UGV_Turret`)과 Story4맵에 매니저1개씩을 저장했다. 맵을 연 뒤 **World Outliner 검색에 `BP_DroneMissionTargetManager`**를 입력하면 `BP_DroneMissionTargetManager_목표연결`이 나온다. 폴더는 `Drone/Managers`다. 새로 끌어올 필요가 없다.
+
+배달 DA의 실제 출격 연결은 사용자 결정대로 `/Game/Drone/Maps/Tutorial/TUT_Delivary_2`다. 예전 맵은 보존한다. 자유 게이트 DA도 `/Game/Drone/Maps/Tutorial/TUT_FreeGate`에 연결하고 준비 중/로비 숨김을 해제했다. 숨김 시험 미션은 유지한다. 팀원 Production `Lvl_DroneTraining`은 이번 배치 대상이 아니다.
+
+배달2는 원래 위치의 `VV_grenades1`, `VV_highcaliber1`, `VV_WeaponBox2`를 각각 집어 기존 `Cylinder`로 옮기는 수업이다. 세 상자는 같은 외형/Transform의 운반 가능 BP로 교체했으며 `Drone/Targets/DeliveryCargo`에서 찾는다. `Cylinder`의 `DronePayloadTargetComponent`에서 `AcceptedPayloadActors` 배열의 스포이드로 허용 화물을 바꾸고, `bAcceptMultiplePayloads=True / RequiredUniquePayloads=3`으로 고유 화물3개를 요구한다. 이미 전달한 화물의 재집기/중복 집계와 다른 화물 전달은 거부한다. 완료 횟수를 바꿀 때는 매니저 조건의 필요 횟수도 맞춘다. 옛 가방/팔레트 목표는 이 레벨에서만 제거했으며 공용 자산 파일은 보존한다.
+
+목적지 Cylinder는 보임/BlockAll 충돌을 켠다. `bHideStartEndMarkerCubes`의 M_Start/M_Target 표시 큐브 정리는 실제 PayloadTargetComponent가 붙은 목적지를 제외하므로, 같은 표시 재질을 써도 목적지가 사라지거나 투하물이 관통하지 않는다.
+
+이미 같은 목적지에 전달한 화물의 윗면에 다음 상자를 쌓아도 같은 Cylinder 전달로 인정한다. 목적지의 실제 전달 기록으로 적재 바닥을 판정하며 다른 목적지의 상자는 제외한다. MissionDirector는 목적지 연결을 검증한 뒤 고유 화물 액터별로 진행을 집계해 같은 원통의 두 번째/세 번째 전달도 목표3회에 반영한다. 일반 정찰/파괴의 같은 액터 중복 방지는 유지한다.
+
+선택한 **레벨 인스턴스** Details → `Drone > Mission Targets` → **목표 연결 목록 · 펼쳐서 스포이드 선택**을 펼친다. 기존 목표별 항목과 실제 대상 참조를 채워 두었다. `대상 액터 · 스포이드` 배열의 원소 옆 스포이드로 바꾸고, 대상/조건을 더 넣으려면 각각의 배열 `+`를 누른다. Content Browser의 BP Class Defaults에는 레벨 액터 스포이드가 나오지 않는다.
+
+각 항목의 **목표 안내 문구·완료 이벤트·필요 횟수·제한 시간·스토리 분기 조건/ID**를 바꿀 수 있다. 조건을 바꾼 뒤 상단 **수정한 목표 조건 → 미션 데이터 적용**을 누르고 연결된 `이 맵의 미션 데이터` DA와 맵을 모두 저장한다. 신규 조건은 고유한 목표 ID를 지정한다. 대상 액터 참조는 맵에, 규칙은 DA에 저장한다. 전역 실패/재출격/다음 수업 등은 연결된 DA를 열어 편집한다.
+
+**목표 액터 배치 · 스포이드 목록 채우기**는 비어 있는 항목을 현재 DA에서 채우며, 이미 선택한 대상/배치 위치는 보존한다. 이전에 실행 중만 생성하던 목표는 에디터에 배치하고 `TaggedActorCountToSkip`으로 중복 생성을 막았다. Course/FPV의 클래스별 런타임 태그도 실제 배치 액터에 반영했다. `Drone.EditorPlaced` 대상은 재출격 때 자동 지면 스냅/호버 구역 재배치로 위치를 되돌리지 않는다.
+
+### 새 맵에 추가하는 순서
 
 1. 사용할 미션 맵에 `/Game/Drone/Managers/BP_DroneMissionTargetManager`를 **1개 배치**한다. 기존 `BP_DroneMissionManager`(Director)는 Controller가 만들므로 추가로 배치하지 않는다. 팀원 Production 맵을 시험용으로 저장하지 않는다.
 2. 배치한 인스턴스의 **Details → Drone → Mission Targets → Target Bindings**에서 `+`를 누른다. BP Class Defaults가 아닌 레벨 인스턴스에서 설정해야 스포이드가 나온다.
@@ -119,11 +139,11 @@ Mission의 규칙과 맵 배치를 분리한다. “차량 파괴 1회”는 DA�
 
 명시적 연결은 선택한 액터를 바꾸는 기능이지 임의 StaticMesh에 체력/정찰/투하 기능을 자동 생성하는 기능이 아니다. 파괴 대상에는 `UDroneHealthComponent`·피해 충돌이, 정찰/투하 대상에는 각각 기존 Recon/Payload Target Component가 필요하다. Trigger는 `bUseOverlappingActorAsEventActor`에 따라 자기 자신/진입 액터 중 누가 사건을 보고하는지 맞춰 찍는다. LOS 특수 수업은 복귀/접지 규칙을 그대로 유지한다.
 
-DA에서 **Event·RequiredProgress·TimeLimitSeconds·순서/분기**를 조정한다. 대상3개를 찍어도 RequiredProgress가1이면 하나로 끝난다. RuntimeSpawnActors는 별개라 기존 기본 표적 생성도 끄려면 해당 DA 배치를 함께 조정한다. BP로 런타임 Targets를 바꿨으면 `RefreshTargets()`를 호출하고, 새로 Spawn한 일반 표적의 체력 이벤트는 `Director.RegisterObjectiveTarget()`에 연결한다. 배치형 기존 표적은 출격 때 자동 구독한다.
+기존 DA에서 **Event·RequiredProgress·TimeLimitSeconds·순서/분기**를 조정하거나, 매니저의 목표 조건을 편집한 뒤 적용 버튼으로 같은 DA에 반영한다. 대상3개를 찍어도 RequiredProgress가1이면 하나로 끝난다. 별도 기본 표적 생성은 DA RuntimeSpawnActors에서 조정한다. 위 배치 도구가 만든 기존 대상은 중복 생략 값을 함께 설정했다. BP로 런타임 Targets를 바꿨으면 `RefreshTargets()`를 호출하고, 새로 Spawn한 일반 표적의 체력 이벤트는 `Director.RegisterObjectiveTarget()`에 연결한다. 배치형 기존 표적은 출격 때 자동 구독한다.
 
 ### 구조·검증·문제 확인
 
-- 헤더/CPP: `ADroneMissionTargetManager`가 레벨 액터 참조/표시 캐시를 소유하고 `ADroneMissionDirector`가 같은 목록으로 사건을 검증한다. `UDroneFlightHUDWidget`의 HudKit Paint가 기존 나침반 위에 그린다. 맵/DA/배치 액터의 Tags를 몰래 수정하지 않는다.
+- 헤더/CPP: `ADroneMissionTargetManager`가 레벨 액터 참조/표시 캐시를 소유하고 `ADroneMissionDirector`가 같은 목록으로 사건을 검증한다. `UDroneFlightHUDWidget`의 HudKit Paint가 기존 나침반 위에 그린다. 기본 런타임 표시에는 맵 저장이 없고, 명시적 에디터 배치 도구만 연결 DA의 태그/대상/중복 생략 값을 반영한다.
 - 테스트 맵: `/Game/Drone/Maps/TestMap/Lvl_MissionCompassTest`. 직접 Play→UGV 선택/출격. 앞 A/B는 태그 없이 스포이드로 연결됐고 뒤 DECOY는 옛 태그가 있지만 대상이 아니다. A/B 파괴 시 진행1/2→성공, 별도 귀환 없음. 데모 DA는 로비 숨김·기존 수업/Story 진행과 분리했다.
 - 정상: A 정면 마커·B 우측 마커, 90° 돌면 A는 좌측, A 파괴 후 B만 남고 B 파괴 후 성공/마커0. 실제 손 조종·사격 감도 확인은 자동 순간이동/직접 피해 검사와 별개다.
 - 표시가 없으면 Enabled·MissionId/ObjectiveId 철자·Targets(None 여부)·Follow Current Objective·현재 미션 Active 여부·실제 HUD의 HudKit 사용을 확인한다. 대상 삭제/HP0도 표시하지 않는다. 자동 방식은 TargetId가 비어 있으면 임의로 맵의 첫 액터를 고르지 않는다.
@@ -178,6 +198,8 @@ DA에서 **Event·RequiredProgress·TimeLimitSeconds·순서/분기**를 조정�
 | Voice | 음성 SoundWave/SoundCue 등 USoundBase 자산을 연결. 현재 음원 없음·빈 슬롯은 자막만 표시 |
 | DurationSeconds | 0이면 음성 길이 또는 글자 수로 자동 산정, 양수면 해당 줄 시간 직접 지정 |
 | StoryFactCondition / StoryFactId | Always 등 조건과 Story Fact ID. 미정 분기를 임의 결정하지 않음 |
+
+기본은 사용자의 제거 요청대로 `bShowHubDialogue=False`여서 허브 대사 박스/자막 진행/Voice 재생이 꺼진다. 재사용할 때만 FrontEnd Root의 이 옵션을 켜고 아래 절차를 따른다. 제공 미션1 영상 안의 자막과는 독립적이다.
 
 1. `/Game/Drone/Data/Missions/DA_Mission_*`을 열어 BriefingLines 항목을 순서대로 추가하고 Speaker·Text를 입력한다.
 2. 음원이 준비되면 프로젝트에 가져온 음성 자산을 각 줄 Voice 슬롯에 연결한다. 실제 소리·길이·자막 동기화는 사람이 확인한다.
@@ -383,6 +405,36 @@ cd C:\URproject\drone
 - `DroneEditor Win64 Development`: 새 C++ 부모 클래스와 동적 Target 등록 코드 Build 성공
 
 기존 `Drone.AI.NPCGreyboxAssets` 종합 테스트는 현재 맵에 추가된 Actor 수와 예전 고정 기대값이 달라 실패한다. 보고된 항목은 Smart Object Station `예상 12/실제 34`, 자동포탑·차량 `예상 1/실제 2`, Rifle/Shotgun `예상 각 1/실제 각 3`, Ground Vehicle Auto Drive 설정이다. 이번 새 애니메이션 생성 실패가 아니며, 다음 AI 맵 정리 때 “정확한 개수 고정” 테스트를 도구 소유 Tag/최소 계약 기준으로 갱신해야 한다.
+
+## HUD 편집 정본
+
+비행 중 HUD의 배치 정본은 `/Game/Drone/UI/WBP/HUD/WBP_DroneFlightHUDKit`이다. 이 WBP의 **Designer**에서 조정한다. 별도 미션 목표·카운트다운 WBP의 배치를 함께 수정할 필요가 없고, 주 HUD 안의 실제 텍스트/이미지 파츠에 기존 데이터 로직이 연결된다. 결과·일시정지·출격 전 안내 같은 독립 화면은 기존 Mission WBP를 유지한다.
+
+고도 값의 하얀 상자는 기본 제거했다(`bShowAltitudeValueFrame=False`). 고도 숫자/포인터/눈금은 유지하며 `HudAltitudeFrame*` Image를 필요할 때만 켠다. 입력 표시의 `HudInputLeft/RightAxisX/Y`는 가로/세로 십자선 Image다. 기본 두께2·청록 알파0.8로 지면 위에서도 보이게 했으며 각 Brush/색/Slot 크기를 직접 조정한다.
+
+| Designer 구역 | 조정 대상 |
+|---|---|
+| 01 임무 목표 | 목표·역할 안내·진행 막대, 내부 줄 간격 |
+| 02 나침반 | 현재 방위, 기준선/포인터 이미지, 눈금·글자 원본 |
+| 03 시간 | 현재 시간·제한·랩·게이트 |
+| 04 기체 상태 | 내구·배터리·신호·바람, 아이콘/막대/설명 간격 |
+| 05 속도 | 값·단위, 표시 위치 |
+| 06 고도 | 값·수직속도, 테두리 이미지4개·눈금·글자 원본 |
+| 07 UGV 조준선 | 모서리8개·중심점·가로/세로 조준 이미지 개별 위치/길이/색 |
+| 08 UGV 무장 | 탄약·재장전, 칸 간격·막대/문구 |
+| 09 구간 기록 | 줄 높이·값/단위 간격 |
+| 10 경고 | 배경·아이콘·경고 두 줄 |
+| 11 조종 입력 | 좌/우 스틱 틀·축·커서 이미지 |
+| 12 카운트다운 | 출발 숫자 크기·위치·색 |
+| 13 화면 모서리 | 좌/우 프레임 이미지 각각 길이·굵기·여백 |
+
+- 바깥 배치는 각 구역의 `Canvas Panel Slot` 위치/앵커/정렬, 크기는 `SizeBox`에서 고친다. 기본 좌우·아래 안전 여백은32px다. 내부 줄/아이콘 간격은 해당 `VerticalBox/HorizontalBox Slot`의 Padding과 SizeBox로 조정한다. 그룹과 이미지가 한 Designer 안에 있어 서로 맞추며 편집할 수 있다.
+- 이미지 파츠는 `Brush`·`Color and Opacity`·Slot 크기를 개별 변경한다. 진행 막대는 ProgressBar의 Widget Style에서 Background/Fill을 각각 조정한다. 배경·테두리·텍스트는 합쳐진 한 장의 이미지가 아니다.
+- `HudCompass*Template`·`HudAltitude*Template`는 움직이는 눈금의 모양/글꼴 원본이다. Designer에서는 보이고 실행 때는 원본만 숨긴다. 눈금은 이미지의 Slot 크기·Brush·Color and Opacity·Is Enabled와 글자 Font/색을 읽어 그린다. 나침반 글자는 Template의 세로 위치, 고도 숫자는 가로 위치를 조정한다. 물리 간격은 Class Defaults의 `CompassPixelsPerDegree`·`AltitudeLadderPixelsPerMeter`를 사용한다. 현재 방위·고도에 따른 이동은 계속 자동 갱신한다.
+- 위치·글자 크기·굵기·정상 색은 Designer 값이 유지된다. 값·경고 상태색·조건부 표시·조종 커서 이동은 코드가 갱신한다. 글꼴 family는 프로젝트 공통 Pretendard를 기본으로 쓰며 별도 폰트를 쓸 때는 Class Defaults의 `bUnifyDesignerFonts` 또는 `FontOptOutWidgetNames`를 조정한다.
+- WBP에는 조정용 예시 값과 모든 구역이 보이는 미리보기가 있다. 실제 게임에서는 UGV 전용 조준/무장·기록·경고·입력 설정·카운트다운이 각 조건에 따라 보이거나 접힌다. 미리보기의 숫자3/경고가 게임에 항상 표시되는 것은 아니다.
+- 내부 위젯 이름은 데이터 연결 계약이므로 유지하고, 계층의 표시명으로 구분한다. `99 호환용`은 이전 네 TextBlock 연결을 보존한 접힌 그룹이므로 삭제하지 않는다. 기존 `WBP_DroneFlightHUD`/`WBP_DroneControlInputDisplay`와 독립 Objective/Countdown WBP는 예전 프로토타입/명시적 오버라이드 호환용이다. 일반 Native/default Controller도 `SharedHUDWidgetClass`로 주 HUD를 사용한다.
+- 일괄 재생성은 사람 편집을 덮을 수 있으므로 반복하지 않는다. `Drone.Tools.OrganizeHudDesigner`는 기본 읽기 전용이며 `-DroneApplyHudOrganization`이 있을 때 주 WBP 하나만 저장한다. 이미 정리된 자산은 건너뛴다. 검사/캡처는 `Drone.UI.HudDesignerContract`, 실제 실행 근거는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
 
 ## 문제가 생기면
 

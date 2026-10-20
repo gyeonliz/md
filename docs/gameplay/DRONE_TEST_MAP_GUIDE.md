@@ -8,7 +8,7 @@ Story의 현재 맵 연결은 아래 표가 정본이다. M2·M3는 원본 Milit
 
 기존 튜토리얼8개·Story4개·Racing 시험맵은 보존한다. 아래 날짜가 붙은 예전 맵 설명/검증은 당시 기록이며 최신 위치·정책은 위 가이드와 STATUS를 우선한다.
 
-현재 절차 기준: 2026-10-20 C PC. 과거 수행 수치/실패 정정은 WORKLOG 정본이다.
+현재 절차 기준: 2026-10-20 D PC. 과거 수행 수치/실패 정정은 WORKLOG 정본이다.
 
 ## 현재 미션 연결과 확인 순서
 
@@ -20,23 +20,24 @@ FrontEnd → 튜토리얼/스토리 → 미션 선택 → 브리핑/기체 → �
 |---|---|---|
 | LOS | `Tutorial/TUT_LOS` | 후퇴한 관찰 시점, 이륙/전진/후진/접지 수업 유지 |
 | 호버/전진/원형 | `TUT_Hover / TUT_Forward_Gate / TUT_Circle_Gate` | 3초 유지/Trigger/완주 뒤 즉시 성공, 별도 귀환 없음 |
-| 물자 운반 | `Tutorial/TUT_Delivary` | 준비 중 해제. 빈 집게→접근/집기→표적 투하 성공, 귀환 없음 |
+| 자유 게이트 | `Tutorial/TUT_FreeGate` | 준비 중/숨김 해제·코스13게이트 순서대로 완주→성공 |
+| 물자 운반 | `Tutorial/TUT_Delivary_2` | VV_grenades1·VV_highcaliber1·VV_WeaponBox2를 각각 집어 Cylinder로 운반. 고유 화물3개 뒤 성공, 귀환 없음. [스포이드/횟수](DRONE_MISSION_FRAMEWORK_GUIDE.md#이미-배치된-맵에서-바로-찾기) |
 | 포탑 파괴 | `Tutorial/TUT_UGV_Turret` | 준비 중 해제. 실제 자동포탑200HP, 유탄2발 파괴→성공 |
-| M1 GoldenTime | `Lvl_Battlefield` | 헬기포트 출격·DROP 수령 표적·기존 병사6·표식 위치 포탑2 |
+| M1 GoldenTime | `Lvl_Battlefield` | 헬기포트 출격·DROP 수령 표적·현재 병사9·표식 위치 포탑2 |
 | M2 Intercept | `Missions/Lvl_Story02_Intercept` | 헬기포트 출격·실제 배치 차량/기존 Spline 연결, 임시 직선60m 불사용 |
 | M3 VeilBreaker | `Missions/Lvl_Story03_VeilBreaker` | M3 시작 표식에 헬기포트 배치·실제 레이더/재밍 완전 이탈 목표 |
 | M4 Endgame | `Lvl_MilitaryCamp` | 헬기포트·기존 고정포탑3개/매니저·NPC27 Nav 연결. 임시 저메모리 설정에서 목표 파괴→성공 통과 |
 
 Runtime Spawn의 `bRelativeToMissionStart / bSnapToGround / TaggedActorCountToSkip`는 미배치 목표 보완용이다. Story4맵의 실제 배치 목표는 DA 임시 목표 Spawn에서 제외해 중복을 막았다. M1은 지정 XY를 유지하고 표시 지붕 위로 올려 저장했다. 원본 Base·팀원 Production Training·ID·Story Fact·분기·시간/기체 선택은 보존한다. 단말/요원·잔해 Scan·미션 중 기체교대·최종 엔딩은 별도 미완료다.
 
-실제 TUT 자동 검사는 `Drone.Tutorial.TUTMapLaunchPIE.{LOS,Hovering,Forward,CircleGate,FPV,Payload,UGVTurret}`다. LOS는 4단계·실제 접지, 물자는 집기/투하 이벤트, 원형은 Gate 순서 통과, 포탑은 피해/파괴 이벤트로 성공을 확인한다. 같은 검사 경로의 `StoryM1 / StoryM2 / StoryM3 / StoryM4`는 실제 제품 맵을 연다. M1은 물리 투하, M2는 이동 차량 후방 Sweep 자폭, M3는 실제 Overlap 진입/완전 이탈, M4는 지휘표적3개 피해/파괴 경로다. `-NullRHI` 실행은 목표·결과 로직만 검증하며 화면 Pass가 아니다. 자동 위치 이동은 손 조종 완주와 다르다. 최신 판정은 STATUS/WORKLOG, 화면·장치 조정은 [UI 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#훈련-사진조작-장치-그림시작-위치)를 따른다.
+실제 TUT 자동 검사는 `Drone.Tutorial.TUTMapLaunchPIE.{LOS,Hovering,Forward,CircleGate,FreeGate,FPV,Payload,UGVTurret}`다. LOS는 4단계·실제 접지, 물자는 집기/투하 이벤트, 원형은 Gate 순서 통과, 포탑은 피해/파괴 이벤트로 성공을 확인한다. 같은 검사 경로의 `StoryM1 / StoryM2 / StoryM3 / StoryM4`는 실제 제품 맵을 연다. M1은 물리 투하, M2는 이동 차량 후방 Sweep 자폭, M3는 실제 Overlap 진입/완전 이탈, M4는 지휘표적3개 피해/파괴 경로다. `-NullRHI` 실행은 목표·결과 로직만 검증하며 화면 Pass가 아니다. 자동 위치 이동은 손 조종 완주와 다르다. 최신 판정은 STATUS/WORKLOG, 화면·장치 조정은 [UI 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#훈련-사진조작-장치-그림시작-위치)를 따른다.
 
 ### 귀환 정책을 유지하는 방법
 
 - LOS(`Mission.Tutorial.Hover`)만 이륙→전진→후진 복귀→실제 착지의 4단계를 유지한다. 완료 전 출발점 접지가 필요하다.
 - 다른 Tutorial·Story는 본목표를 마치면 바로 성공한다. 별도 ReturnToBase Rule·ReturnZone 실행 배치·로비/브리핑/시작 안내의 낡은 귀환 문구를 넣지 않는다. 메뉴의 뒤로가기/로비 복귀와 NPC 순찰 복귀는 별개로 유지한다.
 - `UDroneMissionDefinition::RemoveReturnRequirements()`는 이관/저작 도구가 저장 전에 명시적으로 호출한다. 자동 로드 중 DA를 고치는 기능이 아니며 LOS는 변경하지 않는다. `HasReturnRequirements()`는 **금지된** 귀환 요구 검사이므로 LOS에서는 false여도 후진/착지가 남아 있는 것이 정상이다.
-- 옛 저작 스크립트8개의 Mission 저장 경로에도 정리를 연결했다. 기존 맵 안의 범용 ReturnZone은 삭제하지 않으며 현재 DA에서 요구하지 않으면 클리어 조건이 아니다. 자유 게이트 수업은 여전히 준비 중이다.
+- 옛 저작 스크립트8개의 Mission 저장 경로에도 정리를 연결했다. 기존 맵 안의 범용 ReturnZone은 삭제하지 않으며 현재 DA에서 요구하지 않으면 클리어 조건이 아니다. 자유 게이트는 현재 준비 중을 해제해 실제 TUT_FreeGate로 출격한다.
 
 ## 대형 맵을 메모리 보호 상태로 검사하기
 
