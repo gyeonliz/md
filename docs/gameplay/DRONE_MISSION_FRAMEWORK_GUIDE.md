@@ -8,7 +8,36 @@
 
 ## 이번에 준비된 것
 
+### Story 맵 시작·목표·NPC 배치
+
+Story M1은 `Maps/Lvl_Battlefield`, M2·M3는 원본 MilitaryBase를 보존해 분리한 `Maps/Missions/Lvl_Story02_Intercept`·`Lvl_Story03_VeilBreaker`를 사용한다. M4는 `Maps/Lvl_MilitaryCamp`다. 실제 검증 상태는 STATUS/WORKLOG가 정본이다.
+
+- 출격은 배치된 `SM_helicopter_base*`의 표시 경계 중심 XY·윗면+52cm다. DA `RuntimeStartTransform`은 패드 선택 기준과 출격 Yaw를 제공하며, 패드가 없을 때만 기존 DA/시작 표식/PlayerStart 경로를 사용한다. 첫 LOS의 관찰 시점·후진/착지 예외는 보존한다.
+- 맵의 `Drone/MissionStart`에서 패드를 이동하면 다음 출격이 따라간다. M3 사본의 패드만 원래 `M_Start_Mission3` XY의 지면으로 옮겼다. M2·원본 기지를 함께 옮기지 않는다.
+- `Drone/MissionTargets/M01`의 `M01_MainTarget_Delivery`는 기존 M_Target XY를 유지하고 Shack의 충돌뿐 아니라 표시 지붕 높이까지 확인해 위로 올렸다. DROP 표기와 나침반으로 찾는다. `Drone/Defense/M01`의 포탑2개는 기존 M_Turret 위치다. 기존 병사6명은 보존했다.
+- M2는 `M02_MainTarget_Convoy`에 기존 `BP_DroneVehicleSplineRoute`를 직접 연결한다. 옛 임시 직선60m 차량을 추가하지 않는다. M3는 `M03_MainTarget_Jammer`를 연결하며 기존 재밍 완전 이탈 규칙을 유지한다. 역할 교대·최종 시나리오를 완성한 것은 아니다.
+- `Drone/Managers`의 `M01/02/03/04_TargetCompassManager` 인스턴스에서 TargetBindings의 실제 대상 Actor를 스포이드로 교체한다. 목표 판정·표시가 같은 대상을 따른다. 배치 매니저가 전혀 없는 Story에만 런타임 Tag 기반 매니저를 보완 생성한다.
+- M4는 기존 고정 포탑 `BP_AutoTurret_Emplaced_C_24/18/14`를 `M04_MainTarget_Turret_01/02/03`으로 구분해 연결했다. 기존 3개 파괴 규칙/제한시간은 현재 기준안이며 최종 기획 수량 확정은 아니다. 새 상대좌표 표적3개를 중복 생성하지 않는다. 기존 NPC27·포탑18개를 보존한다.
+- Camp 원본에는 헬기포트가 없어 같은 `SM_helicopter_base_01`을 추가했다. 사용자 확인 위치 `(9700,6500,6105.43cm)`·회전0·Scale0.3을 유지하며 DA 기준 출격점은 `(9700,6500,6212.90cm)`다. 재밍 회피를 위해 포트를 옮기지 않는다. 크기 조정 후 펜스와의 시각적 겹침은 줄였지만 UGV 실제 주행/출발 피격·카메라 흔들림은 수동 확인한다.
+- Camp 재밍은 **해당 맵의 Radar8개 인스턴스만** `JammingRadiusCm=2000`(20m), `FullStrengthRadiusCm=400`(4m)로 조정했다. `JammingHalfHeightCm=3000`·출력1·활성 상태는 유지한다. 기존 150m/최대25m의 과도한 중첩을 줄인 기준안이며 M3와 BP 기본값은 바꾸지 않았다. Details → Drone → Jamming → Radar에서 변경하고 실제 JammingBounds·시작 신호100%·시설 근접/이탈을 시험한다.
+- 위치 표식은 삭제하지 않는다. M_Start/M_Target/M_Radar/M_Enemy/M_Turret 큐브의 Editor 위치를 보존하고 플레이 중 표시/충돌만 끈다. 실제 적/NPC/포탑을 대신 숨기지 않는다.
+- `Drone/Navigation`의 NavMeshBounds는 실제 병사 활동 범위와 지면을 포함한다. Recast `RuntimeGeneration=Dynamic`, `ForceRebuildOnLoad=True`, 타일 생성 동시 작업2개다. **플래그만 바꾸고 저장하면 타일0이 남을 수 있으므로 정식 Build→완료 대기→저장** 후 새 로드에서 검사한다. P로 영역/실제 이동을 확인한다. Volume 밖 이동은 범위를 조정하며 같은 Agent Recast를 중복 배치하지 않는다.
+
+`Tools/AssetMigration/ConfigureStoryMissionLayout.py`는 Editor 종료 후 한 프로세스·한 미션만 처리한다. `DRONE_STORY_LAYOUT_MISSION=1/2/3/4`, Nav 로드 정책만 고칠 때 `DRONE_STORY_LAYOUT_NAV_ONLY=1`을 사용한다. 원본/기존 자산은 `Saved/Backups/CodexMissionLayout_20261020`에 보존한다. M4는 배치 재료 확인을 통과하기 전 저장하지 않으며 메모리 보호를 우회하지 않는다. 팀원 Production Training은 이 도구 대상이 아니다.
+
+Nav 저장 도구는 `Diagnostics.StoryLayout.BakeNavigation`이며 명시적 `-DroneApplyStoryNavigation -DroneLayoutBakeMap=/Game/Drone/Maps/...`가 필요하다. 승인된 Story 한 맵만 Build/EnsureBuildCompletion하고 타일·NPC 투영이 유효할 때 저장한다. 일반 검증에 저장 플래그를 붙이지 않는다. MCP 장시간 요청의 socket_send_failure가 함께 기록된 실행은 기능 assert가 맞아도 전체 Pass로 쓰지 않는다. 최신 실행 수치/정정은 WORKLOG를 따른다.
+
 Story Mission을 만들 때 매번 Level Blueprint에 목표 판정을 새로 짜지 않도록 `/Game/Drone/Mission`에 재사용 Blueprint 묶음을 만들었다.
+
+### 시작 지점을 수동으로 옮기기
+
+1. PIE를 Stop하고 사용할 실제 미션 맵을 연다. Camp는 `Lvl_MilitaryCamp`, M2/3은 위 독립 사본이며 원본 MilitaryBase를 수정하지 않는다.
+2. Outliner → `Drone/MissionStart` → 헬기포트를 선택한다. Camp의 액터 이름은 `M04_SM_helicopter_base_01`이다. `F`로 선택 위치를 찾는다.
+3. `W`로 이동하거나 Details → Transform → Location XYZ를 입력한다. 철조망/벽과 겹치지 않고 지면 위에 놓는다. Camp 현재 위치 `(9700,6500,6105.43cm)`, Scale0.3은 사용자 확인값이다.
+4. 맵을 저장한다. PlayerStart를 옮기는 방식이 아니다. 출격 위치는 패드 표시 경계의 중심 XY·윗면+52cm를 따라가며 실제 기체는 충돌/착지 보정을 더 받을 수 있다.
+5. **출발 방향**은 현재 DA의 `Use Runtime Start=True` 때문에 패드 회전보다 `Runtime Start Transform → Rotation → Yaw(Z)`가 우선이다. Camp는 `Data/Missions/DA_Mission_Story_Endgame_Test` → Mission Definition → Runtime Placement에서 변경하고 DA도 저장한다. 패드를 돌리는 것만으로 출발 방향이 바뀐다고 가정하지 않는다.
+6. 같은 맵에 패드가 여러 개면 DA Runtime Start Transform의 Location도 원하는 패드 근처로 맞춘다. 이 좌표에 가장 가까운 패드를 고른다. 패드가 하나면 위치 이동만으로 출격점이 따라간다.
+7. FrontEnd에서 해당 미션을 다시 출격해 패드 위 시작·방향·벽 겹침/주행·신호·피격을 확인한다. LOS는 BP_LOS 고정 관찰/착지 수업이 별도 예외다.
 
 | Blueprint | 역할 |
 |---|---|
@@ -52,7 +81,9 @@ Blueprint는 빈 표시용 껍데기가 아니다. 공통 판정은 C++ 부모 �
 
 /Game/Drone/Maps/TestMap       # 기능 시험 맵
 /Game/Drone/Maps/Lvl_Battlefield   # M1 역할 확정
-/Game/Drone/Maps/Lvl_MilitaryBase  # M2·M3 공용 지역 확정
+/Game/Drone/Maps/Lvl_MilitaryBase  # 원본 지역 보존
+/Game/Drone/Maps/Missions/Lvl_Story02_Intercept
+/Game/Drone/Maps/Missions/Lvl_Story03_VeilBreaker
 /Game/Drone/Maps/Lvl_MilitaryCamp  # M4 역할 확정
 ```
 
@@ -269,7 +300,7 @@ Box Overlap 없이 Sequencer나 다른 BP에서 진행할 때는 `Try Activate M
 
 그물은 원래 박스 Scale을 Actor Scale로 복사하지 않고 폭/높이→Corner로 바꾼다. 조정/수동 시험은 [물리 가이드](DRONE_CHAOS_DATAFLOW_PLAN.md#현재-pbd-그물-배치조정)를 따른다. 설치형은 `/Game/Drone/AI/AutomaticTurrets/Blueprints/BP_AutoTurret_Emplaced`로 **병사가 점유하는 MG와 별개**다. Battlefield 전달 표적 Tag는 `Story.M1.Payload.Target`이며 최종 Rule의 TargetId도 정확히 일치시켜야 한다.
 
-**맵 역할 확정과 실제 MissionMap 전환은 별개다.** 박스 치환 도구는 Story DA의 `MissionMap`·목표·GameMode·PlayerStart를 변경하지 않는다. 기존4개 격리 Story TestMap 연결을 유지하며, 실제 지역으로 바꿀 때 M1 전달/귀환, M2 차량 Route/도착 실패, M3 Radar/귀환, M4 파괴 목표와 출격 지점까지 함께 확인한다. MilitaryBase의 미확정 `M_Target`을 차량 도착지라고 추정하지 않는다.
+**박스 치환 도구와 현재 미션 배치 도구는 별개다.** 현재 DA는 위 Story 맵 표를 따르고, 예전 격리 TestMap은 보존한다. 박스 치환 도구만으로 DA/목표/GameMode/PlayerStart를 바꾸지 않는다. LOS 외 귀환은 넣지 않는다. MilitaryBase의 미확정 `M_Target`을 차량 도착지라고 추정하지 않는다.
 
 ### 재밍 Radar BP 설정·시험
 
@@ -296,7 +327,7 @@ Box Overlap 없이 Sequencer나 다른 BP에서 진행할 때는 `Try Activate M
 | Mission Definition | 허용 기체 | 목표 순서 |
 |---|---|---|
 | `DA_Mission_Tutorial_Hover` | Scout | 고정 관찰 시점 이륙→전진→후진→착지 (`TestMap/Tutorial/Lvl_Tutorial_Observer_Test`) |
-| `DA_Mission_Tutorial_Payload` | Drop | 지정 표적 물자 투하 → 귀환 |
+| `DA_Mission_Tutorial_Payload` | Drop | 지정 표적 물자 투하 → 즉시 완료(귀환 없음) |
 | `DA_Mission_Tutorial_FPV` | FPV Strike | Arm 후 표적 파괴; 자폭 기체이므로 별도 귀환 없음 |
 
 기존 `BP_TutorialHoverZone`의3초 호버 판정은 별도 기능 시험용으로 보존한다. 새 첫 수업의 BP 위치·4단계 판정값·고정 카메라·접지/후진/재출격 확인은 [Training 가이드의 첫 수업 절](../tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md#첫-수업-고정-관찰-시점-기초-조종)을 따른다. 이전 Hover Zone 수치나 과거 공유맵 수동 순서를 새 첫 수업의 완료 기준으로 재사용하지 않는다.

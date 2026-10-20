@@ -1,15 +1,15 @@
 # 현재 작업 상태
 
-기준일: 2026-10-20 KST C PC. Unreal `0d5f039d`·MD `792e6079` 위 기존 변경 보존·목표 스포이드/나침반·LOS 예외 유지. 제품맵 미수정·새 시험장1개, Commit/Push 없음. 상세는 [WORKLOG](docs/history/DRONE_WORKLOG.md).
+기준일: 2026-10-20 KST C PC. Unreal `2a7b0418`·MD `e160207c` 위 Story 배치/맵 분리·나침반·NavMesh 수정. 원본 Base/Production Training·기존 변경 보존, Commit/Push 없음. 상세는 [WORKLOG](docs/history/DRONE_WORKLOG.md).
 
-## Git 기준(원격 최종 확인10/19)
+## Git 기준(원격 최종 확인10/20)
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal 원격 gyeonliz/drone | 실제 main·origin/main `0d5f039d` | 로컬 HEAD와 일치. 10/18 커밋 반영 |
-| Unreal C PC `C:\URproject\drone` | HEAD `0d5f039d` | 사용자 DA 보존·코드/사진 연결 로컬 변경, Clean 아님 |
-| 문서 원격 `gyeonliz/md` | origin/main `792e6079`(10/16) | 로컬 HEAD와 실제 원격 일치 |
-| 문서 C PC | HEAD `792e6079` | 지침·현재 상태/가이드 로컬 변경, Commit/Push 안 함 |
+| Unreal 원격 gyeonliz/drone | 실제 main·origin/main `2a7b0418` | 사용자 Push 수신·로컬 HEAD 일치 |
+| Unreal C PC `C:\URproject\drone` | HEAD `2a7b0418` | Story DA/맵·코드/검사 도구 로컬 변경, Clean 아님 |
+| 문서 원격 `gyeonliz/md` | origin/main `e160207c` | 실제 원격·로컬 HEAD 일치 |
+| 문서 C PC | HEAD `e160207c` | 상태/가이드 로컬 변경, Commit/Push 안 함 |
 
 ## 10/18~20 최신 구현과 확인 경계
 
@@ -18,7 +18,7 @@
 - **목표 매니저**: 배치형 BP_DroneMissionTargetManager로 스포이드 대상 교체/판정·나침반 방향/거리 연결. 새 경량 시험장 제공. [설정](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#스포이드-목표-연결과-나침반).
 - **전투**: 차량300·포탑200·MG25·유탄150·자폭600. 직격 중복 방지·자폭 잠금·NPC 래그돌 유지. 포탑 자체 HP0 폭발/소리1회·점유 해제·연결 메시 잔해15초 정리 구현, 실제 TUT 파괴/클리어 검사 통과. 청감/밸런스 수동 대기. [조정](docs/gameplay/DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md#차량-피해자폭npc-사망).
 - **오프닝**: Main_cinematic.mp4를 새 실행에 재생·종료/Esc로 타이틀, 실패 시에도 복귀. MP4는 LFS·패키징 NonUFS 설정. [설정/시험](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#시작-오프닝-영상).
-- **검증**: 최신 Build5.81초 성공. 목표 연결/기존 규칙·HUD4/4·나침반1280/1920폭·기존 원형 통과. 이전 DA/귀환 회귀6/6·TUT7종(LOS 착지 포함)·Story M1/2/3 로직 통과 유지. Story 화면/손 조종은 별도. Camp는20GB 미만으로 실행 안 함. 자유 게이트 준비 중, 실물 조작/Story 전체/전역172/패키징 Pass 아님. [근거](docs/history/DRONE_WORKLOG.md).
+- **검증**: 최신 Build5.11초 성공. Story4맵의 출격/목표→결과·나침반·NPC Nav 투영 자동 통과, 시작/목표 촬영. Camp는 승인된 임시 저메모리 설정만 검증(일반 화질/장시간 Pass 아님). Lumen 캐시 초과·출발 피격/흔들림은 잔존. 손 조종·전역172·패키징은 별도. [근거](docs/history/DRONE_WORKLOG.md).
 - **이번 수정**: API 선택/미리보기/포커스 일치, 호버 진행 지연, UGV 검사 이름 충돌, MG Static 경고, 로딩 최소 표시/ReadyHold의 시계 혼용을 수정했다. AI 검사는 선행 자동 교전을 격리해 점유/사망·재점유/수색·복귀 통과·기본 회귀 복귀. 제품 리시 규칙 유지.
 - **레이싱**: Map2 중복 링 실행 제외93개 완주/3맵 기록 복원 근거 유지. 원거리 전체 Fit 대신680~713m 근접 지형/코스 사진 NearView_20261020으로 교체. DA의 맵/기록ID·랜덤도시 '?'·맵 원본 보존. 실제 조종 완주는 별도다.
 
@@ -38,7 +38,7 @@
 
 첫 LOS는 현재 팀원 `Tutorial/TUT_LOS`·BP_LOS 눈높이를 사용한다. 이전 Observer TestMap은 보존했다. 그물 PBD·벽/로터 Sweep·카메라 분리/피해 Shake는 유지하며 실제 Chaos 제작·수동 체감은 후속이다. 세부 이력은 WORKLOG.
 
-Story DA 연결은 Battlefield=M1·MilitaryBase=M2/3·MilitaryCamp=M4다. M1은 기존 수령 표적이 Shack 아래 묻혀 재사용 시 지면 보정에서 빠지던 문제를 런타임 수정했다(XY/회전·맵 보존). M1/2/3 현재 본목표 성공 로직은 통과했으나 제품4맵 전체 플레이는 미검증이다. M2 직선60m는 임시 경로·도로/장애물 확인 필요, M3 역할교대 등 기획 전체와 M4는 미완료다. 표시명은 [CONTEXT](CONTEXT.md#story-미션-표시명), 검사 경계는 WORKLOG를 따른다.
+Story 현재 연결/시작/목표는 [미션 표](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#현재-미션-연결과-확인-순서)·[BP 배치](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#story-맵-시작목표npc-배치)가 정본이다. M2/3 독립 사본·실제 Spline, M1 지붕 위 DROP·표식 포탑2개, M4 기존 포탑3개를 연결했다. 네 맵에 헬기포트·매니저·NavMesh 저장, LOS 외 귀환 없음. Camp 재머8개는 해당 인스턴스만 반경20m/최대4m로 조정·사용자 지정 포트 위치 유지. 최종 분기/역할교대/엔딩·손 조종 완성은 아니다.
 
 UI 현재 상태는 아래 요약을 따른다. Pretendard 공통 적용·기존 아트/ID/저장키 보존 유지. [UI 가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md), 상세는 [오후 WORKLOG](docs/history/DRONE_WORKLOG.md#2026-10-16--오후-ui-전면-개편wbp-전환ugv-무장).
 

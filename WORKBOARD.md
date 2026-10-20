@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-10-20 C PC — LOS 복귀/착지 보존·다른 미션 귀환 제거·실제 맵 검증/M1 지면 보정. RC/사진·기존 변경 유지·미커밋·맵 미저장. [STATUS](STATUS.md), [WORKLOG](docs/history/DRONE_WORKLOG.md).
+마지막 갱신: 2026-10-20 C PC — Story 맵2/3 분리·4맵 출격/목표/나침반/NavMesh 연결·Camp 저메모리 검사/재밍 조정. 원본 Base/Training·LOS 예외 보존, 미커밋. [STATUS](STATUS.md), [WORKLOG](docs/history/DRONE_WORKLOG.md).
 
 ## Now
 
@@ -92,7 +92,7 @@
 | HUD-FIGMA-01 | 시안5 HUD Kit | WBP화·Paint 좌표/매 프레임 눈금 수정, 저녁 검증 WORKLOG | 실제 해상도·미션/나침반/타이머/상태/속도/고도/VS·UGV 표시 수동 확인. 배터리 시간 미정 |
 | MISSION-COMPASS-01 | 스포이드 목표/나침반 매니저 | BP_DroneMissionTargetManager·명시적 대상 판정/현재 목표 표시·경량 시험장 구현, 검증 WORKLOG | 사용할 맵에1개 배치→ObjectiveId/Targets 스포이드 설정→손 조종/사격 확인. 대상 기능·수량/시간은 DA/BP에서 별도 설정 |
 | D-6 높이 제한 | 배치 매니저·BP 값으로 적용 | 구현됨·자동 검증됨(10/05 C PC Claude). BP_DroneAltitudeLimitManager 배치·값 설정, 상세 [WORKLOG](docs/history/DRONE_WORKLOG.md) | 천장 체감 수동 확인 대기. 높이 제한 수치·경고 연출 현재 미정 |
-| STORY-TEST-01 | Story 제품 맵 연결 | DA4개 연결 유지. M1 재사용 표적의 지형 매몰을 실행 중 보정; 실제 M1 투하/M2 이동 차량 요격/M3 재밍 이탈→즉시 클리어 NullRHI 통과 | 화면/손 조종·M2 임시60m 실제 도로·Camp20GB RAM 대기. M1 단말/요원·M2 잔해Scan/반전·M3 기체교대/MANPADS·M4 장거리/엔딩 미완성·미정 유지 |
+| STORY-TEST-01 | Story 제품 맵 수동 완성도 | 맵2/3 분리·4맵 헬기포트/실제 목표/배치 매니저/NavMesh 저장·본목표→성공 자동 통과. M2 기존 Spline 사용, Camp 재밍 범위만 조정 | 손 조종/도로·일반 화질 Camp 성능, M1 단말/요원·M2 잔해Scan/반전·M3 기체교대/MANPADS·M4 장거리/엔딩은 별도 미완성·미정 |
 | MISSION-RULE-PIE-01 | 실제 수업 완료 흐름 | 실제 TUT7종 자동 통과. LOS4단계만 복귀/접지 유지·DA 원본 SHA 보존, 다른 DA 귀환 안내 정리·저작 도구 재도입 방지 | 실제 손 조작·실패/재시도·Story 화면 확인. 자유 게이트 준비 중 유지 |
 | STY-03-PIE-01 | 재밍 Radar·연결/HUD | 빈 Mesh·기지 범위 BP, Noise→NO SIGNAL·조종 차단·복구, 광섬유 면역 구현. 속도 저하 없음 | 일반/광섬유 진입·중심/경계·이탈·입력 복구 수동 확인. 자동 결과 WORKLOG |
 | STORY-BRANCH-01 | Mission 2→3 양쪽 스토리 분기 | Story Fact 저장·성공 적용·조건 목표 필터, 미끼/실제 탑승 양쪽 자동화 완료 | 사용자가 기본 스토리안을 정하면 실제 Mission DA에 Fact 설정 |
@@ -151,7 +151,7 @@
 최신 구현·검증은 [STATUS](STATUS.md), 세션별 수치·로그는 [WORKLOG](docs/history/DRONE_WORKLOG.md)를 따른다. 이전 완료/종료 카드와 Next는 [10월 아카이브](docs/history/archive/WORKBOARD_2026-10.md)에 보존했다.
 
 1. 실물 조종기 휠 회전/누름·왼쪽 아래Cancel, 패드·레이싱3맵/기록·LOS 시야·수업 즉시 클리어·물자/포탑을 확인한다. 새 RC와 사진은 실제 연결됨. 자동 근거는 WORKLOG, 팀원 맵 미저장.
-2. 오프닝 청감·자연 종료·실제 패드는 수동 대기. Camp는 텍스처/Editor 준비 제한을 반영했지만 전체 메모리 구성·실행 안정성은 미완료다. 여유 RAM20GB 확보 후 1회만 [격리 측정](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#대형-맵을-메모리-보호-상태로-검사하기); 이번 패키지 진단 보호 중단 뒤 무거운 반복 없음. 외부 경고는 LOS4개 및 STATUS의 잔존 항목을 구분한다.
+2. 오프닝 청감·자연 종료·실제 패드는 수동 대기. Camp는 승인된 임시 저메모리 Editor 한 프로세스에서 목표/화면 검사 통과. 일반 실행 시작20GB·RAM/커밋4GB 보호 유지, 전체 메모리 귀속/정상 화질·장시간 안정성은 미완료다. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#대형-맵을-메모리-보호-상태로-검사하기).
 3. HUD WBP Designer 반영·1280/1920 눈금·LOS 상자·체크박스를 수동 확인하고, 최신 HUD 해상도 캡처/FlightHUDKitLayout 하네스를 대조한다. 조작/수업/결과 미정은 UI-CONTROLS-DECISION-01.
 4. DR-INTERLINK-INPUT-01 실기 확인 후 Acro 혼합 입력·코스 표시선·NPC 다리/속도 대비 보폭·총 정렬·이동 뒤 날씨 시험 맵·비 차폐·벽/그물·광섬유/UGV 수동 회귀를 이어간다. WTH-03 비 입자 크기/모양·위치/양·젖음/물결·빗소리/실내 감쇠·패드를 가이드대로 확인한다. 팀원 Production Training 보존; 실제 패키징·Chaos 비교·최종 Rain/음원은 별도 후속이다.
-5. Story M1/2/3 기본 목표 완료는 실제 맵 로직 검사 통과. 전체 조종·M1 수령 위치 외형·M2 실제 도로/장애물·M4 Camp 검증은 남았다. 자유 게이트는 준비 중. 기획의 최종 콘텐츠/분기와 구분하며 MBase M_Target 보존. Git·Space는 STATUS, Commit/Push는 사용자.
+5. Story4맵 자동 목표/출격·나침반/NavMesh·시작/목표 사진 확인 완료. 실제 조종·M2 Spline 전체 도로/장애물·Camp 정상 화질과 최종 콘텐츠/분기는 후속이다. 자유 게이트 준비 중. 원본 MBase/Production Training 보존, Commit/Push는 사용자.

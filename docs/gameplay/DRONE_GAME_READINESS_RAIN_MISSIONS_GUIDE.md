@@ -153,7 +153,7 @@ BP 확장: FrontEnd WBP는 `LobbyBackButton / BriefingBackButton`, 기체 선택
 | `Lvl_Tutorial_UGV_NPC_Test` | UGV | 체력 있는 NPC 표적 사격. 이 표적은 AI Auto Possess 비활성 |
 | `Lvl_Tutorial_UGV_Turret_Test` | UGV | 체력 있는 고정 표적 사격. 공격하는 완성형 적 포탑은 아님 |
 
-보존된 Story 경량 시험장은 `TestMap/Lvl_DroneStory01_GoldenTimeTest`부터 `04_EndgameTest`까지다. 로비의 현재 제품 연결은 Battlefield=M1·MilitaryBase=M2/3·MilitaryCamp=M4이며, 본목표는 물자 전달·이동 차량 파괴·재밍 통과·지휘표적3개 파괴다. 별도 귀환 요구는 없고 LOS 튜토리얼만 후진/착지를 유지한다. 맵별 현재 판정·제품과 경량 시험장 구분은 [시험 가이드](DRONE_TEST_MAP_GUIDE.md#현재-미션-연결과-확인-순서)를 따른다. 기존 Racing 시험맵도 보존하며 기본 레이싱은 팀원 맵1·2·3이다.
+보존된 Story 경량 시험장은 `TestMap/Lvl_DroneStory01_GoldenTimeTest`부터 `04_EndgameTest`까지다. M2·M3는 별도 제품 미션 맵으로 분리했고 본목표는 물자 전달·이동 차량 파괴·재밍 통과·지휘표적3개 파괴다. 별도 귀환 요구는 없고 LOS 튜토리얼만 후진/착지를 유지한다. 현재 연결/검증·제품과 경량 시험장 구분은 [시험 가이드](DRONE_TEST_MAP_GUIDE.md#현재-미션-연결과-확인-순서)를 따른다. 기존 Racing 시험맵도 보존하며 기본 레이싱은 팀원 맵1·2·3이다.
 
 ### 바로 Play하는 방법
 

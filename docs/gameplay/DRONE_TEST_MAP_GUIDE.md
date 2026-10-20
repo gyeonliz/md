@@ -4,7 +4,7 @@
 
 Story 선택은 `Lvl_DroneFrontEnd`에서 Select_UI 배치·Pretendard 실제 문구·4개 목록→START→브리핑/Back을 확인한다([UI 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)). 물리 Sandbox에서는 공유 매듭 PBD 그물의 중력/국소 접촉과 일반 벽의 로터 외곽 반발을 시험한다([물리 가이드](DRONE_CHAOS_DATAFLOW_PLAN.md)). 적용·자동 검증·수동 대기 결과의 정본은 [STATUS](../../STATUS.md)다.
 
-Story DA는 Battlefield=M1/MilitaryBase=M2·M3/MilitaryCamp=M4로 연결했고 기존 목표 Tag/수량에 맞는 Runtime Placement를 추가했다. 승인 표식/NPC/맵은 보존한다. **제품4맵 전체 플레이 검증은 아직 아니다.** 재밍 Noise→NO SIGNAL·입력 차단/광섬유 면역·이탈 복원은 [Mission 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md)를 따르며 속도 배율은 유지한다. Production Training은 시험 저장하지 않는다.
+Story의 현재 맵 연결은 아래 표가 정본이다. M2·M3는 원본 MilitaryBase를 보존한 독립 미션 맵으로 분리했다. **제품4맵 전체 콘텐츠/손 조종 완성은 아니다.** 시작 패드·스포이드 목표·나침반·NPC NavMesh 조정은 [Mission 배치 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md#story-맵-시작목표npc-배치)를 따른다. Production Training은 시험 저장하지 않는다.
 
 기존 튜토리얼8개·Story4개·Racing 시험맵은 보존한다. 아래 날짜가 붙은 예전 맵 설명/검증은 당시 기록이며 최신 위치·정책은 위 가이드와 STATUS를 우선한다.
 
@@ -12,7 +12,7 @@ Story DA는 Battlefield=M1/MilitaryBase=M2·M3/MilitaryCamp=M4로 연결했고 �
 
 ## 현재 미션 연결과 확인 순서
 
-목표를 스포이드로 교체하고 나침반에 표시하려면 새 `BP_DroneMissionTargetManager`를 배치한다. `/Game/Drone/Maps/TestMap/Lvl_MissionCompassTest`의 A/B·DECOY 예제를 직접 Play할 수 있다. 설정·원래 MissionManager와의 차이는 [미션 연결 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md#스포이드-목표-연결과-나침반)를 따른다. 기존 제품 맵에는 자동 배치하지 않았다.
+목표를 스포이드로 교체하고 나침반에 표시하려면 `BP_DroneMissionTargetManager`의 레벨 인스턴스를 편집한다. Story4맵에 실제 목표를 연결한 매니저를 배치했다. `/Game/Drone/Maps/TestMap/Lvl_MissionCompassTest`의 A/B·DECOY는 별도 예제다. 설정·원래 MissionManager와의 차이는 [미션 연결 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md#스포이드-목표-연결과-나침반)를 따른다.
 
 FrontEnd → 튜토리얼/스토리 → 미션 선택 → 브리핑/기체 → 출격으로 확인한다. `Diagnostics.Feedback.MissionAssets -DroneNoReturnAudit`는 월드를 열지 않는 읽기 전용 DA 계약 검사다. `-DroneApplyMissionFeedback / -DroneRemoveAllMissionReturns`는 DA 백업/저장 옵션이므로 재검증에는 붙이지 않는다. 이번 원본은 Unreal `Saved/Backups/CodexMissionNoReturn_20261020`, 이전 연결 원본은 `Saved/Backups/CodexMissionFeedback_20261020`에 있다.
 
@@ -22,12 +22,12 @@ FrontEnd → 튜토리얼/스토리 → 미션 선택 → 브리핑/기체 → �
 | 호버/전진/원형 | `TUT_Hover / TUT_Forward_Gate / TUT_Circle_Gate` | 3초 유지/Trigger/완주 뒤 즉시 성공, 별도 귀환 없음 |
 | 물자 운반 | `Tutorial/TUT_Delivary` | 준비 중 해제. 빈 집게→접근/집기→표적 투하 성공, 귀환 없음 |
 | 포탑 파괴 | `Tutorial/TUT_UGV_Turret` | 준비 중 해제. 실제 자동포탑200HP, 유탄2발 파괴→성공 |
-| M1 GoldenTime | `Lvl_Battlefield` | 기존 물자 전달 목표/Tag 유지·실행 중 표적 보충 |
-| M2 Intercept | `Lvl_MilitaryBase` | 기존 차량 파괴 목표, 미지정 경로만 임시 직선60m. 실제 도로/장애물 검증 필요 |
-| M3 VeilBreaker | `Lvl_MilitaryBase` | 기존 재밍/정찰·파괴 규칙 유지, 기존 레이더 Tag 재사용 |
-| M4 Endgame | `Lvl_MilitaryCamp` | 기존 지휘표적3개 규칙 유지·실행 배치. RAM 부족으로 월드 검사 미실행 |
+| M1 GoldenTime | `Lvl_Battlefield` | 헬기포트 출격·DROP 수령 표적·기존 병사6·표식 위치 포탑2 |
+| M2 Intercept | `Missions/Lvl_Story02_Intercept` | 헬기포트 출격·실제 배치 차량/기존 Spline 연결, 임시 직선60m 불사용 |
+| M3 VeilBreaker | `Missions/Lvl_Story03_VeilBreaker` | M3 시작 표식에 헬기포트 배치·실제 레이더/재밍 완전 이탈 목표 |
+| M4 Endgame | `Lvl_MilitaryCamp` | 헬기포트·기존 고정포탑3개/매니저·NPC27 Nav 연결. 임시 저메모리 설정에서 목표 파괴→성공 통과 |
 
-Runtime Spawn의 `bRelativeToMissionStart / bSnapToGround / TaggedActorCountToSkip`를 DA에서 조정한다. 같은 클래스와 첫 Tag가 충분하면 중복 생성하지 않는다. `bSnapToGround`가 켜진 재사용 표적은 지형에 묻힌 경우만 위로 보정하며 XY·회전은 보존한다. M1은 재사용 표적이 보정에서 빠져 위쪽 Shack에 투하물이 먼저 닿던 문제를 이 경로로 수정했다. 시작 표식은 읽기만 하고 Production 맵을 저장하지 않는다. 미션 ID·Story Fact·분기·제한시간/기체 선택은 보존했다. 미구현 단말 회수/요원·잔해 Scan·한 미션 기체교대·최종 엔딩까지 완성한 것은 아니다.
+Runtime Spawn의 `bRelativeToMissionStart / bSnapToGround / TaggedActorCountToSkip`는 미배치 목표 보완용이다. Story4맵의 실제 배치 목표는 DA 임시 목표 Spawn에서 제외해 중복을 막았다. M1은 지정 XY를 유지하고 표시 지붕 위로 올려 저장했다. 원본 Base·팀원 Production Training·ID·Story Fact·분기·시간/기체 선택은 보존한다. 단말/요원·잔해 Scan·미션 중 기체교대·최종 엔딩은 별도 미완료다.
 
 실제 TUT 자동 검사는 `Drone.Tutorial.TUTMapLaunchPIE.{LOS,Hovering,Forward,CircleGate,FPV,Payload,UGVTurret}`다. LOS는 4단계·실제 접지, 물자는 집기/투하 이벤트, 원형은 Gate 순서 통과, 포탑은 피해/파괴 이벤트로 성공을 확인한다. 같은 검사 경로의 `StoryM1 / StoryM2 / StoryM3 / StoryM4`는 실제 제품 맵을 연다. M1은 물리 투하, M2는 이동 차량 후방 Sweep 자폭, M3는 실제 Overlap 진입/완전 이탈, M4는 지휘표적3개 피해/파괴 경로다. `-NullRHI` 실행은 목표·결과 로직만 검증하며 화면 Pass가 아니다. 자동 위치 이동은 손 조종 완주와 다르다. 최신 판정은 STATUS/WORKLOG, 화면·장치 조정은 [UI 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#훈련-사진조작-장치-그림시작-위치)를 따른다.
 
@@ -79,7 +79,15 @@ Unreal 저장소에서 `Tools/Validation/Test-RemainingMapsIsolated.ps1`을 사�
 & ./Tools/Validation/Test-RemainingMapsIsolated.ps1 -MapNames CampBudget -MapPackage /Game/Drone/Maps/Lvl_MilitaryCamp -TestOverride Diagnostics.Camp.EditorBudget
 ```
 
-`Diagnostics.Camp.PackageMemoryOnly`는 패키지만 읽어도 무거우므로 명시 `-DroneProfileCampPackage`와 여유20GB를 요구한다. 보호 중단 시 같은 실행을 반복하거나 DDC를 지우지 않는다. 일반 Python commandlet의 ConsoleVariable 기본값은 실제 Editor 적용값과 다를 수 있어 설정 확인은 `EditorBudget`을 사용한다. 실제 Camp의 렌더/PIE·장시간 안정성·피크 감소율은 메모리 확보 후 후속1회 검증이며 아직 Pass가 아니다.
+`Diagnostics.Camp.PackageMemoryOnly`는 패키지만 읽어도 무거우므로 명시 `-DroneProfileCampPackage`와 여유20GB를 요구한다. 보호 중단 시 반복하거나 DDC를 지우지 않는다. 일반 Python commandlet 값은 실제 Editor 적용값과 다를 수 있어 설정 확인은 `EditorBudget`을 사용한다. Camp의 정상 화질/장시간 안정성·피크 감소율은 미검증이다. 승인된 저메모리 실행 결과와 구분한다.
+
+### 사용자가 승인한 임시 저메모리 Editor 검사
+
+`-EditorReview -LowMemoryReview`를 함께 쓴 별도 모드다. 이 경우만 시작 여유16GiB, 실행 RAM/커밋4GiB 보호를 적용하며 일반 Camp 시작20GiB 기준은 그대로다. 이번 실행에만 Asset/Texture 준비1·추정 예산3GiB·Texture/Shadow 품질1·Streaming Pool768MiB·Grass0.25·Foliage0.5를 적용한다. 원본 맵의 기본 화질/에셋을 낮춰 저장하지 않는다. 자동 패키징·전체 쿠킹·DDC 재생성은 하지 않는다.
+
+`-RunName` 아래 `live.json`과 `engine.log`를 확인한다. `handoff.ok`는 자기 엔진을 종료하지 않고 사용자에게 넘기므로, 검사 중 임의로 만들지 않는다. 연장 검사 시 같은 소유 PID의 RAM/커밋 보호를 먼저 넘겨받고 마지막에만 종료한다. Inspector에서 현재 World가 Camp인지 확인하고 실제 로비→미션 검사를 사용한다. 미션 맵을 직접 Play하는 초기화 경로는 별도 계약이다.
+
+Camp 재밍 반경/출발 패드의 현재값은 [배치 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md#story-맵-시작목표npc-배치)가 정본이다. 시작 신호100%와 시설 근접/이탈을 확인하되 Lumen Surface Cache 초과, 시작 피격/흔들림·실제 주행은 별도 점검한다. 경고를 숨기려고 캐시 예산을 무작정 늘리지 않는다. 근거 사진/보고서는 `Saved/Automation/CodexMissionLayout_20261020`이다.
 
 ## Shotgun 시선 안정화 확인 — 2026-10-04 C PC
 

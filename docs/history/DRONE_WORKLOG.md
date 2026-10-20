@@ -3999,3 +3999,25 @@ STATUS/WORKBOARD·시험/로비/미션 현재 가이드를 갱신했다. STATUS3
 근거 정본은 `C:/URproject/drone/Saved/Automation/CodexMissionCompass_20261020/index.json`. 이전 실패/제외 실행·최초960 그림·수정 전 C++4개/새 시험장 사본을 `Saved/Backups/CodexMissionCompass_20261020` 및 실행별 폴더에 보존했다. 기존 제품 맵 변경0·새 시험장1개, 사용자 진행도481B/UTC2026-10-19T16:16:33.452796Z·HEAD Unreal0d5f039d/MD792e6079 유지·Commit/Push 없음. Camp/자유 게이트/Story 전체 콘텐츠·손 조종/패키징 한계는 기존과 같다.
 
 현재 절차를 DRONE_MISSION_FRAMEWORK_GUIDE의 스포이드 목표 연결과 나침반 절에 정리하고 STATUS/WORKBOARD·시험 가이드를 연결했다. STATUS30586B·WORKBOARD29675B로30KiB 아래라 아카이브 이동은 없다. maintain-space로 기존4페이지 현재5블록만 갱신했고 sequence59/41/42/21·저장 후 기대 본문 일치를 확인했다. 새 Space Page·원시 로그/이미지/자산/비밀값 업로드·Trello/Figma·예약/권한 변경은 없다. 미커밋 코드/문서는 아직 다른 PC/GitHub에 전달되지 않았다.
+
+## 2026-10-20 — 실제 Story 배치·M2/3 분리·Nav 저장·Camp 저메모리/재밍 조정 (C PC Codex)
+
+사용자 Push를 실제 원격과 대조해 Unreal2a7b0418·MDe160207c 수신/초기 Clean을 확인했다. 객체명/폴더의 위치 표시, M1 주목표, M2/3 분리, 헬기포트 출격·나침반·NPC NavMesh와 시작/목표 사진 요청을 이어 수행했다. 기존 파일은 Saved/Backups/CodexMissionLayout_20261020에 보존했다. 팀원 Production Lvl_DroneTraining은 저장/재생성하지 않았다. 원본 MilitaryBase SHA256은 26D27CCB2F565090D6390151251BC1D29A78EBB70BA2A2EEB587F987BFBF53E4로 동일하다. 사용자 진행 저장481B·UTC2026-10-19T16:16:33.452796Z도 유지했다.
+
+M1은 기존 M_Target XY를 유지한 M01_MainTarget_Delivery를 Shack의 표시 지붕 위로 올리고 DROP 글자를 켰다. M_Enemy/M_Turret 재료를 쓰던 오해하기 쉬운 M_Start 표식은 Editor에 보존하고 플레이 표시/충돌만 끄며 기존 병사6명·표식 위치 고정 포탑2개를 연결했다. M2/3은 원본 Base를 저장하지 않고 Editor Save As로 Missions/Lvl_Story02_Intercept·Lvl_Story03_VeilBreaker 독립 사본으로 분리했다. 첫 AssetTools World 복제는 전환 시 GC 오류가 나서 완료로 세지 않았고 원본 해시를 확인한 뒤 Save As 방식으로 대체했다. M2는 실제 배치 차량과 기존 BP_DroneVehicleSplineRoute를 직접 연결해 임시 직선60m를 제거했다. M3는 기존 레이더를 유지하고 해당 사본의 패드만 M_Start_Mission3 XY 지면으로 옮겼으며 재밍 진입/완전 이탈 규칙은 유지했다.
+
+Controller는 Tutorial/Story의 실제 SM_helicopter_base 메시 경계 윗면+52cm를 출격점으로 사용한다. 첫 LOS 고정 관찰/후진/접지 예외와 다른 미션 귀환 제거를 유지한다. 각 맵의 BP_DroneMissionTargetManager가 실제 목표와 판정/나침반을 함께 연결하며 DA의 중복 상대좌표 목표 Spawn을 제거했다. 새로운 최종 시나리오·수량·기체교대·엔딩을 확정한 것은 아니다.
+
+NavMesh는 실제 NPC 범위+지면으로 제한하고 Dynamic/ForceRebuildOnLoad/타일 작업2를 사용한다. 플래그만 바꾸고 저장한 중간 검사는 새 로드에서 타일0·전원 투영 실패였다. 이를 통과로 재사용하지 않고 Diagnostics.StoryLayout.BakeNavigation을 추가해 Build→EnsureBuildCompletion→유효 타일/전원 투영 확인→해당 맵 저장으로 수정했다. 중복 Recast는 만들지 않는다. 최신 Build는 잘못된 void LoadMap 사용을 수정한 뒤5.11초 성공이다. 최종 M1/2/3 새 프로세스 RHI 검사는51.5/44.7/45.6초 Pass, 최소 물리 RAM12613/12252/11844MiB·Private피크11714/11459/11790MiB, 타일486/523/523·NPC6/8/8 전원 투영이었다. 이전 실패/중간 보고서는 삭제하지 않았다.
+
+Camp 실행 전 승인받은 Chrome·Discord·Steam·Epic·Claude·NexonPlug·카카오톡·NVIDIA Overlay를 종료했다(Overlay는 UE 실행 시 재시작). GitHub Desktop·Codex·ChatGPT는 유지했다. 그래도 일반 시작 기준20,480MiB가 부족해 사용자가 별도 저메모리 검사 모드를 승인했다. 이 모드만 시작16,384MiB·RAM/커밋4,096MiB 중단 보호, Asset/Texture 준비1·예상 작업 예산3GiB·Texture/Shadow1·Pool768MiB·Grass0.25/Foliage0.5를 이번 실행에 적용했다. 일반 기준/원본 맵 기본 화질은 낮추지 않았다. Editor PID20260 한 프로세스를 MCP로 조작했고 마우스 제어·전체 쿠킹/패키징·DDC 삭제는 없다. 최초 로드 private 관측 피크24,335MiB·후속 Process PeakPaged24,476MiB는 프로세스 커밋량이며 물리 RAM 자산별 귀속/정상 화질 개선율이 아니다. 기존 텍스처·준비 동시성 수리와 구분한다.
+
+실제 Camp에는 헬기포트나 객체명 목표 폴더가 없고 NPC27·자동포탑18개·재머8개가 있었다. 동일 SM_helicopter_base_01을 추가하고 기존 고정포탑 Emplaced_C_24/18/14를 M04_MainTarget_Turret_01/02/03으로 이름/Tag/매니저 연결했다. 기존 배치/나머지 방어 시설은 보존하고 현재3개 파괴 규칙·240초·기체 선택은 바꾸지 않았다. 새 Nav1605타일·NPC27/27을 확인했다. Camp BakeNavigation은 기능 assert가 맞고 저장됐지만 MCP HTTP socket_send_failure가 함께 기록돼 전체 Fail로 보존한다. 이후 실제 로비→Camp 출격·매니저1/표식3·전원 투영·실제 목표 피해/파괴→클리어 검사는 오류/경고0으로 통과했다.
+
+첫 M4 화면은 재머 중첩으로 NO SIGNAL이었다. 사용자 정정에 따라 시작점을 재밍 회피 위치로 옮기지 않고 **Camp의 Radar8개 인스턴스만** 반경150m/최대25m→반경20m/최대4m로 조정했다. 출력1/활성/높이30m·M3/BP 기본값은 유지한다. 사용자에게 원본에는 패드가 없음을 설명했고 ‘현재 포트 위치 유지—재밍 조정 전 위치’를 확인받았다. 최종 위치(9700,6500,6105.43cm)·회전0·Scale0.3이며 기존 미션과 같은 패드 크기다. DA 기준 출격(9700,6500,6212.90cm)은 실제 기체 충돌/착지 보정을 받을 수 있다. 크기 수정 중 MCP 부분 Transform이 누락 Location을0으로 해석한 일시 상태는 full Transform으로 즉시 복원했으며 그0좌표는 저장하지 않았다.
+
+재밍 조정 후 시작 신호100%/NO SIGNAL 해제와 목표 파괴→성공을 확인했고 최종 크기 저장본도 StoryM4 **70.41초 Success·오류/경고0**, NPC27/27·1605타일 통과했다. 마지막 검사 시 Dynamic Nav12타일은 갱신 중이었으므로 ‘Nav가 전혀 다시 빌드되지 않는다’고 해석하지 않는다. 경량 MissionAssets/CompassBearing/TargetPickerBinding은 마지막0.36초 **3/3** 통과다. 다만 실제 화면에는 Lumen Surface Cache 초과 경고와 출발 적 피격/카메라 흔들림(HP70)이 보인다. 자동 성공과 주행 동선/손 조종·정상 화질/장시간 안정성·연출 완성을 구분하고 이 문제들은 남겼다. 무작정 Lumen 캐시 예산을 늘리지 않았다.
+
+근거 정본은 `C:/URproject/drone/Saved/Automation/CodexMissionLayout_20261020/index.json`, 실제 시작/목표8장은 같은 폴더 Screenshots/StoryM1~4_Start/Target.png다. 마지막 M4 시작 캡처에는 실제 피격 흔들림이 있으므로 예쁜 무피격 사진/플레이 완성 근거로 쓰지 않는다. 실패/중간 실행은 형제 CodexMissionLayout 폴더에 보존하고 중복을 고유 통과 수로 합산하지 않는다. 한 맵 감사가 DA soft World를 읽으며 여러 맵을 로드하던 메모리 문제도 수정해 명시 단일 맵 감사는 DA World 읽기를 건너뛴다. 초기 보호 중단과 수정 뒤 단일 감사 결과를 구분한다.
+
+사용자의 수동 시작점 질문에 현재 코드의 패드 우선·DA Yaw 우선·여러 패드일 때 DA 근처 선택을 설명하고 Mission 배치 가이드에 절차를 추가했다. Camp 에디터는 켜 둔 채 M04_SM_helicopter_base_01을 선택했고 추가 무거운 검사는 하지 않는다. 초기900초 러너 보호를 같은 소유 PID의 ContinueGuard.ps1로 먼저 넘겼으며 RAM/커밋4GiB 보호는 유지한다. 원본 Base/Training·진행 저장 보존, Commit/Push 없음. STATUS30,559B·WORKBOARD29,578B로30KiB 아래라 이번 아카이브 이동은 없다. maintain-space는 기존 진행/시험/BP 페이지의 현재4블록만 갱신·읽기 재확인(sequence61/42/43)하고 수동 시작점 절차만 BP44로 보강·재확인했다. 별도 페이지·원시 로그/자산/이미지 업로드·공유 권한·Trello/Figma 변경은 없다. 미커밋 코드/맵/MD는 아직 다른 PC/GitHub에 전달되지 않았다.
