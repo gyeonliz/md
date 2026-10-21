@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-10-20 D PC — fc27eb7b Pull·UI/배달2·NPC Nav 수리 및 자동 검증 완료. 실제 장치/전체 조종은 별도. [STATUS](STATUS.md), [WORKLOG](docs/history/DRONE_WORKLOG.md).
+마지막 갱신: 2026-10-21 D PC — ddbd963d 위 새 사진6종/Racer 외형·Build14.62초·집중4종 성공. 카운트다운/MD 편집 보존. [STATUS](STATUS.md), [WORKLOG](docs/history/DRONE_WORKLOG.md).
 
 ## Now
 
@@ -11,7 +11,7 @@
 | 항목 | 필요한 결정/자료 | 현재 처리 |
 |---|---|---|
 | M2 | 실제 타겟 탑승 vs 미끼 결말·시스템 성공/실패·다음 Story Fact | D-1 보류(2026-10-05 사용자): 기획자 내용 대기. 양쪽 분기 기반 유지, M3 반대 분기 첫 대사 비어 있음 |
-| M3/M4 | 타겟·적·드론 수량, 성공/실패, 제한·재출격·결과 카메라 | D-2 보류(2026-10-05 사용자): 기획자 내용 대기. M4 시험값 표적3·재출격0(무제한)는 채택 사양 아님 |
+| M3/M4 | 타겟·적 수량, 제한 시간·결과 카메라·M4 최종 출격 위치 | 10/21: M1 임시6종·M1/2 재도전, M3/4 기체 재선택·진행 보존 무한 출격, M4 기체→3지점→출격. BP3 배치·신규4개 검사 통과·최종 위치 조정 대기. [조정](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#미션-4-시작지점과-선택창-조정) |
 | 조종 입력 표시 | 기본값, 장치 자동 전환, 혼합 입력·연결 해제/재연결 | D-3 결정(2026-10-05 사용자): 기본 끔(False), 설정에서 ON/OFF. 기존 구현과 일치·수동 확인 대기. 장치 자동 전환·혼합 입력·연결 해제/재연결 정책 현재 미정 |
 | 레이싱 | 지형/4코스 진행도 대조, Ghost/리플레이·커브·Restart/Quit 범위 | 팀원3맵 연결·완주/복원 자동 통과, 실제 조종·후속 규칙 대기; RACING-TERRAIN-LINK-01 |
 | Tutorial | 수업8개 유지, 권장문구/건너뛰기 정책 | D-4 수업1~8 유지·회의 “4”는 고정 레이싱 코스4개. 진행도 JSON 저장은 수신 코드에 구현됨; 재실행 확인은 TUT-COMPLETION-SAVE-01 |
@@ -46,12 +46,12 @@
 | TUT-OBSERVER-01 | 고정 조종자 첫 수업 | LOS4단계 이륙→전진→후진 복귀→접지 성공을 실제 TUT_LOS에서 자동 통과. LOS DA SHA 보존; STATUS | 손 조종·상자 가시성·Lumen 노출 경고·재출격/다음 수업 확인 |
 | TUT-GATE-SAVE-01 | Gate BP 저장 사고 | CDO MID 참조 원인 수정·Gate BP 수리, 재로드3회·Gate5/5 성공(기존 경고100) | 팀원 Source+BP 수신/종료 후 Build·같은 저장 실기. 기하/색·16개 유지, Production 미수정 |
 | TUT-COURSE-SMOOTH-01 | 장거리 코스 표시선 곡률 분할·BP 표시 예산 | 구현됨·자동 검증됨·수동 확인 대기(10/04 C PC Claude). 긴 코스 곡률 분할·기본1024(시작값·미확정), BP 드래그 재구성 Off. 수치·근거 STATUS/WORKLOG | 팀원 Production 코스 외형·급커브/끝 연결·Editor 편집 체감 수동 확인. BP2048(측정 최대20cm) 검토 가능. 짧은 TestMap68/113조각 기존 균일 분할 유지·Production 저장/재생성 금지 |
-| RACING-TERRAIN-LINK-01 | 레이싱 흐름·지형 연결 | 팀원 맵1·2·3 진입·완주/저장·새 엔진 복원 자동 통과. Map2 연속 중복 링은 실행 중만 제외; WORKLOG | 실제 조종 완주·HUD/기록 체감 확인. 팀원 맵 보존, 자동 위치 주입을 수동 완주로 확대하지 않음 |
+| RACING-TERRAIN-LINK-01 | 레이싱 흐름·지형 연결 | 본체 단독 연결 오류 정정·프로펠러4개/BP 선택3D 복구. 원형/도시 출격·회전 중심·3D 검사 통과; WORKLOG | 손 조종 완주·HUD/기록 체감·원본 맵 보존 |
 | TUT-PROGRESS-01 | 튜토리얼 시간·연속 진행·전체 완료 | 이전 자동 검증 WORKLOG. 수신 코드의 완료 미션/Story Fact JSON 저장은 TUT-COMPLETION-SAVE-01 | 실제8수업·현재 결과창·로비 완료 표시/재진입 확인. Production Training 보존 |
 | TUT-BRIEFING-TEXT-01 | 훈련 문구·시작 안내 | 기획 문구·역할 조작·기본 훈련 시작 안내 구현(Claude), 수동 대기 | 패드/Enter 시작·목표/안내 확인. 기획8개↔UGV NPC 매핑·미기재 화자/키 결정 |
 | TUT-COMPLETION-SAVE-01 | 미션 진행도 영구 저장 | 10/13 수신 소스 확인: 완료 미션·Story Fact·권장문구 표시 여부 JSON 저장/복원 구현. Best Lap 저장과 별개 | Claude가 현재HEAD 회귀 확인 후 실제 성공→종료→재실행 복원·저장 실패 처리 확인. 수신만으로 자동/수동 Pass 아님 |
 | TUT-ORBIT-02 | 회전 수업 = 원형 코스 한 바퀴 | Heading ID 유지·실제 TUT_Circle_Gate 완주→즉시 성공 자동 통과, 귀환 제거 | 손 조종으로 순서/역방향/7⁄8 바퀴 미완료 확인 |
-| TUT-GATE-PRESENTATION-01 | Gate 크기·진행 방향 | Island112개 정합·숨김Native 보존/원본 무저장. 비균등Scale·0접선 수리, m_green Naniteflag 수리; STATUS | 새Source Build 후 Island 크기/방향·3상태색 실기. 잔존 삭제·맵 재생성 금지, Main 참조 별도 |
+| TUT-GATE-PRESENTATION-01 | Gate 크기·방향·3색 | 상태별 MI 자동 우선·빈칸 BP 기본색/발광·Param/Color 호환. Build53.04초·Gate4/4. Island정합/Scale수리 유지. [조정](docs/tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md#세-상태-색과-머터리얼-조정) | 실제 코스 색/방향 확인·원본 맵 보존 |
 | TUT-ROUTE-SELECT-01 | Training Route 4개 선택 시험 | `Lvl_DroneTrainingRouteSelectionTest`에 직선·좌곡선·우곡선·상승 슬라럼과 Gate 각 5개 배치. `1~4` 고정·`5` 무작위, 단일 활성, 진행 초기화, HUD 기록 Source 전환. Build·Map Check·API/저장/실제 키 PIE 성공 | 사용자가 화면에서 경로 형태·Gate 간격·랜덤 전환과 Lap HUD를 확인하고 각 Spline 점을 최종 조정 |
 | TUTORIAL-MISSION-01 | Figma 수업별 Mission | 기존 ID/종합 시험장 보존, 현재 제품 TUT와 UGV NPC 별도 맵 사용. LOS 외 귀환 제거·호버3초 즉시 성공·물자/포탑 연결; 시험 가이드 | FrontEnd에서 각 수업 위치·목표·결과·실제 조종 확인. 자동 위치 이동 완료와 손 조종 완주 구분 |
 | TUT-BEST-01 | Course별 Best Lap 영구 저장 | 구현됨·자동 검증됨·수동 확인 대기(10/02 C PC Claude). 코스/기체/조작별 Best Lap JSON·HUD, 자동화 별도 슬롯. 평균은 실행 History | 같은 조건 실제 완주2회·재실행 복원·첫 완주 전 HUD 확인. D-5 결과 시간은 RACING-TERRAIN-LINK-01 참조 |
@@ -62,10 +62,10 @@
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
-| UI-WBP-EXPORT-01 | WBP 정리 | 화면22종·Native Mission도 저장 WBP7종 사용·한글/간격/파츠/선택 강조·우하단 시작. 도시 배경 유지/사진 회색 제거·실제 M1 촬영 전달. [정본](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#화면별-wbp-편집-정본) | 사용자 Designer 조정·실제 패드/전체 흐름 확인 |
-| UI-HUD-WBP-01 | HUD Designer 통합 | 13구역·임무/입력/카운트다운 한 트리, 조준/프레임 이미지 분리·편집 유지 자동 통과 | 사용자 Designer 간격/파츠 조정·실제 플레이 확인 |
+| UI-WBP-EXPORT-01 | WBP 정리 | 화면22종·3D/6카드/Back 유지. 새 투명 PNG5장→6종, 사진 모드/카드1280·1920 자동 통과·캡처 확인. [정본](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#화면별-wbp-편집-정본) | Sky 긴 설명 간격·실물 패드 확인 |
+| UI-HUD-WBP-01 | HUD Designer 통합 | 13구역·임무/입력/흰색 카운트다운 한 트리, 조준/프레임 이미지 분리·편집 유지 자동 통과 | 사용자 Designer 간격/파츠 조정·실제 플레이 확인 |
 | UI-CONTROLS-DECISION-01 | 조작·흐름 결정 | 자폭 기본 무장/해제 잠금 반영, 나머지 미정 유지 | 기획 결정 후 연결. 드랍 L2/R1·FPV2 범례·수업 매핑·결과 다음 임의 확정 금지 |
-| ASSET-SKYDRONE-01 | 스카이드론 외형 | 이름 반영·외형 미연결, 팀원 푸시 대기 | 수신 뒤 Claude 연결·외형 확인 |
+| ASSET-SKYDRONE-01 | 스카이드론 외형 | Racing 본체+Sky 로터4개·선택 BP 연결/검증됨 | 조종 체감 확인 |
 | TEST-HUD-LAYOUT-01 | HUD 실제 표시 확인 | D PC 자산5종·RHI5종·최종 파츠2종 통과,1280/1920 캡처. 상세 WORKLOG | 창 이동·실물 패드/연속 조종 수동 확인. 숨김 렌더와 구분 |
 | UI-SELECT-ART-01 | 전체 Pretendard·선택명 | Native/Designer 10종 공통 적용·기존 크기/굵기 보존, 목록 끝 괄호만 숨김. 추가 렌더14/14·Story/설정 캡처 확인 | 실제 패드·1280/1920 가독성. DA/ID·아트 보존, 아이콘/명시 Opt-out 제외 |
 | UI-CONTROL-LAYOUT-01 | 조작 이름·가로폭 | Codex 예외 수정·자동 Pass; WORKLOG | 1280/1920·패드 수동 확인 |
@@ -77,7 +77,7 @@
 | UI-LAYOUT-DIAG-01 | 로비 레이아웃 진단 판정 변동 조사 | 진단 판정 변동·기존 Fail 유지. D-11로 KnownIssues.Flow.LobbyLayoutStabilityPIE 분리됨(10/05 C PC Claude), 안정화 완료 아님 | Claude가 표본/대기·레이아웃 원인을 구분하고 반복 렌더 검사 판정 안정화, 1280/1920 수동 확인 별도 |
 | UI-LAYOUT-01 | 목록 진입·선택 시 한 프레임 재배치 | 구현됨·자동 검증됨·수동 확인 대기. 줄바꿈·상시 스크롤바·폭270 후속 포함. 최신 진단 분리는 UI-LAYOUT-DIAG-01 참조, 이전 근거 아카이브/WORKLOG | 1280/1920 실제 화면 가독성, Story 4개 목록의 상시 스크롤바 칸 확인 후 수동 완료 |
 | UI-PAD-01 | 패드만으로 전체 UI 선택 | 구현/자동 검증됨·실기 대기(10/07 D PC Claude). InterLink 노브만으로 전체 이동(좌우 불필요)·패드 규칙 유지. [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md) | 전체 흐름·탭/첫 강조·가독성·복귀, 설정 노브 잠금/조절·콤보 실기 확인. NullRHI는 실기 Pass 아님 |
-| UI-SETTINGS-01 | 설정·체크박스 | 검정 전경 원인 수정·흰색 고정/Settings WBP 재생성, 재현2/2 성공 | 실제 클릭 타이틀/일시정지2회 왕복 수리 통과. 적용/취소·재실행·Standalone 소리/해상도 확인 |
+| UI-SETTINGS-01 | 설정·체크박스 | 공통 Settings WBP 폭1240 복구·로비/일시정지 연결. 실제 표준/넓은 창 가독성·클릭/Back4/4 통과 | 실제 클릭 타이틀/일시정지2회 왕복 수리 통과. 적용/취소·재실행·Standalone 소리/해상도 확인 |
 | UI-FLOW-PROTOTYPE-01 | 로비·브리핑·조작 안내 | 번호만 표시·RC 세로 스틱·Scout/FPV 푸른 배경 사진·권장창 한글 적용. Build·UI4/4, 실제1280/1920 렌더 확인; WORKLOG | 실물 휠 방향/감도·번호 가독성·패드·영상/청감 수동 확인 |
 | COMBAT-IMPACT-DEATH-01 | 차량·포탑·유탄·사망 | 차량300/포탑200·MG25/유탄150/자폭600. 포탑 자체 HP0 폭발/소리1회·점유 해제·잔해15초·실제 TUT2발 파괴/클리어 검사 | 실물 발사·가시성/청감·잔해 정착/밸런스 수동 확인 |
 

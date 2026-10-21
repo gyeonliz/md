@@ -1,6 +1,6 @@
 # 시작 화면 · 로비 탭 · 원형 코스 가이드
 
-현재 절차 기준: 2026-10-20 D PC. 기존5메뉴·결과·훈련/레이싱을 유지한다. 훈련/레이싱 사진은 DA 슬롯, 장치 그림은 조작 안내 WBP에서 조정한다. 사용자 확인 배치의 네모형 RC 그림을 실제 WBP에 연결했다. 실제 검증 범위는 [STATUS](../../STATUS.md), 실행별 근거는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 원본 이미지·Figma·기존 타이틀 아트는 보존한다.
+현재 절차 기준: 2026-10-21 D PC, Unreal005e24a2. 기존5메뉴·결과·훈련/레이싱을 유지한다. 기체 선택은 DA의 큰 사진/카드 슬롯, 장치 그림은 조작 안내 WBP에서 조정한다. 실제 검증 범위는 [STATUS](../../STATUS.md), 실행별 근거는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 원본 이미지·Figma·기존 타이틀 아트는 보존한다.
 
 ## 화면별 WBP 편집 정본
 
@@ -22,25 +22,54 @@ Content Browser에서 아래 이름으로 검색하고 Designer를 연다. 경�
 Native 미션 출격도 BeginPlay에서 위 Mission WBP 기본 화면7종을 로드한다. 별도 BP에서 지정한 위젯 클래스는 유지한다. 이전에는 Native GameMode가 C++ 기본 화면을 열어 저장된 WBP 편집/한글이 빠지는 경로가 있었고 이를 연결했다. Mission WBP 폴더는 Cook 목록에도 포함한다(실제 패키징 검사는 별도).
 
 - 바깥 배치는 Canvas Slot의 앵커·위치·정렬, 크기는 SizeBox/Slot, 안쪽 간격은 가로/세로 Box Slot Padding에서 맞춘다. 계층 표시명은 한글 문구·이미지 파츠·가로/세로 배치로 구분했다. 연결에 쓰이는 내부 이름은 유지한다.
-- 로비·브리핑·기체 선택·출격 안내의 시작 버튼은 오른쪽 아래 앵커/정렬 `(1,1)`, 위치 `(-80,-40)`, 크기 `(300,80)`로 통일했다(1920 기준·해상도별 DPI 적용). Designer에서 바꾼 위치를 실행 코드가 다시 중앙으로 덮어쓰지 않는다.
-- 로비·브리핑·기체 선택 사진의 외곽 상자는 `600×360`, 안쪽 여백은14px다. 모서리 테두리는 길이24·두께2의 Image 파츠8개로 나눴다. 각각 `MissionCardPanel / BriefingThumbnailFrame / DronePreviewFrame`을 찾아 위치·크기·Padding을 조정한다. 지도 사진은 Scale To Fill로 상자를 채운다. UGV는 제공 사진의 기체가 잘리지 않도록 `bFitGroundDronePhoto=True`의 Scale To Fit을 쓴다.
+- 로비·브리핑·기체 선택·출격 안내의 시작 버튼 초기 기준은 오른쪽 아래 앵커/정렬 `(1,1)`, 위치 `(-80,-40)`, 크기 `(300,80)`다(1920 기준·해상도별 DPI 적용). 현재 저장된 Designer 편집값이 우선이며 위치/크기를 실행 코드가 다시 덮어쓰지 않는다.
+- 로비·브리핑·기체 선택 사진의 외곽 상자 초기 기준은 `600×360`, 안쪽 여백14px다. 모서리는 길이24·두께2의 Image 파츠8개다. 현재 `MissionCardPanel / BriefingThumbnailFrame / DronePreviewFrame`의 저장 Designer에서 위치·크기·Padding을 조정한다. 지도 사진은 Fill이며 기체 사진의 비율 설정은 아래 DA 교체 절을 따른다.
 - 정적 문구는 해당 TextBlock의 Text를 편집한다. 미션명/설명/목표/시간은 Mission DA에서 바꾼다. 데이터가 갱신하는 문구를 화면별로 고정하려면 Class Defaults의 `Drone|문구` → `TextOverrides`에 정확한 위젯 이름과 문구를 넣는다. 배열 값/키 이름은 내부 API이므로 한글 표시 문구와 구분한다.
 - 일반 버튼의 Class Defaults `UnselectedButtonOpacity` 기본0.55, `SelectedButtonOpacity` 기본1이다. 목록의 선택 항목과 포커스/호버 항목을 강조한다. 반복 줄 바깥 간격은 `WBP_DroneMissionListItem`의 `ListItemPadding`이다.
 - 기체 사진의 회색 바탕은 `DronePreviewBackdrop` Brush Color 알파0으로 제거했다. 바깥 도시 배경은 `SelectionBackground`의 원본 `T_Select_Background`와 `SelectionBackgroundDim`으로 유지한다. 전체 배경은 Stretch Canvas/Z 순서0~3, 사진 프레임은 기존 모서리 파츠다. 일회성 `-DroneRepairSelectionBackdrop`은 이 WBP 한 개만 저장한다. 확인 기준은 FrontEnd→미션1→드랍드론 선택의 실제 PIE 화면이다.
-- 타이틀 설정창은 화면 형제보다 높은 Z Order로 열리고, 일시정지 설정은 재개 후 다시 열어도 `뒤로`가 연결된다. 위치/크기는 해당 WBP에서 조정한다. 허브 대사 박스는 기본 숨김이며 필요할 때만 Root의 `bShowHubDialogue`를 켠다. 미션 영상 안의 자막은 별개다.
+- 타이틀 설정창은 화면 형제보다 높은 Z Order로 열리고, 일시정지 설정은 재개 후 다시 열어도 `뒤로`가 연결된다. 로비와 일시정지는 공통 `FrontEnd/WBP_DroneSettings`를 사용한다. `SettingsWidth` SizeBox의 Width Override 기준은1240이며 위치/여백·글자/이미지 파츠는 Designer에서 조정한다. 화면 Fit은 바깥 ScaleBox가 담당하므로 폭을 수만 단위로 키우지 않는다. `Drone.UI.ReportedSettingsPIE`는 실제 창1280×720/2553×936의 패널 높이·선택칸/뒤로 버튼 표시 크기와 클릭/Back을 검사한다. 허브 대사 박스는 기본 숨김이며 필요할 때만 Root의 `bShowHubDialogue`를 켠다. 미션 영상 안의 자막은 별개다.
 - 지도 사진은 DA의 `Thumbnail / BriefingImage`에 **테두리 없는 사진**을 연결한다. 저장된 화면에서 옛 `T_Select_M*_Image`의 테두리 포함 Story Override를 다시 덧씌우지 않는다. `MissionImageBackground / BriefingThumbnailBackground`는 투명·Padding0이며 바깥 모서리 Image로 테두리를 조정한다.
 - 배경/로고/화살표·조작 장치 그림은 각각 Image의 Brush, 버튼 그림은 Style의 Normal/Hovered/Pressed에서 바꾼다. 제공 Select_UI/Title Kit를 저장 연결했다. 새 화면의 정적 그림·글자 크기·Slot Padding을 런타임이 재작성하지 않는다.
 - 조작 안내는 Diagram Switcher와 Legend Switcher에 장치3종을 모두 저장했다. 각 장치의 그림·번호·범례 TextBlock을 따로 편집하며 탭 전환은 저장된 파츠를 보여 주기만 한다. `GamepadGuide/KeyboardGuide/RCControllerGuide`는 Native 폴백 생성 데이터이며, 저장된 WBP 범례 문구는 Designer에서 직접 고친다.
 - 한글 표시·공통 폰트를 적용했고 HUD를 제외한 화면의 간격은4px 단위, 일반 글자는 최소12로 한 번 정리했다. 그림 위 번호는 작은 원 안에 맞추며 두 자리 `10`은 원 지름의0.34배 크기로 예외 처리한다. 이후 편집값을 매 실행마다 강제하지 않는다. HUD의 기존 사용자 배치는 보존했다.
 - `Drone.Tools.OrganizeAllDesigners`는 기본 읽기 전용이다. 새 화면 생성·간격 정리·타이틀/조작 안내 원본 재내보내기·시작 버튼 정렬은 각각 명시적 플래그가 필요한 일회성 도구다. 사람 편집 후 반복 실행해 재내보내지 않는다. 실제 검증/미확인은 WORKLOG를 따른다.
 
+### 드론 선택창 이미지 바꾸기
+
+기체는 `/Game/Drone/Data/Drones`의 **기체 DA**에서 바꾼다. 기본 큰 미리보기는 3D 모델이며 아래 카드는 사진이다. `Mission/WBP_DroneSelection`은 상자·위치·여백·테두리를 편집한다. `DronePreviewImage` Brush는 실행 중 DA에서 갱신된다.
+
+| 선택 기체 | 열어야 할 DA |
+|---|---|
+| 정찰드론 | `DA_Drone_Scout_Greybox` |
+| 드랍드론 | `DA_Drone_Drop_Greybox` |
+| FPV 자폭드론 | `DA_Drone_FPVStrike_Greybox` |
+| 광섬유드론 | `DA_Drone_FiberOptic_Greybox` |
+| UGV | `DA_Drone_GroundUGV_Greybox` |
+| 스카이드론 | `DA_Drone_Racer_Greybox` |
+
+1. Play를 멈추고 새 PNG를 Content Browser에 Import한다. 투명 배경이 필요하면 알파가 있는 PNG를 사용한다. 현재 사진 폴더는 `/Game/Drone/FrontEnd/UI/SelectUI/Drones/User_20261021_Updated`다.
+2. 위 표의 DA를 연다. Details의 `Drone Definition → Display → Select`에서 **Select Image**에 큰 사진 텍스처를 지정한다. 큰 칸도 사진으로 쓰려면 `Drone Definition → Preview`의 **선택창 3D 미리보기 사용**을 끈다. 모델이 없거나 로드에 실패해도 이 사진을 사용한다.
+3. **카드 선택 이미지**(`CardSelectImage`)에 아래 작은 카드용 텍스처를 지정한다. 이 칸을 비우면 큰 사진을 카드에도 사용한다. 이미 카드가 지정돼 있으면 큰 사진만 교체해도 카드는 바뀌지 않는다.
+4. **선택 이미지 전체 비율 유지**(`bFitSelectionImages`)를 켜면 큰 사진/카드 모두 그림과 투명 여백 전체를 보존한다. 끄면 카드는 Fill이며 큰 사진은 UGV/드랍의 WBP Fit 예외도 따른다.
+5. 텍스처와 DA를 저장한 뒤 실제 FrontEnd→1번 미션→기체 선택에서 확인한다. 같은 텍스처 파일만 갱신할 때는 해당 텍스처의 Reimport를 사용하면 DA 연결을 다시 고를 필요가 없다.
+
+현재는 사용자가 새로 지급한 투명1920×1080 PNG5장을 `T_SelectDrone_{FPV,ScoutFiber,UGV,Racer,Drop}_Updated`로 연결한다. 한 기체의 SelectImage/CardSelectImage는 같은 텍스처를 사용하고 Fit을 켜 전체 비율을 보존한다. 원본은 `SourceArt/Selection/User_20261021_Updated`에 바이트 그대로 보관했다. 지급1번=FPV, 2번=정찰·광섬유 공용, 3번=UGV, 4번=스카이/레이싱, 5번=드랍이다. 사진 교체와3D 모델 연결은 별개다. 이전 User_20261021 원본18개·텍스처12개와 그 이전 사진은 보존돼 있다. 같은 텍스처 Reimport는 큰 사진/카드에 함께 반영되고, 별도 카드가 필요하면 CardSelectImage만 새로 지정한다.
+
+### 드론 선택창 3D 모델·카메라 조정
+
+같은 DA의 `Drone Definition → Preview`에서 **Preview Actor Class**에 여러 메시가 조립된 기체 BP를 지정하거나, **Preview Mesh**에 단일 Static Mesh를 지정한다. 둘 다 있으면 Actor Class를 우선한다. 드랍을 포함해 복합 기체는 기존 기체 BP를 연결한다. 스카이/레이싱도 **BP_DroneRacerIntegration**을 지정해야 본체와 별도 프로펠러4개가 모두 나온다. `SM_Drone01Body`만 연결하면 본체만 표시된다. 임무 맵에서 비행하는 Pawn Class와 미리보기 슬롯은 구분돼 있어 미리보기만 교체할 수 있다.
+
+카메라는 실제 보이는 메시의 전체 크기와 미리보기 상자 비율에 맞춰 배치한다. 큰 모델 위에서 **왼쪽 드래그로 회전**, **휠로 확대/축소**, **더블클릭으로 기본 구도 복원**한다. 조작 안내는 `DronePreview3D`의 `TextOverrides`에서 `PreviewInteractionHint` 이름으로 수정한다. 모델은 임무와 분리된 미리보기 월드에 만들고 비행·AI BeginPlay를 실행하지 않는다. 바닥 없이 기존 도시 배경 위에 표시한다.
+
+`WBP_DroneSelection`의 `DronePreviewFrame`은 큰 미리보기 크기, `DronePreview3D`는 3D 파츠다. 아래 `DroneListViewport → DroneListScroll → DroneListPanel`은 가로 스크롤 카드6개다. 선택한 카드가 보이도록 스크롤하며 3·4번 미션은 정찰/드랍/FPV/광섬유/UGV/스카이를 모두 허용한다. 복사돼 있던 `LobbyBackButton`은 **SelectionBackButton**으로 수정했고 Designer 표시 이름은 **기체 선택 · 뒤로 버튼**이다. 기존 사진·프레임·나머지 Designer 배치는 유지한다.
+
+미리보기 전용 UI 머터리얼과 기본 RT는 `/Game/Drone/FrontEnd/UI/SelectUI/Preview3D`에 모았다. 실행 중 각 화면은 별도 임시 RT를 사용한다. 머터리얼의 `PreviewTexture`와 반전 알파로 모델 바깥을 투명하게 표시한다. 실제 실행 검증 범위는 STATUS·WORKLOG를 따른다.
+
+실제 출격 레이싱 모델은 `/Game/Drone/Integrations/RoleDrones/BP_DroneRacerIntegration`에서 조정한다. VisualMeshComponent는 DroneRacing/SM_Drone01Body/StaticMeshes의 본체이고, 기존 이름 FPVRotorA~D에는 **DroneSky/SM_Drone01_r1~r4** 프로펠러를 연결한다. 부품5개 모두 위치0·스케일5·Yaw -90으로 원본 조립 좌표를 맞추고 프로펠러에는 DroneRoleVisual/DroneRotor 태그를 둔다. 본체는 프로펠러를 포함한 완성형 메시가 아니다. 게임에서는 각 허브 중심을 유지하며 회전하고 선택창에서는 같은 BP를 정지 상태로 표시한다. 원형·랜덤 도시·Map1/2/3의5개 레이싱 DA는 모두 Drone.Racer.Greybox와 이 공통 BP를 사용한다. 미션 맵/기체 ID/조작·비행 수치는 유지하며, BuildDroneRacerDrone.py도 ConfigureDroneRacerVisual.py로 부품과 PreviewActorClass를 함께 연결한다. 현재 검증 근거는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
+
 ### UGV 사진과 미션 1 영상 교체
 
-UGV의 `DA_Drone_GroundUGV_Greybox.SelectImage`는 `/Game/Drone/FrontEnd/UI/SelectUI/Drones/T_SelectDrone_UGV_User_20261020`에 연결했다. 사용자 제공 JPG를 그대로 사용하며, 큰 사진과 기체 카드에 함께 표시한다. 다른 사진으로 바꾸려면 같은 DA의 SelectImage를 교체한다.
-
-스카이드론은 사용자가 지정한 `ThirdParty/DronePack/D_Mesh/DroneRacing/SM_Drone01Body/StaticMeshes/SM_Drone01Body`를 바닥 없는 스튜디오에서 실제 렌더했다. 선택 사진은 `DA_Drone_Racer_Greybox.SelectImage`의 `T_SelectDrone_SkyDrone_20261020`이며 비행 Pawn/조작 설정은 바꾸지 않는다. 원본 촬영 파일은 `SourceArt/Selection/SkyDrone_20261020.png`다. 새 촬영은 재질·텍스처 컴파일 완료 후 저장해야 체커 임시 재질이 사진에 남지 않는다.
-
-드랍드론은 사용자 `1792480499269.png` 원본을 `DA_Drone_Drop_Greybox.SelectImage`의 `T_SelectDrone_Drop_User_20261020`에 연결했다. 원본은 `SourceArt/Selection/DropDrone_User_20261020.png`이며 픽셀을 바꾸지 않았다. 선택 WBP의 `bFitDropDronePhoto`로 전체 사진 비율을 보존해 날개가 잘리지 않게 한다.
+UGV를 포함한 기체 사진 교체는 [위 순서](#드론-선택창-이미지-바꾸기)를 따른다. 미션 영상은 다음 별도 자산에서 바꾼다.
 
 미션 1은 로비에서 시작을 확정하면 영상 → 기존 브리핑 → 작전 지역/기체 선택으로 진행한다. 영상이 끝나거나 Esc/패드 B를 누르면 브리핑으로 넘어간다. 영상 재생 중에는 브리핑 대사와 버튼 입력을 잠시 멈춘다. 파일 재생 실패 시에도 기존 브리핑으로 복귀한다.
 

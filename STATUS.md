@@ -1,17 +1,19 @@
 # 현재 작업 상태
 
-기준일: 2026-10-20 KST D PC. Unreal `fc27eb7b`·MD `dd16749`, Pull 후 UI/배달2/사진 변경은 로컬 미커밋. 후속 UI·배달2·NPC Nav 수리/자동 검증 완료. 실제 장치/전체 플레이는 별도. 상세는 [WORKLOG](docs/history/DRONE_WORKLOG.md).
+기준일: 2026-10-21 KST D PC. Unreal `ddbd963d`·MD `1aef63a` 위 로컬 변경. 레이싱 프로펠러4개·선택3D BP 연결 복구, 원형/도시/3D3종 통과. 사진5장→6종·흰색 카운트다운 유지. [근거](docs/history/DRONE_WORKLOG.md).
 
-## Git 기준(원격 최종 확인10/20)
+## Git 기준(원격 최종 확인10/21)
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal 원격 gyeonliz/drone | main·origin/main `fc27eb7b` | Fetch/fast-forward 완료·로컬 참조0/0 |
-| Unreal D PC `D:\JGY\project\drone` | HEAD `fc27eb7b` | 기존 변경 백업/복원·맵 충돌은 수신본 우선·후속 변경 미커밋 |
-| 문서 원격 `gyeonliz/md` | origin/main `dd16749` | Fetch 후 로컬과 0/0 |
-| 문서 D PC | HEAD `dd16749` | 상태/가이드 로컬 변경, Commit/Push 안 함 |
+| Unreal 원격 추적 origin/main | `ed85c0e8` | HEAD보다2개 앞섬·이번 Fetch/Pull/Push 없음 |
+| Unreal D PC `D:\JGY\project\drone` | HEAD `ddbd963d` | 새 사진·Racer BP/검사 후속·카운트다운 로컬 변경 |
+| 문서 원격 `gyeonliz/md` | origin/main `1aef63a` | Fetch 후 로컬과 0/0 |
+| 문서 D PC | HEAD `1aef63a` | 상태/가이드 로컬 변경, 이번 Commit/Push 안 함 |
 
 ## 10/18~20 최신 구현과 확인 경계
+
+- **Story 실패**: M1·2 재도전, M3·4 진행 보존 무한 출격. M1 임시6종, M3·4 기체 재선택, M4 기체→3지점→출격·신규4개 미션 검사 통과. BP3 배치·최종 위치 조정 대기. [조정](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#미션-4-시작지점과-선택창-조정).
 
 - **기반 구현**: DA 숨김/준비 중·다음 수업 건너뛰기·맵 비저장 Runtime Placement·미션별 RecordCourseId. 튜토리얼 TUT 맵/DA·HUD WBP/캡처 도구는 현재 커밋에 있다.
 - **UI/훈련**: 그림 위는 번호만·키/동작은 아래 범례로 정리. RC 세로 토글 스틱·Scout/FPV 바닥 없는 실제 모델 사진·튜토리얼 권장창 한글 적용. D PC Build·UI4/4·사진1종 자동 검사 통과, 1280×720/1920×1080 렌더 확인. 실물 조종은 별도. [조정](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#훈련-사진조작-장치-그림시작-위치).
@@ -20,19 +22,19 @@
 - **오프닝**: Main_cinematic.mp4를 새 실행에 재생·종료/Esc로 타이틀, 실패 시에도 복귀. MP4는 LFS·패키징 NonUFS 설정. [설정/시험](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#시작-오프닝-영상).
 - **이전 C PC 검증**: Build5.11초 성공. Story4맵의 출격/목표→결과·나침반·NPC Nav 투영 자동 통과, 시작/목표 촬영. Camp는 승인된 임시 저메모리 설정만 검증(일반 화질/장시간 Pass 아님). Lumen 캐시 초과·출발 피격/흔들림은 잔존. 손 조종·전역172·패키징은 별도. [근거](docs/history/DRONE_WORKLOG.md).
 - **이번 수정**: API 선택/미리보기/포커스 일치, 호버 진행 지연, UGV 검사 이름 충돌, MG Static 경고, 로딩 최소 표시/ReadyHold의 시계 혼용을 수정했다. AI 검사는 선행 자동 교전을 격리해 점유/사망·재점유/수색·복귀 통과·기본 회귀 복귀. 제품 리시 규칙 유지.
-- **레이싱**: Map2 중복 링 실행 제외93개 완주/3맵 기록 복원 근거 유지. 원거리 전체 Fit 대신680~713m 근접 지형/코스 사진 NearView_20261020으로 교체. DA의 맵/기록ID·랜덤도시 '?'·맵 원본 보존. 실제 조종 완주는 별도다.
+- **레이싱**: 공통 BP의 DroneRacing 본체에 맞는 DroneSky 프로펠러4개를 복구하고 선택3D도 같은 BP로 연결했다. 원형/도시 출격·회전 중심/선택3D3종 통과. 앞선 본체 단독 검증 누락을 정정하며5미션/맵·기록/비행 값은 유지한다. 손 조종 완주는 별도다.
 
 이전 Gate/Rain/City 검증·팀원 수신은 [WORKLOG](docs/history/DRONE_WORKLOG.md)에 보존한다. 오후 UI 검증은 아래 범위이며 수신 맵 전체·패키징·실제 패드 Pass로 확대하지 않는다.
 
 ## UI·WBP·UGV 현재 상태
 
 - **편집 정본**: `/Game/Drone/UI/WBP` 화면22종·시작4곳 우하단·사진600×360·모서리8파츠·선택 강조를 유지한다. Native Mission 출격도 저장된 Mission WBP7종을 사용해 Designer 수정이 실제 화면에 반영된다. 명시적 BP 클래스 지정은 보존한다. [편집](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#화면별-wbp-편집-정본).
-- **설정/HUD/문구**: 타이틀 설정 Z 순서·일시정지 재오픈 Back 구독을 수리해 실제 마우스 진입/뒤로2회 왕복 통과. 한글 CDO/정적 문구·번호10·사진 회색 띠·허브 박스 숨김·고도 흰 테두리 제거·입력 십자선 반영, HUD13구역/사용자 배치 보존. [정본](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#hud-편집-정본).
-- **사진/배경**: UGV·사용자 원본 드랍 PNG·지정 메시 스카이 실제 사진을 DA에 연결했다. 드랍/UGV 전체 비율 보존. 원래 도시 배경은 유지하고 선택 사진 안쪽 회색만 투명화했다. 실제 FrontEnd→M1→드랍 선택 촬영을 사용자에게 전달했다. M1 영상/Esc 자동 검사도 통과.
+- **설정/HUD/문구**: 타이틀 설정 Z 순서·일시정지 재오픈 Back 구독을 수리했다. 사용자 제보로 발견한 설정 WBP 폭106,244 오류를1240으로 복구하고 로비/일시정지 공통 WBP에 연결했다. 실제1280×720·2553×936 창에서 표시 크기·마우스/뒤로2회 왕복 통과. 한글 CDO/정적 문구·번호10·사진 회색 띠·허브 박스 숨김·고도 흰 테두리 제거·입력 십자선 반영, HUD13구역/사용자 배치 보존. [정본](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#hud-편집-정본).
+- **기체 선택**: 새 투명 PNG5장을6종 카드/사진 모드에 연결했다(2번 정찰·광섬유, 4번 레이싱). 전체 비율 Fit·3D/도시 배경/6카드/Back 배치 유지. 1280/1920 사진 검사2/2·실제 캡처 확인, Sky 긴 설명 간격은 후속이다. [조정](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#드론-선택창-이미지-바꾸기).
 - **목표/튜토**: Tutorial9·Story4에 검색 가능한 BP_DroneMissionTargetManager 유지. FreeGate 실제 맵/13게이트 완주 통과. 배달2 지정3상자→Cylinder는 겹쳐 적재해도 고유3개를 집계하며 실제 집기/물리 투하3회→성공 통과. 옛 가방/팔레트는 해당 레벨에서만 제거했다. **LOS의 이륙→전진→후진 복귀→실제 착지는 그대로 유지한다.** [편집](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#이미-배치된-맵에서-바로-찾기).
-- **게이트/포트/Nav**: 기존 Materials 옆3상태 MI·헬기포트 전체 fallback 유지. Nav14맵 점검 중 NPC5맵53명 전원 시작점 투영·빌드/저장/재로드 통과, 나머지9맵은 NPC 없음. NPC를 옮기지 않았다. Production Training은 저장하지 않았다. [조정](docs/tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md).
-- **최종 검증**: Development Build32.35초 성공. 회귀14개 중13통과/원형의 낡은 귀환 기대값1실패를 보존하고, 검사만 현행 규칙으로 고쳐 원형 계약+실제 CircleGate2/2 통과. 실제 M1 선택/배달·고유 화물·선택 배경4/4도 통과했다. 실행별 근거는 [WORKLOG](docs/history/DRONE_WORKLOG.md).
-- **확인 경계**: 추적 자산9,755개 누락/LFS 포인터/삭제/충돌0·Production 해시 일치. 기존 맵 경고는 남아 있다. 실물 패드·손 조종 전체 경로·청감·패키징은 별도이며 Commit/Push는 하지 않았다.
+- **게이트/포트/Nav**: BP ‘상태 색상’의 상태별 머터리얼이 있으면 원본 색/발광, 빈 상태만 BP 기본값을 자동 사용한다. Param/Color 호환·Build53.04초·Gate4/4. 기존 포트/Nav 검증은 유지하며 수신 Training 맵은 재저장하지 않았다. [조정](docs/tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md#세-상태-색과-머터리얼-조정).
+- **10/20 실행 근거**: Development Build32.35초 성공. 회귀14개 중13통과/원형의 낡은 귀환 기대값1실패를 보존하고, 검사만 현행 규칙으로 고쳐 원형 계약+실제 CircleGate2/2 통과. 실제 M1 선택/배달·고유 화물·선택 배경4/4도 통과했다. 위 현재 Gate 집중검증과 구분한다. 실행별 근거는 [WORKLOG](docs/history/DRONE_WORKLOG.md).
+- **10/20 보존 감사**: 당시 추적 자산9,755개 누락/LFS 포인터/삭제/충돌0·Production 해시 일치. 오늘 전체 감사를 반복하지 않았다. 기존 맵 경고·실물 패드·손 조종 전체 경로·청감·패키징은 별도다. 이번 Git 병합은 위 표를 따른다.
 
 ## 한눈에 보기
 

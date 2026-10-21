@@ -1,6 +1,6 @@
 # Drone Training 게이트·루트 배치 가이드
 
-현재 조정 기준: 2026-10-20 (Asia/Seoul)
+현재 조정 기준: 2026-10-21 (Asia/Seoul)
 
 코스 제작은 `BP_DroneTrainingCourse`에서 관리한다. 권장 자동 편집 방식은 Course Spline과 분리된 `Ring별 Spline Handle`이며, Handle 배열 순서가 Gate 통과 순서다. 생성된 빛나는 선 Component, 자동 Gate Child Actor와 GateIndex를 직접 관리하지 않는다. 공용 BP의 RaceRing·상태 재질 연결은 반영됐다. Main 자동78개 승계·비사용20개 참조 문제는 이전 조사 결과이며 이후 맵 변경 수신으로 현재 개수/참조를 재확인해야 한다. 기능/외형 시험은 `/Game/Drone/Maps/TestMap/Lvl_DroneTrainingRouteSelectionTest`에서 하고 팀원 Production은 덮어쓰지 않는다. 과거 측정·실행 근거는 [WORKLOG](../history/DRONE_WORKLOG.md).
 
@@ -17,9 +17,15 @@
 
 ### 세 상태 색과 머터리얼 조정
 
-자유 게이트 수업은 `DA_Mission_Tutorial_GateFlight` → `/Game/Drone/Maps/Tutorial/TUT_FreeGate`에 연결돼 로비에서 출격할 수 있다. 이 맵의 `BP_DroneMissionTargetManager_목표연결`에서 코스를 스포이드로 바꾸고, 아래 MI로 코스의 현재/대기/완료 상태 색을 편집한다.
+자유 게이트 수업은 `DA_Mission_Tutorial_GateFlight` → `/Game/Drone/Maps/Tutorial/TUT_FreeGate`에 연결돼 로비에서 출격할 수 있다. 이 맵의 `BP_DroneMissionTargetManager_목표연결`에서 코스를 스포이드로 바꾼다. 색상은 공통 **BP_DroneTrainingGate**에서 조정한다.
 
-기존 재질과 같은 `/Game/Drone/Tutorial/Materials`에 모았다. 부모 `M_DroneTrainingGate_States`를 열면 Color/EmissiveStrength와 Fresnel 테두리 노드를 편집할 수 있다. 일반 색 조절은 아래 MI를 더블클릭한다.
+1. Content Browser에서 `BP_DroneTrainingGate`를 검색한다. 정본은 `/Game/Drone/Tutorial/Blueprints/BP_DroneTrainingGate`다.
+2. BP를 열고 **Class Defaults → Tutorial → Gate → 상태 색상**으로 간다. Details에서 `색상`으로 검색해도 된다.
+3. **01 대기 머터리얼 (선택)**, **02 현재 목표 머터리얼 (선택)**, **03 완료 머터리얼 (선택)**에 원하는 M/MI를 넣는다. 지정한 상태는 머터리얼 원본의 색상·발광·표현을 그대로 쓴다. 별도 모드 선택이나 Construction Script 노드는 필요 없다.
+4. 머터리얼 슬롯을 비우면 **그 상태만** BP의 **01 통과 전 색상 (대기)**, **02 현재 목표 색상**, **03 통과 완료 색상**과 해당 발광 기본값을 쓴다. 예를 들어 현재 목표 머터리얼만 넣으면 현재 목표는 MI, 대기·완료는 BP 기본값이다. 지정된 머터리얼이 있을 때 BP 기본 색을 바꿔도 그 머터리얼을 덮어쓰지 않는다.
+5. Compile/Save한다. 특정 게이트만 다르게 하려면 레벨 인스턴스의 같은 항목을 바꾼다. Reset은 BP 값을 상속하므로 BP에 머터리얼이 있으면 다시 연결된다. 기본 색으로 표시하려면 해당 머터리얼을 명시적으로 비운다. Course의 자동 ChildActor 게이트는 공통 BP 기본값을 사용하고 위치/순서는 Course에서 편집한다.
+
+기존 재질과 같은 `/Game/Drone/Tutorial/Materials`에 머터리얼을 모았다. 부모 `M_DroneTrainingGate_States`에서 Color/EmissiveStrength와 Fresnel 테두리 노드를 편집하거나 아래 MI를 더블클릭한다. 기존 BP에 연결된 세 MI는 자동으로 우선 적용된다. BP 기본 색을 쓰려는 상태만 머터리얼을 비우면 된다.
 
 | 상태 | 머터리얼 인스턴스 | 기본 색 / 발광 |
 |---|---|---|
@@ -27,7 +33,7 @@
 | 지금 통과할 게이트 | `MI_DroneTrainingGate_02_Current` | 노랑 `#FFD54F` / 3 |
 | 이미 통과한 게이트 | `MI_DroneTrainingGate_03_Passed` | 초록 `#56B896` / 0.75 |
 
-MI의 Color/EmissiveStrength를 바꾼다. Gate BP와 튜토리얼 배치 Gate는 **색상·발광은 머터리얼 인스턴스에서 조정**을 켜 두었다. 이를 끄면 BP의 Upcoming/Current/Completed Color·상태별 EmissiveStrength로 조정한다. 실제 통과 순서에 따라 상태 재질이 바뀌며, 새 MID를 자산 CDO에 저장하지 않는 기존 저장 수리는 유지한다. 팀원 Production Training 맵은 이번 작업에서 저장하지 않았다.
+`SetGateStateMaterials` 노드로 런타임에 연결/해제할 수 있다. `SetGateStateColors`는 머터리얼이 없는 상태의 기본 색만 바꾼다. 옛 ‘색상·발광 조정 위치’는 숨겼으며 저장된 모드가 자동 판정을 방해하지 않는다. 지정된 재질에는 색/발광 파라미터를 덮어쓰지 않고, 빈 상태에는 공통 기본 재질 위에 BP 값을 적용한다. 기존 Param/Color 호환·비대상 금속 슬롯·CDO에 런타임 MID를 저장하지 않는 보호는 유지한다. 원본 MI와 Production Training 맵을 이번 기능 때문에 다시 저장하지 않는다. 현재 검증 근거는 STATUS·WORKLOG를 따른다.
 
 ### 헬기포트 외곽 프레임
 

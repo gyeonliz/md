@@ -250,22 +250,24 @@ Box Overlap 없이 Sequencer나 다른 BP에서 진행할 때는 `Try Activate M
 
 ## 실패 처리와 체크포인트
 
-2026-10-01 밤 후속, C PC Unreal `ec2e88f` + 로컬 미커밋. 작업 도구 Claude, 문서 반영 Codex. MISSION-CHECKPOINT-01 실패 재출격은 구현됨·자동 검증 완료이며 실제 추락/재출격 체감은 수동 확인 대기다.
+2026-10-21 사용자 결정: 미션 1·2는 실패 시 재도전 결과 화면, 미션 3·4는 목표 완료까지 무제한 재출격한다. 기존 체크포인트 기반을 사용해 목표 진행도와 파괴한 표적을 보존한다. 미션 3·4는 재출격마다 기체를 다시 고르며, 미션 4는 기체 선택 → 시작지점 3곳 중 선택 → 출격 순서다. 미션 1은 시험을 위해 현재 조종 가능한6종을 임시 허용한다. 이번 코드·자산 적용/검증 상태는 아래 현재 확인 항목과 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
 
 | 설정 | 위치 | 의미 |
 |---|---|---|
 | `FailureResponse` | `/Game/Drone/Data/Missions/DA_Mission_*` | 결과 화면 또는 체크포인트에서 재출격 |
 | `MaxCheckpointRestarts` | 같은 미션 DA | 0 = 제한 없음, 횟수를 다 쓰면 기존 실패 결과 화면 |
+| `bChooseDroneOnEverySortie` | 같은 DA → 재출격마다 기체 다시 선택 | M3/M4 켬, 선택 중 세계를 멈추며 목표 진행 보존 |
 
-기체 파괴·현재 목표 제한 시간 초과·실패 Trigger는 같은 실패 경로를 쓴다. 재출격은 맵을 다시 열지 않고 완료 목표·부서진 표적을 유지한다. 마지막 체크포인트(없으면 처음 출격 위치)에 같은 기체 종류·조작 방식으로 새 기체를 띄워 빙의하고 Director를 재연결하며 옛 기체를 제거한다. 현재 목표 제한 시간만 다시 센다.
+기체 파괴·현재 목표 제한 시간 초과·실패 Trigger는 같은 실패 경로를 쓴다. 재출격은 맵을 다시 열지 않고 완료 목표·부서진 표적을 유지한다. M3는 마지막 체크포인트(없으면 처음 출격 위치)에, M4는 고른 시작지점에 이번에 선택한 기체·조작 방식으로 새 기체를 띄운다. 기체 종류를 바꿔도 같은 Director를 재연결하며 옛 기체를 제거한다. 튜토리얼의 일반 체크포인트 재출격은 같은 기체를 유지한다. 현재 목표 제한 시간만 다시 센다.
 
 예외: 새 첫 `기초 조종` 수업(`Mission.Tutorial.Hover`)은 고정 시점·출발점으로 재출격하고 전용4목표를 처음부터 다시 시작한다. 후진/착지 단계만 남긴 채 이륙하지 않은 상태에서 시작하지 않도록 한 수업 전용 규칙이며 다른 미션의 진행 보존 정책은 바꾸지 않는다.
 
-| DA 분류 | 확정 실패 처리(Figma 기준, Claude 지시서) | 재출격 제한 |
+| DA 분류 | 현재 실패 처리 | 재출격 제한 |
 |---|---|---|
 | Tutorial Hover·Forward·Heading·GateFlight·Payload·FPV·UGV_NPC·UGV_Turret | 체크포인트 재출격 | 0(무제한) |
-| Story GoldenTime(M1)·VeilBreaker(M3)·Endgame(M4) | 체크포인트 재출격 | 0(무제한) |
-| Story Intercept(M2)·Tutorial_Training·Racing_Circuit | 결과 화면 | 0(무제한 설정, 결과 화면 방식) |
+| Story VeilBreaker(M3) | 기체 재선택 → 체크포인트 재출격 | 0(무제한) |
+| Story Endgame(M4) | 기체 재선택 → 시작지점 3곳 선택 → 재출격 | 0(무제한) |
+| Story GoldenTime(M1)·Intercept(M2)·Tutorial_Training·Racing_Circuit | 결과 화면 → 재도전 | 자동 재출격 없음 |
 
 ### Actor 배치법
 
@@ -275,7 +277,17 @@ Box Overlap 없이 Sequencer나 다른 BP에서 진행할 때는 `Try Activate M
 4. `RestartHeightOffset`(기본 150cm)을 조정하고 화살표를 재출격 방향으로 돌린다. 방향은 Yaw만 사용한다.
 5. 해당 미션 DA의 FailureResponse·횟수 제한을 확인하고 추락/시간 초과/실패 Trigger를 각각 확인한다. 팀원 Production Training 맵을 시험용으로 덮어쓰지 않는다.
 
-아직 실제 맵에 체크포인트 Actor를 배치하지 않았다. 현재 재출격은 첫 출격 위치를 쓴다. M1 예시: 정보단말 회수 구현 뒤 픽업 지점에 Actor를 배치하고 진행 목표 ID·방향·높이를 맞춘다. 정보단말 회수와 픽업 지점 배치가 완료됐다는 뜻은 아니다. 재출격 때 브리핑 재생은 MISSION-BRIEFING-02 뒤이며 여부는 현재 미정이다(Figma M1은 “브리핑 재생 포함”, 자막 시스템 구현·음원 없음). 스토리 충돌·레이싱 방식도 현재 미정이다.
+M3는 배치된 체크포인트가 없으면 최초 출격 위치를 사용한다. M1은 현재 결과 화면에서 재도전하므로 체크포인트 자동 재출격을 적용하지 않는다. 과거 체크포인트 테스트 이력은 WORKLOG에서 별도로 확인한다.
+
+### 미션 4 시작지점과 선택창 조정
+
+- UI 정본: `/Game/Drone/UI/WBP/Mission/WBP_DroneStartLocation`. `StartLocationButton0~2`·Title/Description·Confirm/Back을 Designer에서 조정한다. Class Defaults의 텍스트 재정의·선택/비선택 불투명도도 사용할 수 있다. 내부 연결 이름은 유지한다.
+- 미션 데이터: `/Game/Drone/Data/Missions/DA_Mission_Story_Endgame_Test` → **선택 가능한 시작지점** 3개. ID·표시 이름·설명·기본 위치를 편집한다. **재출격마다 시작지점 선택**은 켠다. ID는 중복하지 않는다.
+- 위치 BP: `/Game/Drone/Managers/BP_DroneMissionStartPoint`. M4 맵 Outliner의 `Drone/StartPoints` 폴더에서 세 액터를 옮기고 화살표 방향을 맞춘다. 위치는 기체 기준점이므로 지면 위 높이도 조정한다.
+- 기존 `/Game/Drone/Managers/BP_DroneMissionTargetManager`의 **시작지점 액터 · 스포이드**에서 0·1·2 순서로 연결한다. **시작지점 BP 배치 · 목록 채우기**는 없는 BP만 만들며 기존 위치는 되돌리지 않는다. 맵 액터 참조가 우선이고, 없으면 같은 ID의 BP, 이후 DA 기본 위치를 사용한다.
+- 첫 출격·재출격 모두 기체 선택 → 시작지점 선택 → 출격 순서다. 시작지점 창의 뒤로/Esc는 기체 선택으로 돌아가며, 재출격 중에는 게임을 멈춘 상태를 유지한다. M3/M4의 기체 선택창은 기존 `WBP_DroneSelection`을 사용한다. 재출격 기체 선택 중에는 로비 뒤로 버튼을 숨기며 기존 미션/목표/파괴 표적은 유지한다. 기체를 확정해야 M4 시작지점 창이 열린다.
+- M1 임시6종 허용은 `DA_Mission_Story_GoldenTime_Test`의 `AllowedDroneIds`다. 기본 기체와 실패 시 결과/재도전은 유지한다. M3/M4도6종 허용이며 스카이까지 카드 스크롤로 선택한다.
+- 현재 확인(2026-10-21 D PC): 재선택 후속 Build·설정 도구 통과. M1/M2/M3 새 PIE 성공 후 M4 보완 재실행도 성공했다. M1 6종 선택, M3/M4 실제 카드/출격 클릭으로 정찰→FPV→UGV→드랍 교체, 재출격 중 3D 프리뷰, 완료/부분 목표·파괴 표적 보존, M4 기체→3지점 순서·지점 뒤로→기체 복귀·선택 위치·UGV 실제 접지를 검사했다. M4 실제 `Lvl_MilitaryCamp`에 BP3개와 매니저 스포이드 연결을 저장했다. 기본 출발점 부근 임시 배치이므로 최종 전략 위치·안전거리·적 시야는 기획자 조정 후 실제 맵에서 확인한다. 전체 스토리 전투 완주나 실제 맵의 모든 기체 주행을 통과한 뜻은 아니다.
 
 ### 검증과 수동 확인
 
@@ -425,7 +437,7 @@ cd C:\URproject\drone
 | 09 구간 기록 | 줄 높이·값/단위 간격 |
 | 10 경고 | 배경·아이콘·경고 두 줄 |
 | 11 조종 입력 | 좌/우 스틱 틀·축·커서 이미지 |
-| 12 카운트다운 | 출발 숫자 크기·위치·색 |
+| 12 카운트다운 | CountdownText 기본 흰색(#FFFFFF), 출발 숫자 크기·위치·색 편집 |
 | 13 화면 모서리 | 좌/우 프레임 이미지 각각 길이·굵기·여백 |
 
 - 바깥 배치는 각 구역의 `Canvas Panel Slot` 위치/앵커/정렬, 크기는 `SizeBox`에서 고친다. 기본 좌우·아래 안전 여백은32px다. 내부 줄/아이콘 간격은 해당 `VerticalBox/HorizontalBox Slot`의 Padding과 SizeBox로 조정한다. 그룹과 이미지가 한 Designer 안에 있어 서로 맞추며 편집할 수 있다.
