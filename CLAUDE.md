@@ -1,6 +1,6 @@
 # CLAUDE.md — Drone 문서 저장소 (gyeonliz/md)
 
-설정·대화는 Claude로 이관했고, 이 문서 저장소와 Drone Space는 Codex 담당이다(2026-10-01). 기존 지침은 그대로 유효하며 아래에서 불러온다.
+2026-10-01 Claude 이관은 과거 분담이다. 2026-10-19 사용자 결정으로 Codex가 요청 범위의 코드·자산·Build/PIE와 MD·Space를 직접 수행한다. 현재 AGENTS.md와 아래 지침을 따른다.
 
 @AGENTS.md
 
@@ -29,7 +29,7 @@ D PC의 `D:\JGY\project\droner`는 같은 원격의 별도 Clone이며 작업 �
 - 기능 단위로 완성·테스트한 뒤 다음으로 넘어간다. 작업은 1~3시간 크기로 쪼갠다.
 - 새 시스템 설명 순서: 왜 → 담당 클래스 → 헤더 → CPP → Blueprint 설정 → Editor 테스트 → 정상 결과 → 문제 시 확인 항목.
 - Figma `Project Droner`와 Trello는 읽기 전용이다. 자세한 이관 내역은 `docs/git/CODEX_CONTEXT_SYNC.md`의 2026-10-01 절에 있다.
-- 이 문서 저장소와 Drone Space는 Codex 담당, Unreal 코드는 Claude Code 담당. 코드 변경 요청을 받으면 WORKBOARD 카드로 남긴다. 협업 절차는 [Claude↔Codex 협업 규칙](docs/git/CLAUDE_CODEX_COLLABORATION.md)을 따른다.
+- Codex 직접 작업은 Unreal 구현·검증까지 수행한다. 여러 세션에서는 [작업컴 세션 가이드](docs/git/DRONE_WORK_PC_SESSIONS.md)의 파일/엔진 소유권을 먼저 맞춘다. 명시적 Claude 브리지 위임만 해당 역할 계약을 따른다. [협업 규칙](docs/git/CLAUDE_CODEX_COLLABORATION.md) 참조.
 
 ## Claude 환경에서 달라지는 점
 

@@ -42,6 +42,17 @@ Editor 시험: FrontEnd→FPV 실제 `TUT_FPV_Target`에서 무장 키 없이 �
 
 문제가 있으면 실제 Actor 클래스·HealthComponent/Can Be Damaged·차체 전체 DamageCollision·목표 Tag/Director 등록·충돌 당시 속도·PhysicsAsset/물리 블렌드 순서로 본다. Blueprint 값을 바꾼 뒤에는 체력300 기준 설명도 함께 조정한다.
 
+## 사용자 발사음·기체 파괴음
+
+실제Race/M4 조립2·직접영향 회귀3 Success와 본인local 사망음 pause 예외는 [HUD·오디오 정본](DRONE_MISSION_FRAMEWORK_GUIDE.md#사용자-오디오와-체력-경고)을 따른다. M4 배치 소총/차량·고정자동포탑·UGV의 실제public발사/정확cue/source와 샷건보존을 확인했고 유인MG는 해당맵 미배치다. 직전26전체재실행·AI자율교전/손사격·실청/패키징과 구분한다.
+
+- 일반 적군: NPCWeaponComponent의 Rifle projectile/trace 택일 경로에 `RifleFireSound`. Shotgun Volley에는 새 gunshot을 넣지 않는다.
+- 유인기관총·설치무인/차량포탑: SmartObjectStation의 실제 projectile/trace 발사에 `MGTurretFireSound`. Update=true인 조준/쿨다운 대기는 발사 사건이 아니다.
+- UGV: GroundWeaponComponent의 !bGrenade 실제발사에 `PrimaryFireSound`. 유탄의 기존 명중 폭발음은 분리한다.
+- 여섯 기체 BP: 공통 FlightPawn Health.OnDeath의 `DroneDestructionSound`. Health의 생애별1회·ResetHealth 재사망2life 계약이다. 실제M4 재선택 pause 결함을 본인local PlayerController 소유 공간음만 pause 예외로 수리해2life actual source/DSP진행/PCM을 확인했다. 기존3D감쇠·Master·비로컬 world분기는 유지한다. 충격 자폭의 기존 ExplosionSound+tung 혼합 청감은 별도이며 같은cue 중복으로 단정하지 않는다.
+
+실제 BP 상속/세 발사경로와 장치 voice/비영·무음PCM·Master/거리/동시재생을 대조했다. ShotgunPreserved/SpatialFar의 실제 무음은 `au.NeverDisableSubmixes=1` process-local 조건의 재검사이며 기존2Fail도 WORKLOG에 보존한다. 발사/피해/탄창·샷건 pellet·물리·기존 폭발/맵 규칙은 유지한다. 날짜별 정확한 결과와 리비전은 WORKLOG를 따른다.
+
 ## Blueprint 조정값
 
 `BP_GroundConformingVehicle_Greybox > Class Defaults`에서 다음 값을 조정한다.

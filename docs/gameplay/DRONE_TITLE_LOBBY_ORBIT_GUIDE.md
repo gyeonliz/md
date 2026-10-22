@@ -289,16 +289,39 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 | 그래픽 품질 | 낮음 / 보통 / 높음, 기존 최고·시네마틱·사용자 지정값 보존 | 변경한 항목만 적용, `GameUserSettings` 저장 |
 | 프레임 제한 | 무제한 / 30 / 60 / 120 FPS, 현재값 보존 | 변경한 항목만 적용, `GameUserSettings` 저장 |
 | 수직 동기화 | On / Off | 변경한 항목만 적용, `GameUserSettings` 저장 |
+| 좌우 회전 감도(X) / 상하 시야 감도(Y) | 각각0.25~4배, 기존 기준1배 | 쉬운/게임 조작에서만 적용. 편집 후 Apply 때 같은 `DroneAudioSettings` SaveGame에 저장 |
+| 좌우 회전 / 상하 시야 반전 | 축별 On / Off, 기본 Off | 감도와 같은 pending·적용/취소·저장 경계. Acro/UGV에는 새 배율·반전을 적용하지 않음 |
 
 - Apply는 변경한 값만 확정하며 성공 후 편집 기준을 새 적용값으로 갱신한다. 화면을 자동 닫지는 않는다. 전체 음량 저장 실패는 상태 메시지로 표시하고 다시 적용할 수 있게 한다.
-- 기본값은 음량 100%, 테두리 없는 창·1920×1080, 품질 보통, 60 FPS, VSync On이다. 먼저 편집값으로 준비하며 Apply 전에는 화면/성능을 저장하지 않는다. 음량은 미리보기한다. PIE에서는 기본값 복원도 창/해상도를 변경하지 않는다.
+- 기본값은 음량 100%, 테두리 없는 창·1920×1080, 품질 보통, 60 FPS, VSync On, 카메라 감도X/Y 각각1배·반전 Off다. 먼저 편집값으로 준비하며 Apply 전에는 화면/성능을 저장하지 않는다. 음량은 미리보기한다. PIE에서는 기본값 복원도 창/해상도를 변경하지 않는다.
 - Back/Esc/패드 B는 미적용 음량을 편집 시작값으로 되돌리고 화면/성능 편집값을 버린다. 이미 Apply한 값은 유지한다.
 - PIE/Designer에서는 창 모드와 해상도 컨트롤을 비활성화하고 Standalone 안내를 표시한다. 품질/VSync/FPS 적용은 비해상도 경로를 사용해 Editor 창 크기를 바꾸지 않는다. 실제 디스플레이 변경은 Standalone에서 확인한다.
+- 사용자4음원→7자산·실제Race/M4 Controller/HUD 조립·local사망음 pause 수리는 [오디오 정본](DRONE_MISSION_FRAMEWORK_GUIDE.md#사용자-오디오와-체력-경고)을 따른다. 직전26과 이번통합2/직접회귀3을 구분하며 실물 손조종/청감·Cook/패키징은 미실시다.
 - `UDroneAudioSettingsSubsystem`은 같은 GameInstance의 맵 이동 뒤에도 전체 음량을 적용하고 재실행 시 SaveGame을 복원한다. 다른 GameInstance/Editor 오디오에는 적용하지 않는다. 저장 없음·다른 타입·비정상 수치에는 기본 음량을 유지한다. UI 사운드 원본은 `ButtonHoverSound / ButtonClickSound` 슬롯에 별도로 지정하며 미지정이면 무음이다.
 - 공개 API는 `Refresh From Current Settings / Set Master Volume / Get Master Volume / Apply Pending Settings / Restore Defaults / Cancel Pending Settings / Request Close / Are Display Settings Available`, 닫기 이벤트는 `On Close Requested`다. pending 품질·해상도·VSync·FPS getter도 제공한다.
 - native 설정 컨트롤 이름은 `MasterVolumeSlider`, `DisplayModeCombo`, `ResolutionCombo`, `GraphicsCombo`, `FrameRateCombo`, `VSyncCheck`, `RestoreDefaultsButton / ApplySettingsButton / SettingsBackButton`이다. 이 이름은 기본 WidgetTree를 점검할 때 사용하며 자체 Designer의 자동 바인딩을 보장하지 않는다.
 
-구현 소스: `Source/Drone/UI/DroneFrontEndRootWidget.*`, `DroneSelectionWidget.*`, `DroneSettingsWidget.*`, `DroneAudioSettingsSubsystem.*`. 실제 화면·가청 변화·재실행 저장 복원은 현재 PC의 수동 확인이 남아 있다.
+구현 소스: `Source/Drone/UI/DroneFrontEndRootWidget.*`, `DroneSelectionWidget.*`, `DroneSettingsWidget.*`, `DroneAudioSettingsSubsystem.*`. 카메라 설정의 지정 자동 검사·PNG 검토 범위는 아래와 같다. 실물 장치·가청 변화·실제 재실행 저장 복원은 수동 확인이 남아 있다.
+
+### 카메라 감도·반전과 Designer
+
+X는 기체 Yaw, Y는 SpringArm/CameraBoom Pitch다. 화면 상하를 기체 상승/하강·기체 Pitch·자유 카메라 궤도 회전과 혼동하지 않는다. `DroneFlightPawn::Look / ChangeYaw / ChangeCameraPitch`에서 쉬운/게임 조작의 기존 입력에 감도·반전을 한 번 적용하고 각도 제한을 유지한다. Acro 전용 Rate/스로틀과 UGV 조향/포탑에는 적용하지 않는다. 일반 패드·InterLink DX를 모두 검증하되 장치별 배정/단절과 최종 ViewTarget은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#일반-패드interlink-카메라-설정-경계)을 따른다.
+
+- `FDroneLookSettings`는 감도X/Y·반전X/Y를 같은 SaveGame 클래스/슬롯에 추가한다. UI의 `Set Pending Look Settings / Get Pending Look Settings`로 편집하며 Apply 전에는 실제 적용값을 바꾸지 않는다. 저장 실패 시 적용된 감도를 되돌리고 편집값은 재시도용으로 남긴다. 취소는 마지막 적용값으로, 기본값은1배/반전 Off의 편집값으로 돌아간다. 전체 음량의 기존 즉시 미리보기는 별도다.
+- 기본 컨트롤은 `LookSensitivityXCombo / LookSensitivityYCombo / InvertLookXCheck / InvertLookYCheck`다. 현재 저장 `WBP_DroneSettings`와 Native/Native Kit에서 새 항목을 런타임에 구성하며 기존 Root/BACK·Designer 전체 Kit 상태와 기존 행 등록을 유지한다. 임의의 자체 Designer 트리 전체에 자동 연결을 보장하는 것은 아니므로 공개 API/기대 노드를 맞춘다.
+- 새 X/Y는 기존 `SelectorBox / RowFocus / ArrowLeft / ArrowLeftFocus / ArrowRight / ArrowRightFocus` 자산으로 외부 윤곽·좌우 화살표·현재 행 포커스를 만든다. 설정 본문은 제한 높이 안에서 스크롤하고 기본값/Apply/BACK은 고정한다. 포커스 스크롤은 본문의 실제 자손만 대상으로 삼는다.
+
+**2026-10-22 D PC 확정 범위:** 카메라 revision `look-selector-visuals`의9파일과 실행 담당4파일, 변경13파일 SHA를 동결본과 대조했다. 아래는 같은 revision의 실행별 근거이며 이전 revision 검사와 중복 합산하지 않는다. Unreal 로컬 근거 루트는 `D:\JGY\project\drone\Saved\Automation\WorkPC_Sessions_20261022`다.
+
+| 실행/조건 | 확인한 자동 결과 | 범위 |
+|---|---|---|
+| `Execution/Runs/CameraUnits_101458` · NullRHI | 3 Success·실패0 | `Drone.UI.LookSettings.SaveContract / WidgetTransaction`, `Drone.Flight.LookSettings.InputIsolation`: 저장 메모리 왕복·적용/취소/실패 복원·Designer/Kit·입력/모드 격리 |
+| `Execution/Runs/CameraRendered_101525` · RenderOffscreen | `RenderedScrollPIE.1280x720 / 1920x1080` 2 Success·실패0, 새PNG14장 | 실제 FrontEnd WBP의4항목+고정3버튼, X/Y 윤곽/화살표/포커스·클립 경계·패드 이벤트·캡처 저장/해상도 검사 |
+| `Execution/Runs/CameraRegression_101619` · RenderOffscreen | 8 Success·실패0 | DefaultViewModeSetting·SettingsModalFocusPIE·PIEInputLifecycle·ReportedSettingsPIE4종·GamepadGuideInputContract |
+
+총괄은 새 캡처 중720p X/Y/Apply와1080p X의4장을 직접 열어 기존 Kit과 일관된 윤곽·화살표·청록 포커스, Apply에서 X/Y 강조 해제를 확인했다. 이는14장 전체의 수동 검토·실물 패드 조작·사용자 재실행 저장 Pass가 아니다. 보고서의 테스트 성공과 원시 로그 경고를 구분하며 로그 전체 무경고를 주장하지 않는다. 새 인스턴스 메모리 직렬화 검사는 실제 과거 버전 `.sav` 파일이나 종료→재실행 검증을 대신하지 않는다.
+
+일반 패드의 실제 RightY/RightX→IA→모드→Boom→최종 화면, InterLink의 현재 CameraPitchRate 연결 공백/새 배정, 두 장치의 쉬운/게임×1/3인칭·양방향/해제·실제 재실행 확인은 후속이다. 물리 조종감·LOS 가시성·M3/M4 정상성/성능의 완료 근거로 확대하지 않는다.
 
 ## 10. 목록 튐 진단 (수정 전)
 

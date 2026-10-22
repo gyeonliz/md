@@ -17,9 +17,9 @@
 
 ## 저장소
 
-- Unreal(C PC): `C:\URproject\drone`
-- 문서(C PC): 이 폴더. PC별 경로는 [CLAUDE.md](CLAUDE.md) 표와 Unreal .claude/codex-bridge/local.json의 mdRepo를 참고한다.
-- 이전 D PC: D:\JGY\project\drone / D:\JGY\project\md — 현재 C PC 경로와 구분한다.
+- D PC 작업컴: Unreal `D:\JGY\project\drone`, 문서 `D:\JGY\project\md`(2026-10-22 확인).
+- C PC 메인컴: Unreal `C:\URproject\drone`. PC별 문서 경로는 [CLAUDE.md](CLAUDE.md) 표를 따른다. 이전 PC 실행 결과를 현재 PC 결과로 쓰지 않는다.
+- 세션 분리·실제 대화 ID·파일 소유권: [작업컴 세션 가이드](docs/git/DRONE_WORK_PC_SESSIONS.md).
 - Production 코드: `Source/Drone`
 - 프로젝트 소유 자산: `/Game/Drone`
 - 팀원 Tutorial 맵: `/Game/Drone/Maps/Lvl_DroneTraining`

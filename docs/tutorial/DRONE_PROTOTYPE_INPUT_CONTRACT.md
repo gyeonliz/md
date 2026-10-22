@@ -1,8 +1,8 @@
 # Drone Prototype 입력 계약
 
-기준일: 2026-10-07 (Asia/Seoul)
+기준일: 2026-10-22 D PC(Asia/Seoul). 기존 InterLink 축/버튼 계약과10/07 검증 이력은 보존하고 현재 카메라 설정·두 장치 확인 경계를 보완했다.
 
-이 문서는 구매 에셋 없이 Flight 기능을 시험하기 위한 **확정된 v1 Prototype 조작 계약**이다. Camera 소유와 장치별 역할은 승인됐으며 감도·반전·최종 물리 수치만 Greybox 체감 결과에 따라 조정한다.
+이 문서는 구매 에셋 없이 Flight 기능을 시험하기 위한 **기존 v1 Prototype 조작 계약**을 유지한다. 사용자 확인 대상은 일반 게임패드와 InterLink DX 모두다. 아래 기존 입력 역할을 보존하며 새 카메라 상하 축/버튼 배정·실장치 보정·최종 물리/감도 튜닝은 별도 미정이다. 두 장치 사용 요청을 미사용 조작의 재배치 승인으로 해석하지 않는다.
 
 ## 1. 현재 계약
 
@@ -39,6 +39,19 @@
 | RightY | Throttle | Pitch |
 
 IMC Acro 패드4축 Dead Zone은 쉬운 조작 값을 복사한 Lower0.2/Upper1.0/Radial이다. 키보드에는 Dead Zone을 추가하지 않는다. RT/LT 공용 Altitude를 Acro 보조 스로틀로 안내하지 않는다.
+
+### 일반 패드·InterLink 카메라 설정 경계
+
+쉬운/게임 조작의 감도X/Y·반전 설정은 기존 기체 Yaw/CameraBoom Pitch 입력에만 적용된다. 이동·고도축, Acro 전용 Rate/스로틀, UGV 조향/포탑은 새 설정에서 제외한다. 두 장치는 현재 같은 적용 설정을 사용하며 장치별 프로파일을 새로 채택하지 않았다. 기본값·pending/적용/취소/저장·Designer와 확정 자동 검증 범위는 [설정 가이드](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#카메라-감도반전과-designer)가 정본이다.
+
+| 장치/경로 | 현재 연결·설정 | 남은 확인 |
+|---|---|---|
+| 일반 게임패드 | RightX→YawAction→ChangeYaw에 감도X/반전X, RightY→CameraPitchRate→ChangeCameraPitch→CameraBoom에 감도Y/반전Y | 실제 장치의 중립/방향/해제→엔진 값→IMC/IA 실효값→모드→Boom→최종 ViewTarget을 함께 계측한다. 기존 경로 존재를 실물 상하 동작 Pass로 쓰지 않는다 |
+| InterLink DX | 기존 Axis5/6=Move, Axis7=Yaw, Axis8=Altitude와 Acro/메뉴 계약을 유지한다. CameraPitchRate용 InterLink 매핑은 기존 연결 도구/계약에 없다 | 상하 시야 명령 공백은 감도Y 증가만으로 해결되지 않는다. 실제 저장 IMC·장치의 미사용 축/버튼을 읽고 배정·중립·유지/해제 정책을 확정한 뒤 연결한다 |
+
+InterLink Axis1~4·미사용 버튼의 번호만 보고 물리 복귀형/순간 버튼으로 단정하거나 기존 비행4축을 재사용하지 않는다. 후보 두 버튼 유지 입력이나 남는 축은 아직 선택하지 않았다. 일반 패드의 실제 단절이 확인되면 해당 연결만 별도로 수정한다.
+
+계측은 장치 모델·드라이버·분리/동시 연결, raw/min/center/max·Dead Zone 전후 값·현재 모드·신호/사망 차단·BP 회전율/clamp·최종 ViewTarget을 구분한다. 엔진 키 값은 USB 원시 HID 패킷과 다르다. Boom만 움직였어도 LOS 관찰자나 다른 Camera가 ViewTarget이면 화면 상하 성공으로 판정하지 않는다. 완료 기준은 두 장치 각각 쉬운/게임×1/3인칭·양방향/해제·적용/취소/기본값·실제 재실행과 기존 비행/메뉴 보존이다.
 
 ### InterLink DX(RawInput) 입력 계약
 
@@ -95,6 +108,10 @@ ADroneFlightPawn은 키보드·패드 입력원을 따로 보관하고 의미축
 
 ## 3. PIE에서 결정할 항목
 
+현재 사용자 감도/반전은 기존 IMC 부호 위에서 C++ 설정 변환을 한 번 거친다. 실물 장치 재현 전에는 IMC Modifier를 추가하거나 기본 회전율을 임의로 높이지 않는다. 일반 패드 RightY/InterLink 후보 조작의 실제 값→IA→모드→Boom→최종 화면을 구분해 기록하고 반전을 두 경로에 중복 적용하지 않는다.
+
+아래 PFN-06 문단은 이전 확인 절차를 보존한 내용이며 위 현재 카메라 설정 경계를 대체하지 않는다.
+
 Mouse Y는 Controller Pitch를 사용하지 않고 CameraBoom Pitch를 직접 조정한다. PFN-06 수동 확인에서는 현재 부호와 감도를 바꾸지 않고 체감 결과만 기록한다. 이후 조정할 때는 다음 원칙을 사용한다.
 
 - Mouse Up이 Camera Up이면 Look Mapping에 Modifier를 추가하지 않는다.
@@ -109,13 +126,15 @@ Editor lifecycle을 포함한 새 PIE 3회 자동화와 별도 수동 화면 확
 ## 5. 현재 미정
 
 - 최종 키 배치와 사용자 재매핑
-- Mouse Y 반전 기본값과 Look 감도
+- 새 감도/반전 설정의 기본 동작은 기존 기준1배·반전 Off다. 실장치별 최종 감도·튜닝값과 InterLink 상하 조작 배정은 미정
 - Gamepad/RC Controller의 Rate/Acro 중앙 감도·Expo 최종값
 - InterLink DX 연결됨: 노브 회전 방향 대응·Button1 물리 종류·브리핑 넘김/탭 전용 버튼, 미인식 안내 문구·전시 조종기 정책·멀티 송신기 지원 현재 미정
 - 최종 비행 물리와 자동 수평 유지
 - 멀티플레이 입력·이동 권한 구조
 
 ## 6. 현재 검증 상태
+
+- 10/22 D PC 카메라 설정의 지정 자동 검사·새 PNG 검토 범위는 [설정 가이드](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#카메라-감도반전과-designer)를 따른다. 자동 입력/메모리 직렬화와 일반 패드·InterLink의 실물 조작·실제 재실행은 구분한다. 아래 기존 검증 기록을 이번 장치 Pass로 재사용하지 않는다.
 
 - 현재 IMC는 역할 기능과 시점 전환을 포함해 45개 Mapping(기본 33+축 8+버튼 4)·Input Action15개를 사용한다. Action Asset 자체는 모드 전환 때 교체하지 않는다.
 - Rate/Acro의 연속 축은 `Triggered + Completed + Canceled`를 묶어 Stick 해제 뒤 Pitch/Roll/Yaw 입력이 0으로 돌아가게 한다.

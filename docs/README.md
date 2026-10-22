@@ -1,6 +1,6 @@
 # Drone 상세 문서 안내
 
-- [작업컴 드론 세션 분리·시작 가이드](git/DRONE_WORK_PC_SESSIONS.md): 새 대화 구성·파일/엔진 소유권·복사용 첫 메시지·총괄 보고
+- [작업컴 드론 세션 분리·시작 가이드](git/DRONE_WORK_PC_SESSIONS.md): 현재 D PC 실제 대화 ID·파일/엔진 소유권·초기 읽기 준비·복사용 첫 메시지
 
 - [비행 물리 정확도·OilRig 비 성능·UI·미션별 독립 맵 점검](gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md): 2026-10-01 후속 구현과 실제 검증, 미완료 범위
 
@@ -92,6 +92,8 @@
 - [`PROJECT_EXPERIENCE_PLAN_COPY_PASTE_REPLACEMENTS.md`](applications/PROJECT_EXPERIENCE_PLAN_COPY_PASTE_REPLACEMENTS.md): 원본 HWP를 건드리지 않고 한글에서 항목별로 붙여넣는 제출용 최종 교체 문구
 
 ## History
+
+- [WORK_PC_START_HERE_2026-10.md](history/archive/WORK_PC_START_HERE_2026-10.md): 10/22 개정 전 작업컴 시작 가이드 원문. 현재 절차는 루트 시작 가이드와 세션 등록부를 따른다.
 
 - [`DRONE_WORKLOG.md`](history/DRONE_WORKLOG.md): 날짜별 개발 기록
 - [STATUS_2026-09.md](history/archive/STATUS_2026-09.md): 이전 상태 원문 아카이브

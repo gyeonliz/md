@@ -300,3 +300,32 @@ WORKBOARD가30KB를 넘어서 날짜가 지난 비교표와 PC 인계 행을 원
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
 | SYNC-WORKPC-01 | PC별 즉시 재개 인계 | 10/06 09:32 D PC: MD c5a0524·Unreal 1619b4f 일치, LFS 8,010개 본문 수신·Clean·lock 없음, 정본 STATUS/WORKLOG | Training 맵 본문/자산 변경 표시를 확인. 소스/LFS 본문·바이너리·자동/수동 Pass 구분, Discard 금지 |
+
+## 2026-10-22 D PC 세션 분리 준비 — 면접·공유 대기 원문 이동
+
+### 면접·공유 결정 대기
+
+10/06 비교표 원문은 [10월 아카이브](docs/history/archive/WORKBOARD_2026-10.md)에 보존했다. 기능별 수동 대기 카드는 아래에 유지한다.
+
+| 항목 | 남은 확인/결정 |
+|---|---|
+| D-7 구매 자산 공유 | 비공개 전환은 사용자 방향. 실제 공개/팀원 접근 설정은 이번 미조회. 향후 공개물은 구매 에셋을 제외한 코드·빌드·영상/출처 목록 |
+| D-8 본인 기여·AI 활용/README | md에만 작성하는 결정 유지. 본인 설계·결정·검증 범위 확인 뒤 정직하게 작성, 이번 신규 작성 없음 |
+| BP/Legacy API | 삭제 후 남은 디자이너용 접근자/Legacy 정리 범위 결정 대기. 수신 코드 존재만으로 삭제 승인하지 않음 |
+
+스냅숏 백로그 GIT-LFS-CAP-01·AI-TOOL-REVIEW-01은 현재 카드 없음(09-15 스냅숏), 복원/보류/폐기 결정 대기.
+
+완료·종료 카드·현재 카드의 이전 장문 근거·지난 Next·수동 맵 안내는 [10월 보드 아카이브](docs/history/archive/WORKBOARD_2026-10.md)에 원문 보존했다. 10/06 D PC: RACING-MEETING-01·FIGMA-RACING-02·MISSION-FRAMEWORK-01·MAP-TEST-01(대체)·TUTORIAL-GUIDE-03(완료)도 이동. 현재 수동 순서는 [테스트 가이드](docs/gameplay/DRONE_TEST_MAP_GUIDE.md)를 따른다.
+
+
+## 2026-10-22 D PC 갱신 전 — Next 원문
+
+## Next
+
+최신 구현·검증은 [STATUS](STATUS.md), 세션별 수치·로그는 [WORKLOG](docs/history/DRONE_WORKLOG.md)를 따른다. 이전 완료/종료 카드와 Next는 [10월 아카이브](docs/history/archive/WORKBOARD_2026-10.md)에 보존했다.
+
+1. [현실 조종감 계획](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md)의 참조 기체/제어·조종기·자료 계약부터 확정하고 입력/화면/성능 기준을 계측한다. 확장B/ChaosC·실기체 스펙/합격값은 미정, 신규물리구현은 착수하지 않았다.
+2. 오프닝 청감·자연 종료·실제 패드는 수동 대기. Camp는 승인된 임시 저메모리 Editor 한 프로세스에서 목표/화면 검사 통과. 일반 실행 시작20GB·RAM/커밋4GB 보호 유지, 전체 메모리 귀속/정상 화질·장시간 안정성은 미완료다. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#대형-맵을-메모리-보호-상태로-검사하기).
+3. 실물 조종기/패드·배달2번 맵·UGV·게이트3상태·헬기포트 외곽·M1 영상 청감/건너뛰기를 확인한다. HUD/눈금·LOS 상자·체크박스의 이전 수리 유지, 미정은 UI-CONTROLS-DECISION-01.
+4. DR-INTERLINK-INPUT-01 실기 확인 후 Acro 혼합 입력·코스 표시선·NPC 다리/속도 대비 보폭·총 정렬·이동 뒤 날씨 시험 맵·비 차폐·벽/그물·광섬유/UGV 수동 회귀를 이어간다. WTH-03 비 입자 크기/모양·위치/양·젖음/물결·빗소리/실내 감쇠·패드를 가이드대로 확인한다. 팀원 Production Training 보존; 실제 패키징·Chaos 비교·최종 Rain/음원은 별도 후속이다.
+5. Story4 새사진뒤 RHI4종/24캡처와 M1출격상태는 확인했다. M1미션완료·물리입력, M2대표/실출격·M3/4오브젝트/목표·M4 3ID·실물패드는 후속이다. UI10/실출격12/Camp16GiB·runtime4GiB 보호, 원본/소유권 유지·Commit/Push는 사용자.

@@ -4,7 +4,7 @@
 
 ## 작업 위치
 
-- 2026-10-06 현재 D PC Unreal: `D:\JGY\project\drone`, 문서: `D:\JGY\project\md`.
+- 2026-10-22 확인 D PC Unreal: `D:\JGY\project\drone`, 문서: `D:\JGY\project\md`.
 - C PC 경로 `C:\URproject\drone`과 `C:\Users\jkw11\Documents\Codex\2026-08-19\codex-gpt-chatgpt-codex-1-6`은 이전 인계의 실행 위치다. PC별 절대 경로를 혼용하지 않는다.
 - 새 생산 코드: `Source/Drone`
 - 새 프로젝트 소유 자산: `/Game/Drone`

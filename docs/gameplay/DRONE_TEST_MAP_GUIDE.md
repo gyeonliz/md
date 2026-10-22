@@ -10,6 +10,14 @@ Story의 현재 맵 연결은 아래 표가 정본이다. M2·M3는 원본 Milit
 
 현재 절차 기준: 2026-10-22 C PC Story4 데이터/사진 교차검토. 실행별 수치·실패와 이전PC 기록은 WORKLOG 정본이다.
 
+## Racer 로터 후보 시험
+
+**콘솔 실행 권장 중지:** 사용자 실콘솔에서 arm거부가 재현됐고 미해결이다. 구 -1/arm/스로틀 절차를 현재 실행지침으로 제공하지 않는다. 현재는 기존매핑 범위만·스로틀/모터는 사용자지시보류·모든화면조작/CUA 중지다. 직전23성공은 direct API 자동범위이며 actual console/Slate 조작복구 Pass가 아니다.
+
+Root가 기록된 사용자 console요청의 Pawn도달/low-throttle arm거부 RED를 확인했다. 입력은사용자재실행후복구확인(추가수정0·원인미확정)이며 이번후속patch/Build/PIE검증 결과는없다. InterLink HID/USB·새Editor 등록과 Training/FrontEnd/TUT_LOS 진입/possess는키/축반응 Pass가 아니다.
+
+직전 Build00319.61초·Run003 물리12/회귀11=23Success(19clean/4warnings)는직접Pawn API/자동화 결과다. controlledRacer/Acro1·2/CG0 후보의힘/토크·접지기반과 Legacy·기존DA·이전오디오는보존하며 actualconsole/Slate 전체경로로확장하지않는다. [후보/입력검증 정본](DRONE_REALISTIC_HANDLING_PLAN.md#racer-로터-1차-후보)·[정정이력](../history/DRONE_WORKLOG.md).
+
 ## 현재 미션 연결과 확인 순서
 
 목표를 스포이드로 교체하고 나침반에 표시하려면 `BP_DroneMissionTargetManager`의 레벨 인스턴스를 편집한다. Story4맵에 실제 목표를 연결한 매니저를 배치했다. `/Game/Drone/Maps/TestMap/Lvl_MissionCompassTest`의 A/B·DECOY는 별도 예제다. 설정·원래 MissionManager와의 차이는 [미션 연결 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md#스포이드-목표-연결과-나침반)를 따른다.
@@ -40,7 +48,25 @@ Runtime Spawn의 `bRelativeToMissionStart / bSnapToGround / TaggedActorCountToSk
 
 FrontEnd에서 M1~4 선택/브리핑을1920×1080·1280×720로 확인한다. Pretendard·남색/청록·사선버튼·저장 Designer 유지, 긴 본문 끝까지 스크롤·정보3칸/자막 비겹침·목표3/출발3 안내·사진 전환/비율·START/BACK·Esc/B·키보드/패드를 검사한다. M1 영상→브리핑과 M3/4 재출격 진행 보존도 확인한다. 이벤트 주입과 실제 장치/손 조작 Pass는 별도다.
 
-Story4 행동 라벨은 `START`·`BACK` 영문을 유지한다. 최신 사진 연결 후 RHI 검사와 캡처는 STATUS/WORKLOG의 해당 실행을 확인한다. Layout/Data 통과는 실제 패드/물리입력·목표 완료가 아니다. M1은 맵진입/Drop빙의·DirectorActive·목표0/1까지만 확인했으므로 미션완료로 쓰지 않는다. UI10GiB/실출격12GiB/Camp16GiB·runtime RAM/commit4GiB 보호를 유지하며 반복실행/앱강제종료 없이 남은범위를 [후속계획](DRONE_REALISTIC_HANDLING_PLAN.md#잔여-작업과-완료-기준)으로 확인한다.
+Story4 행동 라벨은 `START`·`BACK` 영문을 유지한다. 최신 사진 연결 후 RHI 검사와 캡처는 STATUS/WORKLOG의 해당 실행을 확인한다. Layout/Data 통과는 실제 패드/물리입력·목표 완료가 아니다. M1은 맵진입/Drop빙의·DirectorActive·목표0/1까지만 확인했으므로 미션완료로 쓰지 않는다. UI10GiB/실출격12GiB/Camp 일반20GiB·승인 저메모리16GiB·runtime RAM/commit4GiB 보호를 유지하며 반복실행/앱강제종료 없이 남은범위를 [후속계획](DRONE_REALISTIC_HANDLING_PLAN.md#잔여-작업과-완료-기준)으로 확인한다.
+
+현재 D PC는 M3 현행 재밍 이탈 목표와 M4 실제 Start1/2/3의 선택/StartId·스포이드·XY·UGV 접지 및 기존 포탑3개/240초 계약을 자동 검증했다. M4 첫 실패는 선택 BP가 아닌 일반 헬기포트를 기대한 검사 오류로 보존하고, 명시적 시작지점 경로를 우선하는 검사만 수리했다. 세 성공 모두 `ground=1` UGV이며 공중 기체의 높이 분기는 코드 보존만 확인했다. `ApplyDamage` 자동 사건으로 목표를 완료했으므로 실제 발사·전투/비행 완주와 구분한다. DA/ID/규칙·제품 맵은 저장하지 않았다. 실행별 날짜·로그·실패는 [WORKLOG](../history/DRONE_WORKLOG.md)가 정본이다.
+
+미션/LOS 캡처는 global `GEngine->GameViewport`의 Window를 사용하며 검사 World/LocalPlayer의 client와 동일성 검증이 없다. 잘못된 캡처라고 확정하지 않되 실제 검증 World의 가시성 Pass 근거로 사용하지 않는다. 새 UI14 PNG는 검사 World/실제 viewport·새 파일/PNG 디코드/픽셀 크기를 검증한 별도 경로다. LOS4단계/접지 자동 계약과 사람·드론 가시성을 분리하고, `break_hit_result` API 오류를 수리한 지면 검사와 World 연결 캡처 후 실기로 판단한다.
+
+성능 CSV는 1280×720·품질3·출발점 무입력10초의 harness Update 벽시계 프레임 간격이며 캡처 대기는 제외한다. Game/Render 카운터와 구분하고 GPU 비활성/미지원은 0ms로 쓰지 않는다. M3 Fence BP SplineMesh None 오류는 잔존하며 CSV StatName ensure 진단은 `-csvAllCategoriesDisabled`·`r.GPUCsvStatsEnabled 0`으로 내장 CSV 전체 통계를 비활성화한 조건의 CPU 표본이다. GPU를 오류 원인으로 확정하지 않는다. M4 Lumen SurfaceCacheAtlas 경고도 병목 원인으로 단정하지 않는다. 구간별 수치는 WORKLOG, 동일 실제 입력/비행/발사 과제와 변경 전후 비교는 후속이다.
+
+### 사용자 오디오·첫 경고 확인
+
+실제 FrontEnd catalog→RacingMap1과 M4 출격의 World/LocalPlayer/Controller/Pawn·Director/HUD/Countdown binding을 먼저 연결하고 같은 actual SWindow/backbuffer의 자연표시 PNG를 사용한다. 첫 global screenshot의 잘못된 Editor viewport는 근거에서 제외하며 실제 Window 재촬영4PNG를 사용한다. 남은 자동public action·배치actor 직접발사와 NPC 자율전투/물리입력·전체미션 수동완주를 구분한다.
+
+실제 FrontEnd catalog의 Racing Map1 출격과 Story M4(Lvl_MilitaryCamp)에서 native Mission PlayerController가 생성한 Pawn·Director·저장 HUD Kit/Countdown WBP 조립을 확인했다. 임시 fixture actor/widget를 새로 만든 검사가 아니라 실제 public flow·Health·fire 호출을 자동 주입한 범위다. 레이싱3/2/1/GO의 cue4/PCM과 실제 Window4PNG, M4 첫low epoch4와 다음5의 경고3파츠·warning1/recovery0을 확인했다. M4 UGV200→199·차량/고정자동포탑 각각 projectile1·Rifle fired1/ammo1에서 정확한 cue와 실제 physical source1을 대조했고 Shotgun8pellet/replacement0도 보존했다. 유인MG는 해당맵 미배치로 실제미션 통과 범위에 넣지 않는다. 발사/피해 public API의 자동 주입 결과이며 NPC 자율교전이나 실물 사격 완료는 아니다.
+
+M4에서 실제 selected Pawn 사망→재선택 pause 뒤 cue·owner/device·실제 physical source/DSP frame 진행·해당 PCM을 함께 대조한다. 수리 전 voice1/playback0·source0/원본상관 약0.06과 수리 후 paused=true에서도 life1 4096→17408→55296, life2 5120→16384→54272 mixer frame 증가·상관 각각약0.998712를 구분한다. 첫 포탑 caller==target 거절과 teleport 직후 listener 동기화는 검사환경/주입 수리로 제품 pause 결함과 분리한다.
+
+원래 category prompt 기본값(Racing/Story false)을 강제로 바꾸지 않았고 실제 Widget CDO/instance 속성과 World binding을 대조한다. 검사구간의 NPC Tick 분리·teleport 뒤 listener 안정화와 제품의 발사/피해 규칙을 구분한다. Master와 FApp/effectivePrimary·장치/actual source를 함께 기록하며 검사 scope au.DisableAppVolume1·process au.NeverDisableSubmixes1·원래 설정 복원을 사용한다. 혼합PCM의 회복tail/환경음 비영만으로 대상cue 재생을 판정하지 않는다.
+
+Build5 성공16.72초, 실제 Mission 신규2개 명명Success(각 succeededWithWarnings1/failed0)다. 직접영향 기존 DroneDestroyed/ImpactDestroyed/MasterMute3개 재검사 Success. Racing은 사망음 pause 수리 전 별도리비전이고 M4/직접회귀3은 최종리비전이다. 기존18+8 지정검사 전체를 이번에 다시 실행한 결과는 아니며 실제 미션의 좁은 통합 범위와 구분한다. 최종Source418/418·신규통합test1개·freeze SHA 38EC6EF7…6F578BA6·기존417중416 보존·FlightPawn audio블록/include2만 수정, Config5/보호125/SourceArt12·Saved10 일치·최종 엔진/Build0 확인. 실물 손조종/전체미션 수동완주·스피커 청감/주관 밸런스·Cook/패키징은 미실시다. [음원/조정 정본](DRONE_MISSION_FRAMEWORK_GUIDE.md#사용자-오디오와-체력-경고)·[실행/실패 이력](../history/DRONE_WORKLOG.md).
 
 ### 귀환 정책을 유지하는 방법
 

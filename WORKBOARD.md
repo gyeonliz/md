@@ -1,10 +1,10 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-10-22 C PC — 현실조종감 참조/잔여계획 MD 정리·새구현0. UI RHI4종/24캡처·M1출격상태 확인, 실제입력/미션완료 별도. [STATUS](STATUS.md), [WORKLOG](docs/history/DRONE_WORKLOG.md).
+마지막 갱신: 2026-10-22 D PC — 기존InterLink/패드·키보드 매핑범위만. 파일30개Git내용정상·복구쓰기0, 사용자재실행후입력복구확인·추가수정0·원인미확정. 스로틀·모터보류·CUA전부중지. [STATUS](STATUS.md), [WORKLOG](docs/history/DRONE_WORKLOG.md).
 
 ## Now
 
-최신 Git·검증 요약은 [STATUS](STATUS.md)를 따른다. 현재 카드·수동 확인 안내·Next만 유지한다.
+최신 근거는 [STATUS](STATUS.md)·[세션 가이드](docs/git/DRONE_WORK_PC_SESSIONS.md). 이전물리23은직접API/자동범위로보존하며 console/Slate/실제조종 Pass가 아니다. 매핑원본·장치등록과 실제조작복구를 구분하고 스로틀/모터는사용자요청으로보류한다.
 
 ### 결정 필요 — 현재 DA 값은 채택 사양이 아님
 
@@ -20,20 +20,7 @@
 
 
 
-### 면접·공유 결정 대기
-
-10/06 비교표 원문은 [10월 아카이브](docs/history/archive/WORKBOARD_2026-10.md)에 보존했다. 기능별 수동 대기 카드는 아래에 유지한다.
-
-| 항목 | 남은 확인/결정 |
-|---|---|
-| D-7 구매 자산 공유 | 비공개 전환은 사용자 방향. 실제 공개/팀원 접근 설정은 이번 미조회. 향후 공개물은 구매 에셋을 제외한 코드·빌드·영상/출처 목록 |
-| D-8 본인 기여·AI 활용/README | md에만 작성하는 결정 유지. 본인 설계·결정·검증 범위 확인 뒤 정직하게 작성, 이번 신규 작성 없음 |
-| BP/Legacy API | 삭제 후 남은 디자이너용 접근자/Legacy 정리 범위 결정 대기. 수신 코드 존재만으로 삭제 승인하지 않음 |
-
-스냅숏 백로그 GIT-LFS-CAP-01·AI-TOOL-REVIEW-01은 현재 카드 없음(09-15 스냅숏), 복원/보류/폐기 결정 대기.
-
-완료·종료 카드·현재 카드의 이전 장문 근거·지난 Next·수동 맵 안내는 [10월 보드 아카이브](docs/history/archive/WORKBOARD_2026-10.md)에 원문 보존했다. 10/06 D PC: RACING-MEETING-01·FIGMA-RACING-02·MISSION-FRAMEWORK-01·MAP-TEST-01(대체)·TUTORIAL-GUIDE-03(완료)도 이동. 현재 수동 순서는 [테스트 가이드](docs/gameplay/DRONE_TEST_MAP_GUIDE.md)를 따른다.
-
+D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 스냅숏 백로그는 결정 대기다. 완료/종료 카드·이전 근거·지난 Next·해당 결정표 원문은 [10월 보드 아카이브](docs/history/archive/WORKBOARD_2026-10.md)에 보존했다. 현재 수동 순서는 [테스트 가이드](docs/gameplay/DRONE_TEST_MAP_GUIDE.md)를 따른다.
 
 ### 카드 그룹
 
@@ -43,13 +30,13 @@
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
-| TUT-OBSERVER-01 | 고정 조종자 첫 수업 | LOS4단계 이륙→전진→후진 복귀→접지 성공을 실제 TUT_LOS에서 자동 통과. LOS DA SHA 보존; STATUS | 손 조종·상자 가시성·Lumen 노출 경고·재출격/다음 수업 확인 |
+| TUT-OBSERVER-01 | 첫 LOS 관찰·후퇴 | 수평 후퇴/메시 Yaw·고정 카메라 추적, 이륙→전진→후진→접지 자동 계약 통과 | World 연결 캡처·HitResult 디코더 수리 후 실제 사람/드론 가시성. 높이 원인 미확정 |
 | TUT-GATE-SAVE-01 | Gate BP 저장 사고 | CDO MID 참조 원인 수정·Gate BP 수리, 재로드3회·Gate5/5 성공(기존 경고100) | 팀원 Source+BP 수신/종료 후 Build·같은 저장 실기. 기하/색·16개 유지, Production 미수정 |
 | TUT-COURSE-SMOOTH-01 | 장거리 코스 표시선 곡률 분할·BP 표시 예산 | 구현됨·자동 검증됨·수동 확인 대기(10/04 C PC Claude). 긴 코스 곡률 분할·기본1024(시작값·미확정), BP 드래그 재구성 Off. 수치·근거 STATUS/WORKLOG | 팀원 Production 코스 외형·급커브/끝 연결·Editor 편집 체감 수동 확인. BP2048(측정 최대20cm) 검토 가능. 짧은 TestMap68/113조각 기존 균일 분할 유지·Production 저장/재생성 금지 |
 | RACING-TERRAIN-LINK-01 | 레이싱 흐름·지형 연결 | 본체 단독 연결 오류 정정·프로펠러4개/BP 선택3D 복구. 원형/도시 출격·회전 중심·3D 검사 통과; WORKLOG | 손 조종 완주·HUD/기록 체감·원본 맵 보존 |
 | TUT-PROGRESS-01 | 튜토리얼 시간·연속 진행·전체 완료 | 이전 자동 검증 WORKLOG. 수신 코드의 완료 미션/Story Fact JSON 저장은 TUT-COMPLETION-SAVE-01 | 실제8수업·현재 결과창·로비 완료 표시/재진입 확인. Production Training 보존 |
 | TUT-BRIEFING-TEXT-01 | 훈련 문구·시작 안내 | 기획 문구·역할 조작·기본 훈련 시작 안내 구현(Claude), 수동 대기 | 패드/Enter 시작·목표/안내 확인. 기획8개↔UGV NPC 매핑·미기재 화자/키 결정 |
-| TUT-COMPLETION-SAVE-01 | 미션 진행도 영구 저장 | 10/13 수신 소스 확인: 완료 미션·Story Fact·권장문구 표시 여부 JSON 저장/복원 구현. Best Lap 저장과 별개 | Claude가 현재HEAD 회귀 확인 후 실제 성공→종료→재실행 복원·저장 실패 처리 확인. 수신만으로 자동/수동 Pass 아님 |
+| TUT-COMPLETION-SAVE-01 | 미션 진행도 영구 저장 | 10/13 수신 소스 확인: 완료 미션·Story Fact·권장문구 표시 여부 JSON 저장/복원 구현. Best Lap 저장과 별개 | 실행 담당이 현재 HEAD 회귀 확인 후 실제 성공→종료→재실행 복원·저장 실패 처리를 확인. 수신만으로 자동/수동 Pass 아님 |
 | TUT-ORBIT-02 | 회전 수업 = 원형 코스 한 바퀴 | Heading ID 유지·실제 TUT_Circle_Gate 완주→즉시 성공 자동 통과, 귀환 제거 | 손 조종으로 순서/역방향/7⁄8 바퀴 미완료 확인 |
 | TUT-GATE-PRESENTATION-01 | Gate 크기·방향·3색 | 상태별 MI 자동 우선·빈칸 BP 기본색/발광·Param/Color 호환. Build53.04초·Gate4/4. Island정합/Scale수리 유지. [조정](docs/tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md#세-상태-색과-머터리얼-조정) | 실제 코스 색/방향 확인·원본 맵 보존 |
 | TUT-ROUTE-SELECT-01 | Training Route 4개 선택 시험 | `Lvl_DroneTrainingRouteSelectionTest`에 직선·좌곡선·우곡선·상승 슬라럼과 Gate 각 5개 배치. `1~4` 고정·`5` 무작위, 단일 활성, 진행 초기화, HUD 기록 Source 전환. Build·Map Check·API/저장/실제 키 PIE 성공 | 사용자가 화면에서 경로 형태·Gate 간격·랜덤 전환과 Lap HUD를 확인하고 각 Spline 점을 최종 조정 |
@@ -63,7 +50,8 @@
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
 | UI-WBP-EXPORT-01 | WBP 정리 | 화면22종·3D/6카드/Back 유지. 새 투명 PNG5장→6종, 사진 모드/카드1280·1920 자동 통과·캡처 확인. [정본](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#화면별-wbp-편집-정본) | Sky 긴 설명 간격·실물 패드 확인 |
-| UI-HUD-WBP-01 | HUD Designer 통합 | 13구역·임무/입력/흰색 카운트다운 한 트리, 조준/프레임 이미지 분리·편집 유지 자동 통과 | 사용자 Designer 간격/파츠 조정·실제 플레이 확인 |
+| UI-HUD-WBP-01 | HUD·첫 경고 | 실제Race3/2/1/출발4PNG·M4 첫경고epoch4부터 배경/아이콘/문구 동시 확인 | 자동public flow/health/fire 주입 범위. 실물/청감·전체수동플레이 별도, AUDIO-USER-01 |
+| AUDIO-USER-01 | 사용자 음원·실제 미션 | 실제Race/M4 조립2Success(경고포함)·local사망음 pause 수리·Build5, 직접영향 기존 DroneDestroyed/ImpactDestroyed/MasterMute3개 재검사 Success | 유인MG미배치·직전26전체재실행 아님. 손조종/실청·패키징 대기. [정본](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#사용자-오디오와-체력-경고) |
 | UI-CONTROLS-DECISION-01 | 조작·흐름 결정 | 자폭 기본 무장/해제 잠금 반영, 나머지 미정 유지 | 기획 결정 후 연결. 드랍 L2/R1·FPV2 범례·수업 매핑·결과 다음 임의 확정 금지 |
 | ASSET-SKYDRONE-01 | 스카이드론 외형 | Racing 본체+Sky 로터4개·선택 BP 연결/검증됨 | 조종 체감 확인 |
 | TEST-HUD-LAYOUT-01 | HUD 실제 표시 확인 | D PC 자산5종·RHI5종·최종 파츠2종 통과,1280/1920 캡처. 상세 WORKLOG | 창 이동·실물 패드/연속 조종 수동 확인. 숨김 렌더와 구분 |
@@ -77,7 +65,7 @@
 | UI-LAYOUT-DIAG-01 | 로비 레이아웃 진단 판정 변동 조사 | 진단 판정 변동·기존 Fail 유지. D-11로 KnownIssues.Flow.LobbyLayoutStabilityPIE 분리됨(10/05 C PC Claude), 안정화 완료 아님 | Claude가 표본/대기·레이아웃 원인을 구분하고 반복 렌더 검사 판정 안정화, 1280/1920 수동 확인 별도 |
 | UI-LAYOUT-01 | 목록 진입·선택 시 한 프레임 재배치 | 구현됨·자동 검증됨·수동 확인 대기. 줄바꿈·상시 스크롤바·폭270 후속 포함. 최신 진단 분리는 UI-LAYOUT-DIAG-01 참조, 이전 근거 아카이브/WORKLOG | 1280/1920 실제 화면 가독성, Story 4개 목록의 상시 스크롤바 칸 확인 후 수동 완료 |
 | UI-PAD-01 | 패드만으로 전체 UI 선택 | 구현/자동 검증됨·실기 대기(10/07 D PC Claude). InterLink 노브만으로 전체 이동(좌우 불필요)·패드 규칙 유지. [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md) | 전체 흐름·탭/첫 강조·가독성·복귀, 설정 노브 잠금/조절·콤보 실기 확인. NullRHI는 실기 Pass 아님 |
-| UI-SETTINGS-01 | 설정·체크박스 | 공통 Settings WBP 폭1240 복구·로비/일시정지 연결. 실제 표준/넓은 창 가독성·클릭/Back4/4 통과 | 실제 클릭 타이틀/일시정지2회 왕복 수리 통과. 적용/취소·재실행·Standalone 소리/해상도 확인 |
+| UI-SETTINGS-01 | 감도·반전·설정 UI | X/Y감도·반전/적용·취소·기본값·저장 구현, 최신 단위3/렌더2/회귀8 Success·새PNG14 | 실제 두 장치/구버전.sav·재실행 확인. [조정](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#카메라-감도반전과-designer) |
 | UI-FLOW-PROTOTYPE-01 | 로비·브리핑·조작 안내 | 번호만 표시·RC 세로 스틱·Scout/FPV 푸른 배경 사진·권장창 한글 적용. Build·UI4/4, 실제1280/1920 렌더 확인; WORKLOG | 실물 휠 방향/감도·번호 가독성·패드·영상/청감 수동 확인 |
 | COMBAT-IMPACT-DEATH-01 | 차량·포탑·유탄·사망 | 차량300/포탑200·MG25/유탄150/자폭600. 포탑 자체 HP0 폭발/소리1회·점유 해제·잔해15초·실제 TUT2발 파괴/클리어 검사 | 실물 발사·가시성/청감·잔해 정착/밸런스 수동 확인 |
 
@@ -92,7 +80,7 @@
 | HUD-FIGMA-01 | 시안5 HUD Kit | WBP화·Paint 좌표/매 프레임 눈금 수정, 저녁 검증 WORKLOG | 실제 해상도·미션/나침반/타이머/상태/속도/고도/VS·UGV 표시 수동 확인. 배터리 시간 미정 |
 | MISSION-COMPASS-01 | 스포이드 목표/조건 | Tutorial9·Story4에 BP_DroneMissionTargetManager 저장·검색/스포이드/조건 `+`·DA 적용. [편집](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#이미-배치된-맵에서-바로-찾기) | FreeGate13게이트·배달2 고유3상자 적재/완료 통과. Nav14맵 점검·NPC5맵53명 빌드/재로드 통과. LOS 복귀/착지 유지·실물 조종 별도 |
 | D-6 높이 제한 | 배치 매니저·BP 값으로 적용 | 구현됨·자동 검증됨(10/05 C PC Claude). BP_DroneAltitudeLimitManager 배치·값 설정, 상세 [WORKLOG](docs/history/DRONE_WORKLOG.md) | 천장 체감 수동 확인 대기. 높이 제한 수치·경고 연출 현재 미정 |
-| STORY-TEST-01 | Story4 실맵 선택·브리핑 | 사진3필드/Designer반영·새 RHI4Success/24PNG, M1Drop빙의·DirectorActive·목표0/1 | M1완료/실기·M2대표/출격·M3/4오브젝트/목표완료·M4 3ID/패드 후속. [검증](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#story4-선택브리핑-검증-경계) |
+| STORY-TEST-01 | Story 실맵·출격/목표 | D PC M3 현행목표·M4 Start1/2/3 XY/UGV접지·3목표 자동 통과. 실패/검사수리 보존 | M1완료/M2출격·M3/4 실물 발사/비행·M4 공중 높이/안전성. [범위](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#story4-선택브리핑-검증-경계) |
 | MISSION-RULE-PIE-01 | 실제 수업 완료 흐름 | 실제 TUT7종 자동 통과. LOS4단계만 복귀/접지 유지·DA 원본 SHA 보존, 다른 DA 귀환 안내 정리·저작 도구 재도입 방지 | 실제 손 조작·실패/재시도·Story 화면 확인. 자유 게이트 준비 중 유지 |
 | STY-03-PIE-01 | 재밍 Radar·연결/HUD | 빈 Mesh·기지 범위 BP, Noise→NO SIGNAL·조종 차단·복구, 광섬유 면역 구현. 속도 저하 없음 | 일반/광섬유 진입·중심/경계·이탈·입력 복구 수동 확인. 자동 결과 WORKLOG |
 | STORY-BRANCH-01 | Mission 2→3 양쪽 스토리 분기 | Story Fact 저장·성공 적용·조건 목표 필터, 미끼/실제 탑승 양쪽 자동화 완료 | 사용자가 기본 스토리안을 정하면 실제 Mission DA에 Fact 설정 |
@@ -104,9 +92,9 @@
 | PAYLOAD-GRIP-01 | 집게 부착 통일 | Codex 예외 수정·자동 Pass; WORKLOG | 시작→투하→재픽업 외형 확인 |
 | ACRO-MEETING-01 | Mode1 Space 하강·반전 및 키보드/패드 겹침 수정 | 구현됨·자동 검증됨·수동 확인 대기(10/04 C PC Claude). 입력원 분리·절댓값 큰 쪽·키 해제 시 패드 인계, 기존 Dead Zone·정확 적분 유지. 근거 STATUS | Mode1 스틱에 엄지를 걸친 채 Space→상승, 키 떼고 스틱→패드 조종, 모두 놓으면0을 실제 장치로 확인. Mode2도 혼합 입력 확인. W/S·A/D·Q/E·Space/Ctrl은 두 Mode 동일; 키보드 배율·Angle·마우스Yaw·회의 반전 뜻 현재 미정 |
 | DR-FPV-ACRO-INPUT-02 | Acro 키보드·패드 Mode 1/2 | InterLink Acro 4축 추가·총45매핑·Dead Zone 계약 자동 검증됨(10/07 D PC Claude). [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md), 혼합 입력은 ACRO-MEETING-01 | Mode 1/2 실기 혼합 입력·비행 체감 확인. 조작 정책/회의 반전 뜻 미정 |
-| DR-INTERLINK-INPUT-01 | InterLink DX 입력·메뉴 | 10/07 이전 자동 검증·집계 정정은 STATUS. 45매핑·ArmSwitch·노브; [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md) | 현재 수신 코드 빌드 후 축/DZ·Mode2·Button1·12/13·노브 이동/탭·방향·설정 실기 확인 |
+| DR-INTERLINK-INPUT-01 | 기존매핑 복구범위 | 추적30개Git내용정상·override없음/복구쓰기0, InterLink HID/USB/새Editor등록·기존맵possess 확인 | 사용자재실행후입력복구확인·추가수정0·원인미확정. CUA전부중지·스로틀/모터보류. [입력계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md) |
 | DR-FPV-ACRO-PIE-01 | FPV Rate/Acro 실제 조작 체감 | Mode 1/2 축 분리와 각속도·무수평복귀에 공통 질량·추력·모터 응답·중력·Body Up 추진·선형/제곱 항력 v2 연결. 별도 속도 단계는 제거 | 키보드/패드로 Nose-down 전진력, 호버·상승·무추력 하강, Roll/Loop와 650°/s 체감, Mode 1/2가 축 배치 외 비행 성능이 같은지 확인 후 수치 조정 |
-| DR-FLIGHT-PHYS-02 | 현실 조종감·기체별 참조 | 기존Greybox유지·조사/계획완료·새구현0. Racer레이싱/기타공중역할별전쟁사용/UGV분리, 모델·사양·장치·확장B/C미정 | [정본계획](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md): 참조/입력계약→계측→구조비교→한기체·숙련자/실맵검증. 모터OFF착지/재이륙·카메라피치/감도·LOS·렉/로딩 포함 |
+| DR-FLIGHT-PHYS-02 | Racer1 opt-in·입력한계 | 직전Build003·물리12/회귀11 Success는직접Pawn API/자동범위 | 실제console arm거부·Slate/조종Pass아님. 모터/스로틀수정보류·controlled후보한계유지. [정본](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#racer-로터-1차-후보) |
 | PHY-CAMERA-01 | 벽·그물 접촉 화면 안정화 | 구현됨·자동 검증됨·수동 확인 대기. 연속 접촉 제약·외형/FPV 카메라 분리·그물 Camera Ignore, 피해 Shake 유지. 검증 WORKLOG | Physics Sandbox에서 1/3인칭 저속/고속/지속 벽 접촉·그물 감속/포획 때 화면 떨림 감소와 충돌 유지 확인. NPC 맵에서 총알 피격 화면 흔들림이 남는지 확인. 자동화만으로 체감 Pass 처리하지 않음 |
 | PHYSICS-SANDBOX-01 | 벽 충돌·그물 얽힘·국소 파괴 벽 | 벽 반발·날개 접촉·그물 감속/포획/하강·탄환/폭발 국소 절단 구현/자동 검증. 실제 Chaos 비교 별도·이전 근거 WORKLOG | Sandbox에서 저속 접촉은 작게 밀리고 고속 충돌은 크게 반발하는지, 날개 끝 접촉 방향의 자세 Kick, 그물 포획·하강·자동 해제와 조종 복구를 화면 확인하고 실제 Chaos Cloth/Dataflow와 Geometry Collection을 별도 구역에서 비교 |
 | PHY-NET-03 | 늘어지는 그물 장애물 | 공유 매듭 PBD·상단 고정/중력·제약/접촉·BP 예산 구현. Chaos Cloth는 별도 후속 | 포획·국소 변형/감쇠·Reset·크기/FPS 수동 확인. 일반 접촉 자동 절단 금지 |
@@ -141,17 +129,18 @@
 | TEST-ORDER-ROUTE-01 | 전체 렌더 회귀 Route 키 순서 의존 관찰 | 2026-10-04 C PC ClaudeAcroFull 전체5회(test.log/test2.log/final.log/final2.log/test3.log) TrainingRouteSelectionPIE 모두 Success(Codex 로그 대조). 그중3회 화면 미렌더이므로 화면 검증과 구분. 지난 Fail은 날짜별 기록 보존, 원인 미특정·해결 확정 아님 | 재발 시 선행 테스트/입력 처리 순서 재현·Claude 조사. Production 맵 보존 |
 | BUILD-PACKAGE-01 | 패키징 쿠킹 설정 | 정적 자동 검증됨(10/02 C PC Claude). Mission/Drone DA AlwaysCook·MissionMap Soft 참조. 실제 패키징 미실행; 검증 WORKLOG | 실제 패키징 미실행. 패키지에서 DA 자동 등록·모든 MissionMap 진입 확인, Production Training 보존 |
 | PERF-ZEN-START-01 | D PC Editor 시작 지연(Zen 대기) 조사 | 원인 특정(10/06 D PC Claude): Zen 세션 기록 733개 로드 약 20초 + 엔진 20초 초과 모달. 10/02 473초는 모달 미응답 대기. 세션 폴더 732개 백업 이동 완료, 재측정 대기. 상세 STATUS/WORKLOG | Claude가 같은 맵·캐시로 cold/warm 시작 로그 비교, 확인창 응답·Zen running→Editor 확인 시간 분리. 캐시 삭제·엔진 소스 수정·보안 해제 금지, Production Training 보존 |
-| SYNC-WORKPC-01 | PC 재개 | Drone `0d5f039d`·실제 원격 일치/0·0. Circuit DA 수정1·Map1~3 DA 미추적3 보존으로 Clean 아님. [STATUS](STATUS.md#git-기준) | 사용자 검토 뒤 필요 시 GitHub Desktop Commit/Push. 최신 HEAD Build/회귀·실기 후속, 과거 Pass 재사용 금지 |
+| SYNC-WORKPC-01 | D PC 입력범위 | 버그시작Source430 변경0·입력30개Git내용정상·복구쓰기0, [등록부](docs/git/DRONE_WORK_PC_SESSIONS.md) | 이번patch/Build/PIE검증없음·사용자재실행후입력복구확인·원인미확정. 사용자Editor/진행보존 |
 | RACING-MAPS-01 | 팀원 레이싱 맵 1·2·3 | Map2 중복 링 때문에 생기던 기록 취소 수정·93개 실행 Gate 완주/저장. 3맵 새 프로세스 복원 통과. 선택/사진/API 포커스 정합·옛 7개 안내 수정; STATUS | 사용자 실제 비행/카드별 사진 확인. 자동 기록은 전용 슬롯, 원본 맵/사진과 기존 DA 변경 보존 |
-| SYNC-COLLAB-01 | 협업·다른 PC 세팅 | 공유 파일 최초 5b03ad3(10/02) Commit/Push 완료. ui/image 역할 파일과 이번 변경은 미추적/미커밋. 다른 PC 실제 세팅 미구현 | 사용자 명시 지시 후 남은 파일 Commit/Push→다른 PC Pull·COLLAB_READY→첫 Space 저장 확인 |
-| SYNC-SPACES-01 | MD·Space 연결 | 저녁 반영 결과는 WORKLOG | 사용자 Commit/Push 후 타 PC 수신. 새 Page·예약·권한·Trello 변경 없음 |
+| SYNC-COLLAB-01 | 협업·다른 PC 세팅 | ui/image 역할 파일은 현재 HEAD에 추적/커밋됨(마지막 변경3f02577b). 직접 작업·소유권은 [현재 규칙](docs/git/DRONE_WORK_PC_SESSIONS.md) | 다른 PC 설정·COLLAB_READY는 별도 확인. 두 저장소 기존/추가 미커밋 보존, Commit/Push는 사용자 |
+| SYNC-SPACES-01 | MD·Space 연결 | 입력최종확인 기존2Page/8연산·재읽기·기존134블록 hash 보존, WORKLOG영수증 | 사용자재실행복구·모터/스로틀보류·새Page0 |
 
 ## Next
 
-최신 구현·검증은 [STATUS](STATUS.md), 세션별 수치·로그는 [WORKLOG](docs/history/DRONE_WORKLOG.md)를 따른다. 이전 완료/종료 카드와 Next는 [10월 아카이브](docs/history/archive/WORKBOARD_2026-10.md)에 보존했다.
+현재 상태는 [STATUS](STATUS.md), 수치·원시 로그 이력은 [WORKLOG](docs/history/DRONE_WORKLOG.md), 이전 Next는 [원문 아카이브](docs/history/archive/WORKBOARD_2026-10.md)를 따른다.
 
-1. [현실 조종감 계획](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md)의 참조 기체/제어·조종기·자료 계약부터 확정하고 입력/화면/성능 기준을 계측한다. 확장B/ChaosC·실기체 스펙/합격값은 미정, 신규물리구현은 착수하지 않았다.
-2. 오프닝 청감·자연 종료·실제 패드는 수동 대기. Camp는 승인된 임시 저메모리 Editor 한 프로세스에서 목표/화면 검사 통과. 일반 실행 시작20GB·RAM/커밋4GB 보호 유지, 전체 메모리 귀속/정상 화질·장시간 안정성은 미완료다. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#대형-맵을-메모리-보호-상태로-검사하기).
-3. 실물 조종기/패드·배달2번 맵·UGV·게이트3상태·헬기포트 외곽·M1 영상 청감/건너뛰기를 확인한다. HUD/눈금·LOS 상자·체크박스의 이전 수리 유지, 미정은 UI-CONTROLS-DECISION-01.
-4. DR-INTERLINK-INPUT-01 실기 확인 후 Acro 혼합 입력·코스 표시선·NPC 다리/속도 대비 보폭·총 정렬·이동 뒤 날씨 시험 맵·비 차폐·벽/그물·광섬유/UGV 수동 회귀를 이어간다. WTH-03 비 입자 크기/모양·위치/양·젖음/물결·빗소리/실내 감쇠·패드를 가이드대로 확인한다. 팀원 Production Training 보존; 실제 패키징·Chaos 비교·최종 Rain/음원은 별도 후속이다.
-5. Story4 새사진뒤 RHI4종/24캡처와 M1출격상태는 확인했다. M1미션완료·물리입력, M2대표/실출격·M3/4오브젝트/목표·M4 3ID·실물패드는 후속이다. UI10/실출격12/Camp16GiB·runtime4GiB 보호, 원본/소유권 유지·Commit/Push는 사용자.
+0. 실제Race/M4 오디오 조립 자동 검증·사망음 pause 수리 결과를 유지하고 실물 손조종/전체완주·스피커 청감/밸런스·Cook/패키징을 확인한다. M4 유인MG는 미배치라 기존 개별검사와 구분한다.
+1. 일반 게임패드와 InterLink DX 각각의 raw→IA→모드→Boom→ViewTarget을 실제 양방향/중립/해제로 계측한다. InterLink 카메라 상하 추가 축/버튼 배정은 결정 대기이며 기존45매핑/비행4축·Mode1/2는 보존한다. 설정 적용/취소/기본값·재실행·실제 구버전 저장과 UI 전체 실기 확인을 이어간다.
+2. LOS 캡처를 검사 World/LocalPlayer에 연결하고 HitResult 디코더를 수리한 뒤 사람·드론 가시성과 지면 관계를 확인한다. 후퇴 시작값400cm·기존 동선/실제 착지 보존, 눈높이 원인 단정/임의 높이 변경 없음.
+3. M3 Fence BP SplineMesh None 오류와 M4 Lumen SurfaceCacheAtlas 경고·긴 로딩을 분리 조사한다. CSV ensure 진단의 내장 전체 통계 비활성(-csvAllCategoriesDisabled·GPUcsv0) CPU 표본은 제품 수정/원인 확정이 아니다. 동일 조건 입력/비행/사격 구간과 GPU 지원 여부를 별도로 계측한다.
+4. 현재는기존매핑 범위와 사용자재실행후입력복구확인·원인미확정상태만 기록한다. 스로틀/모터 원인·수리·재검증과 새물리확대는보류·CUA전부중지. 직전1차후보/오디오·사용자진행을보존하며 새기능/Build를 자동재개하지않는다.
+5. Story M1완료·M2대표/출격·M3/4 실물 조종/사격·M4 공중기체 높이/출격 위치의 안전성을 확인한다. Camp 일반20GiB·승인 저메모리16GiB 시작/runtime4GiB 보호, Production Training 보존. 기존 청감·패드·전체 회귀·패키징은 별도다.

@@ -289,6 +289,8 @@ M3는 배치된 체크포인트가 없으면 최초 출격 위치를 사용한�
 - M1 임시6종 허용은 `DA_Mission_Story_GoldenTime_Test`의 `AllowedDroneIds`다. 기본 기체와 실패 시 결과/재도전은 유지한다. M3/M4도6종 허용이며 스카이까지 카드 스크롤로 선택한다.
 - 현재 확인(2026-10-21 D PC): 재선택 후속 Build·설정 도구 통과. M1/M2/M3 새 PIE 성공 후 M4 보완 재실행도 성공했다. M1 6종 선택, M3/M4 실제 카드/출격 클릭으로 정찰→FPV→UGV→드랍 교체, 재출격 중 3D 프리뷰, 완료/부분 목표·파괴 표적 보존, M4 기체→3지점 순서·지점 뒤로→기체 복귀·선택 위치·UGV 실제 접지를 검사했다. M4 실제 `Lvl_MilitaryCamp`에 BP3개와 매니저 스포이드 연결을 저장했다. 기본 출발점 부근 임시 배치이므로 최종 전략 위치·안전거리·적 시야는 기획자 조정 후 실제 맵에서 확인한다. 전체 스토리 전투 완주나 실제 맵의 모든 기체 주행을 통과한 뜻은 아니다.
 
+현행 자동 검증은 M3 실제 목표와 M4.Start1/2/3의 ID/매니저 스포이드·선택 BP XY·UGV 접지·기존 포탑3개/240초까지다. 명시적 시작지점은 일반 헬기포트 기대값보다 먼저 검사하며 첫 낡은 기대값 실패도 보존한다. 세 M4 실행 모두 UGV이므로 공중기체 높이 분기는 아직 실행 근거가 없다. 목표 완료는 자동 피해 사건이며 실제 발사/손 조종 완료가 아니다. 맵/DA를 다시 저장하지 않는다. 화면·성능 한계와 수동 절차는 [테스트 맵 가이드](DRONE_TEST_MAP_GUIDE.md#story4-선택브리핑-검증-경계), 날짜별 수치는 WORKLOG를 따른다.
+
 ### 검증과 수동 확인
 
 - NullRHI `Drone.Mission.CheckpointRestartPIE` Success: 다른 목표용 체크포인트 무시·1회 갱신·파괴→재출격 2회(새 기체/빙의/Director 재연결/옛 기체 제거/300cm 이내/방향 90°), 세 번째 파괴→실패 결과. `Saved/Automation/ClaudeCheckpoint/test1.log`.
@@ -447,6 +449,29 @@ cd C:\URproject\drone
 - WBP에는 조정용 예시 값과 모든 구역이 보이는 미리보기가 있다. 실제 게임에서는 UGV 전용 조준/무장·기록·경고·입력 설정·카운트다운이 각 조건에 따라 보이거나 접힌다. 미리보기의 숫자3/경고가 게임에 항상 표시되는 것은 아니다.
 - 내부 위젯 이름은 데이터 연결 계약이므로 유지하고, 계층의 표시명으로 구분한다. `99 호환용`은 이전 네 TextBlock 연결을 보존한 접힌 그룹이므로 삭제하지 않는다. 기존 `WBP_DroneFlightHUD`/`WBP_DroneControlInputDisplay`와 독립 Objective/Countdown WBP는 예전 프로토타입/명시적 오버라이드 호환용이다. 일반 Native/default Controller도 `SharedHUDWidgetClass`로 주 HUD를 사용한다.
 - 일괄 재생성은 사람 편집을 덮을 수 있으므로 반복하지 않는다. `Drone.Tools.OrganizeHudDesigner`는 기본 읽기 전용이며 `-DroneApplyHudOrganization`이 있을 때 주 WBP 하나만 저장한다. 이미 정리된 자산은 건너뛴다. 검사/캡처는 `Drone.UI.HudDesignerContract`, 실제 실행 근거는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
+
+### 사용자 오디오와 체력 경고
+
+사용자 원본321Go/warning/tung/gunshot MP34개를 보존하고 mono48kHz PCM16·동일-6dB headroom으로7개 SoundWave를 신규 저장했다. 준비 PCM clipped sample0, S_HealthWarning만 loop다. 기존 map/BP 저장 없이 `/Game/Drone/Audio/User_20261022`에 연결했다.
+
+| 원본 | 자산 | 연결 계약 |
+|---|---|---|
+| 321Go.mp3 | S_Countdown_3 / S_Countdown_2 / S_Countdown_1 / S_Countdown_Go | 현재 숫자/GO 전환마다1회·1x, 기존 Director1초·출발/랩 시작 시계 유지 |
+| warning.mp3 | S_HealthWarning | alive·low health 동안 루프1개, 회복/사망·pause·Master0·소스/위젯 해제 정리. 신호/배터리 경고만으로 재생하지 않음 |
+| tung.mp3 | S_DroneDestroyed | 생애별 Health.OnDeath1회·재사망2life. 본인local PC 소유 공간음만 재선택 pause에서도 재생 |
+| gunshot.mp3 | S_Gunshot | 일반소총·유인/무인/차량포탑·UGV 실제발사. 적군 샷건·UGV유탄 제외 |
+
+HUD Class Defaults의 `HealthWarningSound`, Countdown driver의 `CountdownThreeSound / CountdownTwoSound / CountdownOneSound / CountdownGoSound`에서 음원을 바꾼다. 전체 음량·적용/취소/저장은 [기존 설정 계약](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)을 따른다. 경고10/카운트다운12구역의 내부 이름·사용자 Designer와 `WBP_DroneFlightHUDKit` 정본을 유지한다. 카운트다운은 Snapshot 반복/같은 Director 재연결로 다시 시작하지 않으며 GO 음원 tail로 실제 출발을 늦추지 않는다.
+
+첫 경고 text-only를 같은 저장 HUD Kit/natural present fixture에서 재현했고, 글자/자식을 먼저 갱신한 뒤 Collapsed→표시 전환에만 warning subtree prepass를 적용해 첫 프레임부터 배경·아이콘·글자가 함께 표시됨을 확인했다. Normal/Oracle의12/12 frame연결·양성/음성 픽셀 검증은 통과했다. 검사 종료 readback race 수선과 제품 수리를 구분한다.
+
+실제 FrontEnd catalog의 Racing Map1 출격과 Story M4(Lvl_MilitaryCamp)에서 native Mission PlayerController가 생성한 Pawn·Director·저장 HUD Kit/Countdown WBP 조립을 확인했다. 임시 fixture actor/widget를 새로 만든 검사가 아니라 실제 public flow·Health·fire 호출을 자동 주입한 범위다. 레이싱3/2/1/GO의 cue4/PCM과 실제 Window4PNG, M4 첫low epoch4와 다음5의 경고3파츠·warning1/recovery0을 확인했다. M4 UGV200→199·차량/고정자동포탑 각각 projectile1·Rifle fired1/ammo1에서 정확한 cue와 실제 physical source1을 대조했고 Shotgun8pellet/replacement0도 보존했다. 유인MG는 해당맵 미배치로 실제미션 통과 범위에 넣지 않는다. 발사/피해 public API의 자동 주입 결과이며 NPC 자율교전이나 실물 사격 완료는 아니다.
+
+실제 M4는 사망 다음tick 재선택 UI가 game pause를 걸어 기존 non-UI tung voice 객체만 남고 physical source/DSP 재생이 시작되지 않는 결함이 있었다. 로컬 기체의 본인 PlayerController audio instance만 pause 예외로 생성하고 기존3D 감쇠/Master·1x·PC소유/auto-destroy를 유지했다. 비로컬 기체의 기존 world sound 분기와 게임플레이·물리·카메라·미션 pause 규칙은 바꾸지 않았다. 수리 뒤 선택창 paused=true에서 두 생애마다 tung1개·실제 mixer frame 증가와 원본PCM 상관 약0.998712를 확인했다. voice 객체 수나 혼합PCM 비영만으로 재생을 판정하지 않는다.
+
+**현재 자동 검증:** Build5 성공16.72초, 실제 Mission 신규2개 명명Success(각 succeededWithWarnings1/failed0)다. 직접영향 기존 DroneDestroyed/ImpactDestroyed/MasterMute3개 재검사 Success. Racing은 사망음 pause 수리 전 별도리비전이고 M4/직접회귀3은 최종리비전이다. 기존18+8 지정검사 전체를 이번에 다시 실행한 결과는 아니며 실제 미션의 좁은 통합 범위와 구분한다. 최종Source418/418·신규통합test1개·freeze SHA 38EC6EF7…6F578BA6·기존417중416 보존·FlightPawn audio블록/include2만 수정, Config5/보호125/SourceArt12·Saved10 일치·최종 엔진/Build0 확인. 실물 손조종/전체미션 수동완주·스피커 청감/주관 밸런스·Cook/패키징은 미실시다.
+
+offscreen PCM0은 FApp volume0→effectivePrimary0 검사환경으로 분리했고 device mute 가설은 반증됐다. 검사 scope의 `au.DisableAppVolume=1`/원래값복원·동기 mixer WAV를 사용하며 실제 Master와 구분한다. Shotgun/SpatialFar의 실제 무음PCM은 process-local `au.NeverDisableSubmixes=1` 조건으로 확인했다. 제품 사용자 볼륨/OS설정 변경과 혼동하지 않는다. `DefaultGame.ini`의 `+DirectoriesToAlwaysCook=(Path="/Game/Drone/Audio/User_20261022")`는 정적 포함경로 설정이며 실제 Cook/패키징은 미실행이다. 스피커 청감도 미실시다.
 
 ## 문제가 생기면
 

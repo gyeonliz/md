@@ -1,30 +1,31 @@
 # 현재 작업 상태
 
-기준일: 2026-10-22 KST C PC. 최우선 목표는 현실 조종감. Racer=레이싱용·기타공중=역할별 전쟁 사용 참조 방향 확정, 모델/사양·장치·확장B/ChaosC 미정·새물리구현0. UI RHI4종/24캡처·M1 출격상태 확인, 미션완료/실기와 구분. [근거](docs/history/DRONE_WORKLOG.md).
+기준일: 2026-10-22 KST D PC. 현재 요청은 기존 InterLink/패드·키보드 매핑 복구만이다. 스로틀·모터 수정은 사용자 요청으로 보류했고 Computer Use/화면조작·입력주입은 전부 중지했다. 매핑 원본은 정상내용이며 사용자가 재실행 후 입력 복구를 확인했다. 매핑/입력 추가수정은 없고 근본원인은 미확정이다. 직전 물리23/오디오 근거와 미완료 실기체교정·본미션/장치 범위를 보존한다. [근거](docs/history/DRONE_WORKLOG.md).
 
 ## Git 기준(10/22 로컬 추적 ref·Fetch 없음)
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal 추적 origin/main | `17938bb7` | 현재 HEAD가1개 앞섬, 이번 Fetch/Pull 없음 |
-| Unreal C PC `C:\URproject\drone` | HEAD `c589bbf9` | 빌드14.14초·UI RHI4종·M1출격상태, 새물리구현0 |
-| 문서 추적 origin/main | `9995d8e1` | 로컬과0/0, 이번 Fetch/Pull 없음 |
-| 문서 C PC | HEAD `9995d8e1` | 역할5 관련 문서 미커밋, Commit/Push 없음 |
+| Unreal D PC `D:\JGY\project\drone` | HEAD=추적 origin/main `0d95972c` | main·0/0·기존 오디오/HUD와 물리후보 추가 미커밋 보존. Fetch/Pull 없음 |
+| 문서 D PC `D:\JGY\project\md` | HEAD=추적 origin/main `24d57245` | main·0/0·기존 MD/오디오 보존·물리후보 문서 추가 미커밋 |
+| C PC 이전 실행 기준 | `c589bbf9` 위 당시 변경 | Build14.14초·UI RHI4종·M1 출격은 이전 PC 근거 |
 
-## 10/18~20 최신 구현과 확인 경계
+## 작업컴 세션 운영
 
-- **Story4 UI/사진**: 새사진뒤 Data/Layout1280/Layout1920/ActionLabel4Success·24PNG. M1 Battlefield/Drop/Player0·DirectorActive·목표0/1 확인; 완료/물리입력 미검증. M2미시작·M3/4최신오브젝트/실출격·패드 후속. [정본](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#story4-선택브리핑-검증-경계).
+현재매핑 범위는 [세션등록부](docs/git/DRONE_WORK_PC_SESSIONS.md)를 따른다. Root의추적입력파일30개 Git내용일치·Source430 버그시작이후변경0·SavedInput 매핑override없음/restorationWrites0을 대조했다. HID/USB정상·새Editor등록과 Training/FrontEnd/TUT_LOS 진입/possess는 관찰했으나 사용자가 재실행 후 입력 복구를 확인했다. 매핑/입력 추가수정0·원인미확정이다. 이번후속patch/Build/PIE검증 결과없음·CUA전부중지. 스로틀/모터는 보류다.
 
-- **기반 구현**: DA 숨김/준비 중·다음 수업 건너뛰기·맵 비저장 Runtime Placement·미션별 RecordCourseId. 튜토리얼 TUT 맵/DA·HUD WBP/캡처 도구는 현재 커밋에 있다.
-- **UI/훈련**: 그림 위는 번호만·키/동작은 아래 범례로 정리. RC 세로 토글 스틱·Scout/FPV 바닥 없는 실제 모델 사진·튜토리얼 권장창 한글 적용. D PC Build·UI4/4·사진1종 자동 검사 통과, 1280×720/1920×1080 렌더 확인. 실물 조종은 별도. [조정](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#훈련-사진조작-장치-그림시작-위치).
-- **목표 매니저**: 배치형 BP_DroneMissionTargetManager로 스포이드 대상 교체/판정·나침반 방향/거리 연결. 새 경량 시험장 제공. [설정](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#스포이드-목표-연결과-나침반).
-- **전투**: 차량300·포탑200·MG25·유탄150·자폭600. 직격 중복 방지·자폭 잠금·NPC 래그돌 유지. 포탑 자체 HP0 폭발/소리1회·점유 해제·연결 메시 잔해15초 정리 구현, 실제 TUT 파괴/클리어 검사 통과. 청감/밸런스 수동 대기. [조정](docs/gameplay/DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md#차량-피해자폭npc-사망).
-- **오프닝**: Main_cinematic.mp4를 새 실행에 재생·종료/Esc로 타이틀, 실패 시에도 복귀. MP4는 LFS·패키징 NonUFS 설정. [설정/시험](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#시작-오프닝-영상).
-- **이전 C PC 검증**: Build5.11초 성공. Story4맵의 출격/목표→결과·나침반·NPC Nav 투영 자동 통과, 시작/목표 촬영. Camp는 승인된 임시 저메모리 설정만 검증(일반 화질/장시간 Pass 아님). Lumen 캐시 초과·출발 피격/흔들림은 잔존. 손 조종·전역172·패키징은 별도. [근거](docs/history/DRONE_WORKLOG.md).
-- **이번 수정**: API 선택/미리보기/포커스 일치, 호버 진행 지연, UGV 검사 이름 충돌, MG Static 경고, 로딩 최소 표시/ReadyHold의 시계 혼용을 수정했다. AI 검사는 선행 자동 교전을 격리해 점유/사망·재점유/수색·복귀 통과·기본 회귀 복귀. 제품 리시 규칙 유지.
-- **레이싱**: 공통 BP의 DroneRacing 본체에 맞는 DroneSky 프로펠러4개를 복구하고 선택3D도 같은 BP로 연결했다. 원형/도시 출격·회전 중심/선택3D3종 통과. 앞선 본체 단독 검증 누락을 정정하며5미션/맵·기록/비행 값은 유지한다. 손 조종 완주는 별도다.
+## 현재 D PC 구현·검증 경계
 
-이전 Gate/Rain/City 검증·팀원 수신은 [WORKLOG](docs/history/DRONE_WORKLOG.md)에 보존한다. 오후 UI 검증은 아래 범위이며 수신 맵 전체·패키징·실제 패드 Pass로 확대하지 않는다.
+- **사용자 오디오/실제 미션**: 직전 지정26검사 성공 이력(리비전별)과 별개로 실제 catalog Racing Map1·Story M4의 Mission controller/HUD 조립에서 countdown·health warning·실제배치 발사음·파괴음2life를 자동 확인했다. 사망 뒤 재선택 pause의 tung 실결함을 local-PC 소유 공간음의 pause 예외로 수리, Build5 성공16.72초. 직접영향 기존 DroneDestroyed/ImpactDestroyed/MasterMute3개 재검사 Success·기존417중416 보존·FlightPawn audio블록/include2만 수정, Config5/보호125/SourceArt12·Saved10 일치. 전체 손조종/실청·Cook/패키징은 미실시. [정본](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#사용자-오디오와-체력-경고).
+
+- **물리 1차 후보·입력 한계**: 직전 Build003/Run003의 물리12+기존회귀11=23Success는 직접 Pawn API·자동화 범위다. actual console/Slate/조종기·키보드 전체입력 파이프라인을 통과했다는 뜻이 아니다. 구콘솔 -1→약21.6초뒤arm은조건거부 RED다. 스로틀·모터는보류, controlled Racer/Acro1·2/CG0의 기존힘/토크·접지기반과 synthetic계수·본미션/최종B·C 미완은유지한다. [후보/입력검증 범위](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#racer-로터-1차-후보).
+- **카메라·설정**: 쉬운/게임 조작 X=기체 Yaw, Y=카메라 피치의 감도/반전·적용/취소/기본값·저장 연결 구현. 최신 같은 리비전 단위3·렌더2·회귀8 Success, 새 PNG14장 중 총괄4장 직접 확인. 실제 구버전 .sav·재실행/실물 장치 Pass는 아니다. [편집·경계](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#카메라-감도반전과-designer).
+- **Story**: M3 현행 재밍 이탈 목표 자동 통과. M4 실제 Start1/2/3의 선택/ID·스포이드·XY·UGV 접지·기존3목표 자동 통과. ApplyDamage 자동 이벤트이며 실물 발사/비행 완주가 아니다. 첫 M4 실패는 낡은 일반 헬기포트 기대값으로 보존하고 검사만 수리했다. [시험 범위](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#story4-선택브리핑-검증-경계).
+- **LOS**: 수평 후퇴/메시 Yaw·고정 위치 카메라 추적 구현, 이륙→전진→후진→접지 자동 계약 통과. 지형 HitResult 디코더 오류와 캡처 World 일치 보장이 없어 사람/드론 가시성은 미확인이다. 눈높이 문제로 단정하거나 높이를 임의 조정하지 않았다.
+- **성능**: 1280×720·품질3·출발점 무입력10초 CPU 구간 확보. M3 Fence BP 런타임 오류 잔존, CSV ensure 진단은 내장 CSV 전체 통계 비활성(-csvAllCategoriesDisabled·GPUcsv0) 조건의 CPU 표본으로 분리한다. GPU를 오류 원인으로 확정하지 않는다. M4 캡처의 Lumen 경고는 관찰이며 렉 원인/최적화 효과가 아니다. [측정 해석](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#story4-선택브리핑-검증-경계).
+- **보존 근거**: 직전물리1차 종료감사의 Source430/허용6+추가12·보호125/Saved10·당시엔진0은 이력이다. 이번버그 시작의 새baseline·사용자진행/변경을 보존하며 현재사용자Editor를 종료/원복하지 않았다. 매핑30개는Git내용정상·복구쓰기0, 실제입력복구 미확인. [WORKLOG](docs/history/DRONE_WORKLOG.md).
+
+이전 10/18~20 구현 요약 원문은 [10월 아카이브](docs/history/archive/STATUS_2026-10.md)에 보존했다. C PC Story UI4종/24캡처·M1 상태와 이번 D PC 검증을 구분한다.
 
 ## UI·WBP·UGV 현재 상태
 
@@ -82,22 +83,7 @@ OilRig 근거리 사본3개만 camera-local·생성축Yaw-90°로 화면 가로�
 - Acro 혼합 입력·Dead Zone·자세 적분 조사(10/04 C PC)는 [원문 보존](docs/history/archive/STATUS_2026-10.md)을 참고한다.
 - 코스 표시선 측정·재실행 도구 검증(10/04 C PC)은 [원문 보존](docs/history/archive/STATUS_2026-10.md)을 참고한다.
 
-## 이전 검증 근거 — 입력은 2026-10-07 D PC, 나머지는 10-06 C PC Claude 실행
-
-| 검사 | 조건·결과 | 출처 |
-|---|---|---|
-| 입력 자산 | 기본33+축8+버튼4=45·ArmSwitch·노브 전용 메뉴 이동 구현/자동 검증됨(10/07 D PC Claude), 실기 대기. 집계 정정(10/07 Claude): test4는 17개 중 16 Success·1 Fail, 테스트 수정 후 test5 3/3 | [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)·[WORKLOG](docs/history/DRONE_WORKLOG.md#2026-10-07-interlink-dx-버튼armswitch노브-전용-메뉴-이동--d-pc-claude) |
-| Build | Editor 종료 후 Succeeded | Claude 지시서; 별도 Build 로그 경로 미제공 |
-| Drone.Prototype 전체 + Drone.UI.ControlInputDisplayPIE | RenderOffScreen 1920×1080, **12/12 Success** | `Saved/Automation/ClaudeAcro/test_after_dz.log` |
-| 최신 집중 회귀 | Drone.Prototype + Drone.Tutorial + Drone.UI.ControlInputDisplayPIE **32개 중30 Success·2 Fail(팀원 Production 맵 의존, 변경 전 메시지 동일)** | Saved/Automation/ClaudeCourse/review_fix_test.log |
-| 최신 전체 회귀 | D-12 3차 뒤 전체101개, 실패는 KnownIssues4개·미렌더 패드 포커스6개뿐(10/06 C PC Claude 지시서) | Saved/Automation/ClaudeSplit/full_after.log |
-| 입력 겹침·코스 | overlap_before 4 Fail→overlap_after, AcroInputBehaviorPIE D구역8시나리오·CourseLineAdaptiveSegments 자동 검증 | Saved/Automation/ClaudeAcro/overlap_before.log·overlap_after.log·ClaudeCourse/review_fix_test.log |
-| Route 순서 의존 관찰 | 전체 5회 TrainingRouteSelectionPIE Success; 원인 미특정·해결 확정 아님 | 같은 폴더 `test.log`·`test2.log`·`final.log`·`final2.log`·`test3.log` |
-| D-6 풍향·미션 배터리 | Drone.Weather 5·Drone.Mission 7·Drone.Health.BatteryHUDPIE Success(10/05 C PC Claude) | Saved/Automation/ClaudeD6/t1.log·t4.log |
-| D-5 레이싱 시작·랩 타이머 | RacingStartCountdownPIE 랩 타이머 판정 추가 Success(10/06 C PC Claude) | Claude 지시서; 이번 집중 로그 경로 미제공 |
-
-입력 자산 행의 최신 근거는 D:\JGY\project\drone\Saved\Automation\ClaudeInterLink이며 나머지 경로 루트는 C:\URproject\drone. 새벽12/12·90/94, 코스 후속30/32·전체95개2회는 당시 기록이며 최신10/06 전체101개와 합산하지 않는다. AcroInputBehaviorPIE D구역8시나리오는 키+패드-0.5·키 해제 후 인계·전체 해제0·패드만 스로틀/피치를 확인했다. 자동 입력 주입은 실제 장치 수동 Pass가 아니다.
-
+이전 10/06 C PC·10/07 D PC 검증 표는 [10월 원문 아카이브](docs/history/archive/STATUS_2026-10.md)에 보존했다. 현재 PC 재검증으로 해석하지 않는다.
 
 ## 알려진 실패·실행 환경·미정
 
@@ -105,9 +91,9 @@ OilRig 근거리 사본3개만 camera-local·생성축Yaw-90°로 화면 가로�
 - **PERF-ZEN-START-01 원인 특정·재측정 대기**(10/06 D PC Claude): Zen 서버가 `CommonZenDatasessions`의 지난 실행 기록 733개 폴더(1,466파일·20MB)를 로드하는 데 약 20초가 걸리고(10/06 20.3초·10/02 22.4초), 엔진은 20초를 넘기면 "Wait for ZenServer?" 모달을 띄운다(ZenServerInterface.cpp). 10/02 473초는 그 모달을 09:30:37까지 누르지 않은 대기 시간이며 캐시·셰이더 원인 아님. 사용자 요청으로 오늘 세션 폴더 1개만 남기고 732개를 `CommonZen_sessions_backup_2026-10-06`로 이동(삭제 아님, Editor 실행 중). 다음 Editor 시작에서 Zen 대기 시간 재측정 대기. Defender 실시간 검사는 사용자 판단.
 - **UI-FOCUS-RACE-01 수정 후 확인 중**: UIOnly 루트/버튼 포커스 경쟁·5프레임 복원과 이전 결과는 WORKLOG. 수신 known-test-failures에10/08 PauseMenuRacingPIE의 Resume 첫 포커스가 전체1회 Fail·단독/패드 뒤2회 Pass라는 관찰 추가. 실행PC·새 로그 경로 미명시라 현재D PC Pass로 판정하지 않음. 현재 결과/일시정지·타이틀 첫 강조 수동 대기, 안정화 완료 아님.
 - **TEST-RENDER-UNPAINTED-01 원인 미특정**: 최신 전체101개에서 미렌더 실행의 알려진 패드 포커스6개 실패. LobbyLayout 진단이 기본 회귀에 없으므로 GamepadMissionFlow/GamepadNavigation/TitleFiveMenu/TitleFiveMenuWidget/TutorialComplete/TutorialNextLesson 6개 모두 화면 루트 포커스로 실패하는지로 미렌더를 판단한다(10/05 C PC Claude known-test-failures 갱신). 화면 그려진 포커스·실제 패드 확인 대기.
-- **맵/메모리**: Camp 수리 후 안정성 미검증. 이번 가용12620MB<요구20480MB로 사전 검사에서 중단·엔진 미실행. 이전 패키지 진단 보호 중단/텍스처·준비 제한 유지. 모든 맵 불변·[절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#대형-맵을-메모리-보호-상태로-검사하기).
+- **맵/메모리**: 10/20 C PC Camp 사전 검사 당시 가용12620MB<요구20480MB로 엔진 미실행. 이후 승인된 임시 모드의 확인과 일반 화질/장시간 안정성은 구분한다. 현재 D PC 측정값이 아니다. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#대형-맵을-메모리-보호-상태로-검사하기).
 - **외부팩**: 기존 배열/유리 수리 유지. 시점축4개 직결·옛Rig import 정리·68본/포즈 불변, LOS 경고4. 컬러66.3→10.7MiB·노멀8K Mip/스트리밍 복구. 이동/Action4·VSM/호버 포커스/NavMesh는 잔존. [상세](docs/history/DRONE_WORKLOG.md).
-- 기획 미정 보존: Acro 키보드 각속도 배율/Angle 모드/마우스 Yaw·회의 반전 뜻, 입력 표시 장치 정책, 로비 탭 유지, 레이싱 연결, Production Training 테스트2건. M2 결말·M3/M4 표적 수량/규칙, 브리핑/배터리 수치·최종 아트/메시·완료 저장도 기존 미정이다.
+- 기획 미정 보존: Acro 키보드 각속도 배율/Angle 모드/마우스 Yaw·회의 반전 뜻, 입력 표시 장치 정책, 로비 탭 유지, 레이싱 후속 규칙, Production Training 테스트2건. M2 결말·M3/M4 표적 수량/규칙, 브리핑/배터리 수치·최종 아트/메시는 미정이다. 완료 미션·Story Fact JSON 저장/복원은 구현되어 있으며 현재 HEAD 재실행·실물 입력 확인은 별도다.
 
 면접 대비·참조0 정리의 구현/검증 상세는 [10월 STATUS 원문](docs/history/archive/STATUS_2026-10.md)에 보존했다. 최신 기획 미정과 수동 대기는 WORKBOARD를 따른다.
 
@@ -123,13 +109,7 @@ OilRig 근거리 사본3개만 camera-local·생성축Yaw-90°로 화면 가로�
 
 ## 다음 확인
 
-1. InterLink DX의 비행 축·Dead Zone·Mode 2 호버/피치·쉬운 조작 비복귀 스로틀 체감, Button1 무장/해제 체감·Button12/13, 노브만으로 타이틀→로비→탭→미션→브리핑→기체 선택→출격→결과 이동·첫 강조, 설정 슬라이더 잠금/조절·콤보·노브 방향/확인/Cancel을 확인한다. Acro Mode1에서 스틱에 엄지를 걸친 채 Space→상승, 키 떼고 스틱→패드 조종·모두 놓으면0을 확인하고 Mode2도 비교한다. 코스 급커브 표시선·끝 연결과 Editor 편집 체감도 확인한다. 키보드 짧게 톡(0.1초, FPV 약65°) 후 자세 유지. W+Space와 Space 단독 구분, Scout/Drop Acro 비행도 실제 장치로 확인. 결과·타이틀 첫 버튼 강조를 반복 관찰.
-2. 추가 자동 회귀 판정 전 화면이 그려졌는지 확인하고 포커스 경쟁·미렌더 실행을 따로 기록. UI-LAYOUT-DIAG-01·AI-PERCEPTION-TEST-01 기존 관찰 유지, AI-SHOTGUN-RENDER-01 해결. Route는 재발 시 순서 조사.
-3. 사용자/팀원은 레이싱 변경 맵/4코스 진행도·PlayerStart 연결을 대조하고 배터리 시간과 Acro 미정 조작 방식을 결정. 카운트다운·랩 타이머·FPV 곡예/UGV 분리 전 동일 체감·풍향 HUD 수동 확인·시간 결정 뒤 배터리 추락 확인. 1280/1920·실제 패드·8수업 연속 진행·Best Lap 재실행·설정/배터리/브리핑·추락 재출격 수동 확인 후 Story 콘텐츠를 고도화.
-4. D PC: Island Gate 크기/방향·세 상태색과 시드194849 도시/비 외형을 실기로 확인한다. Build·RHI21개/화면 검증은 끝났지만 완주/기록·Patriot는 대기다. Observer·Pretendard·벽/그물/재밍 체감과 팀원 Source+BP/Build 후 동일 Gate 저장 재시험도 별도다. Story 제품 시작/목표 연결은 미완료, MilitaryBase M_Target은 역할 확인 전 보존한다. 과거Main78/20과 Island112/352는 별개. Zen 비교는 PERF-ZEN-START-01.
-
-세부 카드와 완료 조건은 [WORKBOARD](WORKBOARD.md), 입력 조정은 [Blueprint 가이드](docs/reference/DRONE_CODE_STRUCTURE_AND_USER_TASKS.md), 수동 순서는 [테스트 가이드](docs/gameplay/DRONE_TEST_MAP_GUIDE.md)를 따른다. Commit/Push·Trello/Figma 수정·공유 권한·예약 자동화는 수행하지 않는다.
-
+실행 순서는 [WORKBOARD Next](WORKBOARD.md#next), 입력 계약은 [장치 가이드](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)를 따른다. 우선 두 실물 장치의 raw/IA/모드/Boom/ViewTarget을 함께 계측하고 LOS의 World 연결 캡처·지형 HitResult를 수리해 실제 가시성을 확인한다. M3 Fence BP 오류·M4 Lumen 경고/로딩을 구간별로 조사하며 Racer후보 저속OFF/착지/재이륙은 자동검증됐으며 경사/고속접촉·본미션/장치·최종B/C는 후속이다. 기존 전체 손 조종·패키징·팀원 맵 수동 대기는 유지한다. 이전 상세 체크리스트는 [원문 아카이브](docs/history/archive/STATUS_2026-10.md)에 보존했다.
 ## 이전 기록 보존
 
 10/01 이전 구현·검증·당시 미확인/경계 집계 네 절은 [2026-09 원문 아카이브](docs/history/archive/STATUS_2026-09.md)로 이동했다. 10/01~10/03 세션 전문과 기존 한눈에 보기·Git 요약은 [WORKLOG의 2026-10-04 STATUS 정리 절](docs/history/DRONE_WORKLOG.md)에 원문 그대로 보존했다. 과거 PC/날짜·Codex/Claude 표기를 바꾸지 않았으며 최신 상태를 과거 기록에 소급하지 않는다.

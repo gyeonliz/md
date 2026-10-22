@@ -1,6 +1,33 @@
 # 작업컴 드론 세션 분리·시작 가이드
 
-기준: 2026-10-22. **작업컴에서 새로 열 대화의 구성과 복사할 첫 지시문**이다. 현재 PC의 대화 ID·절대 경로를 작업컴에 그대로 사용하지 않는다. 이 문서 작성으로 새 세션 생성이나 구현을 시작한 것은 아니다.
+기준: 2026-10-22 D PC. 작업컴의 실제 세션 등록부와 다른 PC에서 사용할 시작 지시문이다. PC 간에 대화 ID·절대 경로를 복사하지 않는다.
+
+## 현재 작업컴 등록부
+
+**현재범위:** 현재 요청은 기존 InterLink/패드·키보드 매핑 복구만이다. 스로틀·모터 수정은 사용자 요청으로 보류했고 Computer Use/화면조작·입력주입은 전부 중지했다. 매핑 원본은 정상내용이며 사용자가 재실행 후 입력 복구를 확인했다. 매핑/입력 추가수정은 없고 근본원인은 미확정이다.
+
+입력파일30개Git내용정상/복구쓰기0·SavedInput override없음과 InterLink등록/기존맵진입·possess만확인했다. 사용자재실행후입력복구확인·추가수정0·원인미확정, 이번후속patch/Build/PIE검증없음. 검증/MD는Saved보고서와총괄확인만대조하고 게임Source/엔진/Config/Content·CUA에접근하지않는다.
+
+- MD `D:\JGY\project\md` main24d57245·Unreal `D:\JGY\project\drone` main0d95972c, 추적ref각0/0·Fetch/Pull없음. 기존dirty18/오디오 변경을 보존한다.
+- 직전물리1차(직접API/자동검사) Racer1 opt-in FixedStepCandidate 구현·Build00319.61초·Run003 신규12/기존회귀11=23Success(19clean/4warnings)이며 actualconsole/Slate 입력Pass는아니다. 실제savedRacer OFF/실접지/rearm/secondtakeoff·hold/pause와 별도Chaos sphere 접촉을 확인했다.
+- 지원은 controlledTestMap·Acro1/2·CG0, 계수는가상2kg/40N·THRUSTtau.055/synthetic기하·관성이다. 본미션altitude/net/observer writer·payload/비영CG·실기체교정·fullChaosflight/최종B·C·실물조종·패키징은미완이다.
+- 직전물리종료의 Root최종감사 Source430=기존418중허용6변경+12추가/기타412동일·동결mismatch0·Config5/보호125/SourceArt12/Saved10일치·localdeathaudio블록byte동일·HEAD동일·엔진/Build0. 직전 실제오디오2/회귀3과 이번sound3 회귀를구분하며 전체오디오재실행으로쓰지않는다.
+
+| 역할 | 실제 대화 ID | 이번 물리 작업·쓰기 |
+|---|---|---|
+| 총괄 | `01a16101-d1ba-7540-b166-3c6cd005ab8b` | RotorFlightSettings/FlightProfile·Definition 조건부검증/이관·최종feature/보존 독립감사·게시신호 |
+| 물리커널 | `01a16105-2be7-70c2-81a7-e96dcc58d75c` | 순수SI/FLU 커널·독립analytic 검사3파일 동결 |
+| 실행 | `01a16105-48eb-7101-8b2a-0bc6b4a070e9` | Pawn/단독movement adapter·collision guard·새controlledMap/검사·엔진/Build/PIE 단독·복원/종료 |
+| 카메라/UI | `01a16105-6f90-7af1-8ce7-64ce98f82e77` | 읽기검토·기존UI/카메라/Designer/입력 보존 |
+| 검증/MD | `01a16105-755f-7620-8845-d10c1e9f7a8a` | Saved원시log/index/보고서·Root감사 읽기·MD/기존Space 작성·바이트/hash/재읽기 |
+
+물리코드의 기존변경6은 Drone.Build.cs·FlightControlTypes.h·FlightPawn.cpp/h·DroneDefinition.cpp·CollisionResponseComponent.cpp다. 추가12는 설정/프로필검사·커널/analytic검사·movement/setup·runtime/PIE검사이며 새맵은 `/Game/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot` 하나다. 기존DA/BP·UI/오디오·IMC·ProductionTraining은 보존했다. 모터arm은 무장ArmSwitch와분리하며 하드웨어채널을추가배정하지않았다. Legacy가 기본이며 후보·Chaos 비교를 실제미션 전환으로쓰지않는다.
+
+이번근거는 `Saved/Automation/PhysicsImplementation_20261022`, 문서영수증은그아래 `Validation`이다. 직전오디오 `AudioMission_20261022`의사망pause수리/실제조립/수동미실시경계를보존한다. 검증/MD는엔진/Source/Config/Content를사용·변경하지않고 Saved의 실행/총괄 영수증을대조했다. 원시실패/검사수선은WORKLOG에append하고 과거기록을수정하지않는다.
+
+사용자지시없는stage/Commit/Push·Trello/Figma·권한·예약자동화·임의타대화메시지는없다. STATUS/WORKBOARD30KB·WORKLOGprefix/아카이브원문·기존Space hash guard/재읽기·새Page0을유지한다.
+
+이번 사용자의 "각 세션 맡은 작업 진행시키고 여기서 결과 모아서 총괄" 지시로 총괄은 위 4개 담당 대화에 후속 지시를 전송하고 결과를 취합한다. 결과는 각 대화의 최종 응답과 전용 Saved/Automation 산출물에 남기며 총괄이 wait_threads/read_thread로 확인한다. 담당 간 무제한 임의 메시지 권한으로 확대하지 않는다.
 
 ## 1. 작업컴에서 먼저 할 일
 
@@ -16,17 +43,17 @@
 |새 대화 제목|담당|처음 할 일|쓰기 경계|
 |---|---|---|---|
 |[드론 총괄] 작업컴 계획·통합|우선순위·소유권·결과 취합|실제 경로/HEAD 확인, 아래 분담 확정|작업 계약·인계만. 구현 파일/공유 상태는 담당과 조율|
-|[드론] 비행 물리·착지 조사|현실 조종감·추력/관성·모터 OFF·접지/재이륙|현재 구현 조사와 개선안 제시. 물리 구조/수치 변경은 아직 미착수|FlightPawn/Definition/Acro/GroundDrive 등은 이 역할의 우선 조사 영역. 구현 소유권은 착수 전에 확정|
+|[드론] 비행 물리·착지 조사|현실 조종감·추력/관성·모터 OFF·접지/재이륙|현재 Source/STATUS/물리정본 확인→기존1차후보 보존→현 요청범위 후속구현/검증|총괄 파일소유권 계약에 따라 커널/프로필/adapter를 분담. 엔진/Build는 실행담당1곳|
 |[드론] 본미션·LOS·성능 실행|M3/4 오브젝트 연결, 사진/실출격, LOS, 렉/로딩 계측|미완료 맵과 객체·목표 확인. 동일 조건 성능 기준 확보|엔진·PIE·빌드·Content/맵/DA는 이 역할만 실행·저장. 미션/LOS/성능 소스는 파일별 등록|
 |[드론] 카메라·설정 UI|화면 상하 시야·감도·반전·설정 적용/저장, UI 사진 크롭|원시축→IA→모드→최종 카메라의 연결 조사, 변경 계약|UI/설정 소스·크롭. FlightPawn/IMC/BP는 단독 수정하지 않고 물리/실행 담당과 계약|
 |[드론] 검증·MD 정리|결과 교차검토·현황·커밋 초안|실제 코드/로그 대조, 미구현과 미검증 구분|MD 문서 단독 작성. 게임 코드/엔진/Content 수정 없음|
 
-새 구현을 여러 세션에서 한꺼번에 시작하는 구성이 아니다. 물리 조사·UI 읽기 조사·문서 검토는 병렬로 하고, 맵 실행·빌드·Content 변경은 한 줄로 진행한다. 사용량이 부족하면 검증·MD 역할을 총괄에 합쳐 4개로 운영한다.
+현재 Source/STATUS/정본과 기존1차후보를 먼저 확인하고, 현 사용자 요청과 총괄 파일소유권에 따라 후속구현/검증을 분담한다. 서로 다른 소유파일의 코드/읽기검토는 병렬로 진행할 수 있으며 맵실행·Build·Content는 실행담당1곳, Build중 소스는 동결한다. 사용량에 따라 검증/MD를 총괄에 합쳐4개로 운영할 수 있다.
 
 ## 3. 우선순위와 작업 계약
 
-- 최우선 제품 목표: 실제 드론 조종자가 이질감을 거의 느끼지 않는 물리·조종감. Racer는 레이싱용, 기타 공중 기체는 전쟁에서 사용되는 역할별 기체를 참조한다. UGV는 지상 모델이다. 특정 모델/정확 사양·제어 모드·조종기·숙련자 평가 여부는 미정이다.
-- 물리는 우선 조사·개선안 제출 단계다. 단순 B안 채택은 보류됐으며 확장 B/Chaos C를 근거·접촉 요구·비용으로 비교한다. 바로 전 기체 수치를 바꾸지 않는다.
+- 최우선 제품 목표: 실제 드론 조종자가 이질감을 거의 느끼지 않는 물리·조종감. Racer는 레이싱용, 기타 공중 기체는 전쟁에서 사용되는 역할별 기체를 참조한다. UGV는 지상 모델이다. 일반 게임패드와 InterLink DX 모두 검증 대상이다. 특정 모델/정확 사양·제어 모드·InterLink 카메라 상하 추가 축/버튼 배정·보정·숙련자 평가 여부는 미정이다. 기존45매핑/비행4축·Mode1/2 계약은 보존한다.
+- 물리는 현재 Source/STATUS/[정본](../gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#racer-로터-1차-후보)의 Racer1 opt-in 1차구현/자동검증을 보존하고 현 사용자 요청·총괄 파일소유권 범위에서 후속구현/검증한다. 실사양교정·전기체/본미션writer·최종B/C는 미완이며 미정수치를 채택하지 않는다.
 - 구현·시험 계획: M3/4 목표/오브젝트 연결, 미션 렉·로딩 계측, 쓰로틀 OFF·정상 착지·재이륙, 화면 상하 시야/감도, LOS 사람 후퇴와 드론을 향한 메시·카메라 방향. 각각 완료 기준을 따로 둔다.
 - 물리와 카메라가 공유하는 FlightPawn, Definition, IMC/BP를 동시에 수정하지 않는다. 먼저 `파일 / 작성 역할 / 읽기 역할 / 인계 조건`을 총괄에 등록한다. UI 역할은 축·명령 계약을 전달하고 공유 입력 코드는 지정 소유자가 적용한다.
 - 모든 엔진 실행은 실행 담당에게 요청한다. 물리/UI 역할은 패치·파일 SHA·검사명·예상 결과를 전달한다. 빌드/실행 중 소스를 바꾸지 않는다. 사용자가 켠 Editor를 임의 종료하지 않는다.
@@ -41,7 +68,7 @@
 
 ```text
 작업컴 드론 총괄이다. MD=<MD_ROOT>, Unreal=<DRONE_ROOT>.
-각 저장소 지침과 STATUS/WORKBOARD, docs/git/DRONE_WORK_PC_SESSIONS.md를 필요한 부분만 읽고 실제 경로/HEAD/변경을 확인해라. 과거 작업을 자동 재개하지 말고 현재 분담과 물리 조사 우선 지시를 기준으로 진행해라.
+각 저장소 지침과 STATUS/WORKBOARD·docs/git/DRONE_WORK_PC_SESSIONS.md·물리정본, 실제 Source/HEAD/변경을 필요한 범위에서 확인해라. 기존1차후보와 완료근거를 보존하고 과거작업을 자동재개하지 말며 현 사용자 요청·총괄 파일소유권에 따라 후속구현/검증을 진행해라.
 물리·본미션/LOS/성능 실행·카메라/UI·검증/MD 대화의 작업컴 ID와 파일 소유권을 관리해라. 엔진/빌드/Content 작성자는 실행 담당 하나로 유지한다. 공유 FlightPawn/입력 파일의 중복 수정을 막아라.
 담당 보고를 받아 구현/자동검증/실화면/실물패드를 구분해서 짧게 알려줘. 커밋/푸시는 하지 말고 변경 내역과 한국어 커밋 초안을 준비해라.
 ```
@@ -51,7 +78,7 @@
 ```text
 작업컴 드론 물리 조사 담당이다. MD=<MD_ROOT>, Unreal=<DRONE_ROOT>, 총괄=<WORK_PC_LEAD_ID>.
 docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md와 실제 비행 코드를 대조해라. 최우선은 숙련 실조종자가 이질감을 거의 느끼지 않는 조종감이다. Racer는 레이싱용, 기타 공중 기체는 역할별 전쟁 사용 기체, UGV는 별도다.
-현재는 조사·개선안 단계다. 추력/중력/관성/항력/모터 응답/입력/Rates/스로틀/접지와 정상 재이륙을 조사하고 확장 B/Chaos C의 근거·한계·단계별 검증안을 제시해라. 새 물리/수치/자산 구현을 먼저 시작하지 마라. 조종기와 기준 기체의 미정 조건을 추측하지 마라.
+현재 Source/STATUS/물리정본을 읽고 기존 Racer1 opt-in 로터1차후보/자동검증과 Legacy/오디오/UI를 보존해라. 먼저 필요한 차이와 현재 한계를 조사한 뒤 현 사용자 요청범위와 총괄 파일소유권 계약에 따라 후속구현/검증을 진행해라. 실사양·B/C채택/조종기 미정조건을 추측하지 말고, 엔진/Build는 실행담당1곳에서 소스동결 후 수행해라.
 엔진은 직접 켜지 말고 실행 담당에 필요한 검사를 총괄 경유 요청해라. 결과·막힘을 위 총괄 대화로 보내는 것을 사용자가 승인한다. 원인/제안/미확인을 구분해 보고해라.
 ```
 
@@ -60,7 +87,7 @@ docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md와 실제 비행 코드를 대조
 ```text
 작업컴 드론 본미션/LOS/성능 실행 담당이다. MD=<MD_ROOT>, Unreal=<DRONE_ROOT>, 총괄=<WORK_PC_LEAD_ID>.
 현재 문서와 실제 맵/소스부터 대조해라. M3/4 오브젝트와 목표 연결, 미완료 사진/실출격, LOS 사람을 뒤로 이동하고 드론을 바라보게 메시 Yaw/카메라 방향 조정, 미션 렉/긴 로딩 계측이 담당 범위다. 사용자 맵·설정에서 증거를 남겨라.
-엔진/PIE/빌드/Content 변경은 이 세션만 담당한다. 다른 역할의 소스가 준비된 후 변경 목록을 고정해 빌드한다. 공유 FlightPawn/입력/물리 파일을 임의 변경하지 말고 총괄과 소유권을 먼저 맞춰라. 새 물리 구현은 현재 조사 우선이므로 시작하지 마라.
+엔진/PIE/Build/Content는 이 세션만 담당한다. 현재 Source/STATUS/정본과 기존1차후보를 확인·보존하고 현 사용자 요청·총괄 파일소유권에 따라 후속구현/검증해라. 공유 FlightPawn/입력/물리는 소유권을 맞추고 다른역할 소스가 준비되면 변경목록/해시를 동결해 Build·실행해라. 실행중 소스를 바꾸지 마라.
 기존 변경/원본/시작ID를 보존하고 실제 작업컴 자원 조건을 확인해라. 패키징/전체 쿠킹 등 10분 넘는 작업은 먼저 영향과 시점을 확인해라. START/BACK 영문 유지, 자동 커밋/푸시 없음.
 단계 결과·막힘을 위 총괄로 보내는 것을 사용자가 승인한다. 실행 로그·새 화면·미검증을 구분하고 전체 완료로 뭉뚱그리지 마라.
 ```
