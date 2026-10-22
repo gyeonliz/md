@@ -1,5 +1,7 @@
 # Drone 상세 문서 안내
 
+- [작업컴 드론 세션 분리·시작 가이드](git/DRONE_WORK_PC_SESSIONS.md): 새 대화 구성·파일/엔진 소유권·복사용 첫 메시지·총괄 보고
+
 - [비행 물리 정확도·OilRig 비 성능·UI·미션별 독립 맵 점검](gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md): 2026-10-01 후속 구현과 실제 검증, 미완료 범위
 
 일상 작업에서는 루트의 [`STATUS.md`](../STATUS.md)와 [`WORKBOARD.md`](../WORKBOARD.md)만 보면 된다. 아래 문서는 특정 기능을 구현하거나 팀원에게 작업법을 전달할 때 연다.
@@ -38,6 +40,8 @@
 - [`DRONE_AUTOMATIC_TURRET_GUIDE.md`](ai/DRONE_AUTOMATIC_TURRET_GUIDE.md): 설치형·차량형 무인 자동포탑
 
 ## Gameplay·Physics
+
+- [현실 조종감 기준과 후속 개발 계획](gameplay/DRONE_REALISTIC_HANDLING_PLAN.md): Racer/역할별 공중 기체 참조, 확장B/ChaosC 미정, 카메라·LOS·착지·미션·성능의 잔여 작업과 검증 기준
 
 - [`DRONE_TYPES_AND_CONTROL_MODES.md`](gameplay/DRONE_TYPES_AND_CONTROL_MODES.md): Drone 역할과 조작 모드
 - [`DRONE_MISSION_FRAMEWORK_GUIDE.md`](gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md): Mission Manager·GameMode·목표/실패/귀환 Trigger·파괴 표적 BP와 NPC 이동 애니메이션 사용법

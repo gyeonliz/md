@@ -178,7 +178,9 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 
 폰트 설치/연결 도구는 `Tools/AssetMigration/ImportDronePretendard.py`다. **일반 Editor의 `-ExecutePythonScript`로 실행한다.** FontFactory는 Slate 서비스가 필요하므로 `-run=pythonscript` commandlet로 가져오지 않는다. 공식 [orioncactus/pretendard@v1.3.9](https://github.com/orioncactus/pretendard/tree/v1.3.9)의 변형하지 않은 Regular/Bold를 사용하고 원본 해시를 대조한다. 다운로드 원본은 임포트용 `Saved/Automation/SelectUI/FontSource`에 두며 다른 위치는 `DRONE_PRETENDARD_SOURCE`로 지정한다. `DRONE_PRETENDARD_VERIFY_ONLY=1`은 저장된 연결을 읽기 검사하고 보고서는 `Saved/Automation/SelectUI/PretendardImport.json`이다. FontFace는 **Inline으로 프로젝트 자산에 포함**하므로 팀원/실행 PC의 OS에 폰트를 따로 설치할 필요가 없다. OFL 고지는 `Content/Drone/UI/Fonts/Pretendard/License/Pretendard-LICENSE.txt`를 보존하고 `DefaultGame.ini`의 NonUFS 스테이징으로 배포에 포함한다. 새 USTRUCT/UPROPERTY가 있어 Editor 종료 후 Build가 먼저이며 Live Coding만으로 가져오지 않는다. 현재 빌드/임포트/검증 완료 여부는 STATUS·WORKLOG를 따른다.
 
-확인 순서: FrontEnd→스토리→M1~M4 선택→프리뷰·DA의 글자/무전 교체·선택 강조→START→뒤로 복귀 순으로 본다. 일반/굵은 한글에 Pretendard가 적용되고 긴 문구가 잘리지 않는지, 텍스트PNG Image가 숨겨졌는지도 확인한다. 마우스뿐 아니라 키보드/패드 첫 강조·목록 이동·START·Back을 확인한 뒤 튜토리얼/레이싱·타이틀 아트가 그대로인지 본다. 자동화 대상은 `Drone.UI.SelectUILayoutContract / SelectUIPresentationPIE`, 캡처는 `Saved/Automation/SelectUI/story_m1~4.png`이며 생성/통과 여부는 STATUS·WORKLOG를 따른다. 캡처나 계약 테스트가 실제 패드/화면 수동 Pass를 대신하지 않는다.
+실맵 사진은 Mission DA Thumbnail/BriefingImage와 저장 Designer를 따른다. 현재 `/Game/Drone/UI/Story4Photos`의 M1 Overview→Thumbnail·M1 Target→BriefingImage·M2 Target→BriefingImage를 연결했다.3개는572×332·sRGB/UI 설정이며 M2대표/M3·M4와 출발증거사진은 이번 연결 대상이 아니다. START/BACK 영문·한글본문/Pretendard·사선/꺾쇠·Canvas를 보존한다. 사진연결후 자동RHI와 저장캡처 확인 결과는 STATUS/WORKLOG를 따르며 실물패드·실제미션완료와 구분한다. [검사 기준](DRONE_TEST_MAP_GUIDE.md#story4-선택브리핑-검증-경계).
+
+확인 순서: FrontEnd→스토리→M1~M4 선택→프리뷰·DA의 글자/무전 교체·선택 강조→START→뒤로 복귀 순으로 본다. 일반/굵은 한글에 Pretendard가 적용되고 긴 문구가 잘리지 않는지, 텍스트PNG Image가 숨겨졌는지도 확인한다. 마우스뿐 아니라 키보드/패드 첫 강조·목록 이동·START·Back을 확인한 뒤 튜토리얼/레이싱·타이틀 아트가 그대로인지 본다. 자동화 대상은 `Drone.UI.SelectUILayoutContract / SelectUIPresentationPIE`, 캡처는 `Saved/Automation/SelectUI/story_m1~4.png`이며 10-20판은 이전 참고다. 이번 새 실제4미션 화면 생성/통과 여부는 STATUS·WORKLOG를 따른다. 캡처나 계약 테스트가 실제 패드/화면 수동 Pass를 대신하지 않는다.
 
 ### 프로젝트 공통 Pretendard
 

@@ -4242,3 +4242,45 @@ file-presence-audit.json(14:04 KST): 추적 Unreal 자산9753개 누락0·LFS �
 - 실제 게임 사진이 처음에는 멀고 낮은 각도여서 테스트 인스턴스의3인칭 SpringArm만180cm·Pitch-35/Yaw35로 바꿔 근접 촬영했다. BP 기본 카메라는 수정하지 않았다. Build-camera13.02초 성공·verify-camera.log/report-camera의 원형 검사13:34:20 KST Success이며 게임의 회전 프로펠러 부착 상태를 직접 이미지로 확인했다. Saved/Automation/Racing/circuit_racing.png와 Preview3D_20261021/preview-DA_Drone_Racer_Greybox.png가 실제 결과다. 선택 캡처는 경량 Compass TestMap의 실제3D 화면이며 M1 FrontEnd 캡처로 표현하지 않는다. 수정 전 사진도 preview-before/gameplay-before.png로 보존했다.
 - 실제3D 렌더/자동 출격 검증이며 팀원3맵 전체 손 조종·실물 패드·패키징 Pass는 아니다. 원래 Nanite/기존 맵 경고와 Sky 설명 간격 후속은 별도로 남긴다. Git HEAD ddbd963d, 원격 추적 origin/main ed85c0e8로0/2이며 이번 Fetch/Pull/Commit/Push는 없다.
 - MD 현재 조립/조정 안내와 기존 Space UI5298e67b seq63·진행66a7c9a4 seq78을 정정했다. 두 블록을 다시 읽어 전체 기대값 일치/타 주제 보존을 확인했다. STATUS29,718B·WORKBOARD29,751B로30KB 이하를 유지한다.
+
+
+## 2026-10-21 C PC — Story4 검증 계약·현재 안내 불일치 정리
+
+- 역할5 읽기 검토/문서만 수행. 현재 drone HEAD c589bbf9·추적origin17938bb7(앞1/뒤0), md HEAD/origin9995d8e1(0/0), 시작 두 작업트리clean. Fetch/Pull·Commit/Push 없음. 역할3만 엔진/Content, 역할4만 UI Source를 수정한다. 기존 드론1은 재사용/메시지하지 않았다.
+- 실제4DA의 FString 저장문자열/SHA·소스·최신 문서·팀원 선택시안/Title_Asset를 대조했다. M3 저장 제목은 보급 차단(내부VeilBreaker 유지). M1 임시6종과 드랍 강제 안내, M3 파괴 시나리오와 실제 이탈 목표, M4 베일5기 안내와 실제 포탑3개 목표의 차이를 필수검사로 기록했다. 문자열 추출은 bool/배열 소속/수치 Reflection 검증으로 세지 않는다.
+- 역할3 첫 렌더는71.8초 MemoryGuard로 실제 맵 진입 전 종료(최저여유3746MiB·최대Private5013MiB). 새 실맵사진/실출격·선택/브리핑/실물패드는 미확인이다. Camp20GiB/승인저메모리16GiB 시작요건 미달·보호하향/사용자앱종료 없음. 경량/이전10-20캡처를 새 완료로 확대하지 않는다.
+- E:/기획안/06_드론_메인/작업/Story4_20261021/검증에 state·검증계약·DA 저장문자열 근거를 작성했다. M4.Start1~3별 사진/매니저 배열·BP/DA 우선순위·선택/출격Transform, 1280/1920·본문스크롤/정보비겹침·기체/목표·START/Back/폰트·실제패드 항목을 역할3 검사계약에 남겼다.
+- STATUS/WORKBOARD·미션/TitleUI/시험 가이드의 현재절만 원본백업 후 수정했다. 과거D/C PC 수치/사람기획은 보존한다. 기존Space 관련절의 반영/재조회와 이후 역할3/4 결과 교차검토는 검증/state의 최종 기록을 따른다. 이번 준비문서만으로 게임/화면/제품전체 완료를 선언하지 않는다.
+- Space 후속: 기존 진행/테스트/Blueprint3페이지4블록을 원본백업·hash보호로 적용(sequence81/49/66)했고 같은content stream 재조회에서 기대본문 전부 일치했다. 새 Page/공유/예약 없음. 초기 촬영 raw log의 Condition failed15줄은 원인 미특정으로 보존하며 검사0개/메모리중단과 구분한다. 역할4의 현행 목표 한줄 개선과 별개로 원문 본문에 남은 M3/M4 지시 구분을 중간교차검토에 남겼다.
+
+- 마무리 대조: 역할4 RootWidget.cpp+신규StoryPresentationTest.cpp2파일 준비·Data/Layout1280/Layout1920검사 존재, 크롭 준비 self-test는 역할5 직접 재실행 통과/실사진0개. 역할3 읽기덤프 로그는 DroneMissionDefinition.start_locations 속성 부재로 result-1, 현재DLL02:31:59/헤더13:53:53을 실파일로 확인했다. 단일빌드→Reflection덤프가 선행이며 구DLL 자산저장 없음. Space 진행82·테스트50에 빌드선행을 추가하고 재조회 일치, Blueprint66 유지. 관련 검증표/인계는 다른역할 실증거대기 상태이며 전체완료 아님.
+
+
+## 2026-10-22 C PC — Story4 후속 근거 대조·START/BACK·총괄 보고
+
+- 역할5는 엔진을 재개하지 않고 역할3/4 산출물만 읽었다. 기존2파일 Build_20261021.log Succeeded106.34초와 새DA4개 최소로드 덤프 exit0/64.3초를 직접 확인했다. 10-21 구DLL StartLocations 부재는 해소됐으며 이전 실패/중단은 그대로 보존한다. 최신 START/BACK Source11파일은 manifest SHA11/11일치지만 이전빌드 이후 변경이라 새빌드/Unreal기능Pass가 아니다.
+- mission_da_dump.json의 표시명/ID/맵·기체6/1/6/6·Default허용·Rule시간300/150/180/240초·M4.RequiredProgress3 및 M4.Start1/2/3을 자동교차검사했다. 실제Editor 사진5세트15개는 metadata의맵/ID·SHA·1536x864·map전후SHA일치·actual_sortie=false를 확인했다. M4사진0·실출격0·최종사진연결0. 결과는 검증/교차검증_20261022.json이다.
+- M1 Native조망/목표·M2/M3 Native조망을 직접 열었다. M1 DROP 식별 개선/대표검토후보, M2 작은차량과 산근접구도로 도로/접근맥락 부족, M3 레이더/진입이탈 식별부족·붉은표식으로 보완판정을 유지했다. 사진생성 성공을 제품대표사진 승인·실출격으로 확대하지 않는다.
+- 최신Source는 M3/4 현재출격목표와 후속작전배경을 구분한다. DA원문·BriefingLines/LoadingTips·실물패드·START/BACK 실제WBP·잘림/겹침은 별도검사. HTML178/라벨64는 역할4 브라우저근거이며 Unreal검사와 합산하지 않는다.
+- 사용자 총괄보고 전송승인을 실제총괄 대화의 현재 userMessage로 확인했다. 결과를 검증/state.md에 먼저 남긴 뒤 지정총괄01a12a05-8db0-73f0-8844-70be55f8da90에 완료범위/선행담당대기·재개조건을 보고한다. 전송영수증/Space후속반영은 검증폴더에 기록한다. 게임Source/Content쓰기·엔진실행·Commit/Push·예약0.
+- Space최신 반영: 진행83/테스트51/Blueprint67의3블록을 적용/재조회해 기대본문일치. 로컬6문서 diff --check통과·STATUS29539B/WORKBOARD29769B. 결과를 state에 먼저 기록한 뒤 승인총괄로 전송성공(isError=false), 총괄전송결과.json에 영수증 보존. 전체UI/실출격 판정은 선행대기다.
+
+
+## 2026-10-22 C PC — 승인 사진3개 연결 후 검증 경계 최신화
+
+- 역할3 사진연결_검증_20261022.json·Build_RectFix_20261022.log Succeeded14.14초를 직접대조했다. 최신manifest11SHA·Texture3SHA·원본/cropSHA·572x332/sRGB를 재확인했다. Import전후NativeT3D를 지정 Thumbnail/BriefingImage 필드만 제외해 비교한 결과 나머지DA2개 속성이 동일했다. M1Thumbnail=조망/M1BriefingImage=DROP/M2BriefingImage=차량, 대상외사진/시작점/Rule/Map/시나리오 보존이다.
+- R3_20261022_Data_PhotosAfter/AutomationReport/index.json은 StoryPresentation.Data·ActionLabelEnglishContract2Success/실패0(NullRHI)다. R3_20261022_UI_PhotosAfter/result.json은 시작8764→최저4057MiB/16.3초 MemoryGuard, 새PNG/Report0을 직접확인했다. 후속UI preflight8775<10240MiB·started=false. 과거24캡처/6검사성공을 새사진후RHI/패드로 재사용하지 않는다.
+- 역할4 최종크롭 contact를 직접열어572x332 M1조망/DROP·M2차량 식별을 확인했다. 이 접촉표는 실제WBP 렌더가 아니다. M2대표/M3·M4/실출격·실물패드는 미완료, 실제출격12GiB/Camp16GiB/runtime RAM·commit4GiB 유지다.
+- 역할5는 엔진/게임파일을 변경하지 않고 사진연결_교차검증_20261022.json·현황/계약/인계를갱신했다. 로컬현재절만 백업후반영, Space반영·총괄전송 결과는 검증/state와 영수증을따른다. 새엔진/예약/Commit/Push0.
+- 최신Space 진행84/테스트52/Blueprint68의3블록을반영후재조회해본문일치를확인했다. STATUS29549B/WORKBOARD29731B로30KB이하. 역할5상태에결과/대기조건을먼저기록했으며 승인총괄전송결과는 검증/총괄전송결과_사진연결후_20261022.json을따른다.
+
+
+## 2026-10-22 C PC — 현실 조종감 참조 방향·공유 MD·커밋 준비
+
+- 사용자 최신 지시를 반영해 Racer=실제레이싱용/기타공중=역할별전쟁사용/UGV별도 방향만 확정했다. 특정모델/정확스펙·제어모드·조종기/설정·로그/숙련자평가는 미정이다. 주목표는실제조종자이질감을줄이는조종감, 확장B/ChaosC는 비교후선택·새물리/착지/LOS/카메라구현0이다.
+- 촬영/물리조사_개선안_20261022.md·현실조종감_보완조사_20261022.md·잔여계획_20261022.md·최신state와 실제보고서를 대조했다. 신규 docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md에 현재구조/한계·근거/추천/미정·책임클래스·입력/카메라·모터OFF착지/재이륙·LOS사람후퇴/메시·카메라LookAt·M3/4오브젝트·렉/로딩·숙련자검증을 정리하고 보드/색인/역할가이드에서 연결했다. 새팀공유계획에는 개인랜덤도시 작업을 넣지 않았으며 사용자전용 E잔여계획의 로딩비교맥락은 보존했다.
+- 최신UI R3_20261022_UI_PhotosResume01/AutomationReport/index.json을직접검사: D3D12 RHI4Success/실패0·PNG24. M1선택1920/M1브리핑1280/M2브리핑1920와 M1실제PIE원본을직접열었다. 이전사진후RAM차단은이후실행으로해소됐으나 모든입력/미션성공으로확대하지않는다.
+- M1_Sortie04의sortie_offline_verification.json: Battlefield/Drop/Player0·DirectorActive·목표0/1·맵SHA불변, 원본888x500 SHA일치. physical_input_tested/mission_completed=false. 캡처후처리파일잠금오류 원기록보존. LoadMap8.979198초와캡처대기포함전체269.6초를로딩/FPS로혼용하지않는다. M2_Sortie01은11938<12288MiB/started=false, M3실출격·M4전체/3ID·실물패드후속이다.
+- FlightResearch01은NullRHI읽기12초/exit0, DA6/Pawn CDO6·BP override6false·DA불변확인이다. 6프로파일공통2kg/40N·게임제동20%·Acro실행Deceleration0은현재설정/코드근거이며 실기체스펙/실플레이검증아니다. 공식PX4 v1.16 Acro/Controller·Epic FloatingPawnMovement/Sub-Stepping을재확인해신규가이드의모드/한계근거를연결했다.
+- 문서변경전8파일/기존6파일diff를 검증/문서백업/*_현실조종감MD에 보존했다. 변경/크기/링크·diff --check·stage없음 검사와 한국어 커밋제목/본문초안은 검증/MD정리_커밋준비_20261022.json·이대화outputs의 준비산출물을따른다. 자동stage/commit/push·엔진·새게임구현0. 다른소유Source/Content파일은변경하지않았다.
+- 이번 Space 반영은 기존 진행페이지의 비행/미션2행을1회 갱신(sequence85)하고 본문재조회일치를확인했다. 새Page/다른가이드반복갱신/예약없음. GitHub에 아직없는 신규MD는 미커밋로컬정본이라고 표시했다. 커밋은 사용자 GitHubDesktop에서 검토/실행할 준비까지만 수행한다.

@@ -1,19 +1,19 @@
 # 현재 작업 상태
 
-기준일: 2026-10-21 KST D PC. Unreal `ddbd963d`·MD `1aef63a` 위 로컬 변경. 레이싱 프로펠러4개·선택3D BP 연결 복구, 원형/도시/3D3종 통과. 사진5장→6종·흰색 카운트다운 유지. [근거](docs/history/DRONE_WORKLOG.md).
+기준일: 2026-10-22 KST C PC. 최우선 목표는 현실 조종감. Racer=레이싱용·기타공중=역할별 전쟁 사용 참조 방향 확정, 모델/사양·장치·확장B/ChaosC 미정·새물리구현0. UI RHI4종/24캡처·M1 출격상태 확인, 미션완료/실기와 구분. [근거](docs/history/DRONE_WORKLOG.md).
 
-## Git 기준(원격 최종 확인10/21)
+## Git 기준(10/22 로컬 추적 ref·Fetch 없음)
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal 원격 추적 origin/main | `ed85c0e8` | HEAD보다2개 앞섬·이번 Fetch/Pull/Push 없음 |
-| Unreal D PC `D:\JGY\project\drone` | HEAD `ddbd963d` | 새 사진·Racer BP/검사 후속·카운트다운 로컬 변경 |
-| 문서 원격 `gyeonliz/md` | origin/main `1aef63a` | Fetch 후 로컬과 0/0 |
-| 문서 D PC | HEAD `1aef63a` | 상태/가이드 로컬 변경, 이번 Commit/Push 안 함 |
+| Unreal 추적 origin/main | `17938bb7` | 현재 HEAD가1개 앞섬, 이번 Fetch/Pull 없음 |
+| Unreal C PC `C:\URproject\drone` | HEAD `c589bbf9` | 빌드14.14초·UI RHI4종·M1출격상태, 새물리구현0 |
+| 문서 추적 origin/main | `9995d8e1` | 로컬과0/0, 이번 Fetch/Pull 없음 |
+| 문서 C PC | HEAD `9995d8e1` | 역할5 관련 문서 미커밋, Commit/Push 없음 |
 
 ## 10/18~20 최신 구현과 확인 경계
 
-- **Story 실패**: M1·2 재도전, M3·4 진행 보존 무한 출격. M1 임시6종, M3·4 기체 재선택, M4 기체→3지점→출격·신규4개 미션 검사 통과. BP3 배치·최종 위치 조정 대기. [조정](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#미션-4-시작지점과-선택창-조정).
+- **Story4 UI/사진**: 새사진뒤 Data/Layout1280/Layout1920/ActionLabel4Success·24PNG. M1 Battlefield/Drop/Player0·DirectorActive·목표0/1 확인; 완료/물리입력 미검증. M2미시작·M3/4최신오브젝트/실출격·패드 후속. [정본](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#story4-선택브리핑-검증-경계).
 
 - **기반 구현**: DA 숨김/준비 중·다음 수업 건너뛰기·맵 비저장 Runtime Placement·미션별 RecordCourseId. 튜토리얼 TUT 맵/DA·HUD WBP/캡처 도구는 현재 커밋에 있다.
 - **UI/훈련**: 그림 위는 번호만·키/동작은 아래 범례로 정리. RC 세로 토글 스틱·Scout/FPV 바닥 없는 실제 모델 사진·튜토리얼 권장창 한글 적용. D PC Build·UI4/4·사진1종 자동 검사 통과, 1280×720/1920×1080 렌더 확인. 실물 조종은 별도. [조정](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#훈련-사진조작-장치-그림시작-위치).
@@ -40,7 +40,7 @@
 
 첫 LOS는 현재 팀원 `Tutorial/TUT_LOS`·BP_LOS 눈높이를 사용한다. 이전 Observer TestMap은 보존했다. 그물 PBD·벽/로터 Sweep·카메라 분리/피해 Shake는 유지하며 실제 Chaos 제작·수동 체감은 후속이다. 세부 이력은 WORKLOG.
 
-Story 현재 연결/시작/목표는 [미션 표](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#현재-미션-연결과-확인-순서)·[BP 배치](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#story-맵-시작목표npc-배치)가 정본이다. M2/3 독립 사본·실제 Spline, M1 지붕 위 DROP·표식 포탑2개, M4 기존 포탑3개를 연결했다. 네 맵에 헬기포트·매니저·NavMesh 저장, LOS 외 귀환 없음. Camp 재머8개는 해당 인스턴스만 반경20m/최대4m로 조정·사용자 지정 포트 위치 유지. 최종 분기/역할교대/엔딩·손 조종 완성은 아니다.
+현실 조종감의 참조·구조대안·카메라/LOS·모터OFF/착지·실맵/성능 잔여계획은 [개발 기준](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md)이 정본이다. 조사/계획 완료이며 구현 승인이 아니다. 현재 UI/출격의 상세 실행근거는 WORKLOG, 다음은 WORKBOARD를 따른다.
 
 UI 현재 상태는 아래 요약을 따른다. Pretendard 공통 적용·기존 아트/ID/저장키 보존 유지. [UI 가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md), 상세는 [오후 WORKLOG](docs/history/DRONE_WORKLOG.md#2026-10-16--오후-ui-전면-개편wbp-전환ugv-무장).
 

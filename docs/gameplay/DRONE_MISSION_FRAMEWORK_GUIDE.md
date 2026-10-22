@@ -281,11 +281,11 @@ M3는 배치된 체크포인트가 없으면 최초 출격 위치를 사용한�
 
 ### 미션 4 시작지점과 선택창 조정
 
-- UI 정본: `/Game/Drone/UI/WBP/Mission/WBP_DroneStartLocation`. `StartLocationButton0~2`·Title/Description·Confirm/Back을 Designer에서 조정한다. Class Defaults의 텍스트 재정의·선택/비선택 불투명도도 사용할 수 있다. 내부 연결 이름은 유지한다.
+- UI 정본: `/Game/Drone/UI/WBP/Mission/WBP_DroneStartLocation`. `StartLocationButton0~2`·Title/Description·Confirm/Back을 Designer에서 조정한다. Class Defaults의 텍스트 재정의·선택/비선택 불투명도도 사용할 수 있다. 내부 연결 이름은 유지한다. 행동 라벨은 START/BACK 영문을 유지하고 다른 본문/표시명은 임의 영문화하지 않는다.
 - 미션 데이터: `/Game/Drone/Data/Missions/DA_Mission_Story_Endgame_Test` → **선택 가능한 시작지점** 3개. ID·표시 이름·설명·기본 위치를 편집한다. **재출격마다 시작지점 선택**은 켠다. ID는 중복하지 않는다.
 - 위치 BP: `/Game/Drone/Managers/BP_DroneMissionStartPoint`. M4 맵 Outliner의 `Drone/StartPoints` 폴더에서 세 액터를 옮기고 화살표 방향을 맞춘다. 위치는 기체 기준점이므로 지면 위 높이도 조정한다.
 - 기존 `/Game/Drone/Managers/BP_DroneMissionTargetManager`의 **시작지점 액터 · 스포이드**에서 0·1·2 순서로 연결한다. **시작지점 BP 배치 · 목록 채우기**는 없는 BP만 만들며 기존 위치는 되돌리지 않는다. 맵 액터 참조가 우선이고, 없으면 같은 ID의 BP, 이후 DA 기본 위치를 사용한다.
-- 첫 출격·재출격 모두 기체 선택 → 시작지점 선택 → 출격 순서다. 시작지점 창의 뒤로/Esc는 기체 선택으로 돌아가며, 재출격 중에는 게임을 멈춘 상태를 유지한다. M3/M4의 기체 선택창은 기존 `WBP_DroneSelection`을 사용한다. 재출격 기체 선택 중에는 로비 뒤로 버튼을 숨기며 기존 미션/목표/파괴 표적은 유지한다. 기체를 확정해야 M4 시작지점 창이 열린다.
+- 첫 출격·재출격 모두 기체 선택 → 시작지점 선택 → 출격 순서다. 시작지점 창의 뒤로/Esc는 기체 선택으로 돌아가며, 재출격 중에는 게임을 멈춘 상태를 유지한다. M3/M4의 기체 선택창은 기존 `WBP_DroneSelection`을 사용한다. 재출격 기체 선택 중에는 로비 뒤로 버튼을 숨기며 기존 미션/목표/파괴 표적은 유지한다. 기체를 확정해야 M4 시작지점 창이 열린다. 시작 위치의 실제 우선순위는 매니저 StartPoints의 선택 인덱스→같은 StartId의 배치 BP→DA Transform이다. 배열 순서/ID와 M4.Start1~3 각각의 실출격을 대조한다. 헬기포트만 옮겨 세 선택지가 모두 이동한다고 가정하지 않는다.
 - M1 임시6종 허용은 `DA_Mission_Story_GoldenTime_Test`의 `AllowedDroneIds`다. 기본 기체와 실패 시 결과/재도전은 유지한다. M3/M4도6종 허용이며 스카이까지 카드 스크롤로 선택한다.
 - 현재 확인(2026-10-21 D PC): 재선택 후속 Build·설정 도구 통과. M1/M2/M3 새 PIE 성공 후 M4 보완 재실행도 성공했다. M1 6종 선택, M3/M4 실제 카드/출격 클릭으로 정찰→FPV→UGV→드랍 교체, 재출격 중 3D 프리뷰, 완료/부분 목표·파괴 표적 보존, M4 기체→3지점 순서·지점 뒤로→기체 복귀·선택 위치·UGV 실제 접지를 검사했다. M4 실제 `Lvl_MilitaryCamp`에 BP3개와 매니저 스포이드 연결을 저장했다. 기본 출발점 부근 임시 배치이므로 최종 전략 위치·안전거리·적 시야는 기획자 조정 후 실제 맵에서 확인한다. 전체 스토리 전투 완주나 실제 맵의 모든 기체 주행을 통과한 뜻은 아니다.
 

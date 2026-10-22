@@ -8,7 +8,7 @@ Story의 현재 맵 연결은 아래 표가 정본이다. M2·M3는 원본 Milit
 
 기존 튜토리얼8개·Story4개·Racing 시험맵은 보존한다. 아래 날짜가 붙은 예전 맵 설명/검증은 당시 기록이며 최신 위치·정책은 위 가이드와 STATUS를 우선한다.
 
-현재 절차 기준: 2026-10-20 D PC. 과거 수행 수치/실패 정정은 WORKLOG 정본이다.
+현재 절차 기준: 2026-10-22 C PC Story4 데이터/사진 교차검토. 실행별 수치·실패와 이전PC 기록은 WORKLOG 정본이다.
 
 ## 현재 미션 연결과 확인 순서
 
@@ -23,14 +23,24 @@ FrontEnd → 튜토리얼/스토리 → 미션 선택 → 브리핑/기체 → �
 | 자유 게이트 | `Tutorial/TUT_FreeGate` | 준비 중/숨김 해제·코스13게이트 순서대로 완주→성공 |
 | 물자 운반 | `Tutorial/TUT_Delivary_2` | VV_grenades1·VV_highcaliber1·VV_WeaponBox2를 각각 집어 Cylinder로 운반. 고유 화물3개 뒤 성공, 귀환 없음. [스포이드/횟수](DRONE_MISSION_FRAMEWORK_GUIDE.md#이미-배치된-맵에서-바로-찾기) |
 | 포탑 파괴 | `Tutorial/TUT_UGV_Turret` | 준비 중 해제. 실제 자동포탑200HP, 유탄2발 파괴→성공 |
-| M1 GoldenTime | `Lvl_Battlefield` | 헬기포트 출격·DROP 수령 표적·현재 병사9·표식 위치 포탑2 |
-| M2 Intercept | `Missions/Lvl_Story02_Intercept` | 헬기포트 출격·실제 배치 차량/기존 Spline 연결, 임시 직선60m 불사용 |
-| M3 VeilBreaker | `Missions/Lvl_Story03_VeilBreaker` | M3 시작 표식에 헬기포트 배치·실제 레이더/재밍 완전 이탈 목표 |
-| M4 Endgame | `Lvl_MilitaryCamp` | 헬기포트·기존 고정포탑3개/매니저·NPC27 Nav 연결. 임시 저메모리 설정에서 목표 파괴→성공 통과 |
+| M1 골든 타임 / GoldenTime | `Lvl_Battlefield` | 구급품 DROP 전달·헬기포트 출격, 임시6종 허용/실패 시 결과·재도전 |
+| M2 길목 차단 / Intercept | `Missions/Lvl_Story02_Intercept` | 실제 차량/기존 Spline을 도착 전 파괴. FPV·실패 시 결과/재도전, 직선60m 대체 금지 |
+| M3 보급 차단 / VeilBreaker | `Missions/Lvl_Story03_VeilBreaker` | 실제 레이더 재밍 진입/완전 이탈. 6종/재출격 재선택·진행 보존, 파괴/역할교대 콘텐츠 완료 아님 |
+| M4 최종 타격 / Endgame | `Lvl_MilitaryCamp` | 기존 고정포탑3개 파괴. 기체→출발지3곳→출격, 재선택/진행 보존. 기존 저메모리 자동 근거와 새 실제3ID 출격 검증은 구분 |
 
 Runtime Spawn의 `bRelativeToMissionStart / bSnapToGround / TaggedActorCountToSkip`는 미배치 목표 보완용이다. Story4맵의 실제 배치 목표는 DA 임시 목표 Spawn에서 제외해 중복을 막았다. M1은 지정 XY를 유지하고 표시 지붕 위로 올려 저장했다. 원본 Base·팀원 Production Training·ID·Story Fact·분기·시간/기체 선택은 보존한다. 단말/요원·잔해 Scan·미션 중 기체교대·최종 엔딩은 별도 미완료다.
 
 실제 TUT 자동 검사는 `Drone.Tutorial.TUTMapLaunchPIE.{LOS,Hovering,Forward,CircleGate,FreeGate,FPV,Payload,UGVTurret}`다. LOS는 4단계·실제 접지, 물자는 집기/투하 이벤트, 원형은 Gate 순서 통과, 포탑은 피해/파괴 이벤트로 성공을 확인한다. 같은 검사 경로의 `StoryM1 / StoryM2 / StoryM3 / StoryM4`는 실제 제품 맵을 연다. M1은 물리 투하, M2는 이동 차량 후방 Sweep 자폭, M3는 실제 Overlap 진입/완전 이탈, M4는 지휘표적3개 피해/파괴 경로다. `-NullRHI` 실행은 목표·결과 로직만 검증하며 화면 Pass가 아니다. 자동 위치 이동은 손 조종 완주와 다르다. 최신 판정은 STATUS/WORKLOG, 화면·장치 조정은 [UI 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#훈련-사진조작-장치-그림시작-위치)를 따른다.
+
+### Story4 선택·브리핑 검증 경계
+
+실맵 대표사진·실제 출격·목표 사진을 미션별로 보존하고 촬영PC/KST·MissionId·맵·StartId/액터·기체·원본 해상도·카메라/출격 Transform·원본/크롭 경로를 함께 기록한다. M4는 `M4.Start1/2/3` 각각 확인한다. 시작점 해석은 매니저 StartPoints 배열→동일 StartId 배치 BP→DA Transform 순서이므로 배열 순서와 ID도 대조한다. 현재3곳은 기본 출발점 부근 임시 배치이며 전략적 안전성을 보장하지 않는다.
+
+현재 저장 DA의 M3 본문/요약은 레이더·방호벽·팔레트 파괴, M4는 베일5기지만 현행 Rule은 재밍 완전 이탈/고정포탑3개다. 선택/브리핑은 현행 목표와 미구현 시나리오를 구분해야 한다. M3 표시명은 보급 차단이며 내부 VeilBreaker/ID·기체/순서/시작점은 보존한다. 현행 목표·시간은 실제 Rule, 기체는 AllowedDroneIds/DefaultDroneId, 출발은 StartLocations로 대조한다.
+
+FrontEnd에서 M1~4 선택/브리핑을1920×1080·1280×720로 확인한다. Pretendard·남색/청록·사선버튼·저장 Designer 유지, 긴 본문 끝까지 스크롤·정보3칸/자막 비겹침·목표3/출발3 안내·사진 전환/비율·START/BACK·Esc/B·키보드/패드를 검사한다. M1 영상→브리핑과 M3/4 재출격 진행 보존도 확인한다. 이벤트 주입과 실제 장치/손 조작 Pass는 별도다.
+
+Story4 행동 라벨은 `START`·`BACK` 영문을 유지한다. 최신 사진 연결 후 RHI 검사와 캡처는 STATUS/WORKLOG의 해당 실행을 확인한다. Layout/Data 통과는 실제 패드/물리입력·목표 완료가 아니다. M1은 맵진입/Drop빙의·DirectorActive·목표0/1까지만 확인했으므로 미션완료로 쓰지 않는다. UI10GiB/실출격12GiB/Camp16GiB·runtime RAM/commit4GiB 보호를 유지하며 반복실행/앱강제종료 없이 남은범위를 [후속계획](DRONE_REALISTIC_HANDLING_PLAN.md#잔여-작업과-완료-기준)으로 확인한다.
 
 ### 귀환 정책을 유지하는 방법
 

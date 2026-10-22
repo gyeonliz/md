@@ -1,6 +1,6 @@
 # 드론 역할·조작 방식·물리 비행 기준
 
-기준일: 2026-10-06 (Asia/Seoul). 조작 표시명·화물 파지 갱신; 검증 이력은 [WORKLOG](../history/DRONE_WORKLOG.md).
+기준일: 2026-10-22 (Asia/Seoul). 기체 참조 방향·현재 조작과 현실감 목표를 구분한다. 새 물리 구현은 없으며 검증 이력은 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
 
 ## 기획 자료 사용 원칙
 
@@ -8,6 +8,10 @@
 - Figma 내부 내용은 읽기만 했으며 수정·댓글·공유 설정 변경을 하지 않는다.
 - 아래 목록은 현재 Figma에서 확인한 기획 역할이다. 최종 이름·규칙 확정이나 구현 완료를 뜻하지 않는다.
 - Unreal 코드·Data Asset·자동화 시험으로 확인한 항목만 `구현`으로 표시한다.
+
+## 실제 기체 참조 방향
+
+Racer는 실제 레이싱용 기체, Scout/Drop/FPVStrike/FiberOptic은 전쟁 사용 역할별 공중 기체를 참조한다. GroundUGV는 지상 모델로 분리한다. 특정 모델·정확한 사양·주 제어 모드·조종기·숙련자 평가는 미정이며 전 기체를 FPV Rate로 통일하지 않는다. 현실 조종감을 최우선으로 하는 [참조·구조 대안·잔여계획](DRONE_REALISTIC_HANDLING_PLAN.md)을 따른다. 기존 기본/게임 모드의 구현 설명과 새 목표를 혼동하지 않는다.
 
 ## 세 축을 분리한다
 
@@ -30,9 +34,10 @@
 | 드랍 드론 | `BP_DroneDropIntegration`; Delivery 본체·카메라·로터 6·Bag 선적재 화물 | 탑뷰·투하·착지 잔류·목표 자동 선택·근접 적재·Actor 재투하, 초기/재픽업 파지 통일 | 집게 외형 수동 확인, FX와 Mission별 투하 규칙 |
 | 광섬유 드론 | `BP_DroneFiberOpticIntegration`; DroneSpy Body·분리 Rotor 4개, 공급 GSU 통, 1인칭 기본 | `JammingImmunity + ImpactDetonation`, 통 상단→지나온 지면 Spline과 처진 마지막 구간 구현 | Spy 본체와 GSU 위치·크기·케이블 굵기 화면 조정, 충돌 자폭·재밍 Zone 면역 확인, Mission 3 교대 연결 |
 | 지상 드론 UGV | `BP_DroneGroundUGVIntegration`; GC Drone 1 Skeletal Visual | W/S 전후·A/D 조향·Q/E 제자리 회전, 최초 장거리 지면 획득, 4점 지면 높이/Pitch/Roll 추종, 공중 바람 Drift 차단 | 높은 Spawn→접지·Mesh 위치·스케일·경사/단차 추종 화면 확인, 무장·연료와 Mission 3 교대는 후속 |
+| 레이싱 드론 Racer | `BP_DroneRacerIntegration`; DroneRacing 본체·프로펠러4개 | 현재 레이싱 기체/선택 프리뷰 연결 | 실제 레이싱 기체 참조와 조종감 보정·실물 입력 검증, 특정 모델/사양 미정 |
 | 장거리 타격 드론 | 플레이 기체 미등록 | 출격/타격 연출 미구현 | 플레이 가능 여부 확정 뒤 Sequencer 또는 Pawn 결정 |
 
-`UDroneDefinition`은 `PlannedCapabilities`와 `ImplementedCapabilities`를 따로 가진다. 현재 Catalog에는 Scout/FPV/Drop/Fiber/Ground 5종 Data Asset이 등록돼 있고 자동화가 순서와 역할 Capability를 검사한다. 장거리 타격 후보는 아직 구현 목록에 넣지 않는다.
+`UDroneDefinition`은 `PlannedCapabilities`와 `ImplementedCapabilities`를 따로 가진다. 현재 읽은 플레이 기체 DA는 Scout/FPV/Drop/Fiber/Ground/Racer 6종이다. 기체 등록·기존 자동화와 역할별 실제 조종/미션 완료는 별개다. 장거리 타격 후보는 아직 플레이 구현 목록에 넣지 않는다.
 
 ## 네 조작 방식의 실제 차이
 
