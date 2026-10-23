@@ -1,6 +1,6 @@
 # 드론 역할·조작 방식·물리 비행 기준
 
-기준일: 2026-10-22 (Asia/Seoul). 기체 참조 방향·현재 조작과 현실감 목표를 구분한다. 새 물리 구현은 없으며 검증 이력은 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
+기준일: 2026-10-23 D PC. 역할별 1인칭 카메라와 장치별 스로틀·Acro 중력/평균추력 정합을 반영했다. 기본/게임 assisted와 controlledRacer 후보의 지원 범위는 [현실 조종감 기준](DRONE_REALISTIC_HANDLING_PLAN.md)을 따른다. 실행별 검증 이력은 [WORKLOG](../history/DRONE_WORKLOG.md)에 둔다.
 
 ## 기획 자료 사용 원칙
 
@@ -39,6 +39,40 @@ Racer는 실제 레이싱용 기체, Scout/Drop/FPVStrike/FiberOptic은 전쟁 �
 
 `UDroneDefinition`은 `PlannedCapabilities`와 `ImplementedCapabilities`를 따로 가진다. 현재 읽은 플레이 기체 DA는 Scout/FPV/Drop/Fiber/Ground/Racer 6종이다. 기체 등록·기존 자동화와 역할별 실제 조종/미션 완료는 별개다. 장거리 타격 후보는 아직 플레이 구현 목록에 넣지 않는다.
 
+## 1인칭 카메라 역할 프리셋
+
+저장 Definition 6종을 다시 저장하지 않고 역할별 기본 프로필을 적용한다. 아래는 UE perspective의 **게임 수평 화각(HFOV)**과16:9 직선투영 참고값이다. 넓어진 게임 프리셋이며 제조사 렌즈 사양이나 실기체 광학 교정값이 아니다. Pitch의 +는 위, -는 아래다.
+
+| 역할 | 게임 HFOV | 16:9 직선투영 VFOV | 장착 Pitch | 렌즈 참고 |
+|---|---:|---:|---:|---|
+| Racer | 135° | 107.2656° | +30° | RunCam Racer Nano 4(H125°) |
+| Scout | 110° | 77.5521° | -10° | SIYI A8 mini(H81°)·Pitch/Roll 안정화 근사 |
+| Drop 전방 | 110° | 77.5521° | -15° | 같은 A8 mini 참고 |
+| FPVStrike | 130° | 100.6831° | +15° | RunCam Phoenix 2 SE V2(H124°) |
+| FiberOptic | 130° | 100.6831° | +10° | 같은 FPV 렌즈 참고 |
+| GroundUGV | 95° | 63.0883° | 0° | A8 mini 렌즈 참고·기존 상부 조준 |
+| Drop 하부 보조 | 81° | 51.3212° | -90° | chase arm0·offset(0,0,-12)cm·위치 lag없음 |
+
+Drop 하부에서 전방으로 돌아오면 전방 프로필을 복원한다. 일반 FPV 위치 smoothing·피격 Shake를 유지한다. 미등록 LongRangeStrike의 fallback은 HFOV124°/Pitch+5°이며 플레이 기체 추가를 뜻하지 않는다.
+
+프로필 우선순위는 **Pawn BP camera override → FlightProfile camera override → MissionRole 기본값**이다. DA는 `FlightProfile.bOverrideRoleCameraProfile + CameraProfile`, Pawn BP는 `bOverrideRoleCameraProfileInBlueprint + BlueprintCameraProfileOverride`에서 조정한다. 카메라만 바꾸려고 비행/스로틀 BP override를 켤 필요는 없다. 사용자 FPV HFOV가0이면 이 프로필을 따르고,60~150°를 명시하면 최종 FPV HFOV에 적용한다. 3인칭과 Drop 하부는 독립이다. 기본 시점/조작의 저장·선택 적용은 [설정 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#9-사운드--화면--성능-설정)를 따른다.
+
+공식 렌즈 참고는 [RunCam Racer Nano 4](https://shop.runcam.com/runcam-racer-nano-4/)(D160/H125/V97), [RunCam Phoenix 2 SE V2](https://shop.runcam.com/runcam-phoenix-2-special-edition/)(D160/H124/V95), [SIYI A8 mini 매뉴얼 v1.6](https://siyi.biz/siyi_file/A8%20mini/A8%20mini%20User%20Manual%20v1.6.pdf)(D93/H81)이다. D160을 HFOV160으로 해석하지 않는다. 직선투영 `VFOV = 2 atan(tan(HFOV/2)/(width/height))`와 MaintainXFOV를 사용하며 ultrawide에서는 수평이 유지되고 수직 범위가 줄어든다. 제조사 D/H/V 전체의 삼각형 일치·어안/배럴 왜곡·크롭을 재현하지 않는다.
+
+현재 자동 검증의 리비전·캡처 범위는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 실제 렌즈·소켓 교정과 손 조종/전체 화면 가독성은 별도다.
+
+### FPV·광섬유의 쉬운/게임 조작 조준
+
+FPVStrike/FiberOptic의1인칭·쉬운/게임 조작에서는 새 상하 시야 입력으로 조준한 뒤 전진하면 실제 기체 Root가 그 world 피치로 기울고 이동도 그 방향을 따른다. 카메라는 의도한 Root 기울기를 보상해 조준 각도가 중복되지 않는다. 기본 장착각만으로 자동 상승/하강을 시작하지 않으며 후진/중립에는 Root가 수평으로 돌아가고 조준 시야는 유지한다. 시점/조작 방식/새 Definition 전환은 이전 조준 권한을 지운다. 다른 역할·3인칭·Acro/UGV와 Drop 하부에는 이 보조를 적용하지 않는다. 자동 표적 탐색/유도 기능은 아니다.
+
+실제 Root 충돌을 켠2역할×쉬운/게임에서 상하 look→전진→자연 센서 접촉→표적/자기1회 파괴를 자동 확인했다. 원시 검사·경고와 손 조종의 경계는 WORKLOG를 따른다.
+
+### FPV·광섬유 자폭 센서와 물리 충돌
+
+FPVStrike/FiberOptic은 기존 자동 무장·해제 잠금을 유지한다. 자폭은 **본체 충돌보다 앞에 돌출된 좁은 전방 중앙 센서가 직접 접촉할 때** 발생한다. 본체 옆/아래·로터만의 접촉은 자폭 조건으로 사용하지 않는다. 본체/로터의 일반 물리 충돌은 유지한다. 이전 바닥 고속 충돌·옆면/로터 폭발 검사는 이전 정책 이력이며 현 센서의 성공 근거가 아니다.
+
+하부 물리 충돌 범위는 로터 XY 외곽을 유지하면서 Z를 실제 변환된 메시 두께와2cm 수직 여유로 계산한다. 근처에 바닥이 있다는 이유로 접촉을 넓히지 않도록 정지 probe의 수직 범위와 시간 sweep을 보정한다. 센서 세부 설정·실제 접촉/조준 검증과 잔여 수동 절차는 [시험 가이드](DRONE_TEST_MAP_GUIDE.md)·WORKLOG를 따른다.
+
 ## 네 조작 방식의 실제 차이
 
 ### 쉬운 조작
@@ -46,7 +80,7 @@ Racer는 실제 레이싱용 기체, Scout/Drop/FPVStrike/FiberOptic은 전쟁 �
 - 기존 `UFloatingPawnMovement`의 빠른 자동 감속과 선회 보조를 사용한다.
 - 전후·좌우 입력은 즉시 이동 방향으로 사용한다.
 - 고도 입력은 기체가 기울어도 항상 World Up을 사용한다.
-- 충돌 Root와 3인칭 Camera는 수평을 유지하고 `VisualTiltPivot` 외형만 기울인다.
+- 일반 쉬운 조작은 충돌 Root와3인칭 Camera를 수평으로 유지하고 `VisualTiltPivot`만 기울인다. FPV/Fiber의1인칭 수동 조준 후 전진은 [위 전용 보조](#fpv광섬유의-쉬운게임-조작-조준)를 적용한다.
 
 ### 게임 조작(기존 제한 자세 모드)
 
@@ -61,7 +95,7 @@ Racer는 실제 레이싱용 기체, Scout/Drop/FPVStrike/FiberOptic은 전쟁 �
 - Betaflight Rate/Acro와 같이 Pitch/Roll/Yaw 스틱을 이동 방향이 아닌 **기체 Body 각속도 명령**으로 해석한다.
 - 스틱을 중앙으로 돌려도 자동 수평 복귀하지 않고 현재 자세를 유지한다.
 - Pitch/Roll에 고정 각도 제한이 없어 Roll과 Loop가 가능하다.
-- Throttle 중립은 현재 총질량에서 중력을 상쇄하는 호버, 위 입력은 추가 추력, 아래 입력은 추력 감소로 해석한다. 추력은 기울어진 기체의 Local Up 방향으로 적용되어 W로 기수를 숙이면 전진력이 생긴다.
+- 키보드/중앙복귀 패드는 현재 총질량·해당 backend 중력의 hover를 중립으로 사용한다. RC는 선형 절대출력으로 스틱 중앙이 항상 hover인 것은 아니다. [장치별 스로틀 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#space키-자동-시동off-정책)을 따른다. Acro 추력은 기울어진 기체의 Local Up으로 적용된다. Legacy는 설정 중력, controlledRacer 후보는 World 중력을 hover/가속과 일치시킨다.
 - Mode 1은 왼쪽 스틱 `Yaw/Pitch`, 오른쪽 스틱 `Roll/Throttle`을 사용한다.
 - Mode 2는 왼쪽 스틱 `Yaw/Throttle`, 오른쪽 스틱 `Roll/Pitch`를 사용한다.
 - 키보드는 Mode 1·2 모두 같은 직관적 배치를 유지한다. 장치별 입력을 공용 Move Action에서 재해석하지 않고 Acro 의미축 4개와 패드 세로 원시축 2개로 분리한다.
@@ -74,7 +108,7 @@ Rate/Acro는 Front-end Drone 선택 화면에서 FPV 기체를 고르면 기본 
 
 | 기능 | 키보드·마우스 | Gamepad Mode 1 | Gamepad Mode 2 | 비고 |
 |---|---|---|---|---|
-| Throttle / Local Up 추진 | `Space/Left Ctrl` | 오른쪽 Stick Y | 왼쪽 Stick Y | 중립=호버, Space=추력 증가, Ctrl=추력 감소. 기울면 Body Up 방향으로 추진 |
+| Throttle / Local Up 추진 | `Space/Left Ctrl` | 오른쪽 Stick Y | 왼쪽 Stick Y | 키보드 Space=bounded상승·CtrlOFF·해제hover, pad중앙hover·전용곡선. RC절대축은 별도 입력 계약, 기울면 Body Up 추진 |
 | Yaw | `Q/E` | 왼쪽 Stick X | 왼쪽 Stick X | 왼쪽/오른쪽 선회 |
 | Roll | `A/D` | 오른쪽 Stick X | 오른쪽 Stick X | 기체 좌/우 회전, 90° 제한 없음 |
 | Pitch | `W/S` | 왼쪽 Stick Y | 오른쪽 Stick Y | W는 Nose-down/전진 방향 Pitch, S는 Nose-up/후진 방향 Pitch |
@@ -128,7 +162,7 @@ Pawn Class Defaults에서 다음 Struct를 연다.
 - `Acro Rate Realistic Greybox Tuning`: Rate/Acro에서 사용할 가속·관성·Local Up·Root 자세 사용
 - `Stable / Balanced / Agile Handling Tuning`: Asset 호환 내부 이름. 새 런타임 비행 계산에서는 사용하지 않는다
 
-각 기체의 절대 기준값은 Data Asset의 `Flight Profile`에 둔다. `Physical Flight Settings`에서 무적재 속도 배율·Dry Mass·합산 최대 추력·모터 응답·제곱 항력·적재 속도 하한을, `Acro Rate Settings`에서 중앙 감도·최대 Rate·Expo·수직 속도·중력·선형 항력·Rate 응답을 조정한다. 모드/적재 상태가 바뀔 때마다 원본 기준값에서 다시 계산하므로 배율이 누적되지 않는다.
+각 기체의 절대 기준값은 Data Asset의 `Flight Profile`에 둔다. `Physical Flight Settings`에서 무적재 속도 배율·Dry Mass·합산 최대 추력·모터 응답·제곱 항력·적재 속도 하한을, `Acro Rate Settings`에서 중앙 감도·최대 Rate·Expo·수직 속도·중력·선형 항력·Rate 응답을 조정한다. 모드/적재 효과는 원본 기준에서 계산한다. 장치별 스로틀은 Pawn의 전용 설정(Keyboard0.35·Pad deadzone0.08/exponent1.5), 카메라는 위 독립 override를 사용한다. 활성 candidate의 질량/geometry 모델은 캐시되므로 live payload·물리 설정 변경을 지원한다고 확장하지 않는다.
 
 Drop Drone의 내장 화물 질량은 Pawn의 `DronePayloadDropComponent > Default Inventory Payload Mass Kilograms`, 맵 배치 화물은 `BP_DroneCarryablePayload` 파생 BP 또는 배치 Instance의 `Payload Mass Kilograms`에서 조정한다. 적재하면 `sqrt(DryMass / TotalMass)` 기반 최고속도·Yaw 배율과 `DryMass / TotalMass` 기반 가속·감속 배율이 적용된다. Acro에서는 같은 총질량으로 `MaximumTotalThrustNewtons / TotalMass`를 계산해 호버점과 남는 상승 추력이 실제로 바뀐다.
 
@@ -165,7 +199,7 @@ FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조�
 5. 입력을 놓았을 때 쉬운 조작보다 관성이 길게 남는지 확인한다.
 6. 쉬운 조작으로 돌아왔을 때 Root Pitch/Roll이 수평 복귀하는지 확인한다.
 7. FPV 기체를 골라 Mode 1과 Mode 2에서 Pitch/Throttle 세로축만 표대로 바뀌고 속도·호버·Rate는 같은지 확인한다.
-8. 사람 조종은 Ctrl로 모터 OFF를 확인한 뒤 Space로 시동/상승하고, 놓으면 호버하는지 확인한다. XInput Acro는 중앙 호버·부분 음수 하강·아래 끝 OFF, RC는 절대출력이다. 실제 장치 시험은 대기이며 재시동 조건·BP 문턱값은 [자동 스로틀 모터 정책](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#자동-스로틀-모터-정책)을 따른다.
+8. 새 Space press로 시동/상승·해제hover, Ctrl로 모터OFF가 되는지 확인한다. 선행Ctrl은 필수가 아니다. XInput 중앙호버/부분하강과 RC 절대출력·fresh-low/유효인계는 [현재 입력 정책](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#space키-자동-시동off-정책)을 따른다. 자동 검증과 실물 장치 시험을 구분한다.
 9. W로 Nose-down한 뒤 중립/상승 Throttle에서 기체 Up 축이 전진력으로 바뀌는지 확인한다.
 10. Roll/Pitch 끝 입력으로 90도를 넘어 회전하고 Local Up Throttle로 바라보는 축에 추진되는지 확인한다.
 11. Drop Drone에서 기본 화물을 투하하기 전후 최고속도·가속·Yaw가 회복되는지 확인한다.

@@ -1,6 +1,6 @@
 # Mission 통합 프레임워크·NPC 이동 애니메이션 가이드
 
-현재 절차 기준: 2026-10-20 D PC. Mission 규칙·스포이드 대상 연결/나침반·HUD Designer·맵 배치·재밍 Radar·첫 수업 계약을 소스와 대조한다. 날짜별 실행 결과는 [STATUS](../../STATUS.md)·[WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. Production `/Game/Drone/Maps/Lvl_DroneTraining`은 시험용으로 수정하지 않는다.
+현재 절차 기준: 2026-10-23 D PC. Story 단계별 기체/실제 목표·재출격·재밍의 런타임 정책은 아래 현재 절차를 따른다. 날짜별 실행 결과는 [STATUS](../../STATUS.md)·[WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. Production `/Game/Drone/Maps/Lvl_DroneTraining`은 시험용으로 수정하지 않는다.
 
 2026-10-02 새벽 후속(C PC, ec2e88f + 로컬 미커밋, Claude 구현·Codex 문서 반영): Mission DA `Mission Definition|Progression → NextMissionId`로 Story M1 골든타임→M2 인터셉트→M3 베일브레이커→M4 엔드게임(끝)을 연결했다. 성공 결과 [다음]·로비 순서가 연결을 따르며 M2→M3 결과 분기는 현재 미정이다. 튜토리얼 8개 연결·시간·완료 UI는 [튜토리얼 가이드 5절](DRONE_TUTORIAL_IMPLEMENTATION_TEST_GUIDE.md#5-tutorial-전용-ui-구현)을 따른다.
 
@@ -15,11 +15,11 @@ Story M1은 `Maps/Lvl_Battlefield`, M2·M3는 원본 MilitaryBase를 보존해 �
 - 출격은 배치된 `SM_helicopter_base*`의 표시 경계 중심 XY·윗면+52cm다. DA `RuntimeStartTransform`은 패드 선택 기준과 출격 Yaw를 제공하며, 패드가 없을 때만 기존 DA/시작 표식/PlayerStart 경로를 사용한다. 첫 LOS의 관찰 시점·후진/착지 예외는 보존한다.
 - 맵의 `Drone/MissionStart`에서 패드를 이동하면 다음 출격이 따라간다. M3 사본의 패드만 원래 `M_Start_Mission3` XY의 지면으로 옮겼다. M2·원본 기지를 함께 옮기지 않는다.
 - `Drone/MissionTargets/M01`의 `M01_MainTarget_Delivery`는 기존 M_Target XY를 유지하고 Shack의 충돌뿐 아니라 표시 지붕 높이까지 확인해 위로 올렸다. DROP 표기와 나침반으로 찾는다. `Drone/Defense/M01`의 포탑2개는 기존 M_Turret 위치다. Pull 후 현재 병사9명을 보존하며 NPC 위치를 바꾸지 않고 NavMesh를 연결했다.
-- M2는 `M02_MainTarget_Convoy`에 기존 `BP_DroneVehicleSplineRoute`를 직접 연결한다. 옛 임시 직선60m 차량을 추가하지 않는다. M3는 `M03_MainTarget_Jammer`를 연결하며 기존 재밍 완전 이탈 규칙을 유지한다. 역할 교대·최종 시나리오를 완성한 것은 아니다.
+- M2의 `M02_MainTarget_Convoy`에는 기존 `BP_DroneVehicleSplineRoute`를 연결한다. 옛 임시 직선60m 차량을 추가하지 않는다. M3의 저장된 `M03_MainTarget_Jammer` 바인딩보다 런타임의 실제 재머 전부→거점 방어 단계가 우선한다. [현재 Story 정책](#실패-처리와-체크포인트).
 - `Drone/Managers`의 `BP_DroneMissionTargetManager_목표연결` 인스턴스에서 실제 대상 Actor를 스포이드로 교체한다. [배치된 매니저 편집](#이미-배치된-맵에서-바로-찾기)을 따른다. 목표 판정·표시가 같은 대상을 따르며, 배치 매니저가 전혀 없는 Story에만 런타임 Tag 기반 매니저를 보완 생성한다.
-- M4는 기존 고정 포탑 `BP_AutoTurret_Emplaced_C_24/18/14`를 `M04_MainTarget_Turret_01/02/03`으로 구분해 연결했다. 기존 3개 파괴 규칙/제한시간은 현재 기준안이며 최종 기획 수량 확정은 아니다. 새 상대좌표 표적3개를 중복 생성하지 않는다. 기존 NPC27·포탑18개를 보존한다.
+- M4의 옛 포탑3개 바인딩을 다시 저장하지 않는다. 현재 Director는 실제 재머 전부→실제 Patriot 발사대 전부를 목표로 연결한다. 기존 NPC/포탑 배치는 보존한다. [현재 Story 정책](#실패-처리와-체크포인트).
 - Camp 원본에는 헬기포트가 없어 같은 `SM_helicopter_base_01`을 추가했다. 사용자 확인 위치 `(9700,6500,6105.43cm)`·회전0·Scale0.3을 유지하며 DA 기준 출격점은 `(9700,6500,6212.90cm)`다. 재밍 회피를 위해 포트를 옮기지 않는다. 크기 조정 후 펜스와의 시각적 겹침은 줄였지만 UGV 실제 주행/출발 피격·카메라 흔들림은 수동 확인한다.
-- Camp 재밍은 **해당 맵의 Radar8개 인스턴스만** `JammingRadiusCm=2000`(20m), `FullStrengthRadiusCm=400`(4m)로 조정했다. `JammingHalfHeightCm=3000`·출력1·활성 상태는 유지한다. 기존 150m/최대25m의 과도한 중첩을 줄인 기준안이며 M3와 BP 기본값은 바꾸지 않았다. Details → Drone → Jamming → Radar에서 변경하고 실제 JammingBounds·시작 신호100%·시설 근접/이탈을 시험한다.
+- Camp의 이전20m/4m/반높이30m 작성값과 별개로 M3/M4 런타임은 [현재 Radar 최소 범위](#재밍-radar-bp-설정시험)를 적용한다. 맵/BP의 더 큰 범위와 Scale은 보존하며 실제 경계/시설 근접·이탈·광섬유 면역을 시험한다.
 - 위치 표식은 삭제하지 않는다. M_Start/M_Target/M_Radar/M_Enemy/M_Turret 큐브의 Editor 위치를 보존하고 플레이 중 표시/충돌만 끈다. 실제 적/NPC/포탑을 대신 숨기지 않는다.
 - `Drone/Navigation`의 NavMeshBounds는 실제 병사 활동 범위와 지면을 포함한다. Recast `RuntimeGeneration=Dynamic`, `ForceRebuildOnLoad=True`, 타일 생성 동시 작업2개다. **플래그만 바꾸고 저장하면 타일0이 남을 수 있으므로 정식 Build→완료 대기→저장** 후 새 로드에서 검사한다. P로 영역/실제 이동을 확인한다. Volume 밖 이동은 범위를 조정하며 같은 Agent Recast를 중복 배치하지 않는다.
 
@@ -250,7 +250,17 @@ Box Overlap 없이 Sequencer나 다른 BP에서 진행할 때는 `Try Activate M
 
 ## 실패 처리와 체크포인트
 
-2026-10-21 사용자 결정: 미션 1·2는 실패 시 재도전 결과 화면, 미션 3·4는 목표 완료까지 무제한 재출격한다. 기존 체크포인트 기반을 사용해 목표 진행도와 파괴한 표적을 보존한다. 미션 3·4는 재출격마다 기체를 다시 고르며, 미션 4는 기체 선택 → 시작지점 3곳 중 선택 → 출격 순서다. 미션 1은 시험을 위해 현재 조종 가능한6종을 임시 허용한다. 이번 코드·자산 적용/검증 상태는 아래 현재 확인 항목과 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
+현재 Story 정책(2026-10-23 D PC)은 안정된 Mission ID에 `DroneStoryMissionPolicy`를 적용한다. 원본 DA의 `AllowedDroneIds`·옛 목표 배열을 다시 저장하지 않으므로 디스크 값만으로 현재 허용 목록을 판단하지 않는다.
+
+| 미션 | 초기 기체/목표 | 이후 단계 |
+|---|---|---|
+| M1 GoldenTime | Drop만 허용·배달 | 기존 결과/재도전 |
+| M3 VeilBreaker | FiberOptic만 허용·실제 Radar 재머 전부 해제 | 새 미확정 전투 기체 선택→실제 배치된 설치형 자동포탑 거점 방어 전부 처리 |
+| M4 Endgame | FiberOptic만 허용·실제 Radar 재머 전부 해제 | 새 미확정 전투 기체 선택→실제 `BP_PatriotMissileLauncher` 전부 처리 |
+
+전투 단계는 FiberOptic/FPVStrike/Drop/GroundUGV4종이며 M3/M4에서 Scout/Racer는 계속 제외한다. M3에 명시된 비재밍 후속 목표는 보존한다. 재머 해제는 다음 목표의 파괴 수에 중복 집계하지 않는다. 처음부터 재머가 전부 꺼져 있어도 다음 tick에 단계 교대한다. 현재 Director의 실제 표적 목록이 옛 TargetManager 바인딩보다 우선한다.
+
+M1·M2는 실패 결과→재도전, M3·M4는 같은 Director·목표 진행도·파괴 표적을 보존해 무제한 재출격한다. M3/M4는 출격마다 기체를 다시 고르고 M4는 기체→시작지점3곳→출격을 유지한다. 카드 hover/포커스는 확정이 아니며 선택 단계 진입/지점 Back 후에는 재확정 전 START를 잠근다. 죽음의 화면 지연과 살아 있는 단계 교대는 [UI 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#파괴-후-화면-전환)를 따른다.
 
 | 설정 | 위치 | 의미 |
 |---|---|---|
@@ -286,10 +296,10 @@ M3는 배치된 체크포인트가 없으면 최초 출격 위치를 사용한�
 - 위치 BP: `/Game/Drone/Managers/BP_DroneMissionStartPoint`. M4 맵 Outliner의 `Drone/StartPoints` 폴더에서 세 액터를 옮기고 화살표 방향을 맞춘다. 위치는 기체 기준점이므로 지면 위 높이도 조정한다.
 - 기존 `/Game/Drone/Managers/BP_DroneMissionTargetManager`의 **시작지점 액터 · 스포이드**에서 0·1·2 순서로 연결한다. **시작지점 BP 배치 · 목록 채우기**는 없는 BP만 만들며 기존 위치는 되돌리지 않는다. 맵 액터 참조가 우선이고, 없으면 같은 ID의 BP, 이후 DA 기본 위치를 사용한다.
 - 첫 출격·재출격 모두 기체 선택 → 시작지점 선택 → 출격 순서다. 시작지점 창의 뒤로/Esc는 기체 선택으로 돌아가며, 재출격 중에는 게임을 멈춘 상태를 유지한다. M3/M4의 기체 선택창은 기존 `WBP_DroneSelection`을 사용한다. 재출격 기체 선택 중에는 로비 뒤로 버튼을 숨기며 기존 미션/목표/파괴 표적은 유지한다. 기체를 확정해야 M4 시작지점 창이 열린다. 시작 위치의 실제 우선순위는 매니저 StartPoints의 선택 인덱스→같은 StartId의 배치 BP→DA Transform이다. 배열 순서/ID와 M4.Start1~3 각각의 실출격을 대조한다. 헬기포트만 옮겨 세 선택지가 모두 이동한다고 가정하지 않는다.
-- M1 임시6종 허용은 `DA_Mission_Story_GoldenTime_Test`의 `AllowedDroneIds`다. 기본 기체와 실패 시 결과/재도전은 유지한다. M3/M4도6종 허용이며 스카이까지 카드 스크롤로 선택한다.
+- 기체 허용/기본 기체는 [위 현재 Story 정책](#실패-처리와-체크포인트)을 따른다. 시작지점의 Back/Esc는 기체 확인을 지우고 선택창으로 돌아오며 처음/재출격 모두 새 확인 전에는 START를 비활성화한다. 아래10/21 검증은 이전6종 정책의 이력이다.
 - 현재 확인(2026-10-21 D PC): 재선택 후속 Build·설정 도구 통과. M1/M2/M3 새 PIE 성공 후 M4 보완 재실행도 성공했다. M1 6종 선택, M3/M4 실제 카드/출격 클릭으로 정찰→FPV→UGV→드랍 교체, 재출격 중 3D 프리뷰, 완료/부분 목표·파괴 표적 보존, M4 기체→3지점 순서·지점 뒤로→기체 복귀·선택 위치·UGV 실제 접지를 검사했다. M4 실제 `Lvl_MilitaryCamp`에 BP3개와 매니저 스포이드 연결을 저장했다. 기본 출발점 부근 임시 배치이므로 최종 전략 위치·안전거리·적 시야는 기획자 조정 후 실제 맵에서 확인한다. 전체 스토리 전투 완주나 실제 맵의 모든 기체 주행을 통과한 뜻은 아니다.
 
-현행 자동 검증은 M3 실제 목표와 M4.Start1/2/3의 ID/매니저 스포이드·선택 BP XY·UGV 접지·기존 포탑3개/240초까지다. 명시적 시작지점은 일반 헬기포트 기대값보다 먼저 검사하며 첫 낡은 기대값 실패도 보존한다. 세 M4 실행 모두 UGV이므로 공중기체 높이 분기는 아직 실행 근거가 없다. 목표 완료는 자동 피해 사건이며 실제 발사/손 조종 완료가 아니다. 맵/DA를 다시 저장하지 않는다. 화면·성능 한계와 수동 절차는 [테스트 맵 가이드](DRONE_TEST_MAP_GUIDE.md#story4-선택브리핑-검증-경계), 날짜별 수치는 WORKLOG를 따른다.
+현재 실행 범위·대상 수·실패/재검사는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 실제 맵의 public flow/자동 피해 사건 검사는 손 조종·실제 사격/비행 완주와 다르다. 시작지점 최종 안전성·공중기체 높이와 실물 조작은 [시험 가이드](DRONE_TEST_MAP_GUIDE.md#story4-선택브리핑-검증-경계)에서 확인한다. 원본 DA/맵 재저장으로 런타임 정책을 맞추지 않는다.
 
 ### 검증과 수동 확인
 
@@ -352,6 +362,8 @@ M3는 배치된 체크포인트가 없으면 최초 출격 위치를 사용한�
 
 맵 Instance 값이 BP 기본값보다 우선이다. MilitaryBase 치환은 표식 분포에서 계산한 기지 중심/반경을 사용하므로 기본150m와 다를 수 있다. 런타임 범위 변경은 `Configure Coverage`, 강도는 부모 `Set Normalized Jamming Strength`, 전원은 `Set Jammer Active`, Mission 무력화는 `Disable Jammer`를 사용한다. 마지막 두 함수의 Off/무력화는 기존 `Jammer Disabled` Event를 보고하므로 단순 외형 토글로 쓰지 않는다. 이 BP에 최종 메시를 넣는 것만으로 자동 파괴/피격 체력이 생기는 것은 아니며, 파괴가 필요하면 별도 피해 처리에서 `Disable Jammer`를 호출하도록 연결한다.
 
+M3/M4 Story 실행에서는 world 기준 최소 수평반경100m·최대강도반경25m·반높이50m를 적용하며 더 큰 작성값과 Actor Scale은 보존한다. 이는 게임 진행용 보정이고 실제 전파 교정값이 아니다. 이전 Camp20m 인스턴스값이 이 최소 범위를 제한하지 않는다. 실제 Radar 전부 해제와 기체 교대는 [현재 Story 정책](#실패-처리와-체크포인트)을 따른다.
+
 재밍은 **느려지는 효과가 아니다.** 원거리→근거리로 화면 Noise가 강해지고 링크 손실 때 `NO SIGNAL`과 조종 차단을 표시한다. 잔여 속도·중력 등 실제 물리를 강제로0으로 만들지 않는다. 손실/복원 경계는 Drone의 Signal Component `ConnectionLossThreshold`(기본0.95)·`ConnectionRecoveryThreshold`(0.88)로 구분해 경계 떨림을 줄인다. FiberOptic은 재밍 면역이라 Noise/링크 차단을 받지 않는다.
 
 일반 Drone으로 범위 밖→가장자리→시설 근처→범위 밖을 이동해 Noise·NO SIGNAL·복원을 확인한다. 이어 Radar Off→On, FiberOptic 같은 경로를 시험하고 이동 속도 배율이 줄지 않는지 확인한다. 자동화 대상은 `Drone.Signal.StageContract / RadarCoverage / ControlLink`이며 현재 Pass 여부와 화면 검증은 STATUS·WORKLOG를 따른다. 화면/실제 입력은 수동 확인 대기다.
@@ -377,7 +389,7 @@ M3는 배치된 체크포인트가 없으면 최초 출격 위치를 사용한�
 3. 브리핑을 넘기면 같은 `Lvl_DroneTutorialMissionTest`로 이동하고 해당 기체만 선택할 수 있다.
 4. 호버링은 중앙 Hover Pad 상공 Box 안에서 안정 상태를 3초 유지하고 시작점 뒤 Return Pad로 돌아온다.
 5. 물자 전달은 Drop Drone으로 노란 Payload 표적까지 이동한다. 임시 조작은 `좌클릭/패드 RB=화물 투하`, `우클릭/패드 LB=탑뷰`다. 표적 적중 뒤 Return Pad로 돌아온다.
-6. FPV는 임시 `좌클릭/패드 RB`로 Arm하고 최소 충돌 속도 `600cm/s` 이상으로 떠 있는 표적을 타격한다. `우클릭/패드 LB`는 Disarm이다.
+6. FPV/Fiber는 자동 무장·해제 잠금과 [전방 중앙 센서](DRONE_TYPES_AND_CONTROL_MODES.md#fpv광섬유-자폭-센서와-물리-충돌)를 사용한다. 실제 센서가 목표에 닿는 타격과 본체 옆/아래·로터만의 접촉을 구분한다. 모터 시동/OFF와 자폭 무장을 혼동하지 않는다.
 
 맵의 추가 Carryable은 첫 선적재 화물 투하 이후 재적재를 시험하는 예비 크레이트다. 적재량이 0인 상태에서 300cm 안에서 Primary를 누르면 기체 하단에 붙고 다시 Primary를 누르면 같은 Actor가 투하된다. 이 재적재는 현재 Mission 필수 목표가 아니라 추가 조작 연습이다.
 

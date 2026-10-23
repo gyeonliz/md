@@ -12,10 +12,13 @@ Story의 현재 맵 연결은 아래 표가 정본이다. M2·M3는 원본 Milit
 
 ## Racer 로터 후보 시험
 
-2026-10-23 C PC: 최신 자동 시동/OFF 구현·BuildAutomatic09·회귀13종 통과를 확인했다. 엔진 simulated key-state/등록 delegate/API PIE 범위이며 실물 조종기·키보드 OS 입력·HUD 화면 Pass가 아니다. CUA는 중지 상태다. 구 -1/arm 콘솔 순서 대신 [현재 입력 정책](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#자동-스로틀-모터-정책)을 따른다.
+최신전체Build후Editor를재시작해새DLL을로드한다. controlled 후보는 `/Game/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot`을Play하고savedRacer+LocalPlayer/IMC를사용한다. 기존제품맵은Legacy로유지하며후보지원범위를강제로늘리지않는다.
 
-현재 자동 검증 대상은 `/Game/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot`과 저장된 `BP_DroneRacerIntegration`이다. Legacy가 기본이며 FixedStepCandidate는 controlled Racer·Acro1/2·CG0의 opt-in 범위다. 실제 장치·경사/고속 접촉·전체 본미션 확대와 실기체 교정은 남아 있다. [후보/검증 정본](DRONE_REALISTIC_HANDLING_PLAN.md#racer-로터-1차-후보)·[실행/실패 이력](../history/DRONE_WORKLOG.md).
+키보드/패드/RC는 [장치별 입력 정본](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#space키-자동-시동off-정책)을 따른다. 역할별 HFOV/장착과 Drop 하부 전환·복원/override는 [카메라 정본](DRONE_TYPES_AND_CONTROL_MODES.md#1인칭-카메라-역할-프리셋)을 따른다. 실물 시험은 장치·모드·끝/중앙·키 유지/해제·동시 입력과 최종 ViewTarget을 함께 기록한다.
 
+최신 검증은 `Saved/Automation/WideCameraMissionUI_20261023`의 소스/DLL별 영수증을 따른다. 고유 자동검사101 Success/Fail0(단계별 DLL 근거, 한 DLL 전체 재실행 아님)·최종Build54.95초 성공. 역할 카메라/사용자 설정·명시적 선택/Back·Story 단계/실제 표적·3초 파괴 전환·전방 센서/하부 접촉을 구분한다. 입력33/OFF34·초기69의67Success/2Fail·수리 후 부분 재실행은 서로 합산하지 않는다. Death5는 GREEN-only이며 관찰한 RED는 없다. 실제 Story 검사는 ThirdPerson+Acro1 메모리 설정을 사용해 사용자 저장을 보호했다. 구버전.sav·종료 후 재실행·실물 장치/손 조종·실청·전맵 완주·패키징은 별도다. [원시 결과/실패/보존](../history/DRONE_WORKLOG.md).
+
+[현재입력정책](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#space키-자동-시동off-정책)·[물리후보/한계](DRONE_REALISTIC_HANDLING_PLAN.md#racer-로터-1차-후보)·[RED/수리/보존이력](../history/DRONE_WORKLOG.md).
 ## 현재 미션 연결과 확인 순서
 
 목표를 스포이드로 교체하고 나침반에 표시하려면 `BP_DroneMissionTargetManager`의 레벨 인스턴스를 편집한다. Story4맵에 실제 목표를 연결한 매니저를 배치했다. `/Game/Drone/Maps/TestMap/Lvl_MissionCompassTest`의 A/B·DECOY는 별도 예제다. 설정·원래 MissionManager와의 차이는 [미션 연결 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md#스포이드-목표-연결과-나침반)를 따른다.

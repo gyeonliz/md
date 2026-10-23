@@ -1,6 +1,6 @@
 # Drone 재밍 Greybox 구현·배치 가이드
 
-기준: 2026-09-23 로컬 코드. 이 기능은 미션 후보인 `재밍 회피`에 재사용할 공통 시스템이지, 최종 미션 규칙이나 실제 전파 모델이 아니다. 이번 광섬유/UGV 확장 변경은 아직 커밋·푸시하지 않았으므로 다른 PC에는 자동 전달되지 않는다.
+현재 재밍 정책과 Radar 조정은 [Mission 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md#재밍-radar-bp-설정시험)를 따른다. Noise→NO SIGNAL·입력 차단/복구를 사용하며 속도 저하로 처리하지 않는다. M3/M4는 [현재 단계별 Story 정책](DRONE_MISSION_FRAMEWORK_GUIDE.md#실패-처리와-체크포인트)을 따른다. 아래2026-09-23 Greybox 기록은 공통 구조/과거값 참고이며 최신 게임 규칙·검증을 대신하지 않는다.
 
 ## 왜 필요한가
 
@@ -19,7 +19,7 @@
 
 헤더에는 조정할 Threshold·강도·Event·getter를 선언하고 CPP에는 Overlap→Source 갱신→Snapshot 방송→Pawn/HUD 적용 흐름을 넣었다. Mission Director는 게임 진행용 C++ Event를 구독한다. Zone의 Blueprint Assignable Event는 별도로 남겨 사운드·이펙트 연출에 사용할 수 있다.
 
-## 현재 임시 수치와 조정 위치
+## 공통 Greybox 조정 위치
 
 첫 Greybox 기본값일 뿐 최종 밸런스가 아니다.
 
@@ -27,11 +27,11 @@
 |---|---:|---|
 | 약함/중간/강함 시작 | `0.20 / 0.50 / 0.80` | Drone Integration BP → `SignalComponent` → Class Defaults |
 | 중간/강함 영상 노이즈 강도 데이터 | `0.35 / 0.70` | 같은 Component의 `Presentation` |
-| 강함 비행 반응 배율 | `0.70` | 같은 Component의 `Control` |
+| 강함 반응 | 현재 속도 배율 변경 없음·링크 손실 때 입력 차단 | [현재 Signal/Radar 정책](DRONE_MISSION_FRAMEWORK_GUIDE.md#재밍-radar-bp-설정시험) |
 | Zone 방해 세기 | `0.60` | `DroneJammingVolume` BP 또는 Map Instance |
 | Zone Box 크기 | 반폭 `1000/1000/500 cm` | Zone `JammingBounds` Box Extent |
 
-현재 가장 강한 Zone 강도를 쓰므로 여러 Zone의 세기를 더하지 않는다. `SignalQuality = 1 - MaxJammingStrength`다. 강한 단계에서는 최대 속도와 가속도를 기본 튜닝의 70%로 적용하고 Zone을 떠나면 기본값으로 돌아간다. Yaw·Altitude나 입력 자체는 끊지 않는다.
+가장 강한 Zone을 사용하며 여러 세기를 더하지 않는다. 현재 Signal/링크 손실·회복·면역과 실제 화면/입력 확인은 [Mission 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md#재밍-radar-bp-설정시험)를 따른다. 아래 날짜별 자동 검사 이력은 당시 정책의 결과다.
 
 Figma에서 확인한 광섬유 Drone은 예외다. 해당 Drone Definition의 `ImplementedCapabilities`에 `JammingImmunity`가 들어간 경우에만 Signal Component가 활성 Source의 영향을 무시한다. 면역을 껐을 때도 아직 Box 안이면 즉시 원래 방해 단계로 돌아간다. 현재 `/Game/Drone/Data/Drones/DA_Drone_FiberOptic_Greybox`와 `/Game/Drone/Integrations/RoleDrones/BP_DroneFiberOpticIntegration`이 이 Capability와 `ImpactDetonation`을 구현한다. 기존 Scout·FPV·Drop에는 면역을 임의로 넣지 않았다.
 
@@ -41,12 +41,12 @@ Figma에서 확인한 광섬유 Drone은 예외다. 해당 Drone Definition의 `
 2. 배치한 Zone의 `Details → Actor → Tags`에 Mission Rule `TargetId`와 동일한 Name을 넣는다. Tag가 비면 해당 종류의 모든 Zone 사건을 목표로 받을 수 있다.
 3. Mission Definition의 `ObjectiveRules`에 `Jamming Exited` 또는 `Jammer Disabled`를 목표 순서에 맞게 추가한다. 이는 배치 예시이며 실제 Story Mission의 최종 순서·기지 위치·성공 규칙은 현재 미정이다. 설정법은 [Mission 목표 Rule 가이드](DRONE_MISSION_OBJECTIVE_RULE_GUIDE.md)를 따른다.
 4. 이탈 목표는 활성 Zone 안에 들어왔던 출격 드론이 Box 밖으로 나갈 때만 보고한다. Jammer 해제 목표는 Zone BP가 명시적으로 `DisableJammer()`를 호출했을 때 한 번 보고한다. 무력화 방식(접근·파괴·상호작용)은 미정이며 자동 파괴 규칙은 없다.
-5. `WBP_DroneFlightHUD`는 신호율/경고를 C++에서 표시한다. 영상 노이즈 연출을 만들려면 BP `ReceiveSignalSnapshotDisplayed` Event에서 `VideoNoiseIntensity`를 읽어 별도 Widget/Material의 불투명도를 갱신한다. 지금 코드는 이 강도와 Event만 전달하고 실제 화면 잡음 Material·목표 정보 숨김 효과는 만들지 않았다.
+5. HUD Noise/NO SIGNAL·입력 차단/복구와 FiberOptic 면역은 [현재 Radar 시험 절차](DRONE_MISSION_FRAMEWORK_GUIDE.md#재밍-radar-bp-설정시험)를 따른다. 별도 파괴 후3초 화면과 Signal Snapshot을 같은 이벤트로 취급하지 않는다.
 
 ## Editor에서 테스트
 
 1. 검증용 맵에서 PIE 출격 후 Zone 밖의 HUD 신호 `100% | 정상`을 확인한다.
-2. 기본 강도 0.60 Zone 안에서 `신호 불안정`, 신호 약 40%를 확인한다. 0.85 강도에서는 `강한 방해 · 조작 둔화`, 신호 약 15%와 느려진 이동을 확인한다.
+2. Zone 가장자리→중심에서 신호율/Noise가 변하고 링크 손실 임계점에 NO SIGNAL·입력 차단이 되는지 확인한다. 잔여 속도/중력은 유지하고 속도 배율을 줄이지 않는다. 정확한 임계값과 복원은 Mission 가이드를 따른다.
 3. Zone 밖으로 나가면 신호 100%, 원래 최대 속도/가속도로 복원되는지 본다. 두 Zone이 겹치면 강한 쪽이 우선이고 강한 Zone만 나가면 남은 Zone 단계로 돌아간다.
 4. `Jamming Exited` 또는 `Jammer Disabled` Rule이 활성일 때 같은 Tag Zone에서 해당 사건을 발생시켜 HUD 목표 진행값을 확인한다. `DisableJammer()` 두 번째 호출은 `false`이며 Mission 진행도 중복되지 않아야 한다.
 5. Commandline 자동화 `Drone.Signal.StageContract`는 단계·겹침·복원·면역 on/off·무효 강도·한 번만 해제 계약을, `Drone.Mission.ObjectiveRules`는 재밍/Story 분기를, `Drone.UI.FlightHUDTelemetryBinding`는 강한 경고·노이즈 강도 전달·이탈 뒤 표시 복원을 확인한다. 2026-09-16 관련 회귀 8/8 Success. 실제 화면·맵 배치 PIE는 아직 미확인이다.

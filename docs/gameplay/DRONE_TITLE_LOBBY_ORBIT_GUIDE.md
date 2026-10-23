@@ -1,6 +1,8 @@
 # 시작 화면 · 로비 탭 · 원형 코스 가이드
 
-현재 절차 기준: 2026-10-21 D PC, Unreal005e24a2. 기존5메뉴·결과·훈련/레이싱을 유지한다. 기체 선택은 DA의 큰 사진/카드 슬롯, 장치 그림은 조작 안내 WBP에서 조정한다. 실제 검증 범위는 [STATUS](../../STATUS.md), 실행별 근거는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 원본 이미지·Figma·기존 타이틀 아트는 보존한다.
+현재 절차 기준: 2026-10-23 D PC. 기존5메뉴·결과·훈련/레이싱을 유지하며 Cancel/Esc 동작을 보완했다. 기체 선택은 DA의 큰 사진/카드 슬롯, 장치 그림은 조작 안내 WBP에서 조정한다. 실제 검증 범위는 [STATUS](../../STATUS.md), 실행별 근거는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 원본 이미지·Figma·기존 타이틀 아트는 보존한다.
+
+설정된 InterLink Cancel(Button15)은 Esc와 같이 오프닝/미션 영상 스킵, 미션 일시정지·복귀, 시작 지점 뒤로가기, 시드 편집 취소를 처리한다. 기존 FrontEnd/Selection/Pause/로딩의 Back과 같은 키 규칙을 쓴다. 시드 편집 취소는 해당 입력을 소비하고 Pause는 이미 멈춘 상태에서도 동작한다. 위젯·실제 PlayerInput/영상 PIE 자동 검사는 통과했으며 실물 버튼·전체 화면 수동 확인은 남아 있다. [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md).
 
 ## 화면별 WBP 편집 정본
 
@@ -61,11 +63,17 @@ Native 미션 출격도 BeginPlay에서 위 Mission WBP 기본 화면7종을 로
 
 카메라는 실제 보이는 메시의 전체 크기와 미리보기 상자 비율에 맞춰 배치한다. 큰 모델 위에서 **왼쪽 드래그로 회전**, **휠로 확대/축소**, **더블클릭으로 기본 구도 복원**한다. 조작 안내는 `DronePreview3D`의 `TextOverrides`에서 `PreviewInteractionHint` 이름으로 수정한다. 모델은 임무와 분리된 미리보기 월드에 만들고 비행·AI BeginPlay를 실행하지 않는다. 바닥 없이 기존 도시 배경 위에 표시한다.
 
-`WBP_DroneSelection`의 `DronePreviewFrame`은 큰 미리보기 크기, `DronePreview3D`는 3D 파츠다. 아래 `DroneListViewport → DroneListScroll → DroneListPanel`은 가로 스크롤 카드6개다. 선택한 카드가 보이도록 스크롤하며 3·4번 미션은 정찰/드랍/FPV/광섬유/UGV/스카이를 모두 허용한다. 복사돼 있던 `LobbyBackButton`은 **SelectionBackButton**으로 수정했고 Designer 표시 이름은 **기체 선택 · 뒤로 버튼**이다. 기존 사진·프레임·나머지 Designer 배치는 유지한다.
+`WBP_DroneSelection`의 `DronePreviewFrame`은 큰 미리보기, `DronePreview3D`는3D 파츠다. 카드 포커스/hover는 미리보기만 바꾸고 클릭/확인으로 선택을 확정한다. 미확정 상태에서는 START가 비활성이다. 방향 이동은 실제 카드/컨트롤 위치를 따르고 포커스 카드를 자동 스크롤한다. InterLink Select 노브의 순차 이동은 유지한다. Story 허용 목록은 [단계별 정책](DRONE_MISSION_FRAMEWORK_GUIDE.md#실패-처리와-체크포인트)을 따른다. `SelectionBackButton`(Designer: 기체 선택 · 뒤로 버튼)과 기존 사진/프레임은 보존한다.
 
 미리보기 전용 UI 머터리얼과 기본 RT는 `/Game/Drone/FrontEnd/UI/SelectUI/Preview3D`에 모았다. 실행 중 각 화면은 별도 임시 RT를 사용한다. 머터리얼의 `PreviewTexture`와 반전 알파로 모델 바깥을 투명하게 표시한다. 실제 실행 검증 범위는 STATUS·WORKLOG를 따른다.
 
 실제 출격 레이싱 모델은 `/Game/Drone/Integrations/RoleDrones/BP_DroneRacerIntegration`에서 조정한다. VisualMeshComponent는 DroneRacing/SM_Drone01Body/StaticMeshes의 본체이고, 기존 이름 FPVRotorA~D에는 **DroneSky/SM_Drone01_r1~r4** 프로펠러를 연결한다. 부품5개 모두 위치0·스케일5·Yaw -90으로 원본 조립 좌표를 맞추고 프로펠러에는 DroneRoleVisual/DroneRotor 태그를 둔다. 본체는 프로펠러를 포함한 완성형 메시가 아니다. 게임에서는 각 허브 중심을 유지하며 회전하고 선택창에서는 같은 BP를 정지 상태로 표시한다. 원형·랜덤 도시·Map1/2/3의5개 레이싱 DA는 모두 Drone.Racer.Greybox와 이 공통 BP를 사용한다. 미션 맵/기체 ID/조작·비행 수치는 유지하며, BuildDroneRacerDrone.py도 ConfigureDroneRacerVisual.py로 부품과 PreviewActorClass를 함께 연결한다. 현재 검증 근거는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
+
+### 파괴 후 화면 전환
+
+기체 파괴/자폭 때 전체 화면의 어두운 신호 잡음을 첫 자연 paint부터 약3초 동안 표시한 뒤 기존 결과/재선택으로 이동한다. World가 일시정지돼도 wall-clock으로 진행하고 입력을 잠그며 열린 메뉴를 닫는다. 살아 있는 체크포인트/단계 교대는 다음 core tick에 전환하며 이 지연을 적용하지 않는다. 성공/최종 결과가 우선이고 중복 파괴 사건이 타이머를 재시작하지 않는다. Director 종료/Story Fact 기록은 연출 종료보다 먼저 확정될 수 있다.
+
+자동 검사·실제 렌더 캡처와 손 조작/청감은 구분한다. 검증 리비전·원시 결과는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
 
 ### UGV 사진과 미션 1 영상 교체
 
@@ -291,6 +299,8 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 | 수직 동기화 | On / Off | 변경한 항목만 적용, `GameUserSettings` 저장 |
 | 좌우 회전 감도(X) / 상하 시야 감도(Y) | 각각0.25~4배, 기존 기준1배 | 쉬운/게임 조작에서만 적용. 편집 후 Apply 때 같은 `DroneAudioSettings` SaveGame에 저장 |
 | 좌우 회전 / 상하 시야 반전 | 축별 On / Off, 기본 Off | 감도와 같은 pending·적용/취소·저장 경계. Acro/UGV에는 새 배율·반전을 적용하지 않음 |
+| FPV 수평 시야각 | 역할/프로필 기본값(0) 또는60~150° | 적용/취소/기본값·동일 사용자 설정 저장 경계. 최종 FPV에 적용하며3인칭·Drop 하부는 별도 |
+| 기본 시점 / 기본 조작 | 지원 시점·4조작 방식 | 저장 선택을 기체 선택/첫 출격/재출격의 초기값으로 사용. 화면에서 명시적으로 바꾼 조작은 갱신·출격 때 보존; LOS 고정 관찰 예외 유지 |
 
 - Apply는 변경한 값만 확정하며 성공 후 편집 기준을 새 적용값으로 갱신한다. 화면을 자동 닫지는 않는다. 전체 음량 저장 실패는 상태 메시지로 표시하고 다시 적용할 수 있게 한다.
 - 기본값은 음량 100%, 테두리 없는 창·1920×1080, 품질 보통, 60 FPS, VSync On, 카메라 감도X/Y 각각1배·반전 Off다. 먼저 편집값으로 준비하며 Apply 전에는 화면/성능을 저장하지 않는다. 음량은 미리보기한다. PIE에서는 기본값 복원도 창/해상도를 변경하지 않는다.
@@ -305,11 +315,13 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 
 ### 카메라 감도·반전과 Designer
 
-X는 기체 Yaw, Y는 SpringArm/CameraBoom Pitch다. 화면 상하를 기체 상승/하강·기체 Pitch·자유 카메라 궤도 회전과 혼동하지 않는다. `DroneFlightPawn::Look / ChangeYaw / ChangeCameraPitch`에서 쉬운/게임 조작의 기존 입력에 감도·반전을 한 번 적용하고 각도 제한을 유지한다. Acro 전용 Rate/스로틀과 UGV 조향/포탑에는 적용하지 않는다. 일반 패드·InterLink DX를 모두 검증하되 장치별 배정/단절과 최종 ViewTarget은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#일반-패드interlink-카메라-설정-경계)을 따른다.
+X는 기체 Yaw, Y는 SpringArm/CameraBoom Pitch다. 일반 상하 시야 입력과 고도/Acro 기체 Pitch는 구분한다. FPV/Fiber의1인칭 쉬운/게임 조작은 새 look 후 전진 때 [전용 조준 보조](DRONE_TYPES_AND_CONTROL_MODES.md#fpv광섬유의-쉬운게임-조작-조준)로 실제 Root/이동을 조준 방향에 맞춘다. `DroneFlightPawn::Look / ChangeYaw / ChangeCameraPitch`에서 쉬운/게임 조작의 기존 입력에 감도·반전을 한 번 적용하고 각도 제한을 유지한다. Acro 전용 Rate/스로틀과 UGV 조향/포탑에는 적용하지 않는다. 일반 패드·InterLink DX를 모두 검증하되 장치별 배정/단절과 최종 ViewTarget은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#일반-패드interlink-카메라-설정-경계)을 따른다.
 
 - `FDroneLookSettings`는 감도X/Y·반전X/Y를 같은 SaveGame 클래스/슬롯에 추가한다. UI의 `Set Pending Look Settings / Get Pending Look Settings`로 편집하며 Apply 전에는 실제 적용값을 바꾸지 않는다. 저장 실패 시 적용된 감도를 되돌리고 편집값은 재시도용으로 남긴다. 취소는 마지막 적용값으로, 기본값은1배/반전 Off의 편집값으로 돌아간다. 전체 음량의 기존 즉시 미리보기는 별도다.
 - 기본 컨트롤은 `LookSensitivityXCombo / LookSensitivityYCombo / InvertLookXCheck / InvertLookYCheck`다. 현재 저장 `WBP_DroneSettings`와 Native/Native Kit에서 새 항목을 런타임에 구성하며 기존 Root/BACK·Designer 전체 Kit 상태와 기존 행 등록을 유지한다. 임의의 자체 Designer 트리 전체에 자동 연결을 보장하는 것은 아니므로 공개 API/기대 노드를 맞춘다.
-- 새 X/Y는 기존 `SelectorBox / RowFocus / ArrowLeft / ArrowLeftFocus / ArrowRight / ArrowRightFocus` 자산으로 외부 윤곽·좌우 화살표·현재 행 포커스를 만든다. 설정 본문은 제한 높이 안에서 스크롤하고 기본값/Apply/BACK은 고정한다. 포커스 스크롤은 본문의 실제 자손만 대상으로 삼는다.
+- 설정 선택기는 현재값과 기존 Engine Runtime 흰 SVG16px 내부 아래 화살표를 가진 드롭다운이다. 이전 외부 좌우 화살표는 접고 중복 역할 문구·훈련 모터 설명을 제거한다. 본문은 제한 높이에서 스크롤하고 기본값/Apply/BACK은 고정한다. 포커스 스크롤은 실제 자손만 대상으로 삼는다. 선택/설정의 START 공통 배치는1280/1920 화면을 기준으로 검증하며 이전 절대 좌표를 최종 위치로 간주하지 않는다.
+
+아래10/22 수치는 이전 UI 리비전의 보존 기록이다. 최신 드롭다운·시점/조작/HFOV·파괴 화면의 검증과 캡처 범위는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
 
 **2026-10-22 D PC 확정 범위:** 카메라 revision `look-selector-visuals`의9파일과 실행 담당4파일, 변경13파일 SHA를 동결본과 대조했다. 아래는 같은 revision의 실행별 근거이며 이전 revision 검사와 중복 합산하지 않는다. Unreal 로컬 근거 루트는 `D:\JGY\project\drone\Saved\Automation\WorkPC_Sessions_20261022`다.
 

@@ -1,8 +1,8 @@
 # Drone Prototype 입력 계약
 
-기준일: 2026-10-23 C PC(Asia/Seoul). 기존45매핑·Mode1/2를 보존하고 최신 자동 스로틀 모터 정책을 반영했다. 장치 실측 이력과 이번 엔진 내부 자동검증은 구분한다.
+기준일: 2026-10-23 D PC. 기존45매핑/Mode1·2와 안전가드를 보존하며 키보드·패드·RC의 스로틀 계산을 분리했다. 현재 정책은 아래를 따르며 검증 이력/중간 실패는 [WORKLOG](../history/DRONE_WORKLOG.md)에 둔다. 실물 수정 후 조작·전체 Slate/미션·패키징은 미확인이다.
 
-이 문서는 구매 에셋 없이 Flight 기능을 시험하기 위한 **기존 v1 Prototype 조작 계약**을 유지한다. 사용자 확인 대상은 일반 게임패드와 InterLink DX 모두다. 아래 기존 입력 역할을 보존하며 새 카메라 상하 축/버튼 배정·실장치 보정·최종 물리/감도 튜닝은 별도 미정이다. 두 장치 사용 요청을 미사용 조작의 재배치 승인으로 해석하지 않는다.
+이 문서는 구매 에셋 없이 Flight 기능을 시험하기 위한 **기존 v1 Prototype 조작 계약**을 유지한다. 사용자 확인 대상은 일반 게임패드와 InterLink DX 모두다. 아래 기존 입력 역할을 보존하며 새 카메라 상하 축/버튼 배정·왼쪽 축 이외의 실장치 보정·최종 물리/감도 튜닝은 별도 미정이다. 두 장치 사용 요청을 미사용 조작의 재배치 승인으로 해석하지 않는다.
 
 ## 1. 현재 계약
 
@@ -38,26 +38,32 @@
 | LeftY | Pitch | Throttle |
 | RightY | Throttle | Pitch |
 
-IMC Acro 패드4축 Dead Zone은 쉬운 조작 값을 복사한 Lower0.2/Upper1.0/Radial이다. 키보드에는 Dead Zone을 추가하지 않는다. RT/LT 공용 Altitude를 Acro 보조 스로틀로 안내하지 않는다.
+IMC Acro 패드4축의 기존 Lower0.2/Upper1.0/Radial 자산은 보존한다. 스로틀은 보고된 raw 축에서 전용 dead zone0.08/exponent1.5를 한 번 적용하므로 옛 IMC0.2를 다시 적용한 값을 기대하지 않는다. Pitch/Roll/Yaw와 키보드의 기존 계약은 유지한다. RT/LT 공용 Altitude를 Acro 보조 스로틀로 안내하지 않는다.
 
-### 자동 스로틀 모터 정책
+<a id="자동-스로틀-모터-정책"></a>
 
-최신 사용자 요청으로 모터·스로틀 보류를 해제했다. 아래는 프로젝트에서 선택해 구현한 조작 정책이며 모든 실기체의 공통 방식이라는 뜻은 아니다. IMC의 기존45매핑과 Mode1/2 축 배치를 유지하고 별도 RC 스위치/채널은 추가하지 않았다.
+### Space키 자동 시동·OFF 정책
 
-| 입력원 | OFF와 시동 | 시동 후 출력/중립 |
+10/23 사용자 요청으로 전날 모터/스로틀 보류를 해제했다. 최신 전체 Build를 완료하고 Editor를 재시작해 새 DLL을 로드해야 한다. 구10/22 DLL을 로드한 상태에서는10/23 소스정책이 적용되지 않았다.
+
+| 입력원 | 시동/OFF | 입력 해제·안전조건 |
 |---|---|---|
-| RC 절대축 | 기존 저장 IMC에 연결된 스로틀 축의 최하단 OFF→새 최하단 확인 뒤 올리면 ON | 엔진 signed -1=0%·+1=100% 선형 출력. 중앙 dead zone을 절대 출력에 다시 적용하지 않으며 중립 호버 명령과 구분 |
-| XInput Acro | Mode1 오른쪽 세로/Mode2 왼쪽 세로의 아래 끝 OFF→의도적 위 입력으로 ON | 중앙 호버·부분 음수 제어 하강 |
-| XInput 쉬운/게임 조작 | 기존 L2 끝 OFF→R2로 ON/상승 | 트리거 해제는 호버 |
-| 키보드 | Ctrl OFF→Space로 ON/상승. Ctrl을 누르는 동안 OFF 우선 | Space 해제는 호버. Mode1/2 같은 키 유지 |
+| 키보드 | 새 Space press로 시동·현재hover 위 남은 출력의0.35만큼 상승, Ctrl은OFF 우선·선행Ctrl 불필요 | 해제hover·fresh edge만시동. Space/Ctrl 유지 중 게임패드보다 우선, 해제 후 유효 패드 복귀 |
+| RC 절대축 | 최하단OFF·OFF 상태 새 입력원은 새 최하단 확인 후 올리면ON | 이미Armed인 유효 입력원 전환은 ON 유지. 절대출력/45매핑·Mode1/2 보존 |
+| XInput | raw 축에 전용 dead zone0.08/exponent1.5·중앙hover·끝까지100%. Acro 아래끝OFF/의도적위입력ON, 쉬운·게임 L2/R2 역할 유지 | fresh-low/공통안전 유지·키 유지 중 탈취 금지. 장치별 게임 튜닝값이며 실측사양 아님 |
 
-사람의 Possess/재Possess·일시정지/재개·링크 상실/복귀·출발 hold/해제·입력원 변경 뒤에는 최하단을 새로 확인해야 한다. 초기 높은 출력이나 중앙 복귀로 자동 시동하지 않는다. 실제 KeyState 보고가 없는 RC 축의 기본0을 50% 출력으로 사용하지 않는다. M/Ctrl+M 필수 바인딩·안내·검사는 제거했고 `DroneMotorArm`은 명시적 디버그 API로 남았다. 명시 OFF 뒤에도 이전 최하단 확인을 재사용하지 않는다.
+이미 Armed인 유효 입력원 전환은 ON을 유지하고 OFF 상태 새 입력원은 fresh-low 확인이 필요하다. 키보드 Space/Ctrl 유지 중 게임패드보다 우선하고 해제 후 살아 있는 패드 입력으로 복귀한다. RC 절대축의 유효 인계는 보존한다. 비활성 키보드 release·패드 중립의 탈취와 Possess/hold/pause/dead/link 공통가드를 유지한다. Keyboard0.35·Pad deadzone0.08/exponent1.5는 장치별 게임 기본값이며 실기체/사용자 장치 실측값이 아니다. RC는 선형 절대출력이며 키보드·패드 튜닝의 영향을 받지 않는다.
 
-Pawn Blueprint Class Defaults에 `MotorOffThrottle01=0.02`, `MotorStartThrottle01=0.06`(RC), `CenteredMotorStartCommand=0.10`을 노출했다. OFF는 즉시 적용하며 접지나 길게 누르기를 강제하지 않는다. 시동/정지 문턱 차이로 최하단 잡음을 처리한다. 일반 OFF의 무추력 중력·착지/재이륙은 무기 ArmSwitch·배터리 방전/파손과 구분하고 Legacy·AI·UGV 기존 모델을 보존한다. 새 FixedStepCandidate는 controlled Racer TestMap의 명시 opt-in 범위다.
+PlayerInput의 flush된 키 상태(!State 또는 bWasJustFlushed)는 새 RC 보고로 읽지 않는다. 실제 새 InputKey/InputAxis 보고 후 사용한다. 이번에는 flush Raw0이 Axis8 보정 후 RC출력0.504304로 오인되는 재현을 수리했으며 10/22 전체 입력 장애의 원인으로 소급하지 않는다. M/Ctrl+M/console motor API는 필수 시동 절차가 아니다. 실제 EnhancedPlayerInput/ProcessInputStack 4모드·saved6종(PawnClass, 공중5/UGV별도) 자동 범위이며 실물 손조작 Pass는 아니다.
 
-2026-10-23 C PC BuildAutomatic09와 RegressionAutomatic03 13종(12성공·지원하지 않는 모드 거부의 예상 경고1)이 통과했다. 저장 맵/BP와 IMC45개를 엔진 simulated key-state·등록 delegate·API PIE로 검사했다. 실제 InterLink DX/XInput 입력 경로·캘리브레이션·조작감 및 HUD 화면 확인은 미실시이며 CUA 중지를 유지한다. [검증 범위](../gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#자동-스로틀-모터-정책과-검증-범위)·[실행/실패 이력](../history/DRONE_WORKLOG.md).
+Pawn BP Class Defaults의 시동/정지 문턱은 `MotorOffThrottle01=0.02`, `MotorStartThrottle01=0.06`(RC), `CenteredMotorStartCommand=0.10`이다. OFF는 즉시 적용하고 시동/정지 문턱 차이로 최하단 잡음을 처리한다. 별도 RC 스위치/채널을 추가하지 않았으며 `DroneMotorArm`은 명시적 디버그 API다. 이는 프로젝트의 게임 조작 정책으로 실기체 공통 표준이나 장치 실측값이 아니다. 현재 Armed 유효 인계·OFF 새 입력원 fresh-low·키 유지 우선은 위 정책을 따른다.
+
+InterLink DX 왼쪽 세로 Axis8(HID VID1781/PID0E5A, usage0x31)의 사용자 확인 최하단 raw642·최상단6표본3429~3431(중앙3430)을 읽었다. 장치 논리0~4096을 그대로 쓰면 출력은 약0.156738~0.837402에 그친다. `ReadRCLeftThrottle`의 Axis8 경계에서642~3430을0~1로 선형 보정하고 끝2raw를 snap/clamp한다. Pawn defaults의 EditDefaultsOnly On/Min/Max/Jitter 4항목으로 조정한다. 일반 패드·Mode1 오른쪽 세로·다른 RC 축과 범용 RawInput RangeMin0 계산은 바꾸지 않았다. 이 실측은 현재 장치 왼쪽 축의 표본이며 실기체 물리 교정/전 장치 보정이 아니다.
+
 
 ### 일반 패드·InterLink 카메라 설정 경계
+
+역할별 1인칭 HFOV·장착각·Drop 하부 전환과 카메라 override는 [역할/카메라 정본](../gameplay/DRONE_TYPES_AND_CONTROL_MODES.md#1인칭-카메라-역할-프리셋)을 따른다. 아래 카메라 감도/추가 축 배정과 장치별 스로틀 설정은 별개다.
 
 쉬운/게임 조작의 감도X/Y·반전 설정은 기존 기체 Yaw/CameraBoom Pitch 입력에만 적용된다. 이동·고도축, Acro 전용 Rate/스로틀, UGV 조향/포탑은 새 설정에서 제외한다. 두 장치는 현재 같은 적용 설정을 사용하며 장치별 프로파일을 새로 채택하지 않았다. 기본값·pending/적용/취소/저장·Designer와 확정 자동 검증 범위는 [설정 가이드](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#카메라-감도반전과-designer)가 정본이다.
 
@@ -87,7 +93,7 @@ InterLink Axis1~4·미사용 버튼의 번호만 보고 물리 복귀형/순간 
 | Axis7 | X·왼쪽 스틱 가로 | Yaw | AcroYaw |
 | Axis8 | Y·왼쪽 스틱 세로 | Altitude | AcroGamepadLeftVertical |
 
-기본 33개에 축 8개·아래 버튼 4개 매핑을 추가해 총 45개다. 키보드·마우스·XInput 매핑은 유지하며 모터 동작은 위 자동 스로틀 정책을 따른다. 새 축 매핑의 Dead Zone은 쉬운 조작 Gamepad_RightX의 Lower 0.2·Upper 1.0·Radial을 복사한 값이며 새 수치 결정이 아니다. `bGamepadStick=True`로 -1..+1 정규화, 축 8개 모두 `bInverted=False`다. D PC 사용자 HID 실측에서 앞/위/오른쪽으로 밀면 원시값이 증가(0..4096)했으므로 초기 세로축 반전 가정은 폐기했다. 실제 장치는 Mode 2(왼쪽 세로 비복귀 스로틀·오른쪽 세로 중앙 복귀)로 확인됐다. 게임 Mode 2는 왼쪽 세로=Throttle·오른쪽 세로=Pitch, Mode 1은 두 세로축 역할만 교환한다. 실기 비행 부호·Dead Zone·Mode 2 호버/피치 체감은 수동 확인 대기다. 현재 비복귀 RC 절대출력과 XInput 중앙 호버·자동 시동/OFF 정책은 위 [자동 스로틀 모터 정책](#자동-스로틀-모터-정책)을 따른다. 10/07 실측은 당시 이력이다.
+기본 33개에 축 8개·아래 버튼 4개 매핑을 추가해 총 45개다. 키보드·마우스·XInput 매핑은 유지하고 현재 모터·스로틀 동작은 [위 정책](#space키-자동-시동off-정책)을 따른다. 새 축 매핑의 Dead Zone은 쉬운 조작 Gamepad_RightX의 Lower 0.2·Upper 1.0·Radial을 복사한 값이며 새 수치 결정이 아니다. `bGamepadStick=True`로 -1..+1 정규화, 축 8개 모두 `bInverted=False`다. D PC 사용자 HID 실측에서 앞/위/오른쪽으로 밀면 원시값이 증가(0..4096)했으므로 초기 세로축 반전 가정은 폐기했다. 실제 장치는 Mode 2(왼쪽 세로 비복귀 스로틀·오른쪽 세로 중앙 복귀)로 확인됐다. 게임 Mode 2는 왼쪽 세로=Throttle·오른쪽 세로=Pitch, Mode 1은 두 세로축 역할만 교환한다. 실기 비행 부호·Dead Zone·Mode 2 호버/피치 체감은 수동 확인 대기다. 비복귀 RC 절대출력과 중앙복귀 XInput 호버·시동/OFF는 위 현재 정책을 따른다. 10/07 실측/자산 Dead Zone은 당시 이력이며 현재 raw 스로틀 곡선과 구분한다.
 
 사용자가 확정한 비행 버튼 역할은 좌클릭·우클릭·P(시점 전환), 자폭 온/오프는 1=온·0=오프다. 모든 키는 `GenericUSBController_` 접두사를 사용한다.
 
@@ -98,18 +104,18 @@ InterLink Axis1~4·미사용 버튼의 번호만 보고 물리 복귀형/순간 
 | Button13 | ToggleView | P·시점 전환 |
 | Button1 | IA_DronePrototype_ArmSwitch(Boolean) | Started=ArmImpactDetonation 무장, Completed=Disarm 해제 |
 
-Button1은 PrimaryAbility와 ArmSwitch에 함께 매핑된다. `ADroneFlightPawn.ArmSwitchAction`을 비행 BP FPV/Scout/Drop/FiberOptic 4종 Class Defaults에 연결하며, 자폭 기능 없는 Scout/Drop/FiberOptic/UGV는 ArmSwitch를 무시한다. 마우스 좌클릭 누르면 무장·우클릭 해제는 유지한다. Button1 물리 종류는 현재 미정이며 누름 버튼이면 누르고 있는 동안 무장될 수 있으므로 실기 체감을 확인한다.
+Button1의 PrimaryAbility/ArmSwitch 동시 매핑과4종 BP 연결은 보존한다. 현재 FPVStrike/FiberOptic은 자동 무장·해제 잠금이므로 ArmSwitch release/보조 입력으로 자폭을 해제하지 않는다. 자폭 기능 없는 Scout/Drop/UGV는 ArmSwitch를 무시한다. 무장과 모터 시동/OFF는 별개다. 위 버튼/IA 매핑은 유지하며 자폭의 실제 접촉 조건은 [전방 센서 정본](../gameplay/DRONE_TYPES_AND_CONTROL_MODES.md#fpv광섬유-자폭-센서와-물리-충돌)을 따른다. 실물 버튼 체감·비행은 수동 확인 대기다.
 
 사용자가 확정한 메뉴 조작은 좌우 없이 Select 노브 위/아래만으로 전부 이동·딸깍=확인·Cancel=뒤로다.
 
 | 버튼 | 실물 조작 | 현재 메뉴 규칙 |
 |---|---|---|
-| Button15 | Cancel | Back |
+| Button15 | Cancel | Esc와 같은 Back·영상Skip·미션Pause/복귀·시드편집취소 |
 | Button16 | Select 노브 딸깍 | Accept |
 | Button17 | 노브 회전 한 방향 펄스 | Up·실물 방향 대응 미확인 |
 | Button18 | 노브 회전 반대 방향 펄스 | Down·실물 방향 대응 미확인 |
 
-`UDroneInterLinkNavigationSubsystem`(GameInstanceSubsystem, Config=Game)은 게임 시작 시 기본 키보드·패드 Slate FNavigationConfig 규칙을 보존하며 위 4개를 추가하고 종료 시 복원한다. Slate 없는 Commandlet에서는 생성하지 않는다. `DefaultGame.ini [/Script/Drone.DroneInterLinkNavigationSubsystem]`의 `KnobUpKey / KnobDownKey / KnobPressKey / CancelKey`로 설정하며 노브 방향이 반대면 Up/Down 키를 맞바꾼다. FrontEndRoot·Selection의 뒤로 가기에도 Cancel을 연결했다.
+`UDroneInterLinkNavigationSubsystem`(GameInstanceSubsystem, Config=Game)은 게임 시작 시 기본 키보드·패드 Slate FNavigationConfig 규칙을 보존하며 위 4개를 추가하고 종료 시 복원한다. Slate 없는 Commandlet에서는 생성하지 않는다. `DefaultGame.ini [/Script/Drone.DroneInterLinkNavigationSubsystem]`의 `KnobUpKey / KnobDownKey / KnobPressKey / CancelKey`로 설정하며 노브 방향이 반대면 Up/Down 키를 맞바꾼다. FrontEndRoot·Selection 등 기존 Back에 더해 영상 Skip·시드 편집 취소·시작 지점 Back도 공통 IsBackKey를 쓴다. 미션 Pause는 유효한 설정 Cancel을 중복 없이 바인딩하고 paused 상태에서도 실행한다. WidgetParity·실제 PlayerInput pause PIE·오프닝/M1 영상 Cancel PIE와 기존 Esc 회귀가 최종15에 포함된다. 실물 Cancel 버튼 수동 확인은 별도다.
 
 `FDroneGamepadFocus::StepFocus`는 화면 강조 목록 순서로 이전/다음 포커스를 이동하고 끝에서 감긴다. FrontEndRoot(타이틀/로비/브리핑)·Selection·Settings의 Preview 키 처리에서 노브 키를 가로채며 결과창은 기존 위/아래 명시 규칙을 사용한다. 훈련 로비 탭 버튼은 코드상 목록에 포함되며 실기 확인 대기다. 설정 콤보가 열려 있으면 Slate 기본 위/아래를 사용한다. 음량 슬라이더는 확인(노브 딸깍·A·Enter)으로 잠근 뒤 노브로 조절하며 `KnobSliderStep` 기본 0.05는 BP에서 조정 가능하다. `UDroneInterLinkNavigationSubsystem::GetKnobStep`으로 노브 단계를 판별한다. 패드·키보드 이동 규칙은 유지한다.
 
@@ -119,7 +125,7 @@ Button1은 PrimaryAbility와 ArmSwitch에 함께 매핑된다. `ADroneFlightPawn
 
 ## 2. 현재 C++과의 연결
 
-기존 Acro 축 겹침 수정에서 ADroneFlightPawn은 키보드·패드 입력원을 따로 보관하고 의미축별 절댓값이 큰 쪽을 사용한다(한 Action의 여러 키를 합치는 Enhanced Input 규칙과 동일). 키를 누르면 키보드가 이기고 떼면 패드가 조종하며 모두 놓으면0이다. Mode1/2 차이는 패드 세로축 배치뿐이다. 수정 전 Space+오른쪽-0.5→스로틀-0.38, W+왼쪽-0.5→피치-0.38 덮어쓰기를 재현한 뒤 입력원 분리로 수정했다. 현재 RC 절대출력·중앙 복귀형 시동/정지와 입력원 변경 후 재확인은 위 자동 스로틀 모터 정책을 우선한다. 실제 패드 체감은 수동 대기다.
+아래는 기존 Acro 의미축 중첩 수정의 이력이다. ADroneFlightPawn은 키보드·패드 입력원을 따로 보관하고 의미축별 절댓값이 큰 쪽을 사용한다(한 Action의 여러 키를 합치는 Enhanced Input 규칙과 동일). 키를 누르면 키보드가 이기고 떼면 패드가 조종하며 모두 놓으면0이다. Mode1/2 차이는 패드 세로축 배치뿐이다. 수정 전 Space+오른쪽-0.5→스로틀-0.38, W+왼쪽-0.5→피치-0.38 덮어쓰기를 재현한 뒤 입력원 분리로 수정했다. 실제 패드 체감은 수동 대기다. 현재 스로틀의 RC 절대출력·키 유지 우선/해제 후 패드 복귀·Armed 유효 인계·OFF 새 입력원 fresh-low는 [위 현재 정책](#space키-자동-시동off-정책)이 우선한다.
 
 쉬운/제한 자세는 기존 Move·Altitude·Yaw·카메라 역할을 유지한다. Acro 피치/롤/요는 Body 각속도, 스로틀은 Body Up 추진이다. Mouse X 직접 Yaw·Mouse Y CameraBoom Pitch는 개발 입력이며 최종 정책 미정. SpringArm은 Controller Rotation을 쓰지 않는다. PawnClientRestart가 IMC를 한 번 등록·수명주기에 제거하며 BP EventGraph에 IMC 추가/Action 재바인딩을 넣지 않는다.
 

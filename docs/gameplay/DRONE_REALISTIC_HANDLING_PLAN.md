@@ -1,6 +1,8 @@
 # 현실 조종감 기준과 후속 개발 계획
 
-기준: 2026-10-23 C PC. 최신 사용자 요청으로 모터·스로틀 보류를 해제하고 자동 시동/OFF 정책을 구현했다. BuildAutomatic09 성공·RegressionAutomatic03 13종 통과(12성공·예상 경고1)이며 엔진 내부 simulated key-state·등록 delegate·API PIE 검증이다. 실제 InterLink/XInput·HUD 화면 확인은 미실시이고 CUA 중지를 유지한다. 후보의 controlled Racer opt-in 범위·가상 계수와 실기체 교정/본미션 확대/최종 B·C 미완료는 유지한다.
+기준: 2026-10-23 D PC. 장치별 입력·Legacy OFF 항력/World중력 정책을 유지하고 FPV/Fiber의 자폭 감지와 하부 물리 충돌 범위를 분리했다. 자폭 센서·넓은 역할 카메라는 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md), 실제 검증은 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. controlledRacer opt-in·실기체 교정·본미션/B·C·손 조종·패키징의 기존 지원 한계는 유지한다.
+
+모터 OFF에서도 공기저항은 적용된다. Legacy 정상OFF의 조기 분기에서 빠졌던 공유 공력 계산을 4모드에 연결하고 시작/목표추력0·World중력·기존 선형/제곱항력과 인공제동0을 유지했다. 항력계수를 강하게 조절한 수리가 아니다. 30/240fps의 수평 감속·10초 감속·낙하 중 수평감속/추력0/재시동과 LocalPlayerController+실제 World.Tick 이동이 자동 통과했다. 기본/게임의 ON assisted 구조는 유지하고 controlled candidate는 기존에도 OFF 항력을 계산했으므로 이번 Legacy 결함과 구분한다.
 
 ## Racer 로터 1차 후보
 
@@ -12,16 +14,16 @@
 | 월드/무게중심 | 명시 controlled tag·CG0·외부pose writer 없음. 활성 altitude manager가 있거나 net rig/observer lesson이 존재하는 World는 진입 거부 |
 | 운동 | 로터별 힘/반작용토크·대각관성·rate 제어/배분/포화·THRUST 지연·중력/상대공기속도 항력을 공유 SI커널로 계산 |
 | 단독 writer/시간 | 후보 이동소유자1개. Legacy Floating/Acro 적분·수직clamp·Weather 별도drift를 중복적용하지 않음. bounded fixed-step의 성공step/pose commit·pending/drop을 기록, hold/pause는 진행하지 않음 |
-| 접촉/모터 | 구 swept 이동·normal 속도투영·support slop의 근사접촉. 자동 시동/OFF·무추력 중력·실접지·재이륙. 무장 ArmSwitch·방전·사망과 구분 |
+| 접촉/모터 | 구 swept 이동·normal 속도투영·support slop의 후보 근사접촉. 자동 시동/OFF·무추력 중력·실접지·재이륙. 무장 ArmSwitch·방전·사망과 구분 |
 | 가상 계수 | 실제saved Racer에서 질량2kg/최대합산추력40N/THRUST tau0.055초를 읽었다. geometry/inertia/drag/gains는 synthetic이며 첨부안의 미검증수치 .527kg/60N을 채택한 것이 아님 |
 
-### 자동 스로틀 모터 정책과 검증 범위
+<a id="자동-스로틀-모터-정책과-검증-범위"></a>
 
-RC는 기존 절대축 최하단 OFF→올림 ON, XInput Acro는 아래 끝 OFF→의도적 위 입력으로 시동한다. XInput 중앙은 호버·부분 음수는 하강이며 Mode1/2 축 배치를 유지한다. 쉬운 조작은 L2 끝 OFF→R2 시동, 키보드는 Ctrl OFF→Space 시동/상승·해제 시 호버다. M/Ctrl+M 필수 조작을 제거했다. 이는 프로젝트가 선택한 조작 정책이며 모든 실기체의 공통 표준으로 쓰지 않는다. 재시동 조건과 Blueprint 조정값은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#자동-스로틀-모터-정책)이 정본이다.
+현재 새DLL로 FrontEnd 정상 Editor 재오픈이 확인됐다. Space 새 입력 시동/상승·CtrlOFF·해제hover와 RC/패드 안전정책은 [입력 정본](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#space키-자동-시동off-정책)을 따른다. 후보맵과 기본 Legacy 정책은 보존한다.
 
-최신 C PC BuildAutomatic09 성공과 회귀13종(새 MotorControl3·FlightGolden1·RotorPilot6·입력자산3)의 전체 통과를 확인했다. 예상 경고1은 지원하지 않는 모드의 거부 검사다. 저장된 `Lvl_DroneRotorDynamicsPilot`·`BP_DroneRacerIntegration`의 API PIE와 엔진 simulated key-state/등록 delegate를 검사했으며, 실제 장치 입력·Slate/OS 주입·화면 검증은 아니다. 실제 저장 IMC45매핑·Mode1/2와 Content/Config를 보존했다. Source11개(기존10수정·새 검사1)를 반영했고 종료 후 엔진 worker0·커밋/푸시0이다.
+Acro의 hover/가속은 같은 중력 helper를 사용한다. Legacy는 설정 중력, candidate는 World 중력이며 live hover를 장치별 출력에 반영한다. Legacy 모터1차응답은 프레임 끝 추력 대신 구간평균 추력으로 가속을 계산해 응답의 FPS 차이를 줄였다. 최종 LegacyResponseFrameParity와 candidate 실제 Tick 경로 비교가 통과했다. Legacy drag/position 전체 적분 또는 모든 backend를 재작성한 것은 아니다.
 
-옛 console arm 거부와 당시23자동검사는 [WORKLOG](../history/DRONE_WORKLOG.md)에 이력으로 보존한다. 구 -1/arm 콘솔 순서를 현재 조작법으로 권장하지 않는다. `DroneMotorArm`은 명시적 디버그 API로만 남으며 최신 자동 시동과 구분한다. 실제 InterLink DX/XInput 보정·입력 경로·HUD 배치와 조작감 확인은 남아 있고, 사용자 재허용 전까지 CUA는 중지다.
+쉬운/게임 조작은 기존 FloatingPawnMovement의 climb/속도 보조다. hover는 입력 중립 기준이며 전체 기체의 힘/질량/중력 물리를 통일했다는 뜻이 아니다. 후보 커널은 구성 시 질량/geometry를 캐시하고 live payload·물리설정 변경 시 재구성하지 않으므로 지원 밖 확장에 주의한다. 현재 controlledRacer 무적재/CG0 범위를 유지한다. 실제 key/axis·saved 역할·중력/추력·카메라 변환 자동 검증과 실물 손조작·전체미션 Pass를 구분한다.
 
 별도 ChaosContactComparison은 실제 sphere body 질량2kg·대각관성0.05kgm² 재조회·solver 진행0.100000005초/마지막dt0.008333334초·힘가속/바닥정착을 확인한 최소 비교다. full Chaos flight callback/backend를 설치한 것이 아니며 `ChaosCandidate`는 명시거부한다. 확장B/ChaosC의 최종채택·실기체교정·payload/비영CG·일반강체/로터충돌·고속추락·제품미션 altitude/net/observer 호환·전기체전환·손조종/숙련자 평가·패키징은 미완료다.
 
@@ -52,7 +54,7 @@ Legacy 기본 구조는 [역할·조작 가이드](DRONE_TYPES_AND_CONTROL_MODES
 |바람·항력|Acro 속도/항력과 WeatherResponse의 별도 AddActorWorldOffset Drift가 나뉜다|Movement 속도·위치 차분·바람을 함께 계측하고 새 상대 공기속도 공력과 기존 위치 이동을 중복 적용하지 않는다|
 |배터리·적재|시간 기반 배터리와 적재 질량 반영은 있다|전압 강하·가용 출력·적재 위치/무게중심·회전 관성은 별도 범위다|
 |접촉|몸체/로터 충돌 검사·반사·시각 회전 반응이 있다|충돌이 없는 것이 아니라, 접촉 충격량이 실제 각속도에 미치는 강체 회전과 구분해야 한다|
-|모터/접지 상태|사람 조종 Legacy·로터후보에 자동 시동/OFF와 무추력 중력·정상 착지/재이륙 구현·자동검증|중립 호버와 OFF·공격 ArmSwitch·배터리 fault/파손을 분리. AI/UGV 기존 모델 보존·실물 채널 추가 없음|
+|모터/접지 상태|사람 조종 Legacy와 opt-in Racer에 자동 시동/OFF·무추력 중력·정상 착지/재이륙 구현·자동검증|중립호버와 OFF·공격 ArmSwitch·배터리 fault/파손을 분리. AI/UGV 기존 모델·실물 채널 미추가 유지|
 
 UFloatingPawnMovement는 속도·가속 제한을 제공하지만 자체 중력은 구현하지 않는다. 프로젝트 Acro가 더한 중력과 엔진 기본 이동 기능을 혼동하지 않는다. [Epic 공식 API](https://dev.epicgames.com/documentation/en-us/unreal-engine/API/Runtime/Engine/UFloatingPawnMovement)
 
@@ -93,14 +95,14 @@ Legacy 회귀 기대값과 이관/조건부검증을 보존하고 신규커널5�
 |참조 기체·입력 계약|기체 종류 방향과 일반 패드·InterLink DX 두 검증 대상 확정, InterLink 카메라 상하 추가 축/버튼 배정·보정 미정. 기존45매핑/비행4축·Mode1/2 보존|역할별 후보 중 첫 참조 기체/제어 모드·조종기·Rates/expo·스로틀·FPV 조건을 정리|참조와 미정 항목, 재현 가능한 장치/프로파일 기록|
 |현실적인 비행 물리|Racer1 opt-in FixedStepCandidate 구현·신규12/회귀11 Success, controlledMap/Acro1·2/CG0|payload/외부writer·실기체참조/장치/숙련자 검증·동일조건B/C비교|힘/토크/시간/실접지 실제계측과 회귀·한계·실기체반복과제 구분|
 |화면 상하 시야·감도|쉬운/게임 조작의 감도X/Y·반전·UI/저장 구현, D PC 지정 자동 검사와 PNG 검토 확인 범위는 [설정 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#카메라-감도반전과-designer) 참조|두 장치의 원시 축→Input Action→모드→SpringArm→최종 ViewTarget 계측. InterLink 상하 배정은 미정|실물 장치별 양방향/해제·적용/취소/기본값·실제 재실행/구버전 저장 복원. 자동 입력·메모리 직렬화와 구분|
-|모터 OFF·착지·재이륙|자동 시동/OFF·Legacy 공중OFF/착지/재이륙·Racer 실제 저장맵 PIE 생명주기 자동 통과|실물 RC/XInput·화면·경사/고속충돌·다른 기체/본미션 조건 확인|자동 simulated 입력과 실장치·미션별 반복기록 구분|
+|모터 OFF·착지·재이륙|사람 조종 Legacy의 정상OFF·공중OFF/항력/중력과 Racer 저장맵 재이륙 생명주기 자동검증|실물 RC/XInput·화면·경사/고속충돌·전체 본미션 조건은 후속|자동 simulated 입력과 실장치·미션별 반복기록 구분|
 |LOS 사람 후퇴·드론 보기|후퇴/추적 구현·4단계 자동 계약 통과, 사람/드론 가시성 미확정|검사 World/LocalPlayer 연결 캡처·HitResult 디코더 수리 후 지면/가시성 확인|실제 TUT_LOS에서 사람 메시/카메라가 드론을 보고 과도한 Pitch/Roll 없이 가시성 확보|
 |M3·M4 오브젝트/목표|M3 현행 목표·M4 실제3지점/UGV접지·3목표 자동 통과. 자동 피해 이벤트이며 손 조종/발사 아님|실물 플레이·M4 공중 기체 높이·최종 출발 위치/안전성·시나리오 보완|실제 맵의 진행/실패/성공·장치 입력, World 일치 화면과 구분 기록|
 |본미션 렉|1280×720·품질3·출발점 무입력10초 CPU 계측 확보, 전체 플레이/GPU 미검증|M3 Fence BP 오류·CSV ensure와 M4 Lumen 경고를 분리 조사. 같은 입력/비행/사격 구간 계측|변경 전후 같은 과제 p50/p95·최대 지연·GPU 지원 확인. 진단 우회는 최적화 근거 아님|
 |본미션 로딩|M3/M4 요청→선택→조작과 엔진 LoadMap 구간 확보, 수치는 WORKLOG|같은 PC/옵션·cold/warm/순서·입력 과제로 반복 비교|구간별 시간과 반복 편차. 프로세스 전체/캡처 대기를 로딩/FPS로 쓰지 않음|
 |사진·실물 입력 회귀|M1 조망/DROP·M2 차량 상세 연결, UI 검사 통과|M2 도로와 차량 대표·M3 재밍 외형/진입이탈·M4 전체/출발3곳 보완|사진 메타데이터/맵·대상 일치와 실제 키보드/패드 플레이. M3 흰 원반은 graybox이며 최종 레이더 외형 아님|
 
-공중 모터 OFF·일반 착지는 배터리 소진/파손 경로와 구분한다. 사람 조종 Legacy와 opt-in Racer의 자동 시동/OFF·착지/재이륙은 구현·자동검증됐으며, 실물 장치·경사/고속 충돌·전체 본미션 확대는 후속이다. 화면 상하 카메라 피치는 기체 상승/하강이나 기체 Pitch와 구분한다.
+공중 모터 OFF·일반 착지는 배터리 소진/파손 경로와 구분한다. 사람 조종 Legacy와 opt-in Racer의 자동 시동/OFF·착지/재이륙은 구현·자동검증됐으며 실물 장치·경사/고속충돌·전체 본미션 확대는 후속이다. 일반 카메라 피치/고도 입력과 FPV/Fiber1인칭 쉬운/게임의 [전용 조준 보조](DRONE_TYPES_AND_CONTROL_MODES.md#fpv광섬유의-쉬운게임-조작-조준)를 구분한다.
 
 ## 변경 책임과 구현 전 계약
 

@@ -1,6 +1,6 @@
 # 작업컴 시작 가이드
 
-기준일: 2026-10-22 KST, D PC. 실제 상태는 [STATUS](STATUS.md), 작업 순서는 [WORKBOARD](WORKBOARD.md), 경계는 [CONTEXT](CONTEXT.md)가 정본이다. [세션 등록부](docs/git/DRONE_WORK_PC_SESSIONS.md)에 역할별 실제 대화 ID와 파일/엔진 소유권을 기록한다.
+기준일: 2026-10-23 KST, D PC. 실제 상태는 [STATUS](STATUS.md), 작업 순서는 [WORKBOARD](WORKBOARD.md), 경계는 [CONTEXT](CONTEXT.md)가 정본이다. [세션 등록부](docs/git/DRONE_WORK_PC_SESSIONS.md)에 역할별 실제 대화 ID와 파일/엔진 소유권을 기록한다.
 
 ## 1. 시작할 때 읽고 확인하기
 
@@ -18,7 +18,7 @@ git rev-list --left-right --count HEAD...origin/main
 
 ## 2. 역할과 착수 순서
 
-현재요청은 기존 InterLink/패드·키보드 매핑범위만이며 스로틀/모터수정은보류·Computer Use/화면조작/CUA는전부중지다. 매핑원본30개 Git내용정상·복구쓰기0/장치등록과 사용자재실행후입력복구확인·추가수정0·원인미확정을구분한다. 직전물리23은직접API/자동범위로 실제console/Slate Pass가 아니다. 기존후보/오디오·사용자진행을보존하고 [현재상태](STATUS.md)·[정본](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#racer-로터-1차-후보)·총괄소유권을확인한다.
+10/23 입력·모터/OFF 항력, 역할별 광각·설정/선택 UI, M1/M3/M4 단계, 전면 센서·하향 조준·파괴 전환을 반영했다. Source는 `5ed30281`로 푸시했고, 고유 자동검사 101건은 변경 단계별 검증으로 통과했다(마지막 DLL 전체 재실행 아님). 최종 DLL로 정상 FrontEnd Editor를 재오픈했으며 Space 시동/상승·Ctrl OFF·해제 hover와 RC/패드 안전 조건을 유지한다. [현재 상태](STATUS.md)·[입력 정책](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#space키-자동-시동off-정책)을 따른다. 실물 손조작·실청·패키징은 별도이며, 사용자 승인에 따라 마무리 Commit/Push는 총괄만 수행한다.
 
 엔진/PIE/빌드/Content 저장은 본미션/LOS/성능 담당 한 곳으로 모은다. 공유 FlightPawn/Definition/IMC는 파일·함수 소유권을 먼저 정한다. 총괄의 작성권 인계 후 MD/Space는 검증/MD 역할이 단독 작성하며 최종 실행 근거를 받은 뒤 묶어서 반영한다. Codex 직접 작업에는 옛 Claude 전담 제한을 적용하지 않는다. 명시적 브리지 위임만 해당 역할 계약을 따른다.
 

@@ -4567,6 +4567,109 @@ Execution/MAPPING_FINAL_REPORT.json의파일/설정정상·미실행시험분리
 
 이번 MD시작18dirty스냅샷과 WORKLOG816,795바이트prefix·아카이브3원문은그대로보존한다. 정확한변경목록/크기·요청본문재읽기는 Validation/FILES_CHANGED.json·CHECKS.json에둔다. 추가엔진/CUA/Source/Build작업·새시험/수치/기능확대·stage/Commit/Push·Trello/Figma·공유권한·예약/새Page는없다. 현재입력복구는사용자확인으로마무리하고 스로틀/모터는보류한채종료한다.
 
+
+## 2026-10-23 D PC — Space키 시동 수정·현지 최신화
+
+사용자의10/23 요청으로 전날 스로틀/모터 보류를 해제하고 Space를 눌러도 시동되지 않는 문제를 실행담당이 수정했다. 현지 Source 시작HEAD는c0ffc527442f24282b8ae2207e6894980090f865(main·추적0/0·작업시작Clean), MD는1042ba46bc353d98c45530097397aca43089ce7f(main·작업시작Clean·로컬추적6a40555보다1뒤)였다. 30a30178/c0ffc527 후속코드와 로컬추적문서의C-PC13자동결과를 대조했고 Fetch/Pull하지 않았다. 원격서버 최신성은 미확인이며 로컬참조 문서와현재D-PC실행을 구분한다. 10/22 Source0d95972c·MD24d57245/보류기록은당시이력으로보존한다.
+
+원인둘을구분했다. Root/BINARY_SOURCE_MISMATCH.json은현재Source보다오래된10/22 15:15:02DLL(SHA08A844BBCD9160EE7A5A5B845C0B3256EC15D756F901F12C72755B2E682C5858)을10/23 09:17:01 사용자가로드했고LiveCoding새patch0임을확인했다. Execution/BINARY_CHECK.json의 SetFlightThrottleInput/AreFlightMotorsArmed/GetFlightMotorStatusText 표시는oldDLL모두false/newDLL모두true다. 소스수신/수정만으로이미실행중인구DLL이갱신되지않는문제로새전체Build·Editor재시작이필요했다. 검증/MD는Saved증거만읽고Source/DLL/엔진에는직접접근하지않았다.
+
+별도로현행소스의키보드Ctrl최하단선행조건이첫Space시동을막았다. 테스트만추가한 production원본 Build_RED80.78초성공뒤 실제EnhancedPlayerInput.ProcessInputStack Spacepress/release를assisted/Mode1/Mode2에서검사했다. SpaceKeyDispatch는09:31:28KST Fail, Ctrl선행없이ON/놓고hover기대가3모드각각실패했다. Recordedconsole로그만읽거나directPawn API로시동한것이아니라실제key dispatch를자동실행한RED다. 다만OS/실물키보드·전체Slate포커스수동시험은아니다.
+
+동작수리5Source는 Pawn.cpp의새Spaceedge에Keyboard(-1) 안전시동준비→(+1)상승을명시하고공통가드/RC·패드정책을유지했다. Pawn.h주석·ControlsGuide의Ctrl선행안내·MotorControlTest keydispatch·PilotPIE의savedRacer+LocalPlayer/IMC Space/Ctrl검사를맞췄다. 별도RC스위치/채널·IMC45매핑/Mode1·2는추가/변경하지않았다. 키보드Space는시동/상승·Ctrl은OFF우선·Space해제는hover이며 RC/XInput의fresh-low·hold/pause/dead/control-link가드는보존했다.
+
+Build_GREEN70.47초성공뒤09:35:09~18KST에다음5명명검사가모두Success/Fail0였다. CenteredSafetyLifecycle·KeyboardLegacyLandingRestart·RCAbsoluteBoundLifecycle·SpaceKeyDispatch·ActualRacerPIELifecycle이다. 마지막PIE는실제savedRacer+LocalPlayer/IMC의PlayerInput keyevent로Space시동·releasehover·CtrlOFF를확인했다. 10/22물리23/directAPI와이전C-PC13/simulated key-state·delegate/API PIE를이번5Pass로더하지않는다. 실제InterLink/XInput·OS/전체Slate창포커스·HUD체감·전체비행/패키징의수동Pass는주장하지않는다.
+
+이후RotorPilotSetup의기존Ctrl→Space도움말한줄만 Space시동/Ctrl정지로맞춰최종수정6Source가됐다. Build_FINAL41.37초성공이며GREEN과동작코드는동일하고추가반복시험은하지않았다. 새DLL SHA는2A6913CFAB8A203E16BFBF46690E3C9BC1DF261AB632528C42F916F6451A8B83다. 정상EditorPID32764 한개를09:37:44재오픈했고 REOPEN.log09:37:59 새DroneDLL로드·09:38:07 원본Pilot.umap MAPLOAD·09:38:08 EngineInit완료23.68초를총괄이확인했다. 자동Play/맵저장없음이며사용자는열린Editor에서Play후Space를사용한다.
+
+Execution/REPORT.json 최종상태는FIXED_BUILD_AND_TARGETED_VERIFICATION_PASSED/COMPLETE_NORMAL_EDITOR_REOPENED_WITH_NEW_DLL다. 실행담당감사는Sourcebaseline431·예상외변경0·Config5/보호126/입력18/RawInput11/SourceArt12·Savedbaseline11 보존/설정·자동MissionProgress복원passedtrue다. 기존맵/DA·ProductionTraining·음원/카메라·사용자진행을보존했다. MD담당이게임Source/Config/Content를재해시하거나엔진/CUA/Build를실행한것은아니다.
+
+현재 STATUS/WORKBOARD·입력정책/물리/시험가이드·세션/시작가이드를10/23현재상태와실행방법으로갱신했다. 실사양교정/payload·본미션writer/fullChaos/최종B·C와실물·패키징미완은유지한다. WORKLOG의이번시작822001바이트prefix와기존아카이브3원문을보존하고이절끝만추가했다. 문서크기/변경목록/최소검사는Validation/CHECKS.json·FILES_CHANGED.json에둔다. 로컬추적문서참고는이루어졌으나브랜치이동/Fetch/Pull·Commit/Push는없다.
+
+기존DroneSpace 진행/테스트2Page에2호출4연산모두applied·거부/무시0·새Page0이었다. 재읽기에서요청본문일치·대상밖원래134블록hash일치를확인했다. sequence는[진행100](https://chatgpt.com/space/page_a81d11314f60819188530a4ea2ed4663)·[테스트63](https://chatgpt.com/space/page_ba2823e59d7c8191b0ea8bab809367dc)이며기존C-PC13/10/22물리23·음원이력은보존했다. 요청/각receipt/READBACK_CHECK/BLOCK_HASHES는SpaceMotorStart_20261023/Validation/Space, 실제실행원시는SpaceMotorStartFix_20261023/Execution에둔다.
+
+이번완료는최신DLL반영·키보드첫Space시동/해제hover/CtrlOFF의좁은수리와자동키회귀·정상Editor인계·MD/Space갱신이다. 실제OS/Slate·조종기전체수동검증/체감·전맵완주·패키징을완료로확대하지않는다. 추가수치/기능확대·gameSource/엔진/CUA조작·stage/Commit/Push·Trello/권한/예약/새Page는없다.
+
+## 2026-10-23 D PC — 입력원 전환 OFF·InterLink 왼쪽 끝값·Cancel/Esc 후속
+
+- 사용자 요청: 조종기 입력 시 즉시 스로틀 OFF, InterLink DX 왼쪽 스틱 끝값 미도달, Cancel의 영상 스킵·일시정지·뒤로 동작을 확인/수리했다. 게임 코드/엔진은 실행·UI 담당이 소유했고 이 검증/MD 역할은 Saved 로그와 총괄 영수증만 읽었다.
+- 현재 정책: 이미 Armed인 유효 입력원 전환은 OFF 초기화하지 않으며 OFF 상태 새 입력원은 fresh-low가 필요하다. 비활성 키보드 release와 비활성 패드 중립(절댓값0.1 이하)은 조종권을 탈취하지 않는다. Space 새 입력 시동/상승·CtrlOFF·해제hover 및 hold/pause/dead/link 가드는 보존한다.
+- 실물 근거: 사용자에게 최하단/최상단 위치를 확인받고 공유 HID overlapped ReadFile/HidP_GetUsageValue로 현재 VID1781/PID0E5A 왼쪽 세로 Axis8(usage0x31, report21B)을 읽었다. 논리0~4096에 대해 하단642, 상단6회3430/3430/3429/3431/3430/3430(중앙3430), 기존 출력0.15673828125~0.83740234375였다. Root/CALIBRATION_EVIDENCE.json·USER_BOTTOM_HID.json·USER_TOP_HID.json은 InterLinkFollowup_20261023 아래에 보존한다. WinMM 값은 교정 근거로 쓰지 않았다.
+- 보정: ReadRCLeftThrottle의 Axis8 경계만 raw642~3430을0~1로 선형 보정·끝2raw snap/clamp하고 Pawn defaults의 EditDefaultsOnly On/Min/Max/Jitter 4항목을 사용한다. 일반패드/Mode1 오른쪽 세로/다른 RC 축·범용 RawInput 계산은 그대로다. 현재 왼쪽 축 실측이며 실기체 물리/전 장치 교정이나 수정 후 실물 조작 Pass는 아니다.
+- Cancel: OpeningMovie Skip·Seed 편집취소·StartLocation Back은 기존 IsBackKey를 사용한다. Mission Pause는 설정 Cancel의 유효성/중복 바인딩을 처리하고 paused 중에도 동작한다. FrontEnd/Selection/Pause/로딩의 기존 Back 규칙을 유지한다.
+- 실행 근거: Saved/Automation/DeviceHandoffFix_20261023/Execution의 RED/index.json·RED_ENDPOINT_UI/index.json 실패를 보존했다. 통합 Build_GREEN359.62초 성공 후 첫 GREEN은 모터6 Success 뒤 FEndPlayMapCommand 종료 시 FRelease의 이미 해제된 Settings 참조로 중단됐다(GREEN.log/GREEN_INTERRUPTED.json). 엔진이 수행하는 RemoveFromRoot와 중복된 테스트 정리9줄만 제거했으며 production 변화 없이 Build_GREEN_CLEANUP12.21초 성공 후 전체15개를 다시 실행했다.
+- 최종 GREEN_FINAL/index.json와 GREEN_FINAL.log: 15 Success(14 succeeded/1 succeededWithWarnings), failed0/notRun0/inProcess0·Queue Empty15. 모터6(CenteredSafetyLifecycle/InterLinkMeasuredLeftEndpoints/KeyboardLegacyLandingRestart/MixedDeviceHandoffKeyAxis/RCAbsoluteBoundLifecycle/SpaceKeyDispatch), savedRacer ActualRacerPIELifecycle1, Cancel PausePlayerInputPIE1, 기존 PauseMenuRacingPIE1, WidgetParity1, Opening/Mission01 Cancel 영상2, 기존 Esc 영상2, OpeningMovieContract1이다. 경고1은 RCAbsoluteBoundLifecycle이며 첫 실행6·직전Space5·이전PC13/물리23을 더하지 않는다.
+- 보존: 실행 REPORT.json에서 Config5/보호자산126/입력18/Saved11 mismatch0, Source baseline431의 허용8변경·unexpected0·frozenSourceChanged0을 확인했다. Saved의 EditorPerProjectUserSettings.ini와 DroneMissionProgress_Automation.json 2개는 정상 Editor 재오픈 전에 복원됐다. 이전 Space수리/오디오/물리 후보·원본 Content/Config를 보존한다. 총괄이 REOPEN.log에서 정상 Editor PID20360·새DLL 로드10:45:40·Pilot 맵 로드10:45:48·초기화 완료10:45:49(47.76초)를 확인했다. 새DLL SHA256은 2CE83678AC53A105C76FB7240AF8CC36D3BE8DA345C6C3146EB90955C8242EA3이며 자동Play/맵저장 요청은 없다.
+- 검증 경계: 실제 EnhancedPlayerInput key/axis·저장Racer/PlayerInput pause PIE·위젯 및 영상 PIE 자동 검사다. 물리 스틱 끝 위치 확인과 수정 후 게임 손조작은 구분한다. OS 전체 Slate/실물 Cancel·전체 미션/체감/패키징은 별도 미확인이다. MD 현재5문서+이 WORKLOG, 기존 Drone Space 진행/테스트2페이지만 갱신한다. Commit/Push/Fetch/Pull·Trello·권한·예약 변경은 없다.
+
+### 엔딩 시안 2판 — 사용자 피드백 반영 (2026-10-23, 작업 도구 Claude)
+
+사용자 피드백: 자막·끝 타이틀 카드 제거, 13초 구간(S3) 연기 과다 → "드론 여러 개가 날아와 꽂히며 각각 폭발해 반파되는 이미지"로. S3·S4만 새 프롬프트·시드(203/204)로 재생성(`run_shots.py --only S3,S4`, 335초·518초로 1판보다 느렸음) 하고 `assemble.py --no-subs --no-title`로 `D:\JGY\ai\h3_test\out\ending_draft_v2.mp4`(25.8초) 완성. 육안 확인: S3는 낙하 궤적 여러 줄과 건물별 개별 화구, 가벼운 먼지로 마을이 계속 보임. S4는 반파 건물 위 선회이나 한쪽 연기 덩어리는 아직 굵음. 1판 파일(`ending_draft.mp4`, `ending_S3/S4_00001_`)은 보존. 스토리보드 문서를 2판 기준으로 갱신.
+
+### 엔딩 시안 3판 — 자폭드론 명시·20스텝 (2026-10-23, 작업 도구 Claude)
+
+사용자 피드백 "원거리 자폭드론 이미지로 맞추고, 폭격 떨어질 때 뭉개짐 개선". S2·S3·S4를 델타윙 자폭드론(배회 탄약)을 명시한 프롬프트로 바꾸고 터보 LoRA 없이 20스텝으로 재생성(시드 302/303/304; S2 1509초·S3 318초·S4 313초 — S2는 Unreal 자동화와 겹쳐 RAM 부족으로 느렸음). `ending_draft_v3.mp4`(25.8초, 자막·타이틀 없음) 완성. 육안 확인: S2 자폭드론 두 대 근접 추적 샷 선명, S3 드론이 마을로 꽂히는 모습과 건물별 화구가 또렷, S4 반파 건물·가벼운 먼지. 1·2판 파일 보존. 같은 날 C 드라이브 정리(임시 캐시 28GB 삭제, Twinmotion Library 49GB를 D:\JGY\appdata_moved로 이동+정션)는 PC 환경 작업이라 Claude 메모리에만 기록.
+
+## 2026-10-23 D PC — 장치별 스로틀·역할 FPV·중력/평균추력 정합
+
+- 사용자 요청은 전체 스로틀을 점검하고 키보드/패드/조종기의 다른 입력 의미를 분리하며 드랍/자폭/레이싱 등 기체 역할별 1인칭 시야를 구현하는 범위다. 입력 Root·물리·카메라 역할과 실행담당 한 곳이 게임 Source/엔진을 소유했고, 이 검증/MD 역할은 Saved 영수증만 읽었다. 기존 DeviceHandoff15와 dirty 작업을 보존했다.
+- 입력 정본: Space 새 입력으로 시동, 현재 hover 위 남은 출력의35% 상승·해제hover·CtrlOFF. 중앙복귀 패드는 raw 축에 dead zone0.08/exponent1.5를 한 번 적용하고 끝 입력100%를 보존한다. RC는 선형 절대출력·현재 InterLink 왼쪽 Axis8 실측642~3430/끝2raw를 유지한다. 0.35/0.08/1.5는 게임 기본값이며 실측 기체/장치 사양이 아니다.
+- 혼합 입력은 Space/Ctrl 유지 중 게임패드보다 우선하고 해제 후 유효 패드로 복귀한다. RC 절대축의 인계·Armed 전환 유지/OFF fresh-low·hold/pause/link/death 가드는 보존한다. 중간의 last-pad-wins 기대 변경은 Root가 거부하고 원계약을 복원했다.
+- Raw flush 실제 RED: DEVICE_TRACE/index.json·RAW_FLUSH_RED_RECEIPT.json에서 Manual enum1/AcroMode2 enum3이 새 축 보고 없이 flush Raw0을 RC50.4304%로 읽는 것을 관측했다. ReadReportedThrottleKey가 !State 또는 bWasJustFlushed를 거부하고 다음 실제 InputKey/InputAxis 보고 후 사용하도록 수리했다. 기존4모드·같은 PlayerInput 루프를 유지했다. 이번 재현의 원인이며 10/22 전체 입력 먹통 원인으로 소급하지 않는다.
+- 물리: Acro hover/Legacy 가속은 같은 gravity helper를 사용한다. candidate는 실제 adapter와 같은 World gravity, Legacy는 설정 gravity를 사용하고 장치별 hover를 현재값으로 계산한다. Legacy 모터1차응답의 끝 상태는 유지하면서 프레임 힘을 구간평균 thrust로 적용했다. LegacyResponseFrameParity의 실제 RED→GREEN과 candidate 실제 Tick/adapter 경로 검증을 수행했다. 기본/게임은 기존 FloatingPawnMovement climb/속도 보조이며 전 모드 힘/질량/중력 통일은 아니다. Legacy drag/position 전체 적분·full backend는 재작성하지 않았다. 활성 candidate의 질량/geometry 캐시/live payload 재구성 미지원, controlledRacer 무적재/CG0/World gate 한계는 유지한다. 단독 수식 ANALYTICAL_REVIEW는 엔진 실행과 구분한다.
+- 카메라 정본: 수평 FOV/장착 Pitch는 Racer125/+30, Scout81/-10, Drop전방81/-15, FPVStrike124/+15, FiberOptic124/+10, UGV81/0, Drop하부81/-90이다. Drop하부는 arm0·offset(0,0,-12)cm·위치lag0이며 복귀 시 전방 프로필을 복원한다. 기존 saved6 Definition을 다시 저장하지 않고 role fallback을 적용한다. 독립 BP camera override > FlightProfile camera override > MissionRole. LongRangeStrike124/+5는 미등록 플레이 역할의 fallback일 뿐 완료 기체에 추가하지 않는다.
+- 광학 근거는 Camera/CAMERA_HANDOFF.txt의 공식 RunCam Racer Nano4 H125, Phoenix2 SE V2 H124, SIYI A8 mini H81을 사용한다. D160을 HFOV160으로 복사하지 않았고 16:9 직선투영 VFOV는 각각94.4344/93.2237/51.3212도다. MaintainXFOV·비제한viewport의 ultrawide는 수평 유지/수직 감소다. 어안·왜곡·크롭·실기체 광학 교정은 재현하지 않았으며 장착각/소켓은 게임 튜닝이다. Scout/Drop 안정화는 근사, UGV 상부 조준·일반 FPV smoothing/피격Shake는 유지한다.
+- 실행 정본은 Saved/Automation/ThrottleCameraAlignment_20261023/Execution이다. Build_INITIAL437.21초 후 INITIAL32중30Success(29clean/1warning)/2Fail: DeviceSpecificThrottleDispatch native fixture의 IMC/축 연결 누락, AcroInputBehaviorPIE OFF yaw fixture/옛IMC0.2기대와 실제 keyheld 계약 불일치다. 실제 RacerCDO inputrefs/저장Pawn fixture와 명시arm을 수리했다. Build_FIXTURES_LEGACY_RED59.53초, Legacy 실제 RED 뒤 Build_FOLLOWUP_GREEN30.19초의17중15Success/2Fail(DeviceSpecific6errors·FlightGolden5출력)을 보존했다. Build_DEVICE_TRACE10.32초로 flush 실제 RED를 확인한 후 최종 생산 guard/정리·Build_FINAL21.57초가 성공했다.
+- Golden은 실패 logger의 최대5행 출력이 실제 변경 수가 아니었다. Root가 60행 전체를 독립 대조해 Mode1/2 각10행, 총20행의 velocity 성분만 변경·나머지40행과 모든 pose/position/input 동일을 확인했다. GOLDEN_UPDATE_RECEIPT.json의 검토 정본만 적용했다. SHA256 2463890222F6DACDA1CE382D5B8B8F853D95E76AC67CF23B19737A7AF2867AE0 → 6CB4804FB3CB8EAA7ADC51E8AF79537554E4073CB65CC0CD76185AE5DABBD2BB, 원본 GOLDEN_BEFORE.txt 보존·자동 Golden record 환경 미사용이다.
+- 최종 FINAL/index.json·FINAL.log: 33 Success(32 succeeded/1 succeededWithWarnings), failed0/notRun0/inProcess0·Queue Empty33(12:31:57 KST). Camera3·MotorControl8·ThrustGravityConsistency4·FlightDynamics5·그 밖의 영향 회귀13이다. 경고1은 RCAbsoluteBoundLifecycle이다. DeviceSpecific4모드 actual ProcessInputStack, CatalogDeviceThrottle 실제 saved6/PawnClass(공중5·UGV별도), savedRacer lifecycle·AcroInputBehaviorPIE·카메라 projection/saved roles/lifecycle/override·Drop 전환/복원·Cancel영상/일시정지를 포함한다. 초기30/32·후속15/17·RED·이전15/과거PC 결과를 합산하지 않는다.
+- REPORT.json 보존 확인: Config5·보호자산144·RawInput12·이전DeviceHandoff artifacts54·final freeze15·Saved11 mismatch0/preservationPassed true. 실행 Source snapshot437→437의 허용후속6변경/unexpected0이며 초기 소스작업 전체 변경수를6으로 해석하지 않는다. Saved EditorPerProjectUserSettings.ini/DroneMissionProgress_Automation.json2개를 복원했고 사용자가 종료한 뒤 최신 DroneAudioSettings.sav를 보존해 옛 preparation 값으로 덮지 않았다.
+- 정상 Editor 인계: REPORT/REOPEN에서 PID39776·새DLL A11FDF5FA6C55C33244990832FCF2F26013D9FDD478FA207E0745C95D36C6B95·FrontEnd맵 로드·startup PASS/freshDLL/Editor1개를 확인했다. 자동Play/맵저장 요청은 없다. 실물 수정 후 손조종/전축·실물Cancel·실청·전체OS Slate/미션 완주·Cook/패키징은 미실시다.
+- MD 현재6문서와 WORKLOG append, 기존 Drone Space 진행/테스트2페이지만 최신화한다. 과거 WORKLOG/아카이브 원문은 보존한다. 이 역할의 게임Source/engine/Build/PIE/CUA 변경0, Commit/Push/Fetch/Pull·Trello·권한·예약 변경0이다.
+
+### 같은 날 후속 — 모터 OFF 항력 누락 수리 착수
+
+사용자는 모터 OFF 후 저항 없이 속도를 유지하는 현상을 신고했다. 총괄이 Legacy Pawn Tick의 motor OFF 조기 분기가 중력만 더하고 Acro drag를 건너뛰는 경로를 확인했다고 전달했다. 모터가 꺼져도 공기저항은 적용되어야 하며 Root가 Acro/Pawn/기존 ThrustGravityConsistency test를 소유해 새 regression RED→수리를 진행한다. 기존 입력/카메라 최종33 성공은 그대로 보존하고 새 OFF 항력이나 전체 항력 완료로 확대하지 않는다. 이 시점에는 새 Build/수리Pass·실물수동 판정이 없다. 엔진은 기존 실행담당 한 곳이 계속 소유한다.
+
+### 엔딩 시안 4판 — 실제 장거리 자폭드론 모티브 (2026-10-23, 작업 도구 Claude)
+
+사용자 피드백 "너무 전투기 같다, 실제 장거리 요격(자폭)드론을 모티브로". S2·S3·S4 프롬프트를 샤헤드-136류 배회 탄약(삼각 전익, 날개 끝 수직핀, 조종석·제트엔진 없음, 후방 2엽 프로펠러, 저속 저공, 모페드 소리)으로 교체하고 20스텝 재생성(시드 402/403/404; S2 311초·S3 376초·S4 985초). `ending_draft_v4.mp4`(25.8초) 완성. 육안 확인: S2 회색녹색 델타윙·후방 프로펠러 무인기 4대 편대(전투기 느낌 제거), S3 삼각 전익 드론이 지붕 위로 낮게 들어와 건물에 꽂히며 선명한 화구·이후 먼지 약간, S4 반파 마을 선회. 1~3판 파일 보존. 스토리보드 문서도 4판 기준으로 갱신.
+
+### 2026-10-23 D PC — Legacy 모터 OFF 항력 실제 RED→GREEN
+
+- 사용자 모터 OFF 속도유지 신고를 받아 Root가 Legacy OFF 조기 분기의 Acro 공력 계산 누락을 수리했다. 공기저항은 OFF에서도 적용되어야 한다. 기존 선형/제곱항력 계수와 인공제동0을 유지하고 기존 공유 공력 계산을 정상OFF 4모드에 연결했다. OFF 시작/목표추력0·실제 World중력을 사용하며 기본/게임 ON assisted와 기존 controlled candidate의 정상OFF 항력 경로는 변경 범위를 확대하지 않았다.
+- Saved/Automation/MotorOffDrag_20261023/Execution의 Build_RED20.07초·RED/index.json은 신규 LegacyMotorOffDrag1 Fail/24assert를 실제 관측했다. 4모드×30/240fps마다 수평항력·10초감속·낙하중수평감속 기대가 실패했다. 원래 production은 test-only RED 동안 바뀌지 않았다.
+- 좁은 CPP2패치와 같은 검사 내 실제World 이동 검증을 적용한 Build_GREEN16.35초 성공. GREEN/index.json·REPORT.json은34 Success(32clean/2warnings), failed0/notRun0/inProcess0이다. 직전 입력/카메라33+신규 LegacyMotorOffDrag1을 같은 최종GREEN에서 실행했다. RED/직전phase 결과를 합산하지 않는다.
+- 신규검사 범위: 4모드×30/240fps, 시작10m/s·gravity0·선형0.12/s·제곱0.004/m에서1초854.704±0.1cm/s/10초200~300cm/s, OFF actual thrust0/자동arm없음·실제World중력복귀·스로틀재시동. 별도 실제 LocalController/World.Tick/FloatingPawnMovement에서1초 후800~900cm/s·swept 이동800~1000cm를 확인했다. fixture의 무관 Weather drift만 껐다. 실물 손조작/체감 또는 전체비행실측이 아니다.
+- 경고 포함2검사는 LegacyResponseFrameParity(RHI reserved virtual resource budget)와 ActualRacerPIELifecycle(EOS SDK host resolve/연결)이다. 검사 상태는 모두Success·error0이며 해당 경고를 clean으로 기록하지 않는다. 이 결과로 전체 항력/Legacy drag·position 적분/전backend·실기체 공력 교정이 완료됐다고 확대하지 않는다.
+- REPORT 보존: Config5/보호144/RawInput12/직전33 artifacts515/greenfreeze3/직전33의 비소유Source12/Saved11 mismatch0, Source437→437의 허용3변경·unexpected0, preservationPassed true. 이전 승인 Golden은 record/재생성하지 않았고 나머지 입력/카메라와 원본 자산을 유지했다. EditorPerProjectUserSettings.ini/DroneMissionProgress_Automation.json2개를 복원하고 사용자가 정상 종료한 PID19228 뒤의 최신 Saved를 기준으로 보존해 옛 PID39776 준비본이 최신 audio/progress/settings를 덮지 않게 했다.
+- 새 FrontEnd 정상 Editor 재오픈·최신DLL 확인은 해당 REPORT/REOPEN 영수증을 따른다. 본 기록을 읽은 시점의 REPORT는 보존 통과/REOPEN_PENDING이었다. 실물 손조종/실청·전체미션·Cook/패키징은 미실시다. 이 MD역할의 게임 Source/엔진/Build/PIE/CUA 변경0, Commit/Push/Fetch/Pull·Trello·권한·예약 변경0이다. 현재 상태4문서+WORKLOGappend와 Space 진행/테스트의 해당 절만 갱신하며 기존 카메라 표/입력 정책은 다시 작성하지 않았다.
+
+후속 인계 확인: 최신 REPORT/REOPEN은 EXECUTION_COMPLETE_ALL_34_SUCCESS_PRESERVED_FRONTEND_REOPENED, 정상 FrontEnd PID3220·새DLL SHA256 067B7B9F6C2582C8D09058185919184BACC76B535A5A15FCAE92E0E11453D770(9,297,920B)·startupPASS/Editor1개를 확인했다. 13:02:29 KST DLL 로드·13:02:36 초기화/맵 로드, 자동Play/맵저장 요청없음이다. 위 REOPEN_PENDING은 읽은 시점의 경과로 남긴다.
+
+### 엔딩 시안 5판 — 원경 편대·명중 동기화 (2026-10-23, 작업 도구 Claude)
+
+사용자 피드백 "S2는 비행기가 멀리 떨어진 원경 시야로, S3는 드론이 사라지고 폭발만 따로 나지 말고 명중하는 순간 그 자리에서 폭발". S2를 원거리 능선 시점의 극단 와이드 샷(작은 실루엣 5대)으로, S3를 "드론 한 대가 특정 건물 지붕에 코부터 꽂히는 순간 그 지점에서 폭발, 두 번째 드론도 같은 방식"으로 바꿔 시드 2개(503/513) 후보를 만들고, 접근→명중→폭발 연결이 보이는 513(`ending_S3b_00001_`)을 채택. S4는 그 마지막 프레임을 이어 재생성. 시간: S2 2451초(Codex가 다시 연 Unreal Editor와 GPU 공유로 스텝당 90초까지 저하), S3 321초·S3b 306초·S4 309초(Editor 종료 후 정상). `ending_draft_v5.mp4`(25.8초) 완성, 1~4판 보존. 스토리보드 문서는 5판 기준으로 갱신.
+
+### 엔딩 시안 6판 — 미션 4 인게임 맵 기준·드론별 폭발 (2026-10-23, 작업 도구 Claude)
+
+사용자 피드백 "12초 구간은 여러 드론이 날아가 폭발마다 그 드론이 보이게" + "4번 미션 맵 기준으로". S3 소스를 `drone/Saved/Automation/WorkPC_Sessions_20261022/Execution/Captures/.../StoryM4_Start1_Target.png`(미션 4 Endgame 테스트맵, 베일 발사대·컨테이너) HUD 제외 크롭으로 교체. 후보 3개 생성(발사대 크롭 시드 703 331초 / Start 캡처 능선·레이더 타워 크롭 713 296초 / 브리핑 본진 이미지 723 309초). 능선 후보는 명중이 능선에 가려지고 본진 후보는 후반 검은 연기가 짙어, 샤헤드형 드론 세 대가 편대로 들어와 컨테이너·벙커에 꽂히며 그 자리에서 폭발하는 발사대 크롭(703)을 채택. S4는 그 마지막 프레임 연속(313초). `ending_draft_v6.mp4`(25.8초) 완성, 1~5판 보존. 마을(미션 01) 기반으로 돌던 6판 초기 후보는 중단·폐기.
+
+### 엔딩 시안 7판 — CCTV 구도·급강하 (2026-10-23, 작업 도구 Claude)
+
+사용자 피드백 "너무 수평으로 날아와 박힌다, 드론에 공격당하는 걸 확실하게, CCTV 구도로". S3를 기둥 고정 광각 감시카메라 시점 + 화면 위에서 급강하 명중으로 지시해 후보 2개 생성(본진 이미지 I2V 803 313초 / 전초기지 CCTV T2V 813 313초). 803은 고정 카메라지만 폭발이 크고 검은 연기, 813은 광각 렌즈 플레어·화면 아래 카메라 기둥·급강하·소형 폭발이 분명해 813 채택(인게임 캡처는 아니나 레이더 타워·컨테이너·발사대 등 미션 4 맵 요소). S4는 같은 고정 시점으로 타격 직후 연속(804, 386초). `assemble.py --cctv S3,S4`로 CAM 04·2030-10-23 타임스탬프·REC 오버레이(시안용 임의값) 추가해 `ending_draft_v7.mp4`(25.8초) 완성. 1~6판 보존.
+
+### 엔딩 시안 8판 — CCTV 구간을 미션 4 인게임 맵으로 (2026-10-23, 작업 도구 Claude)
+
+사용자 지적 "CCTV 장면도 4번 미션 맵이어야". S3를 미션 4 Endgame 테스트맵 인게임 캡처 `StoryM4_Start1_Target.png`(베일 발사대·컨테이너) 크롭 기반 I2V로 재생성(고정 카메라·급강하·접촉 순간 폭발, 시드 903, 306초). 비교 후보 능선·레이더 타워 캡처(913, 334초)는 드론이 수평으로 지나가고 폭발이 멀며 플레이어 UGV가 다시 그려져 제외. S4 같은 시점 연속(904, 308초). CCTV 오버레이 유지해 `ending_draft_v8.mp4`(25.8초) 완성. 육안: 드론이 화면 위에서 발사대로 떨어져 닿는 순간 화구, 발사대 뜯김, 컨테이너 2차 폭발; S4는 부서진 발사대에 불·옅은 연기. 1~7판 보존.
+
+### 엔딩 시안 9판 — 망루 구도·소형 무인전투기 (2026-10-23, 작업 도구 Claude)
+
+사용자 피드백 "스샷 구도가 좁다, 망루에서 찍은 구도로 새로, 드론 말고 소형 무인전투기 이미지로". 인게임 캡처는 모두 지상 UGV 시점이라 망루 구도 캡처가 없어 미션 4 맵 요소(발사대·컨테이너·모래주머니·레이더 타워·능선)를 지정한 T2V로 S3 후보 3개 생성(T2V 1003 313초 / T2V 1013 304초 / 본진 이미지 I2V 1023 309초). 1013은 명중 때 화구 없이 먼지만, 1023은 공중 시점이라 제외하고, 망루 철골이 왼쪽에 걸린 넓은 기지 전경에서 소형 제트 무인기가 발사대·타워 기둥에 꽂히며 폭발하는 1003 채택. 기체는 조종석 없는 소형 스텔스 제트 UCAV(XQ-58류)로 지정. S2 원경 편대(1002, 306초)·S4 연속(1004, 331초)도 같은 기체로 재생성. 망루 구도라 CCTV 오버레이 제거. `ending_draft_v9.mp4`(25.8초) 완성, 1~8판 보존. 인게임 망루 캡처가 필요하면 Unreal에서 Endgame 테스트맵 높은 지점 촬영이 별도 작업으로 남음.
+
+### 엔딩 시안 10판 — 15초 구간(S4)을 미션 4 인게임 캡처로 (2026-10-23, 작업 도구 Claude)
+
+사용자 요청 "15초 구간 배경만 4번 미션 인게임 스샷으로, 새로 찍어보던지". 새 캡처는 Unreal이 필요하고 Codex가 엔진을 쓰는 중이라 기존 캡처 `StoryM4_Start1.png`(미션 4 시작 지점: 착륙 패드 위 UGV, 능선·레이더 타워) HUD 제외 크롭(`m4_start_crop.png`)을 첫 프레임으로 I2V 후보 2개 생성(시드 1104 381초 / 1114 1026초 — 후자는 월페이퍼 세션과 GPU 큐 공유로 느렸음). 둘 다 캡처가 유지된 채 능선 너머에서 검은 연기 기둥과 불빛이 오르며, 연기 기둥 세 줄이 퍼지는 1104 채택. `ending_draft_v10.mp4`(25.8초) 완성, 1~9판 보존. 망루 등 새 인게임 캡처 촬영은 Codex Unreal 사용 종료 후 별도 작업.
+
 ## 2026-10-23 — C PC 자동 스로틀 모터 결과 교차검토·MD 최신화
 
 최신 사용자 요청 “모터 스위치는 스로틀걸면 자동으로 켜지고 쭉내려서 끄면 꺼지는 현실방식 반영해줘” 범위로 역할3이 구현·컴파일·자동검증했다. 이는 프로젝트가 선택한 조작 정책이며 모든 실기체의 표준이라는 뜻이 아니다. 기존 문서의 모터/스로틀 보류·후속 patch/Build/PIE 없음은 이번 모터 범위에서 대체한다. 이전 console arm 거부/입력 복구와 실패 기록은 이력으로 보존하며 실제 장치 복구 Pass로 바꾸지 않는다.
@@ -4580,3 +4683,76 @@ Execution/MAPPING_FINAL_REPORT.json의파일/설정정상·미실행시험분리
 정본 결과: `C:/Users/jkw11/Documents/Codex/2026-10-21/drone-story4-capture/outputs/motor-control-20261023/result.json`, 같은 폴더의 `BuildAutomatic09/execution.json`·`stdout.log`·`RegressionAutomatic03/report/index.json`·`PIELifecycle.csv` 및 `E:/기획안/06_드론_메인/작업/Story4_20261021/촬영/state.md`. 역할5 교차검토는 `검증/모터정책_근거검사_20261023.json`, 편집 전8문서 바이트 원본은 `검증/문서백업/20261023_모터정책`이다. MD 시작HEAD1042ba46·clean/index빈상태에서 현재절만 갱신했다. 엔진/게임코드 변경·실행·CUA·자동stage/commit/push는 역할5가 수행하지 않았다. 현재 조작 정본은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#자동-스로틀-모터-정책), 상태와 후속은 STATUS/WORKBOARD다.
 
 기존 Space 진행/시험2Page의 모터 현재절6연산을 각각 atomic 적용(sequence99/62)하고 수정6블록 본문 정확일치·선택된 비대상15블록 hash 보존을 재조회했다. 기존 표의 비행/기체·InterLink2행 외 내용과 D PC 오디오 원문을 보존했고 새Page/새블록0이다. 원본/영수증은 역할5 `outputs/motor-md-20261023/Space_원문백업.json`·`Space_반영확인.json`. 저장 Markdown 확인이며 Page 렌더/CUA는 수행하지 않았다.
+
+## 2026-10-23 D PC — 넓은 FPV·Story 단계 교대·선택 UI·파괴 전환·전방 센서
+
+작업 도구 Codex, 총괄·실행·카메라/UI·검증/MD 소유권은 `docs/git/DRONE_WORK_PC_SESSIONS.md`를 따른다. Unreal 시작 HEADc0ffc527/MD1042ba46 위 현재 변경이며 실제 코드/원시 로그·index/영수증을 대조했다. 엔진/Build/PIE/Content는 실행담당1곳이 사용했다. 검증/MD는 명시 위임된 검사3파일만 수정 후 동결해 Root에 넘겼으며 이후 임의 Source 덮어쓰기·엔진 조작은 없다.
+
+- 사용자 결정: 넓은 역할 시야와 설정 기본 시점/조작·HFOV, hover/포커스와 명시적 선택 분리/START 잠금, 드롭다운 내부 화살표·중복 문구·영상 Esc/Cancel 스킵을 반영한다. 값/편집 정본은 역할/카메라·로비 가이드를 따른다.
+- M1 Drop만, M3/M4 초기 FiberOptic만→실제 Radar 전부 해제→새 미확정 전투4종 선택이다. M3는 실제 배치된 설치형 자동포탑 거점 방어, M4는 실제 Patriot 발사대 전부를 후속 목표로 쓴다. 원본 DA 허용/옛 목표 배열은 다시 저장하지 않으며 같은 Director/진행·파괴 표적 보존 무한 재출격과 M4 3지점을 유지한다.
+- 파괴/자폭 화면은 첫 자연 paint부터 약3 wall-clock초·pause에서도 진행, 입력/메뉴 잠금 후 기존 목적지로 전환한다. 생존 단계 교대는 다음 core tick이고 성공/최종 결과 우선·중복 dedupe다. Director 결과 확정은 연출보다 먼저일 수 있다.
+- 최신 사용자는 **본체보다 앞에 돌출된 좁은 전방 중앙 센서의 직접 접촉만 자폭**하도록 확정했다. 본체/로터 일반 충돌은 유지한다. 이전 body/rotor 충돌 폭발 양성과 바닥600cm/s 정책은 당시 리비전 이력이며 최신 센서의 성공 근거로 쓰지 않는다. 하부 물리Z 보정은 별개다.
+
+### 실패·수선·리비전 경계
+
+초기 THIN14는7Success/7Fail이었다. 미션4개는 통과했고 body7중5Fail/2Pass, rotor는 tangential Fail/hard Pass, UI 시작 배치가 실패했다. Rotor 검사에서 실제 normal1이 responseMin100보다 작아 ResolvedImpactCount를 요구한 기대값은 잘못된 fixture였다. Root가 그 assertion만 제거하고 실제 query/hard positive를 유지했다. 이는 생산의 접선 오폭 결함과 구분한다.
+
+초기 최종Build는466.70초 Succeeded였고 당시449Source를 동결했다. 최초71계획 중 RenderedScroll2는 옛 드롭다운 기대값·cleanup 위험 때문에 실행을 보류했다. 실제 primary69는 다음과 같다.
+
+| 실행 | 원시 index 결과 | 경계 |
+|---|---|---|
+| FINAL_CORE |18 clean Success/Fail0|그때의 body7/rotor2·미션4·Story34·FOV/Save/UI; 최신 센서 근거 아님|
+| FINAL_DEATH |5 clean Success/Fail0|GREEN-only·관찰한 RED 없음; Root가 파괴 PNG4장 직접 확인, Alive는 무overlay 대조|
+| FINAL_ACTUAL |M1 Success(60warnings), M4 Success(2warnings), M3 Fail(4errors/41warnings)|M3 원본 BP_WireFenceNoDeform의 None SplineMesh Construction Script 오류|
+| FINAL_REGRESSION |40clean+2warning Success/1Fail|StorySortiesPIE.M4의 Back 뒤 선택 잔존/START 활성2assert|
+
+따라서 초기69는67Success/2Fail이며71전체/최종DLL 전부 성공으로 쓰지 않는다. M3 내부에서는 radar1/emplaced5와 gate·fresh-sortie·Success 진행까지 도달했지만 전체검사는 Fail이다. 초기 M3 선택 PNG는 검은 Editor viewport/axis gizmo여서 실제 UI 렌더 증거에서 제외했다.
+
+Root는 ClearDroneSelection+Controller Cancel, 처음/재출격 Back 검사, World 소유 Slate 캡처와 Rendered2의 계약/정리를 수리했다. 수리Build C2248(protected 검사API 접근) 실패도 원시 이력으로 보존하며 후속 fixture/Source와 구분한다. 전방 센서11(AngularArc 포함)·조준8(실제 Root collision enabled DownTargetStrike 포함)·하부4는 새 범위로 열거했고 Tick cycle/각운동 segment 속도를 수리했다. 최종 고유101은 센서DLL84+fixtureDLL10+contrastDLL UI6+현재DLL M4 audio1의 성공 근거를 취합했다. 최종 수정 후96전체를 한 DLL에서 다시 실행한 결과가 아니다.
+
+최신 SENSOR_REPAIR Build15.31초 Succeeded·SENSOR_PHYSICS34/index.json은34Success(32clean/2warnings)·Fail/notRun/inProcess0다. 센서11+assisted aim8+Bottom4+body7+rotor2+기존물리2를 확인했다. DownTargetStrike는 실제 Root 충돌을 켠2역할×쉬운/게임의 look/전진→자연접촉→표적/자기1회파괴이며 사람이 손으로 조작한 검사가 아니다. 경고2는 Fiber.Game의 HTTP generate_204 3초 timeout, EligibilityAndLifecycle의 역할 변경 fixture GroundUGV Turret presentation 부재다. 당시 전체96계획 중34만 검증됐고 추가 오디오5는 fixture draft/미실행이었다. 최종 결과는 아래 영수증으로 구분한다.
+
+이후 같은 센서 리비전의96범위는93Success(87clean/6warning)/3Fail였다. 34+9+5+3+45의 index를 직접 대조했다. 실제Story3개는 모두 warning 포함 Success이며 Root가 clean M3 선택 UI를 직접 봤다. M1은 올바른 World/창 캡처였지만 loading fade overlay가 남아 시각QA를 보류했다. Rendered1280/1920는 Success·Root 이미지 확인이지만 화살표 후속 변경은 최종 Settings6로 다시 확인한다.
+
+실패3은 FlightGolden(body-fit 후20행의 상수 원점X-2.7851/Z+14.5375; 기준 파일6CB4 유지), SortiesM3/M4(100m 떨어진 임의Actor 직접기폭 호출이 새 센서 계약에서 거부·timeout)다. 기존 오디오 baseline2도 M4 초기UGV선택/직접impact fixture로 Fail(선택 launch/mixer export와 public combat action)을 보존한다. Root는6Source파일을 수리했다: Audio2·Golden fixture 시작좌표·Sorties 실제 센서/모터history·ActualCapture 실제loading위젯 부재 후.25초 안정·Settings 기존 EngineRuntime 흰SVG16px 화살표다. Mission/Physics 생산 동작을 추가 변경하거나 Golden 기준을 갱신하지 않았다. 최종 증분Build와17건(Golden1/Sorties2/Actual3/Audio5/Settings6)은 별도 리비전이다.96+신규audio5=unique101계획이지만 전체를 한DLL/한실행 성공으로 쓰지 않는다.
+
+최종 오디오/화살표 후속에서 Build_CONTRAST_AUDIO_FINAL183.54초 Succeeded, Settings6 Success와1280_C51D/1920_D83B의 흰 화살표 가독성을 Root가 확인했다. M4 Audio의 실제 재생/volume/noPause/DSP/noDup/tail은 통과했지만 첫 Fiber 무음 launch 진단 fixture의 기대값0이 남아 Fail였다. DA_Endgame.StartCountdownSeconds는 실제0이며 읽기 전용 영수증/save0/hash 보존을 확인했다. 이 값을3초로 바꾸지 않고 configuredCountdown0일 때 event/scene/runtime0을 따로 검사하도록 fixture1파일만 수리했다. 모든 실제 countdown/health/guns/파괴2회 PCM strict 검사는 유지했다. 실제3/2/1/출발음은 ActualRacingMap1의 근거이며 M4의 미설정 countdown으로 확대하지 않는다. 마지막Build/StoryM4 case1 결과는 아래 최종영수증을 따른다.
+
+### 최종 실제 결과
+
+최종 Build_SILENT_LAUNCH_FINAL.log는54.95초 Succeeded다. SourceFreeze453·변경/누락0을 Root가 독립 대조했고 재오픈 영수증의 SourceChanged[]도 확인했다. DLL AA4A61D86CEB3748D3F1C4A5A148957CDEDFEBAB0BD4534520F73C74153153A8(9,581,056B)이다.
+|최종 유효 근거|고유 Success|경고 포함|DLL SHA 앞8|
+|---|---:|---:|---|
+|SENSOR96 잔존 근거|84|3|AA688DEF|
+|FIXTURE_FINAL17 잔존 근거|10|8|A8C6AA84|
+|CONTRAST_AUDIO7의 UI|6|0|558E4AF5|
+|SILENT_LAUNCH_FINAL1의 M4 audio|1|1|AA4A61D8|
+
+101개 이름은 중복 없이 모두 Success이며 이전96의3Fail·오디오 baseline2와 후속 fixture/contrast 음원 Fail·bounded warmup 중단은 별도 원시 이력으로 보존했다. 최종 M4 audio68.10초는 GPU 경쟁 완화를 위한 process 전용 품질(Screen25 등)을 사용했고 기존 FPS gate·voice/DSP/PCM/2생애·tail strict 검사를 유지했다. 기본 그래픽 품질의 실기 성능 Pass로 확대하지 않는다.
+실제 Story M1/M3/M4 3개 모두 Success(경고 포함)다. M1은 Drop 전용 선택·출격까지이며 실제 화물 배달 완료는 이 검사의 범위가 아니다. M3/M4는 실제 재머 해제·새 선택·후속 목표/재출격 진행을 자동 public flow/피해 사건으로 확인했고 손 조종·사격 완주와 구분한다.
+Root가 실제 M1/M3/M4 선택5PNG와 흰 화살표1280_C51D/1920_D83B를 직접 열어 정상 표시를 확인했다. 초기 M3 검은 Editor 캡처와 M1 loading fade가 남은 캡처는 최종 시각 근거에서 제외했다.
+고유 결과는89clean/12warning Success·error0다. 경고는 HTTP timeout·역할 변경 fixture의 UGV presentation·RHI예산·기존 재질/충돌/Nav·WASAPI RAW_MODE_UNSUPPORTED 등을 포함하며 무경고 결과가 아니다.
+Fence BP의 null guard만1회 저장하고 fresh5개 인스턴스 geometry diff0·M3맵 저장0/해시 동일·null오류0을 확인했다
+Config5/보호 자산144/RawInput12/직전34산출물58/기존 Lobby/Golden의 최종 hash 변화0이다. Fence만 승인된 null guard1회 저장 예외이며 BP SHA20A6377461E380E120015BEB78E84C611C9F843C80C818A5E82069678D5DD930, M3맵 SHA26EF30AA1D709A7755EA93A17E24661455091C671FA8CDF01295125980F29A17·mapSave0을 확인했다. 최신 사용자 Saved11·공유캡처10은 정상 재오픈 전 복원했다. 재오픈 후 EditorPerProjectUserSettings.ini의 LastSessionStartTime/CleanShutdown/Drone.TimeStamp3키는 정상 Editor가 변경했으며 활성 Editor 위에 다시 복원하지 않았다.
+새DLL AA4A61D8·정상 FrontEnd Editor PID28480 재오픈/모듈·맵 로드를 확인했다(자동Play·자산저장 요청0)
+
+자동 실제 Story는 메모리 ThirdPerson+Acro1을 사용해 사용자 저장을 쓰지 않았다. 이는 종료/재실행 저장 복원이나 실물 장치 조작 증거가 아니다. 자동 public flow/피해 사건·샘플 이동과 손 조종/사격 완주를 구분한다. 일반패드/InterLink·실청·구버전.sav/실제 종료 후 복원·전맵 완주·실기체 광학/공력 교정·패키징은 별도다. 입력33/OFF34·부분 재실행/이전 PC 결과는 합산하지 않는다.
+
+### Git 승인·보존·문서/Space
+
+사용자는 “쭉다해서전부다끝나면커밋푸쉬까지해줘”라고 완료 후 작업 관련 Commit/Push를 승인했다. Root가 두 repo에서 git fetch origin을 완료했고 직후 Unreal0/0, MD0/1(origin6a40555)이었다. 원격의 고유 입력정보와 WORKLOG14줄 원문을 현재 MD에 반영했다. Git HEAD/index의 최종 동기화·MD Commit/Push는 Root가 처리한다. 실행/검증/MD·Space가 끝난 뒤 Root가 두 repo의 Commit/Push를 처리한다. Unreal main `5ed30281a59d75ab228061e1fdd792ae0763d17f` Commit/Push완료·origin일치. MD 최종 Commit/Push는 Root 후속이며 자기 커밋 해시는 문서에 재귀 기재하지 않는다.
+
+기존 사용자 Lobby WBP는 제외·보존한다. Claude의 미추적 MiniMax H3/엔딩 문서2개·README 색인2줄도 제외한다. WORKLOG 사이의 별도 Claude2절은 작업 트리에 원문 보존하며 Root가 index에서만 제외한다. 과거 no-Commit/Push 문장은 당시 사실로 유지한다. Trello 수정·공유/Push 권한 변경·예약 자동화·임의 타대화 메시지·새Space Page는 없다.
+
+MD 현재58교체와 원격6a40555의 WORKLOG14줄 원문 통합을 수행한다. Space 기존3Page/6블록은 이어 guarded 적용·재읽기하며 최종 영수증은 이 절 끝에 append한다.
+근거 루트는 `Saved/Automation/WideCameraMissionUI_20261023`이고 최종 로컬 세부 영수증은 그 아래 `Validation`이다. Saved 대용량/실행 원문이 Git/Space에 업로드됐다고 주장하지 않는다.
+
+Source 게시: [5ed30281](https://github.com/gyeonliz/drone/commit/5ed30281a59d75ab228061e1fdd792ae0763d17f). MD 최종 Commit/Push는 Root가 이어 처리한다.
+
+### 같은 작업 최종 문서·Space 영수증
+
+MD58교체·현재10문서+WORKLOG에 반영했고 원격6a40555의4,080바이트/14줄 이력을 원문으로 정확히1회 통합했다. 이번 쓰기 직전 WORKLOG855,448바이트 접두는 byte그대로 보존했다. Claude MiniMax/H3두 최상위절 및 엔딩 하위판본·README/미추적2문서·아카이브4파일 hash를 보존했다. Root만 별도 Claude2절을 index에서 제외하고 작업 트리는 보존한다.
+
+Space 기존 [진행105](https://chatgpt.com/space/page_a81d11314f60819188530a4ea2ed4663)·[테스트68](https://chatgpt.com/space/page_ba2823e59d7c8191b0ea8bab809367dc)·[BP76](https://chatgpt.com/space/page_90d36613770c819182701fa5869ba17a)의6개 whole-block 교체를 hash guard로 적용했다. 모든 operation이 적용/무시0이며 재읽기에서 요청 본문 정확일치·대상밖223블록 hash/본문 보존을 확인했다. BP정책2문단을 파싱한 canonical블록1개만 추가됐고 새Page/제목/권한/예약/Trello/기획Page 변경0이다. 이는 저장 Markdown 확인이며 모든폭의 Page 렌더검증이 아니다.
+
+실제 요청/영수증/재읽기는 Validation/SPACE_FINAL_REQUEST_*.json·SPACE_FINAL_RECEIPT_*.json·SPACE_FINAL_READBACK.json, MD크기/보존은 MD_PUBLICATION_RECEIPT.json·FINAL_PUBLICATION_HANDOFF.json에 둔다. WORKBOARD현재 연결행은 위 영수증으로 교체했다. Source main5ed30281 Commit/Push·원격0/0은 확인했고, MD최종Git동기화·Commit/Push는 사용자승인에 따라 Root가 이어 처리한다. 검증/MD의 Git쓰기0·엔진실행0이며 정상Editor PID28480을 건드리지 않았다.

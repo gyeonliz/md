@@ -1,17 +1,15 @@
 # 작업컴 드론 세션 분리·시작 가이드
 
-기준: 2026-10-23 C PC 모터 후속. 아래 D PC 등록부/ID·경로는10/22 당시 이력으로 보존하며 다른 PC의 현재 대화 ID로 재사용하지 않는다.
+기준: 2026-10-23 D PC. WideCameraMissionUI 최신 소유권·실행 단일 엔진·MD/기존Space·완료 후 Commit/Push 사용자 승인을 기록한다.
 
-## 현재 모터 범위와 D PC 등록부 이력
+## 현재 작업컴 등록부
 
-**현재범위:** 최신 사용자 요청으로 C PC 모터·스로틀 보류를 해제해 자동 시동/OFF 구현·BuildAutomatic09·회귀13종을 완료했다. 실물 InterLink/XInput·HUD 화면은 미검증이며 CUA 중지는 유지한다. 정책·재시동 조건은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#자동-스로틀-모터-정책)이 정본이다.
+**현재 범위:** 넓은 역할 FPV/사용자 기본 설정·명시적 선택/드롭다운·Story M1/M3/M4 단계 정책·파괴 전환·전방 센서/하부 충돌 보정이다. 고유 자동검사101 Success/Fail0(단계별 DLL 근거, 한 DLL 전체 재실행 아님)·최종Build54.95초 성공. 실제 실행/보존·Editor 인계는 `WideCameraMissionUI_20261023` 최종 영수증을 따른다. 입력33/OFF34·이전물리/오디오 수치는 [WORKLOG](../history/DRONE_WORKLOG.md)에 보존하며 최신과 합산하지 않는다.
 
-C PC 실행은 역할3(01a15e0e-e6c9-77a2-baab-341ae543ee07)이 담당했고 검증/MD는 Source11 SHA·원시 result/report/CSV를 읽기 대조했다. MD 담당은 게임Source/엔진/Config/Content를 변경하지 않는다. 아래 입력30파일 정상·복구쓰기0·사용자 재실행 후 복구확인·원인미확정과 역할표는 D PC10/22 이력이며 최신 모터 미구현/빌드 금지로 확대 적용하지 않는다.
-
-- MD `D:\JGY\project\md` main24d57245·Unreal `D:\JGY\project\drone` main0d95972c, 추적ref각0/0·Fetch/Pull없음. 기존dirty18/오디오 변경을 보존한다.
-- 직전물리1차(직접API/자동검사) Racer1 opt-in FixedStepCandidate 구현·Build00319.61초·Run003 신규12/기존회귀11=23Success(19clean/4warnings)이며 actualconsole/Slate 입력Pass는아니다. 실제savedRacer OFF/실접지/rearm/secondtakeoff·hold/pause와 별도Chaos sphere 접촉을 확인했다.
-- 지원은 controlledTestMap·Acro1/2·CG0, 계수는가상2kg/40N·THRUSTtau.055/synthetic기하·관성이다. 본미션altitude/net/observer writer·payload/비영CG·실기체교정·fullChaosflight/최종B·C·실물조종·패키징은미완이다.
-- 직전물리종료의 Root최종감사 Source430=기존418중허용6변경+12추가/기타412동일·동결mismatch0·Config5/보호125/SourceArt12/Saved10일치·localdeathaudio블록byte동일·HEAD동일·엔진/Build0. 직전 실제오디오2/회귀3과 이번sound3 회귀를구분하며 전체오디오재실행으로쓰지않는다.
+- Root가 두 저장소에서 `git fetch origin`을 완료했다. Fetch 직후 Unreal HEADc0ffc527은 origin/main0/0, MD HEAD1042ba46은 origin/main6a40555보다1뒤(0/1)다. 원격의 고유 입력정보와 WORKLOG14줄 원문을 현재 MD에 반영했다. Git HEAD/index의 최종 동기화·MD Commit/Push는 Root가 처리한다. Fetch와 Merge/Push 완료를 구분한다.
+- 사용자는 “쭉다해서전부다끝나면커밋푸쉬까지해줘”라고 작업 관련 Commit/Push를 승인했다. Root가 모든 검증·MD/Space 완료 후 두 저장소를 처리한다. Unreal main `5ed30281a59d75ab228061e1fdd792ae0763d17f` Commit/Push완료·origin일치. MD 최종 Commit/Push는 Root 후속이며 자기 커밋 해시는 문서에 재귀 기재하지 않는다. 권한 변경·Trello 수정·예약 자동화는 승인 범위가 아니다.
+- 기존 사용자 Lobby WBP 변경은 제외·보존한다. 별도 Claude의 미추적 MiniMax H3/엔딩 문서2개·README 색인2줄은 제외한다. WORKLOG에 끼워진 Claude2절은 작업 트리에 원문 보존하고 Root가 index에서만 제외한다. 검증/MD는 이를 삭제·정규화하지 않는다.
+- RC45매핑/실측 보정·입력 가드·Legacy 기본/controlledRacer opt-in·오디오/Production Training과 최신 사용자 Saved를 보존한다. 실물 조종·OS 전체 Slate·실청·실제 저장 재실행·패키징은 별도다.
 
 | 역할 | 실제 대화 ID | 이번 물리 작업·쓰기 |
 |---|---|---|
@@ -23,9 +21,9 @@ C PC 실행은 역할3(01a15e0e-e6c9-77a2-baab-341ae543ee07)이 담당했고 검
 
 물리코드의 기존변경6은 Drone.Build.cs·FlightControlTypes.h·FlightPawn.cpp/h·DroneDefinition.cpp·CollisionResponseComponent.cpp다. 추가12는 설정/프로필검사·커널/analytic검사·movement/setup·runtime/PIE검사이며 새맵은 `/Game/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot` 하나다. 기존DA/BP·UI/오디오·IMC·ProductionTraining은 보존했다. 모터arm은 무장ArmSwitch와분리하며 하드웨어채널을추가배정하지않았다. Legacy가 기본이며 후보·Chaos 비교를 실제미션 전환으로쓰지않는다.
 
-이번근거는 `Saved/Automation/PhysicsImplementation_20261022`, 문서영수증은그아래 `Validation`이다. 직전오디오 `AudioMission_20261022`의사망pause수리/실제조립/수동미실시경계를보존한다. 검증/MD는엔진/Source/Config/Content를사용·변경하지않고 Saved의 실행/총괄 영수증을대조했다. 원시실패/검사수선은WORKLOG에append하고 과거기록을수정하지않는다.
+현재 근거 루트는 `Saved/Automation/WideCameraMissionUI_20261023`이고 문서 영수증은 그 아래 `Validation`이다. 엔진/Build/PIE/Content 작업은 실행담당1곳이 소유한다. 검증/MD의 명시 위임 test3파일 수정은 동결 후 Root 소유이며 그 외 Source 변경·엔진 실행은 없다. 원시 실패/검사 수선은 WORKLOG 끝에만 추가하고 과거/Claude본문을 보존한다.
 
-사용자지시없는stage/Commit/Push·Trello/Figma·권한·예약자동화·임의타대화메시지는없다. STATUS/WORKBOARD30KB·WORKLOGprefix/아카이브원문·기존Space hash guard/재읽기·새Page0을유지한다.
+완료 후 Commit/Push는 위 사용자 승인과 Root 영수증을 따른다. STATUS/WORKBOARD30KB·WORKLOG raw prefix/아카이브 원문·기존Space hash guard/재읽기·새Page0을 유지한다. 임의 타대화 메시지·Trello/Figma·권한·예약 자동화는 하지 않는다.
 
 이번 사용자의 "각 세션 맡은 작업 진행시키고 여기서 결과 모아서 총괄" 지시로 총괄은 위 4개 담당 대화에 후속 지시를 전송하고 결과를 취합한다. 결과는 각 대화의 최종 응답과 전용 Saved/Automation 산출물에 남기며 총괄이 wait_threads/read_thread로 확인한다. 담당 간 무제한 임의 메시지 권한으로 확대하지 않는다.
 

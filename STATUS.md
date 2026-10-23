@@ -1,29 +1,31 @@
 # 현재 작업 상태
 
-기준일: 2026-10-23 KST C PC. 최신 사용자 요청에 따라 모터·스로틀 보류를 해제하고 자동 시동/OFF를 구현했다. BuildAutomatic09 성공·회귀13종 통과(12성공·예상 경고1). 실제 InterLink/XInput·HUD 화면 확인은 미실시이며 CUA 중지를 유지한다. [정책/검증](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#자동-스로틀-모터-정책과-검증-범위)·[이력](docs/history/DRONE_WORKLOG.md).
+기준일: 2026-10-23 KST D PC. 넓은 역할별 FPV 시야·사용자 기본 시점/조작·선택 UI, M1 Drop 전용/M3·M4 단계별 기체 교대, 파괴 후 약3초 전환과 FPV 조준/전방 센서 자폭·하부 충돌 범위를 수리했다. 고유 자동검사101 Success/Fail0(단계별 DLL 근거, 한 DLL 전체 재실행 아님)·최종Build54.95초 성공. 실물 손조종·실청·실제 종료/재실행·패키징은 별도다. [카메라/자폭](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md)·[설정/UI](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)·[미션](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md)·[근거](docs/history/DRONE_WORKLOG.md).
 
-## Git 기준(로컬 추적 ref·Fetch 없음)
+## Git 기준(10/23 Root Fetch 완료·최종 Commit/Push는 영수증 기준)
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal D PC `D:\JGY\project\drone` | HEAD=추적 origin/main `0d95972c` | main·0/0·기존 오디오/HUD와 물리후보 추가 미커밋 보존. Fetch/Pull 없음 |
-| 문서 D PC `D:\JGY\project\md` | HEAD=추적 origin/main `24d57245` | main·0/0·기존 MD/오디오 보존·물리후보 문서 추가 미커밋 |
-| C PC 10/23 현재 | Unreal `30a30178`·MD `1042ba46` 위 이번 변경 | Source10개 수정·검사1개 추가·MD별도, stage/커밋/푸시 없음. D PC 위2행은10/22 이력 |
+| Unreal D PC `D:\JGY\project\drone` | main `5ed30281`·origin/main0/0·Commit/Push완료 | 작업 시작 HEADc0ffc527·Clean, Root Fetch 후0/0. 사용자 기존 Lobby WBP 변경 제외·보존 |
+| 문서 D PC `D:\JGY\project\md` | 동기화 기준 origin/main `6a40555`·현재 작업 반영 | 작업 시작 HEAD1042ba46·Clean, Root Fetch 후0/1(origin6a40555). 원격 고유 입력정보·WORKLOG14줄 원문 통합, Git 최종 동기화/Commit·Push는 Root; 별도 Claude 문서/README·이력 제외 보존 |
+| C PC 이전 실행 기준 | `c589bbf9` 위 당시 변경 | Build14.14초·UI RHI4종·M1 출격은 이전 PC 근거 |
 
 ## 작업컴 세션 운영
 
-세션별 소유권은 [등록부](docs/git/DRONE_WORK_PC_SESSIONS.md)를 따른다. D PC의 기존 매핑30파일 정상/복구쓰기0·사용자 재실행 후 입력복구 확인은 당시 이력이며 근본원인은 미확정이다. 이번 C PC 모터 범위에서 Source11개를 반영·빌드·자동검증했고 기존45매핑·Mode1/2·Content/Config를 보존했다. 실제 장치/화면은 미검증·CUA 중지이며 MD 담당은 게임코드/엔진을 변경하지 않았다.
+세션별 소유권과 완료 후 Commit/Push 사용자 승인은 [등록부](docs/git/DRONE_WORK_PC_SESSIONS.md)를 따른다. 최신 근거는 `WideCameraMissionUI_20261023`이며 새DLL AA4A61D8·정상 FrontEnd Editor PID28480 재오픈/모듈·맵 로드를 확인했다(자동Play·자산저장 요청0). 이전 입력33/OFF34와 중간 실패·재검사는 리비전별로 [WORKLOG](docs/history/DRONE_WORKLOG.md)에 보존한다.
 
-## 현재 구현·검증 경계(C PC 모터·D PC 기존 결과 구분)
+## 현재 D PC 구현·검증 경계
 
 - **사용자 오디오/실제 미션**: 직전 지정26검사 성공 이력(리비전별)과 별개로 실제 catalog Racing Map1·Story M4의 Mission controller/HUD 조립에서 countdown·health warning·실제배치 발사음·파괴음2life를 자동 확인했다. 사망 뒤 재선택 pause의 tung 실결함을 local-PC 소유 공간음의 pause 예외로 수리, Build5 성공16.72초. 직접영향 기존 DroneDestroyed/ImpactDestroyed/MasterMute3개 재검사 Success·기존417중416 보존·FlightPawn audio블록/include2만 수정, Config5/보호125/SourceArt12·Saved10 일치. 전체 손조종/실청·Cook/패키징은 미실시. [정본](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#사용자-오디오와-체력-경고).
 
-- **모터·물리 후보**: 자동 시동/OFF·Legacy 무추력 중력·정상 착지/재이륙을 구현했다. C PC 회귀13종은 엔진 내부 simulated key-state·delegate·저장맵 API PIE 범위이며 실제 조종기/화면 Pass가 아니다. FixedStepCandidate는 controlled Racer opt-in 유지·Legacy/AI/UGV 보존. 실기체 교정·전체 본미션/최종 B·C는 미완료다. [정본](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#자동-스로틀-모터-정책과-검증-범위).
-- **카메라·설정**: 쉬운/게임 조작 X=기체 Yaw, Y=카메라 피치의 감도/반전·적용/취소/기본값·저장 연결 구현. 최신 같은 리비전 단위3·렌더2·회귀8 Success, 새 PNG14장 중 총괄4장 직접 확인. 실제 구버전 .sav·재실행/실물 장치 Pass는 아니다. [편집·경계](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#카메라-감도반전과-designer).
-- **Story**: M3 현행 재밍 이탈 목표 자동 통과. M4 실제 Start1/2/3의 선택/ID·스포이드·XY·UGV 접지·기존3목표 자동 통과. ApplyDamage 자동 이벤트이며 실물 발사/비행 완주가 아니다. 첫 M4 실패는 낡은 일반 헬기포트 기대값으로 보존하고 검사만 수리했다. [시험 범위](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#story4-선택브리핑-검증-경계).
+- **모터·물리 후보/키입력**: 장치별 스로틀·키 유지/해제 인계·RC 실측/안전가드·역할 카메라 정본을 유지한다. Legacy 정상OFF 경로에도 기존 공유 항력과 World중력을 연결하고 시작/목표추력0·인공제동0을 유지했다. 4모드×30/240fps 감속·낙하·재시동과 실제World.Tick 이동을 자동 확인했다. 기본/게임 ON assisted·후보Racer 제약과 실물확인은 별도. [OFF 항력 정본](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md).
+- **카메라·설정/UI**: 넓은 역할 시야·사용자 FPV HFOV와 기본 시점/조작, 명시적 카드 확정/START 잠금·위치 기반 포커스·설정 드롭다운·영상 스킵과 파괴 후 전환을 반영했다. [현재 절차](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md).
+
+- **Story**: M1은 Drop, M3/M4는 초기 FiberOptic→실제 재머 전부 해제→새 전투4종 선택이다. M3는 실제 거점 방어, M4는 실제 Patriot 전부를 후속 목표로 사용한다. 무한 재출격/진행 보존·M4 3지점 유지, 자동 피해/공개 흐름과 손 조종 완주는 구분한다. [현재 정책](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#실패-처리와-체크포인트).
 - **LOS**: 수평 후퇴/메시 Yaw·고정 위치 카메라 추적 구현, 이륙→전진→후진→접지 자동 계약 통과. 지형 HitResult 디코더 오류와 캡처 World 일치 보장이 없어 사람/드론 가시성은 미확인이다. 눈높이 문제로 단정하거나 높이를 임의 조정하지 않았다.
-- **성능**: 1280×720·품질3·출발점 무입력10초 CPU 구간 확보. M3 Fence BP 런타임 오류 잔존, CSV ensure 진단은 내장 CSV 전체 통계 비활성(-csvAllCategoriesDisabled·GPUcsv0) 조건의 CPU 표본으로 분리한다. GPU를 오류 원인으로 확정하지 않는다. M4 캡처의 Lumen 경고는 관찰이며 렉 원인/최적화 효과가 아니다. [측정 해석](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#story4-선택브리핑-검증-경계).
-- **보존 근거**: C PC 최신 검증의 Source11 SHA 일치·Content/Config tracked diff0·실행 중 Source/Config 변경0·종료 후 엔진worker0을 대조했다. 이전 D PC 물리/오디오·입력 복구 수치는 당시 이력으로 보존한다. [WORKLOG](docs/history/DRONE_WORKLOG.md).
+- **성능/기존 오류**: Fence BP의 null guard만1회 저장하고 fresh5개 인스턴스 geometry diff0·M3맵 저장0/해시 동일·null오류0을 확인했다. 기존 CPU 무입력10초 표본과 M4 Lumen 경고는 원인 확정·최적화 효과 근거가 아니다. [시험 경계](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#story4-선택브리핑-검증-경계).
+
+- **보존/접촉**: Source453 동결 일치·Config5/보호144/RawInput12/Golden·기존 Lobby 보존, Saved11·공유캡처10 복원(재오픈 뒤 Editor 소유3키 변경은 별도). 물리 충돌은 본체/로터 전체에 유지하고 FPV/Fiber 자폭은 돌출된 전방 중앙 센서 직접 접촉으로 제한한다. [자폭 정본](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md)·[지원 한계](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md).
 
 이전 10/18~20 구현 요약 원문은 [10월 아카이브](docs/history/archive/STATUS_2026-10.md)에 보존했다. C PC Story UI4종/24캡처·M1 상태와 이번 D PC 검증을 구분한다.
 
@@ -41,7 +43,7 @@
 
 첫 LOS는 현재 팀원 `Tutorial/TUT_LOS`·BP_LOS 눈높이를 사용한다. 이전 Observer TestMap은 보존했다. 그물 PBD·벽/로터 Sweep·카메라 분리/피해 Shake는 유지하며 실제 Chaos 제작·수동 체감은 후속이다. 세부 이력은 WORKLOG.
 
-현실 조종감의 참조·구조대안·카메라/LOS·모터OFF/착지·실맵/성능 잔여계획은 [개발 기준](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md)이 정본이다. 후보와 최신 모터 구현/자동검증 범위를 구분하며 계획 전체의 완료를 뜻하지 않는다. 현재 UI/출격의 상세 실행근거는 WORKLOG, 다음은 WORKBOARD를 따른다.
+현실 조종감의 참조·구조대안·카메라/LOS·모터OFF/착지·실맵/성능 잔여계획은 [개발 기준](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md)이 정본이다. 최신 구현·자동검증과 실기체 교정/전체 본미션·최종B·C 계획의 미완 범위를 구분한다. UI/출격의 실행근거는 WORKLOG, 다음은 WORKBOARD를 따른다.
 
 UI 현재 상태는 아래 요약을 따른다. Pretendard 공통 적용·기존 아트/ID/저장키 보존 유지. [UI 가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md), 상세는 [오후 WORKLOG](docs/history/DRONE_WORKLOG.md#2026-10-16--오후-ui-전면-개편wbp-전환ugv-무장).
 
@@ -68,7 +70,7 @@ OilRig 근거리 사본3개만 camera-local·생성축Yaw-90°로 화면 가로�
 | 시작·로비 | 5메뉴·WBP 연결 유지, 현재 로비/브리핑/기체 선택은 위 UI 요약 | 실제 패드·마우스·1280/1920 대기, 미정은 위 요약 |
 | 조종 입력 표시 | 설정 수동 ON/OFF·선택 저장, 저장 `WBP_DroneControlInputDisplay` 연결. 아래 중앙 스틱 표시·OFF 갱신 중지, 고도계 독립 | D-3 기본 False 확정, 장치 자동 전환/분리·재연결 정책 미정. 실제 화면/패드 확인 대기 |
 | 코스 표시선 | 긴 코스만 sqrt(곡률) 밀도+15% 균일 몫, 짧은 TestMap68/113조각 기존 균일 분할 유지. MaximumCourseLineSegments 노출·기본1024(시작값·미확정), BP 드래그 재구성 Off | 팀원 Production 코스 외형·Editor 편집 체감 수동 대기. Production 맵 미저장 |
-| Acro | InterLink DX Acro 4축 추가·Mode 2 실측·세로축 반전 해제(10/07 D PC Claude), [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md). 비행 기체 FPV/Scout/Drop/FiberOptic 6개 입력 연결, 패드 축 4개 Dead Zone, 정확 자세 적분. 키보드·패드 입력원 분리·절댓값 큰 쪽 사용·키 해제 시 패드 인계, Space 단독 자세 불변·Mode 1/2 키보드 동일·FPS 무관 자동 검증 | 실제 패드/키보드 체감·Scout/Drop 비행 대기. 키보드 각속도 배율·Angle 모드·마우스 Yaw·회의 “좌우 스틱 반전” 뜻 미정 |
+| Acro | Mode1/2 축 배치와45매핑 유지, 장치별 스로틀·키 유지 우선권/해제 인계·Acro 중력/평균추력 정합. 역할별 FPV HFOV/장착각/Drop 하부·복원 구현. [입력](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)·[카메라](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md#1인칭-카메라-역할-프리셋) | 실물 입력/시야·실기체교정·payload 후보확장/전체 backend 전환은 미완. 기본/게임 assisted와 구분 |
 | 패드 첫 포커스 | `FDroneGamepadFocus`가 포커스 부여 후 5프레임 감시·루트/없음으로 이탈 시 복원, 다른 강조 버튼 이동은 보존 | UI-FOCUS-RACE-01 **수정 후 확인 중**. 화면 그려진 수정 전 Fail/후 Success 각 1회, 간헐적 첫 버튼 강조 수동 확인 대기 |
 | 튜토리얼·Story 순서/저장 | Tutorial8·Story4 유지, 레이싱은 팀원3맵+별도 랜덤도시. 완료 미션/Story Fact/권장문구 JSON 저장 구현·ProgressSave 자동 검사 | 실제8수업·전체 완료·로비/재실행 확인 대기. 준비 중 수업·정식 건너뛰기 정책은 별도 |
 | Best Lap | `CourseId|DroneId|ControlMode`별 JSON·구간 저장/복원. 팀원3맵 완주/저장 및 새 프로세스 복원 자동 통과, 시험 전용 슬롯 사용 | 같은 조건 사용자 실제 완주2회·HUD/구간 대비 체감. 자동 순간이동 기록을 실제 플레이 기록으로 쓰지 않음 |
@@ -101,7 +103,7 @@ OilRig 근거리 사본3개만 camera-local·생성축Yaw-90°로 화면 가로�
 
 결정/카드 정본은 [WORKBOARD](WORKBOARD.md). D-5·D-6·D-11·D-14와 D-12 Legacy 정리·Flight 이름 변경/분리는 위 구현·검증 상태를 따른다.
 
-- InterLink DX 실제 콘솔·노브/Cancel 메뉴 사용 확정. 버튼3개=좌클릭/우클릭/P·자폭1=온/0=오프·노브 위/아래만으로 메뉴 이동 확정. 구현/자동 검증됨·실기 대기. 노브 회전 방향·Button1 물리 종류·브리핑 넘김/탭 전용 버튼·미인식 안내·비복귀 스로틀 처리·전시 정책/다기종 지원 현재 미정. [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md).
+- InterLink DX의 Cancel은 Esc처럼 영상 스킵·일시정지/복귀·뒤로·시드 편집 취소를 처리한다. 최종 자동 검사 범위와 왼쪽 축 보정은 [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)에 따른다. 실물 버튼·노브 방향·다른 축/장치·체감과 전시 정책은 별도 확인이 필요하다.
 - 현재 미정: 높이 제한 수치·경고 연출·배터리 시간 값·D-1(M2)·D-2(M3/M4)는 기획자 내용 대기. 레이싱 지형/진행도는 팀원 미션3 완료 보고와 현재 맵을 대조해야 한다.
 - 배터리 시간 값 미설정. 레이싱4코스 전체 완성 여부는 미확인이며 일괄 미구현으로 단정하지 않는다.
 - 방콕 잔여987개 삭제는 원격 `1619b4f` diff에서 확인했다. 로컬 수신과 과거 LFS 객체/요금은 별도이며 D-13 나머지 유지 결정은 종료(정본 WORKBOARD).
