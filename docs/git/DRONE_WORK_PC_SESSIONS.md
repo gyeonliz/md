@@ -1,12 +1,12 @@
 # 작업컴 드론 세션 분리·시작 가이드
 
-기준: 2026-10-22 D PC. 작업컴의 실제 세션 등록부와 다른 PC에서 사용할 시작 지시문이다. PC 간에 대화 ID·절대 경로를 복사하지 않는다.
+기준: 2026-10-23 C PC 모터 후속. 아래 D PC 등록부/ID·경로는10/22 당시 이력으로 보존하며 다른 PC의 현재 대화 ID로 재사용하지 않는다.
 
-## 현재 작업컴 등록부
+## 현재 모터 범위와 D PC 등록부 이력
 
-**현재범위:** 현재 요청은 기존 InterLink/패드·키보드 매핑 복구만이다. 스로틀·모터 수정은 사용자 요청으로 보류했고 Computer Use/화면조작·입력주입은 전부 중지했다. 매핑 원본은 정상내용이며 사용자가 재실행 후 입력 복구를 확인했다. 매핑/입력 추가수정은 없고 근본원인은 미확정이다.
+**현재범위:** 최신 사용자 요청으로 C PC 모터·스로틀 보류를 해제해 자동 시동/OFF 구현·BuildAutomatic09·회귀13종을 완료했다. 실물 InterLink/XInput·HUD 화면은 미검증이며 CUA 중지는 유지한다. 정책·재시동 조건은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#자동-스로틀-모터-정책)이 정본이다.
 
-입력파일30개Git내용정상/복구쓰기0·SavedInput override없음과 InterLink등록/기존맵진입·possess만확인했다. 사용자재실행후입력복구확인·추가수정0·원인미확정, 이번후속patch/Build/PIE검증없음. 검증/MD는Saved보고서와총괄확인만대조하고 게임Source/엔진/Config/Content·CUA에접근하지않는다.
+C PC 실행은 역할3(01a15e0e-e6c9-77a2-baab-341ae543ee07)이 담당했고 검증/MD는 Source11 SHA·원시 result/report/CSV를 읽기 대조했다. MD 담당은 게임Source/엔진/Config/Content를 변경하지 않는다. 아래 입력30파일 정상·복구쓰기0·사용자 재실행 후 복구확인·원인미확정과 역할표는 D PC10/22 이력이며 최신 모터 미구현/빌드 금지로 확대 적용하지 않는다.
 
 - MD `D:\JGY\project\md` main24d57245·Unreal `D:\JGY\project\drone` main0d95972c, 추적ref각0/0·Fetch/Pull없음. 기존dirty18/오디오 변경을 보존한다.
 - 직전물리1차(직접API/자동검사) Racer1 opt-in FixedStepCandidate 구현·Build00319.61초·Run003 신규12/기존회귀11=23Success(19clean/4warnings)이며 actualconsole/Slate 입력Pass는아니다. 실제savedRacer OFF/실접지/rearm/secondtakeoff·hold/pause와 별도Chaos sphere 접촉을 확인했다.

@@ -1,29 +1,29 @@
 # 현재 작업 상태
 
-기준일: 2026-10-22 KST D PC. 현재 요청은 기존 InterLink/패드·키보드 매핑 복구만이다. 스로틀·모터 수정은 사용자 요청으로 보류했고 Computer Use/화면조작·입력주입은 전부 중지했다. 매핑 원본은 정상내용이며 사용자가 재실행 후 입력 복구를 확인했다. 매핑/입력 추가수정은 없고 근본원인은 미확정이다. 직전 물리23/오디오 근거와 미완료 실기체교정·본미션/장치 범위를 보존한다. [근거](docs/history/DRONE_WORKLOG.md).
+기준일: 2026-10-23 KST C PC. 최신 사용자 요청에 따라 모터·스로틀 보류를 해제하고 자동 시동/OFF를 구현했다. BuildAutomatic09 성공·회귀13종 통과(12성공·예상 경고1). 실제 InterLink/XInput·HUD 화면 확인은 미실시이며 CUA 중지를 유지한다. [정책/검증](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#자동-스로틀-모터-정책과-검증-범위)·[이력](docs/history/DRONE_WORKLOG.md).
 
-## Git 기준(10/22 로컬 추적 ref·Fetch 없음)
+## Git 기준(로컬 추적 ref·Fetch 없음)
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
 | Unreal D PC `D:\JGY\project\drone` | HEAD=추적 origin/main `0d95972c` | main·0/0·기존 오디오/HUD와 물리후보 추가 미커밋 보존. Fetch/Pull 없음 |
 | 문서 D PC `D:\JGY\project\md` | HEAD=추적 origin/main `24d57245` | main·0/0·기존 MD/오디오 보존·물리후보 문서 추가 미커밋 |
-| C PC 이전 실행 기준 | `c589bbf9` 위 당시 변경 | Build14.14초·UI RHI4종·M1 출격은 이전 PC 근거 |
+| C PC 10/23 현재 | Unreal `30a30178`·MD `1042ba46` 위 이번 변경 | Source10개 수정·검사1개 추가·MD별도, stage/커밋/푸시 없음. D PC 위2행은10/22 이력 |
 
 ## 작업컴 세션 운영
 
-현재매핑 범위는 [세션등록부](docs/git/DRONE_WORK_PC_SESSIONS.md)를 따른다. Root의추적입력파일30개 Git내용일치·Source430 버그시작이후변경0·SavedInput 매핑override없음/restorationWrites0을 대조했다. HID/USB정상·새Editor등록과 Training/FrontEnd/TUT_LOS 진입/possess는 관찰했으나 사용자가 재실행 후 입력 복구를 확인했다. 매핑/입력 추가수정0·원인미확정이다. 이번후속patch/Build/PIE검증 결과없음·CUA전부중지. 스로틀/모터는 보류다.
+세션별 소유권은 [등록부](docs/git/DRONE_WORK_PC_SESSIONS.md)를 따른다. D PC의 기존 매핑30파일 정상/복구쓰기0·사용자 재실행 후 입력복구 확인은 당시 이력이며 근본원인은 미확정이다. 이번 C PC 모터 범위에서 Source11개를 반영·빌드·자동검증했고 기존45매핑·Mode1/2·Content/Config를 보존했다. 실제 장치/화면은 미검증·CUA 중지이며 MD 담당은 게임코드/엔진을 변경하지 않았다.
 
-## 현재 D PC 구현·검증 경계
+## 현재 구현·검증 경계(C PC 모터·D PC 기존 결과 구분)
 
 - **사용자 오디오/실제 미션**: 직전 지정26검사 성공 이력(리비전별)과 별개로 실제 catalog Racing Map1·Story M4의 Mission controller/HUD 조립에서 countdown·health warning·실제배치 발사음·파괴음2life를 자동 확인했다. 사망 뒤 재선택 pause의 tung 실결함을 local-PC 소유 공간음의 pause 예외로 수리, Build5 성공16.72초. 직접영향 기존 DroneDestroyed/ImpactDestroyed/MasterMute3개 재검사 Success·기존417중416 보존·FlightPawn audio블록/include2만 수정, Config5/보호125/SourceArt12·Saved10 일치. 전체 손조종/실청·Cook/패키징은 미실시. [정본](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#사용자-오디오와-체력-경고).
 
-- **물리 1차 후보·입력 한계**: 직전 Build003/Run003의 물리12+기존회귀11=23Success는 직접 Pawn API·자동화 범위다. actual console/Slate/조종기·키보드 전체입력 파이프라인을 통과했다는 뜻이 아니다. 구콘솔 -1→약21.6초뒤arm은조건거부 RED다. 스로틀·모터는보류, controlled Racer/Acro1·2/CG0의 기존힘/토크·접지기반과 synthetic계수·본미션/최종B·C 미완은유지한다. [후보/입력검증 범위](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#racer-로터-1차-후보).
+- **모터·물리 후보**: 자동 시동/OFF·Legacy 무추력 중력·정상 착지/재이륙을 구현했다. C PC 회귀13종은 엔진 내부 simulated key-state·delegate·저장맵 API PIE 범위이며 실제 조종기/화면 Pass가 아니다. FixedStepCandidate는 controlled Racer opt-in 유지·Legacy/AI/UGV 보존. 실기체 교정·전체 본미션/최종 B·C는 미완료다. [정본](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#자동-스로틀-모터-정책과-검증-범위).
 - **카메라·설정**: 쉬운/게임 조작 X=기체 Yaw, Y=카메라 피치의 감도/반전·적용/취소/기본값·저장 연결 구현. 최신 같은 리비전 단위3·렌더2·회귀8 Success, 새 PNG14장 중 총괄4장 직접 확인. 실제 구버전 .sav·재실행/실물 장치 Pass는 아니다. [편집·경계](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#카메라-감도반전과-designer).
 - **Story**: M3 현행 재밍 이탈 목표 자동 통과. M4 실제 Start1/2/3의 선택/ID·스포이드·XY·UGV 접지·기존3목표 자동 통과. ApplyDamage 자동 이벤트이며 실물 발사/비행 완주가 아니다. 첫 M4 실패는 낡은 일반 헬기포트 기대값으로 보존하고 검사만 수리했다. [시험 범위](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#story4-선택브리핑-검증-경계).
 - **LOS**: 수평 후퇴/메시 Yaw·고정 위치 카메라 추적 구현, 이륙→전진→후진→접지 자동 계약 통과. 지형 HitResult 디코더 오류와 캡처 World 일치 보장이 없어 사람/드론 가시성은 미확인이다. 눈높이 문제로 단정하거나 높이를 임의 조정하지 않았다.
 - **성능**: 1280×720·품질3·출발점 무입력10초 CPU 구간 확보. M3 Fence BP 런타임 오류 잔존, CSV ensure 진단은 내장 CSV 전체 통계 비활성(-csvAllCategoriesDisabled·GPUcsv0) 조건의 CPU 표본으로 분리한다. GPU를 오류 원인으로 확정하지 않는다. M4 캡처의 Lumen 경고는 관찰이며 렉 원인/최적화 효과가 아니다. [측정 해석](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#story4-선택브리핑-검증-경계).
-- **보존 근거**: 직전물리1차 종료감사의 Source430/허용6+추가12·보호125/Saved10·당시엔진0은 이력이다. 이번버그 시작의 새baseline·사용자진행/변경을 보존하며 현재사용자Editor를 종료/원복하지 않았다. 매핑30개는Git내용정상·복구쓰기0, 실제입력복구 미확인. [WORKLOG](docs/history/DRONE_WORKLOG.md).
+- **보존 근거**: C PC 최신 검증의 Source11 SHA 일치·Content/Config tracked diff0·실행 중 Source/Config 변경0·종료 후 엔진worker0을 대조했다. 이전 D PC 물리/오디오·입력 복구 수치는 당시 이력으로 보존한다. [WORKLOG](docs/history/DRONE_WORKLOG.md).
 
 이전 10/18~20 구현 요약 원문은 [10월 아카이브](docs/history/archive/STATUS_2026-10.md)에 보존했다. C PC Story UI4종/24캡처·M1 상태와 이번 D PC 검증을 구분한다.
 
@@ -41,7 +41,7 @@
 
 첫 LOS는 현재 팀원 `Tutorial/TUT_LOS`·BP_LOS 눈높이를 사용한다. 이전 Observer TestMap은 보존했다. 그물 PBD·벽/로터 Sweep·카메라 분리/피해 Shake는 유지하며 실제 Chaos 제작·수동 체감은 후속이다. 세부 이력은 WORKLOG.
 
-현실 조종감의 참조·구조대안·카메라/LOS·모터OFF/착지·실맵/성능 잔여계획은 [개발 기준](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md)이 정본이다. 조사/계획 완료이며 구현 승인이 아니다. 현재 UI/출격의 상세 실행근거는 WORKLOG, 다음은 WORKBOARD를 따른다.
+현실 조종감의 참조·구조대안·카메라/LOS·모터OFF/착지·실맵/성능 잔여계획은 [개발 기준](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md)이 정본이다. 후보와 최신 모터 구현/자동검증 범위를 구분하며 계획 전체의 완료를 뜻하지 않는다. 현재 UI/출격의 상세 실행근거는 WORKLOG, 다음은 WORKBOARD를 따른다.
 
 UI 현재 상태는 아래 요약을 따른다. Pretendard 공통 적용·기존 아트/ID/저장키 보존 유지. [UI 가이드](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md), 상세는 [오후 WORKLOG](docs/history/DRONE_WORKLOG.md#2026-10-16--오후-ui-전면-개편wbp-전환ugv-무장).
 

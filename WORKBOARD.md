@@ -1,10 +1,10 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-10-22 D PC — 기존InterLink/패드·키보드 매핑범위만. 파일30개Git내용정상·복구쓰기0, 사용자재실행후입력복구확인·추가수정0·원인미확정. 스로틀·모터보류·CUA전부중지. [STATUS](STATUS.md), [WORKLOG](docs/history/DRONE_WORKLOG.md).
+마지막 갱신: 2026-10-23 C PC — 자동 시동/OFF 구현·빌드·회귀13종 통과. 실물 입력/HUD 확인 대기·CUA 중지. [STATUS](STATUS.md), [WORKLOG](docs/history/DRONE_WORKLOG.md).
 
 ## Now
 
-최신 근거는 [STATUS](STATUS.md)·[세션 가이드](docs/git/DRONE_WORK_PC_SESSIONS.md). 이전물리23은직접API/자동범위로보존하며 console/Slate/실제조종 Pass가 아니다. 매핑원본·장치등록과 실제조작복구를 구분하고 스로틀/모터는사용자요청으로보류한다.
+최신 근거는 [STATUS](STATUS.md)·[입력 정책](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#자동-스로틀-모터-정책). 이번13종은 simulated key-state/API/delegate 범위이며 실제 장치/화면 Pass가 아니다.
 
 ### 결정 필요 — 현재 DA 값은 채택 사양이 아님
 
@@ -92,9 +92,9 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 | PAYLOAD-GRIP-01 | 집게 부착 통일 | Codex 예외 수정·자동 Pass; WORKLOG | 시작→투하→재픽업 외형 확인 |
 | ACRO-MEETING-01 | Mode1 Space 하강·반전 및 키보드/패드 겹침 수정 | 구현됨·자동 검증됨·수동 확인 대기(10/04 C PC Claude). 입력원 분리·절댓값 큰 쪽·키 해제 시 패드 인계, 기존 Dead Zone·정확 적분 유지. 근거 STATUS | Mode1 스틱에 엄지를 걸친 채 Space→상승, 키 떼고 스틱→패드 조종, 모두 놓으면0을 실제 장치로 확인. Mode2도 혼합 입력 확인. W/S·A/D·Q/E·Space/Ctrl은 두 Mode 동일; 키보드 배율·Angle·마우스Yaw·회의 반전 뜻 현재 미정 |
 | DR-FPV-ACRO-INPUT-02 | Acro 키보드·패드 Mode 1/2 | InterLink Acro 4축 추가·총45매핑·Dead Zone 계약 자동 검증됨(10/07 D PC Claude). [입력 계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md), 혼합 입력은 ACRO-MEETING-01 | Mode 1/2 실기 혼합 입력·비행 체감 확인. 조작 정책/회의 반전 뜻 미정 |
-| DR-INTERLINK-INPUT-01 | 기존매핑 복구범위 | 추적30개Git내용정상·override없음/복구쓰기0, InterLink HID/USB/새Editor등록·기존맵possess 확인 | 사용자재실행후입력복구확인·추가수정0·원인미확정. CUA전부중지·스로틀/모터보류. [입력계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md) |
+| DR-INTERLINK-INPUT-01 | 실물 입력 확인 대기 | 기존45매핑/Mode1·2 보존·RC 절대출력 자동 시동/OFF 구현·자산 계약 통과 | 실제 InterLink/XInput 보정·경로·조작감 대기·CUA 중지. [입력계약](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md) |
 | DR-FPV-ACRO-PIE-01 | FPV Rate/Acro 실제 조작 체감 | Mode 1/2 축 분리와 각속도·무수평복귀에 공통 질량·추력·모터 응답·중력·Body Up 추진·선형/제곱 항력 v2 연결. 별도 속도 단계는 제거 | 키보드/패드로 Nose-down 전진력, 호버·상승·무추력 하강, Roll/Loop와 650°/s 체감, Mode 1/2가 축 배치 외 비행 성능이 같은지 확인 후 수치 조정 |
-| DR-FLIGHT-PHYS-02 | Racer1 opt-in·입력한계 | 직전Build003·물리12/회귀11 Success는직접Pawn API/자동범위 | 실제console arm거부·Slate/조종Pass아님. 모터/스로틀수정보류·controlled후보한계유지. [정본](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#racer-로터-1차-후보) |
+| DR-FLIGHT-PHYS-02 | Racer opt-in·모터 자동검증 | BuildAutomatic09·Motor3/Golden1/RotorPilot6/입력3=13통과 | simulated key-state/API범위·실물/화면·전체미션/교정 대기. [정본](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#racer-로터-1차-후보) |
 | PHY-CAMERA-01 | 벽·그물 접촉 화면 안정화 | 구현됨·자동 검증됨·수동 확인 대기. 연속 접촉 제약·외형/FPV 카메라 분리·그물 Camera Ignore, 피해 Shake 유지. 검증 WORKLOG | Physics Sandbox에서 1/3인칭 저속/고속/지속 벽 접촉·그물 감속/포획 때 화면 떨림 감소와 충돌 유지 확인. NPC 맵에서 총알 피격 화면 흔들림이 남는지 확인. 자동화만으로 체감 Pass 처리하지 않음 |
 | PHYSICS-SANDBOX-01 | 벽 충돌·그물 얽힘·국소 파괴 벽 | 벽 반발·날개 접촉·그물 감속/포획/하강·탄환/폭발 국소 절단 구현/자동 검증. 실제 Chaos 비교 별도·이전 근거 WORKLOG | Sandbox에서 저속 접촉은 작게 밀리고 고속 충돌은 크게 반발하는지, 날개 끝 접촉 방향의 자세 Kick, 그물 포획·하강·자동 해제와 조종 복구를 화면 확인하고 실제 Chaos Cloth/Dataflow와 Geometry Collection을 별도 구역에서 비교 |
 | PHY-NET-03 | 늘어지는 그물 장애물 | 공유 매듭 PBD·상단 고정/중력·제약/접촉·BP 예산 구현. Chaos Cloth는 별도 후속 | 포획·국소 변형/감쇠·Reset·크기/FPS 수동 확인. 일반 접촉 자동 절단 금지 |
@@ -132,7 +132,7 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 | SYNC-WORKPC-01 | D PC 입력범위 | 버그시작Source430 변경0·입력30개Git내용정상·복구쓰기0, [등록부](docs/git/DRONE_WORK_PC_SESSIONS.md) | 이번patch/Build/PIE검증없음·사용자재실행후입력복구확인·원인미확정. 사용자Editor/진행보존 |
 | RACING-MAPS-01 | 팀원 레이싱 맵 1·2·3 | Map2 중복 링 때문에 생기던 기록 취소 수정·93개 실행 Gate 완주/저장. 3맵 새 프로세스 복원 통과. 선택/사진/API 포커스 정합·옛 7개 안내 수정; STATUS | 사용자 실제 비행/카드별 사진 확인. 자동 기록은 전용 슬롯, 원본 맵/사진과 기존 DA 변경 보존 |
 | SYNC-COLLAB-01 | 협업·다른 PC 세팅 | ui/image 역할 파일은 현재 HEAD에 추적/커밋됨(마지막 변경3f02577b). 직접 작업·소유권은 [현재 규칙](docs/git/DRONE_WORK_PC_SESSIONS.md) | 다른 PC 설정·COLLAB_READY는 별도 확인. 두 저장소 기존/추가 미커밋 보존, Commit/Push는 사용자 |
-| SYNC-SPACES-01 | MD·Space 연결 | 입력최종확인 기존2Page/8연산·재읽기·기존134블록 hash 보존, WORKLOG영수증 | 사용자재실행복구·모터/스로틀보류·새Page0 |
+| SYNC-SPACES-01 | MD·Space 연결 | 모터 정책·빌드/회귀13과 실물/화면 미검증 경계 최신화 | 기존 Page 해당 부분만·새Page0·커밋/푸시 별도 |
 
 ## Next
 
@@ -142,5 +142,5 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 1. 일반 게임패드와 InterLink DX 각각의 raw→IA→모드→Boom→ViewTarget을 실제 양방향/중립/해제로 계측한다. InterLink 카메라 상하 추가 축/버튼 배정은 결정 대기이며 기존45매핑/비행4축·Mode1/2는 보존한다. 설정 적용/취소/기본값·재실행·실제 구버전 저장과 UI 전체 실기 확인을 이어간다.
 2. LOS 캡처를 검사 World/LocalPlayer에 연결하고 HitResult 디코더를 수리한 뒤 사람·드론 가시성과 지면 관계를 확인한다. 후퇴 시작값400cm·기존 동선/실제 착지 보존, 눈높이 원인 단정/임의 높이 변경 없음.
 3. M3 Fence BP SplineMesh None 오류와 M4 Lumen SurfaceCacheAtlas 경고·긴 로딩을 분리 조사한다. CSV ensure 진단의 내장 전체 통계 비활성(-csvAllCategoriesDisabled·GPUcsv0) CPU 표본은 제품 수정/원인 확정이 아니다. 동일 조건 입력/비행/사격 구간과 GPU 지원 여부를 별도로 계측한다.
-4. 현재는기존매핑 범위와 사용자재실행후입력복구확인·원인미확정상태만 기록한다. 스로틀/모터 원인·수리·재검증과 새물리확대는보류·CUA전부중지. 직전1차후보/오디오·사용자진행을보존하며 새기능/Build를 자동재개하지않는다.
+4. 자동 시동/OFF는 구현·빌드·자동검증 완료다. 실제 장치/HUD 확인은 CUA 재허용 후 진행하며 전체 본미션 확대·실기체 교정은 별도다. MD 작업으로 새 엔진 실행을 재개하지 않는다.
 5. Story M1완료·M2대표/출격·M3/4 실물 조종/사격·M4 공중기체 높이/출격 위치의 안전성을 확인한다. Camp 일반20GiB·승인 저메모리16GiB 시작/runtime4GiB 보호, Production Training 보존. 기존 청감·패드·전체 회귀·패키징은 별도다.

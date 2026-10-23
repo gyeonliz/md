@@ -165,7 +165,7 @@ FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조�
 5. 입력을 놓았을 때 쉬운 조작보다 관성이 길게 남는지 확인한다.
 6. 쉬운 조작으로 돌아왔을 때 Root Pitch/Roll이 수평 복귀하는지 확인한다.
 7. FPV 기체를 골라 Mode 1과 Mode 2에서 Pitch/Throttle 세로축만 표대로 바뀌고 속도·호버·Rate는 같은지 확인한다.
-8. 수평에서 키를 놓으면 중립 호버가 유지되고, Space는 모터 응답 지연 뒤 상승하며 Ctrl은 추력을 줄여 하강하는지 확인한다.
+8. 사람 조종은 Ctrl로 모터 OFF를 확인한 뒤 Space로 시동/상승하고, 놓으면 호버하는지 확인한다. XInput Acro는 중앙 호버·부분 음수 하강·아래 끝 OFF, RC는 절대출력이다. 실제 장치 시험은 대기이며 재시동 조건·BP 문턱값은 [자동 스로틀 모터 정책](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#자동-스로틀-모터-정책)을 따른다.
 9. W로 Nose-down한 뒤 중립/상승 Throttle에서 기체 Up 축이 전진력으로 바뀌는지 확인한다.
 10. Roll/Pitch 끝 입력으로 90도를 넘어 회전하고 Local Up Throttle로 바라보는 축에 추진되는지 확인한다.
 11. Drop Drone에서 기본 화물을 투하하기 전후 최고속도·가속·Yaw가 회복되는지 확인한다.

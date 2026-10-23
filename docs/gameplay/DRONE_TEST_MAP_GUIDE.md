@@ -12,11 +12,9 @@ Story의 현재 맵 연결은 아래 표가 정본이다. M2·M3는 원본 Milit
 
 ## Racer 로터 후보 시험
 
-**콘솔 실행 권장 중지:** 사용자 실콘솔에서 arm거부가 재현됐고 미해결이다. 구 -1/arm/스로틀 절차를 현재 실행지침으로 제공하지 않는다. 현재는 기존매핑 범위만·스로틀/모터는 사용자지시보류·모든화면조작/CUA 중지다. 직전23성공은 direct API 자동범위이며 actual console/Slate 조작복구 Pass가 아니다.
+2026-10-23 C PC: 최신 자동 시동/OFF 구현·BuildAutomatic09·회귀13종 통과를 확인했다. 엔진 simulated key-state/등록 delegate/API PIE 범위이며 실물 조종기·키보드 OS 입력·HUD 화면 Pass가 아니다. CUA는 중지 상태다. 구 -1/arm 콘솔 순서 대신 [현재 입력 정책](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#자동-스로틀-모터-정책)을 따른다.
 
-Root가 기록된 사용자 console요청의 Pawn도달/low-throttle arm거부 RED를 확인했다. 입력은사용자재실행후복구확인(추가수정0·원인미확정)이며 이번후속patch/Build/PIE검증 결과는없다. InterLink HID/USB·새Editor 등록과 Training/FrontEnd/TUT_LOS 진입/possess는키/축반응 Pass가 아니다.
-
-직전 Build00319.61초·Run003 물리12/회귀11=23Success(19clean/4warnings)는직접Pawn API/자동화 결과다. controlledRacer/Acro1·2/CG0 후보의힘/토크·접지기반과 Legacy·기존DA·이전오디오는보존하며 actualconsole/Slate 전체경로로확장하지않는다. [후보/입력검증 정본](DRONE_REALISTIC_HANDLING_PLAN.md#racer-로터-1차-후보)·[정정이력](../history/DRONE_WORKLOG.md).
+현재 자동 검증 대상은 `/Game/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot`과 저장된 `BP_DroneRacerIntegration`이다. Legacy가 기본이며 FixedStepCandidate는 controlled Racer·Acro1/2·CG0의 opt-in 범위다. 실제 장치·경사/고속 접촉·전체 본미션 확대와 실기체 교정은 남아 있다. [후보/검증 정본](DRONE_REALISTIC_HANDLING_PLAN.md#racer-로터-1차-후보)·[실행/실패 이력](../history/DRONE_WORKLOG.md).
 
 ## 현재 미션 연결과 확인 순서
 

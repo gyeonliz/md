@@ -4566,3 +4566,17 @@ Execution/MAPPING_FINAL_REPORT.json의파일/설정정상·미실행시험분리
 기존Space 진행/테스트2페이지에2호출8연산을모두적용했다. 현재미검증console절차4블록을현재실행안내에서제거하고 보류/사용자복구확인으로교체했다. 과거WORKLOG는수정하지않았다. 재읽기에서예기본문·삭제반영과 대상밖원래134블록hash일치를확인했고 새Page/기타Page수정은없다. sequence는 [진행98](https://chatgpt.com/space/page_a81d11314f60819188530a4ea2ed4663)·[테스트61](https://chatgpt.com/space/page_ba2823e59d7c8191b0ea8bab809367dc)이다. Space/READBACK_CHECK.json·BLOCK_HASHES.json·REQUESTS/각receipt를 Validation에둔다.
 
 이번 MD시작18dirty스냅샷과 WORKLOG816,795바이트prefix·아카이브3원문은그대로보존한다. 정확한변경목록/크기·요청본문재읽기는 Validation/FILES_CHANGED.json·CHECKS.json에둔다. 추가엔진/CUA/Source/Build작업·새시험/수치/기능확대·stage/Commit/Push·Trello/Figma·공유권한·예약/새Page는없다. 현재입력복구는사용자확인으로마무리하고 스로틀/모터는보류한채종료한다.
+
+## 2026-10-23 — C PC 자동 스로틀 모터 결과 교차검토·MD 최신화
+
+최신 사용자 요청 “모터 스위치는 스로틀걸면 자동으로 켜지고 쭉내려서 끄면 꺼지는 현실방식 반영해줘” 범위로 역할3이 구현·컴파일·자동검증했다. 이는 프로젝트가 선택한 조작 정책이며 모든 실기체의 표준이라는 뜻이 아니다. 기존 문서의 모터/스로틀 보류·후속 patch/Build/PIE 없음은 이번 모터 범위에서 대체한다. 이전 console arm 거부/입력 복구와 실패 기록은 이력으로 보존하며 실제 장치 복구 Pass로 바꾸지 않는다.
+
+- RC 기존 절대축 최하단 OFF→올림 ON, XInput Acro 중앙 호버·부분 음수 하강·아래 끝 OFF→의도적 위 입력 시동, 쉬운 조작 L2 끝 OFF→R2 ON, 키보드 Ctrl OFF→Space ON/상승·해제 호버. M/Ctrl+M 필수 제거·명시 디버그 API만 유지. 기존 IMC45매핑·Mode1/2·무기 ArmSwitch 보존.
+- 사람의 초기 높은 출력·재Possess·pause/resume·link·hold·입력원 변경 뒤 새 최하단 확인, 즉시 OFF·잡음 히스테리시스. Pawn BP Class Defaults의 OFF0.02/RC ON0.06/center UP0.10. Legacy 무추력 중력·정상 착지/재이륙과 배터리 방전/파손을 구분하고 AI/UGV·오디오 기존 구현 보존.
+- C Unreal `30a30178` 위 Source11개(기존10수정+신규 MotorControlTest1). BuildAutomatic09 exit0·08:40:04 KST 종료, runner5.61초/UBT5.27초·최소RAM13633MiB. RegressionAutomatic03 25.43초·12성공+예상 경고1/실패0/미실행0. 새 Motor3·FlightGolden1·RotorPilot6·입력자산3이며 지원하지 않는 모드의 정상 거부 경고다. 과거 BuildAutomatic01/07/08·MotorAutomatic01·RegressionAutomatic01/02 실패를 삭제/합산하지 않는다.
+- 역할5가 result·실제 report/index·실행 JSON·빌드 성공 로그와 현재 Source11 SHA 전부 일치, Content/Config tracked diff0을 직접 대조했다. PIELifecycle.csv722관측(헤더 제외)의 OFF/접지→시동/상승→공중OFF/접지→재시동·hold/pause 단계를 확인했다. Source/Config 실행 중 변경0·검증 종료 worker0은 역할3 기록이다. 실제 맵 `/Game/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot`, 저장 BP_DroneRacerIntegration을 사용했으며 최소RAM11543MiB/commit40692MiB다.
+- NullRHI·엔진 내부 simulated key-state/등록 delegate·API PIE 검사다. Slate/OS/실물 입력 주입과 HUD 렌더 검증은 없다. 실물 InterLink DX/XInput 캘리브레이션·입력 경로/조작감·HUD 배치, 경사/고속 충돌·본미션 backend 확대·실기체 교정/최종 B·C는 미완료다. CUA 중지 유지, FixedStepCandidate는 controlled Racer opt-in만이다.
+
+정본 결과: `C:/Users/jkw11/Documents/Codex/2026-10-21/drone-story4-capture/outputs/motor-control-20261023/result.json`, 같은 폴더의 `BuildAutomatic09/execution.json`·`stdout.log`·`RegressionAutomatic03/report/index.json`·`PIELifecycle.csv` 및 `E:/기획안/06_드론_메인/작업/Story4_20261021/촬영/state.md`. 역할5 교차검토는 `검증/모터정책_근거검사_20261023.json`, 편집 전8문서 바이트 원본은 `검증/문서백업/20261023_모터정책`이다. MD 시작HEAD1042ba46·clean/index빈상태에서 현재절만 갱신했다. 엔진/게임코드 변경·실행·CUA·자동stage/commit/push는 역할5가 수행하지 않았다. 현재 조작 정본은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#자동-스로틀-모터-정책), 상태와 후속은 STATUS/WORKBOARD다.
+
+기존 Space 진행/시험2Page의 모터 현재절6연산을 각각 atomic 적용(sequence99/62)하고 수정6블록 본문 정확일치·선택된 비대상15블록 hash 보존을 재조회했다. 기존 표의 비행/기체·InterLink2행 외 내용과 D PC 오디오 원문을 보존했고 새Page/새블록0이다. 원본/영수증은 역할5 `outputs/motor-md-20261023/Space_원문백업.json`·`Space_반영확인.json`. 저장 Markdown 확인이며 Page 렌더/CUA는 수행하지 않았다.
