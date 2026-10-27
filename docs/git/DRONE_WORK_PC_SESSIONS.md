@@ -1,8 +1,25 @@
 # 작업컴 드론 세션 분리·시작 가이드
 
-기준: 2026-10-23 D PC. WideCameraMissionUI 최신 소유권·실행 단일 엔진·MD/기존Space·완료 후 Commit/Push 사용자 승인을 기록한다.
+기준: 2026-10-27 D PC. 현재 세 장치 키 설정·패드 입력 보완의 파일 소유권과 단일 엔진 실행을 기록한다. 10/23 승인·소유권은 아래 당시 기록으로 보존한다.
 
 ## 현재 작업컴 등록부
+
+현재 범위는 키마/패드/InterLink 개별 키·축·반전 설정, 조작키 UI 개편, SceneViewport의 패드 RightY 추가 반전 보정, Circle=Esc 공통 취소다. 최종 Build11.82초·동일 생산Source 고유28검사 최종 통과, 실제 화면 경유20경로와1280 UI4장을 확인했다. FINAL4는 생산/Config45경로가 FINAL3와 같고 검사창 정리 test1파일만 변경했으며 UI3연속/맵 전환을 재검증했다. 별도 기존47/101/오디오 실행과 중복 합산하지 않는다.
+
+| 역할 | 실제 대화 ID | 이번 쓰기·실행 경계 |
+|---|---|---|
+| 총괄 | `01a16101-d1ba-7540-b166-3c6cd005ab8b` | Pawn native 재배정·Settings Save·프로젝트 Viewport/DefaultEngine·통합 검사·MD/기존Space·독립 보존 감사 |
+| 입력 코어 | `01a16105-2be7-70c2-81a7-e96dcc58d75c` | Input/DroneDeviceBindings·코어 검사. 엔진 미실행 |
+| 실행 | `01a16105-48eb-7101-8b2a-0bc6b4a070e9` | 엔진/Build/PIE/캡처/Content 단독 실행권·Source 동결 receipt·최신 Saved 복원/종료 |
+| 설정 UI | `01a16105-6f90-7af1-8ce7-64ce98f82e77` | Settings/KeyboardSettings UI·탐색/부모저장 검사. 테스트 최종 캡처·정리 수정은 총괄 통합 |
+| 검토·취소 | `01a16105-755f-7620-8845-d10c1e9f7a8a` | Circle dispatch 검사·MissionPlayerController/StartLocation 수정·native 바인딩 독립 읽기검토 |
+
+근거 루트는 `Saved/Automation/DeviceInputProfiles_20261027/Execution`, 최종 `FINAL_DEVICE_INPUT_UNREAL_EXECUTION_20261027_FINAL4.json`이다. Source/Config67·원본9·최신 Saved10 hash 일치·Editor0. 15:34:46 사용자 종료 뒤 새 기준을 캡처했으며 이전23860 스냅숏으로 복원하지 않았다. Production Training·사용자 Lobby 등 자산은 저장하지 않았다. 이번 Commit/Push·Fetch·Trello/공유/예약 변경은 없다. Unreal main62b3e597·MD main e4c1b3d와 기존 origin/main ref0/0을 읽었고 최신 원격 조회로 표현하지 않는다. 실물 PS 앞밀기 HID750표본은 읽었지만 비행 손조종/미연결 InterLink 교정·패키징은 별도다.
+
+## 2026-10-23 당시 등록부·승인 이력
+
+아래 승인·Fetch/Commit/Push·Editor 인계·파일 소유권은 당시 기록이며 현재 실행/승인으로 재사용하지 않는다.
+
 
 **현재 범위:** 넓은 역할 FPV/사용자 기본 설정·명시적 선택/드롭다운·Story M1/M3/M4 단계 정책·파괴 전환·전방 센서/하부 충돌 보정이다. 고유 자동검사101 Success/Fail0(단계별 DLL 근거, 한 DLL 전체 재실행 아님)·최종Build54.95초 성공. 실제 실행/보존·Editor 인계는 `WideCameraMissionUI_20261023` 최종 영수증을 따른다. 입력33/OFF34·이전물리/오디오 수치는 [WORKLOG](../history/DRONE_WORKLOG.md)에 보존하며 최신과 합산하지 않는다.
 

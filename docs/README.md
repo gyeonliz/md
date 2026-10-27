@@ -13,6 +13,7 @@
 - [`DRONE_PROJECT_PLANNING_BRIEF.md`](planning/DRONE_PROJECT_PLANNING_BRIEF.md): 전체 기획·개발 현황서
 - [`DRONE_FRONTEND_MISSION_FLOW_PLAN.md`](planning/DRONE_FRONTEND_MISSION_FLOW_PLAN.md): 트레일러·로비·미션 선택·진입 흐름
 - [`DRONE_TUTORIAL_STORY_PLAN.md`](planning/DRONE_TUTORIAL_STORY_PLAN.md): Tutorial·Mission·Jamming 실행 순서
+- [`DRONE_ENDING_STORYBOARD_PROPOSAL_2026-10-23.md`](planning/DRONE_ENDING_STORYBOARD_PROPOSAL_2026-10-23.md): 엔딩 영상 스토리보드 제안(인게임 스크린샷 + H3 시안, 미확정)
 - [`DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md`](planning/DRONE_FIGMA_MISSION_IMPLEMENTATION_MATRIX.md): Figma 4개 Mission 요구와 현재 코드/남은 작업 대조
 - [`DRONE_PREASSET_FUNCTION_PLAN.md`](planning/DRONE_PREASSET_FUNCTION_PLAN.md): 구매 에셋 전 기능 계획
 - [`DRONE_MVP_GUIDE.md`](planning/DRONE_MVP_GUIDE.md): 전체 MVP 카드 참고
@@ -38,6 +39,7 @@
 - [`DRONE_NPC_GAZE_TRACKING_PLAN.md`](ai/DRONE_NPC_GAZE_TRACKING_PLAN.md): 감지 뒤 시선·고개 회전
 - [`DRONE_MG_TURRET_3PART_GUIDE.md`](ai/DRONE_MG_TURRET_3PART_GUIDE.md): 유인 MG 3분할·사수 Anchor, 패트리어트 접합부 회전 BP
 - [`DRONE_AUTOMATIC_TURRET_GUIDE.md`](ai/DRONE_AUTOMATIC_TURRET_GUIDE.md): 설치형·차량형 무인 자동포탑
+- [`MINIMAX_H3_LOCAL_SETUP_2026-10-23.md`](ai/MINIMAX_H3_LOCAL_SETUP_2026-10-23.md): D PC MiniMax H3 영상 생성 모델 로컬 설치·실행 절차(라이선스 한국 제외 주의)
 
 ## Gameplay·Physics
 

@@ -162,7 +162,7 @@ Pawn Class Defaults에서 다음 Struct를 연다.
 - `Acro Rate Realistic Greybox Tuning`: Rate/Acro에서 사용할 가속·관성·Local Up·Root 자세 사용
 - `Stable / Balanced / Agile Handling Tuning`: Asset 호환 내부 이름. 새 런타임 비행 계산에서는 사용하지 않는다
 
-각 기체의 절대 기준값은 Data Asset의 `Flight Profile`에 둔다. `Physical Flight Settings`에서 무적재 속도 배율·Dry Mass·합산 최대 추력·모터 응답·제곱 항력·적재 속도 하한을, `Acro Rate Settings`에서 중앙 감도·최대 Rate·Expo·수직 속도·중력·선형 항력·Rate 응답을 조정한다. 모드/적재 효과는 원본 기준에서 계산한다. 장치별 스로틀은 Pawn의 전용 설정(Keyboard0.35·Pad deadzone0.08/exponent1.5), 카메라는 위 독립 override를 사용한다. 활성 candidate의 질량/geometry 모델은 캐시되므로 live payload·물리 설정 변경을 지원한다고 확장하지 않는다.
+각 기체의 절대 기준값은 Data Asset의 `Flight Profile`에 둔다. `Physical Flight Settings`에서 무적재 속도 배율·Dry Mass·합산 최대 추력·모터 응답·제곱 항력·적재 속도 하한을, `Acro Rate Settings`에서 중앙 감도·최대 Rate·Expo·수직 속도·중력·선형 항력·Rate 응답을 조정한다. 모드/적재 효과는 원본 기준에서 계산한다. 장치별 스로틀은 Pawn의 전용 설정(Keyboard0.70·쉬운/게임 Ctrl 착지OFF·Pad deadzone0.08/exponent1.5), 카메라는 위 독립 override를 사용한다. 활성 candidate의 질량/geometry 모델은 캐시되므로 live payload·물리 설정 변경을 지원한다고 확장하지 않는다.
 
 Drop Drone의 내장 화물 질량은 Pawn의 `DronePayloadDropComponent > Default Inventory Payload Mass Kilograms`, 맵 배치 화물은 `BP_DroneCarryablePayload` 파생 BP 또는 배치 Instance의 `Payload Mass Kilograms`에서 조정한다. 적재하면 `sqrt(DryMass / TotalMass)` 기반 최고속도·Yaw 배율과 `DryMass / TotalMass` 기반 가속·감속 배율이 적용된다. Acro에서는 같은 총질량으로 `MaximumTotalThrustNewtons / TotalMass`를 계산해 호버점과 남는 상승 추력이 실제로 바뀐다.
 
