@@ -1,8 +1,28 @@
 # 현실 조종감 기준과 후속 개발 계획
 
-기준: 2026-10-23 D PC. 장치별 입력·Legacy OFF 항력/World중력 정책을 유지하고 FPV/Fiber의 자폭 감지와 하부 물리 충돌 범위를 분리했다. 자폭 센서·넓은 역할 카메라는 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md), 실제 검증은 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. controlledRacer opt-in·실기체 교정·본미션/B·C·손 조종·패키징의 기존 지원 한계는 유지한다.
+기준: 2026-10-28 D PC. 폭탄 SI 항력 수리·자동 검증과 기존 본체 경로를 아래에서 구분한다. 장치별 입력·Legacy OFF 항력/World중력 정책을 유지하고 FPV/Fiber의 자폭 감지와 하부 물리 충돌 범위를 분리했다. 자폭 센서·넓은 역할 카메라는 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md), 실제 검증은 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. controlledRacer opt-in·실기체 교정·본미션/B·C·손 조종·패키징의 기존 지원 한계는 유지한다.
 
 모터 OFF에서도 공기저항은 적용된다. Legacy 정상OFF의 조기 분기에서 빠졌던 공유 공력 계산을 4모드에 연결하고 시작/목표추력0·World중력·기존 선형/제곱항력과 인공제동0을 유지했다. 항력계수를 강하게 조절한 수리가 아니다. 30/240fps의 수평 감속·10초 감속·낙하 중 수평감속/추력0/재시동과 LocalPlayerController+실제 World.Tick 이동이 자동 통과했다. 기본/게임의 ON assisted 구조는 유지하고 controlled candidate는 기존에도 OFF 항력을 계산했으므로 이번 Legacy 결함과 구분한다.
+
+## 현재 적용 경로와 투하물
+
+기체와 투하물은 별도 운동 경로다. 아래는 현재 Source와 실제 saved Drop 런타임 조회를 기준으로 한다. 폭탄 SI 항력은 실제 World/Projectile 30·120fps·단위/바람·고속 비교를 자동 검증했으며, 손조종 완료를 의미하지 않는다.
+
+| 대상/상태 | 현재 계산 | 경계 |
+|---|---|---|
+| Legacy Acro Mode1/2 ON | 합산 추력/총질량·중력·1차 모터 응답·선형+속도제곱 항력·각속도 응답 | 관성 텐서/로터별 토크의 완전한 강체 모델은 아님 |
+| Legacy 쉬운/게임 ON | FloatingPawnMovement의 가속·감속/상승하강 보조 | Acro 힘 적분과 다른 조작 보조 모델 |
+| Legacy 정상 모터 OFF4모드 | 추력0·World중력·공유 선형/속도제곱 항력 | 지면 접촉 마찰과 공중 항력을 구분 |
+| 전투 폭탄 수리 소스 | swept ProjectileMovement·World중력×1·기체 속도+하향3m/s·상대 공기속도 SI 제곱항력 | 30m/s 상한 제거/최대1/120초 substep. 30/120fps 감속/거리/에너지 소산·질량 차이 검증. 회전/양력/실측 형상 공력 모형은 아님 |
+| opt-in Racer 후보 | 상대 공기속도·SI 항력·로터 힘/토크·대각관성 | 일반 Drop과 기본 본미션의 현재 백엔드가 아님 |
+
+실제 saved Drop 조회는 건조2kg+적재0.75kg=2.75kg, 최대 합산추력40N·모터 응답0.055초·World 중력9.8m/s², 기본 선형0.12/s·제곱0.00004/cm다. Legacy Acro는 두 항력에 dry/total mass 비(적재 시2/2.75)를 곱하고 선형은 지수 감쇠, 제곱항은 가속도로 적분한다. 실제 기체의 Cd·면적을 검교정한 값은 아니다. 쉬운/게임 ON의 감속도는 조회된 현재 기본 모드에서1818.18cm/s²이며 별도 보조 계산이다. 지면 마찰은 모터OFF·실제 정지 지지면 접촉을 확인한 때만 작용하고 C++ 기본 마찰계수0.4·접촉 허용0.5cm를 사용한다. 땅에 닿지 않은 상태의 감속은 항력이 담당한다. 앞선 투하/피해/교대 검증은 공중 감속 검증을 포함하지 않았다. 검증 날짜·수선 경과는 [WORKLOG](../history/DRONE_WORKLOG.md)에 기록한다.
+
+### 폭탄 항력과 조정 위치
+
+`UDroneBombMovementComponent`는 `v_air=(v_world-wind)/100`(m/s), `F=-0.5*rho*Cd*A*|v_air|*v_air`(N), `a=F/m`를 사용한다. 실제 투하물 질량을 읽으며 Weather snapshot 바람은 상대속도에 한 번만 사용한다. 반중력/지면 마찰로 공중 감속을 대신하지 않는다. 반 단계 중력→해석적 제곱항 감쇠→반 단계 중력으로 적분하고 UE native swept 충돌을 유지한다.
+
+기본 rho=1.225kg/m³·Cd=1·기준면적0.005m²(50cm²)는 실측이 없는 게임 시작값이다. 커진 표시용 메시의 크기를 실물 공력 면적으로 간주하지 않는다. 폭탄 Movement의 `Drone|Bomb|Aerodynamics` 속성에서 조정하며, 질량은 실제 Payload 질량이다. 배송 화물은 기존 ProjectileMovement·수직 투하·마찰을 유지한다. 실제 0.75kg 폭탄의 수평속도12→10.43777m/s·수평거리22.57548m(2초)를30/120fps에서 확인했다. 같은 형상1.5kg은11.17140m/s·23.25984m로 더 멀리 간다. 지면 접촉/속도 상한 없는 측정이며 자세·회전·양력까지 실기체로 검교정한 결과는 아니다. [실행 근거](../history/DRONE_WORKLOG.md)를 따른다.
 
 ## Racer 로터 1차 후보
 

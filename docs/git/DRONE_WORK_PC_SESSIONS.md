@@ -1,20 +1,20 @@
 # 작업컴 드론 세션 분리·시작 가이드
 
-기준: 2026-10-27 D PC. 현재 세 장치 키 설정·패드 입력 보완의 파일 소유권과 단일 엔진 실행을 기록한다. 10/23 승인·소유권은 아래 당시 기록으로 보존한다.
+기준: 2026-10-28 D PC. 현재 Drop 항력·하방 카메라·Pause·정문/차량·재머 피격과 앞선 PSD/볼륨 작업의 파일 소유권·단일 엔진 실행을 기록한다. 이전 승인·실행 이력은 WORKLOG와 아래 당시 등록부를 따른다.
 
 ## 현재 작업컴 등록부
 
-현재 범위는 키마/패드/InterLink 개별 키·축·반전 설정, 조작키 UI 개편, SceneViewport의 패드 RightY 추가 반전 보정, Circle=Esc 공통 취소다. 최종 Build11.82초·동일 생산Source 고유28검사 최종 통과, 실제 화면 경유20경로와1280 UI4장을 확인했다. FINAL4는 생산/Config45경로가 FINAL3와 같고 검사창 정리 test1파일만 변경했으며 UI3연속/맵 전환을 재검증했다. 별도 기존47/101/오디오 실행과 중복 합산하지 않는다.
+이번 시작 기준은 Unreal `main a53c3a26`·MD `main 620f84b`이며 이전 폭탄/PSD/볼륨 변경을 보존한 뒤 후속 수선을 진행했다. 최종Build48.36초·고유41검사 통과(경고 포함3/실패0, 리비전별). 실제 정문2맵/원본차량32점 도착 실패·Pause1280/1920과 재머 피격4조건을 확인했다. Source/Config65·DLL2·Saved10·Content23·보호11 hash 일치/Editor0. 원본/사용자 M3 맵은 보존한다. 손조종·패키징은 별도다. 사용자 새 Commit/Push 승인 후 Root가 두 origin을 Fetch했고 출발HEAD와0/0이다. 자기 문서 커밋 해시는 최종 Git 영수증을 따른다.
 
 | 역할 | 실제 대화 ID | 이번 쓰기·실행 경계 |
 |---|---|---|
-| 총괄 | `01a16101-d1ba-7540-b166-3c6cd005ab8b` | Pawn native 재배정·Settings Save·프로젝트 Viewport/DefaultEngine·통합 검사·MD/기존Space·독립 보존 감사 |
-| 입력 코어 | `01a16105-2be7-70c2-81a7-e96dcc58d75c` | Input/DroneDeviceBindings·코어 검사. 엔진 미실행 |
-| 실행 | `01a16105-48eb-7101-8b2a-0bc6b4a070e9` | 엔진/Build/PIE/캡처/Content 단독 실행권·Source 동결 receipt·최신 Saved 복원/종료 |
-| 설정 UI | `01a16105-6f90-7af1-8ce7-64ce98f82e77` | Settings/KeyboardSettings UI·탐색/부모저장 검사. 테스트 최종 캡처·정리 수정은 총괄 통합 |
-| 검토·취소 | `01a16105-755f-7620-8845-d10c1e9f7a8a` | Circle dispatch 검사·MissionPlayerController/StartLocation 수정·native 바인딩 독립 읽기검토 |
+| 총괄 | `01a16101-d1ba-7540-b166-3c6cd005ab8b` | 미션/정문/차량 통합·검사·MD/Space·독립 감사·승인 Commit/Push |
+| 폭탄 코어 | `01a16105-2be7-70c2-81a7-e96dcc58d75c` | Abilities 폭탄 SI 항력·피해·배송 회귀/본체 현황·읽기 검토. 엔진 미실행 |
+| 실행 | `01a16105-48eb-7101-8b2a-0bc6b4a070e9` | 엔진/Build/PIE/Content/PSD 아이콘 import/저장 WBP/실제 캡처 단독·Source 동결 receipt·최신 Saved 복원/종료 |
+| 설정 UI | `01a16105-6f90-7af1-8ce7-64ce98f82e77` | 하방 카메라·재머 피격 캡슐/검사, 이전 볼륨 수리. 엔진 미실행 |
+| 상세 UI | `01a16105-755f-7620-8845-d10c1e9f7a8a` | Pause 여백/Slate 검사 수선, 이전 ResultDetails/WBP 이관. 엔진/Content 미실행 |
 
-근거 루트는 `Saved/Automation/DeviceInputProfiles_20261027/Execution`, 최종 `FINAL_DEVICE_INPUT_UNREAL_EXECUTION_20261027_FINAL4.json`이다. Source/Config67·원본9·최신 Saved10 hash 일치·Editor0. 15:34:46 사용자 종료 뒤 새 기준을 캡처했으며 이전23860 스냅숏으로 복원하지 않았다. Production Training·사용자 Lobby 등 자산은 저장하지 않았다. 이번 Commit/Push·Fetch·Trello/공유/예약 변경은 없다. Unreal main62b3e597·MD main e4c1b3d와 기존 origin/main ref0/0을 읽었고 최신 원격 조회로 표현하지 않는다. 실물 PS 앞밀기 HID750표본은 읽었지만 비행 손조종/미연결 InterLink 교정·패키징은 별도다.
+10/27 입력 설정·패드 RightY/Circle 보완은 수신한 현재 HEAD에 포함되어 있다. 당시 최종 Build11.82초·고유28검사·실제 화면 경유20경로/UI4장의 근거는 WORKLOG에서 확인하며 이번 10/28 Pass로 재사용하지 않는다. 사용자가 이번 후속 작업 완료 후 Commit/Push를 새로 승인했다. Root가 이전 자작 Source/Result WBP/아이콘4개와 이번 Source·MD를 취합하며 사용자 M3 맵은 커밋에서 제외한다. Trello/공유 권한/예약은 변경하지 않는다.
 
 ## 2026-10-23 당시 등록부·승인 이력
 

@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-10-27 D PC — 3장치 키 설정·패드 RightY/Cancel 보완, 공식28검사·UI4장 확인. 검사창 정리 후 UI3연속도 통과했으며 실물 비행체감은 대기다. [STATUS](STATUS.md)·[WORKLOG](docs/history/DRONE_WORKLOG.md).
+마지막 갱신: 2026-10-28 D PC — Drop 항력·하방 카메라·Pause·정문/차량·재머 피격 수선 완료. 고유41자동검사/실제 맵·화면 확인. 코드 푸시 완료·문서 승인 후속이며 M3 사용자 맵은 보존한다. [STATUS](STATUS.md)·[세션](docs/git/DRONE_WORK_PC_SESSIONS.md)·[WORKLOG](docs/history/DRONE_WORKLOG.md).
 
 ## Now
 

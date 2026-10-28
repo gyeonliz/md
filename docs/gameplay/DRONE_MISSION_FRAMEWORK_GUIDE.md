@@ -306,6 +306,29 @@ M3는 배치된 체크포인트가 없으면 최초 출격 위치를 사용한�
 - NullRHI `Drone.Mission.CheckpointRestartPIE` Success: 다른 목표용 체크포인트 무시·1회 갱신·파괴→재출격 2회(새 기체/빙의/Director 재연결/옛 기체 제거/300cm 이내/방향 90°), 세 번째 파괴→실패 결과. `Saved/Automation/ClaudeCheckpoint/test1.log`.
 - `Drone.Mission.FailureResponseData` Success, 전체 `Drone.*` NullRHI 80개 중 Success 73·실패 7(기존 NPC 개수 4·렌더 전용 진단 1·Production Training 2). 패드 2개는 렌더링 필요 경고로 건너뜀. `Saved/Automation/ClaudeCheckpoint/full.log`.
 - 수동 확인 대기: 재출격 방식 튜토리얼에서 출격 후 추락해 같은 기체/조작으로 첫 출격 위치에 돌아오는지, 완료 목표·부서진 표적 유지·현재 목표 시간 재설정과 체감을 확인한다. 체크포인트 맵 배치 뒤 중간 지점 재출격도 별도 확인한다. `PC / 패드 / 맵 / 입력 / 기대 / 결과`를 기록한다.
+## 재머 본체 피격 캡슐
+
+`ADroneJammingRadar::DamageCapsule`은 재머 본체의 별도 피격 표면이다. `RadarMesh`의 실제 시각 경계만 사용하고 넓은 재밍 Box는 크기 계산에 넣지 않는다. 기본 `DamageHitboxPaddingCentimeters=10`(BP 편집0~25cm), 월드 Scale1로 비균일 Actor Scale에서도 얇아지지 않게 맞춘다. BP에서 메시를 런타임 교체한 경우 `RefreshDamageHitbox()`를 호출한다. 탄환/폭탄의 query, FPV 전방 센서와 native 낙하 폭탄이 같은 Actor/체력으로 연결되며 직접/반경 중복 피해는 기존 폭발 경계에서 제외한다.
+
+이 캡슐은 **피격용**이며 기존 JammingBounds·CoverageCenterOffset·반경/반높이·강도 감쇠·광섬유 면역·목표 단계는 유지한다. 바깥40cm 선과80cm sweep·먼 AOE 위치는 명중으로 처리하지 않는다. 실제 저장 Radar BP/Native와 비균일 Scale의 자동 검사·미션 단계 회귀 결과는 WORKLOG에 기록한다.
+
+## M2 차량 종점과 M2/M3 정문
+
+M2의 `Story.M2.Convoy.Target` 실제 차량은 native spline 종점 사건을 Director에 연결한다. 살아 있는 표적이 종점에 도착하면 최종 실패이며 기체 교대/체크포인트로 회피하지 않는다. 이미 파괴된 표적·다른 차량·종료 후 도착은 결과를 바꾸지 않는다. 차량은 SetSplineRoute 이후 도착 사실을 유지해 Director 연결 전 도착도 다음 tick에 처리하고, 새로운 경로를 명시적으로 배정할 때만 초기화한다. 실제 작성된32점 경로를 유지하며 60m 직선은 작성 경로가 없을 때의 기존 fallback이다. 별도 실패 Trigger를 추가할 필요가 없다.
+
+M2/M3의 중앙 정문은 `SM_MilitaryTower_TowerComponents_A/B` 금속 문짝2개다. `UDroneDestructibleGateComponent::ConfigureStoryGates`가 Game world의 해당 StaticMeshActor에만 기본HP300과 표준 피해 수신을 실행 중 추가한다. 문짝은 직접 사격·폭탄/자폭의 직접/반경 피해를 받고 HP0에서 숨김/충돌 해제로 통로를 연다. 죽은 체력은 같은 World에 남아 기체 교대로 복구되지 않는다. 주변 `TowerComponents_C/D/E`, Roof, `Gates_*` 담장·기둥, 작은 `fenceLeftDoor`는 대상이 아니다. Mesh object type만 WorldDynamic query로 바꿔 UE 반경 피해에 참여시키고 메시/채널 응답/BodySetup/원본 맵·BP를 저장하지 않는다. 기획자가 Component를 직접 붙이는 경우 MaximumHealth로 조정할 수 있다. 정문은 추가 통행 장애물이며 기존 차량/재머/방어 목표 수에 넣지 않는다. 새 실제 미션 검증 상태는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
+
+## 전투용 투하 폭탄과 소모 후 교대
+
+- M1 GoldenTime와 Payload 수업은 기존 배송 화물이다. M2 Intercept·M3 VeilBreaker·M4 Endgame의 Drop만 전투 폭탄 1발을 탑재한다. M2의 구형 DA 허용 목록에는 실행 중 Drop을 추가하며 기존 기체와 원본 DA는 보존한다. M3/M4는 기존대로 광섬유 기체로 재머를 모두 제거한 뒤 Drop을 포함한 전투 기체 선택을 연다.
+- `DroneStoryMissionPolicy::UsesCombatBombs`와 Director의 초기 출격·기체 재연결 경계에서 역할을 결정한다. 같은 목표 안의 재구독으로 탄을 다시 채우지 않는다. 폭탄은 투하 당시 기체 속도를 이어받아 World중력과 상대 공기속도 SI 항력으로 낙하한다. 계수·지원 범위는 [물리 정본](DRONE_REALISTIC_HANDLING_PLAN.md#폭탄-항력과-조정-위치)을 따른다. M1 배송의 기존 낙하 경로는 보존한다. 폭탄 피해·반경·Niagara·사운드는 실제 FPVStrike 기본 Pawn의 `DroneImpactDetonationComponent` 폭발 설정을 공유한다. 직격 표적은 직접 1회 피해를 받고 반경 피해의 중복 대상에서 제외된다.
+- M4의 기존 Patriot 모델은 세 파트의 충돌이 꺼져 있다. Director가 살아 있는 해당 전투 표적의 Actor 충돌과 기존 Mesh의 QueryOnly 검사만 실행 중 활성화한다. 작성된 응답 채널·BodySetup·물리 시뮬레이션·HP와 원본 BP/맵은 보존한다. 이 상태에서 폭탄이 실제 UpperMesh에 접촉해 피해를 낸다.
+- 폭탄을 쓰면 잔량 0이며 기체는 살아서 계속 비행한다. 재투하·배송 화물 재픽업·공중 재장전은 막는다. HUD 잔량/소모 안내 후 일시정지의 **기체 교대**로 명시적으로 새 출격을 요청한다. 자동 파괴·자동 실패는 없다.
+- 교대는 같은 맵/Director·파괴 표적·완료/부분 목표를 유지한다. M2는 기존 기체로 교대하며 M3/M4는 기존 매 출격 기체 선택, M4 시작지점 선택을 따른다. 사용한 기체는 교대 확정 시 회수되고 새 기체에 1발을 지급한다. 기체 사망에 대한 M2 결과 처리와 M3/M4 재출격 정책은 별개다.
+- `CanReplaceSpentBombDrone / RequestSpentBombDroneReplacement`는 살아 있는 전투 Drop의 빈 탄창에서만 교대를 허용한다. `ConfigureCombatBombMode / IsCombatBombMode`는 Payload 컴포넌트의 런타임 연결 API이며 배송 DA/BP를 전투용으로 덮어쓰지 않는다. 배치된 표적의 실제 사망이 목표 진행을 만든다. 폭탄을 배송 성공 이벤트로 계산하지 않는다.
+
+현재 Build·실제 맵 투하/교대·UI 실행의 검증 경계는 [STATUS](../../STATUS.md)와 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
+
 ## 피해·파괴 목표 사용법
 
 `BP_MissionDamageTarget`은 기본 체력 100이며 Unreal의 표준 `Apply Damage`/`Apply Radial Damage` 경로를 받는다.

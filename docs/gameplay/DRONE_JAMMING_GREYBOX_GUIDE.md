@@ -1,6 +1,6 @@
 # Drone 재밍 Greybox 구현·배치 가이드
 
-현재 재밍 정책과 Radar 조정은 [Mission 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md#재밍-radar-bp-설정시험)를 따른다. Noise→NO SIGNAL·입력 차단/복구를 사용하며 속도 저하로 처리하지 않는다. M3/M4는 [현재 단계별 Story 정책](DRONE_MISSION_FRAMEWORK_GUIDE.md#실패-처리와-체크포인트)을 따른다. 아래2026-09-23 Greybox 기록은 공통 구조/과거값 참고이며 최신 게임 규칙·검증을 대신하지 않는다.
+재머 본체 피격 캡슐의 여유·메시 교체·조정은 [현재 피격 정본](DRONE_MISSION_FRAMEWORK_GUIDE.md#재머-본체-피격-캡슐)을 따른다. 재밍 효과 범위와 별도인 피격 표면이다. 현재 재밍 정책과 Radar 조정은 [Mission 가이드](DRONE_MISSION_FRAMEWORK_GUIDE.md#재밍-radar-bp-설정시험)를 따른다. Noise→NO SIGNAL·입력 차단/복구를 사용하며 속도 저하로 처리하지 않는다. M3/M4는 [현재 단계별 Story 정책](DRONE_MISSION_FRAMEWORK_GUIDE.md#실패-처리와-체크포인트)을 따른다. 아래2026-09-23 Greybox 기록은 공통 구조/과거값 참고이며 최신 게임 규칙·검증을 대신하지 않는다.
 
 ## 왜 필요한가
 

@@ -1,26 +1,28 @@
 # 현재 작업 상태
 
-기준일: 2026-10-27 KST D PC. 키보드 쉬운/게임 Ctrl을 공중 모터ON 하강→실제 접지OFF로 분리했다. 공중 해제hover·착지 후 새Space 재이륙이며 FPV/패드/RC는 기존 정책이다. Build75.30초·집중10건 Success/경고0/Fail0, 30/120fps 착지4조건과 실제Racer48표본을 확인했다. 기존 상승/패드/Acro Ctrl40표본 변화0. 손 조작 체감은 대기다. [입력 정본](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)·[상세 이력](docs/history/DRONE_WORKLOG.md).
+현재 기준(10/28 D PC): Drop 폭탄 SI 항력·우클릭 월드 수직 하방 카메라·Pause 여백·M2/M3 정문 문짝2개 HP300/파괴·M2 차량 종점 최종 실패·재머 본체 피격 캡슐을 반영했다. 최종Build48.36초·고유41자동검사 통과(경고 포함3/실패0; 리비전별 근거, 한DLL 전체41 아님). 실제 M2/M3 정문 파괴/교대 보존, 원본32점1,116.7m 차량 경로/도착 실패, 실제1280/1920 Pause를 확인했다. 폭탄0.75kg 수평12→10.43777m/s(2초),30/120fps 일치. 재머는기본/저장BP·비균일스케일의trace/전방센서/낙하폭탄과바깥guard를검사했고효과범위·강도·면역은유지했다. 본체는 Legacy Acro 간이힘/항력과 쉬운·게임 보조이동 혼용이며 실기체 교정·손조종·패키징은 별도다. [물리 보고](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md)·[이번 근거](docs/history/DRONE_WORKLOG.md).
+
+이전 입력 검증(10/27 D PC): 키보드 쉬운/게임 Ctrl을 공중 모터ON 하강→실제 접지OFF로 분리했다. 공중 해제hover·착지 후 새Space 재이륙이며 FPV/패드/RC는 기존 정책이다. Build75.30초·집중10건 Success/경고0/Fail0, 30/120fps 착지4조건과 실제Racer48표본을 확인했다. 기존 상승/패드/Acro Ctrl40표본 변화0. 손 조작 체감은 대기다. [입력 정본](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)·[상세 이력](docs/history/DRONE_WORKLOG.md).
 
 이전 기능 검증 기준: 2026-10-23 KST D PC. 넓은 역할별 FPV 시야·사용자 기본 시점/조작·선택 UI, M1 Drop 전용/M3·M4 단계별 기체 교대, 파괴 후 약3초 전환과 FPV 조준/전방 센서 자폭·하부 충돌 범위를 수리했다. 고유 자동검사101 Success/Fail0(단계별 DLL 근거, 한 DLL 전체 재실행 아님)·최종Build54.95초 성공. 실물 손조종·실청·실제 종료/재실행·패키징은 별도다. [카메라/자폭](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md)·[설정/UI](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)·[미션](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md)·[근거](docs/history/DRONE_WORKLOG.md).
 
 2026-10-27 D PC: 공통 성공/실패 요약·클릭닫기 상세 modal·게이트 A 화살표와 저장 WBP를 반영했다. 종료 후 HUD의 같은 출격 기록기 연결을 수정하고 Build47.00초 성공. 사용자 Editor 종료 후 전용4건·1280/1920 실제 viewport4건 통과, Root가 결과/상세·M1 Lit 목록/브리핑 화면을 확인했다. 상세 제목 한 줄 보완 후1280 viewport도 확인했다. 별도 기존 START배치1실패는 자산 무변경 근거와 보존한다. M1 새 사진2장 연결·원본/LoadingImage/맵 조명 보존, 게이트 프레임 색·재질·판정 범위 보존(50cm 확대 미적용). [조정](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)·[범위](docs/planning/DRONE_RANDOM_CITY_RACING_PROPOSAL_2026-10-27.md).
 
-현재 입력/설정 보완: `조작키 설정`을 키마·게임패드·InterLink 3탭/기능·입력 두 열로 바꾸고 키·축 교환/스틱 반전·장치별 기본값·부모1회 저장을 연결했다. UE SceneViewport의 표준 RightY 추가 반전을 프로젝트 Viewport에서 보정해 패드 Mode2 전후 반전과 Mode1 스로틀 저점 반전을 수리했고 Circle을 Esc의 영상/뒤로/일시정지 경로에 맞췄다. 최종 Build11.82초 성공, 동일 생산Source의 고유28검사가 리비전별 최종 통과했다(경고3검사 보존, 검사창 정리 UI3 중복 합산 없음). 실제 화면 경유5기종×2모드×2장치20경로·native 재배정4조건·구버전 저장·부모저장과1280 UI4장도 확인했다. 임시 검사창 참조도 해제해 native2→실제모달/맵 전환3검사를 한 Editor에서 재통과했다. 앞선47건의 카메라·정립 착지·RC배치 보완은 유지한다. PS앞밀기 HID750표본은 확인했으나 실물 비행체감·미연결 InterLink 새 실측은 미확인이다. [입력 정본](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)·[상세 이력](docs/history/DRONE_WORKLOG.md).
+수신한 현재 HEAD에는 10/27 키마·패드·InterLink 3탭/키·축 교환·반전·장치별 기본값·부모1회 저장, SceneViewport RightY 보정과 Circle=Esc가 포함돼 있다. 당시 고유28검사/Build11.82초/UI4장 및 앞선 카메라·정립 착지·RC배치47검사의 경계는 [WORKLOG](docs/history/DRONE_WORKLOG.md)에 보존한다. 실제 손조종·미연결 InterLink 새 실측·패키징은 별도다.
 
-## Git 기준(10/27 로컬 읽기·이번 Fetch 없음)
+## Git 기준(10/28 사용자 Commit/Push 승인·원격 Fetch 확인)
 
-최종 보존: Source/Config67경로·원본9개·15:34 사용자 종료 후 새 Saved10개 hash 일치, Editor0. FINAL4 영수증을 따른다. [실행 영수증/복원 경계](docs/history/DRONE_WORKLOG.md).
+보존 확인: 사용자 저장·종료 직후 새 baseline의 Saved10·Content23·보호11과 Source/Config65·DLL2 hash가 일치한다. 이번 엔진 Content 쓰기/Training 저장0·Editor0. 이전 자작 Result WBP/아이콘4개는 그대로이며 별도 사용자 M3 맵 변경은 보존/커밋 제외다. 사용자 현재 Commit/Push 승인 후 원격을 Fetch했고 두 main은 출발 HEAD와 origin/main0/0이었다.
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal D PC `D:\JGY\project\drone` | main `62b3e597`·기존 origin/main ref0/0 | 현재 입력/물리/UI 후속 미커밋 변경과 사용자 기존 Lobby WBP를 보존. 이번 Commit/Push 없음 |
-| 문서 D PC `D:\JGY\project\md` | main `e4c1b3d`·기존 origin/main ref0/0 | 현재 MD/Space 최신화는 미커밋. 이전10/23 Commit/Push 이력은 WORKLOG에서 분리 확인 |
+| Unreal D PC `D:\JGY\project\drone` | main `9102cd03`·origin/main0/0 | 57파일 Commit/Push 완료·LFS5개 업로드. 별도 사용자 M3 맵 변경만 보존/제외 |
+| 문서 D PC `D:\JGY\project\md` | main · 작업출발 `620f84b` | 현재 문서·Space 갱신본을 승인 커밋/푸시에 포함. 자기 커밋 해시는 최종 Git 영수증 참조 |
 | C PC 이전 실행 기준 | `c589bbf9` 위 당시 변경 | Build14.14초·UI RHI4종·M1 출격은 이전 PC 근거 |
 
 ## 작업컴 세션 운영
 
-총괄이 기존4담당의 코드/검토 결과를 모으고 엔진·Build·PIE는 실행 담당1곳만 사용했다. 최신 근거는 `DeviceInputProfiles_20261027/Execution/FINAL_DEVICE_INPUT_UNREAL_EXECUTION_20261027_FINAL4.json`이다. 현재 일반 Editor는 종료 상태이며 이번 Commit/Push는 없다. 최신 소유권과10/23 승인·이력의 구분은 [등록부](docs/git/DRONE_WORK_PC_SESSIONS.md)를 따른다.
+총괄이 기존4담당의 코드/검토 결과를 모으고 엔진·Build·PIE는 실행 담당1곳만 사용했다. 최신 근거는 `DropBombGatePhysics_20261028/Execution/FINAL_DROP_GATE_PHYSICS_UNREAL_EXECUTION_20261028_BUILD6.json`이다. 현재 Editor는 종료 상태이며 최종 Git 결과는 아래 Git 기준과 WORKLOG/영수증을 따른다. 최신 소유권과10/23 승인·이력의 구분은 [등록부](docs/git/DRONE_WORK_PC_SESSIONS.md)를 따른다.
 
 ## 현재 D PC 구현·검증 경계
 

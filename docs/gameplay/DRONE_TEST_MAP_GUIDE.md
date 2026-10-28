@@ -10,6 +10,18 @@ Story의 현재 맵 연결은 아래 표가 정본이다. M2·M3는 원본 Milit
 
 현재 절차 기준: 2026-10-22 C PC Story4 데이터/사진 교차검토. 실행별 수치·실패와 이전PC 기록은 WORKLOG 정본이다.
 
+## 전투 투하·상세 기록창·음량 확인
+
+1. M1/화물 수업은 배송 화물 투하·안착·목표 전달·재픽업이 유지되는지 확인한다. M2/M3/M4 Drop 선택 설명은 폭탄 1발이며 M3/M4 초기에는 광섬유만 선택 가능해야 한다.
+2. 전투 Drop의 폭탄이 실제로 낙하하고 기체 속도를 이어받는지, 자폭과 같은 피해/반경/효과가 한 번만 적용되는지 확인한다. 기체는 생존하고 잔량 0·재투하/화물 재픽업 불가여야 한다. 배송 이벤트가 전투 목표를 진행시키면 실패다.
+3. 미션이 진행 중인 상태에서 빈 폭탄 기체의 일시정지→기체 교대를 누른다. 동일 맵/Director·완료/부분 목표·파괴한 표적이 유지되고 새 기체는 1발을 가져야 한다. M2의 실제 사망 결과 처리, M3/M4 기체 재선택과 M4 시작지점3곳은 별도로 유지한다.
+4. 성공/실패 결과에서 상세를 열어 3통계 카드·2구간 요약과 실제 기록/미확인 `--`를 확인한다. 1280/1920에서 글자·단위·아이콘 잘림을 확인하고 카드 안팎 클릭·Esc/패드 취소/RC Back으로 닫아 뒤 버튼이 실행되지 않는지, 상세 버튼 포커스가 돌아오는지 확인한다.
+5. native와 저장 Settings WBP에서 키보드/패드/InterLink 확인으로 음량 조절에 들어가 위아래 키·Slate Navigation을 각각 보낸다. 확인/취소 전에는 음량만 바뀌고 포커스가 머물러야 한다. 확인은 유지·취소는 조절 진입값으로 미리듣기까지 되돌아가며, 눌러둔 반복 입력으로 재진입/전체 닫기/저장이 발생하면 실패다. 부모 적용에서만 1회 저장한다.
+
+최신 실행 결과와 실패/fixture 수선, Source·DLL·WBP 경계는 [STATUS](../../STATUS.md)와 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 합성 Slate/PIE 통과를 실물 손조종·실청·패키징 Pass로 확대하지 않는다.
+
+추가 수선 확인은 `Drone.Abilities.CombatBomb.AirResistance`·`AerodynamicUnitsAndWeather`·`HighSpeedFrameParity`, `Drone.Camera.DropNadir`, `Drone.UI.Pause.InformationLayout`, `Drone.Mission.ConvoyEscape`, `Drone.Mission.DestructibleBaseGate`, `Drone.Signal.RadarDamageHitbox`를 사용한다. 실제 맵은 `ConvoyEscapeActualStoryPIE.M2`·`DestructibleBaseGateActualStoryPIE.M2/M3`에서 원본 경로/정문·교대 보존과1280/1920 정보를 확인한다. 재머는 본체 피격 캡슐의5cm 여유 명중·40cm 외부선/80cm 외부sweep 비명중을 확인하며 효과 범위와 혼동하지 않는다. 자동 fixture의 위치/시간 배율/직접 피해와 손조종을 구분하고 최신 고유 결과·중간 실패는 WORKLOG를 따른다.
+
 ## Racer 로터 후보 시험
 
 최신전체Build후Editor를재시작해새DLL을로드한다. controlled 후보는 `/Game/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot`을Play하고savedRacer+LocalPlayer/IMC를사용한다. 기존제품맵은Legacy로유지하며후보지원범위를강제로늘리지않는다.

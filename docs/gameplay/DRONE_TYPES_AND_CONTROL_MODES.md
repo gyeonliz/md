@@ -31,7 +31,7 @@ Racer는 실제 레이싱용 기체, Scout/Drop/FPVStrike/FiberOptic은 전쟁 �
 |---|---|---|---|
 | 정찰 드론 | `BP_DroneScoutIntegration`; DroneSpy 본체·카메라·로터 4 | 거리·화각·LOS 유지형 Scan과 Training 표적 구현 | 모델 스케일/방향·Scan 체감, 최종 UI/FX |
 | FPV 자폭 드론 | `BP_DroneFPVIntegration`; FPV 본체·로터 4, FPV 기본 시점 | 출격 시 자동 무장·해제 잠금·유효 충돌1회 폭발, 제공 Niagara/Cue 연결 | 실제 비행 체감·폭발 크기/청감 조정 |
-| 드랍 드론 | `BP_DroneDropIntegration`; Delivery 본체·카메라·로터 6·Bag 선적재 화물 | 탑뷰·투하·착지 잔류·목표 자동 선택·근접 적재·Actor 재투하, 초기/재픽업 파지 통일 | 집게 외형 수동 확인, FX와 Mission별 투하 규칙 |
+| 드랍 드론 | `BP_DroneDropIntegration`; Delivery 본체·카메라·로터 6 | M1/수업 배송·재픽업, M2/M3/M4 전투 폭탄 1발·소모 후 생존/명시적 기체 교대 | [투하·교대 정본](DRONE_MISSION_FRAMEWORK_GUIDE.md#전투용-투하-폭탄과-소모-후-교대), 실제 집게 외형/실기 조준 확인 |
 | 광섬유 드론 | `BP_DroneFiberOpticIntegration`; DroneSpy Body·분리 Rotor 4개, 공급 GSU 통, 1인칭 기본 | `JammingImmunity + ImpactDetonation`, 통 상단→지나온 지면 Spline과 처진 마지막 구간 구현 | Spy 본체와 GSU 위치·크기·케이블 굵기 화면 조정, 충돌 자폭·재밍 Zone 면역 확인, Mission 3 교대 연결 |
 | 지상 드론 UGV | `BP_DroneGroundUGVIntegration`; GC Drone 1 Skeletal Visual | W/S 전후·A/D 조향·Q/E 제자리 회전, 최초 장거리 지면 획득, 4점 지면 높이/Pitch/Roll 추종, 공중 바람 Drift 차단 | 높은 Spawn→접지·Mesh 위치·스케일·경사/단차 추종 화면 확인, 무장·연료와 Mission 3 교대는 후속 |
 | 레이싱 드론 Racer | `BP_DroneRacerIntegration`; DroneRacing 본체·프로펠러4개 | 현재 레이싱 기체/선택 프리뷰 연결 | 실제 레이싱 기체 참조와 조종감 보정·실물 입력 검증, 특정 모델/사양 미정 |
@@ -51,9 +51,9 @@ Racer는 실제 레이싱용 기체, Scout/Drop/FPVStrike/FiberOptic은 전쟁 �
 | FPVStrike | 130° | 100.6831° | +15° | RunCam Phoenix 2 SE V2(H124°) |
 | FiberOptic | 130° | 100.6831° | +10° | 같은 FPV 렌즈 참고 |
 | GroundUGV | 95° | 63.0883° | 0° | A8 mini 렌즈 참고·기존 상부 조준 |
-| Drop 하부 보조 | 81° | 51.3212° | -90° | chase arm0·offset(0,0,-12)cm·위치 lag없음 |
+| Drop 하부 보조 | 81° | 51.3212° | 월드 -90° | chase arm0·월드 하방 offset Z(-12cm 기본)·위치/회전 lag없음 |
 
-Drop 하부에서 전방으로 돌아오면 전방 프로필을 복원한다. 일반 FPV 위치 smoothing·피격 Shake를 유지한다. 미등록 LongRangeStrike의 fallback은 HFOV124°/Pitch+5°이며 플레이 기체 추가를 뜻하지 않는다.
+Drop 우클릭 하부 보기는 기체가 Pitch/Roll되어도 기체 중심 바로 아래에서 월드 수직을 바라본다. Offset의 Z만 하방 거리에 사용하고 XY·DropAimPitch 설정과 관계없이 수직을 유지한다. 진입 즉시 변환을 갱신하고, 복귀하면 이전 Target/Socket offset·회전 지연·전방 프로필을 복원한다. 움직이는 폭탄은 속도를 상속하므로 이 수직 시점 자체를 착탄 예측 마커로 간주하지 않는다. 일반 FPV 위치 smoothing·피격 Shake를 유지한다. 미등록 LongRangeStrike의 fallback은 HFOV124°/Pitch+5°이며 플레이 기체 추가를 뜻하지 않는다.
 
 프로필 우선순위는 **Pawn BP camera override → FlightProfile camera override → MissionRole 기본값**이다. DA는 `FlightProfile.bOverrideRoleCameraProfile + CameraProfile`, Pawn BP는 `bOverrideRoleCameraProfileInBlueprint + BlueprintCameraProfileOverride`에서 조정한다. 카메라만 바꾸려고 비행/스로틀 BP override를 켤 필요는 없다. 사용자 FPV HFOV가0이면 이 프로필을 따르고,60~150°를 명시하면 최종 FPV HFOV에 적용한다. 3인칭과 Drop 하부는 독립이다. 기본 시점/조작의 저장·선택 적용은 [설정 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#9-사운드--화면--성능-설정)를 따른다.
 
