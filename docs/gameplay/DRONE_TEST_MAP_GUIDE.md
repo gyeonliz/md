@@ -10,6 +10,16 @@ Story의 현재 맵 연결은 아래 표가 정본이다. M2·M3는 원본 Milit
 
 현재 절차 기준: 2026-10-22 C PC Story4 데이터/사진 교차검토. 실행별 수치·실패와 이전PC 기록은 WORKLOG 정본이다.
 
+## 카메라·피격 캡슐·전선·창 모드 확인
+
+1. `Drone.Camera.TerrainClearance.Native/SavedRoles`에서 기체는 지면 밖에 둔 채 FPV를 아래로 기울이고 전방 벽에 접근한다. 실제 CameraComponent·GetCameraView·플레이어 POV 모두 구형 probe가 지형 밖에 있어야 한다. 3인칭 스프링, 작은 Drop의 시작 겹침, 기존 HFOV·기체 회전·수직 하방/복귀도 대조한다. `Drone.Camera.NearPlaneClearance.Native/SavedFPV`는 HFOV117/150·Roll90°·비스듬한 하방에서 실제 투영행렬의 가까운 네 모서리/렌즈까지의 교차를 검사한다. 카메라 중심만 안전한 결과로 통과시키지 않는다.
+2. `Drone.Physics.TargetCapsuleCollision`은 native/저장 BP와 회전·비균일 스케일, 실제 M4 작은 포탑 Scale3/Patriot Scale8을 검사한다. 외형 30cm 밖의 허공과 드론 이동이 막히면 실패다. 캡슐 명중·실제 전방 기폭/낙하 폭탄의 단일 피해, 파괴 후 비활성 및 살아 있는 시설의 캡슐 Off→On 복구도 확인한다.
+3. `Drone.Mission.TargetCollision.ActualM4TurretsPIE`는 실제 맵에 배치된 18개 포탑에서 실행 후 허공 차단을 검사한다. 단위 fixture의 배치와 실제 맵·손조종을 구분한다. 병사·재머 AOE·건물/정문·비행 기체 Root/기폭 센서를 일괄 치환하지 않는다.
+4. `Drone.Mission.PowerLineCollision.ActualM1PIE`는 실제 M1의 전선 18개 NoCollision·기둥 23개 Blocking과 전선 중앙 선 추적/18cm sweep, 원래 배치·가시성 보존을 확인한다. `PowerLineCollision.Policy`는 같은 Actor의 전선/기둥 분리와 다른 미션·Editor World 비적용을 대조한다.
+5. `Drone.Settings.DisplayMode.PIEGuard`는 Game fixture의 WorldType만 임시 PIE로 지정한 UI guard 검사다. 실제 별도 `-game` 실행은 `Drone.Settings.DisplayMode.Standalone.Native/SavedWBP`와 `Drone.UI.DisplayMode.ActualStandalone`을 사용한다. 실제 SWindow·viewport와 Win32 제목줄/테두리·모니터 경계, 저장값 재읽기와 사용자 원래 설정 복원을 대조한다. packaged 실행 확인으로 확대하지 않는다.
+
+실행별 Build·원시 실패·fixture 수선·최종 고유 통과 수와 보존 해시는 [STATUS](../../STATUS.md)·[WORKLOG](../history/DRONE_WORKLOG.md)가 정본이다. 현재 테스트 소스만으로 통과를 추정하지 않는다. 자동 검사 기록을 사용자 기록/설정에 남기지 않으며 Production Training과 제품 맵은 저장하지 않는다. UE5.8의 `GGameUserSettingsIni`는 논리 설정 키일 수 있으므로 실제 파일 검사·백업은 초기화된 `FConfigBranch.IniPath`를 사용한다. 임의의 임시 경로로 전역 키를 바꾸거나 기대 저장값을 직접 넣지 않는다.
+
 ## 전투 투하·상세 기록창·음량 확인
 
 1. M1/화물 수업은 배송 화물 투하·안착·목표 전달·재픽업이 유지되는지 확인한다. M2/M3/M4 Drop 선택 설명은 폭탄 1발이며 M3/M4 초기에는 광섬유만 선택 가능해야 한다.

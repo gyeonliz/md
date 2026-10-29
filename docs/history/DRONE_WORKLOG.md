@@ -4952,3 +4952,38 @@ STATUS/WORKBOARD·입력 정본·설정 UI 가이드와 현재 세션 등록부�
 - 최종 Build6 성공48.36초. DLL SHA256 A2A09E9DB91B617B9B2D6DEAE18BEF5E0FDE733F1920137042D613417906E2EE. 최신 고유41통과/실패0/경고 포함3은 BUILD3 기능27+BUILD5의2실패 교체(중복M3제외)로 원래29, 실제Story3, BUILD6 재머4+직접영향회귀5다. BUILD6 생산 차이는 Radar2파일뿐이며 원래32의 해당 경로 불변을 대조했다. 한DLL 전체41 재실행으로 쓰지 않는다. 기존 startup 프레임의 Condition failed 로그와 맵 재질/VSM/NavMesh 경고는 선택 검사 결과와 분리해 원문 보존한다. 전체 로그0error·실물 손조종·실청·패키징 Pass는 주장하지 않는다.
 - 보존/영수증: Source/Config65·DLL2·최신Saved10·Content23·보호11 hash를 실행 담당과 Root가 대조, Training 저장0·이번 엔진 Content 쓰기0·Editor0이다. 근거 루트는 D:/JGY/project/drone/Saved/Automation/DropBombGatePhysics_20261028/Execution이며 FINAL_DROP_GATE_PHYSICS_UNREAL_EXECUTION_20261028_BUILD6.json, ROOT_FINAL_EXECUTION_AUDIT.json, ROOT_LATEST41_LEDGER.json을 따른다. Root raw WORKLOG prefix baseline과 같은 바이트를 보존하고 끝에만 이 항목을 추가했다. 실제 PNG 사본은 C:/Users/Metacon_41/Documents/ChatGPT/드론/artifacts/20261028-drop-gate-physics의 pause-1280/1920·gate-before/destroyed다. 기존 PSD/볼륨31과 현재41을 합산하지 않는다.
 - 승인 전달: 사용자가 "다 하면 커밋푸쉬까지해줘"라고 새로 승인했다. 두 origin Fetch 직후 출발 main a53c3a26/620f84b는 각각0/0이었다. Root가 이전 자작 Source/Result WBP/아이콘4개와 이번 Source를57파일로 커밋했고 Unreal main 9102cd037af3093d927018e0a36d4cc9755d76a0를 origin/main에 Push 완료·원격 ref 일치, LFS5개298KB 업로드를 확인했다. 사용자 M3 맵은 별도 수정 그대로 남겨 커밋/업로드에서 제외했다. 이 항목과 현재 MD/기존 Space 갱신본을 문서 후속 커밋에 포함하며 자기 문서 해시는 최종 Git 영수증/최종 응답을 따른다. Trello·공유 권한·예약 자동화는 변경하지 않았다.
+
+
+## 2026-10-29 — 카메라 지형/광각 near면·전투 표적 캡슐·M1 전선·창 모드 수선과 전달
+
+- D PC 실제 작업 위치는 Unreal `D:\JGY\project\drone`, MD `D:\JGY\project\md`. 시작 두 main clean, Fetch 뒤 Unreal `f6a3796b`·MD `f33385c`와 각 origin/main 0/0. 이전 사용자 M3 맵 저장은 이미 f6a3796b에 포함된 기준이며 어제 미커밋 맵으로 되돌리지 않았다. 같은 대화의 사용자 “다 하면 커밋푸쉬까지해줘” 계속 지시에 따라 이번 종결도 Root가 Commit/Push한다. 새 날짜의 별도 승인을 받았다고 기록하지 않는다.
+- 기존 실행 대화 한 곳만 엔진/Build/PIE/Win32/RHI 사용. 카메라·물리·읽기 검토는 Source/조사만, Root는 M1 전선·범위 검사와 통합/독립 감사·MD/Space/Git 담당. 새 스레드/워크트리·Trello/공유 권한/예약 변경 없음.
+
+### 구현
+
+- `UDroneCameraSpringArmComponent`로 CameraBoom을 확장했다. 기본 UE SpringArm의 arm0 trace 생략 때문에 Native FPV body Z47/r45는 지형 밖인데 eye Z-11.50, Saved FPV body Z18.32/r16.321에서 eye Z-46.64가 재현됐다. root→실제 렌즈 sphere sweep과 초기 probe 겹침 분리로 실제 component/CameraView/PublishedPOV를 함께 보호한다. 기존 위치/회전 lag·시점/드론 회전·HFOV·Drop nadir/복귀는 유지한다.
+- 중심 보호만으로는 광각의 가까운 화면 모서리를 막지 못했다. Build3의 실제 CameraView 투영에서 HFOV117/150·Roll/비스듬한 하방의 nearcorner 교차를 RED2로 확인했다(대표 HFOV150, eye Z14cm·corner 약 -5.16cm). 실제 CameraView/viewport projection의 reversed-Z near4corner 최대 거리를 구형 여유에 포함했다. ProbeSize는 최소값, ClearanceMarginCentimeters는 기본1cm/0~10cm이고 additive FOV/이동도 반영한다. 시야각·near clip 자체는 줄이지 않았다.
+- `UDroneTargetCapsuleComponent`는 메시별 좌표/실제 스케일의 장축 캡슐과 넓고 얇은 부품의 평행 캡슐로 포탑·지상 차량·일반 Mission 표적·M4 Patriot을 덮는다. 회전된 월드 AABB를 로컬 Box에 다시 적용하던 과대 범위와 중복 blocking을 제거했다. 기존 Box 이름/타입/접근자는 남기고 query만 끈다. 메시/피벗/총구/HP·차량 지면 보정/경로를 유지한다. 이동의 sweep=false는 기존 코드다.
+- BP `TargetCapsules.PaddingCentimeters`는 월드4cm/0~10cm, 일반 표적의 `bUseCapsuleDamageCollision=true`가 기본이다. 시설의 기존 Box opt-out·RefreshDamageCapsules와 살아 있는 Off→On 복구, 사망 후 비활성을 검사했다. 재머10cm 캡슐·재밍 AOE/강도/면역·병사·정문/건물/지형·비행 Sphere Root/전방 퓨즈는 보존했다.
+- Director 종료 뒤 표적이 늦게 파괴되면 Director death handler만으로는 새 캡슐 정리가 지속되지 않았다. 실제 forward fuse로 기체가 먼저 사망한 후 낙하 폭탄/표적 사망을 검사해 corpse query 잔존을 확인했다. Director 소유 StoryTargetCapsules에만 owner Health 사망 감시를 직접 연결하고 죽은 Health의 Configure/Refresh도 차단했다. 네이티브 표적의 파괴 옵션·포탑 잔해 정책은 유지한다.
+- `DroneStoryEnvironmentCollision::ConfigureOverheadWires`는 M1/Game World의 정확한 SM_Wire_01 컴포넌트만 NoCollision으로 한다. 같은 BP_PowerLines_01의 SM_TelephonePole은 유지한다. 다른 미션/Editor World 비적용, 동일 Actor의 wire/pole 분리·반복 적용과 외형/가시성/배치 보존을 검사했다. 원본 BP·Mesh·맵 저장 없음.
+- 화면 모드 생산 코드는 이미 WindowedFullscreen→Apply/Confirm/Save로 구현되어 있어 변경하지 않았다. PIE 내부/PIE 새 창의 화면 모드·해상도는 의도적 차단이다. 실제 별도 Game 프로세스는 창1280×720에서 모니터2560×1440으로 전환하고 Win32 제목줄/테두리/크기 프레임이 모두 없어졌다. 저장 모드2/1과 다른 값으로 변경 후 재읽기·원래 모드/사용자 파일 복원을 확인했다.
+
+### 실행 근거와 실패 보존
+
+- `Saved/Automation/CameraCollision_20261029/Execution/FINAL_CAMERA_COLLISION_EXECUTION_20261029.json`이 최종 실행 영수증이다. 최종Build5 엔진9.54초/벽시계10.23497초 성공, Source/Config539 drift0. 같은DLL `7A085DFFCC9AA110B606AB6DE6D7CE976DEC965494167520F916A9FB9E39DFE5`에서 고유44 통과: Editor41(일반38+경고 포함3), Standalone3(일반3), 실패/미실행0. Root가 요약을 독립 집계한 `Root/ROOT_LATEST44_LEDGER.json`·빌드/보존 대조 `ROOT_FINAL_EXECUTION_AUDIT.json`을 남겼다.
+- 카메라 Terrain2/NearPlane2/DropNadir2, 표적 capsule20(native/저장 BP·yaw/비균일 scale·M4 작은 turret Scale3/Patriot Scale8), M1 실제 PIE1+정책2, 실제 M4 포탑1, 기존 전투/재머/차량/포탑/설정 guard를 최종 대조했다. Native/SavedWBP/실제 FrontEnd 별도 실행3도 같은DLL이다.
+- 실제 M1 wire18 모두 NoCollision, pole23 Blocking·geometry/visibility 보존. wire 중앙 simple/complex line·18cm sweep을 확인했다. 실제 M4 MG18 모두 캡슐이며 허공108조회 차단33→0. 정밀 조건의 드론 이동·로터 query·forward fuse·실제 낙하 폭탄과 반복 피해/사망1회·corpse query0를 확인했다. 실제 손 조종과 구분한다.
+- 최초 metadata V1은 Python query 반환값 처리 오류로60조회 unavailable였다. 이를 비명중으로 해석하지 않았고 V2에서 complex30/60 명중·simple 비명중을 확인했다. 네이티브 실제 PIE 재현으로 다시 잠갔다.
+- 최초 Editor RED25는 요청 증상/요구24와 PIE guard fixture1 실패다. Build2 Editor39는34통과/5실패(기존 전투 fixture2+Patriot 사망3); Build3의 전투2는 수선 후 통과하고 Near2 RED·Patriot3 corpse query30/33/39 잔존을 기록했다. Build4 집중5(Near2+Patriot3) 통과 뒤 최종5에서 전체44를 재실행했다. 중간 단계와 최종 고유44를 합산하지 않는다.
+- 전투 fixture는 옛 Box만10cm로 줄이고 실제 캡슐이 따르는200cm Visual을 그대로 두던 설정을 맞췄다. 기존 DamageAndDeath는 200cm 떨어진 yaw0/body hit로 기폭을 기대해 현행 powered-history/전방 직접 센서 계약과 달랐다. 실제 face trace·전방 센서 geometry/회전·powered history로 준비하고 기존 bottom rejection·전체 피해·사망1회 단언을 보존했다. 생산 fuse 규칙은 수정하지 않았다.
+- 표시 fixture의 소유 LocalPlayer 누락·PIE wrapper 미지원·임시 INI branch/실제 디스크 경로 혼동 실패를 보존했다. UE5.8의 GGameUserSettingsIni는 논리 키일 수 있어 실제 초기화 branch의 IniPath로 disk copy/read를 수정했다. canonical UI Apply/LoadSettings를 사용하며 기대 키를 주입하거나 생산 화면 설정 코드를 바꾸지 않았다. 전역 임시 키 실험을 종결하고 최종 Native/SavedWBP/실제 FrontEnd3 모두 실제 저장/재읽기를 통과했다.
+- 설치된 FabToolset UBT 규칙 불일치는 `-DisablePlugin=Fab` 빌드 인자만 사용해 우회했다. 프로젝트 plugin/Config 파일은 변경하지 않았다. 첫 Build 실패·test 컴파일 수선, 원시 Editor 시작 `Condition failed`15와 맵 경고 포함3은 원문 그대로 남겼다. 전체 raw log 오류0으로 보고하지 않는다.
+
+### 보존과 전달
+
+- 오늘 시작 Saved10·Content31·보호11과 별도 읽기 자산12(관련 Content 고유43)는 모두 hash 일치. Source/Config539·DLL2도 빌드 receipt와 일치/Editor0. Config 수정0·Content Git 변경0·Production Training/제품 맵 저장0, 새 사용자 저장 파일0이다. 어제 baseline을 복원하지 않았다.
+- 실제 M4 BP_AutoTurret_Vehicle_C_3의1280 RHI SceneCapture PNG에서 몸체·기관총 아트를 Root가 보았다. 원본 actor property write0/transform 보존·asset save0이며 이 이미지는 Editor SceneCapture로 PIE HUD/손조종/물리 query의 시각 증거로 확대하지 않는다. 첫 Python capture entry 오류는 보존하고 두 번째 export를 사용했다. 파일: `Execution/Captures/FINAL_BUILD5_RHI2_M4_SmallTurret_Closeup_1280.png`.
+- Source25파일(생산15+검사10)은 `f4c660e11ec2738cedb893bb2278ba93e021bab5`로 Commit/Push했으며 origin/main 일치를 확인했다. Content는 스테이징하지 않았다. MD는 현재 STATUS/WORKBOARD·가이드4·세션·이 append를 함께 전달하며 자기 커밋 해시는 최종 Git receipt를 따른다.
+- Drone Space 진행127·시험79·BP89의 관련 기존 블록을 갱신하고 readback 일치 확인. 최종 Git 전달 상태는 진행 블록에서 후속 확정하며 Root receipt에 남긴다. 기존 기획/이력·공유 권한은 보존했다. STATUS/WORKBOARD는 각각29,657/29,922bytes로30KB 이하이다.
+- 실물 손조종·기체/전체 미션 수동 완주·청감·packaged 실행은 이번에 확인하지 않았다. 이전 Drop41/PSD31·입력/오디오 수치와 합산하지 않는다.

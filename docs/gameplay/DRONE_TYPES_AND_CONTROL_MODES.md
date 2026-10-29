@@ -61,6 +61,12 @@ Drop 우클릭 하부 보기는 기체가 Pitch/Roll되어도 기체 중심 바�
 
 현재 자동 검증의 리비전·캡처 범위는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 실제 렌즈·소켓 교정과 손 조종/전체 화면 가독성은 별도다.
 
+### 카메라 지형 관통 방지
+
+공통 `CameraBoom`은 `UDroneCameraSpringArmComponent`를 사용한다. UE 기본 스프링의 지연·회전 계산 후 기체 중심부터 실제 렌즈까지 구형 probe로 검사하므로, arm 길이가 0인 1인칭·Drop 하방도 보호한다. 작은 기체의 probe가 처음부터 바닥과 겹치면 먼저 바깥으로 밀어낸다. 카메라 socket을 보정해 실제 CameraComponent·GetCameraView·플레이어 POV에 같은 위치를 사용하며, 자유 공간의 장착 위치·회전·HFOV·Drop 수직 하방/복귀는 유지한다.
+
+Pawn BP의 `CameraBoom`에서 `bDoCollisionTest`·`ProbeChannel`·`ProbeSize`와 `CameraCollision.ClearanceMarginCentimeters`(기본 1cm, 0~10cm)를 조정한다. `ProbeSize`는 최소값이며 실제 CameraView 투영행렬·현재 viewport에서 가까운 화면 네 모서리까지 포함하는 구형 여유를 계산한다. 광각·큰 Roll에서 렌즈 중심만 안전해도 화면 끝이 지면 아래로 들어가던 경우를 보호하며 FOV·near clip 자체는 줄이지 않는다. 충돌 검사를 끄거나 지형의 Camera 채널을 Ignore로 바꾸면 보호를 우회하므로 기존 Blocking 응답을 유지한다. 피격 Additive Offset의 이동과 FOV도 포함한다. 실행별 통과·미확인 범위는 [시험 가이드](DRONE_TEST_MAP_GUIDE.md)와 WORKLOG를 따른다.
+
 ### FPV·광섬유의 쉬운/게임 조작 조준
 
 FPVStrike/FiberOptic의1인칭·쉬운/게임 조작에서는 새 상하 시야 입력으로 조준한 뒤 전진하면 실제 기체 Root가 그 world 피치로 기울고 이동도 그 방향을 따른다. 카메라는 의도한 Root 기울기를 보상해 조준 각도가 중복되지 않는다. 기본 장착각만으로 자동 상승/하강을 시작하지 않으며 후진/중립에는 Root가 수평으로 돌아가고 조준 시야는 유지한다. 시점/조작 방식/새 Definition 전환은 이전 조준 권한을 지운다. 다른 역할·3인칭·Acro/UGV와 Drop 하부에는 이 보조를 적용하지 않는다. 자동 표적 탐색/유도 기능은 아니다.

@@ -327,6 +327,8 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 
 구현 소스: `Source/Drone/UI/DroneFrontEndRootWidget.*`, `DroneSelectionWidget.*`, `DroneSettingsWidget.*`, `DroneAudioSettingsSubsystem.*`. 카메라 설정의 지정 자동 검사·PNG 검토 범위는 아래와 같다. 실물 장치·가청 변화·실제 재실행 저장 복원은 수동 확인이 남아 있다.
 
+테두리 없는 창은 `WindowedFullscreen`이며 선택 해상도 대신 모니터 전체 크기를 사용한다. 에디터 내부 PIE와 PIE 새 창은 화면 모드/해상도 적용 대상이 아니다. 별도 `Standalone Game` 또는 Game World에서 설정의 적용을 사용한다. 실제 Windows 창의 제목줄·테두리 제거, 저장/복원 확인과 패키지 검증의 구분은 [시험 가이드](DRONE_TEST_MAP_GUIDE.md)를 따른다.
+
 ### 카메라 감도·반전과 Designer
 
 설정은 위/아래로 사용 가능한 항목을 순환하고 보이는 곳으로 스크롤한다. Enter로 콤보를 열어 위/아래 선택·Enter 확정, Esc는 열린 목록만 취소하고 selector에 복귀한다. 음량은 Enter 편집→위/아래 값 변경→Enter 확정 또는 Esc 원복이며 편집을 끝내면 다시 위/아래 항목 이동이다. 팝업/편집이 없는 Esc는 미적용 변경을 취소하고 설정을 닫는다. 체크박스·기본값·적용·BACK도 Enter로 조작한다. 실제 native/WBP Slate 검사와 PIE 확인 경계는 STATUS/WORKLOG를 따른다.

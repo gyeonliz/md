@@ -312,6 +312,16 @@ M3는 배치된 체크포인트가 없으면 최초 출격 위치를 사용한�
 
 이 캡슐은 **피격용**이며 기존 JammingBounds·CoverageCenterOffset·반경/반높이·강도 감쇠·광섬유 면역·목표 단계는 유지한다. 바깥40cm 선과80cm sweep·먼 AOE 위치는 명중으로 처리하지 않는다. 실제 저장 Radar BP/Native와 비균일 Scale의 자동 검사·미션 단계 회귀 결과는 WORKLOG에 기록한다.
 
+## 전투 대상 캡슐과 미션 1 전선
+
+설치형·차량형·유인 기관총 포탑, 지상 차량, 일반 Mission 피격 표적과 M4 Patriot은 `UDroneTargetCapsuleComponent`의 부품별 캡슐을 사용한다. 회전된 월드 경계를 하나의 로컬 Box로 다시 키우지 않고 메시 자체 좌표와 실제 스케일에서 장축을 맞춘다. 넓고 얇은 부품은 여러 캡슐로 덮고 조준 회전·부착 이동·스케일 변화를 따른다. 이전 Box subobject 이름/타입은 BP 참조 호환을 위해 남지만 충돌은 꺼서 중복 차단을 막는다. 모델·피벗·총구·체력과 차량의 지면 보정/경로는 별도 계약으로 유지한다.
+
+BP의 `TargetCapsules.PaddingCentimeters`는 월드 기준 기본 4cm(0~10cm)다. 메시 교체·여유값 변경 후 `RefreshCapsules()`로 다시 맞춘다. 일반 Mission 표적은 `bUseCapsuleDamageCollision=true`가 기본이며 시설에 기존 Box가 필요한 경우만 끄고 `RefreshDamageCapsules()`를 호출한다. 살아 있는 표적의 Off→On 전환은 복구하고, 파괴 후에는 캡슐이 다시 활성화되지 않는다. 재머의 기존 10cm 캡슐·병사·정문/건물·지형·재밍 AOE와 비행 기체 Sphere Root/전방 기폭 센서는 이 변환에 포함하지 않는다.
+
+M1 `Battlefield`의 전봇대 어셈블리에는 전선 `SM_Wire_01`과 기둥 `SM_TelephonePole`이 분리되어 있다. M1 시작 시 `DroneStoryEnvironmentCollision::ConfigureOverheadWires`가 전선 컴포넌트만 NoCollision으로 설정한다. 기둥의 충돌·전선 외형·배치/가시성과 원본 맵·BP·Mesh 자산은 유지한다. 다른 미션이나 Editor World에는 적용하지 않는다.
+
+Director가 추가하는 `StoryTargetCapsules`는 표적 Health의 사망을 직접 감시한다. 기체 자폭·교대 때문에 Director의 진행 구독이 해제된 뒤 표적이 늦게 파괴돼도 물리 판정은 정리하며, 죽은 Health를 다시 Configure/Refresh해도 부활시키지 않는다. 네이티브 표적의 파괴 옵션·포탑 잔해 정책은 각 표적이 계속 소유한다.
+
 ## M2 차량 종점과 M2/M3 정문
 
 M2의 `Story.M2.Convoy.Target` 실제 차량은 native spline 종점 사건을 Director에 연결한다. 살아 있는 표적이 종점에 도착하면 최종 실패이며 기체 교대/체크포인트로 회피하지 않는다. 이미 파괴된 표적·다른 차량·종료 후 도착은 결과를 바꾸지 않는다. 차량은 SetSplineRoute 이후 도착 사실을 유지해 Director 연결 전 도착도 다음 tick에 처리하고, 새로운 경로를 명시적으로 배정할 때만 초기화한다. 실제 작성된32점 경로를 유지하며 60m 직선은 작성 경로가 없을 때의 기존 fallback이다. 별도 실패 Trigger를 추가할 필요가 없다.

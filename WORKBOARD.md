@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-10-28 D PC — Drop 항력·하방 카메라·Pause·정문/차량·재머 피격 수선 완료. 고유41자동검사/실제 맵·화면 확인. 코드 푸시 완료·문서 승인 후속이며 M3 사용자 맵은 보존한다. [STATUS](STATUS.md)·[세션](docs/git/DRONE_WORK_PC_SESSIONS.md)·[WORKLOG](docs/history/DRONE_WORKLOG.md).
+마지막 갱신: 2026-10-29 D PC — 카메라 렌즈/광각 near면 스프링·비병사 전투 표적 캡슐·M4 허공/파괴 후 판정·M1 전선 수선 완료. 같은DLL44자동검사 통과(경고 포함3/실패0), 별도 창 모드 정상/PIE 차단 확인. 원본 맵·설정 보존. 코드 f4c660e1 푸시, 문서·Space 전달. [STATUS](STATUS.md)·[현재 절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#카메라피격-캡슐전선창-모드-확인)·[WORKLOG](docs/history/DRONE_WORKLOG.md).
 
 ## Now
 
