@@ -10,6 +10,28 @@ Story의 현재 맵 연결은 아래 표가 정본이다. M2·M3는 원본 Milit
 
 현재 절차 기준: 2026-10-22 C PC Story4 데이터/사진 교차검토. 실행별 수치·실패와 이전PC 기록은 WORKLOG 정본이다.
 
+## 파일럿 비행장 배치
+
+`/Game/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot`은400×400m, 바닥 상면Z=0의 파일럿 비행장이다. 기존100×100m보다 각 변4배/면적16배다. 출발반경20m와 중앙 폭40m·길이340m는 충돌 소품 없이 비워 둔다.30/60/100m 거리띠와2/5/10/20m 높이 기준, 크기가 다른 박스/낮은 벽/컨테이너·차량형 모형, 먼 실루엣을 합쳐39개 환경 액터를 배치했다.
+
+Outliner의 `Pilot.Environment` 아래 `GroundMarkings`9·`Labels`7·`HeightReferences`8·`Props`11·`DistantSilhouettes`4에서 지상 환경39개를 개별 이동/크기/재질 편집한다. 소유 tag는 `Pilot.Environment`, label은 `PilotEnv_` 접두사다. 지상 소품은 기본 도형·기존 재질을 사용한다. 표시형상에 맞는 단순 충돌 소품23개, 거리띠/글자는 비충돌이다. 적합한 단순 충돌이 없는 기존 컨테이너 메시 대신 수정 가능한 박스형 모형을 사용했다.
+
+하늘·원경은 별도 `Pilot.SkyDepth` 폴더/tag, `PilotSky_` label의16개 액터다. 비행장 바깥 약260~520m 거리에 높이35~160m의 큰 박스 건물·타워14개를 두고 모두 `NoCollision`으로 설정한다. 구름은 `VolumetricCloud`의 바닥고도0.20km·층높이0.25km(상단450m), 수평선은 옅은 `ExponentialHeightFog` 밀도0.004다. 기존44개 액터와 중앙/출발 통로는 유지한다. 구름과 건물은 유한 거리에 있어 시선·위치 변화의 비교 기준이 되지만 별도 속도/HUD 기능을 추가한 것은 아니다.
+
+구름 조정은 `/Game/Drone/TestMaterials/MI_PilotSkyDepth_Clouds`에서 `Layout_CloudGlobalScale=16`, `Cloud_GlobalCoverage=0.1`, `Cloud_GlobalDensity=0.08`, `Noise_Strength=(0.8,0.04,0,2.5)`를 편집한다. 엔진 기본 구름 재질을 부모로 둔 프로젝트 소유 MIC1개이며 엔진 원본은 수정하지 않는다. 고도·층높이는 구름 액터, 안개 밀도는 안개 액터에서 조정한다. 이 재질은 파일럿맵에서만 사용한다. 전체 맵은 기존44+하늘16=60액터다.
+
+기존 Setup/출발위치·관찰offset·GameMode/tag·조명/날씨/카메라와 물리/키 코드는 유지한다. 이번 환경의 저장 범위는 파일럿umap와 구름MIC1개이며 Production Training·본미션·기존DA/BP는 건드리지 않는다. C++ Build는 필요 없다. 저장·재열기 후 실제RHI에서 같은 FPV 위치/화각의 수평·상방40°·70°를 확인하고, 키/재시작/날씨 집중3검사를 수행한다. 앞선 지상 환경의 착륙 포함4검사와 구분한다. 화면 검사에는 임시 PIE view target을 사용하며 기체의 원래 카메라/FOV 설정을 저장하지 않는다. 자동 입력·충돌 설정 확인과 사람의 비행/실제 소품 충돌체감은 구분한다. 앞선 보조 PIE sphere프로브는 결과가 없어 통과 근거로 쓰지 않았으며 기존41검사도 환경 후 전체 재실행으로 합산하지 않는다. 실행별 근거는 STATUS/WORKLOG를 따른다.
+
+## 파일럿 숫자키 실행 확인
+
+대상과 키별 역할은 [입력 정본](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#파일럿-테스트맵-전용-숫자키), 계산/계수/적용 조건은 [물리 정본](DRONE_REALISTIC_HANDLING_PLAN.md#파일럿-맵의-접촉회전착륙-보정)을 따른다. Editor를 저장·종료하고 기존 실행 담당 한 곳에서 현재 Source를 Build한 뒤 같은 DLL로 검사한다.
+
+1. `Drone.Physics.RotorPilot.ContactRefinement`는 실제 saved Racer의 마찰 감속/거리·접점 토크·공중 회전 감쇠·기존 OFF 저속 정립/구름 정착·공중/벽/천장/뒤집힘/호버 추력 거부·30/120fps·정확맵 격리·중심 법선 충격 회전0/에너지·계수/default0 검증을 수행한다. `NaturalLanding`의 ArmedLowThrust/ObliqueApproach/TakeoffRelease/RateIntentRelease/FrameParity/GuardRelease/DefaultsValidationAndScope는 실제 Setup→저장 Racer와 native 바닥을 사용한다.40·45% 출력과30/120fps 착지·비스듬한2.5m/s 접근·기수 방향/정지/모터ON 유지, 실제 보정 상태에서 새 고추력/강한 회전의 첫step 해제·재이륙, 접촉 상실/공중/벽/천장/뒤집힘/호버 거부·계수/기본값/외부맵 격리를 확인한다. transient GameWorld의 canonical PIE 경로와 실제 sweep을 쓰며 작성 맵을 저장하지 않는다. 자연 보조의 조정 위치와 조건은 [물리 정본](DRONE_REALISTIC_HANDLING_PLAN.md#파일럿-맵의-접촉회전착륙-보정)을 따른다.
+2. `Drone.Physics.RotorPilot.ShortcutsPIE`는 숫자열1/2/3·4~7·0/9·8을 PlayerInput press→실제 World 시간의 서로 다른 진행2회 확인→관측/release로 검사한다. 일시정지 거부 case만 application frame2회로 확인하며 목표 상태가 나올 때까지 기다려 단언을 우회하지 않는다. 관찰 카메라 추적/최종 POV, 모터ON 모드거부·Pause/입력차단·8반복/날씨/기체·카메라 정리와 새Space를 확인한다. 다른 맵은 `ShortcutWorldIsolation`에서 차단한다. 함수를 직접 호출한 결과를 키 입력 증거로 쓰지 않는다.
+3. `RestartInputSafetyPIE`는 heldSpace·외부 input flush·반복8·repeat 입력에서OFF 유지, 실제 release 후 새Space, 사망 뒤8의 새 입력 복구를 확인한다. RC high→bottom→rise는 semantic throttle API 검사이며 USB/HID 실측이 아니다. `WeatherKeyIndependencePIE`는90도/10m/s 바람 아래 실제9두회와8에서 기존 바람/비가 보존되는지 확인한다.
+4. 같은 DLL의 실제 RHI에서 `ShortcutsPIE`를 실행하면1/2/3/8마다 화면 정착 후 고유 UTC/GUID 폴더의 PNG4개를 저장하고 쓰기 완료를 기다린다. NullRHI에서는 이 캡처를 생략한다. 저장 결과는 Root가 이미지로 확인하며 자동 PlayerInput과 사람이 물리 키보드/패드/RC를 조종한 검증을 구분한다.
+5. 공유 커널·기존 프로필·모터/추력·게이트 마커의 직접 회귀를 함께 검사한다. 제품맵·DA/BP·기록/설정은 오늘 기준 hash로 대조하고 실행 종료 후 복원한다. Source/DLL 동결, 실패 이력, 자동/수동·패키징 경계는 STATUS/WORKLOG에 기록한다.
+
 ## 카메라·피격 캡슐·전선·창 모드 확인
 
 1. `Drone.Camera.TerrainClearance.Native/SavedRoles`에서 기체는 지면 밖에 둔 채 FPV를 아래로 기울이고 전방 벽에 접근한다. 실제 CameraComponent·GetCameraView·플레이어 POV 모두 구형 probe가 지형 밖에 있어야 한다. 3인칭 스프링, 작은 Drop의 시작 겹침, 기존 HFOV·기체 회전·수직 하방/복귀도 대조한다. `Drone.Camera.NearPlaneClearance.Native/SavedFPV`는 HFOV117/150·Roll90°·비스듬한 하방에서 실제 투영행렬의 가까운 네 모서리/렌즈까지의 교차를 검사한다. 카메라 중심만 안전한 결과로 통과시키지 않는다.

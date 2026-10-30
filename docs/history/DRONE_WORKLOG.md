@@ -4987,3 +4987,85 @@ STATUS/WORKBOARD·입력 정본·설정 UI 가이드와 현재 세션 등록부�
 - Source25파일(생산15+검사10)은 `f4c660e11ec2738cedb893bb2278ba93e021bab5`로 Commit/Push했으며 origin/main 일치를 확인했다. Content는 스테이징하지 않았다. MD는 현재 STATUS/WORKBOARD·가이드4·세션·이 append를 함께 전달하며 자기 커밋 해시는 최종 Git receipt를 따른다.
 - Drone Space 진행127·시험79·BP89의 관련 기존 블록을 갱신하고 readback 일치 확인. 최종 Git 전달 상태는 진행 블록에서 후속 확정하며 Root receipt에 남긴다. 기존 기획/이력·공유 권한은 보존했다. STATUS/WORKBOARD는 각각29,657/29,922bytes로30KB 이하이다.
 - 실물 손조종·기체/전체 미션 수동 완주·청감·packaged 실행은 이번에 확인하지 않았다. 이전 Drop41/PSD31·입력/오디오 수치와 합산하지 않는다.
+
+
+## 2026-10-30 — 최신 수신·파일럿 숫자키 전용 범위/실행 미반영·현재 관성/물리식 보고
+
+- 사용자 요청: 최신화, 숫자키 시점 전환 등의 실제 연결과 파일럿 맵 한정 여부, 현재 관성·물리 계산식 보고. 이번에는 소스/설정/기존 실행 근거를 읽고 MD/Space를 갱신했다. 엔진/Build/PIE/CUA·Content 저장·Commit/Push·Trello·공유권한·예약 변경은 하지 않았다. 기존 엔진 세션4곳의 최신 상태를 읽기 확인했고 새 엔진 작업을 할당하지 않았다. 물리식은 읽기 전용 검토를 병행했다.
+- Git: 점검 시작 코드 main108e9c9500c9d60800ed5dc22dbc01225951524a·문서 main8d5c52bbc4225e1e06d776a4f8c5985fd5f16995 clean/추적0/0, ls-remote origin refs/heads/main 실제 일치. 수신 efa9bdea의 사용자 맵7개 변경/삭제(TUT_Delivary 삭제 포함)는 보존하며 자산 내부 실행 검증/복구로 주장하지 않는다. 108e9c95의 숫자키·활성 작성 코스까지 게이트 마커 확대·S_Gunshot 교체를 Source/차이로 확인했고 새 청감/렌더 Pass는 아니다.
+- 숫자키 범위: 숫자열1 관찰/2 FPV/3 3인칭/4 Easy/5 Game/6 Mode1/7 Mode2/0 바람/9 비,8·NumPad 미할당. Setup은 WasInputKeyJustPressed를 직접 읽고 controlled tag·플레이어 소유 기체·Pause/입력차단을 검사한다. 모터ON 모드변경은 거부하고4/5는Legacy,6/7만후보를 사용한다. 파일명 자체로 잠그지 않고 Setup/표식 배치가 경계다. 일반 IMC·3장치 키 설정을 바꾸지 않는다.
+- 저장 패키지 이름/참조 읽기 검사: tracked 맵75개+Content/Drone 자산2232개=2307개, 합계11875994354바이트. DroneRotorPilotSetup/GameMode/DroneRotorControlledTest의 ASCII/UTF16 명칭은 Content/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot.umap 한 곳에서만 발견, 오류0·LFS 포인터0. UE AssetRegistry/PIE 검사가 아닌 직렬화 참조 검사로 구분한다. 맵·BP 재저장 없음.
+- 실행 반영 공백: 현재 Drone DLL SHA256 7A085DFFCC9AA110B606AB6DE6D7CE976DEC965494167520F916A9FB9E39DFE5는10/29 FINAL_BUILD5와 같다. 당시539파일 영수증 대비 현재 Source5파일(RotorPilotSetup.cpp/h, PilotPIETest.cpp, RacingGateMarker.cpp, GateMarkerTest.cpp)이 다르고 ApplyPilotShortcut/ShortcutsPIE 문자열도 현재 DLL에 없다. 새 코드의 현재 실행 반영은 미완료다. ShortcutsPIE 소스는1만PlayerInput 주입,2/3·모드·날씨는함수 직접호출이므로 전 키 실제입력 검증으로 쓰지 않는다. 10/29 44Success(경고포함3/실패0)는 당시 결과이며 현재 HEAD 전체 Pass로 확대하지 않는다. 다음은 사용자 Editor 저장·종료 후 실행 담당1곳의 현재 Source Build·실제 숫자열/모드/날씨 확인이다.
+- 현재 물리 보고: 기본 본미션 Legacy 쉬운/게임ON은 FloatingPawnMovement의 가속/감속 보조, Legacy Acro는 합산추력/총질량·중력·선형/제곱항력과 각속도1차응답(tau_r 기본0.08s)이다. 관성텐서/모터별토크 적분이 아니다. OFF 항력/World중력과 실제정지지지면 마찰mu0.4/정립 보조는 존재하며 후보는 이접지경로에서 제외된다. Legacy 항력은월드속도·바람은별도drift다.
+- 후보 관성: 로터별 힘/팔의 모멘트/반작용토크를 합산하고 omega_dot=J^-1*(tau-omega cross Jomega), 상대 공기속도 축별 선형+제곱항력, a=R*(Frotor+Fdrag)/m+g를 SI 중간값/쿼터니언으로 적분한다. 기본 J=diag(.05)kgm²·팔.25m·4로터·rho1.225·CdA축별.01306122449m²·선형c.24kg/s·P.625/I=D0·dt1/120/프레임16step/최대부채.25s는 실기체 미교정 합성값이다. 현재 Racer/Acro1·2/CG0 controlledWorld만 지원하며 본미션 전체 전환·fullChaos flight는 아니다.
+- 확정 미구현: 후보의 구형sweep/법선속도제거/slide에는 접선마찰·접촉지점충돌토크·Legacy정립착지가 없고 공력에도 회전저항토크가 없다. 착지미끄러짐/모터정지후잔여회전이 남을 수 있는 구조다. 이를 단순히 공기저항 전체 미적용으로 단정하지 않으며 완성된 착륙물리라고 보고하지 않는다. 전투폭탄은 실제Payload질량·바람상대SI제곱항력/중력/해석감쇠·swept충돌을 사용하지만 회전/텀블링/양력은 없다.
+- MD: STATUS/WORKBOARD·입력 정본·시험 가이드·현실 조종감 계산식·화살표 가이드·세션 등록부를 현재 Source/실행 경계에 맞췄다. STATUS/WORKBOARD는30KB 이하, WORKLOG 기존 바이트는 그대로 보존해 이절만 추가했다. 현재 문서 변경은 로컬 미커밋이며 GitHub 원문은 이전 커밋이다.
+- Space: 기존 진행 Page sequence130(1블록), 테스트80(1블록), BP가이드90(게이트/입력/물리3블록) 총5연산 적용, 모두 거부/무시없음. 정확한 대상5블록을 다시 읽어 기대본문 일치5/5 확인. 새Page/Agent Instructions/권한/배치는 만들지 않았다. 기존 Story/Drop/PSD·날짜별기록 등 대상 밖 본문은 보존했다. 저장 Markdown 확인이며 전화면 레이아웃/수동조종 확인은 아니다.
+- 로컬 근거: Saved/Automation/LatestSync_20261030/Root/PILOT_MAP_REFERENCE_SCAN.json·BUILD_RECEIPT_COMPARISON.json·SPACE_VERIFIED.json·MD_BASE_UPDATES.json·MD_PHYSICS_UPDATES.json·LATEST_SYNC_FINAL.json. 이번 확인은 코드/참조/기존 실행물 읽기이며 새 자동 실행을 성공으로 추정하지 않았다.
+
+
+## 2026-10-30 — 파일럿 전용 접촉·회전·착륙/8재시작 완료·41검사·사용자 인계
+
+- 사용자 요청: 파일럿 테스트맵에만 접지 마찰·충돌토크·회전공기저항·착륙보정, 숫자키 빌드/실제 입력 검증,8재시작. 엔진/Build/PIE/RHI는 기존 실행 담당01a16105-48eb-7101-8b2a-0bc6b4a070e9 한 곳만 사용했다. 총괄·물리/숫자키 구현·독립 읽기 검토로 분리했다. 진단 스킬의 재현→수정→동일경로 검증을 사용했으며 기존 근거의 다른PC/이전DLL을 새 Pass로 재사용하지 않았다.
+- 범위: 정확한 /Game/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot·Game/PIE World·controlled tag·명시opt-in만 신설 기능을 적용한다. Setup의 초기생성과숫자키도canonical경로/PIEprefix를검사한다. 다른맵은ScopedSettings false/C0이며 공유 설정 기본OFF/마찰0/회전C0/정립rate0, 원본DA/BP/맵과Legacy를보존했다.4/5는Legacy,6/7만보강candidate다.
+- 접촉: SI 접점속도 v+omega cross r와유효질량으로normal/tangent impulse를계산하고 |Jt|<=mu*Jn, v+=J/m,omega+=I^-1*(r cross J)를적용했다. CG0구형실반경접점을재구성해nativepullback이인공회전팔을만드는것을막고, 중력지지impulse를두번더하지않는다. 회전항력 tau=-C*omega는기존관성적분전후exact exponential halfstep으로감쇠한다.
+- 착륙: 최근실제blocking contact/같은정지면/nativepullbackslop를재확인,모터OFF·잔여추력5%중량이하·선형/회전접선속도.5m/s이하·UpDot>.25·.05초지지에서heading보존정립/저속rolling정착을보조한다. 공중3cm/벽/천장/뒤집힘/모터ON/고속은대상외다. Setup일시사본mu.4/e.1/C축별.025Nm s/정립rate6이며기체자산을저장하지않았다. 접지는기존구형충돌체기준,외형다리접지·실측형상/계수교정·fullChaos는별도다.
+- 숫자키:1고정관찰/2FPV/3추적,4쉬움/5게임/6Mode1/7Mode2,8재시작,0바람/9비.8은새Racer·시작위치·Mode2·기본시점·모터OFF,선형/각속도/모터/제어기초기화·날씨유지·구기체/관찰카메라정리다. heldSpace/입력flush/반복8은미해제키집합을유지하고실제release후새press를요구한다. InterLink래치버튼은momentary대기에서제외하고RC는새bottom→rise를유지한다. 죽은기체의DisableInput뒤새기체입력복원도확인했다.
+- 독립검토로반복8+flush에서held집합유실,사선pullback의가짜normal회전,9가90도/10m/s기존바람을0도/5m/s로바꾸는문제를찾아수선했다.9는바람override를쓰지않고0만바람을바꾼다. 키검사는함수직접호출대신PlayerInputpress→frame→release로확장했고RC안전검사의semanticAPI주입과실물HID를구분한다.
+- 실행 이력: RED Build1 PKG_Transient미정의fixture수선, g0hover0대신.5출력으로회전생성, Build2 8.85초성공/15검사9Success6Fail(누락4물리+8+다른맵차단). 관찰추적fixture의SetActorLocation뒤후보state resync누락을수선했다. GREEN Build3 test FRigidBodyState namespace모호함1줄수선. Build4 8.85초성공. 첫suite는정규식[.]를리터럴matcher에넣어0건실행했고검증으로세지않았다. UE AutomationCommandline소스를읽어StartsWith:/^/$/+문법으로교정했다.
+- GREEN SUITE2는실제RHI41중40Success/GroundFriction1Fail였다. 실제Racer m2kg/r.45m/Iy.05에서는무회전항력/정립OFF의Coulomb구름전이손실이10.989%인데검사의고정15%감소기대가과했다. 생산계수나마찰함수를맞추지않고GroundFriction함수만무공력고립fixture+실제m/r/I해석식·mu0대조·접점slip·수동에너지·충격량검사로강화했다. 다른8contact검사/운영8파일/PilotPIE는바꾸지않았다.
+- 최종Build5 8.96초(벽시계9.5659811초)성공,같은DLL의GREEN_SUITE3 고유41/41Success. native report 일반39+경고포함2/failed0/notRun0/inProcess0, RotorPilot19+FlightDynamics5+RotorProfile1+MotorControl10+ThrustGravity5+GateMarker1이다. 경고3entry는HTTP timeout/가상RHI예약예산과의도된Acro외모드거부이며원시startupConditionfailed15는별도다. 전체로그오류0으로주장하지않는다.
+- 최종실측: ground rolling 예상/측정v1.780219780m/s/omega3.956043956rad/s/E3.560439560J/impulse.439560440Ns 일치·접점slip0. 회전2.524619583→1.192543754rad/s,접촉omegaY2.917rad/s,정립upZ.999999999/yaw36.999747884/속도.000000542cm/s,30/120fps차이0. normal대조omega0/에너지5→1.49J/접선100cm/s. 계수NaN/음수/default0/다른taggedWorld격리도통과했다.
+- 실제D3D12 PIE에서1/2/3/8 스크린샷4장(2560x1392)을실행담당과총괄이직접열어관찰드론/FPV본체없음/3인칭본체/8모터OFF·속도0·heldrelease안내를확인했다. 최종캡처는Captures/Run_20261030_005815_8A91BEA0499D0E3710620A83E61957C3이며앞선Build4캡처와별도다. 사람의물리키보드·패드/RC손조작·실기체교정·패키징Pass는아니다.
+- 최종보존: Source/Config540·DLL2동일. Drone DLL64CCE23477F75B460DA9B3CD4020BEBFC68A57426757D16824D8457DD922C614,RawInput6C9904E07B262B1B6871089F5425520CB361930968D85743B193F67C308E0DD3. 오늘Saved10복원·Content68/보호33/Config7/기존TUT_Delivary삭제상태보존/추가사용자Saved0/엔진0·맵저장0. 이후사용자가“엔진키고테스트해본다”하여인계했으며,이후추가엔진실행·설정복원·Source수정은하지않는다. 사용자의후속실행상태를이종료영수증과혼동하지않는다.
+- Git 정정: 총괄이과거완료후Commit/Push지시를이번작업에도적용해로컬90a07506을만드는오판을했다. 사용자“커밋푸쉬는안시켰는데”에따라직접만든커밋만mixed취소하고Source10파일byte보존·HEAD/원격main108e9c95·index비움을확인했다. 원격Push는한번도하지않았다. 문서HEAD8d5c52b+로컬8파일변경은유지하며MD커밋/푸시는없다. 이후새Commit/Push는사용자의별도지시가필요하다.
+- MD/Space: 입력·물리식/조정·시험가이드·상태/보드·세션·UI가이드갱신. STATUS/WORKBOARD30KB이하,WORKLOG기존바이트보존후이절만추가. 기존진행Page131/테스트81/BP91의4개블록에현구현/검증/범위·사용자인계·로컬커밋취소/푸시없음을반영하고4/4본문재읽기일치. 새Page/권한/예약/기획/Trello변경없다.
+- 근거: Execution/GREEN_FINAL_STATUS.json·GREEN_SUITE3_SUMMARY.json·GREEN_BUILD5_SOURCE.json·POST_GREEN_SUITE3_FROZEN_AUDIT.json·POST_GREEN_SUITE3_PRESERVATION.json·GREEN_SUITE3_RHI_CAPTURE_REVIEW.json,Root/ROOT_FINAL_VERIFICATION.json·GREEN5_SOURCE_FREEZE.json·LOCAL_COMMIT_CANCELLED.json·FINAL_SPACE_VERIFIED.json. 최종전달Root기록은FINAL_DELIVERY.json을따른다.
+
+
+## 2026-10-30 — 파일럿 비행장400×400m 확장·공간감 환경39개 배치
+
+- 사용자 요청: 해당 파일럿 공간에 공간감을 느낄 오브젝트를 간단히 배치하고 더 넓힐 것. 기존 실행 담당01a16105-48eb-7101-8b2a-0bc6b4a070e9 한 곳만 엔진/맵 편집/저장/PIE/RHI를 사용했다. 추가 요청이므로 직전 사용자 테스트 인계 이후의 새 승인 범위로 구분한다. Commit/Push는 하지 않았다.
+- 대상 /Game/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot만 load/수정. 실제 floor100×100m→400×400m(160000m²·면적16배),바닥상면Z0 보존. 실제Setup위치는0,0,0이라과거생성스크립트의예상Z48을적용하지않고저장값·관찰offset·원래GameMode/tag·조명/날씨/카메라를보존했다.
+- 환경39개/총44액터: GroundMarkings9/Labels7/HeightReferences8/Props11/DistantSilhouettes4.30/60/100m 거리띠·2/5/10/20m 높이기둥과표식,박스4/낮은벽3/컨테이너형2/차량형2파츠·원경4개. 출발반경20m와중앙40m폭·340m길이는충돌소품없이비웠다. 소유tag/Outliner폴더 Pilot.Environment, label PilotEnv_으로개별수정가능하다.
+- 기본도형/기존재질을재사용해새Mesh/Material자산0. 기존OilRig컨테이너는적합한simple box가없어사용하지않고직접수정가능한box형모형을썼다. 표시형상일치단순충돌23개,거리띠/문구는비충돌설정이다. 소품의실제비행충돌체감이나모든접촉동역학검증으로확대하지않는다.
+- 해당umap을2회저장/재열기확인(바닥확장·배치,7문구정립).18771→94475bytes,기존SHA5964AF90BF664E5E06C19D2847C5DD6E4702FAD0469B2873CDE5AE8435E5B279→19C1315629EEBBDDC57218766C233AC94CD84A5F65CBB6C940814D0CA3C71962. 이번요청직전원본은Execution/RequestTimeBackup에보존했다. 초기Slate callback이load/save중재진입해ownedtagassert로실패했으나이미저장성공한맵을재생성/롤백하지않고새읽기/캡처로완료했다. 예외와성공된저장기록은분리보존한다.
+- 실제Editor RHI 항공/통로1600×900 PNG2장을총괄이열어거리표식·높이/소품·중앙비움/넓이를확인했다. 환경뒤ActualRacerPIELifecycle/RestartInputSafetyPIE/ShortcutsPIE/WeatherKeyIndependencePIE 집중4개모두Success,같은기존Build5 DLL로실제PlayerInput1/2/3/8·재시작/날씨/착륙을확인했다. 추가보조sphere프로브는실행결과가없어통과로세지않았다. 이전41개전체를환경변경뒤재실행했다고주장하지않는다.
+- Source/Config540·DLL2·Config/Project7 byte보존/새Source쓰기0·Build0. 기존Source10로컬수정은유지했다. 요청전Saved10복원·새사용자Saved0·대상외Content/보호자산/기존삭제보존·최종엔진0. 보호목록의대상umap만승인변경으로분리했고ProductionTraining/본미션/DA/BP는수정없다. Git main108e9c95 및index상태유지,추가맵1개는로컬변경만남겼다. Commit/Push 없음.
+- MD STATUS/WORKBOARD·시험맵가이드·세션정본갱신,30KB기준준수. 기존Space 진행132/테스트82/BP92의관련3블록반영·재읽기3/3일치,새Page/권한/예약/Trello변경없음. WORKLOG기존바이트를보존하고이절만추가했다.
+- 근거 Saved/Automation/PilotEnvironment_20261030/Execution/FINAL_STATUS.json·FINAL_PRESERVATION.json·MAP_SAVED_REOPENED.json·MAP_VISUAL_REVIEW1.json·FOCUSED_PIE1.log·AUXILIARY_PROBE_STATUS.json,Root/MD_UPDATES.json·SPACE_VERIFIED.json·FINAL_DELIVERY.json. 최종깨끗한배치미리보기는Execution/Captures/Environment_Corridor.png와Environment_Aerial.png다.
+
+
+## 2026-10-30 — 파일럿 하늘 공간감·원경 박스 건물 추가
+
+- 사용자: 하늘을 보면 거리·공간감이 없다는 요청과 멀리 큰 박스 건물을 배치하자는 후속 제안을 반영했다. 파일럿 테스트맵만 적용하며 Commit/Push 요청은 없으므로 실행하지 않았다.
+- 엔진/PIE/RHI/저장은 기존 실행 대화 `01a16105-48eb-7101-8b2a-0bc6b4a070e9` 한 곳만 사용했다. 총괄은 근거·실제이미지 확인과 MD/기존Space 갱신을 담당했다.
+- 400×400m 바닥/지상39개 포함 기존44액터의 위치·형상·설정과 GameMode/tag/카메라·조명 보존. `Pilot.SkyDepth` 소유16개 추가로 총60액터: 비행장 밖 약260~520m의 높이35~160m 건물·타워14개(모두 NoCollision), 구름층1, 옅은높이안개1. 출발20m·중앙40×340m는 비워두었다.
+- 구름 바닥0.20km·층높이0.25km/추적거리2km·view sample1/shadow sample0.5, 안개밀도0.004. 새 `/Game/Drone/TestMaterials/MI_PilotSkyDepth_Clouds` 7,570bytes에 scale16/coverage0.1/density0.08/Noise_Strength(0.8,0.04,0,2.5)를 저장했다. 엔진 부모/원본 재질2개는 해시 보존했다. 조정 절차 정본은 DRONE_TEST_MAP_GUIDE의 ‘파일럿 비행장 배치’다.
+- `VERIFY_SAVED2_RESULT.json`에서 저장·재열기 후 기존44동일/새16/건물14/재질·계수를 확인했다. `PIE_ANGLES2.json`의 실제 PIE에서 원래 FPV 위치/FOV135를 읽어 임시viewtarget으로 수평/상방40°/70°를 촬영했다. 원래 기체카메라/FOV를 저장하지 않았다. 총괄이 수평 원시화면과 최종40°/70°를 이미지로 읽어 구름 덩어리/파란틈·높은 타워를 확인했다. 잔구름 노이즈가 남는 간이 시험 환경이며 최종 아트/사람의 비행체감은 별도다.
+- `FOCUSED_SKY_PIE1/index.json`: RestartInputSafetyPIE/ShortcutsPIE/WeatherKeyIndependencePIE 고유3 모두Success, 요약 succeeded2+succeededWithWarnings1/failed0/notRun0. 앞선 지상환경4검사나 물리41검사의 새 전체재실행으로 합산하지 않는다. 새 C++ Build는 없다.
+- 임시 Python의 비노출 API(`MaterialInstanceDynamic.create`, cloud `get_material`, runtime spawn)·PIE 중 editor world 부재·첫Shot suffix 대기 실패는 원시결과에 보존했다. 실제 지원API/저장MIC·올바른세션/최종HighResShot으로 수선한 후 결과를 확인했다. 중간 실패를 Pass로 세거나 로그 오류0으로 보고하지 않는다.
+- `FINAL_PRESERVATION.json`: Source/Config540·DLL2·Config/Project7 보존, Content69/보호34 중 허가한 파일럿맵만 변경, 새MIC1개, 요청직전Saved10 복원/새Saved0·원본엔진재질 보존·엔진0. 코드HEAD108e9c95와 MD HEAD8d5c52b를 유지하고 stage/Commit/Push 없이 로컬 변경으로 인계했다.
+- 파일럿맵130,815bytes SHA256 AD3E21590FE654E178B0BD6812F5B969E967F6F774AB03619645673849CE69B7, MIC SHA256 B68412956212E4538DB9701F9F3736AB0144068B7E6D4814F0A84FB1E4BCFE15. 백업은 이번요청 직전94,475bytes 버전이며 앞선 지상배치를 되돌리지 않았다.
+- 근거: `Saved/Automation/PilotSkyDepth_20261030/Execution/`의 위영수증·`FINAL_STATUS.json`·Captures/PIE_SkyFinal_00deg.png/40deg.png/70deg.png. MD와 Drone Space 기존 진행/테스트/조정 페이지의 관련 현재내용만 갱신한다.
+- Space 최종: 기존 진행seq133·테스트seq83·조정seq93의3개 block을hash보호로갱신하고재읽기3/3동일확인. 조정Page의저장응답unknown은재읽기로실제적용을확인해중복쓰기하지않았다. 새Page/권한/Trello/예약/Commit/Push없음. 총괄FINAL_DELIVERY.json·SPACE_VERIFIED.json에최종근거저장.
+
+
+## 2026-10-30 — 파일럿 자연 착륙·접지 방향·입력 관측 보강
+
+- 사용자 ‘좀 자연스럽게 앵간해서 착지되게 보정’ 요청. 기존 OFF/.5m/s 제한이 알려진 기능 한계여서 실제 Setup→저장 Racer/native 바닥의 RED-capable 검사로 확장 요구를 먼저 고정했다. 엔진은 기존 실행 대화1곳, 생산/검사는 물리담당·단축키담당, 총괄/독립읽기검토를 분리했다. Commit/Push 승인 없음.
+- RED_NATURAL1 고유5실패: ON40/45% 추력에서 upZ≈-.955/-.961로 전복, OFF2.5m/s에서도 회전/미끄럼. 새보정은 exact파일럿6/7만 켜고 공유 구조체false/0·다른맵강제OFF다. 요청/실제추력 각각.94mg이하 진입/.99mg초과 해제, 각축rate20deg/s·상향분리.15m/s·접선/tip3m/s·UpDot>.1. 접지각속도24/s·접선6/s 지수감쇠, 자세는.08초 연속지지 뒤.2초 smoothstep램프/Slerp6/s. 모터/collective를 유지하고 새이륙/강한조작은 모터응답 지연 없이 해제한다. Setup Details Rotor Pilot→Landing의 실제노브로 전달된다.
+- GREEN1 집중13/16: 정지·정립/모터·재이륙 성공, heading3검사 실패. 최초 적격floorhitheading을 같은면의 짧은bounce동안 기억하는 GREEN2는14/16(OFF heading해결/ON2실패). powered bounce의유효낙하가작아.1초 기억이먼저끊기는가설로 단일Natural episode기한만.25초로 맞춘 GREEN3에서16/16(14일반+2경고)통과. restitution/출력/기대치 그대로다. 실제support가없으면힘/q보정0,다른면/벽/천장/inverted/high·rate에는기억폐기한다. 기존NaturalOFF .1초 기한은 유지했다.
+- 최종착지 지표: ON40/45%(실제.816327/.918367mg)에서 upZ.999999999, yaw37→37.000000692/37.000000538°, 속도.003475/.004111cm/s,모터16/18N 유지. OFF2.5m/s±기울기 heading37±.005°,새이륙+396.463cm,30/120fps 끝점 위치·속도 차0. 자동물리/가드검증이며 실물HID 손조종/실기체 교정은 아니다.
+- GREEN3 전체 FINAL_REGRESSION1은47/48,ShortcutsPIE case9 Zero만실패; WEATHER_DIAGNOSTIC1에서도같은1실패/날씨독립1성공. case9 바람500→case10 0이었고동기Publish코드는불변이었다. 기존Phase1의latent Update1회는실제WorldTick 증거가없어, PilotPIETest fixture1파일만press/observe WorldTime·GFrame 및서로다른World시간2진행을 확인하도록수선했다. pause case12만실frame2로교착방지,모든기존Test->Test단언행/기대값byte동일이다. 생산키·날씨본문은수정하지않았다.
+- 최종 FINAL_REGRESSION2/index.json: 같은Build4 DLL 고유48전부Success(일반46+경고포함2/Fail0/notRun0). 앞선16/중간실패/이전41·환경4·하늘3을중복합산하지않는다. Build4 wall=11.621388초, 최종Source/DLL은 GREEN_BUILD4_SOURCE.json과 POST_FINAL_REGRESSION2_PRESERVATION.json의동결결과다. 경고/원시시작로그를보존하고 전체로그오류0으로보고하지않는다.
+- Root/GREEN4_SOURCE_FREEZE.json의 허가 Source8=생산6+검사2만 이번baseline대비변경. Source/Config541·DLL2는최종동결본과일치,Content70/보호35/Config·Project7/파일럿맵130815bytes·구름MIC7570bytes는요청직전해시보존. 이번맵/DA/BP/엔진재질저장0,요청직전Saved10복원·새Saved0·엔진0. main108e9c95/MD8d5c52b·index비움/Commit·Push없음이다.
+- 정본은 DRONE_REALISTIC_HANDLING_PLAN의 파일럿 접촉·회전·착륙 절,검사절차는 DRONE_TEST_MAP_GUIDE/InputContract다. 기존 Drone Space 진행/테스트/조정3페이지에현재결과를반영하고동일본문재읽기로확인한다. 로컬근거는 Saved/Automation/PilotLandingAssist_20261030의 Root/Physics/Shortcuts/Execution,중간실패는그대로보존한다.
+- Space 최종: 기존 진행seq134·테스트seq84·조정seq94를hash보호로갱신하고3/3본문재읽기동일확인. Root가최종Build4 Key8 RHI도이미지로확인했다. 실제사람의HID조작Pass로확대하지않으며새Page/권한/예약/Trello/Commit·Push없음. Root/SPACE_VERIFIED.json·FINAL_DELIVERY.json으로인계.
+
+
+## 2026-10-30 — 사용자 요청 저장용 로컬 커밋
+
+- 사용자가 새 물리·카메라 조정 전에 저장용 커밋을 요청하고 Editor 종료를 알렸다. 실제 Editor/Build0을 확인했다. 이후 작업의 Commit/Push까지 포괄 승인한 것으로 확대하지 않는다.
+- Unreal main `330c73371a35e019cf7a37cd7523bba265f5cdfd`에 Source10·파일럿맵1·구름MIC1 총12파일을 저장했다. 직전 Build4 동결 Source/Config541·맵/구름 해시가 현재 파일과 일치했고, staged diff check 통과 및 커밋 후 작업트리 Clean을 확인했다. 기존 동일DLL 고유48통과 근거를 연결하며 새 Build/PIE·손조종 검사를 수행한 기록은 아니다.
+- 관련 MD8파일도 저장용 로컬 커밋으로 보존한다. 현재 STATUS/WORKBOARD·세션의 Git 상태를 갱신하고 Drone Space 진행상황의 현재 저장 상태만 연결한다. 이전 취소·미커밋·원시 실패 기록은 당시 사실로 보존한다. Push·Trello·공유 권한·예약 변경은 없다.

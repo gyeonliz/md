@@ -4,6 +4,26 @@
 
 이 문서는 구매 에셋 없이 Flight 기능을 시험하기 위한 **기존 v1 Prototype 조작 계약**을 유지한다. 사용자 확인 대상은 일반 게임패드와 InterLink DX 모두다. 아래 기존 입력 역할을 보존하며 새 카메라 상하 축/버튼 배정·왼쪽 축 이외의 실장치 보정·최종 물리/감도 튜닝은 별도 미정이다. 두 장치 사용 요청을 미사용 조작의 재배치 승인으로 해석하지 않는다.
 
+### 파일럿 테스트맵 전용 숫자키
+
+`/Game/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot`의 `ADroneRotorPilotSetup`만 소유하는 임시 숫자열 단축키다. 일반 미션/기존 훈련맵의 IMC나 사용자 키 설정을 바꾸지 않는다. 현재 저장 배치에서는 전용 Setup·GameMode·`DroneRotorControlledTest` 표식이 이 맵에만 있다. 실행 World·PIE 접두사를 제거한 정확한 위 패키지 경로·표식을 함께 검사한다. 액터/표식을 다른 맵에 복사해도 초기 기체 생성과 숫자키는 동작하지 않는다.
+
+| 키 | 동작 | 조건 |
+|---|---|---|
+| 숫자열 `1` | 고정 위치 관찰 카메라, 드론 방향 추적 | 비행 입력 차단/일시정지 중 거부 |
+| 숫자열 `2` | 드론 1인칭, ViewTarget을 드론으로 복귀 | Drop 하부 시점 해제 |
+| 숫자열 `3` | 드론 3인칭, ViewTarget을 드론으로 복귀 | Drop 하부 시점 해제 |
+| 숫자열 `4` / `5` | 쉬운 / 게임 조작, Legacy 이동 | 모터 OFF에서만 변경 |
+| 숫자열 `6` / `7` | Mode1 / Mode2, 로터 후보 이동 | 모터 OFF·Racer/controlled tag 등 후보 제약 |
+| 숫자열 `0` / `9` | 바람 / 비 독립 토글 | 바람 기본5m/s·비는 일시적 Profile/시각 액터 사용 |
+| 숫자열 `8` | 출발 위치에서 새 Racer로 재시작 | Mode2·기본 시점·모터OFF·날씨 유지, 누른 키 실제 해제 후 새 입력 필요 |
+
+NumPad는 별도 연결하지 않는다. 재시작은 관찰 카메라·기존 기체를 정리하고 선형/각속도·모터·제어기 상태를 초기화한다. 입력 초기화가 만든 합성 release는 실제 키 해제로 인정하지 않고 반복8에도 미해제 키를 유지한다. InterLink 래치형 버튼은 순간 버튼 해제 대기에서 제외하며 RC는 새 최하단→상승 확인을 유지한다. 사망으로 DisableInput된 기체도 새 기체로 교체한다. `9`는 기존 바람의 방향/세기를 바꾸지 않는다.
+
+파일럿6/7의 자연 착륙 보조는 실제 접지·낮은 추력에서 모터 ON/OFF 모두 정립과 감속을 돕고, 새 이륙/강한 회전 명령에 해제한다. 모터 스위치·재시동 입력 규칙은 그대로다. 조건과 Setup 조정 위치는 [물리 정본](../gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#파일럿-맵의-접촉회전착륙-보정)을 따른다.
+
+이 키들은 `WasInputKeyJustPressed`를 직접 읽어 사용자 조작키 재지정 대상이 아니다. 일반 플레이의 `P`/Triangle/InterLink Button13 시점 전환은 기존 IMC→ToggleViewAction→ToggleFirstPersonView 경로와 3장치 설정을 유지한다. 숫자 `1/0`의 기존 자폭 ArmSwitch와 물리키를 공유하지만 파일럿 Racer의 기폭 기능은 비활성이며 일반 미션에 파일럿 토글이 추가되는 것은 아니다. 실행 반영 여부는 [시험 가이드](../gameplay/DRONE_TEST_MAP_GUIDE.md#파일럿-숫자키-실행-확인)를 따른다.
+
 ## 1. 현재 계약
 
 | Input Action | Value Type | 키 | Mapping Modifier | Callback 기대값과 역할 |

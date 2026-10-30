@@ -1,8 +1,64 @@
 # 현실 조종감 기준과 후속 개발 계획
 
-기준: 2026-10-28 D PC. 폭탄 SI 항력 수리·자동 검증과 기존 본체 경로를 아래에서 구분한다. 장치별 입력·Legacy OFF 항력/World중력 정책을 유지하고 FPV/Fiber의 자폭 감지와 하부 물리 충돌 범위를 분리했다. 자폭 센서·넓은 역할 카메라는 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md), 실제 검증은 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. controlledRacer opt-in·실기체 교정·본미션/B·C·손 조종·패키징의 기존 지원 한계는 유지한다.
+기준: 2026-10-30 D PC. 정확한 파일럿 테스트맵에만 접촉·회전항력·착륙 보정을 추가한 현재 소스 기준이다. Build·자동/RHI·실물 확인 결과는 STATUS/WORKLOG를 따른다. 폭탄 SI 항력 수리·자동 검증과 기존 본체 경로를 아래에서 구분한다. 장치별 입력·Legacy OFF 항력/World중력 정책을 유지하고 FPV/Fiber의 자폭 감지와 하부 물리 충돌 범위를 분리했다. 자폭 센서·넓은 역할 카메라는 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md), 실제 검증은 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. controlledRacer opt-in·실기체 교정·본미션/B·C·손 조종·패키징의 기존 지원 한계는 유지한다.
 
 모터 OFF에서도 공기저항은 적용된다. Legacy 정상OFF의 조기 분기에서 빠졌던 공유 공력 계산을 4모드에 연결하고 시작/목표추력0·World중력·기존 선형/제곱항력과 인공제동0을 유지했다. 항력계수를 강하게 조절한 수리가 아니다. 30/240fps의 수평 감속·10초 감속·낙하 중 수평감속/추력0/재시동과 LocalPlayerController+실제 World.Tick 이동이 자동 통과했다. 기본/게임의 ON assisted 구조는 유지하고 controlled candidate는 기존에도 OFF 항력을 계산했으므로 이번 Legacy 결함과 구분한다.
+
+## 현재 운동·관성 계산식
+
+전체 기체에 같은 강체 물리를 적용하지 않는다. 기본 본미션은 Legacy이며, 로터 후보의 관성텐서 적분은 controlled Racer·Acro Mode1/2에서만 사용한다. 키/패드/RC는 같은 모드의 물리식을 공유하되 스로틀의 절대값/중앙 hover·곡선·안전 가드가 다르다. Space/Ctrl 쉬운/게임은 별도 상승/착지 보조다.
+
+| 경로 | 병진 운동 | 회전 |
+|---|---|---|
+| Legacy 쉬운/게임 ON | FloatingPawnMovement 입력 가속·자동 감속·상승 보조 | 조작 보조 회전 |
+| Legacy Acro ON | 합산 추력/총질량·중력·선형/제곱 항력 | 목표 각속도 1차 응답, 관성텐서 미사용 |
+| Legacy OFF | 추력0·World중력·공유 항력, 실제 지지면에서 마찰/정립 보조 | 로터 토크 적분 아님 |
+| 파일럿 로터 후보 | 로터별 힘·상대 항력·중력·접촉 충격량/마찰 | 대각 관성·로터/접촉 토크·회전항력, 낮은 추력의 ON/OFF 접지 착륙 보조 |
+| 전투 폭탄 | 실제 Payload 질량·중력·바람 상대 SI 제곱항력 | 텀블링·양력·회전 공력 미구현 |
+
+### Legacy 추력·항력·회전
+
+`m = m_dry + m_payload`, `T_target = u T_max`다. 모터 1차 응답은 `T_new = T_target + (T_old-T_target) exp(-dt/tau_m)`이며 가속도에는 프레임 구간 평균 추력 `T_mean`을 사용한다. `a = BodyUp * T_mean/m + g`이고 C++ 기본값은 건조2kg·최대합산40N·추력응답0.055초·ON 설정중력9.8m/s²다. 자산/BP 값이 우선하며 실기체 측정값은 아니다. OFF는 World중력을 읽고 추력을0으로 처리한다. 호버 출력은 `m*g/T_max`이고 적재 질량도 포함한다.
+
+Legacy 회전은 `omega_new = omega_target + (omega_old-omega_target) exp(-dt/tau_r)`, `tau_r` 기본0.08초다. 프레임 회전량은 `omega_target*dt + (omega_old-omega_target)*tau_r*(1-exp(-dt/tau_r))`를 축각으로 적용한다. 이는 회전 관성처럼 반응을 지연시키는 근사이며 `J`나 모터별 토크를 계산한 것이 아니다.
+
+Legacy 항력은 cm/s 속도에 `r = clamp(m_dry/m,0.05,1)`, 먼저 `v *= exp(-lambda*r*dt)`, 다음 `v += -k*r*|v|*v*dt`를 적용한다. 기본 `lambda=0.12/s`, `k=0.00004/cm`(SI 환산0.004/m)다. 이 경로의 항력은 Movement의 월드 속도를 사용하며 바람은 WeatherResponse의 별도 보간 위치 drift다. 후보처럼 상대 공기속도 하나로 결합한 모델은 아니다. 근거는 `DroneAcroFlightComponent.cpp:289,339,380`, `DroneWeatherResponseComponent.cpp:68,125`다.
+
+Legacy의 정지 지지면·모터OFF 접선 속력은 `s_new=max(0,s-mu*max(0,-g dot n)*dt)`로 줄인다. 기본 마찰계수0.4·접촉여유0.5cm이며 실제 hit·정지 지지면·법선 등을 확인한다. 후보는 `GetMotorOffGroundSupport()`에서 제외되므로 이 마찰/정립 보정을 상속하지 않는다. 근거는 `DroneFlightPawn.cpp:628,664,684`다.
+
+### 파일럿 로터 후보의 관성·공력
+
+후보는 SI 단위(m, kg, s, N, Nm, rad)·몸체 FLU 좌표를 사용하며 UE cm/축 부호를 경계에서 변환한다. 로터마다 `F_i = T_i axis_i`, `tau_i = (r_i-r_CG) cross F_i - axis_i*spin_i*k_tau_i*T_i`를 합산한다. 각속도는 다음 강체 식을 실제 적분한다.
+
+`omega_dot = J^-1 * (sum(tau_i) - C*omega - omega cross (J*omega))`
+
+회전 항력 C는 파일럿 접촉 opt-in에서만 활성화하고 그 외에는0이다. 기존 토크/관성 적분과 별도 지수 half-step으로 감쇠한다.
+
+`v_air_body = R^-1 * (v_world-wind)`이며 축별 항력은 `F_drag_j = -c_j*v_j - 0.5*rho*(CdA)_j*v_j*abs(v_j)`다. 병진 가속도는 `a_world = R*(sum(F_i)+F_drag)/m + g`다. 중간 시점 가속도/각속도를 구해 `p_new=p_old+v_old*dt+0.5*a_mid*dt^2`, `v_new=v_old+a_mid*dt`와 쿼터니언 자세를 갱신한다. 후보를 켜면 Legacy 이동/적분·별도 바람 drift를 중지해 중복 적용하지 않는다. 근거는 `DroneFlightDynamicsKernel.cpp:24,99,109,338`, `DroneFlightDynamicsMovementComponent.cpp:110`다.
+
+합성 기본값은 `J=diag(0.05,0.05,0.05) kg m²`, X쿼드4로터·팔0.25m·각 최대추력25%·반작용계수0.01m다. `rho=1.225kg/m³`, 축별 `CdA=0.01306122449m²`, 선형항력 `c=0.24kg/s`, 각속도 제어 `P=0.625`, `I=D=0`, 토크상한 `(4,4,0.2)Nm`다. 질량/최대추력/모터응답은 기존 기체 설정에서 상속한다. 관성·형상·공력·제어이득은 실기체 질량분포나 풍동/비행 실측으로 교정하지 않았다. 기본2kg의 단축 직선운동에서 기존 항력 수준에 맞춘 비교값이며 Legacy의 벡터속력 항력과 후보의 축별 항력은 대각 운동에서 다르다. 근거는 `DroneRotorFlightSettings.h:61`, `.cpp:5,70`다.
+
+계산 간격은 기본1/120초, 한 프레임 최대16회·누적 지연0.25초이며 초과 시간은 drop으로 기록한다. Chaos 강체 비행 백엔드는 없고 `ChaosCandidate`는 거부한다.
+
+### 파일럿 맵의 접촉·회전·착륙 보정
+
+이 보강은 정확한 `/Game/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot`의 Game/PIE World·controlled 표식·명시적 opt-in에서만 사용한다. 다른 맵에서는 설정 사본의 opt-in과 회전 항력을 강제로 끈다. 공유 설정 기본값은 OFF·마찰0·회전항력0·정립rate0이며 제품맵/DA/BP를 저장하지 않는다. 이 맵에서도4/5는 기존 Legacy,6/7은 보강된 로터 후보를 사용한다.
+
+접촉점 속도는 `v_contact = v_CG + omega_world cross r - v_surface`다. 현재 지원하는 CG0 구형 충돌체의 접점은 `sphere_center - normal*실제반경`으로 계산해 UE 이동 pullback이 가짜 회전 팔을 만들지 않게 한다. 방향 d의 역유효질량은 `1/m + d dot ((I_world^-1*(r cross d)) cross r)`다. 법선 충격량 `Jn=-(1+e)*(v_contact dot n)/역유효질량(n)`으로 침투 방향 속도를 제거하고, 접선 충격량은 접점 미끄럼을 멈추는 양과 `mu*Jn` 중 작은 값으로 제한한다. 이 단계의 Jn에 중력 지지가 포함되므로 `m*g*dt`를 다시 더하지 않는다.
+
+충격 후 `v += impulse/m`, `omega_body += R^-1*(r cross impulse)/J`를 적용한다. 구형 중심의 순수 법선 충격은 회전을 만들지 않으며 접선 마찰이 회전 토크를 만든다. 벽/바닥 충돌에 실제 질량·관성·반경을 사용한다. 이는 현재 구형·CG0 범위의 접촉 계산이며 기체 전체 메시의 다점 강체 접촉이나 full Chaos 비행을 뜻하지 않는다.
+
+회전 항력 토크는 `tau_drag=-C*omega_body`다. 커널은 `omega *= exp(-(C/J)*dt/2)`를 기존 토크/관성 적분의 앞뒤에 적용해 계수가 커도 감쇠 자체가 에너지를 늘리지 않도록 한다. 기본 시험맵 C는 축별0.025Nm·s다. 다른 맵과 opt-in OFF는 C=0으로 기존 경로를 유지한다.
+
+자연 착륙 보정은 `NaturalLandingAssist.bEnabled`가 켜진 파일럿 후보에서 사용한다. 최근 실제 blocking hit와 같은 정지 지지면을 native pullback 여유 안에서 계속 확인한다. 모터 ON/OFF 모두 **요청 추력과 실제 추력이 각각 중량의94% 이하**일 때 진입하며, 진입 후에는99% 초과 시 즉시 해제한다. 접선 속도와 `|omega|*반경`은 각각3m/s 이하, 기체 위쪽/지지법선 내적은0.1 초과여야 한다. 지지면으로부터 상향 분리 속도가0.15m/s를 넘거나 각축 회전 목표가20°/s를 넘으면 보정을 먼저 해제한다. 새 이륙 명령은 모터의0.055초 응답 지연을 기다리지 않고 요청 추력으로 즉시 판단한다.
+
+실제 접지 직후 각속도는 `exp(-24*dt)`, 접선 속도는 `exp(-6*dt)`로 감쇠해 구르며 뒤집히는 것을 줄인다. 자세는 연속 지지0.08초 뒤0.2초 동안 `ramp=x*x*(3-2*x)`로 보정 강도를 올리고 `alpha=1-exp(-6*ramp*dt)`의 quaternion Slerp로 지지면에 정렬한다. 최초 적격 바닥 hit의 heading을 보존하고 모터 ON 상태·요청 collective를 유지한다. 같은 정지 지지면의 짧은 반동에는0.25초 동안 방향 기억만 유지하며 실제 접지가 없으면 감쇠·자세 보정은 하지 않는다. 다른 지지면/벽/천장·강한 입력·오래 떠 있음·뒤집힘에는 기억도 폐기한다. 자연 보조 OFF의 기존 최근지지 기한0.1초는 유지한다. 활성 중에는 제어기의 오래된 I/D 상태만 비워 충돌을 줄인다. 공중3cm 근접·벽/천장·뒤집힘·고추력/강한 회전 의도·동력상실/파괴는 대상이 아니며, 위치를 지면으로 당기거나 모터를 자동 OFF하지 않는다. 이는 물리 충격량과 구분되는 명시적 게임 보조이며 실기체 교정값은 아니다. 자연 보조를 끈 수동 opt-in의 기존 OFF/0.5m/s 착륙 경로는 유지한다.
+
+파일럿 Setup의 일시적 설정 사본은 `GroundFrictionCoefficient=0.4`, `ContactRestitution=0.1`(0.5m/s 미만 충격은 반발0), `AngularDragNewtonMeterSeconds=(0.025,0.025,0.025)`를 유지한다. 맵의 Setup Details `Rotor Pilot → Landing`에서 `LandingAssist`와 `LandingMaximumApproachSpeedMetersPerSecond=3`, `LandingMinimumUpDot=0.1`, `LandingAlignmentRatePerSecond=6`을 편집한다. `LandingAssist` 기본은 Enabled/EnterThrustToWeight0.94/ExitThrustToWeight0.99/MaximumBodyRateCommandDegreesPerSecond20/SupportConfirmationSeconds0.08/BlendInSeconds0.2/AngularSettlingRatePerSecond24/MaximumUpwardSeparationSpeedMetersPerSecond0.15다. 값은 새 기체 생성 또는 모터OFF 상태의6/7 재선택 때 설정 사본으로 전달되므로 변경 후8재시작으로 확인한다. 공유 `FDroneRotorLandingAssistSettings` 기본은 false/모든 수치0이며 다른 맵에서는 자연 보조를 강제로 끈다. 접근속도 UI 메타·검증 상한은 모두5m/s다. 원래 기체 DA/BP·맵을 자동 저장하지 않는다. 설정·구현은 `DroneRotorFlightSettings`, `DroneFlightDynamicsMovementComponent`, `DroneRotorPilotSetup`, 커널 `IntegrateRigidBody`가 정본이며 실행 결과와 실물 손조작은 STATUS/WORKLOG에서 구분한다.
+
+### 전투 폭탄
+
+폭탄은 `v_air=(v_world-wind)`를 m/s로 바꿔 `F_drag=-0.5*rho*Cd*A*|v_air|*v_air`, `a_drag=F_drag/m_payload`를 계산한다. 기본 `rho=1.225`, `Cd=1`, `A=0.005m²`이며 실제 Payload 질량을 사용한다. 반 단계 중력→`v_air/(1+k*|v_air|*dt)` 해석 감쇠→반 단계 중력으로 갱신하고 swept 충돌을 유지한다. 회전/텀블링/양력과 실측 탄도 교정은 없다. 근거는 `DroneBombMovementComponent.cpp:38,48`다.
 
 ## 현재 적용 경로와 투하물
 
@@ -28,6 +84,8 @@
 
 `/Game/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot`을 열고 Play한다. 새 전용 맵의 DroneRotorControlledTest tag와 Setup이 기존 saved `DA_Drone_Racer_Greybox`의 PawnClass/Definition을 읽어 메모리에서만 Acro Mode2·FixedStepCandidate로 진입시킨다. 시작은 motor OFF다. 원래 DA/BP와 제품맵은 opt-in으로 저장하지 않는다.
 
+이 맵의 숫자열 시점/모드/날씨 단축키는 [입력 정본](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#파일럿-테스트맵-전용-숫자키)을 따른다.4/5는 Legacy 쉬운/게임으로 이동하고6/7만 로터 후보를 사용하므로 같은 맵의 모든 모드가 같은 물리 계산을 쓰는 것은 아니다.
+
 | 항목 | 현재 지원·구분 |
 |---|---|
 | 백엔드/기체 | Legacy가 기본. Racer1종의 명시 opt-in FixedStepCandidate·Acro Mode1/2만 지원 |
@@ -39,7 +97,7 @@
 
 <a id="자동-스로틀-모터-정책과-검증-범위"></a>
 
-현재 새DLL로 FrontEnd 정상 Editor 재오픈이 확인됐다. Space 새 입력 시동/상승·CtrlOFF·해제hover와 RC/패드 안전정책은 [입력 정본](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#space키-자동-시동off-정책)을 따른다. 후보맵과 기본 Legacy 정책은 보존한다.
+현재 Source를 반영한 DLL로 실행해야 하며, 소스의 단축키 추가와 실행 파일 반영 여부는 별도로 확인한다. Space 새 입력 시동/상승·CtrlOFF·해제hover와 RC/패드 안전정책은 [입력 정본](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#space키-자동-시동off-정책)을 따른다. 후보맵과 기본 Legacy 정책은 보존한다.
 
 Acro의 hover/가속은 같은 중력 helper를 사용한다. Legacy는 설정 중력, candidate는 World 중력이며 live hover를 장치별 출력에 반영한다. Legacy 모터1차응답은 프레임 끝 추력 대신 구간평균 추력으로 가속을 계산해 응답의 FPS 차이를 줄였다. 최종 LegacyResponseFrameParity와 candidate 실제 Tick 경로 비교가 통과했다. Legacy drag/position 전체 적분 또는 모든 backend를 재작성한 것은 아니다.
 

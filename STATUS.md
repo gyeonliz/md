@@ -1,6 +1,6 @@
 # 현재 작업 상태
 
-현재 기준(10/29 D PC): 1인칭·Drop·3인칭 공통 스프링에 실제 렌즈/광각 near면 보호를 반영했다. 비병사 전투 표적은 부품별 캡슐로 맞추고, M4 실제 포탑18개의 허공 차단108검사33→0, 기체 사망 뒤 표적 파괴의 잔여 충돌0을 확인했다. M1 전선18개만 비충돌·전봇대23개 충돌/외형 보존이다. 최종Build9.54초(벽시계10.23초)·같은DLL44자동검사 통과(Editor41+Standalone3, 경고 포함3/실패0). 실제 Windows2560×1440 테두리 없는 창·저장/재읽기/복원도 통과했고 PIE 내부는 의도적 적용 차단이다. Source/Config539·DLL2·Saved10·관련Content43·보호11 일치/Editor0·맵 저장0. [카메라](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md#카메라-지형-관통-방지)·[캡슐/전선](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#전투-대상-캡슐과-미션-1-전선)·[검증](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#카메라피격-캡슐전선창-모드-확인). 손조종·패키징은 별도다.
+현재 기준(10/30 D PC): 파일럿6/7의 자연 착륙을 보강했다. 실제 접지·낮은 요청/실제 추력에서 모터ON/OFF 모두 감속·정립하며 새 상승/강한 회전 명령에는 즉시 해제한다. 수평·회전접선3m/s/UpDot0.1까지 허용하고 첫 접지 방향은 짧은 반동0.25초 동안 기억만 유지한다. Setup의 LandingAssist에서 조정한다. [계산/조정 정본](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#파일럿-맵의-접촉회전착륙-보정). 최종Build4·동일DLL 고유48전부통과(일반46+경고포함2/실패0), 실제Worldtick 관측을 보강한 단축키·날씨 검사도 통과했다. 중간착지/방향/날씨관측 실패는 WORKLOG에 보존한다. Source/Config541 동결·Content70/보호35·맵/구름·요청직전Saved10 보존/복원·엔진종료, 맵저장0이다. 기존400×400m 지상39개와 하늘16개는 유지한다. Source10/맵/MIC·MD는 사용자 요청으로 저장용 로컬 커밋에 보존하며 Push는 없다. 실물 손조종·정밀 외형/계수교정·패키징은 별도다.
 
 이전 입력 검증(10/27 D PC): 키보드 쉬운/게임 Ctrl을 공중 모터ON 하강→실제 접지OFF로 분리했다. 공중 해제hover·착지 후 새Space 재이륙이며 FPV/패드/RC는 기존 정책이다. Build75.30초·집중10건 Success/경고0/Fail0, 30/120fps 착지4조건과 실제Racer48표본을 확인했다. 기존 상승/패드/Acro Ctrl40표본 변화0. 손 조작 체감은 대기다. [입력 정본](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)·[상세 이력](docs/history/DRONE_WORKLOG.md).
 
@@ -10,18 +10,18 @@
 
 수신한 현재 HEAD에는 10/27 키마·패드·InterLink 3탭/키·축 교환·반전·장치별 기본값·부모1회 저장, SceneViewport RightY 보정과 Circle=Esc가 포함돼 있다. 당시 고유28검사/Build11.82초/UI4장 및 앞선 카메라·정립 착지·RC배치47검사의 경계는 [WORKLOG](docs/history/DRONE_WORKLOG.md)에 보존한다. 실제 손조종·미연결 InterLink 새 실측·패키징은 별도다.
 
-## Git 기준(10/29 작업컴·원격 조회)
-
-사용자의 동일 대화 지시 “다 하면 커밋푸쉬까지해줘”에 따라 이번 수정·검증·MD/Space 종결본을 전달한다. 작업 시작은 두 main clean/Fetch0/0(Unreal f6a3796b·MD f33385c)이다. 이전 사용자 M3 맵은 이미 f6a3796b에 포함되어 있으며 이번 Content 변경·맵 저장은 없다.
+## Git 기준(10/30 작업컴·로컬 저장)
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal D PC `D:\JGY\project\drone` | main `f4c660e1`·origin 일치 | Source25파일 Commit/Push 완료. 539파일/2DLL은 최종Build와 byte 일치 |
-| 문서 D PC `D:\JGY\project\md` | main · 출발 `f33385c` | 최신 가이드·STATUS/WORKBOARD·세션·WORKLOG와 Space를 전달한다. 문서 자기 커밋은 최종 Git 영수증 참조 |
+| Unreal D PC `D:\JGY\project\drone` | main `330c7337` | Source10+파일럿맵1+구름MIC1 저장용 커밋·Clean·Push 없음 |
+| 문서 D PC `D:\JGY\project\md` | main·본 기록 동반 저장 | 관련 문서8개 로컬 커밋·Space 저장 상태 반영·Push 없음 |
+
+사용자 맵 변경/삭제·오디오 교체가 포함된 수신 HEAD를 보존했다. 이전 완료 지시를 이번에도 적용해 만든 로컬90a07506은 사용자의 “커밋푸쉬는안시켰는데” 정정 후 취소했다. Source10파일 byte 보존·HEAD/원격108e9c95·index 비움을 확인했다. 이번에는 사용자의 저장용 커밋 지시로 로컬 보존하며 Push는 하지 않는다. 상세는 WORKLOG와 로컬 `LOCAL_COMMIT_CANCELLED.json`을 따른다.
 
 ## 작업컴 세션 운영
 
-총괄이 코드·검토·문서/Space를 취합했고 엔진·Build·PIE·RHI는 기존 실행 담당1곳만 사용했다. 현재 근거는 `CameraCollision_20261029/Execution/FINAL_CAMERA_COLLISION_EXECUTION_20261029.json`, 총괄 `Root/ROOT_LATEST44_LEDGER.json`·`ROOT_FINAL_EXECUTION_AUDIT.json`이다. 오늘 시작 Saved/Content 기준으로 복원·보존했으며 과거 baseline을 덮어쓰지 않았다. [소유권](docs/git/DRONE_WORK_PC_SESSIONS.md)·상세 이력은 WORKLOG를 따른다.
+총괄이 물리/숫자키 구현·독립 읽기 검토를 취합했고 엔진/Build/PIE/RHI는 기존 실행 담당 한 곳만 사용했다. 최종 검증 후 엔진을 종료하고 사용자에게 직접 테스트를 인계했다. 인계 후 엔진 추가 실행·사용자 설정 복원·Source 변경은 하지 않는다. [소유권](docs/git/DRONE_WORK_PC_SESSIONS.md)·상세 이력은 WORKLOG를 따른다.
 
 ## 현재 D PC 구현·검증 경계
 

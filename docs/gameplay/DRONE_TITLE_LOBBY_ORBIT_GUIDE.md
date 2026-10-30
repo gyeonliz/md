@@ -229,11 +229,11 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 - 기존 결과 WBP의 상세 부분 갱신은 Editor에서 `unreal.DroneMissionResultWidget.migrate_result_details_widget_blueprint(False, False)`로 사전 검사한 뒤 명시적으로 `(True, True)`를 실행한다. 대상은 `/Game/Drone/UI/WBP/Mission/WBP_DroneMissionResult` 한 자산이며 상세 하위 트리만 교체·Compile·Save한다. 구형 CDO의 크기/색이 새 트리에 남지 않도록 생성 전에 reference 기본값을 적용한다. unsaved 편집·불완전한 이름 계약·예상 밖 부모 변경은 저장하지 않으며 V1 marker가 있으면 재호출에도 Designer 조정을 보존한다. Python의 반환 모양은 엔진 도구 설명과 실제 실행 보고를 따른다. 요약 영역 자체가 없는 자산의 최초 추가는 기존 `DroneRacingResultBlueprintTools.update_racing_result_widget_blueprint`를 쓰며 이 도구만으로 이미 있는 상세 트리가 재배치되지는 않는다. 현재 자산 반영·Build·검증 상태는 [STATUS](../../STATUS.md)와 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
 - 실제 화면 확인: 1280×720/1920×1080에서 성공·실패·다음 없음·훈련 전체 완료·시드 레이싱 결과를 본다. 버튼열/정보/긴 글자 잘림·선택 상태와 다음·재도전·로비/시작 메뉴 전환을 확인한다. 옛680 fixture 검사 통과를 현재 팀원 자산 화면 Pass로 대신하지 않는다.
 
-### 랜덤 도시 다음 게이트 화살표 조정
+### 다음 게이트 화살표 조정
 
 화살표는 `WBP_DroneFlightHUDKit`의 Class Defaults → `Drone | HUD | Racing Gate Marker` → `RacingGateMarker`에서 조정한다. `bEnabled`(표시), `ArrowColor / PanelColor / TextColor`, `WorldOffset`(게이트 위 월드 cm), `ScreenOffset`(HUD 픽셀), `Scale / ArrowWidth / LineThickness / FontSize`, `EdgeInset`, `OccludedOpacity`, `Label`을 편집할 수 있다. 화면 밖 목표는 가장자리 방향 화살표, 건물 뒤 목표는 낮은 불투명도와 ‘가려짐’으로 표시한다. 기본 프레임 색·머터리얼·통과 판정 범위는 이 UI 설정과 독립이다.
 
-표시 대상은 HUD에 연결된 랜덤 도시 Course의 `GetCurrentGate()` 한 곳이다. 통과/리셋은 Sequence를 따라가고 완주·비활성·Source 해제·신호 끊김에서는 숨긴다. 자체 BP 연출을 쓰려면 `bDrawNativeMarker`를 끄고 BlueprintPure `GetRacingGateMarkerTarget`을 사용한다. 비랜덤 팀원 코스에는 이 화살표를 추가하지 않는다. 구현·자동/렌더 확인 범위는 [현재 상태](../../STATUS.md)와 [작업 이력](../history/DRONE_WORKLOG.md)을 따른다.
+현재 Source의 표시 대상은 HUD에 연결된 활성 Course의 `GetCurrentGate()` 한 곳이며 랜덤 도시와 작성 코스 모두 포함한다. 통과/리셋은 Sequence를 따라가고 완주·비활성·Source 해제·신호 끊김에서는 숨긴다. 자체 BP 연출을 쓰려면 `bDrawNativeMarker`를 끄고 BlueprintPure `GetRacingGateMarkerTarget`을 사용한다. 작성 코스까지 표시하는 수신 변경은 이번 최종DLL에 반영됐고 RacingGateMarker 자동 계약도 통과했다. 게이트 전용 새 렌더/손 조종 검증으로 확대하지 않는다. 구현·자동/렌더 확인 범위는 [현재 상태](../../STATUS.md)와 [작업 이력](../history/DRONE_WORKLOG.md)을 따른다.
 
 담당 클래스는 `UDroneMissionDefinition`과 `UDroneFrontEndRootWidget`이다.
 

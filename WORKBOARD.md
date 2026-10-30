@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-10-29 D PC — 카메라 렌즈/광각 near면 스프링·비병사 전투 표적 캡슐·M4 허공/파괴 후 판정·M1 전선 수선 완료. 같은DLL44자동검사 통과(경고 포함3/실패0), 별도 창 모드 정상/PIE 차단 확인. 원본 맵·설정 보존. 코드 f4c660e1 푸시, 문서·Space 전달. [STATUS](STATUS.md)·[현재 절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#카메라피격-캡슐전선창-모드-확인)·[WORKLOG](docs/history/DRONE_WORKLOG.md).
+마지막 갱신: 2026-10-30 D PC — 파일럿 자연착륙·방향보존/재이륙 보강, 최종Build4·같은DLL48통과. 키 검사는 실제Worldtick 관측으로 수선, 맵·구름 보존/저장용 로컬 커밋·Push 없음. [STATUS](STATUS.md).
 
 ## Now
 
@@ -30,6 +30,7 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
+| ROTOR-PILOT-KEYS-01 | 파일럿 체감·교정 | 자연착륙/8재시작·같은DLL48자동/RHI 확인 | 실물 조종·외형 접지/계수 교정 후 확장 |
 | INPUT-KM-VERTICAL-01 | 키마 상승·착지 | 쉬운/게임 Ctrl 하강→접지OFF, 집중10건 통과 | 손 조작 확인·FPV/패드/RC 정책 유지. [입력](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md) |
 | RACING-RANDOM-UI-01 | 공통 결과·게이트 화살표 | 전용4건·viewport4건·제목1280 확인 | [범위](docs/planning/DRONE_RANDOM_CITY_RACING_PROPOSAL_2026-10-27.md) |
 | INPUT-PHYSICS-RECHECK-01 | 3장치 키 설정·패드 RightY/Cancel | 고유28최종통과·실제화면20경로·UI4장/정리3건 재검증 | 실물 RC/PS 비행·체감 확인 |
@@ -134,8 +135,8 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 | PERF-ZEN-START-01 | D PC Editor 시작 지연(Zen 대기) 조사 | 원인 특정(10/06 D PC Claude): Zen 세션 기록 733개 로드 약 20초 + 엔진 20초 초과 모달. 10/02 473초는 모달 미응답 대기. 세션 폴더 732개 백업 이동 완료, 재측정 대기. 상세 STATUS/WORKLOG | Claude가 같은 맵·캐시로 cold/warm 시작 로그 비교, 확인창 응답·Zen running→Editor 확인 시간 분리. 캐시 삭제·엔진 소스 수정·보안 해제 금지, Production Training 보존 |
 | SYNC-WORKPC-01 | D PC 10/27 | FINAL4 Source/Config67·보호9·최신Saved10 hash 일치/Editor0 | 다른 PC 수신·실기·패키징 별도. [등록부](docs/git/DRONE_WORK_PC_SESSIONS.md) |
 | RACING-MAPS-01 | 팀원 레이싱 맵 1·2·3 | Map2 중복 링 때문에 생기던 기록 취소 수정·93개 실행 Gate 완주/저장. 3맵 새 프로세스 복원 통과. 선택/사진/API 포커스 정합·옛 7개 안내 수정; STATUS | 사용자 실제 비행/카드별 사진 확인. 자동 기록은 전용 슬롯, 원본 맵/사진과 기존 DA 변경 보존 |
-| SYNC-COLLAB-01 | 협업·다른 PC 세팅 | 최신 소유권·단일 엔진·10/23 승인 이력은 [등록부](docs/git/DRONE_WORK_PC_SESSIONS.md) | 다른 PC 수신/Build 별도. 사용자 Lobby·Claude 문서 보존, 이번 Commit/Push 없음 |
-| SYNC-SPACES-01 | MD·Space 최신화 | 기존3Page/5블록 교체·재읽기 일치, seq121/76/84 | 새Page0·역사/비대상 보존. 이번 Commit/Push 없음 |
+| SYNC-COLLAB-01 | 협업·다른 PC 세팅 | 최신 소유권·단일 엔진·10/23 승인 이력은 [등록부](docs/git/DRONE_WORK_PC_SESSIONS.md) | 다른 PC 수신/Build 별도. 사용자 Lobby·Claude 문서 보존, 저장용 로컬 커밋·Push 없음 |
+| SYNC-SPACES-01 | MD·Space 최신화 | 기존3Page/5블록 교체·재읽기 일치, seq121/76/84 | 새Page0·역사/비대상 보존. 저장용 로컬 커밋·Push 없음 |
 
 ## Next
 
