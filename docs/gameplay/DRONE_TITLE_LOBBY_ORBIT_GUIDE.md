@@ -320,8 +320,8 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 - 기본값은 음량 100%, 테두리 없는 창·1920×1080, 품질 보통, 60 FPS, VSync On, 카메라 감도X/Y 각각1배·반전 Off다. 먼저 편집값으로 준비하며 Apply 전에는 화면/성능을 저장하지 않는다. 음량은 미리보기한다. PIE에서는 기본값 복원도 창/해상도를 변경하지 않는다.
 - Back/Esc/패드 B는 미적용 음량을 편집 시작값으로 되돌리고 화면/성능 편집값을 버린다. 이미 Apply한 값은 유지한다.
 - PIE/Designer에서는 창 모드와 해상도 컨트롤을 비활성화하고 Standalone 안내를 표시한다. 품질/VSync/FPS 적용은 비해상도 경로를 사용해 Editor 창 크기를 바꾸지 않는다. 실제 디스플레이 변경은 Standalone에서 확인한다.
-- 사용자4음원→7자산·실제Race/M4 Controller/HUD 조립·local사망음 pause 수리는 [오디오 정본](DRONE_MISSION_FRAMEWORK_GUIDE.md#사용자-오디오와-체력-경고)을 따른다. 직전26과 이번통합2/직접회귀3을 구분하며 실물 손조종/청감·Cook/패키징은 미실시다.
-- `UDroneAudioSettingsSubsystem`은 같은 GameInstance의 맵 이동 뒤에도 전체 음량을 적용하고 재실행 시 SaveGame을 복원한다. 다른 GameInstance/Editor 오디오에는 적용하지 않는다. 저장 없음·다른 타입·비정상 수치에는 기본 음량을 유지한다. UI 사운드 원본은 `ButtonHoverSound / ButtonClickSound` 슬롯에 별도로 지정하며 미지정이면 무음이다.
+- 제출14음원의 상황별 연결·공통 UI 이동/확정·메뉴 BGM과 기존 카운트다운/체력 경고는 [오디오 정본](DRONE_MISSION_FRAMEWORK_GUIDE.md#사용자-오디오와-체력-경고)을 따른다. Blueprint 조정은 `DA_DroneSoundBank`의 이벤트별 Sound/Gain/Pitch를 사용한다. 최신 검증·청감/패키징 경계는 STATUS·WORKLOG가 정본이다.
+- `UDroneAudioSettingsSubsystem`은 같은 GameInstance의 맵 이동 뒤에도 전체 음량을 적용하고 재실행 시 SaveGame을 복원한다. 다른 GameInstance/Editor 오디오에는 적용하지 않는다. 저장 없음·다른 타입·비정상 수치에는 기본 음량을 유지한다. UI 선택/확정은 공통 버튼 delegate가 소유하므로 기존 `ButtonHoverSound / ButtonClickSound`와 Slate 스타일음을 중복 재생하지 않는다. 현재 조정 위치는 Bank의 UISelect/UIConfirm이다.
 - 공개 API는 `Refresh From Current Settings / Set Master Volume / Get Master Volume / Apply Pending Settings / Restore Defaults / Cancel Pending Settings / Request Close / Are Display Settings Available`, 닫기 이벤트는 `On Close Requested`다. pending 품질·해상도·VSync·FPS getter도 제공한다.
 - native 설정 컨트롤 이름은 `MasterVolumeSlider`, `DisplayModeCombo`, `ResolutionCombo`, `GraphicsCombo`, `FrameRateCombo`, `VSyncCheck`, `RestoreDefaultsButton / ApplySettingsButton / SettingsBackButton`이다. 이 이름은 기본 WidgetTree를 점검할 때 사용하며 자체 Designer의 자동 바인딩을 보장하지 않는다.
 

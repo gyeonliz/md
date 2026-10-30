@@ -100,6 +100,7 @@
 - [`DRONE_WORKLOG.md`](history/DRONE_WORKLOG.md): 날짜별 개발 기록
 - [STATUS_2026-09.md](history/archive/STATUS_2026-09.md): 이전 상태 원문 아카이브
 - [WORKBOARD_2026-10.md](history/archive/WORKBOARD_2026-10.md): 날짜별 보드·완료/종료 카드·장문 근거·지난 Next 원문(10/13 이전 비교표·PC 인계 보존 포함)
+- [Mission 오디오 이전 검증 원문](history/archive/DRONE_MISSION_AUDIO_2026-10.md): 제출음원14종 도입 전 321/경고/파괴/발사 연결·실행 근거 보존
 - [`DRONE_PROGRESS_REPORT_2026-09-17_TO_2026-09-30.md`](history/DRONE_PROGRESS_REPORT_2026-09-17_TO_2026-09-30.md): 9월 17일 이후 작업·현재 상태·다음 계획을 교수님·팀원 공유용으로 정리한 보고서
 - [`DRONE_TRELLO_BOARD_2026-09-09.md`](history/DRONE_TRELLO_BOARD_2026-09-09.md): 2026-09-09 Trello 입력본
 - [`DRONE_PROJECT_AUDIT.md`](history/DRONE_PROJECT_AUDIT.md): Prototype 구현 전 감사

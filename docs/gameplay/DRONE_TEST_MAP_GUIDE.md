@@ -22,6 +22,14 @@ Outliner의 `Pilot.Environment` 아래 `GroundMarkings`9·`Labels`7·`HeightRefe
 
 기존 Setup/출발위치·관찰offset·GameMode/tag·조명/날씨/카메라와 물리/키 코드는 유지한다. 이번 환경의 저장 범위는 파일럿umap와 구름MIC1개이며 Production Training·본미션·기존DA/BP는 건드리지 않는다. C++ Build는 필요 없다. 저장·재열기 후 실제RHI에서 같은 FPV 위치/화각의 수평·상방40°·70°를 확인하고, 키/재시작/날씨 집중3검사를 수행한다. 앞선 지상 환경의 착륙 포함4검사와 구분한다. 화면 검사에는 임시 PIE view target을 사용하며 기체의 원래 카메라/FOV 설정을 저장하지 않는다. 자동 입력·충돌 설정 확인과 사람의 비행/실제 소품 충돌체감은 구분한다. 앞선 보조 PIE sphere프로브는 결과가 없어 통과 근거로 쓰지 않았으며 기존41검사도 환경 후 전체 재실행으로 합산하지 않는다. 실행별 근거는 STATUS/WORKLOG를 따른다.
 
+## 파일럿 물리·소화면 확인
+
+시험값은 [별도 Data Asset과 계산식](DRONE_REALISTIC_HANDLING_PLAN.md#파일럿-시험용-data-asset과-50-호버)에서 조정한다. 숫자1로 관찰 진입 후 다시1을 눌러 좌상단3인칭 소화면을 켜고 끈다.2/3은 소화면을 닫고 해당 시점으로 돌아가며8재시작은 캡처를 정리한다.3인칭은 기체 Yaw만 추적하고 Pitch/Roll에 수평을 유지한다.1인칭은 기존 기체 기울기를 따른다. 소화면은 실제3번 카메라의 위치·지형충돌·지연/FOV를 공유하는640×360 캡처이며 표시폭은 화면25%/최대320px다.
+
+4~7의 본체 판정은 외형 밑면에 맞춘 같은 평평한 상자다. 형상/높이의 정본은 [접촉 모델](DRONE_REALISTIC_HANDLING_PLAN.md#파일럿-맵의-접촉회전착륙-보정)을 따른다. 실제 바닥에 자연 접지시킨 뒤 옆에서 본체 하단 간격1cm 이내·평면 미끄럼 후 정지·본체 밖 장애물에 허공 충돌 없음·제자리 회전 중 벽/바닥 관통 없음·접지/공중4↔5↔6↔7 전환의 위치 유지와8재시작을 확인한다. `Drone.Physics.RotorPilot.FlatHull`6개는 실제 Setup/저장Racer/본체 정점과 native 충돌을 사용한다. EasyGameLandingAndControls는4/5의 실제 낙하/표시 정착·Ctrl 접지OFF·벽 회전·바닥/벽 초기 중첩 해소와 saved Racer의 offset 보정 Floating 파생형을 확인한다. 착륙 보조를 끈 평면 검사와6/7 자연 보조의 착륙 검사를 구분한다. 기존 구형 접촉 단위검사는 opt-out 경로를 유지한다. 실제 실행별 통과/실패·RHI 화면 근거는 STATUS/WORKLOG에 기록한다.
+
+MotionAudit는 실제 World/Pawn Tick의 반복 이착륙/에너지·시간·OFF/40/50% 하강·저장DA 적용/약한보정을 검사한다. Camera.ObserverInsetAndYawOnlyChase는 실제 렌즈 자세/소화면 재입력/전환/재시작 정리를 검사하며 ShortcutsPIE는 실제 PlayerInput press/release로 반복1과2/3/8을 확인한다. 실제RHI 화면과 자동 입력 검증은 실물 HID 손조종 체감과 구분한다.
+
 ## 파일럿 숫자키 실행 확인
 
 대상과 키별 역할은 [입력 정본](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#파일럿-테스트맵-전용-숫자키), 계산/계수/적용 조건은 [물리 정본](DRONE_REALISTIC_HANDLING_PLAN.md#파일럿-맵의-접촉회전착륙-보정)을 따른다. Editor를 저장·종료하고 기존 실행 담당 한 곳에서 현재 Source를 Build한 뒤 같은 DLL로 검사한다.

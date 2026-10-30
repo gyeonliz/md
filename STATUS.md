@@ -1,6 +1,6 @@
 # 현재 작업 상태
 
-현재 기준(10/30 D PC): 파일럿6/7의 자연 착륙을 보강했다. 실제 접지·낮은 요청/실제 추력에서 모터ON/OFF 모두 감속·정립하며 새 상승/강한 회전 명령에는 즉시 해제한다. 수평·회전접선3m/s/UpDot0.1까지 허용하고 첫 접지 방향은 짧은 반동0.25초 동안 기억만 유지한다. Setup의 LandingAssist에서 조정한다. [계산/조정 정본](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#파일럿-맵의-접촉회전착륙-보정). 최종Build4·동일DLL 고유48전부통과(일반46+경고포함2/실패0), 실제Worldtick 관측을 보강한 단축키·날씨 검사도 통과했다. 중간착지/방향/날씨관측 실패는 WORKLOG에 보존한다. Source/Config541 동결·Content70/보호35·맵/구름·요청직전Saved10 보존/복원·엔진종료, 맵저장0이다. 기존400×400m 지상39개와 하늘16개는 유지한다. Source10/맵/MIC·MD는 사용자 요청으로 저장용 로컬 커밋에 보존하며 Push는 없다. 실물 손조종·정밀 외형/계수교정·패키징은 별도다.
+현재 기준(10/30 D PC): 파일럿4~7 공통 평면 본체·실제 밑면 높이·접지/전환을 구현하고 RHI4~7/8재시작 gap0.03764cm/전환pose0을 확인했다. 제출음원14종도 상황별 연결·새Wave14/편집Bank1개를 저장했다. 최종E2 Build13.81초·같은DLL 고유91검사(오디오22+물리/공유69) 최종Success/Fail0이다. 새4·기존87 중84통과 뒤 무음export3건은 검사 프로세스 한정 submix설정으로 같은DLL 재검사 통과했으며 최초실패를 보존한다. [판정·계산](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#파일럿-맵의-접촉회전착륙-보정)·[오디오 조정](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#사용자-오디오와-체력-경고)·[상세 근거](docs/history/DRONE_WORKLOG.md). 최종 보존 감사·MD/Space 재읽기를 마쳤고 사용자 승인에 따라 code59b3c0f7을 origin/main에 Push했다. 문서는 이 결과를 담은 동반 버전이다. 실물 손조종·스피커 청감/밸런스·패키징은 별도다.
 
 이전 입력 검증(10/27 D PC): 키보드 쉬운/게임 Ctrl을 공중 모터ON 하강→실제 접지OFF로 분리했다. 공중 해제hover·착지 후 새Space 재이륙이며 FPV/패드/RC는 기존 정책이다. Build75.30초·집중10건 Success/경고0/Fail0, 30/120fps 착지4조건과 실제Racer48표본을 확인했다. 기존 상승/패드/Acro Ctrl40표본 변화0. 손 조작 체감은 대기다. [입력 정본](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)·[상세 이력](docs/history/DRONE_WORKLOG.md).
 
@@ -10,22 +10,22 @@
 
 수신한 현재 HEAD에는 10/27 키마·패드·InterLink 3탭/키·축 교환·반전·장치별 기본값·부모1회 저장, SceneViewport RightY 보정과 Circle=Esc가 포함돼 있다. 당시 고유28검사/Build11.82초/UI4장 및 앞선 카메라·정립 착지·RC배치47검사의 경계는 [WORKLOG](docs/history/DRONE_WORKLOG.md)에 보존한다. 실제 손조종·미연결 InterLink 새 실측·패키징은 별도다.
 
-## Git 기준(10/30 작업컴·로컬 저장)
+## Git 기준(10/30 작업컴·최종 전달)
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal D PC `D:\JGY\project\drone` | main `330c7337` | Source10+파일럿맵1+구름MIC1 저장용 커밋·Clean·Push 없음 |
-| 문서 D PC `D:\JGY\project\md` | main·본 기록 동반 저장 | 관련 문서8개 로컬 커밋·Space 저장 상태 반영·Push 없음 |
+| Unreal D PC `D:\JGY\project\drone` | main `59b3c0f7` | origin/main 원격 SHA 일치·0/0·Clean, LFS46개/151MB 전달 |
+| 문서 D PC `D:\JGY\project\md` | main·이 기록을 담은 동반 버전 | 관련11문서·Space3Page 최신화, 문서 SHA/원격 확인은 Space 최종 인계 |
 
-사용자 맵 변경/삭제·오디오 교체가 포함된 수신 HEAD를 보존했다. 이전 완료 지시를 이번에도 적용해 만든 로컬90a07506은 사용자의 “커밋푸쉬는안시켰는데” 정정 후 취소했다. Source10파일 byte 보존·HEAD/원격108e9c95·index 비움을 확인했다. 이번에는 사용자의 저장용 커밋 지시로 로컬 보존하며 Push는 하지 않는다. 상세는 WORKLOG와 로컬 `LOCAL_COMMIT_CANCELLED.json`을 따른다.
+사용자 맵 변경/삭제·오디오 교체가 포함된 수신 HEAD와 앞선 저장용 code330c7337/doc062e249를 보존한다. 이전 무승인90a07506 취소·byte보존 이력은 WORKLOG에 있다. 이번에는 사용자가 물리·추가 제출음원 완료 후 Commit/Push를 명시적으로 승인했다. 코드59b3c0f7의 Push와 원격 일치를 확인했으며 문서는 동반 전달한다.
 
 ## 작업컴 세션 운영
 
-총괄이 물리/숫자키 구현·독립 읽기 검토를 취합했고 엔진/Build/PIE/RHI는 기존 실행 담당 한 곳만 사용했다. 최종 검증 후 엔진을 종료하고 사용자에게 직접 테스트를 인계했다. 인계 후 엔진 추가 실행·사용자 설정 복원·Source 변경은 하지 않는다. [소유권](docs/git/DRONE_WORK_PC_SESSIONS.md)·상세 이력은 WORKLOG를 따른다.
+총괄이 물리/숫자키 구현·독립 읽기 검토를 취합했고 엔진/Build/PIE/RHI는 기존 실행 담당 한 곳만 사용했다. 앞선 검증 인계 후 사용자가 새 물리/카메라 작업을 요청하고 Editor 종료를 확인했다. 이번 실행도 이 대화 한 곳에서 수행한 뒤 종료·요청직전 사용자 설정 복원 후 인계한다. [소유권](docs/git/DRONE_WORK_PC_SESSIONS.md)·상세 이력은 WORKLOG를 따른다.
 
 ## 현재 D PC 구현·검증 경계
 
-- **사용자 오디오/실제 미션**: 직전 지정26검사 성공 이력(리비전별)과 별개로 실제 catalog Racing Map1·Story M4의 Mission controller/HUD 조립에서 countdown·health warning·실제배치 발사음·파괴음2life를 자동 확인했다. 사망 뒤 재선택 pause의 tung 실결함을 local-PC 소유 공간음의 pause 예외로 수리, Build5 성공16.72초. 직접영향 기존 DroneDestroyed/ImpactDestroyed/MasterMute3개 재검사 Success·기존417중416 보존·FlightPawn audio블록/include2만 수정, Config5/보호125/SourceArt12·Saved10 일치. 전체 손조종/실청·Cook/패키징은 미실시. [정본](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#사용자-오디오와-체력-경고).
+- **사용자 오디오/실제 미션**: 새14종은 Bank에서 상황별 Sound/Gain/Pitch를 편집한다. 원본14·기존321Go/warning·이전7Wave를 보존하고 소실잡음은3초/−18dB다. 고유오디오22개·실제RacingMap1/StoryM4·중복/무음/Master/독립PCM을 확인했다. 회귀3건의 무음녹음 환경 수선과 경고는 WORKLOG에 보존한다. [정본](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md#사용자-오디오와-체력-경고).
 
 - **모터·물리 후보/키입력**: 장치별 스로틀·키 유지/해제 인계·RC 실측/안전가드·역할 카메라 정본을 유지한다. Legacy 정상OFF 경로에도 기존 공유 항력과 World중력을 연결하고 시작/목표추력0·인공제동0을 유지했다. 4모드×30/240fps 감속·낙하·재시동과 실제World.Tick 이동을 자동 확인했다. 기본/게임 ON assisted·후보Racer 제약과 실물확인은 별도. [OFF 항력 정본](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md).
 - **카메라·설정/UI**: 넓은 역할 시야·사용자 FPV HFOV와 기본 시점/조작, 명시적 카드 확정/START 잠금·위치 기반 포커스·설정 드롭다운·영상 스킵과 파괴 후 전환을 반영했다. [현재 절차](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md).

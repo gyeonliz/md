@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-10-30 D PC — 파일럿 자연착륙·방향보존/재이륙 보강, 최종Build4·같은DLL48통과. 키 검사는 실제Worldtick 관측으로 수선, 맵·구름 보존/저장용 로컬 커밋·Push 없음. [STATUS](STATUS.md).
+마지막 갱신: 2026-10-30 D PC — 평면판정4~7·제출음원14종, 같은DLL 고유91검사 최종통과·코드59b3c0f7 Push/문서 동반 전달. [STATUS](STATUS.md).
 
 ## Now
 
@@ -30,7 +30,8 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
-| ROTOR-PILOT-KEYS-01 | 파일럿 체감·교정 | 자연착륙/8재시작·같은DLL48자동/RHI 확인 | 실물 조종·외형 접지/계수 교정 후 확장 |
+| ROTOR-PILOT-KEYS-01 | 파일럿 체감·교정 | 공통 평면 본체4~7·69검사/RHI 접지 확인 | 실물 조종 후 튜닝 |
+| SOUND-PACK-14 | 제출음원14종 | 연결/편집Bank·고유오디오22 통과 | 보존확인·코드Push/문서동반, 청감 조정 후속 |
 | INPUT-KM-VERTICAL-01 | 키마 상승·착지 | 쉬운/게임 Ctrl 하강→접지OFF, 집중10건 통과 | 손 조작 확인·FPV/패드/RC 정책 유지. [입력](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md) |
 | RACING-RANDOM-UI-01 | 공통 결과·게이트 화살표 | 전용4건·viewport4건·제목1280 확인 | [범위](docs/planning/DRONE_RANDOM_CITY_RACING_PROPOSAL_2026-10-27.md) |
 | INPUT-PHYSICS-RECHECK-01 | 3장치 키 설정·패드 RightY/Cancel | 고유28최종통과·실제화면20경로·UI4장/정리3건 재검증 | 실물 RC/PS 비행·체감 확인 |
@@ -136,13 +137,13 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 | SYNC-WORKPC-01 | D PC 10/27 | FINAL4 Source/Config67·보호9·최신Saved10 hash 일치/Editor0 | 다른 PC 수신·실기·패키징 별도. [등록부](docs/git/DRONE_WORK_PC_SESSIONS.md) |
 | RACING-MAPS-01 | 팀원 레이싱 맵 1·2·3 | Map2 중복 링 때문에 생기던 기록 취소 수정·93개 실행 Gate 완주/저장. 3맵 새 프로세스 복원 통과. 선택/사진/API 포커스 정합·옛 7개 안내 수정; STATUS | 사용자 실제 비행/카드별 사진 확인. 자동 기록은 전용 슬롯, 원본 맵/사진과 기존 DA 변경 보존 |
 | SYNC-COLLAB-01 | 협업·다른 PC 세팅 | 최신 소유권·단일 엔진·10/23 승인 이력은 [등록부](docs/git/DRONE_WORK_PC_SESSIONS.md) | 다른 PC 수신/Build 별도. 사용자 Lobby·Claude 문서 보존, 저장용 로컬 커밋·Push 없음 |
-| SYNC-SPACES-01 | MD·Space 최신화 | 기존3Page/5블록 교체·재읽기 일치, seq121/76/84 | 새Page0·역사/비대상 보존. 저장용 로컬 커밋·Push 없음 |
+| SYNC-SPACES-01 | MD·Space 최신화 | 기존3Page/4블록 교체·재읽기 일치 | 새Page0·역사/비대상 보존, Git 결과는 STATUS·WORKLOG |
 
 ## Next
 
 현재 상태는 [STATUS](STATUS.md), 수치·원시 로그 이력은 [WORKLOG](docs/history/DRONE_WORKLOG.md), 이전 Next는 [원문 아카이브](docs/history/archive/WORKBOARD_2026-10.md)를 따른다.
 
-0. 실제Race/M4 오디오 조립 자동 검증·사망음 pause 수리 결과를 유지하고 실물 손조종/전체완주·스피커 청감/밸런스·Cook/패키징을 확인한다. M4 유인MG는 미배치라 기존 개별검사와 구분한다.
+0. 제출14음원·실제Race/M4와 같은DLL 고유91검사 결과를 유지하고 실물 손조종/전체완주·스피커 청감/밸런스·Cook/패키징을 확인한다. M4 유인MG는 미배치라 개별검사와 구분한다.
 1. PS 앞밀기 HID750표본·SceneViewport20경로·3장치 키 설정의 공식28검사 근거를 유지하고 실제 장치 양방향/중립/해제·비행체감·종료/재실행 복원을 확인한다. InterLink 추가 카메라 조작 배정은 기존 비행4축과 구분한다. 키·축·반전 pending/부모적용/취소/기본값과 원본45매핑 보존 절차는 입력 정본을 따른다.
 2. LOS 캡처를 검사 World/LocalPlayer에 연결하고 HitResult 디코더를 수리한 뒤 사람·드론 가시성과 지면 관계를 확인한다. 후퇴 시작값400cm·기존 동선/실제 착지 보존, 눈높이 원인 단정/임의 높이 변경 없음.
 3. M3 Fence null guard/기하 보존을 유지하고 실제 배치·접촉을 확인한다. M4 Lumen 경고·긴 로딩은 별도 성능 과제다. 기존 무입력 CPU 표본으로 원인/최적화 효과를 확정하지 않고 같은 조건의 비행/사격과 GPU 지원 여부를 계측한다.

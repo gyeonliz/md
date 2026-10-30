@@ -5069,3 +5069,54 @@ STATUS/WORKBOARD·입력 정본·설정 UI 가이드와 현재 세션 등록부�
 - 사용자가 새 물리·카메라 조정 전에 저장용 커밋을 요청하고 Editor 종료를 알렸다. 실제 Editor/Build0을 확인했다. 이후 작업의 Commit/Push까지 포괄 승인한 것으로 확대하지 않는다.
 - Unreal main `330c73371a35e019cf7a37cd7523bba265f5cdfd`에 Source10·파일럿맵1·구름MIC1 총12파일을 저장했다. 직전 Build4 동결 Source/Config541·맵/구름 해시가 현재 파일과 일치했고, staged diff check 통과 및 커밋 후 작업트리 Clean을 확인했다. 기존 동일DLL 고유48통과 근거를 연결하며 새 Build/PIE·손조종 검사를 수행한 기록은 아니다.
 - 관련 MD8파일도 저장용 로컬 커밋으로 보존한다. 현재 STATUS/WORKBOARD·세션의 Git 상태를 갱신하고 Drone Space 진행상황의 현재 저장 상태만 연결한다. 이전 취소·미커밋·원시 실패 기록은 당시 사실로 보존한다. Push·Trello·공유 권한·예약 변경은 없다.
+
+
+## 2026-10-30 D PC — 저장용 커밋 후 파일럿 물리DA·호버/하강·소화면·yaw전용 추적
+
+사용자가 저장용 커밋을 먼저 지시해 code330c7337/doc062e249를 로컬 보존했으며 Push는 하지 않았다. 이후 Editor 종료를 직접 확인하고 이 대화 한 곳에서 새 요청을 수행했다. 새 구현/문서/DA는 미커밋이다.
+
+- 원래 설정 진단: MotionAudit2 Success. 실제 saved Racer2kg/40N의30·120fps×6회 touch-and-go에서 시간장부 중복/양의 모터 일 대비 비정상 에너지 증가0. 착지 후 vz0.39~0.57m/s와 최고높이 수렴은 관측됐으나 무제한 버니합 가속 버그로 확정하지 않았다.1초 OFF하강4.680917m/40%1.255836m/50%0.394766m,모터시동지연 포함이다.
+- 새 별도DA1개: DA_RotorPilot_PhysicsTuning. 실제Setup의 유효 질량0.9kg/최대17.64N/모터tau0.035,관성/공력/접촉·자연착륙·50%호버/아래곡선p1.5/약한수직속도보정0.2s^-1·중량5%제한을 편집한다. 원래RacerDA/BP와작성맵은저장하지 않았다. 가속도/모터/관성/항력 식은 DRONE_REALISTIC_HANDLING_PLAN이 정본이다.
+- 카메라: 관찰1재입력마다 좌상단3인칭소화면 ON/OFF,2/3진입시닫힘·8/EndPlay시캡처정리. 실제3카메라와같은위치/지형보호/지연/FOV.3인칭 yaw추적·pitch/roll독립,FPV기체기울기추적유지. 실제PlayerInput반복1/2/3/8과RHI를검증했다.
+- 중간실패 보존: Build1성공76.31s 뒤 focused1 1/11통과/10실패(새legacy모터flagON에의한출격거부)→명시적OFF 선행. Build2성공35.00s 뒤 focused2는카메라fixture의잘못된PawnOwner cast로엔진접근위반/미완료,HUD도같은소유자조회수정. Build3성공31.06s/focused3 10/11:40%새추력곡선의yaw권한저하로0.4s회전2.6903°가옛3°기대미달. 강한yaw의landing해제검사는아직아래호버인45%로바꾸고3°/첫step해제 단언은유지했다.40/45%landing출력검사는선형입력비율대신중량70%초과실추력을확인한다. 원시실패를성공으로치환하지않았다.
+- 최종Build4 9.94s 성공,동일DLL 고유63=61일반+2경고포함/실패0/미실행0. 이전48+신규4+기존Camera11이며집중실행과중복합산하지않는다. 새40%1초하강1.593033m/OFF4.773237m/50%0.294456m(시동지연포함),안정된50%중량평형·초기vz2→5초후0.530135m/s. 반복입력최고높이약1.43~1.46m·비정상에너지증가0. 실물HID손조종/실기체교정/패키징은미실시다.
+- 보존: 요청직전Source541/모듈2/Saved10/ConfigProject7/Content70/보호35와맵·MIC를기준으로백업/해시확인했다. 최종Source544/모듈2동결대조,기존자산/Production/원래DA/BP/맵/구름불변·맵저장0·추가시험DA1. 사용자Editor정상종료후의Saved10만복원·엔진0. 이전요청Saved로복원하지않았다. 별도Commit/Push/Trello/권한/예약변경없음.
+
+근거: 로컬 Saved/Automation/PilotMotionTuning_20261030/Execution의 REQUEST_BASELINE.json, BASELINE_AUDIT/index.json·CSV, TUNING_BUILD1~4_SOURCE.json, TUNING_FOCUSED1~3 로그, FINAL_REGRESSION/index.json, FINAL_STATUS.json과RHI PNG/명령결과. MD와기존Drone Space 진행/테스트/조정3페이지를같이갱신했다.
+
+
+### 같은 요청 후속 — 질량 편집 뒤 중앙복귀 호버 중복 변환 수정
+
+앞선 Build4/63검사·RHI 확인 뒤 질량 편집 경계를 추가 점검했다. 새 시험값에서 질량만1.2kg으로 바꾸면 패드 중립의 물리호버2/3을 파일럿50%곡선에 다시 넣어 실제추력13.72N/2초상승316.094745cm가 재현됐다. MASS_NEUTRAL_RED_BUILD 9.31s의 첫 검사는중립만으로시동하려한fixture실패(모터OFF/추력0)라재현근거로쓰지않는다. 최하단→상승→중립의실제계약으로수선한 RED2_BUILD9.56s/RED2에서모터ON·13.72N·상승3.16m의정확한실패를확인했다.
+
+GetRotorPilotStickThrottleNormalized 어댑터가 중앙복귀장치의기존mg/Tmax변환을되돌린뒤새파일럿곡선에한번만입력한다. RC절대축은그대로전달하고모터/장치안전가드와물리hover분율API의의미는보존한다. HUD는스틱영역출력을표시한다. 새회귀는실제Setup/Pawn의공개설정API로질량1.2kg을적용하고패드최하단→상승→중립·실제Worldtick의추력11.76N/2초위치드리프트0.235159000cm를검사한다.
+
+TUNING_FINAL_BUILD 75.56s 성공 뒤같은최종DLL로 FINAL_REGRESSION2 고유63전부통과(일반61+경고포함2/실패0/미실행0)를재확인했다. FINAL_INTERACTIVE에서자동63·소화면은확인했으나후속3번PNG가관찰시점과같아최종시점증거로쓰지않았다. 새VISUAL_SOLO 실행에서실제PlayerCameraManager의PublishedPOV와렌즈위치를2cm이내로대조한3인칭과관찰소화면RHI를확인하고종료했다. 이전Build4화면/보고서는덮어쓰지않고보존했다. Source544/모듈2최종동결·기존Content70/보호35/Config7/작성맵·구름·원래DA/BP보존/맵저장0·요청직전Saved10복원·엔진0이며새시험DA1개만추가다. 최종근거는 FINAL_STATUS.json/FINAL_TEST_SUMMARY2.json/FINAL_REGRESSION2/index.json/FINAL_INTERACTIVE.log/ObserverInsetVerified.png/YawOnlyChaseVerified.png/FINAL_COMPLETE_PRESERVATION.json이다. MD와기존Space3페이지를최종상태로반영하며새Commit/Push는하지않는다.
+
+
+## 2026-10-30 D PC — 파일럿 공통 평면 판정 검증
+
+- 사용자 요청: 떠 있는 외형을 실제 밑면 높이에 맞춘 평평한 판정으로 수정하고, 파일럿맵4 쉬운/5 게임도6/7과 공유한다. 중지·상태보고 후 새4/5 요청으로 재개했으며 전체 완료 뒤 Commit/Push를 새로 승인했다. 추가 음원14종 작업은 이 물리 검증 이후 범위다.
+- 기존 saved Racer sphere 반경45cm/외형 local minZ+0.07459cm로 실제 rest 외형 gap45.10451cm를 RED 재현했다. body만56.1124×67.4372×35.3663cm의 native offset box1개로 fit, 중심Z17.7577cm/Actor·CG0 유지, 별도 rotor 전체74.6×100cm는 제외했다. 출발/접지/회전/MTD·Ctrl groundOFF·모터OFF 마찰/정립/hit callback을 active shape로 연결했다. exact pilot Game/PIE+controlled opt-in만 적용, 다른 맵 기본Sphere 보존.
+- 4~7 sameHull/UpdatedComponent를 유지하고 mode handoff 높이 변화를 제거했다. neutral fit은 transient bank/shake 제외, native Floating 파생은 offset MTD만 보정한다. 실제 translation blocking hit에서 남은 inward COM 상대속도만 에너지 비증가 projection, 구형 opt-out/계수/입력/질량/추력/카메라/PIP는 보존했다.
+- 자연 착륙 회귀는 첫 box normal impulse 뒤 적격성 판단, native 초기 중첩/짧은 probe gap의 heading 폐기, actualhit와 기억 관측시각 혼합, current속도초과시 기억까지 폐기로 분리·수선했다. actual support/명령·추력/up/접선 gate는 유지하고 이미 적격인 같은 지면의 기억만 보존/새관측 갱신, 지원없는 힘·Slerp·시간가산0이다. 임시 DEBUG-PILOT-HULL/CVar는 최종에서 제거했다.
+- 최종 Physics/FINAL_G_SOURCE_FREEZE.json 14파일·Source/Config/RawInput549, Build9.53초, 동일DLL FINAL_G_REGRESSION69/index.json 고유69=일반67+경고2/Fail0/notRun0. FlatHull6·NaturalLanding7·기존 물리/입력/카메라 회귀를 포함한다. 40/45% 최종yaw37.00199/37.00205도·속도약1e-6cm/s, native body rest bottom0.03535999cm다.
+- 실제 saved pilot map RHI6단계(초기2/4/5/6/7/8새기체), 각고정3초 관측에서 body vertex5042 minZ0.0376394cm/바닥Z0, 같은Root/activeUpdated 일치·모드 pose변화0. Root가 GREEN_PIE_REST_4TO7_SIDE.png를 직접 확인했다. 별도 body teleport/hold/pause없음, map/asset save0. Saved10을 이번재개직전baseline으로 복원, Content71/보호35/Config7/시험DA/맵·구름0drift, 엔진/컴파일러0.
+- 원시 단계: RED build fixture FScene 모호성 수정→RED5fail; ALL4B13=9pass4fail, C13=9pass4fail, DIAG3=1pass2fail, D13=7pass6fail(정착속도 해결/heading잔류), E69=65pass4fail, F69=68pass1fail, 최종G69 전부pass. Guard fixture의 Sphere 높이·Cube scale/반폭 혼동도 actual bounds로 수선했다. 실행 결과를 중복 합산하지 않는다.
+- 근거는 로컬 Saved/Automation/PilotHullFit_20261030/Execution4To7의 최종G build/source/69/index/RHI_COMPLETE/sequence/이미지다. 원시 미완료·실패·진단은 보존했다. 사용자 손조종/실기체 교정·패키징 Pass는 주장하지 않는다. 이후 Source 음원 추가는 별도 검증 리비전으로 기록한다.
+
+## 2026-10-30 D PC — 제출14음원·파일럿 최종 통합 확인
+
+사용자가 추가 지정한 Downloads/정수_정규연/새 폴더/제출서류-1-1/드로너사운드14개를 조사·원본 byte 보존하고 상황별로 연결했다. Commit/Push는 이번 물리·음원 완료 후 하라는 새 명시 지시에 따른다. 엔진/Build/import/PIE/RHI는 기존 실행01a16105-48eb-7101-8b2a-0bc6b4a070e9 한 곳만 사용했고 총괄/구현/독립 검토의 별도 엔진 실행은0이다.
+
+- 새 /Game/Drone/Audio/User_20261030에 Wave14+DA_DroneSoundBank1개만 저장했다. 메뉴BGM·UGV재장전·UI이동/확정·게이트·투하/집기·소실잡음·폭발·피격·미션성공/실패·라이플/기관총·샷건이다. 원본14와 PCM WAV14/SHA/trim 명세는 SourceArt/Audio/User_20261030이며 binary28개는 LFS다. 재현 Prepare/Import 도구2개와 AlwaysCook1줄을 추가했다. 기존321Go/warning·이전7Wave/SourceArt12·명시적 custom cue는 보존한다.
+- BGM은165.4초 원곡/loop·Gain.25, 폭발은5초 원곡을 보존한다. static300초 원본은3초 파생본/짧은fade·Bank Gain.12589254(−18dB 한 번)다. UI선택.08초/확정.18초, 샷건은 앞무음.315초 제거 뒤1.8초로 활성 끝2.016초 이후 여유를 보존한다. UI 공통delegate·focus1회, accepted pickup/drop/reload·비치명피해·결과1회, 샷건8pellet당1음·carrier폭발 HealthDeath1회/투하폭탄 별도1회다. PC소유 파괴음의 manual Play 전 AutoDestroy=true로 완료 컴포넌트 누적도 막았다.
+- 최종 Source동결은 Draft/SOURCE_APPLY_FREEZE_E2.json(28파일), Build13.81초 성공이다. 최종 Drone DLL E61EE1F75497CFA5D388A2B34AEE667F185612CDF8399E69D2251DF5082E148B, RawInput6C9904E0…E0DD3. 같은DLL 고유91개가 최종Success/Fail0/notRun0이며 한 번의91개 실행을 뜻하지 않는다. UserPack4=일반1+경고3/PCM29구간, Broad87=일반64+경고20/실패3, Silent3=경고3/실패0이다. 마지막3개는 Broad의 실패만 같은DLL·새 검사 프로세스의 au.NeverDisableSubmixes=1에서 재검사한 것으로 고유수94로 합산하지 않는다. 오디오22(새4+기존18)와 물리/공유69이며 Root/FINAL_UNIQUE_TEST_LEDGER.json에 이름별 최종 결과를 모았다.
+- 실제 catalog RacingMap1·StoryM4의 controller/HUD/출격 조립 오디오2개도 Success다. UserPack은 실제 Slate Enter·게임패드Accept·InterLink 키 route, Native pickup/drop/reload/hit/gate와 성공/거부, 투하/폭발 별도PCM·실제cue1/legacy0, static pause/해제·BGM/영상/전환·Master를 확인했다. E2 근접폭발 PCM peak.00133829, 첫1.2초 BGM peak.01537277이다. 실제 HID 손조종·NPC 자율교전/전체미션 손완주·스피커 청감/밸런스·Cook/패키징은 하지 않았다.
+- 원시 실패도 보존한다: B compile은 Pack test private Gate 호출1건→public Sequence traversal 실제 reject/accept/duplicate 경로로 교정; C4=자산1통과/무음녹음3실패→UE AudioMixerSubmix auto-disable의 RecordingData.Append 전 return 확인; D4=2통과/폭발거리·BGM시작 관측2실패; E는Build13.47초까지만/재생0; E2는 명시listener100cm blast·drop/blast 별도PCM·우발충돌 격리·최초BGM1.2초의 fixture 교정 후4통과다. PCM nonempty·무음peak·cue1/legacy0/게임플레이 기대는 완화하지 않았다. Broad87의 SpatialFar/CountdownLifecycle/HealthLifecycleAndMasterMute도 기존 무음export 경로였고 Source/Build 변경 없이 검사 프로세스 cvar1 대조로3통과·독립WAV24개를 확보했다. WASAPI RAW_MODE_UNSUPPORTED 후 정상WASAPI fallback, 기존 맵/UI 경고와 startup self-test 오류 로그는 남아 있어 전체 로그 오류0 주장은 하지 않는다.
+- 최종 SILENT3_E2_COMPLETE.json은 실제 audio-enabled/nativeRHI·NullAudio경고0·Source/Config/도구 snapshot558/DLL2 drift0·engine/compiler0이다. 기존audio7/sourceArt12/사용자원본14/Content71/보호35/시험DA1/맵·구름2/새SourceArt29/새import15 모두 drift0, 요청 직전 최신 Saved10 복원·맵저장0이다. 물리G의 RHI4~7/8재시작 gap.0376394cm·pose변화0은 음원 적용 전 실제화면 근거로 유지하고, 같은 최종E2 DLL에서 물리69를 다시 통과했다.
+- MD 현재 오디오 정본을 갱신하며 이전 절 원문을 DRONE_MISSION_AUDIO_2026-10.md에 그대로 옮겼다. 아카이브 작업75400B/529행→75358B/537행, 원문SHA1e888592…b93305b·동일 확인, README색인 추가다. 이후 현재 조정/검사 절차만 보강했다. Space 기존 진행/테스트/BP3Page·고유4블록의 현재 결과와Bank조정을 갱신·재읽기 일치했다(seq138/87/97). 새Page·권한·Trello·예약 수정0이다. 최종 Git 전달은 아래 후속 기록을 따른다.
+
+### 같은 작업 Git 전달 — 사용자 새 명시 승인
+
+총괄이 검증·MD/Space 반영 후 정확한 task91파일만 stage/검사하고 `59b3c0f7ee24a3f141d2906dd76cdd4735b15bff`(파일럿 평면 접지와 상황별 사용자 음원 연결)을 Commit/Push했다. 새 binary44개의 staged LFS oid/size를 실제 파일 SHA와 대조했고, push는 이전 저장용 조상과 함께 LFS46개/151MB를 전달했다. origin/main은108e9c95→59b3c0f7, ls-remote의 정확한 fullSHA=HEAD·tracking0/0·worktree/index Clean이다. 강제Push·별도remote·맵저장0이며 과거 무승인Commit 취소 이력과 이번 새 승인을 구분한다. 이 절/현재11문서를 담은 MD는 동반 커밋으로 전달하고 최종 문서SHA·원격 일치와 최종인계는 Drone Space 진행 Page와 로컬 Root/GIT_FINAL_RECEIPT.json에서 확인한다.

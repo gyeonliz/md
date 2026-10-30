@@ -40,21 +40,64 @@ Legacy의 정지 지지면·모터OFF 접선 속력은 `s_new=max(0,s-mu*max(0,-
 
 계산 간격은 기본1/120초, 한 프레임 최대16회·누적 지연0.25초이며 초과 시간은 drop으로 기록한다. Chaos 강체 비행 백엔드는 없고 `ChaosCandidate`는 거부한다.
 
+### 파일럿 시험용 Data Asset과 50% 호버
+
+`/Game/Drone/TestData/DA_RotorPilot_PhysicsTuning`의 **Physical Flight Settings**가 정확한 파일럿맵의 유효 물리값 정본이다. Setup의 PhysicsTuning 참조가 이 자산을 읽으며 원래 Racer Definition/BP는 저장하지 않는다. 저장한 값을 반영하려면 PIE를 다시 시작하거나 모터 OFF에서8재시작/6·7 재선택한다. 기존 Setup Landing 필드는 직렬화 보존용이며 편집 위치는 이 Data Asset으로 옮겼다. 일반 미션/다른 맵은 기존 정책을 유지한다.
+
+| 시험 시작값 | 값 | 조정 효과 |
+|---|---|---|
+| DryMassKilograms / MaximumTotalThrustNewtons | 0.9kg / 17.64N | 기본 World중력9.8에서 최대 추력/중량=2. 질량만 줄여 같은 비율을 유지하면 하강 가속도가 저절로 빨라지지는 않는다 |
+| MotorResponseTimeSeconds | 0.035s | 추력 상태의 응답 지연 |
+| RotorDynamics.InertiaDiagonalKilogramMetersSquared | (0.0225,0.0225,0.0225)kg·m² | 회전 관성. P=(0.28125), torque max=(1.8,1.8,0.09)Nm |
+| 선형항력 / CdA / 회전항력 | (0.108,0.108,0.054)kg/s / 축별0.005877551m² / 축별0.01125Nm·s | 공중 속도·회전 감쇠 |
+| GroundFrictionCoefficient / ContactRestitution | 0.4 / 0 | 마찰과 착지 반발. 공중 속도나 모터 상태를 착지 때 강제로 초기화하는 기능이 아니다 |
+| PilotHover | Enabled, StickHover01=0.5, DescentExponent=1.5 | 스로틀50%를 실제 중량에 맞추고 그 아래 추력을 더 빨리 줄임 |
+| 약한 호버 보정 | VerticalDampingPerSecond=0.2, StickAssistHalfWidth01=0.08, MaximumAssistWeightFraction=0.05 | 42~58% 안에서 중앙일수록 강함. 최대 중량5%의 수직속도 보정; 고도 기억/적분항 없음 |
+
+키보드/패드는 기존 입력 정책에서 이미 물리 호버분율mg/Tmax로 중립을 변환하므로, 파일럿 어댑터는 이를 스틱 영역으로 되돌린 뒤 새 곡선에 한 번만 넣는다. RC 절대축은 되돌림 없이 그대로 쓴다. 예를 들어 질량1.2kg/최대17.64N이면 물리 호버분율은2/3이지만 중앙복귀 명령은 여전히 파일럿50%이며 실제 추력11.76N을 유지한다. GetCurrentAcroHoverThrottleNormalized의 물리분율 의미와 모터 시동/최하단 안전가드는 유지한다.
+
+이 값들은 체감 조정용 합성 시작값이며 실기체 실측 사양이 아니다. 4/5는 Legacy 이동을 사용하고6/7만 아래의 로터 후보 호버 곡선/보정을 사용한다. 지원은 기존 무적재 Racer/CG0 범위다.
+
+아래는 수평·무풍·회전 명령0·추력 포화 없음의 식이다. `u`는 RC 절대축0~1 또는 중앙복귀 장치의 곡선 처리 뒤 중립을s로 정규화한 명령, `s=0.5`, `h=mg/Tmax`이며 충분한 최대 추력이 있을 때 적용한다.
+
+```text
+u <= s: T_base = mg * (u/s)^1.5
+u >  s: T_base = Tmax * [h + (1-h)*(u-s)/(1-s)]
+w = clamp(1 - abs(u-s)/0.08, 0, 1)
+deltaT = w * clamp(-m*0.2*v_z, -0.05*mg, +0.05*mg)
+T_target = clamp(T_base + deltaT, 0, Tmax)
+T_end = T_target + (T_start-T_target)*exp(-dt/0.035)
+T_mean = T_target + (T_start-T_target)*0.035/dt*(1-exp(-dt/0.035))
+a_world = R(q)*(sum(rotor_force_mean)+F_drag_body)/m + gravity_world
+v_new = v_old + a_mid*dt
+p_new = p_old + v_old*dt + 0.5*a_mid*dt^2
+```
+
+deltaT는 모터ON·공중·BodyUp.Z>0.7일 때만 작동한다. 모터OFF는 추력0과 실제 World중력/항력으로 낙하한다. 회전 명령이 있으면 로터별 배분/포화와 각 로터의 모터 응답이 먼저 적용된다. `m=0.9kg`에서50%는8.82N/가속도0,45%는약7.53N/하향1.43m/s²,40%는약6.31N/하향2.79m/s²다(항력·보정·추력 지연 전). 중력을 추가 배수하거나 가속도 항을 누적하지 않는다. 실제 속도에는 이전 관성이 남으며 지속적인 추력은 속도를 계속 바꾼다.
+
+반복 이착륙 검사는 실제 Setup→saved Racer·World Tick으로30/120fps·6회 동일 입력을 실행한다. 시간 장부와 모터가 한 일 대비 에너지를 함께 검사하며, 기존 설정의 비정상 누적은 재현되지 않았다. 기존 restitution0.1에서는 착지 직후 상승속도와 두 번째 점프 높이 증가가 관측됐으며 새 시험값은 반발을0으로 둔다. 원시 비교·하강/약한보정 실측·중간 실패는 WORKLOG와 로컬 PilotMotionTuning_20261030이 정본이다. 실물 조종 느낌은 사용자 확인 대기다.
+
 ### 파일럿 맵의 접촉·회전·착륙 보정
 
 이 보강은 정확한 `/Game/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot`의 Game/PIE World·controlled 표식·명시적 opt-in에서만 사용한다. 다른 맵에서는 설정 사본의 opt-in과 회전 항력을 강제로 끈다. 공유 설정 기본값은 OFF·마찰0·회전항력0·정립rate0이며 제품맵/DA/BP를 저장하지 않는다. 이 맵에서도4/5는 기존 Legacy,6/7은 보강된 로터 후보를 사용한다.
 
-접촉점 속도는 `v_contact = v_CG + omega_world cross r - v_surface`다. 현재 지원하는 CG0 구형 충돌체의 접점은 `sphere_center - normal*실제반경`으로 계산해 UE 이동 pullback이 가짜 회전 팔을 만들지 않게 한다. 방향 d의 역유효질량은 `1/m + d dot ((I_world^-1*(r cross d)) cross r)`다. 법선 충격량 `Jn=-(1+e)*(v_contact dot n)/역유효질량(n)`으로 침투 방향 속도를 제거하고, 접선 충격량은 접점 미끄럼을 멈추는 양과 `mu*Jn` 중 작은 값으로 제한한다. 이 단계의 Jn에 중력 지지가 포함되므로 `m*g*dt`를 다시 더하지 않는다.
+파일럿4~7은 `RotorDynamics.bEnablePilotBodyHull`로 보이는 본체에 맞춘 평평한 native 상자1개를 사용한다. 별도 시험용 PhysicsTuning의 기본값만 ON이고 공유 기본값/다른 맵은 OFF다. Racer의 본체 LOD0 실측은 Actor 기준 min `(-28.0562,-33.7186,0.07459)`, max `(28.0562,33.7187,35.4409)`cm, 크기 약56.1×67.4×35.4cm다. 별도 프로펠러 전체74.6×100cm를 판정에 포함하지 않는다. 상자 형상 중심만 Z≈17.7577cm이며 Actor/CG0·외형/카메라 상대변환은 유지한다. 원래 반경45cm 구는 밑면이−45cm여서 외형이 약45cm 뜨는 원인이었다. 출발 위치와 접지 검사는 구 반경 대신 실제 상자 밑면을 사용한다. 중립 외형으로 fit하므로 전환 직전의 시각 bank/shake를 고정 판정에 포함하지 않는다. 원래 메시/BP/DA와 작성 맵은 저장하지 않는다.
 
-충격 후 `v += impulse/m`, `omega_body += R^-1*(r cross impulse)/J`를 적용한다. 구형 중심의 순수 법선 충격은 회전을 만들지 않으며 접선 마찰이 회전 토크를 만든다. 벽/바닥 충돌에 실제 질량·관성·반경을 사용한다. 이는 현재 구형·CG0 범위의 접촉 계산이며 기체 전체 메시의 다점 강체 접촉이나 full Chaos 비행을 뜻하지 않는다.
+기존 Sphere 포인터/카메라·외형 연결은 비충돌 anchor로 보존한다. 파일럿4/5는 후보 적분만 해제하고 같은 Hull을 FloatingPawnMovement의 UpdatedComponent로 유지하므로4↔5↔6↔7 전환에서 판정 교체나45cm 높이 이동이 없다. 일반 해제/수명 종료에는 원래 루트·충돌 프로필·overlap·UpdatedComponent를 복원한다. 쉬운/게임의 원래 비행식·입력은 유지하고 Ctrl 접지OFF·모터OFF 마찰/정립·hit callback만 실제 active primitive와 native shape 검사로 연결한다. 접지한 모터OFF 외형만 잔류 시각 기울기를 중립으로 복귀시킨다. 별도 넓은 로터 probe는 이 Hull에서 사용하지 않고 본체 native 충돌을 사용한다. 회전 guard도4~7에 공유한다. `UDronePilotFloatingPawnMovement`는 같은 기존 컴포넌트 이름/UFloating API를 유지하며 이 맵의 offset Hull에서만 MTD 겹침 중심을 보정하고 다른 맵은 Super를 따른다. 본미션의 구형 판정은 유지한다.
 
-회전 항력 토크는 `tau_drag=-C*omega_body`다. 커널은 `omega *= exp(-(C/J)*dt/2)`를 기존 토크/관성 적분의 앞뒤에 적용해 계수가 커도 감쇠 자체가 에너지를 늘리지 않도록 한다. 기본 시험맵 C는 축별0.025Nm·s다. 다른 맵과 opt-in OFF는 C=0으로 기존 경로를 유지한다.
+6/7 커널의 접촉점 속도는 `v_contact = v_CG + omega_world cross r - v_surface`다. 새 상자는 native 충돌 시점의 외형 접점을 사용하며 바닥 네 모서리가 같은 평면에 실제 지지될 때만 평평한 지지 접점을 구성한다. 구형 opt-out의 접점은 `sphere_center - normal*실제반경`을 유지한다. UE 이동 pullback을 회전 팔에 더하지 않는다. 방향 d의 역유효질량은 `1/m + d dot ((I_world^-1*(r cross d)) cross r)`다. 법선 충격량 `Jn=-(1+e)*(v_contact dot n)/역유효질량(n)`으로 침투 방향 속도를 제거하고, 접선 충격량은 접점 미끄럼을 멈추는 양과 `mu*Jn` 중 작은 값으로 제한한다. 이 단계의 Jn에 중력 지지가 포함되므로 `m*g*dt`를 다시 더하지 않는다.4/5는 이 로터 커널로 전환하지 않고 기존 FloatingPawnMovement·모터OFF 접지 마찰/정립 계산을 유지한다.
 
-자연 착륙 보정은 `NaturalLandingAssist.bEnabled`가 켜진 파일럿 후보에서 사용한다. 최근 실제 blocking hit와 같은 정지 지지면을 native pullback 여유 안에서 계속 확인한다. 모터 ON/OFF 모두 **요청 추력과 실제 추력이 각각 중량의94% 이하**일 때 진입하며, 진입 후에는99% 초과 시 즉시 해제한다. 접선 속도와 `|omega|*반경`은 각각3m/s 이하, 기체 위쪽/지지법선 내적은0.1 초과여야 한다. 지지면으로부터 상향 분리 속도가0.15m/s를 넘거나 각축 회전 목표가20°/s를 넘으면 보정을 먼저 해제한다. 새 이륙 명령은 모터의0.055초 응답 지연을 기다리지 않고 요청 추력으로 즉시 판단한다.
+충격 후 `v += impulse/m`, `omega_body += R^-1*(r cross impulse)/J`를 적용한다. 구형 중심의 순수 법선 충격은 회전을 만들지 않으며 접선 마찰이 회전 토크를 만든다. 상자에는 실제 형상의 접촉 팔/외곽 거리를 사용한다. native sweep·MTD·Slide를 유지하고 위치가 같은 회전도 상자 모서리 이동량을 나눠 겹침을 확인한다. 이는 CG0·단일 본체 상자와 제한된 평면 지지 모델이며 기체 전체 메시의 다점 강체 접촉이나 full Chaos 비행을 뜻하지 않는다. 질량·관성·공력·50% 호버·착륙 보조 계수는 별도 PhysicsTuning 값을 유지한다.
 
-실제 접지 직후 각속도는 `exp(-24*dt)`, 접선 속도는 `exp(-6*dt)`로 감쇠해 구르며 뒤집히는 것을 줄인다. 자세는 연속 지지0.08초 뒤0.2초 동안 `ramp=x*x*(3-2*x)`로 보정 강도를 올리고 `alpha=1-exp(-6*ramp*dt)`의 quaternion Slerp로 지지면에 정렬한다. 최초 적격 바닥 hit의 heading을 보존하고 모터 ON 상태·요청 collective를 유지한다. 같은 정지 지지면의 짧은 반동에는0.25초 동안 방향 기억만 유지하며 실제 접지가 없으면 감쇠·자세 보정은 하지 않는다. 다른 지지면/벽/천장·강한 입력·오래 떠 있음·뒤집힘에는 기억도 폐기한다. 자연 보조 OFF의 기존 최근지지 기한0.1초는 유지한다. 활성 중에는 제어기의 오래된 I/D 상태만 비워 충돌을 줄인다. 공중3cm 근접·벽/천장·뒤집힘·고추력/강한 회전 의도·동력상실/파괴는 대상이 아니며, 위치를 지면으로 당기거나 모터를 자동 OFF하지 않는다. 이는 물리 충격량과 구분되는 명시적 게임 보조이며 실기체 교정값은 아니다. 자연 보조를 끈 수동 opt-in의 기존 OFF/0.5m/s 착륙 경로는 유지한다.
+상자 후보의 병진 native sweep이 실제로 막힌 step에는 SI 속도도 같은 제약과 일치시킨다. 접점 충격 계산 뒤 남은 `v_rel=v_CG-v_surface`의 `dot(v_rel,n)<0` 성분만 `v_rel-=n*dot(v_rel,n)`으로 제거한다. 표면 기준 운동에너지가 늘지 않을 때만 적용하며 접선 속도·충돌 토크·모터 상태는 유지한다. 실제 병진 blocking hit가 없는 공중·회전만 막힌 경우에는 적용하지 않는다. 이는 모서리 접점의 회전 보상 속도와 회전을 별도로 막는 swept adapter의 차이를 맞추는 근사 제약이며 공력 계수 변경이 아니다.
 
-파일럿 Setup의 일시적 설정 사본은 `GroundFrictionCoefficient=0.4`, `ContactRestitution=0.1`(0.5m/s 미만 충격은 반발0), `AngularDragNewtonMeterSeconds=(0.025,0.025,0.025)`를 유지한다. 맵의 Setup Details `Rotor Pilot → Landing`에서 `LandingAssist`와 `LandingMaximumApproachSpeedMetersPerSecond=3`, `LandingMinimumUpDot=0.1`, `LandingAlignmentRatePerSecond=6`을 편집한다. `LandingAssist` 기본은 Enabled/EnterThrustToWeight0.94/ExitThrustToWeight0.99/MaximumBodyRateCommandDegreesPerSecond20/SupportConfirmationSeconds0.08/BlendInSeconds0.2/AngularSettlingRatePerSecond24/MaximumUpwardSeparationSpeedMetersPerSecond0.15다. 값은 새 기체 생성 또는 모터OFF 상태의6/7 재선택 때 설정 사본으로 전달되므로 변경 후8재시작으로 확인한다. 공유 `FDroneRotorLandingAssistSettings` 기본은 false/모든 수치0이며 다른 맵에서는 자연 보조를 강제로 끈다. 접근속도 UI 메타·검증 상한은 모두5m/s다. 원래 기체 DA/BP·맵을 자동 저장하지 않는다. 설정·구현은 `DroneRotorFlightSettings`, `DroneFlightDynamicsMovementComponent`, `DroneRotorPilotSetup`, 커널 `IntegrateRigidBody`가 정본이며 실행 결과와 실물 손조작은 STATUS/WORKLOG에서 구분한다.
+회전 항력 토크는 `tau_drag=-C*omega_body`다. 커널은 `omega *= exp(-(C/J)*dt/2)`를 기존 토크/관성 적분의 앞뒤에 적용해 계수가 커도 감쇠 자체가 에너지를 늘리지 않도록 한다. 현재 시험DA의 C는 축별0.01125Nm·s다. 다른 맵과 opt-in OFF는 C=0으로 기존 경로를 유지한다.
+
+자연 착륙 보정은 `NaturalLandingAssist.bEnabled`가 켜진 파일럿6/7 후보에서 사용한다. 최근 실제 blocking hit와 같은 정지 지지면을 native pullback 여유 안에서 계속 확인한다. 모터 ON/OFF 모두 **요청 추력과 실제 추력이 각각 중량의94% 이하**일 때 진입하며, 진입 후에는99% 초과 시 즉시 해제한다. 최초 실제 바닥 충돌 전의 접선 속도와 `|omega|*외곽거리`는 각각3m/s 이하, 기체 위쪽/지지법선 내적은0.1 초과여야 한다. 이 적격 첫 접촉의 기수 방향을 기억하며 같은 지지면/유효시간 내에 상자 모서리 충격이 만든 회전은 실제 접지에서만 감쇠한다. 실제 충돌 시각과 기억을 위한 같은 바닥 native 관측 시각은 별도이며, 이미 실제 접촉으로 시작한 기억만 같은 면·변환·법선·Up·현재 명령 조건에서 새 관측으로 갱신한다. 매 step의 실제 지지·명령/추력·Up·접선 속도 제한은 계속 확인한다. 물리 속도가 잠시 상한을 넘으면 힘·자세·지원 시간 가산은 계속 거부하되 이미 적격인 방향 기억만 유효시간 안에서 보존한다. 지지면으로부터 상향 분리 속도가0.15m/s를 넘거나 각축 회전 목표가20°/s를 넘으면 보정을 먼저 해제한다. 새 이륙 명령은 모터 응답 지연을 기다리지 않고 요청 추력으로 즉시 판단한다.
+
+실제 접지 직후 각속도는 `exp(-24*dt)`, 접선 속도는 `exp(-6*dt)`로 감쇠해 구르며 뒤집히는 것을 줄인다. 자세는 실제 지지0.08초 확인 뒤0.2초 동안 `ramp=x*x*(3-2*x)`로 보정 강도를 올리고 `alpha=1-exp(-6*ramp*dt)`의 quaternion Slerp로 지지면에 정렬한다. 최초 적격 바닥 hit의 heading을 보존하고 모터 ON 상태·요청 collective를 유지한다. 같은 정지 지지면의 짧은 반동/초기 중첩에는0.25초의 기존 면·변환·Up·현재 입력/추력 조건 안에서 방향과 이미 실제 지지로 쌓은 시간을 보존한다. 실제 지원이 없는 동안은 active·감쇠·자세 보정과 시간 가산을 멈춘다. 상자 후보의 지지 시간은 이 짧은 틈에서 일시정지하고 구형 opt-out은 기존 연속 확인을 유지한다. 다른 지지면/벽/천장·강한 입력·오래 떠 있음·뒤집힘에는 기억과 시간을 폐기한다. 자연 보조 OFF의 기존 최근지지 기한0.1초는 유지한다. 활성 중에는 제어기의 오래된 I/D 상태만 비워 충돌을 줄인다. 공중3cm 근접·벽/천장·뒤집힘·고추력/강한 회전 의도·동력상실/파괴는 보정 대상이 아니며, 위치를 지면으로 당기거나 모터를 자동 OFF하지 않는다. 이는 물리 충격량과 구분되는 명시적 게임 보조이며 실기체 교정값은 아니다. 자연 보조를 끈 수동 opt-in의 기존 OFF/0.5m/s 착륙 경로는 유지한다.
+
+현재 파일럿의 접촉·착륙 계수는 위 별도 PhysicsTuning 자산의 RotorDynamics에서 편집한다. NaturalLandingAssist의 Enabled/Enter0.94/Exit0.99/MaximumBodyRateCommand20°/s/SupportConfirmation0.08s/BlendIn0.2s/AngularSettling24/s/MaximumUpwardSeparation0.15m/s와 UprightLandingAlignmentRate6/s/MaximumSpeed3m/s/MinimumUpDot0.1을 사용한다. 공유 기본값은 OFF/수치0이며 다른 맵에서는 자연 보조와 PilotHover를 강제로 끈다. 접근속도 편집/검증 상한은5m/s다. 기존 DA/BP·맵은 자동 저장하지 않는다.
 
 ### 전투 폭탄
 
@@ -93,7 +136,7 @@ Legacy의 정지 지지면·모터OFF 접선 속력은 `s_new=max(0,s-mu*max(0,-
 | 운동 | 로터별 힘/반작용토크·대각관성·rate 제어/배분/포화·THRUST 지연·중력/상대공기속도 항력을 공유 SI커널로 계산 |
 | 단독 writer/시간 | 후보 이동소유자1개. Legacy Floating/Acro 적분·수직clamp·Weather 별도drift를 중복적용하지 않음. bounded fixed-step의 성공step/pose commit·pending/drop을 기록, hold/pause는 진행하지 않음 |
 | 접촉/모터 | 구 swept 이동·normal 속도투영·support slop의 후보 근사접촉. 자동 시동/OFF·무추력 중력·실접지·재이륙. 무장 ArmSwitch·방전·사망과 구분 |
-| 가상 계수 | 실제saved Racer에서 질량2kg/최대합산추력40N/THRUST tau0.055초를 읽었다. geometry/inertia/drag/gains는 synthetic이며 첨부안의 미검증수치 .527kg/60N을 채택한 것이 아님 |
+| 가상 계수 | 원래saved Racer는2kg/40N/tau0.055, 현재 파일럿은별도DA0.9kg/17.64N/tau0.035. geometry/inertia/drag/gains와시험값은synthetic이며실기체채택사양아님 |
 
 <a id="자동-스로틀-모터-정책과-검증-범위"></a>
 
@@ -122,13 +165,13 @@ Acro의 hover/가속은 같은 중력 helper를 사용한다. Legacy는 설정 �
 
 ## 현재 구현에서 출발할 부분과 한계
 
-Legacy 기본 구조는 [역할·조작 가이드](DRONE_TYPES_AND_CONTROL_MODES.md)를 따른다. 아래 기본/게임·Legacy Acro 한계는 기존 모델에 대한 정적 조사이며 위 opt-in 로터후보와 구분한다. 여섯 DA 수치의 이전 C PC 조회를 전기체 실사양으로 쓰지 않는다. 이번 실제Racer 런타임의2kg/40N/tau0.055만 별도 확인했다.
+Legacy 기본 구조는 [역할·조작 가이드](DRONE_TYPES_AND_CONTROL_MODES.md)를 따른다. 아래 기본/게임·Legacy Acro 한계는 기존 모델에 대한 정적 조사이며 위 opt-in 로터후보와 구분한다. 여섯 DA 수치의 이전 C PC 조회를 전기체 실사양으로 쓰지 않는다. 원래 Racer의2kg/40N/tau0.055와 현재 파일럿 전용DA의0.9kg/17.64N/tau0.035를 구분한다.
 
 |부분|현재 확인|현실 조종감 검증에서 필요한 구분|
 |---|---|---|
 |기본/게임 조작|UFloatingPawnMovement에 이동 입력을 주며 기울기 표현·감속 계수가 다르다|기체 자세가 로터 추력의 방향을 바꿔 가속하는 구조와 동일하지 않다|
 |Acro|추력·질량·중력·모터 응답·항력을 계산하고 각속도 응답을 적분한다|각속도 1차 응답과 직접 자세 회전은 관성 텐서·유한 토크·모터 배분/포화를 계산하는 모델과 다르다|
-|기체 프로파일|이전C PC의6개DA 공통2kg/40N 일부값·BP override 꺼짐, 이번D PC actualRacer2kg/40N 확인|synthetic 가상값과 실사양을 구분하고 나머지기체 런타임/UGV 공중추력 적용을 추정하지 않음|
+|기체 프로파일|이전C PC의6개DA 공통2kg/40N 일부값·BP override 꺼짐, 원래Racer2kg/40N·파일럿전용DA0.9kg/17.64N 구분|synthetic 가상값과 실사양을 구분하고 나머지기체 런타임/UGV 공중추력 적용을 추정하지 않음|
 |바람·항력|Acro 속도/항력과 WeatherResponse의 별도 AddActorWorldOffset Drift가 나뉜다|Movement 속도·위치 차분·바람을 함께 계측하고 새 상대 공기속도 공력과 기존 위치 이동을 중복 적용하지 않는다|
 |배터리·적재|시간 기반 배터리와 적재 질량 반영은 있다|전압 강하·가용 출력·적재 위치/무게중심·회전 관성은 별도 범위다|
 |접촉|몸체/로터 충돌 검사·반사·시각 회전 반응이 있다|충돌이 없는 것이 아니라, 접촉 충격량이 실제 각속도에 미치는 강체 회전과 구분해야 한다|
