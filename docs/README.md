@@ -98,6 +98,7 @@
 - [WORK_PC_START_HERE_2026-10.md](history/archive/WORK_PC_START_HERE_2026-10.md): 10/22 개정 전 작업컴 시작 가이드 원문. 현재 절차는 루트 시작 가이드와 세션 등록부를 따른다.
 
 - [`DRONE_WORKLOG.md`](history/DRONE_WORKLOG.md): 날짜별 개발 기록
+- [DRONE_WORKLOG_2026-10.md](history/archive/DRONE_WORKLOG_2026-10.md): 2026년10월 122개 절 원문·전체 이관 제목 목록. 원래 WORKLOG의 제목/앵커에는 이관 링크를 유지한다.
 - [STATUS_2026-09.md](history/archive/STATUS_2026-09.md): 이전 상태 원문 아카이브
 - [WORKBOARD_2026-10.md](history/archive/WORKBOARD_2026-10.md): 날짜별 보드·완료/종료 카드·장문 근거·지난 Next 원문(10/13 이전 비교표·PC 인계 보존 포함)
 - [Mission 오디오 이전 검증 원문](history/archive/DRONE_MISSION_AUDIO_2026-10.md): 제출음원14종 도입 전 321/경고/파괴/발사 연결·실행 근거 보존

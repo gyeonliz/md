@@ -10,6 +10,35 @@ Story의 현재 맵 연결은 아래 표가 정본이다. M2·M3는 원본 Milit
 
 현재 절차 기준: 2026-10-22 C PC Story4 데이터/사진 교차검토. 실행별 수치·실패와 이전PC 기록은 WORKLOG 정본이다.
 
+## 현행 비행모드와 SimParity 확인
+
+기준: 2026-11-03 D PC, Unreal `5905a3cb` + 사용자 미커밋 변경. Claude 실행 로그를 Codex가 읽기 대조했다. 성공·실패/수정 재검사는 [이번 WORKLOG](../history/DRONE_WORKLOG.md#2026-11-03--실기-정합배달-튜토리얼미션-사진-후속)가 정본이며 전체 Pass나 수동 Pass는 아니다.
+
+| 확인 대상 | 현재 코드·시험 계약 | 사람이 확인할 것 |
+|---|---|---|
+| 역할×조작 | `DroneTrainingFlightModelTest`·`Drone.SimParity.ControlSchemeRoleRouting` 등, 정찰/투하 P/S/A와 FPV 자세 모드 분리 | FrontEnd 출격→F/L3/RC Button3·HUD 모드·다음 기체·설정 적용/실제 재실행 복원 |
+| 시동·착륙 | `Drone.SimParity.FpvAirmodeArmToggle`, `FiberOpticAirmodeIdle`, `DjiCombinationStickStart`, `LandDetectorPx4Defaults`, `LandingMap1PIE`, `DjiLandingProtection`, `DjiPadRcSameClimb` | 실제 패드/RC 최저스로틀·arm·DJI CSC/착륙 완료/접지3초 정지/재시동, 벽/공중 접촉과 착륙 구분 |
+| 공력·전압·투하 | `AeroGroundEffectAndPropWashMath`, `AeroPawnLegacyAndRotor`, `BatterySagThrust`, `WindBuildingShelter`, `PayloadKernelMassChange`, `PayloadReleasePawn`, `PropDamageAndJello`(모두 `Drone.SimParity.*`) | 같은 자세/조건에서 지면·후류·바람·배터리와 투하 전후 속도 연속성·모터/화면 흔들림 |
+| 입력·지연 | `DataAssetInputAudit`, `RateCurve201`, `LegacyRateAndMotorStep`, `KernelRateAndMotorStep`, 착륙/충돌/입력→자세 지연 시험 | 기존 실물 축/반전/혼합 입력·중립/해제·설정 취소/재시작 확인. PIEInputLifecycle은 IMC53과 추가8매핑을 개별 검사하고 probe 전 시동 |
+| 렌더 스모크 | `Drone.SimParity.SmokeFlightPIE`: 실제 PIE Drop Mode2 GPS 전진/제동·FPV 1인칭 어안 켬/끔 같은 자세 캡처·자기 기체 숨김 | 렌더 실행 결과·PNG를 확보해 비교. NullRHI는 건너뛰므로 Success 상태만으로 화면 Pass 처리하지 않음 |
+| 국내 실기 기동 | `Drone.SimParity.KoreanPracticalExamAtti`: 지연0.3초 사람 모델의 ATTI 기동·정상/측풍 접근·비상 착륙 | 실제 사람 조작/자격 실기 합격을 대신하지 않음. 시험 소스의 평가기준 인용과 잠정 바람/기수 조건을 구분 |
+| SITL 비교 | `Drone.SimParity.SitlReplay`는 `작업/SITL_20261031/결과/sitl_run.csv`를 입력으로 사용, 없으면 skip. `GpsBrakeNoReverse`는 별도 회귀 계약 | 원본 CSV·리비전·장치/조건·실행 로그를 확보하기 전에는 SITL 비교 완료/실기체 일치로 판정하지 않음 |
+
+실기 기동 시험 소스가 인용한 허용오차는 수평 기동 고도±0.5m·정지 중심반경1m/5초·직진/후진50m와 경로1m/끝 초과5m·삼각/원주7.5m·착륙장2×2m다. 바람2~3m/s·비상 F-H10m·기수±15°는 소스에서도 잠정 조건이다. 이는 저장소 시험 계약의 설명이며 현행 법정 기준을 새로 검증한 결과가 아니다.
+
+스모크/입력덤프 소스의 출력 위치는 `작업/SimParity_20261030/보고용`·`덤프_DA_IMC.md`로 Saved와 다르다. 이번 지시의 실행 근거 범위는 Saved/Automation이므로 해당 출력이 생성됐다고 추정하지 않는다. Build/PIE/자동화 재실행은 이번 문서 작업에 포함하지 않는다. [입력 정본](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)·[물리 조정](DRONE_REALISTIC_HANDLING_PLAN.md#비행-효과와-질량-갱신).
+
+StoryPhysicsTestMaps의 M2/M3 기대값은11/01 커밋 `7108b911`에서 `/Game/Drone/Maps/Missions/Lvl_Story02_Intercept`·`Lvl_Story03_VeilBreaker`로 정정됐다. 새 맵 생성이나 이번 수동 진입 성공을 뜻하지 않는다. 현재 맵 연결 정본은 아래 기존 Story 표를 따른다.
+
+## 배달·미션 사진·선택창 확인
+
+- 배달은 팀원 Yook34의 `/Game/Drone/Maps/Tutorial/TUT_Delivary_2`에서 확인한다. 사용자 요청 범위의 인스턴스만 조정됐고 백업은 `Saved/TUT_Delivary_2_Backup_20261103.umap`이다. `TargetVisualScale` XY2.5배(약3.05×3.22m), 화물3개 `PayloadVisual`1/3, `Tutorial.Payload.Target`·서로 다른 상자3개 수령 설정을 복구했다. 팔레트 크기/화물 비율·3개 배달 성공·재픽업 방향을 손으로 확인한다. 목표 문구는 여전히 “원통 착륙장”이며 팔레트로 변경할지는 현재 미정이다. 적용 도구는 `Tools/AssetMigration/AdjustDeliveryTutorial20261103.py`이며 문서 확인을 위해 재실행하지 않는다.
+- 화물 바닥 Yaw 유지 옵션·Anchor 조정은 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md#맵-배치-화물-bp-사용조정)을 따른다. 배달 자동 성공만으로 크기/회전 체감 Pass로 판정하지 않는다.
+- 미션13개는 `Thumbnail=BriefingImage`로 통일했다. M1 골든타임은 사막 건물 옥상, M2 길목차단은 기지 정문 트럭이다. Tutorial01~08은 사용자 파일명 대응, racing1~3은 Map1~3 번호 순으로 유지(사용자 확정)한다. 텍스처는 `/Game/Drone/UI/Textures/MissionPhotos_20261103`, 적용 도구는 `Tools/AssetMigration/ApplyMissionPhotos20261103.py`다. M1/M2 선택·설명 캡처 확인은 Claude 보고이며 다른 미션도 두 화면의 동일 사진/번호를 확인한다.
+- 선택창3D는 `UDroneSelectionPreviewWidget::ReloadAfterOpenSeconds` 기본0.75초에1회 재생성, `RecaptureAfterBuildSeconds` 기본1.5초 동안 매 프레임 재촬영·텍스처 프리스트림을 한다. FrontEnd에서 열기/기체 전환/닫기·재오픈 후 모델·텍스처·도시 배경·회전/확대가 안정적인지 수동 확인한다.
+- 3번 `TUT_Forward_Gate`의 게이트 강조/HUD 미표시 제보는 D PC에서 정상 표시·`TUTMapLaunchPIE.Forward` 통과(Claude 보고 캡처 `Saved/Automation/TUT/Forward.png`)다. 제보 PC는 바이너리 재생성/Build 후 재확인하며 타 PC 해결 완료로 처리하지 않는다.
+- 비행 수동 확인은 P/S/A 제동·위치 유지·수평 복귀, 실제 외형 기울기, FPV 설정3행 배치·업틸트/화각/어안·OSD 순서다. 조작·카메라 수치 정본은 [역할/모드](DRONE_TYPES_AND_CONTROL_MODES.md), 실기 게인 미정·미구현 항목은 [물리 정본](DRONE_REALISTIC_HANDLING_PLAN.md#dji-교육-비행과-외형-기울기)을 따른다.
+
 ## 파일럿 비행장 배치
 
 `/Game/Drone/Maps/TestMap/Lvl_DroneRotorDynamicsPilot`은400×400m, 바닥 상면Z=0의 파일럿 비행장이다. 기존100×100m보다 각 변4배/면적16배다. 출발반경20m와 중앙 폭40m·길이340m는 충돌 소품 없이 비워 둔다.30/60/100m 거리띠와2/5/10/20m 높이 기준, 크기가 다른 박스/낮은 벽/컨테이너·차량형 모형, 먼 실루엣을 합쳐39개 환경 액터를 배치했다.

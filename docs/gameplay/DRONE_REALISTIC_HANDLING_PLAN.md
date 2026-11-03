@@ -1,8 +1,18 @@
 # 현실 조종감 기준과 후속 개발 계획
 
-기준: 2026-10-30 D PC. 정확한 파일럿 테스트맵에만 접촉·회전항력·착륙 보정을 추가한 현재 소스 기준이다. Build·자동/RHI·실물 확인 결과는 STATUS/WORKLOG를 따른다. 폭탄 SI 항력 수리·자동 검증과 기존 본체 경로를 아래에서 구분한다. 장치별 입력·Legacy OFF 항력/World중력 정책을 유지하고 FPV/Fiber의 자폭 감지와 하부 물리 충돌 범위를 분리했다. 자폭 센서·넓은 역할 카메라는 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md), 실제 검증은 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. controlledRacer opt-in·실기체 교정·본미션/B·C·손 조종·패키징의 기존 지원 한계는 유지한다.
+기준: 2026-11-03 D PC 읽기 대조, 코드 `5905a3cb` + 사용자 미커밋 변경. 교육 비행·공력/전압·투하 질량 갱신은 구현됨이며 Claude 실행 자동 검증의 성공·실패 범위는 WORKLOG를 따른다. 역할별 제어/카메라는 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md), 입력/모터 조작은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md), 실행별 이력은 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 기존 파일럿 시험장의 접촉 보정과 controlledRacer opt-in, 실기체 교정·전기체/본미션 확대·B/C 최종 채택·패키징 한계는 유지한다.
 
-모터 OFF에서도 공기저항은 적용된다. Legacy 정상OFF의 조기 분기에서 빠졌던 공유 공력 계산을 4모드에 연결하고 시작/목표추력0·World중력·기존 선형/제곱항력과 인공제동0을 유지했다. 항력계수를 강하게 조절한 수리가 아니다. 30/240fps의 수평 감속·10초 감속·낙하 중 수평감속/추력0/재시동과 LocalPlayerController+실제 World.Tick 이동이 자동 통과했다. 기본/게임의 ON assisted 구조는 유지하고 controlled candidate는 기존에도 OFF 항력을 계산했으므로 이번 Legacy 결함과 구분한다.
+모터 OFF에서도 공기저항은 적용된다. Legacy 정상OFF의 조기 분기에서 빠졌던 공유 공력 계산을 4모드에 연결하고 시작/목표추력0·World중력·기존 선형/제곱항력과 인공제동0을 유지했다. 항력계수를 강하게 조절한 수리가 아니다. 30/240fps의 수평 감속·10초 감속·낙하 중 수평감속/추력0/재시동과 LocalPlayerController+실제 World.Tick 이동이 자동 통과했다. 쉬운의 ON assisted 구조는 유지하고 controlled candidate는 기존에도 OFF 항력을 계산했으므로 이번 Legacy 결함과 구분한다.
+
+## DJI 교육 비행과 외형 기울기
+
+`TrainingFlightSettings`는 Mini 4 Pro 공개 사양을 참고해 P(N) 수평12m/s·25°, S16m/s·35°, GPS 능동 제동 한도35°를 사용한다. P/S는 위치 유지·바람 보정, A(ATTI)는 고도/수평 복귀만 유지하고 표류한다. 상승/하강5m/s·Yaw100°/s와 제어이득·항력0.35/s·EXP0.3·자세 지연0.18초는 기존 모델 계약이며 실기 튜닝 게인은 현재 미정이다.
+
+제동 중 큰 속도오차만 적분을 동결하고 오차가 유지 포착 속도의2배 이하가 되면 적분을 재개한다. 횡풍 잔여 속도 때문에 위치 유지로 진입하지 못하던 결함을 수리했다. 쉬운 조작도 속도 루프 시간상수만큼 앞에서 정지점을 잡아 되밀림을 줄인다. 실기 공식 제동거리는 확보하지 않았으며 독립 재현 수치는 엔진 실측과 구분해 [WORKLOG](../history/DRONE_WORKLOG.md#2026-11-03--실기-정합배달-튜토리얼미션-사진-후속)에 둔다.
+
+학습 비행 모델 외형은 제어기 실제 각도 `atan(a/g)`를 그대로 표시한다. 이전14°/18° 축소 표시를 대체했으며 DJI 짐벌 수평/FPV 기체 고정은 [카메라 정본](DRONE_TYPES_AND_CONTROL_MODES.md#1인칭-카메라-역할-프리셋)을 따른다. 제동 세기·위치 유지·수평 복귀·외형 화면은 수동 대기다.
+
+Steam 무료 ORQA FPV.SkyDive·FPV Drone Simulator는 D PC에 설치됐다고 Claude가 보고했다. SkyDive 실행 파일 메타데이터에서 레이트·Angle/Horizon·카메라 각도·좁게/넓게 FOV·프롭워시·지면효과·전압강하·TPA 항목을 확인했으나 실제 기본값은 미확인이다. 우리 TPA·FOV 빠른 선택·터틀 모드는 미구현이다.
 
 ## 현재 운동·관성 계산식
 
@@ -10,7 +20,8 @@
 
 | 경로 | 병진 운동 | 회전 |
 |---|---|---|
-| Legacy 쉬운/게임 ON | FloatingPawnMovement 입력 가속·자동 감속·상승 보조 | 조작 보조 회전 |
+| Legacy 쉬운 ON | FloatingPawnMovement 입력 가속·자동 감속·상승 보조 | 조작 보조 회전 |
+| 정찰·투하 GPS/ATTI ON | 교육 제어기의 기울기 가속·대기상대 항력·고도 유지, 기존 감속/바람 drift 중복 제외 | Mode1/2 Root 수평·명령 기울기 외형, GPS/ATTI 차이는 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md#역할별-비행모드-라우팅) |
 | Legacy Acro ON | 합산 추력/총질량·중력·선형/제곱 항력 | 목표 각속도 1차 응답, 관성텐서 미사용 |
 | Legacy OFF | 추력0·World중력·공유 항력, 실제 지지면에서 마찰/정립 보조 | 로터 토크 적분 아님 |
 | 파일럿 로터 후보 | 로터별 힘·상대 항력·중력·접촉 충격량/마찰 | 대각 관성·로터/접촉 토크·회전항력, 낮은 추력의 ON/OFF 접지 착륙 보조 |
@@ -18,7 +29,7 @@
 
 ### Legacy 추력·항력·회전
 
-`m = m_dry + m_payload`, `T_target = u T_max`다. 모터 1차 응답은 `T_new = T_target + (T_old-T_target) exp(-dt/tau_m)`이며 가속도에는 프레임 구간 평균 추력 `T_mean`을 사용한다. `a = BodyUp * T_mean/m + g`이고 C++ 기본값은 건조2kg·최대합산40N·추력응답0.055초·ON 설정중력9.8m/s²다. 자산/BP 값이 우선하며 실기체 측정값은 아니다. OFF는 World중력을 읽고 추력을0으로 처리한다. 호버 출력은 `m*g/T_max`이고 적재 질량도 포함한다.
+`m = m_dry + m_payload`다. Legacy Acro의 명령은 1차 지연 후 프레임 구간 평균을 사용하며, 실제 추력은 `T = T_available * (idle + (1-idle)*u_mean)^exponent * controlEffectiveness * aeroMultiplier`로 계산한다(OFF는0). 기본 exponent1/idle0이면 기존 선형이다. `T_available`은 배터리 전압 배율을 반영하고 호버 명령은 필요한 `m*g/T_available`에 추력 곡선의 역함수를 적용한다. `a = BodyUp*T/m + g`다. C++ 기본2kg/40N/응답0.055초는 자산값과 구분하며 FPV 변경값은 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md#공개-자료를-반영한-현재-fpv-기준값)을 따른다. OFF는 World중력·추력0이다.
 
 Legacy 회전은 `omega_new = omega_target + (omega_old-omega_target) exp(-dt/tau_r)`, `tau_r` 기본0.08초다. 프레임 회전량은 `omega_target*dt + (omega_old-omega_target)*tau_r*(1-exp(-dt/tau_r))`를 축각으로 적용한다. 이는 회전 관성처럼 반응을 지연시키는 근사이며 `J`나 모터별 토크를 계산한 것이 아니다.
 
@@ -105,17 +116,33 @@ deltaT는 모터ON·공중·BodyUp.Z>0.7일 때만 작동한다. 모터OFF는 �
 
 ## 현재 적용 경로와 투하물
 
+### 비행 효과와 질량 갱신
+
+다음은 현행 구현 계약이다. 자동 검증의 성공/실패·실행별 조건은 [WORKLOG](../history/DRONE_WORKLOG.md#2026-11-03--실기-정합배달-튜토리얼미션-사진-후속)를 따른다.
+
+| 기능·조정 위치 | 현재 계산·경계 |
+|---|---|
+| `PhysicalFlightSettings.RotorAero` | Legacy Acro·로터 파일럿 추력에 지면효과/하강 후류 손실을 반영하고 Pitch/Roll 외란을 더한다. 기본 반경0.0635m·h/R 하한1·fade4~8·후류 최대 손실0.15. 교육/보조 모델에는 같은 물리 추력 경로를 적용하지 않는다. 실기체/CFD 검교정 아님 |
+| `BatteryComponent` → `Battery/Sag` | 잔량별 LiPo 휴지전압−부하×셀 강하(기본0.25V), 부하 응답0.1초. 만충 최대부하 대비 전압비²를0~1로 제한해 가용 최대추력에 한 번 연결한다. 잔량 소모는 기존 시간 기준. 교육/보조 비행 부하는0.5 근사이며 전기 소비량 적분 모델 아님 |
+| `WeatherWorldSubsystem` → `Wind/Shelter` | `GetWindAtLocation`이 상류 Visibility Trace(기본30m), 근접 차폐 잔풍25%·난류30%를 계산한다. 교육 경로는 상대풍 항력에 사용하고 별도 위치 drift를 중지한다. 실내 전체 유동 해석 아님 |
+| `RefreshPayloadMassEffects` / `UpdatePilotMass` | 투하 순간 기체 속도·자세를 보존한다. 파일럿 모델 질량과 평행축 대각관성을 갱신하고 Legacy Acro는 매 Tick 총질량을 사용한다. 보조/교육 경로의 잠깐 상승 가속과 카메라 kick 연출을 분리한다. 비영CG·전체 backend 지원 완료 아님 |
+| `DroneDroppedPayload::InitializePayload` | 전투 폭탄뿐 아니라 일반 화물도 분리 순간 운반 기체 속도+설정 하향속도를 상속한다. 전투 폭탄의 SI 상대풍 항력과 일반 화물 모델은 구분한다 |
+| `CollisionResponseComponent` → `Prop Damage` | 벽·구조물 접촉 법선속도에 따른 손상 누적→추력/조종 저하·카메라 젤로 근사, Definition 적용 시 손상 초기화. 실제 블레이드 파손/복합재 해석 아님 |
+| `LandDetectorSettings` | 접촉과 착륙 완료를 분리한다. 접촉+상대 수직속도≤25cm/s·수평≤150cm/s·기울기 각속도≤20°/s·저추력(hover 미만)이 기본1초 지속돼야 착륙 완료다. DJI 정지/CSC는 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#space키-자동-시동off-정책)을 따른다 |
+
+`ApplyPayloadMassChange`는 기준 질량/관성에 적재 변화와 적재 위치를 반영하는 제한된 갱신이다. 기존 “live payload 갱신 없음”은 이 경로에는 해당하지 않는다. 외부 writer·일반 강체/전기체 전환·실기체 교정은 여전히 후속이다. 카메라의 진동·짐벌 지연·어안은 [카메라 가이드](DRONE_TYPES_AND_CONTROL_MODES.md#카메라-체감과-어안-조정)를 따른다.
+
 기체와 투하물은 별도 운동 경로다. 아래는 현재 Source와 실제 saved Drop 런타임 조회를 기준으로 한다. 폭탄 SI 항력은 실제 World/Projectile 30·120fps·단위/바람·고속 비교를 자동 검증했으며, 손조종 완료를 의미하지 않는다.
 
 | 대상/상태 | 현재 계산 | 경계 |
 |---|---|---|
 | Legacy Acro Mode1/2 ON | 합산 추력/총질량·중력·1차 모터 응답·선형+속도제곱 항력·각속도 응답 | 관성 텐서/로터별 토크의 완전한 강체 모델은 아님 |
-| Legacy 쉬운/게임 ON | FloatingPawnMovement의 가속·감속/상승하강 보조 | Acro 힘 적분과 다른 조작 보조 모델 |
+| Legacy 쉬운 ON | FloatingPawnMovement의 가속·감속/상승하강 보조 | Acro 힘 적분과 다른 조작 보조 모델 |
 | Legacy 정상 모터 OFF4모드 | 추력0·World중력·공유 선형/속도제곱 항력 | 지면 접촉 마찰과 공중 항력을 구분 |
 | 전투 폭탄 수리 소스 | swept ProjectileMovement·World중력×1·기체 속도+하향3m/s·상대 공기속도 SI 제곱항력 | 30m/s 상한 제거/최대1/120초 substep. 30/120fps 감속/거리/에너지 소산·질량 차이 검증. 회전/양력/실측 형상 공력 모형은 아님 |
 | opt-in Racer 후보 | 상대 공기속도·SI 항력·로터 힘/토크·대각관성 | 일반 Drop과 기본 본미션의 현재 백엔드가 아님 |
 
-실제 saved Drop 조회는 건조2kg+적재0.75kg=2.75kg, 최대 합산추력40N·모터 응답0.055초·World 중력9.8m/s², 기본 선형0.12/s·제곱0.00004/cm다. Legacy Acro는 두 항력에 dry/total mass 비(적재 시2/2.75)를 곱하고 선형은 지수 감쇠, 제곱항은 가속도로 적분한다. 실제 기체의 Cd·면적을 검교정한 값은 아니다. 쉬운/게임 ON의 감속도는 조회된 현재 기본 모드에서1818.18cm/s²이며 별도 보조 계산이다. 지면 마찰은 모터OFF·실제 정지 지지면 접촉을 확인한 때만 작용하고 C++ 기본 마찰계수0.4·접촉 허용0.5cm를 사용한다. 땅에 닿지 않은 상태의 감속은 항력이 담당한다. 앞선 투하/피해/교대 검증은 공중 감속 검증을 포함하지 않았다. 검증 날짜·수선 경과는 [WORKLOG](../history/DRONE_WORKLOG.md)에 기록한다.
+이전 리비전의 saved Drop 조회는 건조2kg+적재0.75kg=2.75kg, 최대 합산추력40N·모터 응답0.055초·World 중력9.8m/s², 기본 선형0.12/s·제곱0.00004/cm다. Legacy Acro는 두 항력에 dry/total mass 비(적재 시2/2.75)를 곱하고 선형은 지수 감쇠, 제곱항은 가속도로 적분한다. 실제 기체의 Cd·면적을 검교정한 값은 아니다. 쉬운/게임의 이전 비교육 경로 감속도1818.18cm/s²는 당시 조회값이며 현재 GPS/ATTI에는 적용하지 않는다. 기존 OFF 마찰 외에 FPV ON 접지에서도 받침 하중(중력−추력 법선성분)에 따른 마찰을 계산하며 C++ 기본 마찰계수0.4·접촉 허용0.5cm를 사용한다. 땅에 닿지 않은 상태의 감속은 항력이 담당한다. 앞선 투하/피해/교대 검증은 공중 감속 검증을 포함하지 않았다. 검증 날짜·수선 경과는 [WORKLOG](../history/DRONE_WORKLOG.md)에 기록한다.
 
 ### 폭탄 항력과 조정 위치
 
@@ -144,7 +171,7 @@ deltaT는 모터ON·공중·BodyUp.Z>0.7일 때만 작동한다. 모터OFF는 �
 
 Acro의 hover/가속은 같은 중력 helper를 사용한다. Legacy는 설정 중력, candidate는 World 중력이며 live hover를 장치별 출력에 반영한다. Legacy 모터1차응답은 프레임 끝 추력 대신 구간평균 추력으로 가속을 계산해 응답의 FPS 차이를 줄였다. 최종 LegacyResponseFrameParity와 candidate 실제 Tick 경로 비교가 통과했다. Legacy drag/position 전체 적분 또는 모든 backend를 재작성한 것은 아니다.
 
-쉬운/게임 조작은 기존 FloatingPawnMovement의 climb/속도 보조다. hover는 입력 중립 기준이며 전체 기체의 힘/질량/중력 물리를 통일했다는 뜻이 아니다. 후보 커널은 구성 시 질량/geometry를 캐시하고 live payload·물리설정 변경 시 재구성하지 않으므로 지원 밖 확장에 주의한다. 현재 controlledRacer 무적재/CG0 범위를 유지한다. 실제 key/axis·saved 역할·중력/추력·카메라 변환 자동 검증과 실물 손조작·전체미션 Pass를 구분한다.
+쉬운 조작은 기존 FloatingPawnMovement의 climb/속도 보조다. hover는 입력 중립 기준이며 전체 기체의 힘/질량/중력 물리를 통일했다는 뜻이 아니다. 후보 커널은 구성 시 geometry를 캐시하며 live payload 질량/대각관성 갱신은 위 구현 경로를 따른다. 일반 물리설정 재구성/비영CG 확대는 별도다. 현재 controlledRacer 무적재/CG0 범위를 유지한다. 실제 key/axis·saved 역할·중력/추력·카메라 변환 자동 검증과 실물 손조작·전체미션 Pass를 구분한다.
 
 별도 ChaosContactComparison은 실제 sphere body 질량2kg·대각관성0.05kgm² 재조회·solver 진행0.100000005초/마지막dt0.008333334초·힘가속/바닥정착을 확인한 최소 비교다. full Chaos flight callback/backend를 설치한 것이 아니며 `ChaosCandidate`는 명시거부한다. 확장B/ChaosC의 최종채택·실기체교정·payload/비영CG·일반강체/로터충돌·고속추락·제품미션 altitude/net/observer 호환·전기체전환·손조종/숙련자 평가·패키징은 미완료다.
 
@@ -156,20 +183,20 @@ Acro의 hover/가속은 같은 중력 helper를 사용한다. Legacy는 설정 �
 |Scout·Drop·FPVStrike·FiberOptic|전쟁에 사용되는 기체를 역할별로 참조한다|정찰·운반/투하·FPV·유선 역할의 질량·적재·제어·카메라 차이를 조사한다. 모든 기체를 같은 FPV Rate로 통일하지 않는다|
 |GroundUGV|공중 기체와 구분한 지상 모델을 유지한다|주행·접지·조향을 별도로 검증한다|
 |실기체 모델·정확한 사양|미정|질량·추력·관성·배터리·로터 수치를 이름만 보고 정하지 않는다|
-|주 제어 모드·Rates/스로틀 설정|미정|Mode1/2 축 배치와 Rate/Angle/고도·위치 보조를 구분해 정한다|
-|사용·검증 장치|일반 게임패드와 InterLink DX 모두|두 장치를 따로 검증한다. InterLink 카메라 상하의 축/버튼 배정·보정 정책은 미정이며 새 배정 승인이 아니다|
+|주 제어 모드·Rates/스로틀 설정|현행 구현은 역할 정본, 실기 튜닝은 미정|P/S/A·FPV Angle/Rate와 송신기 축 배치를 구분한다|
+|사용·검증 장치|일반 게임패드와 InterLink DX 모두|두 장치를 따로 검증한다. InterLink 짐벌 Axis3 기본 배정은 코드에 있으며 실장치 교정·추가 배정은 미정|
 |비행 로그·영상·숙련자 평가|자료와 평가 가능 여부 미정|자료 확보 전에는 일반 모델/수치 검증과 실기체 일치 판정을 구분한다|
 |최종 물리 구조|확장 B와 Chaos C 모두 미확정|참조 응답·회전 관성/포화·접촉 요구와 성능을 비교한 뒤 선택한다|
 
-참조 종류만 확정된 상태다. 특정 제품 채택·실제 제어 모드·현실감 합격 기준까지 결정된 것은 아니다. 장거리 타격 후보의 플레이 기체 구현도 이번 계획에 포함해 완료 처리하지 않는다.
+현행 제어 모드/참고 사양은 위 정본을 따르며 특정 기체의 완전 복제·현실감 합격 기준까지 확정한 것은 아니다. 장거리 타격 후보의 플레이 기체 구현도 이번 계획에 포함해 완료 처리하지 않는다.
 
 ## 현재 구현에서 출발할 부분과 한계
 
-Legacy 기본 구조는 [역할·조작 가이드](DRONE_TYPES_AND_CONTROL_MODES.md)를 따른다. 아래 기본/게임·Legacy Acro 한계는 기존 모델에 대한 정적 조사이며 위 opt-in 로터후보와 구분한다. 여섯 DA 수치의 이전 C PC 조회를 전기체 실사양으로 쓰지 않는다. 원래 Racer의2kg/40N/tau0.055와 현재 파일럿 전용DA의0.9kg/17.64N/tau0.035를 구분한다.
+Legacy 기본 구조는 [역할·조작 가이드](DRONE_TYPES_AND_CONTROL_MODES.md)를 따른다. 아래 쉬운·Legacy Acro 한계는 기존 모델에 대한 정적 조사이며 위 opt-in 로터후보와 구분한다. 여섯 DA 수치의 이전 C PC 조회를 전기체 실사양으로 쓰지 않는다. 원래 Racer의2kg/40N/tau0.055와 현재 파일럿 전용DA의0.9kg/17.64N/tau0.035를 구분한다.
 
 |부분|현재 확인|현실 조종감 검증에서 필요한 구분|
 |---|---|---|
-|기본/게임 조작|UFloatingPawnMovement에 이동 입력을 주며 기울기 표현·감속 계수가 다르다|기체 자세가 로터 추력의 방향을 바꿔 가속하는 구조와 동일하지 않다|
+|쉬운 조작|교육 비행 활성 역할은 위 P/S/A 모델, 그 외 기존 FloatingPawnMovement 보조|기체 자세가 로터 추력의 방향을 바꿔 가속하는 구조와 동일하지 않다|
 |Acro|추력·질량·중력·모터 응답·항력을 계산하고 각속도 응답을 적분한다|각속도 1차 응답과 직접 자세 회전은 관성 텐서·유한 토크·모터 배분/포화를 계산하는 모델과 다르다|
 |기체 프로파일|이전C PC의6개DA 공통2kg/40N 일부값·BP override 꺼짐, 원래Racer2kg/40N·파일럿전용DA0.9kg/17.64N 구분|synthetic 가상값과 실사양을 구분하고 나머지기체 런타임/UGV 공중추력 적용을 추정하지 않음|
 |바람·항력|Acro 속도/항력과 WeatherResponse의 별도 AddActorWorldOffset Drift가 나뉜다|Movement 속도·위치 차분·바람을 함께 계측하고 새 상대 공기속도 공력과 기존 위치 이동을 중복 적용하지 않는다|
@@ -193,7 +220,7 @@ Legacy 제동값의 정지 시간/거리는 조건부 예측이다. 실제 입�
 
 B/C는 보정 입력→같은 제어기→모터 배분/포화→모터 응답→힘/토크를 공통 조건으로 두고 비교한다. 로터별 구동 모델과 Chaos 사용은 별개의 선택이다. 로터 4개를 그렸거나 Chaos를 사용한다는 사실만으로 현실감을 판정하지 않는다. 서브스텝도 안정성과 CPU 비용을 함께 보며, 임의 Actor Tick이 엔진 물리와 자동으로 같은 간격에 실행된다고 가정하지 않는다. [Epic Physics Sub-Stepping](https://dev.epicgames.com/documentation/en-us/unreal-engine/physics-sub-stepping-in-unreal-engine)
 
-공통 기체 물리 위에 실제 제어 방식의 목표를 구분한다. Rate/Acro는 각속도와 수동 출력을 명령하고 스틱 중립이 자동 수평·위치 정지를 뜻하지 않는다. Angle의 자세 복원, 고도 보조, 위치/속도 보조도 서로 다른 기능이다. 기본/게임이라는 현재 UI 이름에 자동 정지·관성 정도를 임의로 배정하지 않는다. Mode1/2는 축 배치 차이로 유지한다. [PX4 v1.16 Acro](https://docs.px4.io/v1.16/en/flight_modes_mc/acro), [제어 구조](https://docs.px4.io/v1.16/en/flight_stack/controller_diagrams)
+공통 기체 물리 위에 실제 제어 방식의 목표를 구분한다. Rate/Acro는 각속도와 수동 출력을 명령하고 스틱 중립이 자동 수평·위치 정지를 뜻하지 않는다. Angle의 자세 복원, 고도 보조, 위치/속도 보조도 서로 다른 기능이다. 쉬운이라는 현재 UI 이름에 자동 정지·관성 정도를 임의로 배정하지 않는다. Mode1/2는 축 배치 차이로 유지한다. [PX4 v1.16 Acro](https://docs.px4.io/v1.16/en/flight_modes_mc/acro), [제어 구조](https://docs.px4.io/v1.16/en/flight_stack/controller_diagrams)
 
 ## 59번 구현안 검토와 선행 계약
 
@@ -213,9 +240,9 @@ Legacy 회귀 기대값과 이관/조건부검증을 보존하고 신규커널5�
 
 |작업|현재 상태|다음 작업|완료를 판단할 근거|
 |---|---|---|---|
-|참조 기체·입력 계약|기체 종류 방향과 일반 패드·InterLink DX 두 검증 대상 확정, InterLink 카메라 상하 추가 축/버튼 배정·보정 미정. 기존45매핑/비행4축·Mode1/2 보존|역할별 후보 중 첫 참조 기체/제어 모드·조종기·Rates/expo·스로틀·FPV 조건을 정리|참조와 미정 항목, 재현 가능한 장치/프로파일 기록|
+|참조 기체·입력 계약|기체 종류 방향과 일반 패드·InterLink DX 두 검증 대상 확정, InterLink 짐벌 Axis3·모드 Button3·모터 Button4 기본 배정 구현, 실장치 보정 확대 미정. IMC53/기존 비행4축·Mode1/2 유지|역할별 후보 중 첫 참조 기체/제어 모드·조종기·Rates/expo·스로틀·FPV 조건을 정리|참조와 미정 항목, 재현 가능한 장치/프로파일 기록|
 |현실적인 비행 물리|Racer1 opt-in FixedStepCandidate 구현·신규12/회귀11 Success, controlledMap/Acro1·2/CG0|payload/외부writer·실기체참조/장치/숙련자 검증·동일조건B/C비교|힘/토크/시간/실접지 실제계측과 회귀·한계·실기체반복과제 구분|
-|화면 상하 시야·감도|쉬운/게임 조작의 감도X/Y·반전·UI/저장 구현, D PC 지정 자동 검사와 PNG 검토 확인 범위는 [설정 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#카메라-감도반전과-designer) 참조|두 장치의 원시 축→Input Action→모드→SpringArm→최종 ViewTarget 계측. InterLink 상하 배정은 미정|실물 장치별 양방향/해제·적용/취소/기본값·실제 재실행/구버전 저장 복원. 자동 입력·메모리 직렬화와 구분|
+|화면 상하 시야·감도|쉬운 조작의 감도X/Y·반전·UI/저장 구현, D PC 지정 자동 검사와 PNG 검토 확인 범위는 [설정 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#카메라-감도반전과-designer) 참조|두 장치의 원시 축→Input Action→모드→SpringArm→최종 ViewTarget 계측. InterLink 짐벌 Axis3 기본 배정 구현·실물 확인 대기|실물 장치별 양방향/해제·적용/취소/기본값·실제 재실행/구버전 저장 복원. 자동 입력·메모리 직렬화와 구분|
 |모터 OFF·착지·재이륙|사람 조종 Legacy의 정상OFF·공중OFF/항력/중력과 Racer 저장맵 재이륙 생명주기 자동검증|실물 RC/XInput·화면·경사/고속충돌·전체 본미션 조건은 후속|자동 simulated 입력과 실장치·미션별 반복기록 구분|
 |LOS 사람 후퇴·드론 보기|후퇴/추적 구현·4단계 자동 계약 통과, 사람/드론 가시성 미확정|검사 World/LocalPlayer 연결 캡처·HitResult 디코더 수리 후 지면/가시성 확인|실제 TUT_LOS에서 사람 메시/카메라가 드론을 보고 과도한 Pitch/Roll 없이 가시성 확보|
 |M3·M4 오브젝트/목표|M3 현행 목표·M4 실제3지점/UGV접지·3목표 자동 통과. 자동 피해 이벤트이며 손 조종/발사 아님|실물 플레이·M4 공중 기체 높이·최종 출발 위치/안전성·시나리오 보완|실제 맵의 진행/실패/성공·장치 입력, World 일치 화면과 구분 기록|

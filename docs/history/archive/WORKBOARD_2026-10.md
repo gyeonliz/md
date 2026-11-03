@@ -329,3 +329,20 @@ WORKBOARD가30KB를 넘어서 날짜가 지난 비교표와 PC 인계 행을 원
 3. 실물 조종기/패드·배달2번 맵·UGV·게이트3상태·헬기포트 외곽·M1 영상 청감/건너뛰기를 확인한다. HUD/눈금·LOS 상자·체크박스의 이전 수리 유지, 미정은 UI-CONTROLS-DECISION-01.
 4. DR-INTERLINK-INPUT-01 실기 확인 후 Acro 혼합 입력·코스 표시선·NPC 다리/속도 대비 보폭·총 정렬·이동 뒤 날씨 시험 맵·비 차폐·벽/그물·광섬유/UGV 수동 회귀를 이어간다. WTH-03 비 입자 크기/모양·위치/양·젖음/물결·빗소리/실내 감쇠·패드를 가이드대로 확인한다. 팀원 Production Training 보존; 실제 패키징·Chaos 비교·최종 Rain/음원은 별도 후속이다.
 5. Story4 새사진뒤 RHI4종/24캡처와 M1출격상태는 확인했다. M1미션완료·물리입력, M2대표/실출격·M3/4오브젝트/목표·M4 3ID·실물패드는 후속이다. UI10/실출격12/Camp16GiB·runtime4GiB 보호, 원본/소유권 유지·Commit/Push는 사용자.
+
+## 2026-11-03 이관 — 10/30 갱신 요약·SYNC-SPACES-01·Next 원문
+
+마지막 갱신: 2026-10-30 D PC — 평면판정4~7·제출음원14종, 같은DLL 고유91검사 최종통과·코드59b3c0f7 Push/문서 동반 전달. [STATUS](STATUS.md).
+
+| SYNC-SPACES-01 | MD·Space 최신화 | 기존3Page/4블록 교체·재읽기 일치 | 새Page0·역사/비대상 보존, Git 결과는 STATUS·WORKLOG |
+
+## Next
+
+현재 상태는 [STATUS](STATUS.md), 수치·원시 로그 이력은 [WORKLOG](docs/history/DRONE_WORKLOG.md), 이전 Next는 [원문 아카이브](docs/history/archive/WORKBOARD_2026-10.md)를 따른다.
+
+0. 제출14음원·실제Race/M4와 같은DLL 고유91검사 결과를 유지하고 실물 손조종/전체완주·스피커 청감/밸런스·Cook/패키징을 확인한다. M4 유인MG는 미배치라 개별검사와 구분한다.
+1. PS 앞밀기 HID750표본·SceneViewport20경로·3장치 키 설정의 공식28검사 근거를 유지하고 실제 장치 양방향/중립/해제·비행체감·종료/재실행 복원을 확인한다. InterLink 추가 카메라 조작 배정은 기존 비행4축과 구분한다. 키·축·반전 pending/부모적용/취소/기본값과 원본45매핑 보존 절차는 입력 정본을 따른다.
+2. LOS 캡처를 검사 World/LocalPlayer에 연결하고 HitResult 디코더를 수리한 뒤 사람·드론 가시성과 지면 관계를 확인한다. 후퇴 시작값400cm·기존 동선/실제 착지 보존, 눈높이 원인 단정/임의 높이 변경 없음.
+3. M3 Fence null guard/기하 보존을 유지하고 실제 배치·접촉을 확인한다. M4 Lumen 경고·긴 로딩은 별도 성능 과제다. 기존 무입력 CPU 표본으로 원인/최적화 효과를 확정하지 않고 같은 조건의 비행/사격과 GPU 지원 여부를 계측한다.
+4. 최신 전체Build 후 새DLL Editor를 사용한다. 전방 센서 직접 접촉/본체·로터 접촉 구분과3초 파괴 화면·생존 단계 즉시 교대를 실제 조종으로 확인한다. 실기체 교정/payload/B·C·패키징은 후속이다.
+5. M1 배달·M3/4 재머→교대→후속 목표를 손 조종/사격으로 확인하고 M2 분기·M4 공중 높이/출격 위치 안전성을 점검한다. Camp 일반20GiB·승인 저메모리16GiB 시작/runtime4GiB 보호와 Production Training 보존을 유지한다.
