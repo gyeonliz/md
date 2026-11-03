@@ -2754,3 +2754,11 @@ Drone Space는 기존 진행상황과 다음 작업 Sequence142(현재 요약·N
 문서 반영: STATUS 요약·WORKBOARD FLIGHT-PHYSICS-01/Next·역할 가이드 기준값 수정. 기존 물리 가이드 미커밋 변경은 보존했다. 새 파일/아카이브·Unreal 수정·Build/PIE/자동화·Commit/Push는 수행하지 않았다. Space 및 정적 검증 결과는 아래에 추가한다.
 
 최종 확인: 진행상황 Space Sequence143의 요약·Next 2연산 모두 적용(거부/ignored 없음), 같은 content stream 재읽기로 두 블록 본문 전체 일치를 확인했다. 다른 페이지는 변경하지 않았으며 이번 대상 미반영 없음. STATUS27,458B·WORKBOARD29,996B로 각각30,000B 이하, git diff --check(core.whitespace=cr-at-eol) 오류0. git status의 수정5파일 중 이번 작업은 지정4파일이며 DRONE_REALISTIC_HANDLING_PLAN.md는 앞선 변경 그대로다.
+
+## 2026-11-03 — 작업 브랜치 커밋 main 병합·Push
+
+사용자의 “커밋 병합해서 푸쉬해줘” 지시에 따라 Codex가 실제 Git/원격을 확인하고 작업 브랜치를 main에 반영했다. 시작 Unreal은 feat/skydive-fpv-physics-parity=682852c5b96949bf3e16164a730fdeae5cee0926·Clean, main/origin/main=6de91783이었다. Fetch 후 작업 브랜치만1커밋 앞서고 main이 조상임을 확인했다. 변경14개는 기존 SkyDive Source/검사/Golden/도구와 FPV·레이서·광섬유 DA3개이며 diff --check를 통과했다.
+
+기존682852c5 커밋을 재작성/스쿼시하지 않고 main으로 Fast-forward 병합했다. Push 뒤 실제 origin/main ls-remote=로컬HEAD 전체SHA, tracking0/0·worktree/index Clean이다. 원래 기능 브랜치도 그대로 보존했다. Force Push·새 기능/자산 편집·맵저장·엔진 제어·Build/PIE/자동검증은 없으며 이전 혼합 성공/실패 및 후속 집중3통과를 이번 병합의 새 검사로 재사용하지 않는다.
+
+MD 시작main7aad12e는 Fetch 후 원격 일치·Clean이었다. 현재 STATUS/WORKBOARD의 오래된 미커밋/Git 표기를 교정하고 이 기록을 append-only로 추가해 동반 Commit/Push한다. Drone Space의 기존 진행 Page도 같은 Git 인계와 새 검사 없음으로 갱신하며 최종 문서SHA/원격 확인은 해당 인계와 Saved/Automation/MergePush_20261103/GIT_FINAL_RECEIPT.json을 따른다. STATUS/WORKBOARD는30KB 제한 안에 유지한다.

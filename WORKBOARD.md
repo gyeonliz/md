@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-11-03 D PC — 코드 `6de91783` + Claude 미커밋·SkyDive 정합 반영. [STATUS](STATUS.md).
+마지막 갱신: 2026-11-03 D PC — 코드 `682852c5` main 병합·Push. [STATUS](STATUS.md).
 
 ## Now
 
