@@ -1,6 +1,8 @@
 # 현재 작업 상태
 
-현재 기준: 2026-11-03 D PC, Unreal `5905a3cb` + 사용자 미커밋 변경. Claude가 실기 정합·게임 조작 폐지/쉬운 조작 유지·배달 튜토리얼·미션 사진·선택창3D를 구현했다. Codex는 코드 diff·지정 실행 로그를 읽기 대조했다. 자동 검증은 성공/실패가 섞이며 전체 Pass가 아니다. 수치·실패 분류·지시서와 원시 집계 차이는 [이번 WORKLOG](docs/history/DRONE_WORKLOG.md#2026-11-03--실기-정합배달-튜토리얼미션-사진-후속)가 정본이다. [역할/카메라](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md)·[물리](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#dji-교육-비행과-외형-기울기)·[배달/사진/3D 수동 절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인). 비행 체감·외형/크기·집기 방향·설정3행/OSD·3D 재로딩은 수동 대기이며 TPA·FOV 빠른 선택·터틀은 미구현이다.
+현재 기준: 2026-11-03 D PC, Unreal `6de91783` + 사용자 미커밋 변경. Claude가 실기 정합·게임 조작 폐지/쉬운 조작 유지·배달 튜토리얼·미션 사진·선택창3D를 구현했다. Codex는 코드 diff·지정 실행 로그를 읽기 대조했다. 자동 검증은 성공/실패가 섞이며 전체 Pass가 아니다. 수치·실패 분류·지시서와 원시 집계 차이는 [이번 WORKLOG](docs/history/DRONE_WORKLOG.md#2026-11-03--실기-정합배달-튜토리얼미션-사진-후속)가 정본이다. [역할/카메라](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md)·[물리](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#dji-교육-비행과-외형-기울기)·[배달/사진/3D 수동 절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인). 비행 체감·외형/크기·집기 방향·설정3행/OSD·3D 재로딩은 수동 대기이며 TPA·FOV 빠른 선택·터틀은 미구현이다.
+
+SkyDive 실측 정합을 FPV 타격·레이서·광섬유에 구현했다(Claude, D PC·미커밋). 광섬유 적용은 사용자 확정·후속 집중검증3성공/0실패이며 전체 회귀 Pass가 아니다. 손 조종은 수동 대기·광섬유15m/s 상한 조정은 미정. [현재 FPV 값](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md#공개-자료를-반영한-현재-fpv-기준값)·[검증/실측 원문 경로](docs/history/DRONE_WORKLOG.md#2026-11-03--skydive-실측-정합fpv-물리).
 
 10/30 파일럿 평면판정·제출음원 고유91검사 및 이전 입력/UI 결과는 당시 리비전의 검증이다. [이전 요약 원문](docs/history/archive/STATUS_2026-10.md)·[10월 WORKLOG](docs/history/archive/DRONE_WORKLOG_2026-10.md)에 보존하며 이번 미커밋 변경의 Pass로 재사용하지 않는다. 실물 손조종·실기체 교정·청감·전체 미션·패키징은 수동 확인 대기다.
 
@@ -8,8 +10,8 @@
 
 | 저장소 | 2026-11-03 읽기 대조 | 상태 |
 |---|---|---|
-| Unreal D PC `D:\JGY\project\drone` | HEAD·로컬 origin/main `5905a3cb` | 사용자 미커밋 있음. 실제 원격 재조회/Fetch 없음 |
-| 문서 D PC `D:\JGY\project\md` | 시작 HEAD·로컬 origin/main `0646cc5` | 오전 최신화 미커밋11파일 보존·이번 변경도 로컬 미커밋 |
+| Unreal D PC `D:\JGY\project\drone` | HEAD·로컬 origin/main `6de91783` | 브랜치 `feat/skydive-fpv-physics-parity`·Claude 미커밋. 실제 원격 재조회/Fetch 없음 |
+| 문서 D PC `D:\JGY\project\md` | 시작 HEAD·로컬 origin/main `7d9afc8` | 시작 Clean·이번 문서 변경은 로컬 미커밋 |
 
 코드·자산 실행 담당 Claude(D PC), 문서 반영 Codex. 이번 세션은 코드/자산 수정·Build/PIE/자동화·Commit/Push를 수행하지 않는다. 실행 담당·실행 PC는 커밋 작성자만으로 단정하지 않는다. [세션 운영](docs/git/DRONE_WORK_PC_SESSIONS.md)·[이번 근거](docs/history/DRONE_WORKLOG.md#2026-11-03--실기-정합배달-튜토리얼미션-사진-후속).
 

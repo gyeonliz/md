@@ -1,6 +1,6 @@
 # 드론 역할·조작 방식·물리 비행 기준
 
-기준: 2026-11-03 D PC, Unreal `5905a3cb` + 사용자 미커밋 변경. 실행 담당 Claude, 문서 반영 Codex. 구현·자동 검증·수동 대기는 [WORKLOG](../history/DRONE_WORKLOG.md#2026-11-03--실기-정합배달-튜토리얼미션-사진-후속)를 따른다.
+기준: 2026-11-03 D PC, Unreal `6de91783` + 사용자 미커밋 변경. 실행 담당 Claude, 문서 반영 Codex. 구현·자동 검증·수동 대기는 [WORKLOG](../history/DRONE_WORKLOG.md#2026-11-03--skydive-실측-정합fpv-물리)를 따른다.
 
 ## 기획 자료 사용 원칙
 
@@ -130,25 +130,30 @@ FPV 기본 조작은 Mode2·기본 자세 Angle이며, 설정 조작 목록은 `
 
 ## 공개 자료를 반영한 현재 FPV 기준값
 
-현재 FPVStrike·Racer·FiberOptic 공통 ACTUAL 레이트는 중앙70°/s·최대670°/s·expo0(세 축)이다. Angle60°·small_angle25° 시동 차단·아이들5.5%·thr_mid0.5/expo0을 사용한다. 광섬유의 이전180/650/0.3을 대체했다. FPVStrike/Racer의5인치6S 참고 질량0.66kg·최대추력53.74N·약38,000RPM 등은 자산 계약이며 실기 실측이 아니다. 아래 질량/항력 등은 역할 자산 override 이전 공통 시작값이다.
+현재 FPV 타격·레이서는 사용자 SkyDive 비교값 적용 지시에 따라 아래 DA 값을 사용한다. 레이트는 Betaflight 클래식 RC1.0/Super0.7/Expo0의 ACTUAL 근사200/667/0.58이며 이번 물리 적용에서 변경하지 않았다. 광섬유도 사용자 결정에 따라 SkyDive 정합값을 적용했다. ACTUAL70/670/0·질량2.2kg·역할 속도 상한15m/s는 유지한다. 10/31의 정찰 추력 상속은 이 결정으로 대체한다. Angle60°·small_angle25° 시동 차단·아이들5.5%·thr_mid0.5/expo0은 유지한다.
 
 특정 군용 자폭 드론의 비공개 성능을 추정하지 않는다. 조작 의미는 Betaflight 공식 문서, 이동 성능 범위는 공개된 민간 FPV 제품 사양을 기준으로 잡았다.
 
-| 항목 | 현재 Greybox 값 | 근거와 해석 |
-|---|---:|---|
-| 무적재 수평 최대 속도 | 현재 DA 기준56.25m/s | DA MaxSpeed4500cm/s×Unloaded1.25=5625cm/s. 게임 속도 상한·실기 검증 아님. 초기27m/s는 과거 공개사양 참고값 |
-| 상승/하강 World Z 제한 | 9 m/s | DJI Avata 2 Sport 공개 최대 상승·하강 속도 |
-| Pitch/Roll 최대 Rate | 670°/s | ACTUAL 공통 기본값 |
-| Yaw 최대 Rate | 670°/s | ACTUAL 공통 기본값 |
-| Pitch/Roll 중앙 감도 | 70°/s | ACTUAL 중앙 감도 |
-| Pitch/Roll Expo | 0 | ACTUAL 기본값 |
-| Dry Mass | 2.0 kg | 기체별 계측 전 공통 시작값. Payload 제외 |
-| 합산 최대 추력 | 40 N | 현재 총질량에서 가속도와 호버점을 계산하는 시작값 |
-| Motor Response | 0.055 s | 스로틀 명령이 실제 합산 추력에 도달하는 1차 지연 |
-| Gravity | 980 cm/s² | World Down 가속도 시작값 |
-| Linear Drag | 0.12 /s | 고속 관성을 점진적으로 줄이는 Greybox 항력 |
-| Quadratic Drag | 0.00004 /cm | 속도 제곱에 비례하는 고속 항력 시작값 |
-| Body Rate 응답 | 0.08 s | 목표 각속도로 수렴하는 시작 응답 시간 |
+| 항목 | 현재 FPV 타격 / 레이서 DA 값 | 근거와 해석 |
+|---|---|---|
+| 무적재 속도 상한 | MaxSpeed3200cm/s × Unloaded1.25 = 40m/s(144km/h) | 이전4500/56.25m/s 표기 정정. SkyDive 최고속 미측정·상한 유지·채택값 미정 |
+| 상승/하강 World Z 제한 | 36m/s | SkyDive ALT 변화 기준 상승 정합; ALT 단위는 m 추정 |
+| Pitch/Roll·Yaw 최대 Rate | 667°/s | SkyDive 레이트 ACTUAL 근사 |
+| 중앙 감도 / Expo | 200°/s / 0.58 | 세 축 동일 |
+| Dry Mass | 0.66 / 0.453kg | FPV 역할 질량 유지 / SkyDive RACER 기준 |
+| 합산 최대 추력 | 23.75 / 16.30N | `m*9.8/(0.055+0.945*0.23)`, 추력비 약3.67 |
+| 추력 곡선 지수 / 호버 스틱 | 1(선형) / 23% | 지수2·추력비8.3 실기 참고값을 비교 시뮬 정합으로 대체; 복귀 여부 미정 |
+| Motor RPM | 38000 / 40180 | 레이서만 SkyDive RACER RPM 반영 |
+| Motor Response | 0.055s | 기존 응답 유지 |
+| Gravity | 980cm/s² | World Down |
+| Linear Drag | 0.06/s | 이전0.12 대체 |
+| Quadratic Drag(Up 직교 성분) | 0.000027/cm | 이전 등방0.00058 대체 |
+| VerticalQuadraticDragPerCentimeter(기체 Up 성분) | 0.000185/cm | C++ 기본0은 기존 등방 유지; 월드 수직 고정축이 아님 |
+| 광섬유 DA | 2.2kg / 79.16N(이전40N), 추력비3.67(이전2.04) / 선형 추력·호버23%·아이들5.5% | 제곱 항력 수평0.000027·수직0.000185/cm, 선형 항력0.06/s·수직 제한36m/s 적용. MaxSpeed1200 × Unloaded1.25 = 15m/s 역할 상한 유지로 상승·수평 모두15m/s 제한; 상한 조정·최고속도 미정 |
+| Body Rate 응답 | 0.08s | 기존 회전 응답 유지 |
+| Angle / 카메라 | 60° / HFOV120°, FPV+25°·레이서+30° | 이번 변경 없음. HFOV는 사용자 결정 |
+
+적용 도구는 Unreal `Tools/AssetMigration/ApplySkyDiveMeasured20261103.py`, 저장 없는 덤프는 `DumpDroneFpvPhysics.py`다. SkyDive 최고속·감속·키보드 램프 모델 비교는 미측정/미구현이며 손 조종 체감은 수동 대기다. 날짜별 실측·자동검증 수치와 원문 경로는 [11/03 WORKLOG](../history/DRONE_WORKLOG.md#2026-11-03--skydive-실측-정합fpv-물리)가 정본이다.
 
 DJI 공개값에는 무풍·해수면 등 측정 조건이 붙으며, 현재 프로젝트 값은 기체를 1:1 복제한다는 뜻이 아니다. 공식 참고: [DJI Avata 2 사양](https://www.dji.com/avata-2/specs), [Betaflight Modes](https://betaflight.com/docs/wiki/guides/current/Modes), [Betaflight Rate Calculator](https://betaflight.com/docs/wiki/guides/current/Rate-Calculator).
 

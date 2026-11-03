@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-11-03 D PC — 코드 `5905a3cb` + 사용자 미커밋, Claude 실기/배달/사진/3D 구현·자동 성공/잔여 실패·수동 대기 반영. [STATUS](STATUS.md).
+마지막 갱신: 2026-11-03 D PC — 코드 `6de91783` + Claude 미커밋·SkyDive 정합 반영. [STATUS](STATUS.md).
 
 ## Now
 
@@ -33,9 +33,9 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 | TUT-DELIVERY-1103 | 배달맵 복구/크기 | 판2.5배·화물1/3·3개 수령/태그 복구·종단 자동 성공 | 크기·집기 방향 실기, “원통 착륙장” 문구 미정. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
 | MISSION-PHOTOS-1103 | 13미션 사진 통일 | Thumbnail=BriefingImage·레이싱 번호 유지 | 전체 사진 수동 대조. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
 | UI-SELECT-3D-1103 | 선택3D 재로딩 | 지연 재생성·재촬영·프리스트림 구현 | 열기/기체 전환/재오픈 실기. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
-| SIMPARITY-EXEC-01 | 실행 근거·잔여 실패 | 로그 대조·집계 차이 [WORKLOG](docs/history/DRONE_WORKLOG.md#2026-11-03--실기-정합배달-튜토리얼미션-사진-후속) | 기존/미확인/환경 실패 분리·전체 Pass 금지 |
+| SIMPARITY-EXEC-01 | 실행 근거·잔여 실패 | SkyDive 최종 일반9·경고1 성공/실패0. [근거](docs/history/DRONE_WORKLOG.md#2026-11-03--skydive-실측-정합fpv-물리) | 전체 재실행 아님·LandingMap1PIE 잔여 |
 | FLIGHT-MODE-01 | 실기 정합·모드 | 게임 조작 폐지·쉬운 유지·P/S/A·FPV Angle 구현 | 비행·설정/OSD 수동 확인. [정본](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md) |
-| FLIGHT-PHYSICS-01 | 공력·외형·카메라 | 제동 횡풍 결함·실각도 표시 구현 | 실기 게인 미정·외형/체감 확인. [정본](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md) |
+| FLIGHT-PHYSICS-01 | 공력·외형·카메라 | SkyDive FPV타격/레이서·광섬유 정합 구현·광섬유 적용 결정됨 | 손 조종 대기·광섬유15m/s 상한 조정 미정. [정본](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md) |
 | ROTOR-PILOT-KEYS-01 | 파일럿 체감·교정 | 공통 평면 본체4~7·69검사/RHI 접지 확인 | 실물 조종 후 튜닝 |
 | SOUND-PACK-14 | 제출음원14종 | 연결/편집Bank·고유오디오22 통과 | 보존확인·코드Push/문서동반, 청감 조정 후속 |
 | INPUT-KM-VERTICAL-01 | 키마 상승·착지 | 쉬운 Ctrl 하강→접지OFF, 집중10건 통과 | 손 조작 확인·FPV/패드/RC 정책 유지. [입력](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md) |
@@ -151,4 +151,4 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 1. 실기 정합: 두 장치에서 제동·위치 유지·수평 복귀·외형 기울기, FPV 설정3행·OSD를 확인한다. 실기 튜닝 게인은 미정이다.
 2. 배달/사진/3D: 팔레트·화물 크기·집기 방향·3개 전달, 사진 번호/두 화면, 선택창 재로딩을 [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인)대로 확인한다. 배달 목표 문구 변경은 미정이다.
 3. 원인 미확인 LandingMap1PIE·설정 체크박스2종은 2회 상한으로 중단 상태다. Claude가 후속 범위를 정하고 기존/환경 의존 실패와 분리한다. TPA·FOV 빠른 선택·터틀은 미구현이다.
-4. 기존 수동/패키징 대기를 유지한다. Forward 제보 PC는 Build 후 재확인. 팀원 맵 보존·엔진 실행 없음.
+4. 광섬유 SkyDive 적용 결정됨·구현/검증, 손 조종 대기. 15m/s 상한 조정·최고속도·추력비8.3 복귀·키보드 모델 미정. 기존 수동/패키징·Forward 타 PC 재확인 대기.

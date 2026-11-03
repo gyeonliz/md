@@ -1,6 +1,6 @@
 # 현실 조종감 기준과 후속 개발 계획
 
-기준: 2026-11-03 D PC 읽기 대조, 코드 `5905a3cb` + 사용자 미커밋 변경. 교육 비행·공력/전압·투하 질량 갱신은 구현됨이며 Claude 실행 자동 검증의 성공·실패 범위는 WORKLOG를 따른다. 역할별 제어/카메라는 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md), 입력/모터 조작은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md), 실행별 이력은 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 기존 파일럿 시험장의 접촉 보정과 controlledRacer opt-in, 실기체 교정·전기체/본미션 확대·B/C 최종 채택·패키징 한계는 유지한다.
+기준: 2026-11-03 D PC 읽기 대조, 코드 `6de91783` + 사용자 미커밋 변경. 교육 비행·공력/전압·투하 질량 갱신·FPV SkyDive 정합은 구현됨이며 Claude 실행 자동 검증의 성공·실패 범위는 WORKLOG를 따른다. 역할별 제어/카메라는 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md), 입력/모터 조작은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md), 실행별 이력은 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 기존 파일럿 시험장의 접촉 보정과 controlledRacer opt-in, 실기체 교정·전기체/본미션 확대·B/C 최종 채택·패키징 한계는 유지한다.
 
 모터 OFF에서도 공기저항은 적용된다. Legacy 정상OFF의 조기 분기에서 빠졌던 공유 공력 계산을 4모드에 연결하고 시작/목표추력0·World중력·기존 선형/제곱항력과 인공제동0을 유지했다. 항력계수를 강하게 조절한 수리가 아니다. 30/240fps의 수평 감속·10초 감속·낙하 중 수평감속/추력0/재시동과 LocalPlayerController+실제 World.Tick 이동이 자동 통과했다. 쉬운의 ON assisted 구조는 유지하고 controlled candidate는 기존에도 OFF 항력을 계산했으므로 이번 Legacy 결함과 구분한다.
 
@@ -12,7 +12,7 @@
 
 학습 비행 모델 외형은 제어기 실제 각도 `atan(a/g)`를 그대로 표시한다. 이전14°/18° 축소 표시를 대체했으며 DJI 짐벌 수평/FPV 기체 고정은 [카메라 정본](DRONE_TYPES_AND_CONTROL_MODES.md#1인칭-카메라-역할-프리셋)을 따른다. 제동 세기·위치 유지·수평 복귀·외형 화면은 수동 대기다.
 
-Steam 무료 ORQA FPV.SkyDive·FPV Drone Simulator는 D PC에 설치됐다고 Claude가 보고했다. SkyDive 실행 파일 메타데이터에서 레이트·Angle/Horizon·카메라 각도·좁게/넓게 FOV·프롭워시·지면효과·전압강하·TPA 항목을 확인했으나 실제 기본값은 미확인이다. 우리 TPA·FOV 빠른 선택·터틀 모드는 미구현이다.
+Steam 무료 ORQA FPV.SkyDive·FPV Drone Simulator는 D PC 설치 보고가 있다. SkyDive는 Claude가 키보드 Computer use로 RACER의 이륙·호버·상승·회전·기체 고정 카메라를 실측했고 사용자 지시에 따라 FPV 타격·레이서 DA에 정합을 적용했다. ALT 단위는 m 추정, 가상 스틱 램프·캡처 지연 제약이 있으며 최고속·감속은 측정 실패다. SkyDive FOV90°·업틸트30°·어안0과 우리 사용자 HFOV120° 결정은 구분한다. 광섬유 적용·속도 상한·실기 추력비8.3 복귀·키보드 스로틀 모델은 미정이다. 우리 TPA·FOV 빠른 선택·터틀은 미구현이다. 날짜별 측정/실행 근거는 [WORKLOG](../history/DRONE_WORKLOG.md#2026-11-03--skydive-실측-정합fpv-물리), 현재 DA 값은 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md#공개-자료를-반영한-현재-fpv-기준값)을 따른다.
 
 ## 현재 운동·관성 계산식
 
@@ -33,7 +33,7 @@ Steam 무료 ORQA FPV.SkyDive·FPV Drone Simulator는 D PC에 설치됐다고 Cl
 
 Legacy 회전은 `omega_new = omega_target + (omega_old-omega_target) exp(-dt/tau_r)`, `tau_r` 기본0.08초다. 프레임 회전량은 `omega_target*dt + (omega_old-omega_target)*tau_r*(1-exp(-dt/tau_r))`를 축각으로 적용한다. 이는 회전 관성처럼 반응을 지연시키는 근사이며 `J`나 모터별 토크를 계산한 것이 아니다.
 
-Legacy 항력은 cm/s 속도에 `r = clamp(m_dry/m,0.05,1)`, 먼저 `v *= exp(-lambda*r*dt)`, 다음 `v += -k*r*|v|*v*dt`를 적용한다. 기본 `lambda=0.12/s`, `k=0.00004/cm`(SI 환산0.004/m)다. 이 경로의 항력은 Movement의 월드 속도를 사용하며 바람은 WeatherResponse의 별도 보간 위치 drift다. 후보처럼 상대 공기속도 하나로 결합한 모델은 아니다. 근거는 `DroneAcroFlightComponent.cpp:289,339,380`, `DroneWeatherResponseComponent.cpp:68,125`다.
+Legacy 항력은 cm/s 속도에 `r = clamp(m_dry/m,0.05,1)`, 먼저 `v *= exp(-lambda*r*dt)`를 적용한다. `kv = VerticalQuadraticDragPerCentimeter`가0이면 기존 등방 식 `v += -k*r*|v|*v*dt`를 유지한다. `kv>0`이면 기체 Up 단위벡터 `n`으로 `v_up=n*dot(v,n)`, `v_plane=v-v_up`를 분리하고 `v += -r*(kv*|v_up|*v_up + k*|v_plane|*v_plane)*dt`를 적용한다. 월드 수직/수평이 아니라 기체 축 기준이며 이후 추력·중력 가속도를 더한다. C++ 기본은 `lambda=0.12/s`, `k=0.00004/cm`, `kv=0`이다. FPV 타격·레이서의 현재 override는 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md#공개-자료를-반영한-현재-fpv-기준값)을 따른다. 다른 기체·로터 후보 커널은 이번 변경 대상이 아니다. 이 경로는 Movement 월드 속도를 사용하며 바람은 WeatherResponse의 별도 보간 위치 drift다. 후보의 상대 공기속도 통합 모델과 구분한다. 근거: `DroneAcroFlightComponent.cpp::UpdateFlightPhysics`, `DroneFlightControlTypes.h::FDronePhysicalFlightSettings`, `DroneWeatherResponseComponent.cpp`.
 
 Legacy의 정지 지지면·모터OFF 접선 속력은 `s_new=max(0,s-mu*max(0,-g dot n)*dt)`로 줄인다. 기본 마찰계수0.4·접촉여유0.5cm이며 실제 hit·정지 지지면·법선 등을 확인한다. 후보는 `GetMotorOffGroundSupport()`에서 제외되므로 이 마찰/정립 보정을 상속하지 않는다. 근거는 `DroneFlightPawn.cpp:628,664,684`다.
 

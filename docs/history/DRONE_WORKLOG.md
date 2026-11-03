@@ -2693,3 +2693,64 @@ STATUS 최신 요약/링크, WORKBOARD 실기·배달·사진·선택3D 카드/N
 Claude에게 넘길 문서/후속 작업: Unreal `.claude/known-test-failures.md`에 기존 실패·원인 미확인3종·영상/RHI 환경 의존·Payload 수정 후3성공·기대값/FlightGolden 갱신을 분리 반영하고 Triage 성공 수149↔155 차이를 정정 확인할 것. 사진 도구 레이싱 주석의 확인 대기도 사용자 번호 유지 결정과 맞출 필요가 있다. 이 docs 세션에서 Unreal 파일은 수정하지 않았고 Build/PIE/자동화/맵 생성·Commit/Push·Trello/Figma 수정은 실행하지 않았다.
 
 최종 정적 확인: git diff --check(core.whitespace=cr-at-eol) 오류0, 대상 현재문서6개의 로컬 파일 링크 누락0. STATUS 26940B/118줄, WORKBOARD 29951B/154줄로 각각30,000B 이하. 이번 수정7파일이며 git status --short의 전체11파일 중 docs/README와 아카이브3개는 오전 변경 보존이다. 추가 아카이브/새 파일/Commit/Push 없음.
+
+## 2026-11-03 — SkyDive 실측 정합(FPV 물리)
+
+### 기준·읽기 대조
+
+브리지 `20261103-160217-docs-docs-skydive-parity-1103/prompt.md`를 UTF-8로 읽고 같은 날 realpilot-delivery 반영 뒤에 추가했다. 기준은 D PC(`D:\JGY\project\drone`, md `D:\JGY\project\md`), Unreal HEAD·로컬 origin/main `6de91783`, 브랜치 `feat/skydive-fpv-physics-parity` + Claude 미커밋이다. 코드·자산·실측·실행 담당 Claude, 문서·Space 반영 Codex. md 시작 HEAD·로컬 origin/main `7d9afc8`, 작업트리 Clean을 확인했으며 Commit/Push·Fetch는 하지 않았다.
+
+Codex는 지정 C++/골든 diff8파일·신규 시험/적용/덤프 도구3개, 지정 DA2개 수정 상태, 실측 원문0·3~11절과 지정 로그/보고서를 읽기 대조했다. 자산 바이너리를 Editor에서 재조회하거나 실측 캡처37장을 독립 판독한 것은 아니다. DA 적용값은 도구 내용·Claude 실행 보고와 자동 로그를 근거로 한다. Unreal 수정·Build/PIE/자동화·도구 실행은 하지 않았다.
+
+### 실측·구현·결정
+
+- 사용자 지시: “콘솔 우리값 기준으로 넣고 조작 비교해서 우리 겜에 적용”. SkyDive 비교값의 FPV 타격·레이서 적용은 확정이며10/31 결정B의 실기 추력비8.3보다 비교 시뮬 정합을 우선한다. 되돌리기는 가능하지만 복귀 여부는 미정이다.
+- 실측 원문은 Unreal `Saved/SkyDive_측정_지시서_20261103.md`, 캡처37장은 `Saved/SkyDive_측정_캡처/`다(Git 제외 Saved·온라인 공개 아님). SkyDive v2.9.2(b) 기본 RACER453g·2450KV·1400mAh·40180RPM, 키보드 가상 스틱 입력이다. 이륙24±1%·호버22~23%, 100/46/28% 상승 정속 약36/20/8 OSD ALT단위/s(m 추정), Acro 롤/요1초 약1.6/1.3회전(667°/s와 부합), 기체 고정 카메라·업틸트30°·FOV90·어안0이다. 스틱 램프·캡처지연 약0.9초·맵 길이/속도OSD 부재 제약이 있다. 감속은 저속도 정지로 단정할 수 없으며 최고속·고속 감속은 측정 실패다.
+- 구현됨: FPV 타격·레이서 DA의 선형 추력·호버23%·질량/RPM·축별 항력·수직 상한을 적용했다. 수치 정본은 [현재 FPV 기준값](../gameplay/DRONE_TYPES_AND_CONTROL_MODES.md#공개-자료를-반영한-현재-fpv-기준값), 계산식 정본은 [Legacy 추력·항력·회전](../gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#legacy-추력항력회전)이다. 이전 값은 적용 스크립트 로그 `before=`를 참조한다. MaxSpeed3200·레이트200/667/0.58·Angle60°·사용자 HFOV120°·광섬유 DA는 이번 적용에서 변경하지 않았다.
+- 구현됨: `FDronePhysicalFlightSettings::VerticalQuadraticDragPerCentimeter`(기본0=기존 등방)와 `DroneAcroFlightComponent.cpp`의 기체 Up/직교 성분별 제곱 항력을 추가했다. 다른 기체·로터 후보 커널은 영향 대상이 아니다. `DroneAcroFlightComponent.h`·`DroneFlightPawn.h`에 시험 friend를 추가했다.
+- 구현됨: 신규 `DroneSimParitySkyDiveMeasuredTest.cpp`의 `Drone.SimParity.SkyDiveMeasured`는 호버23%·상승36/20/8·35% 풀피치3초 수평22~40m/s를 판정한다. `DroneSimParityMotorTest.cpp`의 FpvRealSpecAndMotor는 추력비3.67·호버23%·100km/h 이상/프로파일 상한 이내를 검사한다(이전8.3·25~45%·130km/h 근접 대체).
+- 구현됨: `Tools/AssetMigration/ApplySkyDiveMeasured20261103.py`로 DA2종 적용, `DumpDroneFpvPhysics.py`는 저장 없는 조회 도구다. `FlightGoldenBaseline.txt` FPVAcroMode1/2만20행 재기록했고 Scout·Drop·UGV 행은 diff상 동일하다. `DroneThrustGravityConsistencyTest.cpp`의 무항력 헬퍼 수직계수0, `DroneMotorControlTest.cpp`의 RC 착륙 출력25→15%·Acro 키보드/패드2초 속도비 하한0.80→0.75로 기대값을 조정했다. 기대값 변경은 제품 결함 수정과 구분한다.
+
+### 자동 검증 — D PC Claude 실행·Codex 로그 대조
+
+경로는 Unreal `Saved/Automation/ClaudeSkyDive/` 아래다. JSON의 `succeeded`는 경고 성공을 제외하므로 로그의 Success 수와 구분한다. 실행별 수를 합산하거나 최종 수정 뒤 전체 회귀 Pass로 표시하지 않는다.
+
+| 검사/시점 | 지시서 | 실제 로그·보고서 | 근거 |
+|---|---|---|---|
+| SimParity·DA1차·RenderOffscreen | 37성공/2실패 | 완료37성공/2실패 일치 | simparity2.log |
+| SimParity+Flight·DA최종 | 84성공/5실패 | JSON 일반84·경고 성공2·실패5, 로그 Success86/Fail5(총91) | flight3.log·report_flight3/index.json |
+| FPV 골든 재기록 | 재기록 | FlightGolden1성공/0실패 | golden_record.log |
+| 기대값/골든 수정 뒤 재검증6종 | 9성공/0실패 | JSON 일반9·경고 성공1·실패0, 로그 Success10/Fail0(총10) | verify4.log·report_verify4/index.json |
+
+flight3의 경고 성공2건은 AssistedStrikeAim.EligibilityAndLifecycle·MotorControl.MixedDeviceHandoffKeyAxis, verify4의 경고 성공1건은 ThrustGravityConsistency.CandidateResponseFrameParity다. 지시서 수치는 JSON 일반 성공 수와 일치하며 누락된 경고 성공을 위처럼 별도 표시했다.
+
+- 1차 실패: LandingMap1PIE(기존)·SkyDiveMeasured 수평1차 기준 미달. 수직 항력0.000169→최종0.000185 및 수평 판정 조정 뒤 후자는 성공했다.
+- flight3 실패5건: LandingMap1PIE·RCAbsoluteBoundLifecycle·SpaceKeyDispatch·LegacyResponseFrameParity·FlightGolden. 후자4건은 기대값3건/골든 재기록 후 verify4에서 성공했다. LandingMap1PIE는 기존 잔여 실패이며 verify4에서 재실행하지 않았다.
+- 최종 SkyDiveMeasured: 두 기체 모두 호버0.230·상승100/46/28%=36.0/18.9/7.3m/s·호버 드리프트0.00m/s, 35% 풀피치(Angle60°) 수평3초25.2·6초34.7m/s. SkyDive의 가속 중25~30m/s는 약30~45° 추정으로 시험 조건과 완전히 동일하지 않다. FpvRealSpec은 추력비3.67·호버0.230·고도 유지 최고속144km/h(40m/s 상한)다. 이 최고속을 SkyDive 실측값으로 쓰지 않는다.
+- 자동 검증됨: 위 성공 항목 범위만. 수동 확인 대기: FPV 타격·레이서 손 조종 호버 위치·상승 세기·수평 가속·Angle 복귀. 광섬유 적용 여부 결정 대기.
+- 미구현/미측정: SkyDive 최고속·고속 감속·광섬유 정합·키보드 램프 모델 비교. SkyDive 비스티키는 키 해제 즉시0%이며 우리 키보드 모델 채택은 미정이다. MaxSpeed 상한·추력비8.3 복귀 여부도 미정이다.
+
+### 문서·Space 반영
+
+STATUS 최신 요약/Git 기준, WORKBOARD의 FLIGHT-PHYSICS-01·SIMPARITY-EXEC-01/Next, 역할 기준값 표·물리 식/Steam 문단을 갱신했다. 이전 realpilot-delivery/과거 기록은 보존하고 새 파일·아카이브는 만들지 않았다. Drone Space 저장 결과와 최종 정적 확인은 아래 후속 문단에 기록한다.
+
+Drone Space는 기존 진행상황과 다음 작업 Sequence142(현재 요약·Next2연산), Blueprint 조정과 팀원 가이드 Sequence100(물리값·실측/카메라2연산)을 갱신했다. 저장 영수증4연산 모두 거부/ignored 없음, 같은 content stream의 대상4블록 재읽기에서 작성 본문과 전체 일치를 확인했다. 기존 날짜별 기록·기획/디자인·Trello 링크·다른 절을 보존했고 새 Page·공유/예약 변경은 없다. 이번 대상 미반영 없음. GitHub MD 본문은 사용자 Commit/Push 뒤 반영되며 사용자 화면의 모든 폭 렌더는 확인하지 않았다.
+
+범위 밖 발견·Claude 인계: `DroneFlightControlTypes.h`의 새 필드 주석과 `ApplySkyDiveMeasured20261103.py`의 머리말은 SkyDive “31% 풀피치45m/s 이상”을 아직 인용하지만 실측 원문6절은 해당 독해를 정정하고 최고속 미측정으로 둔다. 헤더의 “광섬유에도 값을 넣는다” 문구도 실제 적용2종/광섬유 미정과 다르므로 주석 정정이 필요하다. 실측 원문11절의 시험 하한25와 현재 소스22 차이도 기록 정합 확인 대상이다. docs 범위에서 Unreal/Saved 원문은 수정하지 않았다.
+
+최종 정적 확인: git diff --check(core.whitespace=cr-at-eol) 오류0. STATUS27411B·WORKBOARD29926B로 각각30,000B 이하. 이번 변경은 지정5파일이며 과거 WORKLOG 본문 보존·추가 로컬 링크 검사는 아래 확인 결과를 따른다. Build/PIE/자동화·Commit/Push·Figma/Trello 수정·아카이브/새 파일 생성 없음.
+
+확인 완료: 시작 HEAD의 WORKLOG 전체가 줄끝 정규화 후 그대로 접두부에 보존됨을 검사했다. 지정5파일의 실제 로컬 파일 링크 누락0이며 기존 과거 본문의 버튼 표기 [A/Enter]는 파일 링크가 아니므로 보존했다. git status --short는 지정5파일 수정만 표시했다.
+
+### 같은 날 후속 — 광섬유 SkyDive 정합 확장
+
+2026-11-03 D PC, Unreal HEAD `6de91783`·브랜치 `feat/skydive-fpv-physics-parity` + Claude 미커밋, md는 앞선 Codex 반영분 포함 미커밋이다. 실행 담당 Claude·문서/Space 반영 Codex. 사용자 “네, 적용”으로 광섬유 적용이 확정됐다. 앞선 절의 광섬유 미정/미구현·미변경 및 적용2종 표기는 당시 상태이며 이 후속으로 대체한다. 현재 값 정본은 [FPV 기준값](../gameplay/DRONE_TYPES_AND_CONTROL_MODES.md#공개-자료를-반영한-현재-fpv-기준값)이다. 10/31 정찰 기체+0.2kg 중 질량은 유지하고 정찰 추력 상속은 대체했다.
+
+- 구현됨: 광섬유 DA 추력40→79.16N·호버23%·추력비2.04→3.67 및 SkyDive 항력/수직 제한 적용. `ApplySkyDiveMeasured20261103.py`에 광섬유 추가, `Drone.SimParity.SkyDiveMeasured` 광섬유 행은 역할 상한15m/s로 판정, `DroneSimParityMotorTest.cpp`의 `FiberOpticSpec` 기대값은 정찰 추력 상속에서 SkyDive 호버23% 규칙으로 변경했다.
+- 자동 검증됨(Claude 지시서·Saved 측정 지시서11절 근거, Codex 재실행 없음): 적용 후 SimParity+Flight **87성공/2실패**(`Saved/Automation/ClaudeSkyDive/flight5.log`·`report_flight5`). 실패는 기존 LandingMap1PIE와 광섬유 상한 기준 미반영 SkyDiveMeasured다. 기준 수정 후 SkyDiveMeasured·FiberOpticSpec·RealPilotPawnScope **3성공/0실패**(`verify6.log`·`report_verify6`, 같은 디렉터리). 최종 전체 회귀 Pass로 처리하지 않는다.
+- 광섬유 측정: 호버0.230, 상승100%/46%=15.0m/s(상한)·28%=7.3m/s, 35% 풀피치3초 수평14.3m/s(상한15). FiberSpec은 추력비3.67·1초 상승15m/s·최고속54km/h(역할 상한)다. SkyDive 최고속 실측값이 아니다.
+- 수동 확인 대기: 광섬유15m/s 상한 안의 호버·상승 변화 손 조종 체감. 미정: 광섬유15m/s 상한 조정·최고속도·10/31 추력비8.3 복귀 여부. 과거 기록/실패는 보존한다.
+
+문서 반영: STATUS 요약·WORKBOARD FLIGHT-PHYSICS-01/Next·역할 가이드 기준값 수정. 기존 물리 가이드 미커밋 변경은 보존했다. 새 파일/아카이브·Unreal 수정·Build/PIE/자동화·Commit/Push는 수행하지 않았다. Space 및 정적 검증 결과는 아래에 추가한다.
+
+최종 확인: 진행상황 Space Sequence143의 요약·Next 2연산 모두 적용(거부/ignored 없음), 같은 content stream 재읽기로 두 블록 본문 전체 일치를 확인했다. 다른 페이지는 변경하지 않았으며 이번 대상 미반영 없음. STATUS27,458B·WORKBOARD29,996B로 각각30,000B 이하, git diff --check(core.whitespace=cr-at-eol) 오류0. git status의 수정5파일 중 이번 작업은 지정4파일이며 DRONE_REALISTIC_HANDLING_PLAN.md는 앞선 변경 그대로다.
