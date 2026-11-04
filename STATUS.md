@@ -1,19 +1,19 @@
 # 현재 작업 상태
 
-현재 기준: 2026-11-03 D PC, Unreal `682852c5`를 작업 브랜치에서 main으로 병합·Push했다. Claude가 실기 정합·게임 조작 폐지/쉬운 조작 유지·배달 튜토리얼·미션 사진·선택창3D를 구현했다. Codex는 코드 diff·지정 실행 로그를 읽기 대조했다. 자동 검증은 성공/실패가 섞이며 전체 Pass가 아니다. 수치·실패 분류·지시서와 원시 집계 차이는 [이번 WORKLOG](docs/history/DRONE_WORKLOG.md#2026-11-03--실기-정합배달-튜토리얼미션-사진-후속)가 정본이다. [역할/카메라](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md)·[물리](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#dji-교육-비행과-외형-기울기)·[배달/사진/3D 수동 절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인). 비행 체감·외형/크기·집기 방향·설정3행/OSD·3D 재로딩은 수동 대기이며 TPA·FOV 빠른 선택·터틀은 미구현이다.
+현재 Git 기준: 2026-11-05 D PC, Unreal main `871e8705`·origin/main `fbd691e3`(각 고유1개, 병합 대기), MD main/origin `d955b5e` + 로컬 문서9개. 아래 자동 검증은 11/04 실행 기록이며 이번에는 재실행하지 않았다. 해당 B12의 Source/Config/Tools/RawInput 732파일이 Git 정리 직전과 SHA 일치함을 확인했다. 실제 문제와 낡은 검사 전제를 수정하고 B09에서 Editor 고유574개를 전체 실행한 뒤, 제품 Source를 유지한 검사fixture 수선판 B12에서 영향8개를 재검사했다. **최신 판정은 실제573통과·실패0·외부 SITL CSV 부재1스킵**이다. 전체 원형과 후속판을 구분하며 단일 DLL 전체 통과라고 표시하지 않는다. [수정·최종 근거 정본](docs/history/DRONE_WORKLOG.md#2026-11-04--전체-점검-실패-수선과-재검사).
 
-SkyDive 실측 정합을 FPV 타격·레이서·광섬유에 구현했다(Claude, D PC·커밋682852c5). 광섬유 적용은 사용자 확정·후속 집중검증3성공/0실패이며 전체 회귀 Pass가 아니다. 손 조종은 수동 대기·광섬유15m/s 상한 조정은 미정. [현재 FPV 값](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md#공개-자료를-반영한-현재-fpv-기준값)·[검증/실측 원문 경로](docs/history/DRONE_WORKLOG.md#2026-11-03--skydive-실측-정합fpv-물리).
+M4 저장 기본 기체를 초기 출격 정책과 같은 FiberOptic으로 맞췄고, 세 시작점→실제 재머→새 전투 기체→Patriot 진행을 확인했다. M1의 축 배율0 장식 section만 런타임 충돌을 해제하고 정상 이웃/전봇대는 보존했다. 머티리얼2개의 개별 사용 플래그도 수선했다. 로비는 첫 배치 전에 실제 미션 미리보기를 채우고 키보드 포커스로 내용이 바뀔 때만 재배치해 첫 프레임 글자/구분선 겹침을 수정했다. 미리보기로 미션을 자동 확정하지 않는다.
 
-10/30 파일럿 평면판정·제출음원 고유91검사 및 이전 입력/UI 결과는 당시 리비전의 검증이다. [이전 요약 원문](docs/history/archive/STATUS_2026-10.md)·[10월 WORKLOG](docs/history/archive/DRONE_WORKLOG_2026-10.md)에 보존하며 이번 변경의 Pass로 재사용하지 않는다. 실물 손조종·실기체 교정·청감·전체 미션·패키징은 수동 확인 대기다.
+검사는 현재 시동·전면 센서·역할/수업/목표 정책, 실제 자식 Designer·스크롤/마우스·화면별 렌더와 게임 창 첫 표시 기준으로 갱신했다. 오디오3개는 녹음 fixture의 무음 submix 휴면을 실행 범위 안에서만 방지하고 실제 PCM·파형 검사를 유지했다. 생산 물리값·모터 안전장치를 검사에 맞춰 되돌리지 않았다.
+
+엔진/Build는 `/root/pilot_shortcuts_restart` 한 곳만 실행하고 종료했다. 제품 Source 유지·실행별732파일 동결·모든 맵75 SHA일치·Content 변경은 예정 자산3개뿐이며 사용자 Saved8개를 byte 원복했다. Production Training 저장0, 기존 Antigravity/OSD 수정 보존, 이번 Commit/Push 없음. 0배율 원본의 로딩 Body 경고, 실물 키보드/플스/InterLink 손 조종·청감·전체 미션 손 조종 완주·독립 게임창/Cook/패키징은 이 자동 통과와 구분한다.
 
 ## Git 기준
 
-| 저장소 | 2026-11-03 읽기 대조 | 상태 |
+| 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal D PC `D:\JGY\project\drone` | main `682852c5` | 작업 브랜치1커밋 Fast-forward 병합·Push, 실제 원격 SHA=HEAD·0/0·Clean |
-| 문서 D PC `D:\JGY\project\md` | 시작 main `7aad12e`·동반 갱신 버전 | 시작 원격 일치·Clean, 병합 기록을 동반 Commit/Push |
-
-기능 구현·코드/자산 실행 담당은 Claude(D PC), 이번 Git 병합·Push와 문서 반영은 사용자 지시에 따라 Codex가 수행했다. 기존 커밋을 유지했고 병합 후 tree는 원래 작업 브랜치와 동일하다. 새 코드/자산 수정·Build/PIE/자동검증은 하지 않았다. 실행 담당·실행 PC는 커밋 작성자만으로 단정하지 않는다. [세션 운영](docs/git/DRONE_WORK_PC_SESSIONS.md)·[이번 근거](docs/history/DRONE_WORKLOG.md#2026-11-03--실기-정합배달-튜토리얼미션-사진-후속).
+| Unreal `D:/JGY/project/drone` | main `871e8705` / origin `fbd691e3` | 이전 수선62파일은 로컬 커밋 포함·원격과1/1. 충돌 예상0, LFS 본문 확인. 추가 미커밋은 스크립트 끝 빈 줄 제거1건 |
+| 문서 `D:/JGY/project/md` | main/origin `d955b5e` | 커밋0/0·문서9개 미커밋 보존/최신화. [Git 점검 정본](docs/history/DRONE_WORKLOG.md#2026-11-05--git-점검과-정리) |
 
 ## 현재 D PC 구현·검증 경계
 

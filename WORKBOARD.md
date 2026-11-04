@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-11-03 D PC — 코드 `682852c5` main 병합·Push. [STATUS](STATUS.md).
+마지막 갱신: 2026-11-05 D PC — Git 분기/미커밋 정리. 검증 결과는 11/04 기록. [STATUS](STATUS.md).
 
 ## Now
 
@@ -33,7 +33,7 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 | TUT-DELIVERY-1103 | 배달맵 복구/크기 | 판2.5배·화물1/3·3개 수령/태그 복구·종단 자동 성공 | 크기·집기 방향 실기, “원통 착륙장” 문구 미정. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
 | MISSION-PHOTOS-1103 | 13미션 사진 통일 | Thumbnail=BriefingImage·레이싱 번호 유지 | 전체 사진 수동 대조. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
 | UI-SELECT-3D-1103 | 선택3D 재로딩 | 지연 재생성·재촬영·프리스트림 구현 | 열기/기체 전환/재오픈 실기. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
-| SIMPARITY-EXEC-01 | 실행 근거·잔여 실패 | SkyDive 최종 일반9·경고1 성공/실패0. [근거](docs/history/DRONE_WORKLOG.md#2026-11-03--skydive-실측-정합fpv-물리) | 전체 재실행 아님·LandingMap1PIE 잔여 |
+| SIMPARITY-EXEC-01 | 전체 점검·영향 재검 | 574개+fixture 영향 재검, 최신573통과/실패0/스킵1. [근거](docs/history/DRONE_WORKLOG.md#2026-11-04--전체-점검-실패-수선과-재검사) | 자동 완료·실물 조종/청감·패키징 별도 |
 | FLIGHT-MODE-01 | 실기 정합·모드 | 게임 조작 폐지·쉬운 유지·P/S/A·FPV Angle 구현 | 비행·설정/OSD 수동 확인. [정본](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md) |
 | FLIGHT-PHYSICS-01 | 공력·외형·카메라 | SkyDive FPV타격/레이서·광섬유 정합 구현·광섬유 적용 결정됨 | 손 조종 대기·광섬유15m/s 상한 조정 미정. [정본](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md) |
 | ROTOR-PILOT-KEYS-01 | 파일럿 체감·교정 | 공통 평면 본체4~7·69검사/RHI 접지 확인 | 실물 조종 후 튜닝 |
@@ -146,9 +146,11 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 
 ## Next
 
-현재 상태는 [STATUS](STATUS.md), 실행 근거와 실패 이력은 [WORKLOG](docs/history/DRONE_WORKLOG.md), 지난 Next 원문은 [10월 아카이브](docs/history/archive/WORKBOARD_2026-10.md)를 따른다.
+Git: 코드 main/origin 1/1, 충돌 예상0·병합 대기. 문서9개 미커밋. [정본](docs/history/DRONE_WORKLOG.md#2026-11-05--git-점검과-정리).
 
-1. 실기 정합: 두 장치에서 제동·위치 유지·수평 복귀·외형 기울기, FPV 설정3행·OSD를 확인한다. 실기 튜닝 게인은 미정이다.
-2. 배달/사진/3D: 팔레트·화물 크기·집기 방향·3개 전달, 사진 번호/두 화면, 선택창 재로딩을 [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인)대로 확인한다. 배달 목표 문구 변경은 미정이다.
-3. 원인 미확인 LandingMap1PIE·설정 체크박스2종은 2회 상한으로 중단 상태다. Claude가 후속 범위를 정하고 기존/환경 의존 실패와 분리한다. TPA·FOV 빠른 선택·터틀은 미구현이다.
-4. 광섬유 SkyDive 적용 결정됨·구현/검증, 손 조종 대기. 15m/s 상한 조정·최고속도·추력비8.3 복귀·키보드 모델 미정. 기존 수동/패키징·Forward 타 PC 재확인 대기.
+[최종 수선·재검사 WORKLOG](docs/history/DRONE_WORKLOG.md#2026-11-04--전체-점검-실패-수선과-재검사)를 현재 기준으로 사용한다. 옛 실패 등록은 최신 자동 결과를 면제하는 기준으로 쓰지 않는다.
+
+1. 실제 키보드·플스·InterLink로 시동/착지·방향/키 설정·M4 세 시작점/교대와 전체 미션을 손 조종한다. 자동 주입 결과와 구분한다.
+2. 출발 카운트·체력 경고·무기/폭발음을 실제로 듣고, 실제 배달/사진과 첫 프레임 문구도 확인한다.
+3. 독립 게임창·Cook/패키징을 별도로 검증한다. 원본0배율 장식의 로딩 Body 경고는 런타임 판정 수선과 구분해 추적한다.
+4. 광섬유15m/s 상한 조정·실기 게인·TPA/FOV 빠른 선택/터틀은 기존 결정·미구현 범위를 유지한다.

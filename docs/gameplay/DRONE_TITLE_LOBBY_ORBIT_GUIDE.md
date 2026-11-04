@@ -1,6 +1,6 @@
 # 시작 화면 · 로비 탭 · 원형 코스 가이드
 
-현재 절차 기준: 2026-10-23 D PC. 기존5메뉴·결과·훈련/레이싱을 유지하며 Cancel/Esc 동작을 보완했다. 기체 선택은 DA의 큰 사진/카드 슬롯, 장치 그림은 조작 안내 WBP에서 조정한다. 실제 검증 범위는 [STATUS](../../STATUS.md), 실행별 근거는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 원본 이미지·Figma·기존 타이틀 아트는 보존한다.
+현재 절차 기준: 2026-11-04 D PC. 기존5메뉴·결과·훈련/레이싱을 유지하며 Cancel/Esc 동작을 보완했다. 기체 선택은 DA의 큰 사진/카드 슬롯, 장치 그림은 조작 안내 WBP에서 조정한다. 실제 검증 범위는 [STATUS](../../STATUS.md), 실행별 근거는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 원본 이미지·Figma·기존 타이틀 아트는 보존한다.
 
 설정된 InterLink Cancel(Button15)은 Esc와 같이 오프닝/미션 영상 스킵, 미션 일시정지·복귀, 시작 지점 뒤로가기, 시드 편집 취소를 처리한다. 기존 FrontEnd/Selection/Pause/로딩의 Back과 같은 키 규칙을 쓴다. 시드 편집 취소는 해당 입력을 소비하고 Pause는 이미 멈춘 상태에서도 동작한다. 위젯·실제 PlayerInput/영상 PIE 자동 검사는 통과했으며 실물 버튼·전체 화면 수동 확인은 남아 있다. [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md).
 
@@ -27,6 +27,7 @@ Native 미션 출격도 BeginPlay에서 위 Mission WBP 기본 화면7종을 로
 - 로비·브리핑·기체 선택·출격 안내의 시작 버튼 초기 기준은 오른쪽 아래 앵커/정렬 `(1,1)`, 위치 `(-80,-40)`, 크기 `(300,80)`다(1920 기준·해상도별 DPI 적용). 현재 저장된 Designer 편집값이 우선이며 위치/크기를 실행 코드가 다시 덮어쓰지 않는다.
 - 로비·브리핑·기체 선택 사진의 외곽 상자 초기 기준은 `600×360`, 안쪽 여백14px다. 모서리는 길이24·두께2의 Image 파츠8개다. 현재 `MissionCardPanel / BriefingThumbnailFrame / DronePreviewFrame`의 저장 Designer에서 위치·크기·Padding을 조정한다. 지도 사진은 Fill이며 기체 사진의 비율 설정은 아래 DA 교체 절을 따른다.
 - 정적 문구는 해당 TextBlock의 Text를 편집한다. 미션명/설명/목표/시간은 Mission DA에서 바꾼다. 데이터가 갱신하는 문구를 화면별로 고정하려면 Class Defaults의 `Drone|문구` → `TextOverrides`에 정확한 위젯 이름과 문구를 넣는다. 배열 값/키 이름은 내부 API이므로 한글 표시 문구와 구분한다.
+- 로비는 최초 배치 전에 현재 미션의 미리보기 문구를 채운다. 키보드/패드 포커스·hover로 미리보기가 실제로 바뀔 때만 배치를 다시 계산해 긴 부제목이 구분선과 겹치지 않게 한다. 미리보기는 Flow의 미션 선택을 확정하지 않으며, 글자·폰트·상자 폭/좌표는 저장 Designer와 DA를 계속 따른다.
 - 일반 버튼의 Class Defaults `UnselectedButtonOpacity` 기본0.55, `SelectedButtonOpacity` 기본1이다. 목록의 선택 항목과 포커스/호버 항목을 강조한다. 반복 줄 바깥 간격은 `WBP_DroneMissionListItem`의 `ListItemPadding`이다.
 - 기체 사진의 회색 바탕은 `DronePreviewBackdrop` Brush Color 알파0으로 제거했다. 바깥 도시 배경은 `SelectionBackground`의 원본 `T_Select_Background`와 `SelectionBackgroundDim`으로 유지한다. 전체 배경은 Stretch Canvas/Z 순서0~3, 사진 프레임은 기존 모서리 파츠다. 일회성 `-DroneRepairSelectionBackdrop`은 이 WBP 한 개만 저장한다. 확인 기준은 FrontEnd→미션1→드랍드론 선택의 실제 PIE 화면이다.
 - 타이틀 설정창은 화면 형제보다 높은 Z Order로 열리고, 일시정지 설정은 재개 후 다시 열어도 `뒤로`가 연결된다. 로비와 일시정지는 공통 `FrontEnd/WBP_DroneSettings`를 사용한다. `SettingsWidth` SizeBox의 Width Override 기준은1240이며 위치/여백·글자/이미지 파츠는 Designer에서 조정한다. 화면 Fit은 바깥 ScaleBox가 담당하므로 폭을 수만 단위로 키우지 않는다. `Drone.UI.ReportedSettingsPIE`는 실제 창1280×720/2553×936의 패널 높이·선택칸/뒤로 버튼 표시 크기와 클릭/Back을 검사한다. 허브 대사 박스는 기본 숨김이며 필요할 때만 Root의 `bShowHubDialogue`를 켠다. 미션 영상 안의 자막은 별개다.
@@ -77,16 +78,16 @@ Native 미션 출격도 BeginPlay에서 위 Mission WBP 기본 화면7종을 로
 
 자동 검사·실제 렌더 캡처와 손 조작/청감은 구분한다. 검증 리비전·원시 결과는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
 
-### UGV 사진과 미션 1 영상 교체
+### UGV 사진과 Story 브리핑 영상 교체
 
 UGV를 포함한 기체 사진 교체는 [위 순서](#드론-선택창-이미지-바꾸기)를 따른다. 미션 영상은 다음 별도 자산에서 바꾼다.
 
-미션 1은 로비에서 시작을 확정하면 영상 → 기존 브리핑 → 작전 지역/기체 선택으로 진행한다. 영상이 끝나거나 Esc/패드 B를 누르면 브리핑으로 넘어간다. 영상 재생 중에는 브리핑 대사와 버튼 입력을 잠시 멈춘다. 파일 재생 실패 시에도 기존 브리핑으로 복귀한다.
+Story 미션 1~4는 로비에서 시작을 확정하면 영상 → 기존 브리핑 → 작전 지역/기체 선택으로 진행한다. 영상이 끝나거나 Esc/패드 B/InterLink Cancel을 누르면 브리핑으로 넘어간다. 영상 재생 중에는 브리핑 대사와 버튼 입력을 잠시 멈춘다. 파일 재생 실패 시에도 기존 브리핑으로 복귀한다.
 
-- 영상 파일: 프로젝트 `Content/Movies/Mission_briefing1.mp4`.
-- Media Source: `/Game/Drone/FrontEnd/Media/MS_Mission01_Briefing`, File Path=`./Movies/Mission_briefing1.mp4`.
-- 연결: `DA_Mission_Story_GoldenTime_Test`의 `BriefingAsset`. 다른 Story 미션에도 FileMediaSource를 연결하면 같은 재생/건너뛰기 흐름을 쓴다.
-- 화면: `WBP_DroneCinematic`의 `CinematicFrameSize / OpeningMovieImage / CinematicSkipHint`에서 영상 크기·스킵 문구·위치를 편집한다. FrontEnd Controller의 위젯 클래스 참조와 Movies 패키징 목록도 저장했다. 실제 패키징 검증은 별도다.
+- 영상 파일은 프로젝트 `Content/Movies/Mission_briefing1.mp4`~`Mission_briefing4.mp4`다. Media Source는 `/Game/Drone/FrontEnd/Media/MS_Mission01_Briefing`~`MS_Mission04_Briefing`, File Path는 `./Movies/해당파일.mp4`다.
+- Mission DA의 `BriefingAsset` 연결은 M1=`GoldenTime`, M2=`Intercept`, M3=`VeilBreaker`, M4=`Endgame`이다(각 `DA_Mission_Story_*_Test`).
+- 화면은 `WBP_DroneCinematic`의 `CinematicFrameSize / OpeningMovieImage / CinematicSkipHint`에서 편집한다. 부모 `Drone|Opening → bPreserveMovieAspectRatio` 기본 True는 디코딩된 원본 비율을 유지하며 Designer 프레임 폭을 크기 기준으로 삼는다. M2~4의 서로 다른 가로 비율도 늘이지 않는다.
+- FrontEnd Controller 위젯 참조와 Movies 패키징 목록을 유지한다. 실행 검증의 날짜·범위는 [WORKLOG](../history/DRONE_WORKLOG.md#2026-11-04--antigravity-변경-감사와-병합-버전-검증)를 따른다. 실제 Cook/패키징 검증은 별도다.
 
 ## 0. 현재 계약 — 5메뉴·조종 입력 표시 현재 구현과 계약
 
@@ -180,7 +181,7 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 | `InterfaceBoldFont` | 제목·강조용 `/Game/Drone/UI/Fonts/Pretendard/Pretendard_Bold_Font` |
 | `StorySelectLayout` | 1920×1080 기준 좌표/크기. `ListPosition / ListWidth`, `ThumbnailPosition / ThumbnailSize`, `DetailsPosition`, `StartPosition / StartSize`, `BackArtworkPosition / HeadingPosition` 조정 |
 
-시작 배치는 목록 `(117,321)`·폭389, 프리뷰 `(556,350)`·`584×543`, 설명 `(1248,321)`, START `(695,980)`·`530×58`이다. 제목/설명도 실제 글자의 폭·줄바꿈을 사용하므로1280/1920에서 겹침·끝 잘림을 보고 Layout/텍스트 박스를 조정한다. 텍스트가 길다는 이유로 부모 전체 Scale을 늘리거나 글자를 이미지로 굳히지 않는다.
+Native 폴백의 기존 초기값은 목록 `(117,321)`·폭389, 프리뷰 `(556,350)`·`584×543`, 설명 `(1248,321)`, START `(695,980)`·`530×58`이다. 현재 저장된 `FrontEnd/WBP_DroneLobby`의 Designer 배치는 이 값과 구분하며, 위 편집 정본과 실제1280/1920 렌더를 기준으로 확인한다. 제목/설명은 실제 글자의 폭·줄바꿈을 사용하므로 겹침·끝 잘림을 보고 텍스트 박스를 조정한다. 텍스트가 길다는 이유로 부모 전체 Scale을 늘리거나 글자를 이미지로 굳히지 않는다.
 
 기존 MissionId로4개 프리뷰를 찾으며 M3도 `Mission.Story.VeilBreaker.Test` ID를 유지한다. 이름·영문명·설명·목표·무전은 Mission DA의 동적 값을 사용하므로 기획 문구 수정 때 텍스트PNG를 다시 만들 필요가 없다. Back/Heading/MissionLabel/Start·Selected/Unselected·Details의 구형 필드와 원본/이미 임포트한 텍스트PNG16개는 호환·원본 보존을 위해 삭제하지 않지만 화면에는 쓰지 않는다. 프리뷰 미지정 시 기존 DA/배경 fallback과 Tooltip 계약을 유지한다.
 

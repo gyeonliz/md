@@ -1,6 +1,6 @@
 # 현실 조종감 기준과 후속 개발 계획
 
-기준: 2026-11-03 D PC 읽기 대조, 코드 `6de91783` + 사용자 미커밋 변경. 교육 비행·공력/전압·투하 질량 갱신·FPV SkyDive 정합은 구현됨이며 Claude 실행 자동 검증의 성공·실패 범위는 WORKLOG를 따른다. 역할별 제어/카메라는 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md), 입력/모터 조작은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md), 실행별 이력은 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다. 기존 파일럿 시험장의 접촉 보정과 controlledRacer opt-in, 실기체 교정·전기체/본미션 확대·B/C 최종 채택·패키징 한계는 유지한다.
+기준: 2026-11-04 D PC, 코드 main `682852c5` + 로컬 감사·수정. 교육 비행·공력/전압·투하 질량 갱신·FPV 타격/레이서/광섬유 SkyDive 정합은 구현됨이다. 이번 Codex 단일 실행과 이전 Claude 검증을 구분해 [감사 WORKLOG](../history/DRONE_WORKLOG.md#2026-11-04--antigravity-변경-감사와-병합-버전-검증)를 따른다. 역할/카메라는 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md), 조작은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)이다. 파일럿 접촉 보정·controlledRacer opt-in과 실기체 교정·B/C 최종 채택·패키징 한계는 유지한다.
 
 모터 OFF에서도 공기저항은 적용된다. Legacy 정상OFF의 조기 분기에서 빠졌던 공유 공력 계산을 4모드에 연결하고 시작/목표추력0·World중력·기존 선형/제곱항력과 인공제동0을 유지했다. 항력계수를 강하게 조절한 수리가 아니다. 30/240fps의 수평 감속·10초 감속·낙하 중 수평감속/추력0/재시동과 LocalPlayerController+실제 World.Tick 이동이 자동 통과했다. 쉬운의 ON assisted 구조는 유지하고 controlled candidate는 기존에도 OFF 항력을 계산했으므로 이번 Legacy 결함과 구분한다.
 
@@ -10,9 +10,9 @@
 
 제동 중 큰 속도오차만 적분을 동결하고 오차가 유지 포착 속도의2배 이하가 되면 적분을 재개한다. 횡풍 잔여 속도 때문에 위치 유지로 진입하지 못하던 결함을 수리했다. 쉬운 조작도 속도 루프 시간상수만큼 앞에서 정지점을 잡아 되밀림을 줄인다. 실기 공식 제동거리는 확보하지 않았으며 독립 재현 수치는 엔진 실측과 구분해 [WORKLOG](../history/DRONE_WORKLOG.md#2026-11-03--실기-정합배달-튜토리얼미션-사진-후속)에 둔다.
 
-학습 비행 모델 외형은 제어기 실제 각도 `atan(a/g)`를 그대로 표시한다. 이전14°/18° 축소 표시를 대체했으며 DJI 짐벌 수평/FPV 기체 고정은 [카메라 정본](DRONE_TYPES_AND_CONTROL_MODES.md#1인칭-카메라-역할-프리셋)을 따른다. 제동 세기·위치 유지·수평 복귀·외형 화면은 수동 대기다.
+학습 비행 모델 외형은 제어기 실제 각도 `atan(a/g)`를 그대로 표시한다. 전진 가속은 기체 앞부분이 내려가는 방향이며 쉬운 조작의 외형과 FPV 고정 카메라도 이를 따른다. GPS 이동 중 바람 보정 적분을 매 프레임 지우지 않는다. DJI 짐벌 수평/FPV 기체 고정은 [카메라 정본](DRONE_TYPES_AND_CONTROL_MODES.md#1인칭-카메라-역할-프리셋)을 따른다. 제동 세기·위치 유지·수평 복귀·손 조종 체감은 수동 대기다.
 
-Steam 무료 ORQA FPV.SkyDive·FPV Drone Simulator는 D PC 설치 보고가 있다. SkyDive는 Claude가 키보드 Computer use로 RACER의 이륙·호버·상승·회전·기체 고정 카메라를 실측했고 사용자 지시에 따라 FPV 타격·레이서 DA에 정합을 적용했다. ALT 단위는 m 추정, 가상 스틱 램프·캡처 지연 제약이 있으며 최고속·감속은 측정 실패다. SkyDive FOV90°·업틸트30°·어안0과 우리 사용자 HFOV120° 결정은 구분한다. 광섬유 적용·속도 상한·실기 추력비8.3 복귀·키보드 스로틀 모델은 미정이다. 우리 TPA·FOV 빠른 선택·터틀은 미구현이다. 날짜별 측정/실행 근거는 [WORKLOG](../history/DRONE_WORKLOG.md#2026-11-03--skydive-실측-정합fpv-물리), 현재 DA 값은 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md#공개-자료를-반영한-현재-fpv-기준값)을 따른다.
+Steam 무료 ORQA FPV.SkyDive·FPV Drone Simulator는 D PC 설치 보고가 있다. SkyDive는 Claude가 키보드 Computer use로 RACER의 이륙·호버·상승·회전·기체 고정 카메라를 실측했고 사용자 지시에 따라 FPV 타격·레이서 DA에 정합을 적용했다. ALT 단위는 m 추정, 가상 스틱 램프·캡처 지연 제약이 있으며 최고속·감속은 측정 실패다. SkyDive FOV90°·업틸트30°·어안0과 우리 사용자 HFOV120° 결정은 구분한다. 광섬유에도 사용자 결정으로 같은 정합을 적용했으며 역할 상한15m/s를 유지한다. 상한 변경·실기 추력비8.3 복귀·키보드 스로틀 모델은 미정이다. 우리 TPA·FOV 빠른 선택·터틀은 미구현이다. 날짜별 측정/실행 근거는 [WORKLOG](../history/DRONE_WORKLOG.md#2026-11-03--skydive-실측-정합fpv-물리), 현재 DA 값은 [역할 정본](DRONE_TYPES_AND_CONTROL_MODES.md#공개-자료를-반영한-현재-fpv-기준값)을 따른다.
 
 ## 현재 운동·관성 계산식
 

@@ -2762,3 +2762,179 @@ Drone Space는 기존 진행상황과 다음 작업 Sequence142(현재 요약·N
 기존682852c5 커밋을 재작성/스쿼시하지 않고 main으로 Fast-forward 병합했다. Push 뒤 실제 origin/main ls-remote=로컬HEAD 전체SHA, tracking0/0·worktree/index Clean이다. 원래 기능 브랜치도 그대로 보존했다. Force Push·새 기능/자산 편집·맵저장·엔진 제어·Build/PIE/자동검증은 없으며 이전 혼합 성공/실패 및 후속 집중3통과를 이번 병합의 새 검사로 재사용하지 않는다.
 
 MD 시작main7aad12e는 Fetch 후 원격 일치·Clean이었다. 현재 STATUS/WORKBOARD의 오래된 미커밋/Git 표기를 교정하고 이 기록을 append-only로 추가해 동반 Commit/Push한다. Drone Space의 기존 진행 Page도 같은 Git 인계와 새 검사 없음으로 갱신하며 최종 문서SHA/원격 확인은 해당 인계와 Saved/Automation/MergePush_20261103/GIT_FINAL_RECEIPT.json을 따른다. STATUS/WORKBOARD는30KB 제한 안에 유지한다.
+
+
+## 2026-11-04 — Antigravity 변경 감사와 병합 버전 검증
+
+- 사용자 범위: 병합본 Build/FPV·레이서·광섬유 물리, Mode1/2 표기, Easy→Mode2 제보, Drop 선택 프리뷰 화물, M2~4 제공 영상 및 Antigravity 변경 전부 감사. main682852c5/MD d955b5e 유지·이번 Commit/Push 없음. 옛 실행 채팅은 사용량 제한으로 실행하지 못했고, Codex Root가 단일 실행 소유권을 인수했다. 하위 검토자는 Source/Content/엔진 쓰기 없이 Saved 초안만 제공했다.
+- 입력18파일(추적11/미추적7)을 REQUEST_BASELINE.json/InputBackup에 byte 백업했다. Antigravity의 DA3·FileMediaSource3·Movies3·Config·연결 도구·UI/물리 변경을 Git diff와 실제 저장 자산/로그로 대조했다. 순수 main 단독 실행이 아니라 main+외부18개를 초기 기준으로 사용했다.
+- 초기 Build19.98초 성공. 기존43개는 일반37/경고3성공·3실패: SelectionControlLayout(옛 이름/Designer wrap), TrainingGpsStopAndHold(바람3조건), LandingMap1PIE. 신규 독립 기하검사는 실제 저장3기체의 Easy 전진 시 앞부분 상승을 재현했고 Mode1/2는 정상 하향이었다. 외부 기존 VisualBank 기대값도 같은 역방향으로 바뀌어 결함을 가리므로 원래 기대를 복원했다.
+- 수정: Pawn 전진 pitch2곳의 원래 음수 복원(최종 HEAD와 동일), Training 이동 중 Integral 매 프레임 초기화 제거, native fallback에서만 Selection no-wrap 적용, enum DisplayName/ControlsGuide까지 ‘모드 1/2’, OpeningMovie의 실제 decoder 크기 기반 비율 유지. HoldPoint/AltitudeHold 추적은 유지하고 질량/추력/항력·수직/프로필 상한은 바꾸지 않았다.
+- Easy→Mode2: 실제 saved WBP·DA·PawnClass로 Selection callback9 + Settings Combo Apply3 → spawn/possession/HUD12개 통과. FPVStrike DA 기본3이어도 Easy 선택0/표시0/실제0을 확인했다. 생산 resolver 변경 없이 fresh Build에서 재현되지 않았다. 초기 신규 fixture는 DefaultDroneId/목표 준비 누락으로 실패해 시험 준비만 수정했다. RED1 반복 준비 실패 후 Root 자신의 시험 엔진만 중단한 원시 로그도 보존한다.
+- LandingMap1: 실제 충돌 callback의 touchdown 모터OFF가 sweep pullback1.0239cm에서 발생해 다음 tick의 기존 gap<1cm 관측보다 빨랐다. 테스트는 고유 착지 사유·직전ON→OFF·실제 floor hit/법선/비관통을 추가 관측한다. 단순OFF를 접지로 간주하지 않고 원래1cm/속도/시간/접촉 assertion과 이전 airborne failure 누적을 유지했다. 생산 착지 허용범위 변경0. 최종 실제6시나리오 통과.
+- 최종 Build GREEN_C11.75초 성공, module SHA256=aa234c35d29824395b0aee8e143b9947bee4abb677e15099bad72b4923b34778. GREEN_FINAL64개: 일반42+경고21성공/1실패·notRun0,303.24초. 실패 Selection3D.PIE는 index0/phase0 대기시간초과이며 같은 DLL의 ISOLATED_SELECTION에서24.03초 단독 경고성공1/실패0. 이를 묶음 전체 Pass나 해결 완료로 바꾸지 않는다. SitlReplay는 sitl_run.csv 부재로 내부skip1(보고서Success)이며 실제 SITL 검증으로 세지 않는다.
+- 실제 기본 Mode1/2 경로3기체와 두 시점의 방향/카메라, active 물리값·모터τ0.055초·호버≈0.23·GPS 바람·착륙 통과. FPV0.66kg/23.75N·레이서0.453kg/16.30N·광섬유2.2kg/79.16N, idle5.5%·수평/기체Up 제곱항력.000027/.000185 per cm·선형.06/s·World-Z36m/s, 프로필40/40/15m/s. Easy ON은 별도 FloatingPawnMovement 보조이며 Acro 힘식과 동일하지 않다. 기존 SkyDiveMeasured/Spec 일부는 real-model flag opt-out seam이고 신규 semantic/실제 출격 검사는 기본 role routing을 유지했다.
+- DropPreviewPayloadIsolation: actual Drop clone의 화물 숨김·reload·양수 RHI 모델 pixels, 원본 source의 화물 가시성/재고/질량/pose 보존 통과. 생산 프리뷰 추가 수정0. 단일 FScreenshotRequest가 Editor 화면을 잡은 PNG는 외형 확인 근거로 쓰지 않는다. 실제 기존 선택창 단독 검사의6기체 캡처를 따른다.
+- 영상M2/M3/M4 원본/복사 SHA·bytes 동등(각107506287/120223606/116335064B), avc1+mp4a·14.443/17.216/13.909초·3704×1722/3622×1672/3768×1696. 실제 catalog→각 movie decoder, Esc/패드B/RC Cancel·브리핑 복귀·조기 맵이동0·끝까지 seek 없이 자연 종료3개 통과. M1 기존2개도 통과. RED2의16:9 늘어짐은 최종 sourceAspect=frameAspect로 수정했다. 묶음 실행의900×72 캡처는 크기 QA로 인정하지 않고 fresh VISUAL_FIXED 결과와 별도 대조한다. Python 임시 viewport override 시도는 property명 오류로 적용되지 않았으며 해당 원시 오류를 보존한다.
+- 잔여: Antigravity OSD는 글자뿐 아니라 bFpvOsdActive=false로 인공수평선도 끈다. EnsureFpvOsdWidgets의 Designer 숨김은 호출되지 않는다. 제거 의도 질문은 미응답으로 현재 생산코드를 그대로 보존하며 이 항목을 완성 Pass로 표시하지 않는다. 실물 장치 손 조종·전체 미션 완주·청감·Cook/패키징은 미실시다.
+- 보존: 저작 맵48/48 SHA 동일, 입력 Content/Config/도구 동일, 사용자 Saved8개는 시험 후 백업과 대조/복원, HEAD동일. 상세 원본은 D:/JGY/project/drone/Saved/Automation/AntigravityAudit_20261104의 baseline·RED·GREEN·별도실행·보존 보고서이며 Git 제외 로컬 자료다. 기존 팀원 맵/자산·사용자 입력 설정을 덮어쓰지 않았다. 문서/Space의 새 요약은 아래 동기화 결과로 구분한다.
+
+### 11/04 감사 마무리·Space 반영
+
+- fresh VISUAL_FIXED의 실제 M2/M3/M4 재생/취소/자연 종료3개 모두 성공했다. 캡처는1280×720/1280×686/1274×680이며 세 장을 직접 읽어 원본 비율·자막·검은 스킵 배경을 확인했다. 큰 Drop 선택창 단독 캡처도 읽어 들고 있는 화물이 빠진 것을 확인했다. 임시 viewport Python 설정은 실패했으므로 창 크기가 그 스크립트 덕분이라고 주장하지 않는다.
+- 저장 없는 메타데이터 commandlet: FileMediaSource3 모두 ./Movies 상대 경로이고 실제 WBP_DroneCinematic의 PreserveMovieAspectRatio=True다. BriefingAsset의 Python str은 SoftObjectPath 구조체 설명만 반환하므로 연결 근거는 실제 catalog→해당 movie 통합검사를 사용한다. HUDKit WidgetTree는 protected로 읽지 못해 Designer OSD 존재/숨김을 확인했다고 표시하지 않는다.
+- 경고는 오디오 장치 RAW 모드 미지원·PenetrationPullback cvar 반복 조회·광섬유 MI_cable SplineMeshes usage flag 누락/기본 재질 fallback이다. 케이블 재질은 이번 외부18파일 변경 대상이 아니며 별도 자산 저장 없이 잔여로 남긴다.
+- Drone Space 기존 진행/테스트/BP3페이지에서6개 연산 적용·거부0, readback6개 본문 정확히 일치. sequence146/90/101, 신규 Page/권한/예약 변경0. 로컬 STATUS26993B·WORKBOARD29807B로30KB 이하, WORKLOG append-only. 이번 코드/문서 Commit/Push 없음. 최종 엔진/컴파일러0.
+
+
+### 11/04 후속 — OSD 글자만 숨김·인공수평선 유지 확정
+
+- 사용자 답변으로 전압·LQ·스로틀·시간 글자만 숨기고 인공수평선을 유지하도록 확정했다. 앞선 제거 범위 미응답 기록은 당시 상태이며 이번 결정으로 해소한다.
+- DroneFlightHUDKit에서 글자 숨김을 매 Refresh에 연결하고 ForEachWidgetAndDescendants로 저장/자식 WBP의 이름 계약4종만 Collapsed 처리한다. 부모 패널과 비문자 장식은 건드리지 않는다. Native 텍스트 재생성 없이 기존 bShowFpvOsd·실기 송신기·1인칭·비투하 카메라 조건으로 선 활성화를 복원했다. 전압/배터리·타이머 계산·비행/입력/카메라/미션 자산은 변경하지 않았다.
+- 신규 Drone.UI.FpvOsdTextOnly가 수정 전 실제 saved HUD/FPVStrike·Racer·FiberOptic에서 수평선 비활성·픽셀 차이0과 Designer 글자4종 노출로 실패했다(RED_RUNTIME). 최초 Build는 신규 cpp가 캐시에 반영되지 않아0action이었고, -NoUBTMakefiles로 소스 재탐색 후32.16초 실제 컴파일했다.
+- 생산 수정 후 Build60.40초 성공, 같은 DLL의 FpvOsdTextOnly·HudDesignerContract·RealPilotSpecNumbers·FpvRealTransmitterModel 집중4개 성공/실패0. 원시 일반4·경고0 성공, 2.34초다. 직전64개 전체를 이 후속에서 다시 실행한 결과는 아니다.
+- 실제 저장 HUD 수평/기울기/명시OFF 렌더를 비교해 선 가시성과 pitch/roll 추종을 확인하고 세 역할×모드1/2 활성·Easy/3인칭 숨김을 검사했다. 저장 트리 기반 Designer fixture의 기존 글자4종 숨김·부모/장식 유지와 native fallback의 글자 미생성도 검사했다. 증거는 Saved/Automation/FpvOsdTextOnly_20261104의 RED/GREEN 로그·Captures/FINAL_VERIFIED.json이다. 실물 조종 확인은 별도다.
+- 저작 맵48개 SHA동일·사용자 Saved8개 백업 대조/복원, 소스2개와 신규 테스트1개만 이번 추가 변경이다. 엔진·Build는 Root 한 곳 순차 실행, Commit/Push 없음.
+
+- OSD 후속 Space 반영: 진행147·테스트91·BP102의 기존3블록에 글자만 숨김/수평선 유지·BP 조정값·집중4검사 결과를 적용하고3개 본문 readback 일치를 확인했다. 새 Page/권한/예약/Commit/Push 없음. 실제 saved HUD의 수평/기울기1280×720 PNG2장을 직접 읽어 글자4종 부재와 흰 수평선·중앙 조준선 유지/기울기 이동을 확인했다.
+
+
+## 2026-11-04 — 전체 자동 점검
+
+- 사용자 ‘전반적으로 점검 한번 싹’ 요청. main682852c5/같은 DLL eb613656732a5195f108fc191196214ff623dbf9b41b51028d79890d32cc45a8 유지·제작 도구8개 제외·Editor 고유574개 실행. Build 재확인 성공(추가 컴파일0), 소스/자산 수정·Commit/Push 없음. Root 단일 엔진·순차 실행.
+- 1차 실제530통과/43실패/1스킵, 후속 조건 분리 후 실제533통과/40실패/1스킵. 최초 실패/CLI는 보존하고 재검사로 지우지 않는다. 실물/독립 게임 창/패키징과 구분한다.
+- Core/최초Flow에 영상 옵션이 포함됐음을 확인해 일반 Mission/UI와 후속Flow에서는 제거했다. 미디어5개는 전용 옵션 실행이다. 사용자 PIE942×386은 일부 캡처의 최소400px 조건보다 작아 UI/후속에는 저장 없는1280×720 기본값을 썼고 원본 설정을 복원했다.
+- Source/Config/Tools733 SHA동일·보호122(저작 맵48) SHA동일·Content9859 metadata변경0·Saved8개 대조/복원·HEAD동일. 원시 전체는 로컬 Saved/Automation/GeneralCheck_20261104의 BASELINE/각 index.json·RUN·RESULTS_CURRENT/FINAL_AUDIT/REPORT.md다. Git 제외 파일을 GitHub에 올렸다고 표시하지 않는다.
+
+| 범위 | 고유 검사 | 실제 통과 | 건너뜀 | 실패 |
+|---|---:|---:|---:|---:|
+| 비행·물리·입력/AI | 285 | 279 | 1 | 5 |
+| 진입·메뉴 흐름 | 55 | 51 | 0 | 4 |
+| 미션·튜토리얼·오디오 | 131 | 115 | 0 | 16 |
+| UI·설정·영상 | 100 | 88 | 0 | 12 |
+| 기존 KnownIssues | 3 | 0 | 0 | 3 |
+
+마지막 실패(원시 메시지는 로컬 REPORT/JSON):
+
+- Drone.AI.ShotgunSystemsTestMapPIE: Shotgun NPC did not make pursuit progress (state=0 detected=0 pursuits=1 disengages=0 move=0 maxTravel=560.6 minDistance=2091.2 maxSpeed=600.0 pawn=V(X=783.05, Y=-459.55, Z=90.15) target=V(X=500.53, Y=-2061.66, Z=-19871.91)). Samples: t=6.55 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 target=-100.0/1627 moves=1 | t=6.57 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 target=-100.0/1627 moves=1 | t=6.58 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 target=-100.0/1627 moves=1 | t=6.60 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 target=-100.0/1627 moves=1 | t=6.62 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 target=-100.0/1627 moves=1 | t=6.64 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 target=-100.0/1627 moves=1 | t=6.65 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 target=-100.0/1627 moves=1 | t=6.67 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 target=-100.0/1627 moves=1 | t=6.68 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 target=-100.0/1627 moves=1 | t=6.70 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 target=-100.0/1627 moves=1 | t=6.72 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 target=-100.0/1627 moves=1 | t=6.74 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 target=-100.0/1627 moves=1 | t=6.76 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 target=-100.0/1627 moves=1 | t=6.77 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 target=-100.0/1627 moves=1 | t=6.79 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 target=-100.0/1627 moves=1 | t=6.81 p=2 s=0 body=71.4 vel=0.0 speed=0.0 next=149.6/908 ta
+- Drone.Integration.ExtendedRoleDrones: Expected 'Fiber Pawn uses the DroneSpy body and four separated rotor meshes' to be true.
+- Drone.Integration.RoleDroneAssets: Expected 'Role Pawn references exactly its selected Drone Pack meshes' to be true.
+- Drone.Prototype.FlightProfiles: Expected 'FPV Strike caps world vertical speed at 30 m/s' to be true.
+- Drone.Signal.ControlLink: Expected 'Real Move/Altitude handlers queue pilot input while connected' to be false.; Expected 'Fresh Move input works again after reconnect' to be false.
+- Drone.Flow.GamepadMissionFlowPIE: [UI-PAD] FAIL: A again on the chosen Hover card → Briefing with focus on the launch button (state=3, player=BP_DroneFrontEndPlayerController_C_0, Slate focus=SButton [Button.cpp(67)], highlighted=FinishMissionBriefingButton, droneCard=-1)
+- Drone.Flow.KeyboardStoryFlowPIE: [UI-KEY] FAIL: Enter again → Briefing with focus on the start button (state=3, Slate focus=SButton [Button.cpp(67)], highlighted=FinishMissionBriefingButton, card=-1, drone=-1)
+- Drone.Flow.MissionEntryPIE: Expected 'Native Selection fallback is usable without a finished WBP' to be true.; Expected 'Mission Success creates the Result Widget' to be not null.
+- Drone.Flow.TutorialProgression: Expected 'Next lesson is the following playable one' to be Mission.Tutorial.FPV, but it was Mission.Tutorial.GateFlight.; Expected 'Next lesson becomes the selection' to be Mission.Tutorial.FPV, but it was Mission.Tutorial.GateFlight.
+- Drone.Audio.UserCombat.SpatialFar: Synchronous WAV export from the same PIE mixer failed
+- Drone.Audio.UserUI.CountdownLifecycle: Same-device synchronous UI mixer WAV export failed
+- Drone.Audio.UserUI.HealthLifecycleAndMasterMute: Same-device synchronous UI mixer WAV export failed
+- Drone.Tutorial.TUTMapLaunchPIE.FPV: Expected 'No arm key is needed before the real rear impact' to be true.; Expected 'Actual FPV lesson vehicle is destroyed in one impact' to be true.
+- Drone.Tutorial.TUTMapLaunchPIE.Hovering: Expected 'Actual lesson goal completes without a return step' to be true.
+- Drone.Tutorial.TUTMapLaunchPIE.LOS: LOS takeoff advances to forward: The two values are not equal.; LOS still requires its backward return: The two values are not equal.
+- Drone.Tutorial.TUTMapLaunchPIE.StoryM1: Expected 'Actual Story goal completes immediately without return' to be true.
+- Drone.Tutorial.TUTMapLaunchPIE.StoryM2: Expected 'StoryM2: drone starts over SM_helicopter_base' to be true.; Expected 'Actual FPV sweep intercepts the Story vehicle' to be true.
+- Drone.Tutorial.TUTMapLaunchPIE.StoryM3: Expected 'StoryM3: objectives come from the lesson DA' to be 1, but it was 2.; Expected 'Actual Story goal completes immediately without return' to be true.
+- Drone.Tutorial.TUTMapLaunchPIE.StoryM4: Expected 'StoryM4: lesson drone is selected' to be true.; Expected 'StoryM4: lesson launches' to be true.
+- Drone.Tutorial.TUTMapLaunchPIE.StoryM4_Start1: Expected 'StoryM4_Start1: lesson drone is selected' to be true.; Expected 'StoryM4_Start1: lesson launches' to be true.
+- Drone.Tutorial.TUTMapLaunchPIE.StoryM4_Start2: Expected 'StoryM4_Start2: lesson drone is selected' to be true.; Expected 'StoryM4_Start2: lesson launches' to be true.
+- Drone.Tutorial.TUTMapLaunchPIE.StoryM4_Start3: Expected 'StoryM4_Start3: lesson drone is selected' to be true.; Expected 'StoryM4_Start3: lesson launches' to be true.
+- Drone.Tutorial.HoverMissionPIE: Expected 'Lesson releases camera at result' to be false.; Expected 'Normal drone view restored' to be true.
+- Drone.Tutorial.IndependentMapEntryPIE: Expected 'Lesson releases camera at result' to be false.; Expected 'Normal drone view restored' to be true.
+- Drone.Tutorial.ObserverLessonPIE: Expected 'Lesson releases camera at result' to be false.; Expected 'Normal drone view restored' to be true.
+- Drone.UI.StoryPresentation.Data: Expected 'Short goal follows the current execution rule' to be "광섬유 드론으로 재밍 구역을 완전히 통과하세요.", but it was "재밍 레이더 파괴 → 거점 방어 포탑 파괴".; Expected 'Short goal follows the current execution rule' to be "지휘 표적 세 개를 모두 파괴하세요.", but it was "재밍 레이더 파괴 → 패트리어트 미사일 발사대 파괴".
+- Drone.UI.StoryPresentation.Layout1280: Expected 'Short goal follows the current execution rule' to be "광섬유 드론으로 재밍 구역을 완전히 통과하세요.", but it was "재밍 레이더 파괴 → 거점 방어 포탑 파괴".; Expected 'Short goal follows the current execution rule' to be "지휘 표적 세 개를 모두 파괴하세요.", but it was "재밍 레이더 파괴 → 패트리어트 미사일 발사대 파괴".
+- Drone.UI.StoryPresentation.Layout1920: Expected 'Short goal follows the current execution rule' to be "광섬유 드론으로 재밍 구역을 완전히 통과하세요.", but it was "재밍 레이더 파괴 → 거점 방어 포탑 파괴".; Expected 'Short goal follows the current execution rule' to be "지휘 표적 세 개를 모두 파괴하세요.", but it was "재밍 레이더 파괴 → 패트리어트 미사일 발사대 파괴".
+- Drone.UI.TrainingPresentationCapture.1280: Expected 'The preview actually belongs to the selected mission' to be true.; Presentation capture timed out
+- Drone.UI.TrainingPresentationCapture.1920: Expected 'The preview actually belongs to the selected mission' to be true.; Presentation capture timed out
+- Drone.UI.TrainingPresentationCapture.RacingMap1: Expected 'The preview actually belongs to the selected mission' to be true.; Expected 'The authored close-map photo is fitted without extra UI cropping' to be true.
+- Drone.UI.TrainingPresentationCapture.RacingMap2: Expected 'The preview actually belongs to the selected mission' to be true.; Expected 'The authored close-map photo is fitted without extra UI cropping' to be true.
+- Drone.UI.TrainingPresentationCapture.RacingMap3: Expected 'The preview actually belongs to the selected mission' to be true.; Expected 'The authored close-map photo is fitted without extra UI cropping' to be true.
+- Drone.UI.AllDesignerContract: Start action bottom-right anchor: The two values are not equal.; Start action common outer margin: The two values are not equal.
+- Drone.UI.PauseSettingsCheckboxClickPIE: Pause VSyncCheck mouse click toggles immediately: The two values are equal.; Pause VSyncCheck mouse click is still applied 0.5s later: The two values are equal.
+- Drone.UI.SelectUIPresentationPIE: Expected 'Start keeps the authored corner action size' to be true.; Expected 'Start chevrons retain full geometry' to be true.
+- Drone.UI.SettingsCheckboxClickPIE: Title VSyncCheck mouse click toggles immediately: The two values are equal.; Title VSyncCheck mouse click is still applied 0.5s later: The two values are equal.
+- KnownIssues.Flow.LobbyLayoutStabilityPIE: [DEBUG-lobby-layout] Probe requires the actual native-fallback FrontEnd BP Root and Slate
+- KnownIssues.Tutorial.TrainingAssets: Expected 'Training Map has one Recon role test target' to be 1, but it was 0.; Expected 'Training Map has one Impact role test target' to be 1, but it was 0.
+- KnownIssues.Tutorial.TrainingPIESmoke: Expected 'Training PIE contains a saved RecastNavMesh Actor' to be true.; Expected 'Training PIE Gate Sequence contains every spawned Gate' to be 102, but it was 92.
+
+후속 재검사:
+
+- Drone.Flow.GamepadMissionFlowPIE: Fail→Fail (FLOW_RECHECK)
+- Drone.Flow.GamepadNavigationPIE: Fail→Success (FLOW_RECHECK)
+- Drone.Flow.KeyboardStoryFlowPIE: Fail→Fail (FLOW_RECHECK)
+- Drone.Flow.MissionEntryPIE: Fail→Fail (FLOW_RECHECK)
+- Drone.Flow.PauseMenuRacingPIE: Fail→Success (FLOW_RECHECK)
+- Drone.Audio.UserCombat.SpatialFar: Fail→Fail (EVIDENCE_RECHECK)
+- Drone.Audio.UserUI.CountdownLifecycle: Fail→Fail (EVIDENCE_RECHECK)
+- Drone.Audio.UserUI.HealthLifecycleAndMasterMute: Fail→Fail (EVIDENCE_RECHECK)
+- Drone.Mission.ActualStoryStages.M1: Fail→Success (EVIDENCE_RECHECK)
+
+## 실패 해석과 우선순위
+
+- **재검사 결과**: 영상 옵션 없이 표준 시험 창 조건으로 분리한 9개 중 GamepadNavigationPIE·PauseMenuRacingPIE·ActualStoryStages.M1은 통과했다. 일반 패드/키보드 흐름2개는 최초 타이틀 포커스를 지나 브리핑의 시작 버튼 기대에서 실패했으며, 실제 강조 위젯은 FinishMissionBriefingButton이었다. MissionEntryPIE도 기존 실패가 남았다. WAV 수집3개는 새 프로세스에서도 동일한 수집/파일 내보내기 오류였다. 1차 실패43개를 보존하고 최신40개와 구분한다.
+- **M4 데이터 불일치 확인**: 읽기 전용 조회에서 Endgame DA의 DefaultDroneId는 `Drone.GroundUGV.Greybox`였다. 현재 출격 정책은 초기 `Drone.FiberOptic.Greybox` 1종이며, 옛 TUT M4 검사는 DA 기본 기체를 직접 선택한다(DroneTutorialTUTMapsPIETest.cpp:258/277). 따라서 이 4개 실패는 허용되지 않는 UGV 선택부터 시작한다. 새로운 ActualStoryStages.M4는 현행 Fiber로 통과했다. DA 기본값과 현행 정책의 정합·세 시작점 실제 경로는 후속 대상이며, 시작점 UI 자체가 깨졌다고 확정하지 않는다. M3 DA 기본값은 Fiber다.
+- **외형 자산 실패2개는 경로 문자열 문제 확인**: Scout/Fiber의 실제 본체·로터는 DroneSky 경로다. 검사가 기대하는 DroneSpy 6개 경로를 엔진으로 읽으면 모두 같은 DroneSky 자산으로 리다이렉트됐다. 실제 Scout6/Fiber5/Drop8 메시 집합은 해석된 기대 자산과 맞는다. 리다이렉트를 해석하지 않는 옛 문자열 비교가 실패한 것이며 메시 파일 누락으로 표시하지 않는다(ROLE_ASSET_READONLY.json). 자동 검사 판정 자체는 Fail로 보존했다.
+- **실제 동작을 더 확인할 경로**: 옛 수업의 이륙/복귀/완료·결과 카메라 해제, Story M1/2 완료, M4 시작지점 선택 경로와 메뉴 최초 포커스·결과창 흐름. 최신 단계 검사 성공만으로 이 실패를 정상 처리하지 않는다. M4 옛 검사는 기체 선택/출격부터 실패한 뒤 시작점 위젯을 180초 기다렸으므로, 시작점 UI 자체의 고장으로 단정할 수 없다.
+- **Training 맵 구성 차이**: `KnownIssues.Tutorial.TrainingPIESmoke`에서 저장 RecastNavMesh 부재와 Gate Sequence 92/102가 관측됐다. `TrainingAssets`는 역할 표적/화물, 전체 게이트 수와 프레임 메시 수에 옛 생성맵 계약을 요구해 실패했다. 팀원 제작 맵을 시험용으로 재생성하거나 저장해 맞추지 않았다.
+- **확정된 오래된 기대**: `FlightProfiles`는 30m/s를 기대하나 현재 설정은 36m/s다. `StoryPresentation` 3개는 M3 ‘재밍 구역 이탈’/M4 ‘지휘 표적3개’를 기대하며 현재 ‘재머 파괴 후 추가 타격’ 정책과 다르다. 옛 StoryM3 검사의 목표1개 기대와 TutorialProgression의 수업 순서/준비 중 기대도 현행 정책과 다르다. 이 검사들의 다른 실패까지 모두 같은 원인이라고 확정하지 않는다.
+- **모터/센서 전제**: `ControlLink` fixture는 모터를 켜지 않은 채 Move 입력 큐 생성을 기대하지만 현재 Move는 미시동이면 반환한다(DroneFlightPawn.cpp:2522). 옛 FPV 수업 검사는 시동 없이 뒤쪽 실제 충돌 기폭을 기대한다. 사용자 결정인 초기 지상 폭발 방지·좁은 전면 중앙 센서와 대조해야 하며, 검사를 맞추려고 생산 안전 조건을 제거하지 않았다.
+- **UI 검사 전제**: TrainingPresentationCapture 5개는 루트 WidgetTree에서 사진/안내를 직접 찾는다. 현행 루트는 자식 Designer 화면 내부까지 찾는 FindDesignerPart를 사용한다(DroneFrontEndRootWidget.cpp:1555/1606/1659). 따라서 안내 위젯 대기는 실제 화면 미표시의 증거가 아니다. 레이싱 사진 Fit 기대와 현재 Fill 설정 차이는 별도다. 체크박스2개 검사는 스크롤 밖 항목의 크기0 위치를 클릭했고 Enter는 통과했다. 실제 캡처도 설정 상단만 보인다. 마우스 고장으로 단정하지 않는다.
+- **START 검사**: AllDesignerContract의 앵커/여백 수치와 SelectUIPresentationPIE의 저장 크기·화살표 높이 기대가 실패했다. 반면 WideCameraMissionPresentation은 1280/1920에서 실제 START 우하단 기준선 일치를 확인했다. 저장 슬롯 수치와 표시 결과를 구분하며, 현행 크기가 디자인상 적절한지는 별도다. M1 캡처의 사진에는 명암·그림자가 보였다.
+- **AI 검사**: ShotgunSystemsTestMapPIE의 추격 표적이 약199m 아래로 낙하했다. fixture에서 비행 시동이 없는 점은 확인했지만 추격 구현 결함 여부는 미확정이다.
+- **표시 경고**: 게이트 `MI_DroneTrainingGate_02_Current`의 Nanite 사용 플래그, 케이블 `MI_cable`의 SplineMeshes 사용 플래그가 없어 게임에서 기본 머티리얼을 쓴다는 경고가 있었다. 이번에는 머티리얼을 저장·수정하지 않았다. 화면 영향 확인과 자산 담당 조정이 필요하다.
+- **맵 충돌 경고**: Battlefield의 일부 콘크리트 방벽 spline 컴포넌트와 철조망에는 X축 Scale=0으로 유효하지 않은 물리 Body가 생긴다는 경고가 있었다. 이번에는 제작 맵을 저장하지 않았다. 경고만으로 사용자가 겪은 허공 충돌과 동일하다고 단정하지 않지만 실제 배치/충돌 검토 대상이다.
+- **오디오 검사**: 실제 RacingMap1/StoryM4 이벤트 검사는 통과했다. 일부 WAV 증거 수집 실패는 소리가 실제로 안 난다는 판정과 구분한다. 후속 재검사 상태를 아래 표와 원시 JSON에서 따른다. 청감 확인은 수행하지 않았다.
+
+모든 실패 원문과 1차 결과는 보존했다. 현재 코드/자산을 바꿔 검사를 통과시키는 작업은 이번 점검에서 하지 않았다. 물리 입력 주입/순간이동/자동 피해에 의한 성공은 손 조종 완주와 다르다. 실제 플스·InterLink 축/버튼 입력과 청감·독립 게임창·Cook/패키징은 별도 확인 대상이다.
+
+Content 패키지9845개 기본 헤더 이상/LFS 포인터0개, 전체 Content 맵75개 중 프로젝트 저작 맵48개는 별도 SHA보호다. 헤더 검사를 모든 자산 로드/Cook으로 표시하지 않는다.
+
+- Space 동반 갱신: 진행상황 sequence148·테스트 가이드 sequence92의 현재 블록2개 모두 applied 후 정확한 본문 readback 일치. 기존 Page만 수정, 기획/BP 가이드·공유 권한·Trello·예약은 변경하지 않았다. 로컬 원시 로그는 업로드하지 않았다. 이번 소스/자산·HEAD·Saved 최종 대조도 일치하며 Commit/Push 없음.
+
+## 2026-11-04 — 전체 점검 실패 수선과 재검사
+
+D PC Unreal `main 682852c5`·MD `main d955b5e`와 기존 로컬 변경을 보존했다. 사용자의 실제 문제 수선/낡은 검사 최신화/전체 재실행 지시를 수행했다. Commit/Push·Trello·공유 권한·예약 변경은 없다. 엔진/Build/PIE/자산 작업은 `/root/pilot_shortcuts_restart` 한 곳만 담당하고 Root가 결과를 통합했다. 물리/Tutorial·UI 담당은 지정 Source만 수선하고 준비 장벽 뒤 동결했다.
+
+실제 수선: M4 저장 DA 기본UGV를 초기 FiberOptic 정책과 맞췄다. asset 변경 전 B01 T01에서 기대Fiber/실제UGV 오류 하나를 재현하고, 적용 후 새 프로세스 verify에서 재저장0으로 확인했다. Allowed/목표/미션맵·세 시작점을 보존했다. Gate Current MIC Nanite와 OilRig cable MIC SplineMeshes 사용 플래그만 개별 override로 수선했고 부모/스칼라/벡터/텍스처를 보존했다. 적용 자산은 이3개, 제작 맵 저장0이다. 실제 M4 기본/Start1~3에서 재머 전부 해제→새 전투 기체→Patriot 진행, 실제 M1 물리 배송과 FPV/M2 활성 전면 센서도 통과했다.
+
+M1 Game World의 지정 Battlefield barrier/barbed-wire 계열 중 축 배율0인 section만 충돌/overlap/nav 기여를 끈다. 실제 M1에서5개 비차단·정상300개 보존, 전선18개 비차단·기둥23개 차단과 외형/배치를 확인했다. 원본 자산 로딩 Body 경고를 없앴다고 표시하지 않는다. 원본 맵/BP는 저장하지 않았다.
+
+로비는 정확 게임 SWindow의 자연 present와 같은 epoch paint 기하로 확인했다. D02 global screenshot은 첫 장이 다른 Editor 표면/후속 phase여서 가시 첫 프레임 근거에서 제외했다. D03 실제 첫 UI의 부제목/구분선·본문·정보행 약21px 이동을 재현했다. D04 초기 preview 선채움으로 첫 진입은 해결했으나 실제 Down→M2의 긴 부제목에서 같은 겹침이 남았다. 최종 수선은 최초 배치 전 실제 preview를 채우고, NativeTick에서 preview가 실제로 바뀌는 분기에서만 layout prepass1회를 수행한다. Flow 선택/폰트/좌표/폭/Wrap·작성 WBP 변경0이다. START4곳의 실제1280/1920렌더는 기존2design-px 기준을 통과해 제품수선 후보를 폐기했다.
+
+낡은 검사는 리다이렉터/현행36m/s·실제 모터 시동/재연결 interlock·현재8수업/목표/활성 damage capsule·비동기 결과 UI 완료·저장 child Designer/실제 스크롤과 마우스 hit path로 갱신했다. TrainingAssets는 별도 경량 TestMap, 실제 Production readonly smoke는 active92/sequence92와 동일기하 비활성10 및 실제 ground Nav consumer 조건을 검사한다. 경고 Occurrences0이 UE5.8에서 필수 출현이라는 잘못된 전제만 optional -1로 바꿨다. 로비의 정상 scroll/content-fit/화면 밖 미배치 항목은 실제 visible fixed geometry와 구분하고2px 허용값을 유지한다. 생산 물리/모터 안전을 단언에 맞춰 바꾸거나 목표를 강제 완료하지 않았다. 오디오3개는 같은-device silent submix 휴면 때문에 empty export가 났으며 process 대조→fixture 범위 cvar/원복으로 실제 PCM·파형·peak/loop/pause/mute/export를 유지했다. 청감 Pass가 아니다.
+
+중간 실패도 보존했다. B01 집중F02는25완료 후 낡은 legend 열의 null 접근으로 중단돼 나머지12는 미완료였다. B02 TObjectPtr compile 오류와 B05 멤버명 shadow compile 오류는 test 단위 최소 교정 뒤 별도 새 Build로 진행했다. B03 집중22개 최종19성공/3실패와 D01~D04 원시 실패/첫 프레임 PNG는 최종 성공으로 덮어쓰지 않았다.
+
+첫 전체 시도는471개까지 실행하고466실제성공/4실패/1스킵, 남은103미실행으로 원형을 보존했다. G03에서 승인된 M4 기본 기체 수선과 달리 `StoryPhysicsTestMaps`가 아직UGV를 기대하는1개 실패를 발견해 기대값 한 줄만FiberOptic으로 맞췄다. 나머지 맵·목표·그물/벽 단언과 제품 Source는 B08 이후 그대로다.
+
+첫 전체 시도에서 CORE 실제284/CSV스킵1은 정상이나 FLOW의 패드·키보드 카드→START Down 경로2개가 실패했다. 반복 PIE 중 systemresolution metadata가 줄었고 패드 실행 구간에는1196×160이 기록됐다. 초기 조사에서 키보드 실패 시1190×86이라고 해석했으나, 실행별 timeline 재대조 결과 그 값은 다음 MissionEntry 검사 구간이므로 정정했다. 시스템 해상도와 실제 game viewport도 구분한다. UE5.8 PlayLevel.cpp의 OnPIEWindowClosed가 client 크기를 기록하고, EndPIE가 CenterNewWindow=false이면 그 값을 CDO NewWindowWidth/Height에 다시 넣는 경로를 1차 소스로 확인했다. 시작 때 크기를 한 번만 지정하던 낡은 Saved harness 전제를 보완해, 백업된 설정을 최종 원복하는 실행 범위 안에서 CenterNewWindow=true와 초기1280×720으로 크기 재사용 오염을 차단했다. 같은 DLL의 FLOW55 대조를 통과했고 V2 전체 재실행에서 실제 game viewport/CDO를 관측했다. LastSize는 Python 보호 필드여서 미측정으로 명시했다. 이후 원래 두 Down 경로를 추가 키/직접 focus 없이 검사했다. 이전 시도의 성공을 최종 전체에 합산하지 않았다. harness 원형/변형·해시·실제 창 크기와 실패는 실행 보고서에 보존한다.
+
+전체 B09_FINAL_EXPECTED_M4 Build 39.58초 성공, DLL SHA256 `54194CD409C790F79086C7E19957474DE0CEA4A70DF13BEDE854BE76500FB9DB`. 이 B09·V2의 여섯 분야 새 프로세스에서 Editor 고유574개(작성 도구8개 제외)를 모두 실행한 원형은 실제568 Success·Fail5·외부CSV 부재1 Skip이다. CORE285/FLOW55/MISSION131/UI95/KNOWN3/MEDIA5 전부 포함, MEDIA5에만 영상 flag를 사용했다. 나침반1280의 정확client 크기 단언에서1274가 나왔고, 나침반 목표/표시 단언 오류는 없었다. ApprovedVisual4개는 이전 v1 PNG와 파일명 충돌로 실패했고 게임/기록/UI 판정 오류는 없었다. 제품·헤더·자산·V2 환경을 보존하고 테스트3파일만 수선했다. 나침반/Approved의 창 크기 setup을 실제 game viewport residual 보정으로 맞췄다. 최대3회/5초 안에 요청width/height를 정확히 만족해야 하며 원래 width 단언/모든 목표 검사를 유지하고 height 엄격 단언을 추가했다.
+
+ApprovedVisual은 case·UTC·GUID invocation 폴더를 한 번 생성해 widget/owned viewport 캡처와 progress/record sandbox를 함께 격리했다. 기존 비덮어쓰기 단언을 유지하고 viewport 저장에도 추가했으며, 지연된 전역 screenshot 대신 실제 World 소유 창을 동기 캡처하고 전후 client 크기를 엄격히 확인한다. 같은 CLI stage의 Racing1920 반복1회도 별도로 검사했다. 구 v1 관측본30파일은 불변 대조했다. H04 이전 위젯 PNG14개는 원래 guard로 보존됐지만, 전역 screenshot16개는 H04 때 갱신됐고 이전 byte 백업을 찾지 못했으므로 그 원본 보존을 주장하지 않는다. 현재 관측본/해시와 원시 로그를 보존했으며 프로젝트 작성 자산·맵과는 별개인 자동 생성 캡처다.
+
+B10 첫 fixture 빌드는 Approved의 double RoundToInt 반환 int64와 expected int32의 TestEqual 형식 불일치4곳으로 실패했다. 엔진/컴파일러0 확인 뒤 실제값4표현만 명시 int32 cast로 맞췄고 수치·허용값·판정은 바꾸지 않았다. 원시 실패 빌드와 다음 B12을 구분한다.
+
+B11 Build14.76초와 영향8개 검사에서는 직접 영향6+AllDesigner가 통과했고 대표 KnownLobby만 첫 프레임 제목 할당 높이3.768design-px 차이로 실패했다. 같은 CLI의 Racing1920 반복도 별도 고유 폴더/JSON과 구v1 30SHA불변으로 통과했다. 원시 자연PNG18장을 보존해 제목glyph는 같고 아래문구가2~3px 움직임을 확인했다. 직접 실제client는1280×722로 요청720과 달랐다. UE shortest-side DPI curve와 SScaleBox 첫 normalizing prepass 근거를 대조하고, 제품 폰트/레이아웃을 바꾸기 전에 검사의 Opening host를 정확1280×720으로 보정했다. 양수인 같은 client/root paint scale의 서로 다른 두 자연 Title 프레임이 확인된 뒤 최초 Lobby 동작을 요청하며, Lobby 선행paint·첫샘플폐기·extraDraw/prepass·2px완화는 없다. 원래 모든 단언을 유지한 B12로 같은 순서를 다시 검사했다. 보호 prepass-scale getter는 Source적용전검토에서 제거해 미측정으로 명시하고 공개paint geometry scale/높이만 읽었다.
+
+후속 B12_KNOWN_HOST_PRECONDITION Build 11.59초 성공, DLL `5CE2476F2C26F65C231EB3BAFBDA015463FF94D45EAF98E350843CB6FF971A3B`에서 영향 8개를 재검사했다. 제품 Source 동일성 SHA를 확인했으며 fixture 외 변화0이다. 최신 고유574개 판정은 **실제573 Success·Fail0·외부CSV 부재1 Skip**이다. `full_plus_targeted_fixture_recheck`로 전체 원형·후속 검사와 각test의최신stage/module을 보존했고, B12 한 DLL로 전체574가 통과했다고 표시하지 않는다. 이전시도471/C01/F06의 성공을 최종 전체로 합산하지 않았다. exact inventory 누락/중복/추가0이다.
+
+최종 보존: 모든 맵75 SHA일치·Production Training 저장0·Content 예정 자산3개 외 변경0·기존 Antigravity/OSD 변경 보존·사용자 Saved8개 byte원복·알려진 임시 검사 슬롯 정리·엔진/컴파일러0. 원시/최종 보고서와 각 실행 START/END·해시 정본은 `D:/JGY/project/drone/Saved/Automation/GeneralFix_20261104/REPORT.md`, `RESULTS_FULL_B09.json`, `RESULTS_VERIFIED_CURRENT.json`, `FINAL_RECEIPT.json`다. private Saved/대용량 자산은 Space에 업로드하지 않는다. 실물 키보드/PS/InterLink 손 조종·청감·전체 미션 손 조종 완주·독립 게임창/Cook/패키징은 별도다. MD/Space 동기화 결과는 후속 영수증을 따른다.
+
+MD/Drone Space 최종 동기화 완료: STATUS·WORKBOARD·세션 등록부·현재 가이드·known-fail 등록과 이번 WORKLOG를 갱신했다. STATUS27,184B·WORKBOARD29,797B(각30KB 이하), WORKLOG 기존 prefix SHA보존을 확인했다. 기존 진행 Page seq150/hash35b15997…와 테스트 가이드 seq94/hash65f31709…의 guarded 편집2건 및 exact readback2건을 확인했다. 가이드 edit의 중간 seq93 unknown outcome은 같은 stream readback으로 이미 적용을 확인해 재시도하지 않았다. 새 Page·로그/자산 업로드·공유/Trello/예약·Commit/Push는0이다. 영수증은 로컬 GeneralFix_20261104/ROOT_DOCS_RECEIPT.json·SPACE_SYNC.json이다.
+
+
+## 2026-11-05 — Git 점검과 정리
+
+사용자 요청은 Git 확인·정리다. 두 저장소 origin을 새로 fetch하고 실제 refs/index/worktree·변경 파일·LFS 본문을 대조했다. 이번에는 Commit/Push·Merge/Rebase·브랜치 삭제·reset/stash·엔진/Build/PIE를 하지 않았다.
+
+- Unreal main `871e87054b84fa6c03e09870e45c54b12e46a985`의 로컬 커밋 `1104`는 62파일(+2367/−353)이다. 직전 미션4 기본 기체/미션1 충돌/재질/로비 및 검사 수선·기존 Antigravity/OSD/영상 변경을 포함한다. 현재 origin/main은 `fbd691e3ffa4226c5a3c967695145bfa575e1b6a`의 `261104`이며 공통 조상은 `682852c5`다. HEAD...origin은 로컬1/원격1이다. 11/04의 에이전트 무커밋 기록은 당시 사실이며 새 커밋을 에이전트가 수행했다고 표시하지 않는다.
+- 원격 변경5개는 `Content/Drone/Maps/Missions/Lvl_Story03_VeilBreaker.umap`, `Content/Drone/Maps/Tutorial/TUT_Delivary_2.umap`, `Content/Drone/Maps/Tutorial/TUT_UGV_Turret.umap`와 기획 DOCX2개다. 로컬62개와 파일 교집합0이며 `merge-tree --write-tree --name-only --messages HEAD origin/main`은 exit0/충돌0, 예상 tree `4dffc830fa2a99a950f3737f04541cd2e11ddc79`다. 이는 미리보기이며 브랜치/index/작업맵에는 적용하지 않았다. 원격3맵 수신/적용 후 엔진 재검증은 별도다.
+- 변경된 로컬 LFS11개(미션 DA3·MediaSource3·재질2·영상3)의 실제 파일 크기/SHA256이 각 HEAD pointer와 모두 일치한다. 처음 없던 원격3맵 LFS 본문만 범위를 한정해 fetch했고 모두 pointer 크기/SHA256 일치를 확인했다. 원격 LFS 다운로드와 로컬 커밋의 Push/LFS 업로드는 구분한다.
+- B12 마지막 SOURCE_FREEZE의 Source/Config/Tools/RawInput732파일은 정리 전 모두 SHA 일치했다. 코드 동작 변경 없이 `Tools/AssetMigration/ConnectMissionBriefingMovies.py` EOF의 빈 줄1개만 제거했다. 기존 커밋에 대한 `show --check`의 단일 공백 오류를 발견해 작업본에서 수선했고, 최종 working diff check로 확인한다. 새 Build/자동검사 성공으로 표시하지 않는다.
+- MD main과 origin/main은 `d955b5e99c37b08652c6fb2f0fcecd90622a1911`로0/0이다. 기존 미커밋9문서·staged0/untracked0/unmerged0을 보존했다. STATUS Git 기준·WORKBOARD Next·세션 현재 소유권과 이번 WORKLOG만 최신화했다. 이전 날짜 기록은 수정하지 않고 이 절에 새 사실을 추가한다.
+- 현재 남은 Git 작업은 원격 맵/기획 변경을 로컬 수정과 병합한 뒤 검증하고, 요청된 경우 문서/공백 정리를 Commit/Push하는 것이다. 검증된 자동573/실패0/외부CSV 스킵1은 11/04 전체+집중 재검사이며, 아직 적용하지 않은 원격3맵의 통과로 확대하지 않는다. 실물 조종·청감·패키징 대기도 유지한다.
+
+근거는 작업공간 `artifacts/git-20261105/GIT_AUDIT_INITIAL.json`, `TESTED_SOURCE_COMPARISON.json`, `GIT_AUDIT_FINAL.json`이다. 마지막 문서는 작업 후 상태를 기록하며 원시 초깃값은 덮어쓰지 않는다. 기존 진행 Space의 현재 단락만 guarded 갱신하고 결과를 별도 receipt로 확인한다. private Git 메타데이터/로그·대용량 본문은 Space에 업로드하지 않는다.
+
+이번 진행 Space 저장 seq151·hash8acf3b1c…b1f003a와 같은 stream exact readback을 확인했다. Git 초기/최종 상태와 LFS14개 일치·두 저장소 diff check exit0을 영수증에 보존했다. 새 Page·Commit/Push·실제 병합은 없다.

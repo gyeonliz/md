@@ -8,7 +8,17 @@ Story의 현재 맵 연결은 아래 표가 정본이다. M2·M3는 원본 Milit
 
 기존 튜토리얼8개·Story4개·Racing 시험맵은 보존한다. 아래 날짜가 붙은 예전 맵 설명/검증은 당시 기록이며 최신 위치·정책은 위 가이드와 STATUS를 우선한다.
 
-현재 절차 기준: 2026-10-22 C PC Story4 데이터/사진 교차검토. 실행별 수치·실패와 이전PC 기록은 WORKLOG 정본이다.
+현재 절차는 실제 Source·저장 자산과 아래 점검 기준을 따른다. 실행별 수치·실패와 이전 PC 기록은 WORKLOG 정본이다.
+
+## 전체 자동 점검 기준
+
+Editor 실행 목록을 새로 조회해 자산을 작성하는 `Drone.Tools.*`만 제외하고 `Drone.*`와 `KnownIssues.*`를 함께 검사한다. `KnownIssues` 이름이나 이전 실패 등록만으로 현재 실패를 면제하지 않는다. 기본 실행과 영상 전용 `-DroneTestMissionMovies` 실행은 분리하고, 모든 분야의 DLL·Source가 같은지 대조한 뒤 고유 검사 수를 집계한다. 외부 SITL CSV가 없는 경우는 실제 통과와 구분한다. 끝나면 사용자 설정·기록을 원복하고 제작 맵의 해시를 확인한다.
+
+반복 PIE에서는 명목 해상도와 실제 viewport 크기를 함께 기록한다. UE5.8은 종료한 client 크기를 다음 PIE 기본 크기로 재사용하므로, 실행 시작에 크기를 한 번 지정하는 것만으로는 충분하지 않다. 전체 검사 harness는 실행 범위 안에서 기본 `CenterNewWindow=true`와1280×720을 사용해 누적 크기 오염을 차단하고, 별도 해상도를 요구하는 검사의 요청은 보존한다. 이 값은 창 요청 크기이며 제목 영역을 제외한 실제 client 크기와 구분한다. 원래 사용자 설정은 백업·복원하며 엔진/프로젝트 설정을 영구 변경하지 않는다. 지나치게 작아진 창에서 난 포커스 실패를 생산 navigation 수선으로 처리하지 않는다.
+
+1280/1920 화면 검사는 실제 GameViewport의 폭·높이를 정확히 확인한다. 창 외곽의 테두리/제목 영역 차이는 현재 실측값으로 보정하고 횟수·시간을 제한하며, 허용오차를 넓혀 통과시키지 않는다. World·Viewport·창이 교체되거나 실제 크기가 바뀌면 다시 확인한다. 캡처와 임시 진행/기록은 case·UTC·GUID로 만든 실행별 폴더 안에 격리하고 기존 파일 비덮어쓰기 조건을 유지한다. 일반 화면 캡처는 해당 World 소유 창에서 얻고 요청값·실제 client·PNG 외곽 크기를 구분한다. 첫 가시 프레임을 검증할 때는 추가 그리기를 유발하는 캡처 대신 자연 렌더 관측을 사용한다.
+
+기체 외형은 리다이렉터를 해석한 실제 자산을 비교하고, 시동·재연결·기폭 검사는 현재 모터 안전 조건과 활성 피격 부품을 사용한다. 결과 화면은 실제 비동기 표시 완료를 확인한다. UI는 저장된 자식 Designer에서 찾고, 마우스 클릭 전 실제 스크롤·화면 안 좌표를 확인한다. 화면 크기별 START 위치는 해당 크기로 실제 그린 기하를 측정한다. 로비의 첫 표시 검사는 정확한 게임 창의 자연 렌더 프레임을 사용하며, 의도된 스크롤·내용에 따른 높이·화면 밖 미배치 항목을 고정 배치 흔들림과 구분한다. 단언을 맞추려고 생산 물리값·안전 장치를 바꾸거나 목표를 강제 완료하지 않는다.
 
 ## 현행 비행모드와 SimParity 확인
 
@@ -74,7 +84,7 @@ MotionAudit는 실제 World/Pawn Tick의 반복 이착륙/에너지·시간·OFF
 1. `Drone.Camera.TerrainClearance.Native/SavedRoles`에서 기체는 지면 밖에 둔 채 FPV를 아래로 기울이고 전방 벽에 접근한다. 실제 CameraComponent·GetCameraView·플레이어 POV 모두 구형 probe가 지형 밖에 있어야 한다. 3인칭 스프링, 작은 Drop의 시작 겹침, 기존 HFOV·기체 회전·수직 하방/복귀도 대조한다. `Drone.Camera.NearPlaneClearance.Native/SavedFPV`는 HFOV117/150·Roll90°·비스듬한 하방에서 실제 투영행렬의 가까운 네 모서리/렌즈까지의 교차를 검사한다. 카메라 중심만 안전한 결과로 통과시키지 않는다.
 2. `Drone.Physics.TargetCapsuleCollision`은 native/저장 BP와 회전·비균일 스케일, 실제 M4 작은 포탑 Scale3/Patriot Scale8을 검사한다. 외형 30cm 밖의 허공과 드론 이동이 막히면 실패다. 캡슐 명중·실제 전방 기폭/낙하 폭탄의 단일 피해, 파괴 후 비활성 및 살아 있는 시설의 캡슐 Off→On 복구도 확인한다.
 3. `Drone.Mission.TargetCollision.ActualM4TurretsPIE`는 실제 맵에 배치된 18개 포탑에서 실행 후 허공 차단을 검사한다. 단위 fixture의 배치와 실제 맵·손조종을 구분한다. 병사·재머 AOE·건물/정문·비행 기체 Root/기폭 센서를 일괄 치환하지 않는다.
-4. `Drone.Mission.PowerLineCollision.ActualM1PIE`는 실제 M1의 전선 18개 NoCollision·기둥 23개 Blocking과 전선 중앙 선 추적/18cm sweep, 원래 배치·가시성 보존을 확인한다. `PowerLineCollision.Policy`는 같은 Actor의 전선/기둥 분리와 다른 미션·Editor World 비적용을 대조한다.
+4. `Drone.Mission.PowerLineCollision.ActualM1PIE`는 실제 M1의 전선 18개 NoCollision·기둥 23개 Blocking과 전선 중앙 선 추적/18cm sweep, 원래 배치·가시성 보존을 확인한다. 축 배율 0인 지정 spline 장식 section의 단독 sweep 비차단과 정상 이웃 section의 충돌 보존도 대조한다. `PowerLineCollision.Policy`는 같은 Actor의 전선/기둥 분리와 다른 미션·Editor World 비적용을 대조한다. 원본 로딩 경고와 실행 중 충돌 판정은 별도로 기록한다.
 5. `Drone.Settings.DisplayMode.PIEGuard`는 Game fixture의 WorldType만 임시 PIE로 지정한 UI guard 검사다. 실제 별도 `-game` 실행은 `Drone.Settings.DisplayMode.Standalone.Native/SavedWBP`와 `Drone.UI.DisplayMode.ActualStandalone`을 사용한다. 실제 SWindow·viewport와 Win32 제목줄/테두리·모니터 경계, 저장값 재읽기와 사용자 원래 설정 복원을 대조한다. packaged 실행 확인으로 확대하지 않는다.
 
 실행별 Build·원시 실패·fixture 수선·최종 고유 통과 수와 보존 해시는 [STATUS](../../STATUS.md)·[WORKLOG](../history/DRONE_WORKLOG.md)가 정본이다. 현재 테스트 소스만으로 통과를 추정하지 않는다. 자동 검사 기록을 사용자 기록/설정에 남기지 않으며 Production Training과 제품 맵은 저장하지 않는다. UE5.8의 `GGameUserSettingsIni`는 논리 설정 키일 수 있으므로 실제 파일 검사·백업은 초기화된 `FConfigBranch.IniPath`를 사용한다. 임의의 임시 경로로 전역 키를 바꾸거나 기대 저장값을 직접 넣지 않는다.

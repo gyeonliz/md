@@ -250,7 +250,7 @@ Box Overlap 없이 Sequencer나 다른 BP에서 진행할 때는 `Try Activate M
 
 ## 실패 처리와 체크포인트
 
-현재 Story 정책(2026-10-23 D PC)은 안정된 Mission ID에 `DroneStoryMissionPolicy`를 적용한다. 원본 DA의 `AllowedDroneIds`·옛 목표 배열을 다시 저장하지 않으므로 디스크 값만으로 현재 허용 목록을 판단하지 않는다.
+현재 Story 정책은 안정된 Mission ID에 `DroneStoryMissionPolicy`를 적용한다. 원본 DA의 `AllowedDroneIds`·옛 목표 배열을 다시 저장하지 않으므로 디스크 값만으로 현재 허용 목록을 판단하지 않는다. 저장된 `DefaultDroneId`도 첫 출격의 허용 기체와 일치해야 한다. M4의 `DA_Mission_Story_Endgame_Test`는 `FiberOptic`을 사용하고, 후속 전투 단계의 기체 교대와 세 시작지점은 별도로 유지한다.
 
 | 미션 | 초기 기체/목표 | 이후 단계 |
 |---|---|---|
@@ -319,6 +319,8 @@ M3는 배치된 체크포인트가 없으면 최초 출격 위치를 사용한�
 BP의 `TargetCapsules.PaddingCentimeters`는 월드 기준 기본 4cm(0~10cm)다. 메시 교체·여유값 변경 후 `RefreshCapsules()`로 다시 맞춘다. 일반 Mission 표적은 `bUseCapsuleDamageCollision=true`가 기본이며 시설에 기존 Box가 필요한 경우만 끄고 `RefreshDamageCapsules()`를 호출한다. 살아 있는 표적의 Off→On 전환은 복구하고, 파괴 후에는 캡슐이 다시 활성화되지 않는다. 재머의 기존 10cm 캡슐·병사·정문/건물·지형·재밍 AOE와 비행 기체 Sphere Root/전방 기폭 센서는 이 변환에 포함하지 않는다.
 
 M1 `Battlefield`의 전봇대 어셈블리에는 전선 `SM_Wire_01`과 기둥 `SM_TelephonePole`이 분리되어 있다. M1 시작 시 `DroneStoryEnvironmentCollision::ConfigureOverheadWires`가 전선 컴포넌트만 NoCollision으로 설정한다. 기둥의 충돌·전선 외형·배치/가시성과 원본 맵·BP·Mesh 자산은 유지한다. 다른 미션이나 Editor World에는 적용하지 않는다.
+
+같은 M1 Game World에서 `ConfigureDegenerateSplineSections`는 `/Game/Battlefield/`의 `BP_ConcreteBarriers_Spline`·`BP_BarbedWire` 계열 중 축 배율이 0인 장식 section만 충돌·overlap·navigation 기여를 해제한다. 정상 배율의 이웃 section과 외형·배치·작성 맵/BP는 보존한다. 런타임 판정 수선이므로 원본 자산 로딩 때의 0배율 Body 경고 제거와 구분한다.
 
 Director가 추가하는 `StoryTargetCapsules`는 표적 Health의 사망을 직접 감시한다. 기체 자폭·교대 때문에 Director의 진행 구독이 해제된 뒤 표적이 늦게 파괴돼도 물리 판정은 정리하며, 죽은 Health를 다시 Configure/Refresh해도 부활시키지 않는다. 네이티브 표적의 파괴 옵션·포탑 잔해 정책은 각 표적이 계속 소유한다.
 

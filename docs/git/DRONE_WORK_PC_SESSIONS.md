@@ -1,5 +1,7 @@
 # 작업컴 드론 세션 분리·시작 가이드
 
+현재 실행 소유권(2026-11-05): Git/MD/Space 정리는 Root만 수행했고 엔진은 사용하지 않았다. main871e8705·origin fbd691e3의1/1은 병합 대기다. 11/04의 실패 수선·Build·자산 저장/검증·집중검사와 전체574개는 `/root/pilot_shortcuts_restart` 한 곳만 실행했다. Root는 코드 통합/독립 검토·MD/Space·결과 집계, `/root/physics_formula_audit`와 `/root/pilot_contact_review`는 맡은 Source/검사 수선만 담당했다. 최종 실제573통과/실패0/외부CSV 스킵1, 엔진 종료·사용자 Saved8 복원·모든 맵75 SHA보존을 확인했다. 현재 결과는 STATUS와 WORKLOG 11/04 전체 점검 실패 수선과 재검사를 따른다. 아래 등록부와 이전 승인은 당시 이력이며 이번 Commit/Push 승인은 없다.
+
 기준: 2026-10-30 D PC. 총괄은 Source/로그 대조·MD/Space·최종 Commit/Push, 물리 구현과 오디오 원고는 별도 담당, 엔진/Build/PIE/RHI/import는 기존 실행 대화01a16105-48eb-7101-8b2a-0bc6b4a070e9 한 곳만 사용한다. 물리G69/RHI 접지 확인 뒤 제출음원14종·새Wave14/Bank1을 적용했고, 최종E2 같은DLL 고유91검사를 통과했다. 무음export3건은 별도 검사 프로세스 설정으로 재검사했으며 원시실패와 검증 리비전은 WORKLOG가 정본이다. 사용자가 두 작업 완료 후 Commit/Push를 새로 승인했으므로 이전 날짜 승인과 구분한다. 아래 등록부/48·41/63은 당시 이력이다.
 
 ## 현재 점검과 직전 담당 등록부

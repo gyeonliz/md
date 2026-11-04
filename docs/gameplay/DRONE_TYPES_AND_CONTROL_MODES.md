@@ -1,6 +1,6 @@
 # 드론 역할·조작 방식·물리 비행 기준
 
-기준: 2026-11-03 D PC, Unreal `6de91783` + 사용자 미커밋 변경. 실행 담당 Claude, 문서 반영 Codex. 구현·자동 검증·수동 대기는 [WORKLOG](../history/DRONE_WORKLOG.md#2026-11-03--skydive-실측-정합fpv-물리)를 따른다.
+기준: 2026-11-04 D PC, Unreal main `682852c5` + 로컬 감사·수정. 현재 실행 담당은 Codex 한 곳이며, 이전 Claude 실측 정합과 이번 Antigravity 변경 감사를 구분한다. [현재 감사 근거](../history/DRONE_WORKLOG.md#2026-11-04--antigravity-변경-감사와-병합-버전-검증)·[실측 정합 원문](../history/DRONE_WORKLOG.md#2026-11-03--skydive-실측-정합fpv-물리)을 따른다.
 
 ## 기획 자료 사용 원칙
 
@@ -20,7 +20,7 @@ Racer는 실제 레이싱용 기체, Scout/Drop/FPVStrike/FiberOptic은 전쟁 �
 | 축 | 현재 값 | 의미 |
 |---|---|---|
 | 임무 역할 `EDroneMissionRole` | 정찰, 드랍, FPV 자폭, 광섬유, 지상 UGV, 장거리 타격 | 기체가 임무에서 맡는 기능 |
-| 조작 방식 `EDroneControlMode` | 쉬운 조작, FPV 모드 1, FPV 모드 2 | 게임 조작은 목록 제거·enum Hidden, 옛 저장값은 쉬운 조작으로 이전 |
+| 조작 방식 `EDroneControlMode` | 쉬운 조작, 모드 1, 모드 2 | 게임 조작은 목록 제거·enum Hidden, 옛 저장값은 쉬운 조작으로 이전. 모드 1/2의 기존 enum 직렬화 값2/3은 유지 |
 | 물리 성능 `FDronePhysicalFlightSettings` | 무적재 최고속도 배율, Dry Mass, 합산 최대 추력, 모터 응답, 제곱 항력, 적재 속도 하한 | 기체 고유 성능과 Payload 하중 |
 
 느림/보통/빠름 사용자 선택은 폐기했다. 각 기체는 Data Asset에 기록된 기준 속도에 `UnloadedMaximumSpeedMultiplier`를 곱한 단일 무적재 성능을 사용한다. 현재 기본 배율 `1.25`는 기존 빠름 수준을 승격한 값이다. `EDroneHandlingPreset`과 `Stable/Balanced/Agile` 이름은 저장 Asset·Blueprint 함수 호환용으로만 남고 모든 런타임 요청을 `Balanced`로 정규화한다. FPV 계열은 송신기 Mode2·기본 자세 Angle이며 Mode1/2는 같은 물리 성능을 가진다.
@@ -88,7 +88,7 @@ FPVStrike/FiberOptic은 기존 자동 무장·해제 잠금을 유지한다. 자
 | FPVStrike·Racer·FiberOptic | Mode1/2·기본 Angle, Rate/Angle/Horizon 전환 | Rate는 수평 복귀 없음, Angle 최대60°·중립 수평, Horizon 중앙 복귀·스틱 끝에서 복귀 감소 |
 | UGV | 기존 지상 주행 | 비행 모드 순환 제외 |
 
-`F`/패드 `L3`/RC `Button3`로 순환하고 HUD는 `P-GPS`/`S-SPORT`/`A-ATTI`와 FPV 자세 모드를 표시한다. 선택은 다음 기체에 이어지고 디스크 저장은 설정 적용 때 수행한다. 실제 종료/재실행 복원·장치 체감은 확인 대기다. FPV OSD는 셀 전압·타이머·LQ·스로틀·인공수평선·조준선이다. DJI 모델값·튜닝 한계는 [물리 정본](DRONE_REALISTIC_HANDLING_PLAN.md#dji-교육-비행과-외형-기울기)을 따른다.
+`F`/패드 `L3`/RC `Button3`로 순환하고 HUD는 `P-GPS`/`S-SPORT`/`A-ATTI`와 FPV 자세 모드를 표시한다. 선택은 다음 기체에 이어지고 디스크 저장은 설정 적용 때 수행한다. 실제 종료/재실행 복원·장치 체감은 확인 대기다. FPV OSD는 사용자 결정대로 인공수평선·중앙 조준선을 유지하고 셀 전압·시간·LQ·스로틀 글자는 항상 숨긴다. Native 글자를 생성하지 않으며 저장/자식 WBP의 HudKitOsdVoltageText/TimerText/LinkText/ThrottleText도 숨긴다. WBP_DroneFlightHUDKit의 Drone|HUD|FPV OSD에서 bShowFpvOsd로 선 표시를 켜고 끄며 Horizon Max Pitch/Roll 기본20°/40°·Pitch Travel0.18을 조정한다. 모드1/2의 실기 송신기 1인칭에서만 보이고 Easy/3인칭에서는 숨긴다. DJI 모델값·튜닝 한계는 [물리 정본](DRONE_REALISTIC_HANDLING_PLAN.md#dji-교육-비행과-외형-기울기)을 따른다.
 
 ## 현재 조작 방식
 
