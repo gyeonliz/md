@@ -58,6 +58,10 @@ Native 미션 출격도 BeginPlay에서 위 Mission WBP 기본 화면7종을 로
 
 현재는 사용자가 새로 지급한 투명1920×1080 PNG5장을 `T_SelectDrone_{FPV,ScoutFiber,UGV,Racer,Drop}_Updated`로 연결한다. 한 기체의 SelectImage/CardSelectImage는 같은 텍스처를 사용하고 Fit을 켜 전체 비율을 보존한다. 원본은 `SourceArt/Selection/User_20261021_Updated`에 바이트 그대로 보관했다. 지급1번=FPV, 2번=정찰·광섬유 공용, 3번=UGV, 4번=스카이/레이싱, 5번=드랍이다. 사진 교체와3D 모델 연결은 별개다. 이전 User_20261021 원본18개·텍스처12개와 그 이전 사진은 보존돼 있다. 같은 텍스처 Reimport는 큰 사진/카드에 함께 반영되고, 별도 카드가 필요하면 CardSelectImage만 새로 지정한다.
 
+### 드랍 드론 출격 시점 선택
+
+Drop 기체의 카메라 선택 행은1인칭·3인칭·투하 카메라를 제공하며 마우스·키보드 Enter·패드 확인·InterLink 순차 탐색으로 선택한다. 카드 미리보기/확정과 START 잠금은 기존 규칙을 유지한다. `WBP_DroneSelection`의 `DropCameraModeRow`·`DropCameraModeButton`·`DropCameraModeButtonText`가 모두 있으면 작성한 Designer를 그대로 쓰고, 없으면 기존 조작법 컨트롤 상위 VerticalBox에 시점 행을 보충한다. Drop만 이 행을 표시한다. Pawn의 런타임 Blueprint API `SetCameraViewChoice(int32)`/`GetCameraViewChoice()`는0=1인칭·1=3인칭·2=투하이며, 선택창의 저장 경로 `CycleDropCameraMode`와 구분한다. 저장 우선순위·다음 출격/재출격·P 순환/우클릭 복귀·실제 LOS 예외는 [카메라 정본](DRONE_TYPES_AND_CONTROL_MODES.md#드랍-드론의-3시점-선택)을 따른다. 전역 설정의 기본 시점 목록은 기체 기본값·1인칭·3인칭을 유지한다. 설정창의 기본값 복원은 아직 편집값이며 Apply 성공 뒤에만 Drop 전용 선택도 해제되어 전역→기체 기본값으로 돌아간다. Cancel은 기존 Drop 선택을 유지하고 저장 실패는 이전 선택/flag를 복구한다.
+
 ### 드론 선택창 3D 모델·카메라 조정
 
 같은 DA의 `Drone Definition → Preview`에서 **Preview Actor Class**에 여러 메시가 조립된 기체 BP를 지정하거나, **Preview Mesh**에 단일 Static Mesh를 지정한다. 둘 다 있으면 Actor Class를 우선한다. 드랍을 포함해 복합 기체는 기존 기체 BP를 연결한다. 스카이/레이싱도 **BP_DroneRacerIntegration**을 지정해야 본체와 별도 프로펠러4개가 모두 나온다. `SM_Drone01Body`만 연결하면 본체만 표시된다. 임무 맵에서 비행하는 Pawn Class와 미리보기 슬롯은 구분돼 있어 미리보기만 교체할 수 있다.
@@ -248,7 +252,11 @@ Native 폴백의 기존 초기값은 목록 `(117,321)`·폭389, 프리뷰 `(556
 
 ### 시드 레이싱·로딩·일시정지 확인
 
-`ADroneProceduralCityGenerator`는 도시·날씨·코스를 단계 생성하고 같은 시드를 다시 사용할 수 있다. 지정/무작위 시드·난도별 기록을 확인하되 팀원 고정4코스 완성으로 표시하지 않는다. 미션 Controller는 생성/Story 준비 중 로딩과 취소, 미션 중 Esc/Start 일시정지·재개·재시작·타이틀 복귀를 연결한다. 일시정지 재시작은 같은 도시 시드를 예약한다. 로딩/기체 선택/결과 화면은 미션 중 Pause와 별도 뒤로 처리를 사용한다. 실제 프레임 정지/취소 복귀/재생성·첫 포커스는 현재HEAD Build/회귀 뒤 확인한다.
+로딩 최초 표시·준비 완료의 현재 계약은 아래 절차와 [실행 정본](../history/DRONE_WORKLOG.md#2026-11-05--정찰-카메라-고정과-맵-로딩-최초-표시)을 따른다. 정찰 수동 카메라는 [카메라 정본](DRONE_TYPES_AND_CONTROL_MODES.md#정찰-카메라의-수동각과-자세-분리)을 따른다.
+
+`ADroneProceduralCityGenerator`는 도시·날씨·코스를 단계 생성하고 같은 시드를 다시 쓴다. 미션 진입·재시작/재도전·이전/다음·로비/타이틀 이동은 Controller의 `OpenLevelAfterLoadingVisible` 경로가 출발 화면에 기존 로딩 UI를 먼저 붙이고 자연 paint→후속 게임 프레임→비차단 RHI fence 완료 뒤 `OpenLevel`을 요청한다. 추가 Draw/강제 prepass·고정 sleep은 쓰지 않는다. 첫 화면은 이미 올라온 LoadingImage/Thumbnail만 사용해 새 그림의 동기 로드로 표시를 늦추지 않으며 도착 맵의 기존 준비·이미지/단계 표시를 유지한다.
+
+준비가 끝나면 기체 선택을 즉시 열고 기존 fade는 그 위에서 진행한다. 옛 `ProceduralLoadingMinDisplaySeconds`/`ProceduralLoadingReadyHoldSeconds`는 자산 직렬화 호환용이며 강제 대기로 쓰지 않는다. 이미 확정된 blocking 맵 이동 구간은 취소 안내를 숨기고, 도착 후 도시 생성의 Esc/패드 B/InterLink 취소·같은 시드 재시작·기체 선택/결과의 뒤로·일시정지 동작은 기존 경로를 유지한다. 동일 Controller의 중복 이동을 거부하고 위젯은 이동 요청 동안 강한 참조로 보존하며 Controller/World 종료 때 정리한다. 화면을 그릴 수 없는 headless 경로는 기존 즉시 이동을 유지하며 화면 통과로 표시하지 않는다.
 
 ## 5. 회전 = 원형 코스 비행
 
@@ -314,7 +322,7 @@ Native 폴백의 기존 초기값은 목록 `(117,321)`·폭389, 프리뷰 `(556
 | 좌우 회전 감도(X) / 상하 시야 감도(Y) | 각각0.25~4배, 기존 기준1배 | 쉬운/게임 조작에서만 적용. 편집 후 Apply 때 같은 `DroneAudioSettings` SaveGame에 저장 |
 | 좌우 회전 / 상하 시야 반전 | 축별 On / Off, 기본 Off | 감도와 같은 pending·적용/취소·저장 경계. Acro/UGV에는 새 배율·반전을 적용하지 않음 |
 | FPV 수평 시야각 | 역할/프로필 기본값(0) 또는60~150° | 적용/취소/기본값·동일 사용자 설정 저장 경계. 최종 FPV에 적용하며3인칭·Drop 하부는 별도 |
-| 기본 시점 / 기본 조작 | 지원 시점·4조작 방식 | 저장 선택을 기체 선택/첫 출격/재출격의 초기값으로 사용. 화면에서 명시적으로 바꾼 조작은 갱신·출격 때 보존; LOS 고정 관찰 예외 유지 |
+| 기본 시점 / 기본 조작 | 기체 기본값·1인칭·3인칭 / 쉬운 조작·모드1·모드2 | 저장 선택을 첫 출격/재출격의 초기값으로 사용. Drop 전용 시점은 [선택 행](#드랍-드론-출격-시점-선택) 우선, LOS 고정 관찰 예외 유지 |
 
 - 전체 음량은 키보드 Enter·패드 확인·InterLink 노브 누름으로 조절을 시작한다. 조절 중 위아래는 음량을 올리고 내리며 항목 탐색으로 빠지지 않는다. 다시 확인하면 값을 유지하고, Esc/패드 취소/RC Cancel은 조절 진입 음량으로 즉시 미리듣기까지 원복한 뒤 조절만 끝낸다. 확인·취소를 놓기 전 반복으로 재진입하거나 설정 전체를 닫지 않는다. 이후 새 위아래 입력은 원래 항목 탐색을 한다.
 - Apply는 변경한 값만 확정하며 성공 후 편집 기준을 새 적용값으로 갱신한다. 화면을 자동 닫지는 않는다. 전체 음량 저장 실패는 상태 메시지로 표시하고 다시 적용할 수 있게 한다.

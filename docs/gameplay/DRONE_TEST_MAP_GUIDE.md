@@ -10,6 +10,31 @@ Story의 현재 맵 연결은 아래 표가 정본이다. M2·M3는 원본 Milit
 
 현재 절차는 실제 Source·저장 자산과 아래 점검 기준을 따른다. 실행별 수치·실패와 이전 PC 기록은 WORKLOG 정본이다.
 
+## Tutorial2 하늘 시야 재현과 판정
+
+Tutorial2 InterLink의 카메라 자동 상향 없음은 사용자 확인 범위다. 기본 RC 카메라축 미지정/명시 할당과 실제 진입·설정 회귀는 자동 검증됐으며, 최초 하늘 RED의 실제 원시 입력과 과거 누적 원인은 미확정이다. 공중 UI 입력 초기화로 같은 Mode2/HORIZON에서 모터가 꺼지는 별도 소프트웨어 경로를 실제 PIE로 재현·수선했다. 실물 전장치·최초 오류 순간과 동일 원인 확인·모든 비행 경로 통과로 확대하지 않는다. [최종 검증·제한 정본](../history/DRONE_WORKLOG.md#2026-11-05--카메라공중-ui-입력충돌-최종-검증과-전달).
+
+1. 실제 첫 수업 `Mission.Tutorial.Hover`의 `Tutorial/TUT_LOS` 완료→결과 Next→브리핑→`Mission.Tutorial.Hovering`의 `/Game/Drone/Maps/Tutorial/TUT_Hover`→기체 선택 START→시작 안내 START를 따른다. 로비 직접 Hovering 진입은 별도 대조 경로다. 자동 검사의 LOS 목표 완료는 공개 완료 함수 경계이며 손 조종 완주가 아니다.
+2. 실제 저장 설정을 자동화 초기화 뒤 복원하고, 첫 Pawn의 Mode2/control3·P_ASSIST/training1·명시적 시점 선택 없음/view-1→1인칭을 확인한다. 선택 ID뿐 아니라 실제 맵 패키지와 새 World/Controller/Pawn/안내창을 대조한다. 실제 버튼의 Slate hit path와 멈춤/재개 상태를 기록한다.
+3. 최초 표시·일시정지 전후·START 뒤, 시동/스로틀, 전진·해제·후진·해제·시점 왕복을 구분한다. 실제 Game World/Viewport 화면만 채택하며 검은 편집기 화면으로 최초 표시 정상 판정을 하지 않는다.
+4. 실제 오류 세션의 모터%·기체/카메라/PCM 시점·현재/직전 캐시·수동각/입력·IMC/매핑·포커스/마우스 캡처를 같은 시점에 대조한다. 공개 매핑 조회와 실제 Pawn 카메라 액션은 관측하지만 활성 IMC 목록/우선순위와 private 수동각 캐시 직접 조회는 미지원이다. 실제 세션2회에서 몸체 Pitch/Roll0°·Boom 상대 Pitch+60°·Camera 상대0°·CameraManager 액터 약+60°를 각각 관측했지만 내부 최종 POV/수동 캐시를 읽은 것은 아니다. 현재 PC.playerInput 속성 조회는 거부돼 runtime 입력/과거 delta 원인은UNKNOWN이다. PlayerInput 축0은 원시 HID 보고 수신이나 장치 중립의 증거가 아니다. 실물 키보드/마우스·플스·InterLink 조작은 각각 확인한다.
+
+수정 전 합성 키보드·모터49%의 고유2경로/3회는 당시 미재현 범위다. 최종 모듈/검사명·오류/경고와 재사용 결과는 [최종 검증·제한 정본](../history/DRONE_WORKLOG.md#2026-11-05--카메라공중-ui-입력충돌-최종-검증과-전달)을 따른다. 최신 사용자 저장 기준은 PostUserManualB07Save의99개이며 과거98/9를 최신 기준으로 덮어 복원하지 않는다. 엔진/Build/PIE/MCP는 실행 담당 한 곳만 사용한다.
+
+## 공중 UI 입력 해제와 모터 유지
+
+`Drone.Prototype.PIEAirborneUIReset.PauseResume/KeyboardRebind/DeviceRebind`와 `...LOS.PauseResume/KeyboardRebind/DeviceRebind`를 각각 실제 실행 목록과 대조한다. 원래 FPV3의 이름 아래 LOS 하위 이름을 두면 Unreal 계층에서 FPV3이 숨겨질 수 있으므로 이름/명령·실제 Report를 확인한다. 목록 누락을 통과나 notRun0으로 오해하지 않는다.
+
+기존 Prototype 실제 PIE의 FPV 기체·Mode2/HORIZON에서 RC 최하단→상승으로 시동·공중 상태를 먼저 증명한 뒤, pause/resume·키보드 재지정·RC 카메라 할당을 각각 실행한다. 같은 양의 RC 스로틀을 유지하고 새 low/arm/stop 입력 없이 모터·모드·스로틀을 확인한다. LOS 변형은 실제 Observer ViewTarget과 공개 방향 토글 ON을 조작 전후 대조한다. 이어 명시적 OFF 후 계속 높은 입력을 넣어 자동 재시동하지 않는지 확인한다. 설정은 메모리에서 복원하고 사용자 슬롯/맵을 저장하지 않는다.
+
+초기 Roll20°는 시험 조건이며 UI가 만든 기울기라는 뜻이 아니다. 출력0.6512는 명령값이고 모터OFF 중 실제 추력65%의 증거가 아니다. 최종 UI 로그는 짧은 복귀 구간을 관측하며, 명시 중립3초의 자유 비행 자세 복귀는 별도 검사다. 실제 USB/HID·손 조종·접지/충돌 원인은 자동 검사만으로 확정하지 않는다.
+
+## 튜토리얼/M1 충돌과 수평 복귀 확인
+
+실제 미션 ID·전체 World/DA 패키지와 막힌 경로의 HitActor/컴포넌트·메시·형상/프로필/채널을 먼저 확인한다. 허용된 M1+튜토리얼8개의 정확한 SM_Wire_01 또는 MOUT 전봇대/native CableComponent만 런타임 NoCollision으로 한다. FPV TUT_FPV_Target의 지정 native 물리벽16개만 별도 순수 차단체 조건으로 해제하며 태그·추가 컴포넌트·Hit/Overlap 이벤트·Overlap 응답이 있으면 제외한다. 전봇대/목표/게이트와 원본 자산은 보존한다. Editor 미리보기 충돌과 선택 미션의 런타임 적용을 구분한다.
+
+불필요한 차단 부품만 고치고 같은 Actor의 전봇대·정상 이웃·지면·게이트 순서/목표/배달 감지 overlap을 보존한다. 몸체/로터/카메라 경로와 정상 목표 완료를 각각 확인한다. Production `/Game/Drone/Maps/Lvl_DroneTraining`을 시험 저장·덮어쓰기·재생성하지 않는다. 허용된 Tutorial/M1 실맵 변경도 실행 담당이 원본 백업/해시와 재읽기 근거를 남긴다. 수평 복귀 증상은 모드 표시가 유지된 상태의 중립 후 기체 기울기 잔존이며 모드 자동 전환으로 단정하지 않는다.
+
 ## 전체 자동 점검 기준
 
 Editor 실행 목록을 새로 조회해 자산을 작성하는 `Drone.Tools.*`만 제외하고 `Drone.*`와 `KnownIssues.*`를 함께 검사한다. `KnownIssues` 이름이나 이전 실패 등록만으로 현재 실패를 면제하지 않는다. 기본 실행과 영상 전용 `-DroneTestMissionMovies` 실행은 분리하고, 모든 분야의 DLL·Source가 같은지 대조한 뒤 고유 검사 수를 집계한다. 외부 SITL CSV가 없는 경우는 실제 통과와 구분한다. 끝나면 사용자 설정·기록을 원복하고 제작 맵의 해시를 확인한다.
@@ -22,6 +47,14 @@ Editor 실행 목록을 새로 조회해 자산을 작성하는 `Drone.Tools.*`�
 
 ## 현행 비행모드와 SimParity 확인
 
+로딩 최초 표시 회귀 `Drone.Flow.LoadingBeforeTravelPIE`는 실제 저장 FrontEnd의 public 선택/확정/START→Controller→`PreLoadMap` 경계를 탄다. 실제 Story 정의를 transient 복제해 기존 경량 GoldenTimeTest 맵을 가리키는 최소 재현이며 자산/맵은 저장하지 않는다. 요청→최초 자연 paint 시간/프레임과 절대 firstPresent/nonblankPresent/PreLoad 진입 시각을 기록하고 실제 비영 backbuffer가 경계 이전에 출력돼야 통과다. 경계 뒤 Flush 완료를 경계 전 표시로 오인하지 않으며 이미 관찰한 첫 픽셀만 PNG로 보존한다. SWindow backbuffer와 실제 GameViewport 크기를 구분하고 추가 Draw/Prepass/스크린샷 요청·지연 주입을 하지 않는다. Story/도시 생성 준비·취소·재시작/복귀 회귀도 비교하며 옛0.95초 최소 표시/0.4초 캡처 대기 전제는 현재 요구로 대체한다.
+
+정찰 카메라 회귀는 기본 짐벌/진동 효과를 유지한 saved Scout BP의1·3인칭×쉬운/모드1/모드2에서 수동 상하→해제·전진/놓음/반전·시점 왕복을 실제 World.Tick/공개 PlayerCameraManager POV로 확인한다. 옛 Mode2 검사는 효과 전체OFF가 아니라 `TrainingFlightMode Off`여서 문제 짐벌 누설 경로가 비활성이었다. 기존 Racer/yaw 음성 대조와 오차 기준을 유지하고 실물 조종은 별도다. [현재 실행 정본](../history/DRONE_WORKLOG.md#2026-11-05--정찰-카메라-고정과-맵-로딩-최초-표시).
+
+Drop 시점 회귀는 실제 저장 WBP의 기체 선택행에서1인칭/3인칭/투하 선택·확인·재표시, Drop 전용 저장/복원과 미선택 시 전역 기본값 fallback을 본다. 출격·재출격 시 선택을 유지하고 비Drop/LOS 실제 ViewTarget에 영향을 주면 실패다. 시점 공통 Action은1→3→투하→1, Secondary는 투하 진입/직전 전방 시점 복귀를 확인하고, 설정 기본값 복원 후 Cancel은 Drop 선호 유지, Apply 성공은 Drop 선호 해제/fallback, 저장 실패는 선호값/flag 원복을 확인한다. 하부 수직·FOV·지형 관통 방지와 기존 입력/사람 방향 보조 회귀를 비교한다. 실제 장치 조작·화면 가독성은 자동 주입과 구분하며 [카메라 계약](DRONE_TYPES_AND_CONTROL_MODES.md#드랍-드론의-3시점-선택)·[최신 실행 범위](../history/DRONE_WORKLOG.md#2026-11-05--드랍-드론-3시점-선택)를 따른다.
+
+쉬운 조작 회귀는 `Drone.SimParity.TrainingPawnRoleScope`의 실제 saved Scout/Drop·PlayerController 시동·Move callback와 World.Tick으로 검사한다. 30/60/120fps·방향0/90도에서 이동/해제의 기존 제동·기울기·입력 연속성과 Space/Ctrl, 이동 중 반대 방향 명령을 본다. 실제 위치를 수평으로 옮기는 외부 변위를 가한 뒤 옛 좌표로 돌아오면 실패다. `TrainingBrakeNoPositionReturn`·`TrainingBrakeWindNoAnchor`는 같은 속도·입력·바람에서 좌표만 다른 두 경우의 속도 일치를 검사한다. `Drone.Input.ObserverRelativeMovement`는 실제 관찰 ViewTarget·모드1/2·방향/키 토글·실제 Pawn 1인칭/추적 금지와 숨은 카메라 플래그의 오판 방지를 확인한다. 관찰Yaw37°·5기체×2모드×기체Yaw4×입력8의320조건은 방향·대각입력 길이·기존Angle 축별 한도를 검사하고, 실제 Scout/Drop 월드4회는 방향 ON/OFF 입력을 검사한다. 순수 좌표 회전의 입력 길이를 보존하며 기존 Acro 축별 제한은 후단에서 유지한다. 이 숫자는 단일 자동 테스트 내부 조건 수이며 테스트 개수에 더하지 않는다. 단독 Pawn.Tick+합성 이동으로 실제 월드/컴포넌트 입력 순서를 대신하지 않는다. 실물 키보드/플스/InterLink 손 조종은 별도다.
+
 기준: 2026-11-03 D PC, Unreal `5905a3cb` + 사용자 미커밋 변경. Claude 실행 로그를 Codex가 읽기 대조했다. 성공·실패/수정 재검사는 [이번 WORKLOG](../history/DRONE_WORKLOG.md#2026-11-03--실기-정합배달-튜토리얼미션-사진-후속)가 정본이며 전체 Pass나 수동 Pass는 아니다.
 
 | 확인 대상 | 현재 코드·시험 계약 | 사람이 확인할 것 |
@@ -30,7 +63,7 @@ Editor 실행 목록을 새로 조회해 자산을 작성하는 `Drone.Tools.*`�
 | 시동·착륙 | `Drone.SimParity.FpvAirmodeArmToggle`, `FiberOpticAirmodeIdle`, `DjiCombinationStickStart`, `LandDetectorPx4Defaults`, `LandingMap1PIE`, `DjiLandingProtection`, `DjiPadRcSameClimb` | 실제 패드/RC 최저스로틀·arm·DJI CSC/착륙 완료/접지3초 정지/재시동, 벽/공중 접촉과 착륙 구분 |
 | 공력·전압·투하 | `AeroGroundEffectAndPropWashMath`, `AeroPawnLegacyAndRotor`, `BatterySagThrust`, `WindBuildingShelter`, `PayloadKernelMassChange`, `PayloadReleasePawn`, `PropDamageAndJello`(모두 `Drone.SimParity.*`) | 같은 자세/조건에서 지면·후류·바람·배터리와 투하 전후 속도 연속성·모터/화면 흔들림 |
 | 입력·지연 | `DataAssetInputAudit`, `RateCurve201`, `LegacyRateAndMotorStep`, `KernelRateAndMotorStep`, 착륙/충돌/입력→자세 지연 시험 | 기존 실물 축/반전/혼합 입력·중립/해제·설정 취소/재시작 확인. PIEInputLifecycle은 IMC53과 추가8매핑을 개별 검사하고 probe 전 시동 |
-| 렌더 스모크 | `Drone.SimParity.SmokeFlightPIE`: 실제 PIE Drop Mode2 GPS 전진/제동·FPV 1인칭 어안 켬/끔 같은 자세 캡처·자기 기체 숨김 | 렌더 실행 결과·PNG를 확보해 비교. NullRHI는 건너뛰므로 Success 상태만으로 화면 Pass 처리하지 않음 |
+| 렌더 스모크 | `Drone.SimParity.SmokeFlightPIE`: 실제 PIE Drop Mode2 속도 보조 전진/제동·FPV 1인칭 어안 켬/끔 같은 자세 캡처·자기 기체 숨김 | 렌더 실행 결과·PNG를 확보해 비교. NullRHI는 건너뛰므로 Success 상태만으로 화면 Pass 처리하지 않음 |
 | 국내 실기 기동 | `Drone.SimParity.KoreanPracticalExamAtti`: 지연0.3초 사람 모델의 ATTI 기동·정상/측풍 접근·비상 착륙 | 실제 사람 조작/자격 실기 합격을 대신하지 않음. 시험 소스의 평가기준 인용과 잠정 바람/기수 조건을 구분 |
 | SITL 비교 | `Drone.SimParity.SitlReplay`는 `작업/SITL_20261031/결과/sitl_run.csv`를 입력으로 사용, 없으면 skip. `GpsBrakeNoReverse`는 별도 회귀 계약 | 원본 CSV·리비전·장치/조건·실행 로그를 확보하기 전에는 SITL 비교 완료/실기체 일치로 판정하지 않음 |
 
@@ -47,7 +80,7 @@ StoryPhysicsTestMaps의 M2/M3 기대값은11/01 커밋 `7108b911`에서 `/Game/D
 - 미션13개는 `Thumbnail=BriefingImage`로 통일했다. M1 골든타임은 사막 건물 옥상, M2 길목차단은 기지 정문 트럭이다. Tutorial01~08은 사용자 파일명 대응, racing1~3은 Map1~3 번호 순으로 유지(사용자 확정)한다. 텍스처는 `/Game/Drone/UI/Textures/MissionPhotos_20261103`, 적용 도구는 `Tools/AssetMigration/ApplyMissionPhotos20261103.py`다. M1/M2 선택·설명 캡처 확인은 Claude 보고이며 다른 미션도 두 화면의 동일 사진/번호를 확인한다.
 - 선택창3D는 `UDroneSelectionPreviewWidget::ReloadAfterOpenSeconds` 기본0.75초에1회 재생성, `RecaptureAfterBuildSeconds` 기본1.5초 동안 매 프레임 재촬영·텍스처 프리스트림을 한다. FrontEnd에서 열기/기체 전환/닫기·재오픈 후 모델·텍스처·도시 배경·회전/확대가 안정적인지 수동 확인한다.
 - 3번 `TUT_Forward_Gate`의 게이트 강조/HUD 미표시 제보는 D PC에서 정상 표시·`TUTMapLaunchPIE.Forward` 통과(Claude 보고 캡처 `Saved/Automation/TUT/Forward.png`)다. 제보 PC는 바이너리 재생성/Build 후 재확인하며 타 PC 해결 완료로 처리하지 않는다.
-- 비행 수동 확인은 P/S/A 제동·위치 유지·수평 복귀, 실제 외형 기울기, FPV 설정3행 배치·업틸트/화각/어안·OSD 순서다. 조작·카메라 수치 정본은 [역할/모드](DRONE_TYPES_AND_CONTROL_MODES.md), 실기 게인 미정·미구현 항목은 [물리 정본](DRONE_REALISTIC_HANDLING_PLAN.md#dji-교육-비행과-외형-기울기)을 따른다.
+- 비행 수동 확인은 P/S/A 기존 제동·수평 복귀·외부 변위 미복귀·사람 방향 ON/OFF, 실제 외형 기울기, FPV 설정3행 배치·업틸트/화각/어안·OSD 순서다. 조작·카메라 수치 정본은 [역할/모드](DRONE_TYPES_AND_CONTROL_MODES.md), 실기 게인 미정·미구현 항목은 [물리 정본](DRONE_REALISTIC_HANDLING_PLAN.md#dji-교육-비행과-외형-기울기)을 따른다.
 
 ## 파일럿 비행장 배치
 
@@ -84,7 +117,7 @@ MotionAudit는 실제 World/Pawn Tick의 반복 이착륙/에너지·시간·OFF
 1. `Drone.Camera.TerrainClearance.Native/SavedRoles`에서 기체는 지면 밖에 둔 채 FPV를 아래로 기울이고 전방 벽에 접근한다. 실제 CameraComponent·GetCameraView·플레이어 POV 모두 구형 probe가 지형 밖에 있어야 한다. 3인칭 스프링, 작은 Drop의 시작 겹침, 기존 HFOV·기체 회전·수직 하방/복귀도 대조한다. `Drone.Camera.NearPlaneClearance.Native/SavedFPV`는 HFOV117/150·Roll90°·비스듬한 하방에서 실제 투영행렬의 가까운 네 모서리/렌즈까지의 교차를 검사한다. 카메라 중심만 안전한 결과로 통과시키지 않는다.
 2. `Drone.Physics.TargetCapsuleCollision`은 native/저장 BP와 회전·비균일 스케일, 실제 M4 작은 포탑 Scale3/Patriot Scale8을 검사한다. 외형 30cm 밖의 허공과 드론 이동이 막히면 실패다. 캡슐 명중·실제 전방 기폭/낙하 폭탄의 단일 피해, 파괴 후 비활성 및 살아 있는 시설의 캡슐 Off→On 복구도 확인한다.
 3. `Drone.Mission.TargetCollision.ActualM4TurretsPIE`는 실제 맵에 배치된 18개 포탑에서 실행 후 허공 차단을 검사한다. 단위 fixture의 배치와 실제 맵·손조종을 구분한다. 병사·재머 AOE·건물/정문·비행 기체 Root/기폭 센서를 일괄 치환하지 않는다.
-4. `Drone.Mission.PowerLineCollision.ActualM1PIE`는 실제 M1의 전선 18개 NoCollision·기둥 23개 Blocking과 전선 중앙 선 추적/18cm sweep, 원래 배치·가시성 보존을 확인한다. 축 배율 0인 지정 spline 장식 section의 단독 sweep 비차단과 정상 이웃 section의 충돌 보존도 대조한다. `PowerLineCollision.Policy`는 같은 Actor의 전선/기둥 분리와 다른 미션·Editor World 비적용을 대조한다. 원본 로딩 경고와 실행 중 충돌 판정은 별도로 기록한다.
+4. `Drone.Mission.PowerLineCollision.ActualM1PIE`는 실제 M1 전선18 NoCollision·기둥23 Blocking과 배치/가시성·지정0배율 section/정상 이웃을 확인한다. 기존 격리 Visibility/18cm 대조와 별도로 주변 액터를 숨기지 않은18전선·3폴대 몸통/상단의 simple/complex48비교를 실제 활성 기체 형상/채널/응답으로 관측한다. 폴대 양성 대조를 필수로 두고 다른 적중을 곧바로 허공벽 결함으로 단정하지 않는다. 응답 인덱스는 실제 배열의0~63/64개이며 ECC_MAX의 deprecated64를 조회하지 않는다. Policy와 실제 FPV 검사는 전선/전봇대 분리·타 owner 케이블/Editor 제외·물리벽/목표 진행 보존을 대조한다. M1 모든 길목·방향·기체와 실제 손 조종은 별도다.
 5. `Drone.Settings.DisplayMode.PIEGuard`는 Game fixture의 WorldType만 임시 PIE로 지정한 UI guard 검사다. 실제 별도 `-game` 실행은 `Drone.Settings.DisplayMode.Standalone.Native/SavedWBP`와 `Drone.UI.DisplayMode.ActualStandalone`을 사용한다. 실제 SWindow·viewport와 Win32 제목줄/테두리·모니터 경계, 저장값 재읽기와 사용자 원래 설정 복원을 대조한다. packaged 실행 확인으로 확대하지 않는다.
 
 실행별 Build·원시 실패·fixture 수선·최종 고유 통과 수와 보존 해시는 [STATUS](../../STATUS.md)·[WORKLOG](../history/DRONE_WORKLOG.md)가 정본이다. 현재 테스트 소스만으로 통과를 추정하지 않는다. 자동 검사 기록을 사용자 기록/설정에 남기지 않으며 Production Training과 제품 맵은 저장하지 않는다. UE5.8의 `GGameUserSettingsIni`는 논리 설정 키일 수 있으므로 실제 파일 검사·백업은 초기화된 `FConfigBranch.IniPath`를 사용한다. 임의의 임시 경로로 전역 키를 바꾸거나 기대 저장값을 직접 넣지 않는다.

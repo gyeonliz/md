@@ -1,21 +1,29 @@
 # Drone Prototype 입력 계약
 
-기준일: 2026-11-03 D PC, 코드 `5905a3cb` + 사용자 미커밋 변경. IMC53매핑·역할별 모터/짐벌·비행 명령 snapshot 분리는 구현됨이며 자동 검증의 실행별 범위는 WORKLOG를 따른다. [WORKLOG](../history/DRONE_WORKLOG.md)·[역할 정본](../gameplay/DRONE_TYPES_AND_CONTROL_MODES.md#역할별-비행모드-라우팅)을 따른다. 실물 조작·전체 Slate/미션·패키징은 확인 대기다.
+검증 기준: 2026-11-05 D PC, 코드 `5a08d015` + 카메라·공중 UI 입력 수선. IMC53 기본 행과 저장 ID, 기존 비행 수학·방향 보조를 유지한다. 현재 정책은 아래 절차, 실행 범위는 [최종 검증·제한 정본](../history/DRONE_WORKLOG.md#2026-11-05--카메라공중-ui-입력충돌-최종-검증과-전달)을 따른다. 실물 전장치/전체 미션·패키징은 별도다.
 
 사용자 확인 대상은 일반 게임패드와 InterLink DX 모두다. 커밋된 기본 입력 배정과 실장치 보정 확대·최종 물리/감도 튜닝의 미정을 구분한다.
 
-게임 조작은 설정 목록 제거·enum Hidden이며 옛 저장값은 쉬운 조작으로 이전한다. 쉬운 조작은 유지하고 FPV타격·광섬유·레이서는 송신기 Mode1/2를 사용한다. 자세·레이트·시동 각도·OSD·설정3행은 [역할 정본](../gameplay/DRONE_TYPES_AND_CONTROL_MODES.md#역할별-비행모드-라우팅)을 따른다.
+게임 조작은 설정 목록 제거·enum Hidden이며 옛 저장값은 쉬운 조작으로 이전한다. 쉬운 조작은 FPV 역할에서도 그대로 유지한다. FPV타격·광섬유·레이서의 Mode1/2는 기존 송신기 경로이며 사람 방향 보조는 아래 실제 관찰 뷰 조건에서만 선택한다.
 
 ### 비행 모드·카메라 추가 입력
 
 | 기능 | 키보드 | 패드 | InterLink |
 |---|---|---|---|
-| 역할별 비행 모드 순환(DJI P→S→A) | F | L3 | Button3 |
+| 사람 관찰 Mode1/2: 방향 ON/OFF / 그 밖: 역할별 비행 모드 순환 | F | L3 | Button3 |
 | 카메라 위/아래 | T/G | 쉬운 조작은 기존 오른쪽 세로 | 기존 CameraPitchRate와 별개 |
 | 정찰·투하 Mode1/2 짐벌 | T/G도 사용 | RT/LT | Axis3 |
 | FPV 계열 모터 arm | X 토글 | □(FaceButton_Left) 토글 | Button4 눌림ON·해제OFF |
 
 앞3행은 IMC에8매핑을 추가해 총53개(기존33+RC축8+버튼4+추가8)다. arm은 Pawn BindKey라 IMC 수에 포함하지 않는다. FPV Mode1/2는 고정 업틸트로 새 tilt/gimbal을 무시한다. 쉬운 조작은 기존 오른쪽 스틱 카메라, 정찰·투하 Mode1/2만 별도 짐벌축을 사용한다. Button1 자폭 ArmSwitch와 Button4 모터 arm은 별개다. 메뉴 노브/Cancel·UGV 무장·파일럿 숫자키와 구분한다.
+
+### 사람 기준 이동 방향 보조
+
+기본OFF다. 실제 `PlayerController.GetViewTarget()`이 사람 관찰 `ADroneTutorialObserverLesson`이고 조작이 Mode1/2일 때 F/L3/InterLink Button3을 한 번 눌러 ON, 다시 눌러 OFF한다. 관찰 카메라의 수평 방향을 기준으로 전후좌우 입력을 변환해 기체 Yaw가 바뀌어도 사람 기준 방향을 따른다. 원시 좌우 스틱 표시·Yaw/스로틀·기존 제동/항력·자세·착륙 설정은 그대로다. 좌표를 저장하거나 예전 위치로 돌아가는 기능은 없다.
+
+실제 ViewTarget이 Pawn인 1인칭/기체 추적 시점, 쉬운 조작·UGV에서는 사용할 수 없다. 실제로 사람 관찰 카메라를 보고 있다면 숨은 Pawn의 FPV/DropCamera 플래그만 바뀌었다는 이유로 해제하지 않는다. 실제 관찰 뷰를 벗어나거나 모드를 바꾸면 해제하며, 다시 사용하려면 해당 뷰에서 켠다.
+
+세 장치 키 설정의 **비행 모드 / 사람 기준 이동 ON·OFF** 행에서 재지정한다. 기존 `FlightModeCycleAction`을 재사용하므로 IMC 기본 매핑 수53은 유지한다. 방향 토글은 P/S/A·Rate/Angle/Horizon 선택이나 제동 ON/OFF와 별개다. 방향 ON의 HUD 공급 문자열은 `LOS-DIR`이며 실제 화면/장치 체감은 수동 확인한다.
 
 ### 파일럿 테스트맵 전용 숫자키
 
@@ -35,7 +43,7 @@ NumPad는 별도 연결하지 않는다. 재시작은 관찰 카메라·기존 �
 
 파일럿4~7은 본체 밑면 높이에 맞춘 같은 평평한 상자 판정을 사용하며 모드 전환에 따라 높이가 바뀌지 않는다.4/5는 쉬운 비행·키보드 Ctrl 접지OFF 정책을 유지하고 실제 새 판정의 지지를 확인한다.6/7의 자연 착륙 보조는 실제 접지·낮은 추력에서 모터 ON/OFF 모두 정립과 감속을 돕고, 새 이륙/강한 회전 명령에 해제한다. 모터 스위치·재시동 입력 규칙은 그대로다. 형상·접지 전환 조건과 별도 시험용 Data Asset 조정 위치는 [물리 정본](../gameplay/DRONE_REALISTIC_HANDLING_PLAN.md#파일럿-맵의-접촉회전착륙-보정)을 따른다.
 
-이 키들은 `WasInputKeyJustPressed`를 직접 읽어 사용자 조작키 재지정 대상이 아니다. 일반 플레이의 `P`/Triangle/InterLink Button13 시점 전환은 기존 IMC→ToggleViewAction→ToggleFirstPersonView 경로와 3장치 설정을 유지한다. 숫자 `1/0`의 기존 자폭 ArmSwitch와 물리키를 공유하지만 파일럿 Racer의 기폭 기능은 비활성이며 일반 미션에 파일럿 토글이 추가되는 것은 아니다. 실행 반영 여부는 [시험 가이드](../gameplay/DRONE_TEST_MAP_GUIDE.md#파일럿-숫자키-실행-확인)를 따른다.
+이 키들은 `WasInputKeyJustPressed`를 직접 읽어 사용자 조작키 재지정 대상이 아니다. 일반 플레이의 `P`/Triangle/InterLink Button13 시점 전환은 기존 IMC→ToggleViewAction과3장치 키 재지정을 유지한다. Drop은1인칭→3인칭→투하→1인칭으로 순환하고 다른 기체는 기존 두 시점이다. Drop의 우클릭/LB/InterLink Button12 Secondary는 투하 보기 진입/직전1·3인칭 복귀이며, 실제 LOS 관찰 ViewTarget은 유지한다. 선택/저장 우선순위는 [카메라 정본](../gameplay/DRONE_TYPES_AND_CONTROL_MODES.md#드랍-드론의-3시점-선택)을 따른다. 숫자 `1/0`의 기존 자폭 ArmSwitch와 물리키를 공유하지만 파일럿 Racer의 기폭 기능은 비활성이며 일반 미션에 파일럿 토글이 추가되는 것은 아니다. 실행 반영 여부는 [시험 가이드](../gameplay/DRONE_TEST_MAP_GUIDE.md#파일럿-숫자키-실행-확인)를 따른다.
 
 ## 1. 현재 계약
 
@@ -89,7 +97,13 @@ IMC Acro 패드4축의 기존 Lower0.2/Upper1.0/Radial 자산은 보존한다. F
 | RC 절대축 | 선형 절대출력·fresh-low 후 올려 시동 유지. ON에서 최저점 의미는 위 역할별 정책 | 장치 인계·축 보정·공통가드 유지 |
 | XInput | FPV는 raw전용 deadzone0.08/exponent1.5·중앙hover. DJI 경로는 signed 수직스틱을 교육 제어기에서 직접 처리 | DJI는 패드/RC 같은 스틱→같은 목표 수직속도. FPV 곡선 중복 적용 없음 |
 
-이미 Armed인 유효 입력원 전환은 ON을 유지하고 OFF 상태 새 입력원은 fresh-low 확인이 필요하다. 키보드 Space/Ctrl 유지 중 게임패드보다 우선하고 해제 후 살아 있는 패드 입력으로 복귀한다. RC 절대축의 유효 인계는 보존한다. 비활성 키보드 release·패드 중립의 탈취와 Possess/hold/pause/dead/link 공통가드를 유지한다. Keyboard0.70·Pad deadzone0.08/exponent1.5는 장치별 게임 기본값이며 실기체/사용자 장치 실측값이 아니다. RC는 선형 절대출력이며 키보드·패드 튜닝의 영향을 받지 않는다.
+이미 Armed인 유효 입력원 전환은 ON을 유지하고 OFF 상태 새 입력원은 fresh-low 확인이 필요하다. 키보드 Space/Ctrl 유지 우선·해제 후 살아 있는 패드 복귀와 RC 절대축 인계를 보존한다. Possess/hold/dead/link 안전 초기화는 유지하며 pause/rebind는 아래 공중 UI 정책으로 구분한다. Keyboard0.70·Pad deadzone0.08/exponent1.5는 게임 기본값이며 실기체/사용자 장치 실측값이 아니다.
+
+### 공중 UI 입력 해제와 명시적 모터 OFF
+
+기존 LandDetector가 공중으로 판정하고 이미 Armed·링크 정상·출발대기 없음일 때 pause/resume·키 재지정은 누른 입력만 해제한다. RC 절대축은 마지막 유효 스로틀, 키보드/중앙복귀패드는 기존 hover 명령을 유지한다. 모드·실제 각속도·LOS 방향 선택은 보존한다. 실제 시점/조작 모드/링크 전환에서의 LOS 해제는 기존 경로다.
+
+이미 OFF·착륙 완료·죽음·링크 손실·출발대기·점유/기체 교대에는 기존 full reset과 새 low-before-arm 조건을 유지한다. 이전 armed 상태를 저장했다 강제로 재시동하지 않는다. 일시정지 입력은 OFF 기체를 시동하거나 공중 RC 명령을 새 값으로 덮지 않는다. 실제 PIE UI6와 명시OFF·모터 안전 검증의 범위는 WORKLOG를 따른다.
 
 2026-10-27 키마 고도 반응 수정: 키보드의 모터 출력 한정값과 쉬운 조작의 방향성 고도 명령을 분리했다. 보조모드 Space 유지=고도입력1, 해제=0이며, Acro는 기존 질량·추력·모터응답·속도상한을 사용하면서 키보드 ClimbFractionAboveHover 기본/비정상값 fallback만0.70으로 올렸다. 패드/RC 곡선·UGV·마우스 감도·현 역할별 모터 정책·중력은 보존한다. 실제 검증 상태는 [STATUS](../../STATUS.md), 날짜별 측정/Build 이력은 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
 
@@ -132,7 +146,7 @@ HUD 십자 표시는 장치 축 보고가 있으면 실제 좌/우 스틱 위치
 | 장치/경로 | 현재 연결·설정 | 남은 확인 |
 |---|---|---|
 | 일반 게임패드 | RightX→YawAction→ChangeYaw에 감도X/반전X, RightY→CameraPitchRate→ChangeCameraPitch→CameraBoom에 감도Y/반전Y | 실제 장치의 중립/방향/해제→엔진 값→IMC/IA 실효값→모드→Boom→최종 ViewTarget을 함께 계측한다. 기존 경로 존재를 실물 상하 동작 Pass로 쓰지 않는다 |
-| InterLink DX | 기존 Axis5/6=Move, Axis7=Yaw, Axis8=Altitude와 Acro/메뉴 계약을 유지한다. CameraPitchRate용 InterLink 매핑은 기존 연결 도구/계약에 없다 | 상하 시야 명령 공백은 감도Y 증가만으로 해결되지 않는다. 실제 저장 IMC·장치의 미사용 축/버튼을 읽고 배정·중립·유지/해제 정책을 확정한 뒤 연결한다 |
+| InterLink DX | 기존 비행/Acro/메뉴 계약과 IMC53행·BindingId 유지. Mode1/2 카메라 Axis3 행은 기본 미지정이며 명시 할당/반전(원래Axis3 포함)만 활성 | 비행축의 Axis3 재지정·키보드/패드 조합을 보존한다. 쉬운 조작의 별도 CameraPitchRate 추가 배정과 실제 HID 수신/중립·시점 확인은 구분한다 |
 
 InterLink Axis1~4·미사용 버튼의 번호만 보고 물리 복귀형/순간 버튼으로 단정하거나 기존 비행4축을 재사용하지 않는다. 후보 두 버튼 유지 입력이나 남는 축은 아직 선택하지 않았다. 일반 패드의 실제 단절이 확인되면 해당 연결만 별도로 수정한다.
 

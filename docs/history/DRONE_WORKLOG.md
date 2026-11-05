@@ -2938,3 +2938,155 @@ MD/Drone Space 최종 동기화 완료: STATUS·WORKBOARD·세션 등록부·현
 근거는 작업공간 `artifacts/git-20261105/GIT_AUDIT_INITIAL.json`, `TESTED_SOURCE_COMPARISON.json`, `GIT_AUDIT_FINAL.json`이다. 마지막 문서는 작업 후 상태를 기록하며 원시 초깃값은 덮어쓰지 않는다. 기존 진행 Space의 현재 단락만 guarded 갱신하고 결과를 별도 receipt로 확인한다. private Git 메타데이터/로그·대용량 본문은 Space에 업로드하지 않는다.
 
 이번 진행 Space 저장 seq151·hash8acf3b1c…b1f003a와 같은 stream exact readback을 확인했다. Git 초기/최종 상태와 LFS14개 일치·두 저장소 diff check exit0을 영수증에 보존했다. 새 Page·Commit/Push·실제 병합은 없다.
+
+
+## 2026-11-05 — 쉬운 조작 입력 중복 수선
+
+사용자 제보: 놓으면 이전 위치로 돌아가고, 이동 중 조작이 끊기며 기울어지는 방향이 뒤집힌다. 최신 Drone.log는 M2 FPV/Drop 뒤 Tutorial.Hover Scout control0을 보였지만 실물 장치/원시축 기록은 없어 입력 장치를 단정하지 않았다. 사용자 병합/Push 이후 실제 HEAD는 Unreal main/origin0e405e6a·MD main/origin e24c5c0이고 시작 worktree/index는 깨끗했다. 이번 Commit/Push는 없다.
+
+원인은 일반 FloatingPawnMovement의 입력 가속/소비와 교육 GPS 제어가 겹치던 순서다. 로컬 UE5.8 MovementComponent의 bTickBeforeOwner=true에 따라 이동이 먼저 입력으로 가속한 뒤 ConsumeInputVector를 호출했다. 뒤의 Pawn.UpdateTrainingFlight는 같은 입력을 못 보고 이전 유지점/제동을 적용했다. 기존 검사는 Pawn.Tick+직접 AddActorOffset만 사용해 이 실제 컴포넌트 순서를 놓쳤다. 세 후보(이중 처리→좌표 부호→유지점 갱신)를 세우고 첫 후보의 단일 변수 수선으로 같은 재현이 통과했다.
+
+- B01 재현 검사 Build는 잘못된 WorldSettings include1건으로 실패했다. GameFramework/WorldSettings.h로 교정했고 원형은 보존했다. 제품 버그의 RED와 혼동하지 않는다.
+- B02 Build11.12초 후 제품변경0의 R01에서 TrainingPawnRoleScope Fail. Scout/Drop 각각 전진 기수Z +0.412/+0.409, 해제6초 잔류속도202.633/204.051cm/s를 재현했다. armed1/link1, held 역주행0이다. 이 짧은 조건에서 원점 도착 자체를 재현했다고 표시하지 않는다.
+- 제품 수선은 DronePilotFloatingPawnMovement.cpp/h 두 파일이다. 활성 교육 모델일 때만 일반 ApplyControlInputToVelocity를 건너뛰어 입력 소비/속도를 교육 제어기 한 곳이 소유한다. 이동 sweep/충돌·모터 안전·교육 Off/FPV Acro/UGV 경로·모든 게인/추력/항력/기울기 부호는 유지했다.
+- B03 Build46.91초의 같은 원형 검사 R02는 Success. 기수Z −0.414148·해제6초 속도0.687cm/s로 바뀌었으며 기존4개 실패 단언을 완화하지 않았다. 원형 검사 SHA1808E32B…14C9를 RED/GREEN 모두 유지했다.
+- B04 Build10.68초는 제품2파일이 B03와 같고 검사만 확대했다. R03_EXPANDED_EASY_12의 같은 DLL/한 프로세스에서 요청 고유12개 모두Success/실패0이다. Scout/Drop×(60fps0도·30fps0도·120fps0도·60fps90도)=8조건에서 held 역주행/중단0·앞/오른쪽 기울기·새 HoldPoint·3초 추가 중립·두 번째 이동·Space상승/Ctrl하강을 검사했다. 정지속도0.680~0.700cm/s이며 기존30cm 후퇴/정지속도 단언은 유지했다. 기존 GPS/ATTI·모드/축/짐벌/키 충돌·FPV실기모델·시동/착지·기울기·신호 연결 회귀를 포함한다.
+- 실제 자동 명령과 원형/후속 Report는 Saved/Automation/EasyControlRegression_20261105/Runs의 각 RUNTIME.log·Report/index.json·END.json에 남겼다. 최종12개 test-state는 모두Success이며 report 경고 합계는 0건이다. 실행 전후 보존/원복은 실행 담당의 최종 영수증을 따른다.
+- 실행 담당은 /root/pilot_shortcuts_restart 한 곳이고 Root는 엔진을 직접 실행하지 않았다. source허용범위는 제품2+기존 검사1이며 Config/자산/맵은 수정하지 않았다. 새 Saved 원본8개/맵75 기준을 사용해 11/04의 옛 백업으로 되돌리지 않는다. 실물 손 조종/기기 원시축·전체 미션 손 조종·청감/패키징은 이번12자동 검사에 포함하지 않는다.
+
+최신 문서에서 사용자 완료한 Git 병합/Push와 이번 미커밋 수선을 구분했다. 11/04 전체574→573성공/0실패/외부CSV스킵1은 당시 리비전이며 이번 DLL 전체574재검사로 합산하지 않는다. MD/Drone Space는 관련 현재 절차와 결과만 함께 갱신한다. private Saved/로그·자산 업로드·공유/Trello/예약 변경·Commit/Push는 하지 않는다.
+
+최종 보존 감사/문서 반영 확인: 11/05 원본 Saved8개 byte원복·맵75/보호29 SHA불변·Content9859 메타데이터불변이다. 실제 디스크 B02 동결732개에서 허용3파일 외729개 rawSHA일치를 확인했다. HEAD archive의237개 차이는 CRLF/LF만 다른 것으로 별도 증명했으며 원시 감사 실패/원문을 보존하고 코드를 재저장하지 않았다. 최종 엔진/컴파일러0·Source변경은 제품2/검사1·Commit/Push0이다. MD6문서와 Space 진행seq152·테스트가이드seq95 guarded수정/같은stream exact readback2건을 확인했다. 새 Page/공유/Trello/예약은 없다. 최종 실행영수증은 EasyControlRegression_20261105/FINAL_RECEIPT.json, 문서/Space영수증은 작업공간 artifacts/easy-control-20261105다.
+
+
+## 2026-11-05 — GPS 좌표 복귀 제거와 사람 기준 이동
+
+사용자는 쉬운 조작에 GPS 수평 위치 유지를 요청한 적이 없음을 지적하고 좌표 유지/옛 좌표 복귀 제거를 명시했다. 기존 제동·공기저항·관성·수평 복귀·착륙 보정은 유지한다. Mode1/2의 GPS 기반 이동은 기체 회전과 무관한 사람 시점 기준 전후좌우이며 제동과 별개라는 답을 확인했다. 이 절이 현재 계약의 정본이며 앞선 GPS 정지점 유지/복귀 성공 기록은 당시 시험 결과로 보존한다.
+
+구현 경계: 수평 유지점 API/분기를 없애고 기존 속도 PI 제동·항력·추력/관성·고도/착륙 보조를 보존했다. 저장된 GPS enum 숫자는 호환으로 남지만 P-ASSIST로 표시한다. 사람 방향 보조는 기본OFF·Mode1/2·실제 ObserverLesson ViewTarget에만 적용하며 F/L3/RC Button3의 기존 ActionStarted로 ON/OFF한다. 키 설정3장치의 같은 행에서 재지정하고 raw 스틱 표시·Yaw/스로틀과 제동/비행/자세 모드를 바꾸지 않는다. 실제 Pawn 1인칭/추적 뷰는 거부·해제한다. 실제 사람 관찰 뷰를 보는 동안 숨은 Pawn FPV/DropCamera 플래그만 바뀐 것은 실제 뷰 전환으로 처리하지 않는다.
+
+세션 분담: Root 통합/수정, no_gps_code_review 독립 검토·뷰 조건 수선, no_gps_docs_sync 문서/Space, pilot_shortcuts_restart 한 곳만 Build/엔진/자동 검증/원복. 이번 문서 세션은 코드·Config·자산·엔진·Build·Commit/Push를 수행하지 않았다. 기존 MD6WIP와 대상8문서 원본을 DocsPrep/BeforeDocs에 raw byte/SHA로 보존한 뒤 현재 절차를 갱신했다.
+
+검증 근거: 최종 B02 Build15.59초 성공·R02_FINAL20 한 프로세스/동일 DLL. Build의 nonpreferred MSVC와 Engine SoundWaveProcedural C4996 경고는 남고 아래0은 자동 검사 경고 수다; 최종 관련 자동 검사 **20통과·실패0**(B02 최종 DLL의 관련20개 한 프로세스, 오류/경고/스킵0·명세 누락/추가0); 검사경고 0건. 실제 Scout/Drop World.Tick8조건에서 입력 지속·해제·외부변위(+700,-400cm) 뒤 미복귀·이동 중 방향반전·Space/Ctrl을 확인했다. 관찰Yaw37°의5역할×2모드×기체Yaw4×입력8=320조건에서 방향·입력길이·Angle축별 한도, 실제Scout/Drop 이동4조건과 공유키 ON/OFF/실제뷰 해제를 확인했다. 내부 조건수는20개 검사에 합산하지 않는다. 최종 module SHA 2743DA03028712714BD44144AFA1A9E8ED0CCDADE14B33078EC7D44995886237. 실행 범위는 B02 최종 DLL의 관련20개 한 프로세스, 오류/경고/스킵0·명세 누락/추가0이며 이전 first5/직전12개·11/04 전체574개와 중복 합산하거나 현재 전체 Drone.* 통과로 확대하지 않는다. 원시 실패/중간판/최종판은 각 실행 폴더에 보존한다.
+
+보존: 현재 디스크 원본 기준 Saved8개 byte복원·맵75/보호29 SHA동일·Content9859 크기/시각동일. Source735→736은 허용 기존9변경+새검사1뿐이며 이전 Pilot2파일 byte보존. ROOT_KEEP_PHYSICS_PROOF의 UpdateFlightPhysics/착륙보정 함수 EOL정규화 본문과 교육 수치30개 동일. 엔진/컴파일러0. 최종 영수증 D:/JGY/project/drone/Saved/Automation/EasyNoGps_20261105/FINAL_RECEIPT.json; 보고서 D:/JGY/project/drone/Saved/Automation/EasyNoGps_20261105/REPORT.md. 실물 키보드/플스/InterLink 손 조작·전체 미션 수동 완주·청감·독립 패키징은 이 자동 결과와 별도다.
+
+문서 배치: STATUS 현재 요약·WORKBOARD 해당 카드/Next·입력 계약·역할/물리·시험 가이드·세션 소유권을 갱신하고 결과 수치 전문은 이 절에만 둔다. 이전 WORKLOG prefix를 보존하고 기존 Drone Space 진행/시험 페이지의 현재 단락만 guarded 반영한다. 새 Page·로그/대용량 자산 업로드·공유/Trello/예약·Commit/Push는 없다. Space exact readback과 최종 파일 크기는 DOCS_FINAL_RECEIPT.json을 따른다.
+
+Space 동기화 완료: 진행상황 페이지 seq153·시험 가이드 seq96의 기존 현재 단락만 guarded 교체하고 동일 content stream exact readback을 확인했다. 두 블록의 이전 Markdown 전문은 당시 리비전 원문으로 그대로 남겼으며 새 Page/비공개 로그 업로드는 없다. 최종 문서8개·원문 prefix 보존·30KB/링크·diff 검증 영수증은 로컬 EasyNoGps_20261105/DOCS_FINAL_RECEIPT.json이다.
+
+
+## 2026-11-05 — 드랍 드론 3시점 선택
+
+사용자 확정 요청은 드랍 드론 카메라를1인칭·3인칭·투하 중 선택하는 것이다. Root가 Drop 전용 선택flag/3값을 저장하고 미선택 때 기존 전역 시점→기체 기본값을 따르는 최소안을 승인했다. 전역 DefaultView enum을 늘리거나 비Drop·비행/착륙 물리를 바꾸지 않는다.
+
+선택/입력 계약 정본은 [역할/카메라](../gameplay/DRONE_TYPES_AND_CONTROL_MODES.md#드랍-드론의-3시점-선택), UI 조정은 [설정/선택 가이드](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#드랍-드론-출격-시점-선택)다. 시점 선택은 즉시 Drop 전용 저장·재출격 유지, P/Triangle/RC13은1→3→투하→1이며 Secondary RMB/LB/RC12는 투하 진입/직전1·3인칭 복귀를 유지한다. 실제 Observer ViewTarget은 유지하고 수직 하방/FOV/충돌 보호도 보존한다. 설정 기본값 복원은 Apply 성공 뒤만 Drop 선호를 해제하고 Cancel/저장 실패는 이전 Drop 선택을 보존/복구한다.
+
+소스: 최종 SOURCE_READY_B04의 제품8파일+새검사1을 raw SHA 대조했다. 초기 카메라 mount 적용/저장 시점 순서를 수선해 기존 Fiber 각도/재출격 assertion을 그대로 통과했고 이동/제동/물리값·입력 매핑은 바꾸지 않았다. 최종 구현/진단/검토는 no_gps_code_review, Root는 사용자 추가 지시대로 배정/관리/결과 취합, MD/Space는 no_gps_docs_sync, Build/엔진/자동 검사/PNG 직접 검토/원복은 pilot_shortcuts_restart 하나만 실행했다. 문서 세션의 코드/Config/자산/엔진/Build/CommitPush 변경0이다.
+
+검증: B04 Build13.55초 성공·R04_FINAL17_RHI 한 프로세스/동일 DLL. 앞선 B01은 검사 TObjectPtr 컴파일 오류, B02/R01은14통과/3실패(Slate fixture2·실제 Fiber mount 초기화 회귀1), B03/R02는 입력 초기화가 빠진 fixture World.Tick crash였고 원형을 보존했다. B04의 InitInputSystem 수선 후 R03 신규2통과는 최종17에 더하지 않는다. 실행 담당이 실제 D3D12/1920×1080 PNG를 열어 새 행 글자/화살표·기존 버튼 정렬/스타일·카드/START 비겹침을 확인했다. 캡처는3D 미리보기 영역이 비어 있고 focus 전환 프레임이 없으므로 그 확인으로 확대하지 않는다. 아래0은 자동 검사 경고 수다; 관련 자동 검사17통과·실패0(B04 동일 DLL·R04 한 D3D12 RHI 프로세스·검사오류/경고/스킵0); 검사경고 0건. 최종 DLL SHA A5C923C3DFAF8E94E69764DFE00522D8C9556D9F9B41D949D65BBF9ACEA2995C. 원시 실행·선택 목록·보존 감사는 Saved/Automation/DropCameraChoice_20261105/FINAL_RECEIPT.json·REPORT.md를 따른다. 이전 GPS제거20개/first5·과거 전체574개 결과를 현재 리비전의 통과로 합산하지 않는다. 실물 손 조종·전체 미션 완주·청감·Cook/패키징은 별도다.
+
+보존: 현재 디스크 HEAD5a08d015 원본 Saved8 byte복원·맵75/보호29 SHA·Content9859 크기/시각동일. Source736→737은 허용 제품8+새검사1뿐이며 이전 Pilot movement2파일 byte보존. 엔진/컴파일러0. MD는 HEAD e24c5c0의 기존8WIP/관련9문서 원본을 DocsPrep/BeforeDocs에 raw byte/SHA로 보존한 뒤 현재8문서만 갱신했다. 물리 정본은 이번에 수정하지 않고 WORKLOG 기존 prefix를 보존했다. STATUS/WORKBOARD는30KB 아래이며 Space는 기존 진행/시험/Blueprint카메라 단락만 guarded 갱신/재조회한다. 최종 문서·Space 영수증은 로컬 DOCS_FINAL_RECEIPT.json이다. 새 Page·비공개 로그 업로드·공유/Trello/예약·Commit/Push는 없다.
+
+Space 동기화 완료: 기존 진행/시험/Blueprint 카메라 단락3개(progress seq154·guide seq97·blueprint seq103)의 guarded 반영과 동일 content stream exact readback을 확인했다. 이전 단락 전문·과거 실행 표현은 그대로 보존했다. 문서8개/기존8WIP·WORKLOG prefix412321B·30KB·링크/diff 검증 영수증은 로컬 DropCameraChoice_20261105/DOCS_FINAL_RECEIPT.json이다.
+
+
+## 2026-11-05 — 정찰 카메라 고정과 맵 로딩 최초 표시
+
+사용자 요청은 정찰 카메라의 원하지 않은 자동 들림/자세 추종을 고치고 맵 로딩 때문에 로딩창이 뒤늦게 뜨지 않게 먼저 빠르게 보이는 것이다. Root는 사용자 추가 지시대로 배정/관리/취합만 맡았고 카메라는 no_gps_code_review, 로딩 진단/구현·MD/Space는 no_gps_docs_sync, Build/엔진/실제 RHI·PNG/원복은 pilot_shortcuts_restart 한 곳만 실행했다.
+
+진단 루프: diagnosing-bugs 절차로 test-only 원형을 먼저 실행했다. R01 로딩은 DA의 raw Auto분류를 Story로 해석하지 못한 fixture 준비 실패였으며 사용자 증상 RED가 아니다. GetLobbyCategory 정본/명시적 transient 분류를 고친 R02는 START→PreLoad11.9066ms 동안 자연paint/firstPresent/nonblankPresent0·제출프레임0으로 실제 증상 RED를 보였다. 가설은 도착 뒤에만 UI 생성→같은 프레임 이동→첫 UI 이미지 동기 로드→준비 후 강제 유지 순이며 예측을 먼저 공유했다. 원인은 첫 두 경계였고 수선 후 중간 R03은 자연paint63.0598ms/1프레임·present177.3789ms<PreLoad217.5ms·제출2프레임/비영730769픽셀로 GREEN이었다. 이는 해당 중간 리비전이고 최종 검사는 아래와 구분한다.
+
+최종 소스: 이번 실제 디스크 baseline의 허용11경로(제품7·기존검사2·새검사2)만 바뀌었다. 로딩6제품/2검사와 정찰 Pawn/기존Mode2검사/새Scout검사는 독립 범위이며 읽기 전용 로딩 독립검토의 확정 차단결함0·최종739파일 raw SHA 일치를 확인했다. 카메라 계약은 [역할 정본](../gameplay/DRONE_TYPES_AND_CONTROL_MODES.md#정찰-카메라의-수동각과-자세-분리), 로딩/취소·편집 위치는 [UI 정본](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#시드-레이싱로딩일시정지-확인)을 따른다. 기존 Mode2 검사에 카메라 효과 전체가 OFF였다는 앞선 설명은 정확하지 않다. TrainingFlightMode Off라 문제의 짐벌 누설 경로가 비활성이었던 것이며 새 검사는 기본 짐벌/진동 효과를 유지한다. 새 정찰 고정 요구와 충돌한 Scout 기대만 갱신하고 Racer·Yaw 음성 대조·기존 오차는 보존했다.
+
+검증: 최종 B04 Build10.31초 성공·R05_FINAL28_RHI 한 프로세스/동일 DLL의22clean+6warning Success=28. 경고13은 WASAPI RAW_MODE_UNSUPPORTED8·제3자 MOUT demo의옛 입력 참조4·외부 연결 확인 HTTP timeout1이며 무경고 결과가 아니다. Build에도 비선호 MSVC 안내가 남는다. 카메라 R02/R03 수동/시동 준비 실패는 input setup/reset 순서의 fixture 오류로 분리했고 B04에서 정상 초기화/실제 시동/수평 이동 조건을 보강했다. 로딩은 R01 준비오류와 R02 actualRED, R03/R04 중간 GREEN을 분리했다; 관련 자동 검사28통과·실패0(B04 동일 DLL·R05 한 D3D12 RHI 프로세스·오류/스킵0·경고13); 검사경고 13건. 정찰1/3인칭×쉬운/모드1/모드2의6조건에서 실제 시동 유지·수평 비행·수동 상하/해제·전진/놓음/반전·시점 왕복이 통과했다. 입력 예시는1인칭−22°/3인칭−12°이며 cache오차0,1인칭 최대 POV오차0.010°/자동상승0.008°·3인칭0°로 기본 미세진동은 남는다. 최종 요청→첫 자연 paint26.1675ms/1프레임, 실제 비영 backbuffer 제출72.2442ms가 PreLoad 진입97.9485ms보다 앞섰다(2제출프레임·730769비영 픽셀). paint26ms를 실제 화면 제출시간으로 단정하지 않는다. SWindow backbuffer1280×720은 제목줄을 포함하며 실제 GameViewport client 크기와 구분한다. 이미 관찰한 픽셀 PNG를 실행 담당이 직접 열어 로딩 제목/그림/TIP/문구/진행바를 확인했다. 별도 LoadingCancelPIE는 실제 Slate B→생성정지/닫힘→Flow/FrontEnd 복귀 경로를 통과했다. 최종 DLL SHA 5BC816F5ED54FB262EB6AD16E98715B53B8C2BB221AFC5FB2686EDB40BD0B1EE. 중간 원형/실패·카메라 준비 오류와 이전 Drop17/NoGPS20·전체574를 현재 통과 개수에 합산하지 않는다. 원시 보고서는 Saved/Automation/ReconCameraLoading_20261105의 FINAL_RECEIPT.json·REPORT.md·실행별 폴더다.
+
+검사 기준 변경은 사용자 최신 요구에 따른 것이다. 기존 LoadingCapture는0.95초 최소 표시와0.4초 대기를 강제해 빠른 준비 완료를 실패로 보던 전제였고, 실제 ready/선택/닫힘은 유지하면서 그 시간 전제만 제거했다. 최초 표시 판정은 새 실제 public travel·자연paint/RHI·엄격한 pre-load시각/원시픽셀 검사로 보강했다. 첫 PNG는 SWindow backbuffer이며 실제 GameViewport client와 구분하고 transient Story clone→경량 맵 재현 범위다. 생산 미션 완주·실물 키보드/플스/InterLink 손 조종·전용 패키징을 확인했다는 뜻이 아니다.
+
+보존: Saved8개 exact원복·맵75/보호29 SHA동일·Content9859 크기/시각동일. Source737→739은 허용 기존9수정+새검사2뿐이며 기존728/Pilot movement2는 보존했다. 기존 shared loading_story.png도 원본SHA로 복원했다. 엔진/컴파일러0·Commit/Push0. 이번 MD는 실제 기존9WIP/관련10문서 원본을 LoadingDocsPrep/BeforeDocs에 raw byte/SHA로 보존하고 현재8문서만 갱신했다. 물리/입력 정본은 이번 원본에서 변경하지 않고 WORKLOG prefix416432B를 보존한다. 기존 Space 진행/시험/Blueprint 단락만 guarded 반영/재조회하며 새 Page·비공개 로그/대용량 자산 업로드·공유/Trello/예약·Commit/Push는 없다. 최종 MD/Space 영수증은 로컬 DOCS_FINAL_RECEIPT.json이다.
+
+Space 동기화 완료: 기존 진행/시험/Blueprint 관련 단락3개(progress seq155·guide seq98·blueprint seq104)만 guarded 반영하고 동일 content stream exact readback을 확인했다. 이전 단락 원문과 당시 수치 표현은 보존했다. MD8문서·원문 prefix416432B·30KB/링크·diff 검사 영수증은 로컬 ReconCameraLoading_20261105/DOCS_FINAL_RECEIPT.json이다.
+
+
+## 2026-11-05 — Tutorial2 실제 하늘 시야와 자동 검사 범위 정정
+
+현재 판정은 **미해결·실제 사용자 증상 RED 있음·제품 수정0·원인/수정 GREEN 없음**이다. 과거 정찰 카메라/로딩28통과를 Tutorial2 실제 흐름 확인/해결로 넓혀 보고한 범위를 정정한다. 그28개는 당시 격리 조건과 B04/R05 DLL의 유효한 기록으로 원문 보존하며 이번 결과와 합산하지 않는다.
+
+### 실제 사용자 증거와 자동 재현의 차이
+
+사용자는 첫 LOS 완료→Next→Tutorial2 START 뒤 지속 하늘 시야를 키보드/마우스·플스·InterLink 모두에서 보고했다. 최신 사용자 원본 화면을 독립 열람했다. embedded PIE Outliner는 TUT_Hover이며 정찰 드론·Mode2/P_ASSIST·모터 ON72%·고도17.4m·방위219°·속도12.2km/h·HUD시간00:28.27에서 땅 없이 하늘/구름만 보인다. 이는 실제 오류 화면이고 아래 별도 창 자동 검사와 조건이 다르다. 한 화면에서 private 카메라 캐시·실제 HID 보고·원인을 추정하지 않았다. 이전 “증상 RED 미확보”는 그 당시 자동 재현 상태였으며 최신 실제 사용자 화면 뒤의 현재 판정으로 재사용하지 않는다.
+
+실제 saved FrontEnd/DA/맵, 기체 START/시작 안내/결과 Next의 Slate hit path, 새 Hovering World/Controller/Pawn/안내창, 저장 profile 복원을 검사 원고에 보강했다. 자동화 초기화 뒤 실제 DroneAudioSettings 슬롯을 메모리에 적용했으며 로그는 hasControl1/control3, hasView0/view-1, training선택0→첫 Pawn control3/training1/first1이다. 로드 실패 시 silent fallback이 남아 있어 향후 검사는 fail-closed 보강 대상이지만 이번 실행의 profile 로그는 일치한다. LOS 완료는 공개 목표 완료 함수 경계이며 실제 LOS 손 조종 완주가 아니다.
+
+검사 SHA `EE588432E4ACC916ED23E86297AC3B04E565A7F77AA9CBC3C2C5122ECFC32E3E`, B06_SIDEBAR_EE5884 Build exit0, 동일 DLL `DD3E52CD8BE949AFC3F969F41085AD07ED2999A58B6C0017BEE0813F5ED4D65F`로 아래 고유2경로를3회 실행했다. 고유3검사나 전체 회귀 통과로 세지 않는다.
+
+| 실행 | 조건/결과 | 초기 무입력 frames | 비행 max Pitch 오차 / onboard 거리 | 상승 / 수평 이동 |
+|---|---|---:|---|---|
+| R04_LOS_NEXT_EE5884 | LOS.Next, unattended RenderOffscreen RHI, Success | 402 | 0.010° / 85.310cm | 247.026 / 222.028cm |
+| R05_LOBBY_EE5884 | 로비 직접, unattended RenderOffscreen RHI, Success | 442 | 0.010° / 85.242cm | 248.402 / 223.120cm |
+| R06_LOS_NEXT_DISPLAYED_EE5884 | LOS.Next 일반 표시 창, unattended/offscreen 없음, Success | 271 | 0.010° / 85.493cm | 246.297 / 226.615cm |
+
+각 실행은 오류0·경고5(오디오 RAW 모드 미지원1·MOUT 데모 옛 입력4), 모터49%·정상 합성 저장 키보드 시동/전진·해제/후진·해제/시점 왕복 범위다. 27개 PNG를 직접 열어 각7개 게임 화면, 총21개만 유효하게 채택했다. `hovering-paused-start-prompt`/`hovering-first-gameplay`는 세 실행 모두 검은 편집기 viewport여서 총6개 제외했다. 존재/바이트 단언이 잘못된 캡처 surface를 걸러내지 못했다. 초기 멈춤/재개 수치가 정상이어도 실제 최초 표시·일시정지 직전 화면은 미확인이다. 실제 PNG 완료/표시 frame도 직접 기록하지 않아 요청 frame과 구분한다. 유효21장에는 지면/장애물/지평선과 시점 복원이 보이고 지속 하늘 시야는 재현되지 않았다. 실제 사용자 embedded PIE의72% 화면을 이 결과로 부정하지 않는다.
+
+R02의357 frames는 실제 Hovering 무입력·motor0/HID0 진입 통과이며 시동/장치 검증이 아니다. R01의 native window 클릭 실패·R03의 LOS 기대 시점/옛 Controller+새 선택ID 혼동은 fixture 실패다. B05 E91A3D의 보호 입력API2개 접근과 TObjectPtr auto포인터 선언 실패(exit6)도 카메라 RED가 아니다. 앞선 정적 검토에서 이 컴파일 오류를 놓쳤고 원본 검토본을 보존했다. 검사만 공개 GetEnhancedActionMappingsView·명시 PCM Get() 포인터로 수선해 B06을 만들었으며 활성 IMC 목록/우선순위는 미지원으로 기록한다. 실제 Pawn의 CameraTilt/CameraPitchRate/AcroGimbal 이름과 공개 매핑·카메라/기체 quaternion·현재/직전 PCM 캐시·throttle/viewport 상태는 기록했지만 private manual pitch 캐시 직접 값은 미관측이다.
+
+PlayerInput mouse/pad/RC 값은0이었고 InterLink 연결 로그만 관찰됐다. 물리 HID 보고 도착이나 PS 등록/실물3장치 동작을 확인한 결과가 아니다. 다음은 현재 사용자 증상 세션을 배정된 실행 담당만 MCP로 읽어 World/ViewTarget/카메라/입력/포커스·장치 수신을 대조하는 것이다. 사용자의 열린 세션을 종료·StopPIE·Build·설정 변경하지 않으며 원인/최소 수정과 같은 실제 경로의 GREEN을 확인하기 전 해결로 바꾸지 않는다.
+
+### MCP 연결과 자동 시작 설명 정정
+
+공유 DefaultEditorPerProjectUserSettings.ini는 bAutoStartServer=False·8000·/mcp다. 옛 공유 True 문구를 현재 설명에서 정정했고 이번 Config 수정은0이다. 사용자가 ModelContextProtocol.StartServer를 직접 실행한 뒤 로컬 HTTP initialize/tools/list200, protocol2025-11-25·래퍼3/toolset23을 확인했다. Codex 네이티브 도구 노출 완료와 구분한다. 처음 질의는 FrontEnd였으므로 이전 오류 상태를 읽은 것으로 쓰지 않는다. ObjectTools 노출 속성의 한계, 임의 UFunction/Python/live Slate 입력/정상 종료 도구 부재, PIE is_dirty 오류와 중단된 전체 dirty 검색을 clean으로 판정할 수 없음은 [MCP 현재 절차](../git/DRONE_UNREAL_MCP.md)에 반영했다. 세션 토큰/개인 로그는 업로드하지 않았다.
+
+### 보존과 담당
+
+자동 실행 최종 인계 `ExecutionOwner/ACTUAL_ENTRY_EXECUTION_HANDOFF.json`과 `R06_FINAL_PRESERVATION_VERIFY.json`은 Source/Config/도구 포함740개 동결·최신 Saved9 byte복원·맵75/보호29 SHA동일·Content9859 파일 집합/크기/mtime 동일을 기록한다. Content 전체 bytes SHA 검사는 아니다. 기존 Drop/Scout/로딩·입력/물리 WIP와 Production Training을 보존했다. 실행자의 Source/Config/자산/맵 저장·Git mutation·외부 GUI 자동화는0이다. 자동 인계 때 engine/compiler0이고 이후 별도 사용자 Editor가 떠 있는 현재 상태와 구분한다. 문서 담당은 Source/Config/자산·엔진/Build/PIE/MCP 엔진/CUA 호출0이며 읽기 파일/PNG 검토와 MD/기존 Space만 수행한다. Commit/Push·Trello·권한·예약 자동화는 없다.
+
+Root는 기존4개 사이드바의 배정·취합, 카메라는 검사/원고, 실행 한 곳은 엔진/복원, 물리는 독립 몸체/HID 읽기, 검증/MD는 독립 검토·기록을 담당한다. 근거는 로컬 `Saved/Automation/Tutorial2Camera_20261105`의 실행/보고서/이미지와 `Coordination/REVIEW_RUNTIME_R04_R05_R06.json`이다. 사용자 원본 오류 화면은 검증 산출물에 byte보존하고 Space에는 사실 요약만 반영한다.
+
+MD7파일과 기존 Drone Space3페이지를 현재 실제 RED/미해결로 반영하고 저장 본문을 재읽어 확인했다. 진행 seq156·시험 seq99·Blueprint seq105이며 새 Page·이미지/개인 로그 업로드·권한/예약 변경은0이다. STATUS27863B·WORKBOARD29925B로 각각30KB 이하, 기존 WORKLOG422591바이트 원문 prefix는 그대로다. UI 모든 폭의 레이아웃 재검증은 아니며 Source/Config/자산·엔진 변경과 Commit/Push는 없다.
+
+
+### 실제 증상 세션 MCP1차 읽기 추가
+
+실행 담당이 보존한 ConnectedRead01 응답5개를 독립 파일로 읽었다. 13:59:40 KST의 TUT_Hover Pawn Actor transform은 Pitch/Roll0°, CameraManager **액터 transform**은 Pitch59.9993°였다. 이는 현재 세션의 실제 MCP 연결/노출 transform 관측이며 내부 최종 PCM POV·private 수동 pitch 캐시·입력값·HID 보고를 읽은 것으로 확대하지 않는다. 14:00:40 KST의 별도 Component 속성 읽기는 CameraBoom 상대 Pitch60°/arm0·FollowCamera 상대 회전약0/FOV69.7265°·CameraFlightPivot 상대 회전0이었다. Actor 읽기·Component 읽기·앞선 모터72% 화면은 서로 다른 시점이며 동일 프레임의 인과관계/수동 캐시 값/원인으로 단정하지 않는다.
+
+원시 근거는 LiveUserRED_20261105_1357/ConnectedRead01의 PAWN_TRANSFORM.json·PCM_TRANSFORM.json·CameraBoom_VALUES.json·FollowCamera_VALUES.json·CameraFlightPivot_VALUES.json(각 HTTP200), 독립 영수증은 Coordination/REVIEW_LIVE_MCP_FIRST_READ.json이다. 최종 실행 담당 MCP 인계는 대기이며 제품 수정·GREEN은 없다. 현재 STATUS/MCP 설명과 기존 Space 진행 페이지에 이1차 범위를 반영한다. 문서 담당의 엔진/MCP 호출·사용자 엔진 종료/StopPIE/설정 변경은0이다.
+
+
+### 실제 MCP 반복 관측과 runtime 입력 조회 거부 확정
+
+ConnectedRead02의 원시 응답5개와 LIVE_READ02_SUMMARY를 독립 대조했다. 두 차례 모두 Pawn Pitch/Roll0°, Boom 상대 Pitch+60°, FollowCamera 상대 회전약0°, CameraManager 액터 Pitch약+60°였다. CameraFlightPivot 상대 회전0·Boom arm0/상속 Pitch·Roll false도 일치했다. 이는 노출 transform/상대 속성의 반복 관측이며 직접 Component world getter·ViewTarget·내부 최종 PCM 캐시·private 수동 pitch 캐시를 읽은 결과가 아니다. 요청별 timestamp가 달라 동일 프레임/화면 촬영 시점으로 합치지 않는다.
+
+14:06:12 KST ObjectTools.get_properties의 실제 PC.playerInput 읽기는 transport HTTP200이지만 tool isError이며 “the following properties could not be read: playerInput”으로 거부됐다. InputReflectionProbe/INPUT_READ_CAPABILITY_RESULT는 현재 도구가 Edit/Blueprint 노출 플래그를 요구하며 Transient PlayerInput은 해당하지 않음을 소스와 대조했다. ActionInstanceData까지 RPC 실패를 관찰한 것이 아니라 PlayerInput 참조를 얻지 못했고 해당 runtime 값도 미관측이다. 따라서 현재 Mouse/Pad/RC·CameraTilt/AcroGimbal 값과 과거 camera delta 발생원인은UNKNOWN이다. 축0/장치중립/기본 RC 입력을 실제 원인으로 확정하지 않는다. 독립 근거는 Coordination/REVIEW_LIVE_MCP_FINAL_SCOPE.json이다.
+
+카메라 담당은 RC 기본 짐벌 연결 최소 수정 후보·발생원인 bounded 로그·회귀 검사 원고를 준비 중이다. 빌드/일반 PIE의 실제 delta source 및 수정 GREEN은 아직 없다. 이전3회 자동 PASS를 반복해 원인/해결로 처리하지 않는다. 물리 담당은 비행축/스로틀/Mode1·2/사용자 명시 override 보존을 읽기 검토하며 엔진은 실행 담당 한 곳만 사용한다. 현재 사용자가 연 PIE를 종료·StopPIE·Build·저장/설정 변경하거나 예전 Saved9로 원복하지 않는다.
+
+작성 이력 질의도 읽기 추적했다. GetIntendedAirframeTransform/UpdateAssistedStrikeCameraAim은 5ed30281a(10/23 17:55 KST, Git 작성자 gyeonliz)이며 FPV/광섬유·쉬운/게임 조작 조건 때문에 현재 Scout Mode2에는 적용되지 않는다. CameraFeel 짐벌 지연은 e053e38df(10/30 20:04 KST, gyeonliz·Claude Opus5.5 공동작성 기록), 현재 Scout 누설 차단은 그 뒤 기존 미커밋 WIP로 이번 RC 후보 수정과 구분한다. Mode1/2 AcroGimbal/RC Axis3 기본 연결은 b494b4f04(10/31 15:22 KST, 같은 공동작성 기록)이며 정상 카메라 입력 누적 경로는 실행 가능하지만 실제 원인은 미확정이다. Git 작성자/공동작성 trailer와 실제 타이핑 주체를 동일시하지 않으며 미커밋 개인 작성자를 추정하지 않는다. 상세는 Coordination/CAMERA_TILT_AUTHORSHIP_REVIEW.json이다. Git mutation은0이다.
+
+이번 반복 MCP/입력 거부 범위의 MD·기존 Space 반영을 재읽기로 확인했다. 최종 진행 seq158·시험 seq100·Blueprint seq106이며 새 Page/권한/예약/개인 로그 업로드는0이다. STATUS28002B·WORKBOARD29884B, WORKLOG 최초422591바이트 원문 prefix 보존을 확인했다. 수정 원고/빌드/실제 GREEN 완료를 뜻하지 않는다.
+
+## 2026-11-05 — RC 카메라 B07 실사용 확인과 충돌·수평 후속
+
+- D PC Unreal `5a08d015`·MD `e24c5c0` + 기존 WIP. Root가 전달한 사용자 확인은 B07의 Tutorial2 InterLink에서 카메라가 자동으로 위로 돌아가지 않음이다. 이 특정 실사용 확인을 모든 장치/미션의 해결로 확대하지 않는다. 최초 하늘 RED의 실제 원시 입력과 과거 각도 누적 원인은 여전히UNKNOWN이다.
+- 실제 B07 실행 영수증 `Tutorial2Camera_20261105/Runs/B07_RC_CAMERA_FIX/END.json`의 exit0·DLL `C002C75E4C3013637C7D697AEC729EAAADA5B36EE47E07B94B9A72FAE92D0E1C`와 R08 Report/index.json의 DeviceBindings5 Success/오류0/경고0을 읽었다. R07은 첫 WorldTick의 합성 Controller fixture에서 RC축 주입 전 접근 위반으로 중단돼 카메라 각도 회귀 판정이 없다. 제품 입력 실패나 전체 통과로 기록하지 않는다.
+- 최종 test-only READY `FA0612F7D04765C6BDC12769DC626F70C67C754940EDCE4AC8905CBA449801C9`의9파일 SHA를 독립 대조했고 제품5파일은 B07과 동일했다. Lifecycle의 실제 RuntimeContext 적용 확인·effective mapping 비교와 종료 감시 Capture가 같은 포인터를 사용하며, 앞서 지적한1109행 수정/비const 선언을 확인했다. Lifecycle SHA `39605779BA6CDEBB661266FE370AD7E082253FB8F76482CFEA280509DF330FFA`. 이 정적 지적은 해소됐지만 수정된 RC/UI/Lifecycle/진입 검사의 새 Build/실행 결과는 아직 없다. 검토 정본은 `Coordination/RC_CAMERA_TEST_REPAIR_FINAL_INDEPENDENT_REVIEW.json`이다.
+- 새 사용자 요청은 튜토리얼 숨은 벽/전봇대 전선 걸림과 M1 전선 허공 막힘, 간헐적인 중립 후 수평 복귀 실패다. 후자는 모드 표시가 그대로인데 기체가 기울어진 채 유지된다는 사용자 관측이며 모드 자동 전환은 확정하지 않는다. 현재 충돌 HitActor/컴포넌트와 수평 실패 원인/최소 수정/검증은 미완료다.
+- 실제 Source의 기존 M1 전선 정책은 `Mission.Story.GoldenTime.Test`·GameWorld·선택 DA와 실제 World 전체 패키지 일치·출격 runtime placement 경로에서 정확한 `/Game/Battlefield/StaticMeshes/Props/SM_Wire_01.SM_Wire_01` 컴포넌트만 NoCollision으로 한다. `.Test`는 실제 M1 ID이며 실제 맵 `/Game/Drone/Maps/Lvl_Battlefield`를 TestMap 전용으로 해석하지 않는다. 튜토리얼 ID/다른 메시/볼륨과 일회 스캔 이후 생성 부품은 기존 적용 범위 밖일 수 있으나 이번 실제 원인으로 단정하지 않는다. 원본 BP/Mesh/맵 저장을 하는 코드가 아니다.
+- 10/29 WORKLOG 원문의 실제 M1 wire18/pole23·중앙 simple/complex line/18cm sweep 기록은 당시 범위로 보존했다. 문서에 적힌 CameraCollision_20261029 원시 영수증은 현재 Saved 경로에서 발견하지 못했으므로 이번 새 원시보고서 검증으로 쓰지 않는다. 11/04의 degenerate5/정상300 보존도 해당 기록 범위다. 기존 검사는 모든 길목·몸체/로터/카메라 형상의 무차단을 입증하지 않는다.
+- 소스 TUT 실제 경로 기대값과 디스크8맵 존재를 대조했다: LOS/Hover/Forward/CircleGate/FreeGate/FPV/Delivary_2/UGV_Turret. 저장 DA 전부를 엔진으로 새 조회한 것은 아니다. 실제 ID/전체 패키지/차단 부품과 프로필·채널·형상을 실행 담당이 수집하고 정상 목표/게이트/배달 overlap·전봇대/정상 이웃·지면을 보존해야 한다. Production Training 시험 저장/덮어쓰기/재생성은 금지한다. 정본 `Coordination/COLLISION_SCOPE_INDEPENDENT_REVIEW.json`.
+- 기존4대화만 유지한다. Camera는 최종 test-only 인계 뒤 충돌 조사, Physics는 B07 기준을 보존해 FlightPawn.cpp/h의 수평 복귀 조사/최소 수정, 실행 한 곳만 엔진/Build/PIE/MCP/실맵 적용, Root는 취합, 검증/MD는 독립 읽기·기록을 맡는다. Root가 사용자 엔진 종료와 검사 엔진 준비를 전달했으며 문서 담당은 엔진을 조작/조회하지 않았다. 조사 인계 최신 사용자 Saved98을 보존하며 과거 Saved9로 복원하지 않는다. 이번 기록은 진행 상태이며 완료 처리가 아니다. Source/Config/자산/맵 변경·엔진 실행·Commit/Push·Trello/공유/예약 변경은 없다.
+
+## 2026-11-05 — 카메라·공중 UI 입력·충돌 최종 검증과 전달
+
+- D PC 검증 시작 Unreal main `5a08d01548dbc749bcd31bdf54b1b641fd806381`·MD main `e24c5c0dcd88bf7edc5ca66e7ceb302cd53452f3`와 기존 관련 WIP를 보존했다. 사용자 "다끝나고 나면 커밋 푸쉬" 승인에 따라 최종 검증/MD·기존 Space 동기화 뒤 관련 완성 변경을 선별 Commit/정상 Push한다. Source/엔진은 각각 배정된 담당만 사용했고 검증·MD 담당은 Source/Config/자산/맵을 수정하지 않았다.
+- 카메라: 기본 InterLink 카메라축을 미지정으로 두고 명시적 할당/반전·비행축 재지정·IMC53행/저장 ID·키보드/패드 조합을 보존했다. 사용자가 B07 Tutorial2 InterLink에서 카메라 자동 상향 없음 확인을 전달했다. 최초 embedded PIE 하늘 RED의 실제 입력/과거 누적 원인은 여전히 미확정이며 PCM 액터 회전 관측을 내부 최종 POV/동일프레임 측정으로 확대하지 않는다. 초기 R07 fixture 접근 위반과 R08 입력5 통과, R09 수정된 RC/중립8 통과는 당시 모듈 기록이다.
+- 공중 UI 원인 경로: B10/R13의 실제 Prototype PIE FPV3(DeviceRebind/KeyboardRebind/PauseResume)는 시동·공중 조건 성립 뒤 모두 모터 유지 단언만 Fail했다. control3/HORIZON2·스로틀 명령 before/after0.6512는 그대로였지만 motors0·초기 fixtureRoll20°가 남았다. 기존 자유비행 중립4조건은 정상이며 실제 원 사용자 직전 UI 조작이 확인된 것은 아니다. 따라서 원 사용자 원인 확정과 실제 재현된 생산 소프트웨어 경로를 분리한다.
+- 수선은 UI 입력 해제와 명시적 모터 정지의 분리다. 이미 Armed/공중/링크 정상/출발대기 없음인 비행만 보존하고 RC 절대 스로틀은 마지막 유효값, 키보드/중앙복귀패드는 기존 hover 명령으로 정리한다. OFF/죽음/링크 손실/hold/점유·기체 교대·새 입력원의 low-before-arm 보호를 유지하며 stale armed 강제복구를 하지 않는다. 모드·실제 각속도와 LOS 방향 선택을 유지한다. DroneAcroFlightComponent SHA `816BA618ACA49500C8A6657686291A5D1E234FE2180DBD771817B24DBE84AC88` 불변이며 자세 수학·새 모델·GPS/게인/데드존을 바꾸지 않았다.
+- 독립 검토에서 UI 정리가 영구 LOS-DIR 토글까지 끄는 회귀1건을 찾아 그 한 줄만 제거했다. 실제 Observer ViewTarget/공개 방향 ON의 전후 보존3조건을 추가했다. 임시 TraceCameraPitchInput/4호출·24/4 예산 필드는 제거하고 command getter/유효 회귀는 보존했다. B12/R15는 LOS3+안전/방향2만 실행됐고 기존 FPV3은 계층명 때문에 숨겨져 미실행이었다. 표시명 한 줄을 LOS.*로 옮기고 내부 명령/단언/제품 코드를 유지한 B13에서6건 모두 실제 실행했다. 이 중간5를 최종6에 더하지 않는다.
+- 최종 B13_UI_TEST_NAMES_FINAL Build exit0, DLL `207C4A7FA1FAB2D9B0E24E7C3980BB1795887E3D33D3BCBD218160F73B1625B9`; D1286873A78263470C662C82A7439ED263559951268D50BEA234B43B0B6A2847 READY17파일 동결을 대조했다. R16_FINAL_UI_AND_REGRESSION은 같은 DLL의 정확28건 Success(일반18/경고포함10), 오류0/미실행0·경고17이다. 원 FPV3+LOS3 모두 motors1·스로틀0.6512 유지, LOS 선택/시점 유지·명시OFF 뒤 held-high 재시동 거부를 단언했다. UI후 짧은 관측의 Roll은 약7~9°로 복귀 중이며 이6건만으로3초 완전 수평을 단언하지 않는다. 별도 명시 RC 중립4조건/실제 Angle-Horizon, 카메라 RC·Mode2, 모터/장치 인계·착지, lifecycle/실제 LOS.Next 진입과 Native/Saved 설정 회귀도 이28에 포함된다.
+- 별도 재사용: B12/R15의 CenteredSafetyLifecycle·ObserverRelativeMovement2건은 제품 코드 불변/표시명 한 줄 차이로 유지했다(DLL E51AFFF60F830E115E0A9AA1CB8C350489526CD15A4B3C98E994F86FE8C33484). B10/R14의 충돌7건은 helper/Controller/형상·채널·시험 관련6파일 불변을 확인해 유지했다(DLL 5A47ABE9E3223E9339A3AE5340F27EB0EDB50816C2229E87785259D803268333). 최종28과 이전9를 단일 DLL/단일 실행37통과로 표시하지 않는다. 이전 Drop3시점/Scout·로딩/NoGPS 완료 WIP와 원시 검증은 각 기존 절/영수증을 보존하며 새 실행에 중복 합산하지 않는다.
+- 충돌 정책은 정확한 전선/케이블과 FPV 순수 물리벽만 런타임 해제한다. R14 실제 FPV PIE는 native cable20/벽16 retained NoCollision·기둥 유지와 정상 표적 파괴→Mission Success를 확인했다. M1은 실제 선택 Drop Legacy SphereComponent/Pawn 채널2로18전선의 simple/complex36경로에서 Visibility18/동일채널18/활성형상 모두 무적중,3폴대 몸통·상단을 포함48비교와 native 폴대 양성대조3을 확인했다. 전선18 NoCollision/기둥23 Blocking·0배율5 비차단/정상300 유지. 주변 액터를 숨기지 않은 조회이며 다른 적중을 곧바로 결함으로 단정하지 않았다. 추가 의도치 않은 M1 차단체는 특정되지 않았고 모든 길목/방향/기체·원 사용자 허공 막힘 완치를 주장하지 않는다.
+- UE5.8 response 배열64칸과 ECC_MAX65의 차이를 놓쳐 M1 진단/제품 벽 필터가 인덱스64를 읽던 결함은 실제 배열 순회·유효채널/출력 개수 단언으로 수선했다. R14 7/7은 실제 채널2, 출력64개·0~63/유효응답만, 채널64/채널경고0을 확인했다. 이전 R12의64:16과 그 정적 검토 누락은 이전 원문/감사에 보존하며 최종 깨끗한 검증으로 소급하지 않는다.
+- 경고/제한: 최종 R16 경고17=HTTP2/RHI 가상예산1/Audio RAW 미지원10/기존 MOUT legacy input Blueprint4. 사전 startup Condition failed15는 선택 검사 시작 전 진단이며 report오류0과 구분한다. 정확한 기원은 별도 추적되지 않아 무해로 단정하지 않았다. 재사용 R14 M1 경고61=convex39(MudTracks/지형Spline12 컴포넌트 범위·실제 노면 영향 미검증),0축스케일15(고유5 반복·런타임 NoCollision5/정상300 유지),Nanite/RT3,빈Nav2,Recast부재1,AudioRAW1이다. 후속48kHz2채널 초기화 성공과 실제 청감은 별도다. 로딩 형상 경고를 새 전선/폴대 적중 원인으로 연결하지 않으며 실물 HID·사용자 손 조종·청감·모든 미션/Cook/패키징은 별도다.
+- 최종 실행·보존 정본: `Tutorial2Camera_20261105/ExecutionOwner/FINAL_ACCEPTANCE_HANDOFF.json`·`FINAL_PRESERVATION_RECEIPT.json`. 검증 담당도 현재 동결입력743·최신 사용자 저장99·맵75·보호자산29를 다시 SHA 대조해 차이0과 실제 DLL 일치를 확인했다. Content9859는 파일집합/크기/mtime 보존이며 전체 Content SHA 주장 아님. Production Training 저장0·소스/자산의 실행 담당 변경0·엔진/컴파일러0 영수증을 확인했다. 개인 저장·원시 로그·대용량 자산은 Space에 업로드하지 않는다.
+
+- 전달 기록: 기존 Drone Space 진행/시험/Blueprint의 해당 본문3개를 저장하고 각각 seq160/102/108에서 기대 본문과 정확한 재읽기 일치를 확인했다. 게임 main `7771f5491d6734a599856d5aebbc28b5d1fd5c04`를 origin에 정상 Push했고 원격 refs/heads/main 일치·남은 tracked/untracked WIP0을 확인했다. 커밋34파일은 최종 동결 raw SHA 그대로이며 저장 blob은 CRLF→LF 정규화만 다른 것을 대조했다. Drop/Scout·로딩·NoGPS 기존 완성 변경도 포함했고 개인 Saved·로컬 RawInput Input.ini는 추가하지 않았다. MD12파일도 기존 관련 변경을 보존해 선별 전달하며 이 문서 자신의 commit hash를 기록하기 위한 순환 commit은 만들지 않는다. 최종 두 저장소 식별자와 원격 일치는 기존 Space 진행 페이지에 남긴다. 로컬 전달 영수증은 `Tutorial2Camera_20261105/Coordination/FINAL_DOCS_SPACE_HANDOFF.json` 및 `GitPrep/READ_ONLY_COMMIT_SCOPE.json`이다.

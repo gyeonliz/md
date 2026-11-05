@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-11-05 D PC — Git 분기/미커밋 정리. 검증 결과는 11/04 기록. [STATUS](STATUS.md).
+마지막 갱신: 2026-11-05 D PC — 카메라·공중 UI 입력 수선 검증, 실물/전체 경로 제한은 [STATUS](STATUS.md).
 
 ## Now
 
@@ -34,7 +34,7 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 | MISSION-PHOTOS-1103 | 13미션 사진 통일 | Thumbnail=BriefingImage·레이싱 번호 유지 | 전체 사진 수동 대조. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
 | UI-SELECT-3D-1103 | 선택3D 재로딩 | 지연 재생성·재촬영·프리스트림 구현 | 열기/기체 전환/재오픈 실기. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
 | SIMPARITY-EXEC-01 | 전체 점검·영향 재검 | 574개+fixture 영향 재검, 최신573통과/실패0/스킵1. [근거](docs/history/DRONE_WORKLOG.md#2026-11-04--전체-점검-실패-수선과-재검사) | 자동 완료·실물 조종/청감·패키징 별도 |
-| FLIGHT-MODE-01 | 실기 정합·모드 | 게임 조작 폐지·쉬운 유지·P/S/A·FPV Angle 구현 | 비행·설정/OSD 수동 확인. [정본](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md) |
+| FLIGHT-MODE-01 | 조작·카메라 | 좌표 복귀 없음·LOS 방향·Drop3시점·정찰 자세 분리 | 실물 조종 확인. [정본](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md) |
 | FLIGHT-PHYSICS-01 | 공력·외형·카메라 | SkyDive FPV타격/레이서·광섬유 정합 구현·광섬유 적용 결정됨 | 손 조종 대기·광섬유15m/s 상한 조정 미정. [정본](docs/gameplay/DRONE_REALISTIC_HANDLING_PLAN.md) |
 | ROTOR-PILOT-KEYS-01 | 파일럿 체감·교정 | 공통 평면 본체4~7·69검사/RHI 접지 확인 | 실물 조종 후 튜닝 |
 | SOUND-PACK-14 | 제출음원14종 | 연결/편집Bank·고유오디오22 통과 | 보존확인·코드Push/문서동반, 청감 조정 후속 |
@@ -69,7 +69,7 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 | UI-SELECT-ART-01 | 전체 Pretendard·선택명 | Native/Designer 10종 공통 적용·기존 크기/굵기 보존, 목록 끝 괄호만 숨김. 추가 렌더14/14·Story/설정 캡처 확인 | 실제 패드·1280/1920 가독성. DA/ID·아트 보존, 아이콘/명시 Opt-out 제외 |
 | UI-CONTROL-LAYOUT-01 | 조작 목록 | 게임 조작 제거·옛 저장값 이전 구현 | 설정/패드·종료 후 복원 수동 확인 |
 | UI-RESULT-LAYOUT-01 | 결과창 | Mission/WBP_DroneMissionResult에 배치 저장·실행 시 Designer 값 보존 | 현재 패드·다음/재도전/복귀 확인 |
-| UI-LOADING-PAUSE-01 | 로딩·일시정지 | Story/Procedural 로딩·취소, 미션 일시정지/재시작/타이틀 복귀 연결을 소스로 확인 | 현재HEAD Build/회귀→Esc/Start·재개·같은 시드/취소 실기 확인. Pause 포커스 관찰은 UI-FOCUS-RACE-01 |
+| UI-LOADING-PAUSE-01 | 로딩·일시정지 | 맵 이동 전 자연 paint/RHI 완료·준비 후 강제 대기 제거 | 생성 취소/복귀·실물 확인. [정본](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#시드-레이싱로딩일시정지-확인) |
 | UI-FOCUS-RACE-01 | UIOnly 첫 포커스 | 미렌더4건 재실행 통과는 Claude 인계. 원시 집계 차이 WORKLOG | 실제 패드 첫 강조·렌더 여부 대조, 안정화 확정 금지 |
 | UI-MEETING-LOBBY-01 | 5메뉴·WBP 연결 | 이동 참조/TitleMenuClass 복구·구현, 상세 WORKLOG | 패드 순환·진입/복귀·B/Esc·해상도 확인 |
 | UI-CONTROL-DISPLAY-01 | 조종 입력 표시 | WBP 참조 복구·설정/저장 구현, 기본 False 유지 | 위치·저장/재실행·기본값 복원. 장치 전환/분리 정책 미정 |
@@ -146,9 +146,7 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 
 ## Next
 
-Git: 코드 main/origin 1/1, 충돌 예상0·병합 대기. 문서9개 미커밋. [정본](docs/history/DRONE_WORKLOG.md#2026-11-05--git-점검과-정리).
-
-[최종 수선·재검사 WORKLOG](docs/history/DRONE_WORKLOG.md#2026-11-04--전체-점검-실패-수선과-재검사)를 현재 기준으로 사용한다. 옛 실패 등록은 최신 자동 결과를 면제하는 기준으로 쓰지 않는다.
+카메라·UI 수선 최종28통과와 이전9 별도 재사용을 확인했다. 원 사용자 순간의 원인·실물 전장치·M1 모든 경로는 미확정이다. [최종 검증·제한 정본](docs/history/DRONE_WORKLOG.md#2026-11-05--카메라공중-ui-입력충돌-최종-검증과-전달).
 
 1. 실제 키보드·플스·InterLink로 시동/착지·방향/키 설정·M4 세 시작점/교대와 전체 미션을 손 조종한다. 자동 주입 결과와 구분한다.
 2. 출발 카운트·체력 경고·무기/폭발음을 실제로 듣고, 실제 배달/사진과 첫 프레임 문구도 확인한다.

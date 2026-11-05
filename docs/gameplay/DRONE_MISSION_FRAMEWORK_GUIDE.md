@@ -318,7 +318,9 @@ M3는 배치된 체크포인트가 없으면 최초 출격 위치를 사용한�
 
 BP의 `TargetCapsules.PaddingCentimeters`는 월드 기준 기본 4cm(0~10cm)다. 메시 교체·여유값 변경 후 `RefreshCapsules()`로 다시 맞춘다. 일반 Mission 표적은 `bUseCapsuleDamageCollision=true`가 기본이며 시설에 기존 Box가 필요한 경우만 끄고 `RefreshDamageCapsules()`를 호출한다. 살아 있는 표적의 Off→On 전환은 복구하고, 파괴 후에는 캡슐이 다시 활성화되지 않는다. 재머의 기존 10cm 캡슐·병사·정문/건물·지형·재밍 AOE와 비행 기체 Sphere Root/전방 기폭 센서는 이 변환에 포함하지 않는다.
 
-M1 `Battlefield`의 전봇대 어셈블리에는 전선 `SM_Wire_01`과 기둥 `SM_TelephonePole`이 분리되어 있다. M1 시작 시 `DroneStoryEnvironmentCollision::ConfigureOverheadWires`가 전선 컴포넌트만 NoCollision으로 설정한다. 기둥의 충돌·전선 외형·배치/가시성과 원본 맵·BP·Mesh 자산은 유지한다. 다른 미션이나 Editor World에는 적용하지 않는다.
+M1 `Battlefield`의 SM_Wire_01/SM_TelephonePole은 분리돼 있다. `ConfigureOverheadWires`는 M1와 명시한 튜토리얼8개의 Game World에서 정확한 전선 메시 또는 MOUT BP_ElectricityPole 소유의 native CableComponent만 NoCollision으로 한다. 전봇대 몸통·다른 owner 케이블·외형/배치/가시성과 원본 맵/BP/Mesh는 유지한다. 선택 DA와 실제 World 전체 패키지가 일치하는 출격 배치 경로에서만 호출하며 Editor 자산을 고치지 않는다.
+
+FPV의 `ConfigureTutorialInvisibleWalls`는 Mission.Tutorial.FPV와 TUT_FPV_Target 전체 패키지, 지정16개 native BlockingVolume/Brush·InvisibleWall 프로필만 대상으로 한다. 태그·추가 컴포넌트·연결된 Hit/Overlap 이벤트·어떤 채널의 Overlap 응답이라도 있으면 제외한다. 같은 Actor/목표·게이트를 일괄 비활성화하지 않는다. 응답은 실제64칸 배열만 순회하고 deprecated 채널64를 조회하지 않는다. 런타임 전선20/물리벽16·목표 진행과 M1 실제 형상 비교의 검증/제한은 [최종 검증·제한 정본](../history/DRONE_WORKLOG.md#2026-11-05--카메라공중-ui-입력충돌-최종-검증과-전달)을 따른다. 다른 수업의 벽이나 M1 허공 막힘 전체가 해결됐다는 뜻은 아니다.
 
 같은 M1 Game World에서 `ConfigureDegenerateSplineSections`는 `/Game/Battlefield/`의 `BP_ConcreteBarriers_Spline`·`BP_BarbedWire` 계열 중 축 배율이 0인 장식 section만 충돌·overlap·navigation 기여를 해제한다. 정상 배율의 이웃 section과 외형·배치·작성 맵/BP는 보존한다. 런타임 판정 수선이므로 원본 자산 로딩 때의 0배율 Body 경고 제거와 구분한다.
 

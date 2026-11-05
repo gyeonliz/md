@@ -1,6 +1,6 @@
 # 드론 역할·조작 방식·물리 비행 기준
 
-기준: 2026-11-04 D PC, Unreal main `682852c5` + 로컬 감사·수정. 현재 실행 담당은 Codex 한 곳이며, 이전 Claude 실측 정합과 이번 Antigravity 변경 감사를 구분한다. [현재 감사 근거](../history/DRONE_WORKLOG.md#2026-11-04--antigravity-변경-감사와-병합-버전-검증)·[실측 정합 원문](../history/DRONE_WORKLOG.md#2026-11-03--skydive-실측-정합fpv-물리)을 따른다.
+검증 기준: 2026-11-05 D PC, Unreal `5a08d015` + 최종 카메라·공중 UI 입력 수선. 기존 Claude 실측 정합·Antigravity 감사와 날짜별 결과는 보존하며 [최종 검증·제한 정본](../history/DRONE_WORKLOG.md#2026-11-05--카메라공중-ui-입력충돌-최종-검증과-전달)을 따른다.
 
 ## 기획 자료 사용 원칙
 
@@ -54,6 +54,18 @@ Racer는 실제 레이싱용 기체, Scout/Drop/FPVStrike/FiberOptic은 전쟁 �
 
 정찰/투하 짐벌은 −90~+60°·최대100°/s다. DJI 1인칭은 외형이 기울어도 수평을 유지하고 FPV는 기체 자세를 따른다. 참조는 [DJI Mini 4 Pro 공개 사양](https://www.dji.com/mini-4-pro/specs)이며 실기체 광학/조종감 교정 완료를 뜻하지 않는다.
 
+### 정찰 카메라의 수동각과 자세 분리
+
+정찰 프로필의 `bStabilizeAirframePitchAndRoll`이 켜져 있으면 쉬운 조작·모드1·모드2의1인칭/3인칭 모두 사용자가 둔 카메라 Pitch/Roll을 유지하고 Yaw는 기체를 따른다. 기체의 전진/제동/착륙 자세를 카메라에 다시 물리지 않으며1인칭의 지연 짐벌 자세 누설을 제거했다. 수동 상하 입력을 놓아도 선택한 각을 유지하고 기본 진동·피격 효과는 보존한다. Drop·FPV·Racer와 비행/제동 물리값은 바꾸지 않는다. 현재 자동/실물 검증 경계는 [WORKLOG](../history/DRONE_WORKLOG.md#2026-11-05--정찰-카메라-고정과-맵-로딩-최초-표시)를 따른다.
+
+기본 InterLink 카메라축은 미지정이며 명시적 할당/반전(같은 Axis3 포함)을 보존한다. 비행축 재지정·키보드·Mode1/2 조합과 선택한 카메라 각 유지 정책은 그대로다. 사용자의 Tutorial2 InterLink 자동 상향 없음 확인과 자동 회귀를 구분한다. 공중 UI 입력 해제는 이미 켜진 모터·실제 RC 스로틀·Control/Attitude 모드와 LOS 방향 선택을 유지하며, 명시적 OFF·죽음·링크 손실·출발대기·기체 교대의 안전 초기화는 유지한다. 자세 수학·새 모델·GPS를 바꾼 수선이 아니다. 원 사용자 순간의 입력 원인은 미확정이며 재현된 UI 모터OFF 경로와 구분한다. [현재 확인 절차](DRONE_TEST_MAP_GUIDE.md#공중-ui-입력-해제와-모터-유지)·[최종 검증·제한 정본](../history/DRONE_WORKLOG.md#2026-11-05--카메라공중-ui-입력충돌-최종-검증과-전달)을 따른다.
+
+### 드랍 드론의 3시점 선택
+
+기체 선택창의 Drop 시점 행에서 **1인칭 / 3인칭 / 투하 카메라**를 선택한다. 선택은 즉시 Drop 전용으로 저장하고 다음 출격·재출격에도 우선 적용한다. 별도 선택이 없으면 기존 전역 기본 시점→기체 기본값을 따르며 다른 기체의 시점·전역 기본 시점 enum/선택은 바꾸지 않는다.
+
+일반 시점 전환 P/패드 Triangle/InterLink Button13은 Drop에서1인칭→3인칭→투하→1인칭으로 순환하고 다른 기체는 기존 두 시점 전환을 유지한다. 우클릭/패드 LB/InterLink Button12의 보조 기능은 투하 보기 진입/직전1인칭 또는3인칭 복귀를 유지한다. 실제 LOS Observer ViewTarget은 전환하지 않으며 숨은 기체 카메라 상태만 바뀐다. 선택 UI 조정은 [설정·선택 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#드랍-드론-출격-시점-선택), 키 재지정은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)을 따른다.
+
 Drop 우클릭 하부 보기는 기체가 Pitch/Roll되어도 기체 중심 바로 아래에서 월드 수직을 바라본다. Offset의 Z만 하방 거리에 사용하고 XY·DropAimPitch 설정과 관계없이 수직을 유지한다. 진입 즉시 변환을 갱신하고, 복귀하면 이전 Target/Socket offset·회전 지연·전방 프로필을 복원한다. 움직이는 폭탄은 속도를 상속하므로 이 수직 시점 자체를 착탄 예측 마커로 간주하지 않는다. 일반 FPV 위치 smoothing·피격 Shake를 유지한다. 미등록 LongRangeStrike의 fallback은 HFOV124°/Pitch+5°이며 플레이 기체 추가를 뜻하지 않는다.
 
 프로필 우선순위는 **Pawn BP camera override → FlightProfile camera override → MissionRole 기본값**이다. DA는 `FlightProfile.bOverrideRoleCameraProfile + CameraProfile`, Pawn BP는 `bOverrideRoleCameraProfileInBlueprint + BlueprintCameraProfileOverride`에서 조정한다. 카메라만 바꾸려고 비행/스로틀 BP override를 켤 필요는 없다. 사용자 FPV HFOV가0이면 이 프로필을 따르고,60~150°를 명시하면 최종 FPV HFOV에 적용한다. 3인칭과 Drop 하부는 독립이다. 기본 시점/조작의 저장·선택 적용은 [설정 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#9-사운드--화면--성능-설정)를 따른다.
@@ -84,17 +96,17 @@ FPVStrike/FiberOptic은 기존 자동 무장·해제 잠금을 유지한다. 자
 
 | 역할 | 현재 경로 | 스틱 해제·전환 |
 |---|---|---|
-| 정찰·투하 | P(N)→S→A | P/S는 GPS 능동 제동·위치 유지·바람 보정, A는 수평 복귀/고도 유지·표류. Mode1/2 DJI식 스틱·짐벌 안정화 |
+| 정찰·투하 | P(N)→S→A | P/S는 속도·제동/바람 보조, A는 자세/고도 보조. 수평 좌표 유지·복귀 없음. Mode1/2 스틱·짐벌 안정화 유지 |
 | FPVStrike·Racer·FiberOptic | Mode1/2·기본 Angle, Rate/Angle/Horizon 전환 | Rate는 수평 복귀 없음, Angle 최대60°·중립 수평, Horizon 중앙 복귀·스틱 끝에서 복귀 감소 |
 | UGV | 기존 지상 주행 | 비행 모드 순환 제외 |
 
-`F`/패드 `L3`/RC `Button3`로 순환하고 HUD는 `P-GPS`/`S-SPORT`/`A-ATTI`와 FPV 자세 모드를 표시한다. 선택은 다음 기체에 이어지고 디스크 저장은 설정 적용 때 수행한다. 실제 종료/재실행 복원·장치 체감은 확인 대기다. FPV OSD는 사용자 결정대로 인공수평선·중앙 조준선을 유지하고 셀 전압·시간·LQ·스로틀 글자는 항상 숨긴다. Native 글자를 생성하지 않으며 저장/자식 WBP의 HudKitOsdVoltageText/TimerText/LinkText/ThrottleText도 숨긴다. WBP_DroneFlightHUDKit의 Drone|HUD|FPV OSD에서 bShowFpvOsd로 선 표시를 켜고 끄며 Horizon Max Pitch/Roll 기본20°/40°·Pitch Travel0.18을 조정한다. 모드1/2의 실기 송신기 1인칭에서만 보이고 Easy/3인칭에서는 숨긴다. DJI 모델값·튜닝 한계는 [물리 정본](DRONE_REALISTIC_HANDLING_PLAN.md#dji-교육-비행과-외형-기울기)을 따른다.
+`F`/패드 `L3`/InterLink `Button3`은 실제 사람 관찰 ViewTarget의 모드1/2에서 사람 기준 이동 방향을 ON/OFF한다. 기본OFF이며 기체가 회전해도 관찰 카메라 기준 전후좌우를 유지한다. 실제 Pawn 1인칭·기체 추적 시점과 쉬운 조작에서는 이 방향 보조를 쓸 수 없다. 실제 관찰 ViewTarget을 보는 동안 숨은 Pawn FPV/하부카메라 플래그만 바뀐 경우에는 사람 관찰 시점으로 취급한다. 그 밖의 뷰에서 같은 키는 기존 역할별 비행 모드를 순환한다. 방향 토글은 제동·스로틀·자세 모드 선택을 바꾸지 않는다. HUD 공급명은 `P-ASSIST`/`S-SPORT`/`A-ATTI`, 방향 ON은 `LOS-DIR`다. 키 재지정과 자세한 허용 조건은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#사람-기준-이동-방향-보조)을 따른다. FPV OSD는 사용자 결정대로 인공수평선·중앙 조준선을 유지하고 셀 전압·시간·LQ·스로틀 글자는 항상 숨긴다. Native 글자를 생성하지 않으며 저장/자식 WBP의 HudKitOsdVoltageText/TimerText/LinkText/ThrottleText도 숨긴다. WBP_DroneFlightHUDKit의 Drone|HUD|FPV OSD에서 bShowFpvOsd로 선 표시를 켜고 끄며 Horizon Max Pitch/Roll 기본20°/40°·Pitch Travel0.18을 조정한다. 모드1/2의 실기 송신기 1인칭에서만 보이고 Easy/3인칭에서는 숨긴다. DJI 모델값·튜닝 한계는 [물리 정본](DRONE_REALISTIC_HANDLING_PLAN.md#dji-교육-비행과-외형-기울기)을 따른다.
 
 ## 현재 조작 방식
 
 ### 쉬운 조작
 
-쉬운 조작은 유지한다. 정찰/투하는 교육 비행 모델, FPV 계열은 실기 송신기 경로를 따른다. 상승/착지 정책은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#space키-자동-시동off-정책)을 따른다.
+쉬운 조작은 모든 비행 역할의 선택지로 유지하며 수평 GPS 좌표 유지·옛 좌표 복귀를 사용하지 않는다. 정찰/투하는 기존 이동·속도/제동 교육 모델, FPV 계열 쉬운 조작은 기존 보조 경로를 유지한다. 공기저항·관성·수평 복귀·고도/착륙 보정을 보존하며 Mode1/2의 사람 방향 토글과 분리한다. 상승/착지 정책은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#space키-자동-시동off-정책)을 따른다.
 
 ### 게임 조작 호환 처리
 
@@ -123,7 +135,7 @@ FPV 기본 조작은 Mode2·기본 자세 Angle이며, 설정 조작 목록은 `
 | Roll | `A/D` | 오른쪽 Stick X | 오른쪽 Stick X | 기체 좌/우 회전, 90° 제한 없음 |
 | Pitch | `W/S` | 왼쪽 Stick Y | 오른쪽 Stick Y | W는 Nose-down/전진 방향 Pitch, S는 Nose-up/후진 방향 Pitch |
 | Mouse Look | Mouse X: 기체 Yaw, Mouse Y: Camera Pitch | 해당 없음 | 해당 없음 | Rate 스틱이 아닌 개발용 직접 회전/카메라 입력 |
-| 1인칭/3인칭 | `P` | Y/Triangle | Y/Triangle | 임시 시점 전환 |
+| 시점 전환 | `P` | Y/Triangle | Y/Triangle | Drop은1인칭→3인칭→투하, 다른 기체는 기존 두 시점 |
 | 역할 Primary/Secondary | 좌/우 클릭 | RB/LB | RB/LB | 정찰·자폭·투하 역할 기능 |
 
 `IA_DronePrototype_AcroPitch/Roll/Yaw/Throttle` 네 Action과 `AcroGamepadLeftVertical/RightVertical` 두 Action은 Acro에서만 값을 사용한다. 쉬운/제한 자세용 Move·Altitude·Yaw와 같은 물리 키가 IMC에 함께 있어도 Pawn이 현재 모드에 맞는 Action만 소비하므로 W/S와 Space/Ctrl이 같은 축으로 겹치지 않는다. Mode 1·2 배치는 Spektrum의 공식 송신기 설명과 DX5e 매뉴얼의 채널 배치를 기준으로 했다: [Mode 1 vs Mode 2](https://my.spektrumrc.com/Articles/Article.aspx?ArticleID=2105), [DX5e Manual](https://spektrumrc.com/ProdInfo/Files/SPMR5510-Manual_EN.pdf).

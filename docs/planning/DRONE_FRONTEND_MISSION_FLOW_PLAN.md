@@ -88,6 +88,8 @@ Boot
 
 Level Blueprint를 상태의 단일 기준으로 사용하지 않는다. Level Blueprint는 필요하면 해당 맵의 연출 호출만 담당하고, 선택 데이터와 전환 가능 여부는 C++ 흐름 계층이 관리한다.
 
+현재 맵 이동의 표시 절차는 Controller가 기존 로딩 UI의 자연 paint/RHI 완료를 확인한 다음 이동하는 것이다. 상태 enum·GameInstance 선택/검증 책임은 유지하고, 준비 후 최소 표시 시간으로 이동을 지연하지 않는다. [현재 로딩/취소 절차](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#시드-레이싱로딩일시정지-확인)·[실행 정본](../history/DRONE_WORKLOG.md#2026-11-05--정찰-카메라-고정과-맵-로딩-최초-표시)을 따른다.
+
 ### 데이터 자산
 
 `Mission Definition`은 최소한 아래 정보를 가진 프로젝트 소유 Data Asset으로 계획한다.
