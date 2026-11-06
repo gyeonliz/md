@@ -12,9 +12,9 @@ M4 저장 기본 기체를 초기 출격 정책과 같은 FiberOptic으로 맞�
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal `D:/JGY/project/drone` | main `7771f549` 이후 승인 변경 미커밋 | 기존47 반영 이후 경고 자산·INI·7소스 선별 반영, 원본 최종6 Success |
-| 문서 `D:/JGY/project/md` | main `7efbbf3` 이후 문서 미커밋 | 경고 후속·기존 Space 현재화. 기존 기능 가이드/CONTEXT 변경 보존·Commit/Push 없음 |
-| 전시회 사본 | `D:/JGY/project/drone_ops_exhibition_20261106/Drone.uproject` | 최종6 Success·사본 Editor/Game Build 성공. 패키징은 별도 진행 |
+| Unreal `D:/JGY/project/drone` | main `8805ca55849f56837352529ff68abc744ef80445` 정상Push | HEAD/origin/main 일치·ahead/behind0/0, LFS52/52. 원본 Droner 브랜드 보존 |
+| 문서 `D:/JGY/project/md` | 최종내용·실제 Source SHA 반영 | 자체 Commit/Push 결과는 Drone Space/외부 Git 영수증 정본. 이번 보정 뒤 tracked MD 내용 고정 |
+| 전시회 사본 | `D:/JGY/project/drone_ops_exhibition_20261106/Drone.uproject` | 최종P03 Native Front/M3 exit0·오류0, 3UI실제로드/영상5/ZIP47 검증·Drive125part+5지원 배포 확인. Ops 브랜드 분리 |
 
 ## 현재 D PC 구현·검증 경계
 
@@ -84,7 +84,7 @@ OilRig 근거리 사본3개만 camera-local·생성축Yaw-90°로 화면 가로�
 | 물리·역할 | 질량·추력·모터 응답·선형/제곱 항력·Drop kg 하중, Mode 1/2 공통. 속도 단계 제거. 벽/날개 접촉·그물 포획 Greybox·접촉 카메라 분리, 피해 Shake 유지 | Acro는 게임용 근사 모델, 실기체 교정 미완료. 수동 속도/하중/접촉·실제 Chaos 비교 필요 |
 | AI·차량·날씨 | AI-LOCOMOTION-01 다리 고정 후속 구현됨·자동 검증됨(10/05 C PC Claude): 아군 Retargeter Pin Bone·적 발 IK Control Rig 제거. 양손 총 파지·hand_r 부착 유지. 원인·보폭 검증은 [WORKLOG](docs/history/DRONE_WORKLOG.md). StateTree Soft 참조/AlwaysCook·Rifle/MG 디버그 기본 Off 유지. 차량·바람/비·천장 차단, D-6 HUD 방위 통일·불어오는 쪽 풍향 구현됨·자동 검증됨. 비 품질 구현됨·자동 검증됨(10/07 C PC Claude, HEAD `cb77c0d`·스테이징): 끔=전부Off·낮음/중간/높음=카메라 주변 원본 Niagara1개·판 빗줄기 기본0. Weather 전체·SettingsContract Success. [비 가이드](docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md#비-품질-설정과-조정)·[실측/정정](docs/history/DRONE_WORKLOG.md#2026-10-07--비-연출-도입비-품질-옵션-c-pc-claude) | NPC 걷기 다리·속도 대비 보폭/발 미끄러짐·손/총 정렬·사격/재장전 수동 확인 대기. 적 경사면 발 맞춤 없음·Pin 뒤 IK 뼈 잔존 원인 미특정. 최종 애니메이션/산탄총 전용 동작 미정·미구현. 감지 PIE KnownIssues Fail 유지, 풍향 HUD·날씨 시험 맵 수동 확인 대기. 비 입자 크기/모양·위치/양·젖음/물결·음원/실내 감쇠·설정 패드 수동 대기. 단계 최종값/음원 확정 현재 미정; 화면 물방울/바닥 Splash 미구현 |
 | 환경·기체 | D-12 2·3차 구현됨·자동 검증됨(10/06 C PC Claude): Flight 클래스/소스 경로로 변경·ClassRedirects 3개, 피격/Acro/지상 주행 컴포넌트 분리. BP 이름·자산 경로 유지. Legacy 1차·Characters 변환 원본 유지, D-13 종료. 상세 [WORKLOG](docs/history/DRONE_WORKLOG.md) | FPV 곡예·UGV 주행 분리 전 동일 체감 수동 확인 대기. 방콕 삭제 커밋/푸시 상태 별도 확인. 사람 최종 아트·애니메이션·음원 보존 |
-| 패키징 | Asset Manager DroneMission/DroneDefinition AlwaysCook·MissionMap 참조, StateTrees 폴더 DirectoriesToAlwaysCook·StateTreeCookContract 자동 검증 | 실제 패키징/패키지 맵 진입 미실행 |
+| 패키징 | Asset Manager/StateTree Cook계약과 기존 UI텍스처2폴더 AlwaysCook 유지. 최종P03 Cook/Stage/Archive·Native Front/M3·영상5·47CRC/Stage해시 검증 | P03 분할Drive130파일 원격metadata 확인 완료. 실물조종·청감·타PC코덱/GPU는 별도 |
 
 - Acro 혼합 입력·Dead Zone·자세 적분 조사(10/04 C PC)는 [원문 보존](docs/history/archive/STATUS_2026-10.md)을 참고한다.
 - 코스 표시선 측정·재실행 도구 검증(10/04 C PC)은 [원문 보존](docs/history/archive/STATUS_2026-10.md)을 참고한다.
@@ -115,7 +115,7 @@ OilRig 근거리 사본3개만 camera-local·생성축Yaw-90°로 화면 가로�
 
 ## 다음 확인
 
-실행 순서는 [WORKBOARD Next](WORKBOARD.md#next), 입력 계약은 [장치 가이드](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)를 따른다. 우선 두 실물 장치의 raw/IA/모드/Boom/ViewTarget을 함께 계측하고 LOS의 World 연결 캡처·지형 HitResult를 수리해 실제 가시성을 확인한다. M3 Fence BP 오류·M4 Lumen 경고/로딩을 구간별로 조사하며 Racer후보 저속OFF/착지/재이륙은 자동검증됐으며 경사/고속접촉·본미션/장치·최종B/C는 후속이다. 기존 전체 손 조종·패키징·팀원 맵 수동 대기는 유지한다. 이전 상세 체크리스트는 [원문 아카이브](docs/history/archive/STATUS_2026-10.md)에 보존했다.
+실행 순서는 [WORKBOARD Next](WORKBOARD.md#next), 입력 계약은 [장치 가이드](docs/tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md)를 따른다. 우선 두 실물 장치의 raw/IA/모드/Boom/ViewTarget을 함께 계측하고 LOS의 World 연결 캡처·지형 HitResult를 수리해 실제 가시성을 확인한다. M3 Fence BP와 M4 잔여 렌더 진단/로딩을 구간별로 확인하며 Racer후보 저속OFF/착지/재이륙은 자동검증됐으며 경사/고속접촉·본미션/장치·최종B/C는 후속이다. 실물 손 조종·팀원 맵 수동 대기는 유지하고, 완료된 P03 패키징·Native진입·Drive배포는 상단 정본을 따른다. 이전 상세 체크리스트는 [원문 아카이브](docs/history/archive/STATUS_2026-10.md)에 보존했다.
 ## 이전 기록 보존
 
 10/01 이전 구현·검증·당시 미확인/경계 집계 네 절은 [2026-09 원문 아카이브](docs/history/archive/STATUS_2026-09.md)로 이동했다. 10/01~10/03 세션 전문과 기존 한눈에 보기·Git 요약은 [WORKLOG의 2026-10-04 STATUS 정리 절](docs/history/DRONE_WORKLOG.md)에 원문 그대로 보존했다. 과거 PC/날짜·Codex/Claude 표기를 바꾸지 않았으며 최신 상태를 과거 기록에 소급하지 않는다.
