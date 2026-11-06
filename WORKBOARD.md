@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-11-06 D PC — 사본 held 시각 확인·원본 반영 준비.
+마지막 갱신: 2026-11-06 D PC — P03·Drive·원본Push 확인, MD Git결과는 Space/외부영수증 정본.
 
 ## Now
 
@@ -30,7 +30,7 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
-| EXHIBITION-1106 | 전시회 사본 | 사본 명중 확인·held 시각 대기 | 사본 최종→원본 선별 반영·MI_xiwcfassc 복구/검증(미시작). [진행 정본](docs/history/DRONE_WORKLOG.md#2026-11-06--전시회-독립-사본-core-진행-검증) |
+| EXHIBITION-1106 | Ops 최종화 | P03·Drive·원본Push 확인 | MD 최종Git 결과는 Space/외부영수증 정본. [상태](STATUS.md) |
 | TUT-DELIVERY-1103 | 배달맵 복구/크기 | 판2.5배·화물1/3·3개 수령/태그 복구·종단 자동 성공 | 크기·집기 방향 실기, “원통 착륙장” 문구 미정. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
 | MISSION-PHOTOS-1103 | 13미션 사진 통일 | Thumbnail=BriefingImage·레이싱 번호 유지 | 전체 사진 수동 대조. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
 | UI-SELECT-3D-1103 | 선택3D 재로딩 | 지연 재생성·재촬영·프리스트림 구현 | 열기/기체 전환/재오픈 실기. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
@@ -147,7 +147,7 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 
 ## Next
 
-사본 held 게임뷰·최종 보존 확인 후 원본을 백업·선별 반영하고 별도 Build/검증한다. 원본 최신 설정/키 보정·Saved·.git/캐시·Training은 사본으로 덮지 않는다. [진행 정본](docs/history/DRONE_WORKLOG.md#2026-11-06--전시회-독립-사본-core-진행-검증). 기존 실물/전체 미션·패키징 확인은 유지한다.
+전시회 사본/원본 반영과 실행별 검증은 정본을 따른다. 요청한 변경과 최종 파일/설정 보존을 확인했으며 실물 조종·청감·전체 미션/패키징은 아래 기존 후속 범위로 유지한다. [전시회 검증·한계 정본](docs/history/DRONE_WORKLOG.md#2026-11-06--전시회-독립-사본-core-진행-검증).
 
 1. 실제 키보드·플스·InterLink로 시동/착지·방향/키 설정·M4 세 시작점/교대와 전체 미션을 손 조종한다. 자동 주입 결과와 구분한다.
 2. 출발 카운트·체력 경고·무기/폭발음을 실제로 듣고, 실제 배달/사진과 첫 프레임 문구도 확인한다.

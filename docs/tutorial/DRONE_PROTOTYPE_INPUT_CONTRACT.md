@@ -23,7 +23,7 @@
 
 실제 ViewTarget이 Pawn인 1인칭/기체 추적 시점, 쉬운 조작·UGV에서는 사용할 수 없다. 실제로 사람 관찰 카메라를 보고 있다면 숨은 Pawn의 FPV/DropCamera 플래그만 바뀌었다는 이유로 해제하지 않는다. 실제 관찰 뷰를 벗어나거나 모드를 바꾸면 해제하며, 다시 사용하려면 해당 뷰에서 켠다.
 
-세 장치 키 설정의 **비행 모드 / 사람 기준 이동 ON·OFF** 행에서 재지정한다. 기존 `FlightModeCycleAction`을 재사용하므로 IMC 기본 매핑 수53은 유지한다. 방향 토글은 P/S/A·Rate/Angle/Horizon 선택이나 제동 ON/OFF와 별개다. 방향 ON의 HUD 공급 문자열은 `LOS-DIR`이며 실제 화면/장치 체감은 수동 확인한다.
+세 장치 키 설정의 **비행 모드 / 사람 기준 이동 ON·OFF** 행에서 재지정한다. 기존 `FlightModeCycleAction`을 재사용하므로 IMC 기본 매핑 수53은 유지한다. 방향 토글은 P/S/A·Horizon/Acro 선택이나 제동 ON/OFF와 별개다. 관찰 뷰 밖에서 정찰·투하 P/S/A는 같은 키로 순환하지만 FPV 계열 Horizon/Acro는 설정에서만 고른다. 방향 ON의 HUD 공급 문자열은 `LOS-DIR`이며 실제 화면/장치 체감은 수동 확인한다.
 
 ### 파일럿 테스트맵 전용 숫자키
 

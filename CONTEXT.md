@@ -66,7 +66,7 @@ Story 선택 화면은 Select_UI 시안을 따르되 배경·미션 사진만 �
 
 ## 현재 조작·역할 기준
 
-- `Assisted Easy`는 Actor-relative 수평 이동·World Up 고도, `Manual Realistic Greybox`는 제한 자세·Local Up, Rate/Acro Mode 1·2는 Pitch/Roll/Yaw Body 각속도·자동 수평 복귀 없음으로 분리한다.
+- `Assisted Easy`는 Actor-relative 수평 이동·World Up 고도, `Manual Realistic Greybox`는 제한 자세·Local Up이다. FPV 계열 Mode 1·2는 송신기 축 배치이며 자세는 설정의 Horizon(중립 자동 수평, 기본값) 또는 Acro(Rate, 자동 수평 없음)로 고른다. F/L3는 FPV 자세를 바꾸지 않으며 정찰·투하 P/S/A·실제 사람 관찰 방향 토글은 유지한다.
 - 느림/보통/빠름 속도 선택은 제거한다. 각 기체의 기존 빠름 수준을 단일 무적재 기준으로 사용하고 Legacy `Stable/Balanced/Agile` 이름은 Asset 직렬화 호환용으로만 유지한다.
 - Mode 1/2는 RC 송신기 축 배치만 다르며 같은 Dry Mass·합산 최대 추력·모터 응답·중력·Body Up 추력·선형/제곱 항력·Body Rate 응답을 사용한다. 기반은 `UFloatingPawnMovement`이고 비행 컨트롤러 PID·모터 믹싱·프로펠러 유동·관성 텐서를 1:1 해석한다고 표현하지 않는다.
 - Drop Drone은 내장 화물 또는 실제 부착 Payload Actor의 kg 질량을 총질량에 더한다. 적재 시 최고속도·가속·감속·Yaw·추력 대비 중량 여유가 줄고, 투하하면 즉시 무적재 성능으로 복구한다. 질량과 기체 물리값은 Blueprint/Data Asset에서 조정한다.

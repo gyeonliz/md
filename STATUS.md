@@ -1,6 +1,6 @@
 # 현재 작업 상태
 
-현재 기준: 2026-11-06 D PC. 사본 `D:/JGY/project/drone_ops_exhibition_20261106/Drone.uproject`의 Core23·별도 M3 실제4개 단계/완료 판정·모델 변경 후10개 검사는 실행별 근거로 유지한다. 추가 M3 재실행 관찰은 새 모델 생산 폭탄의 직접 명중1발이 xiwcfassc_tier_2에 원시 피해600·HP200→0·사망1·목표0→1/4, 다른3개 피해0임을 확인했다. 이 추가1건은10개 중 같은 M3 검사의 재실행이다. Core의 파일쓰기 경계 가로채기·실제888×500 캡처와 별도 해상도/실물 미확인 범위는 유지한다. held 기존2캡처는 그리드만 보여 무효이며 올바른 게임뷰·최종 Source/모듈/설정 보존 영수증을 기다린다. 사용자 승인으로 사본 최종 확인 뒤 원본 `D:/JGY/project/drone`에 필요한 변경을 백업·선별 반영하는 단계가 추가됐으나 원본 적용은 미시작이다. 원본 최신 사용자 설정/키 보정·SaveGames·.git/캐시·Training 맵을 사본 것으로 덮지 않으며 원본 Build/검증은 별도다. `MI_xiwcfassc`는 사용자 정정으로 실수 저장 복구 대상이며 현재본 백업·수정 전본/parent/texture 확인 후 해당 자산만 복구 예정이고 아직 미복구다. [진행 정본](docs/history/DRONE_WORKLOG.md#2026-11-06--전시회-독립-사본-core-진행-검증)·[편집 위치](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#전시회-사본의-조작-설정과-미디어). 전체 작업 미완료·이번 Commit/Push 없음.
+현재 기준: 2026-11-06 D PC. PDF18·최종P03·개인Drive 분할 배포 검증을 완료했고 원본 Source 8805ca55849f56837352529ff68abc744ef80445의 정상Push를 확인했다(HEAD/origin/main 일치·ahead/behind0/0). MD 자체 Commit/Push 최종 결과는 [Drone Space 진행 정본](https://chatgpt.com/space/page_a81d11314f60819188530a4ea2ed4663)과 외부 Git 영수증에서 확인한다. P03은 UI텍스처3개 Cook누락을 수선해 실제Native Front로드·missing/fallback0과 Front/M3 exit0·오류0을 확인했다(신규Native 설정PNG는 없음). 사본 T13 관련9개/별도T14 로딩1개, 원본T15 6개와 초기화면T16 9개/T17 2개를 분리한다. 양쪽19DA native일치, Lumen 캐시노출3.0 및 기존6HUD 경고 소멸, 브랜드·맵·Saved보존을 확인했다. 원형7개/문구7개와 복합13개는 모두 사용자 확정이다. Drive는96MiB이하125part+복원5파일=130개 ID/이름/크기/계정/상위폴더 대조 통과이며 단일ZIP 업로드가 아니다. 로컬복원ZIP SHA/MD5·CRC47·추출47해시 및 최종125part stream일치를 확인했으나 원격MD5는 커넥터 미제공으로 검증하지 못했다. 원본 Droner/Ops 브랜드 차이·기존 카메라/입력 계약을 유지한다. 실물 조종·청감·타PC코덱·GPU예산은 미검증이며 ContactShadows/VSM marking queue/Atlas 및 엔진 진단을 전체경고0으로 쓰지 않는다. P01/P02는 배포하지 않는다. [P03 배포 정본](docs/history/DRONE_WORKLOG.md#2026-11-06--p03-ui-cook-수선과-분할-drive-배포-검증) · [Drive 폴더](https://drive.google.com/drive/folders/1gKR8RwQjLfBhWMbDIeDMsBf7jHYQxzGf).
 
 M4 저장 기본 기체를 초기 출격 정책과 같은 FiberOptic으로 맞췄고, 세 시작점→실제 재머→새 전투 기체→Patriot 진행을 확인했다. M1의 축 배율0 장식 section만 런타임 충돌을 해제하고 정상 이웃/전봇대는 보존했다. 머티리얼2개의 개별 사용 플래그도 수선했다. 로비는 첫 배치 전에 실제 미션 미리보기를 채우고 키보드 포커스로 내용이 바뀔 때만 재배치해 첫 프레임 글자/구분선 겹침을 수정했다. 미리보기로 미션을 자동 확정하지 않는다.
 
@@ -12,9 +12,9 @@ M4 저장 기본 기체를 초기 출격 정책과 같은 FiberOptic으로 맞�
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal `D:/JGY/project/drone` | main `7771f549`·MI_xiwcfassc 1파일 미커밋 | 사용자 실수 저장 복구/선별 반영은 미시작. 최신 설정·Saved·Training 보존, 원본 Build/검증 별도 |
-| 문서 `D:/JGY/project/md` | main `7efbbf3` 이후 진행 문서 미커밋 | 전시회 Core 진행 갱신·전체 미완료·Commit/Push 없음 |
-| 전시회 사본 | `D:/JGY/project/drone_ops_exhibition_20261106/Drone.uproject` | UE5.8·별도 파일·Core23 통과·시각/M3 후속 대기·Git 작업 없음 |
+| Unreal `D:/JGY/project/drone` | main `7771f549` 이후 승인 변경 미커밋 | 기존47 반영 이후 경고 자산·INI·7소스 선별 반영, 원본 최종6 Success |
+| 문서 `D:/JGY/project/md` | main `7efbbf3` 이후 문서 미커밋 | 경고 후속·기존 Space 현재화. 기존 기능 가이드/CONTEXT 변경 보존·Commit/Push 없음 |
+| 전시회 사본 | `D:/JGY/project/drone_ops_exhibition_20261106/Drone.uproject` | 최종6 Success·사본 Editor/Game Build 성공. 패키징은 별도 진행 |
 
 ## 현재 D PC 구현·검증 경계
 

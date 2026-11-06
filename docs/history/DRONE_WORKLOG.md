@@ -3133,3 +3133,122 @@ ConnectedRead02의 원시 응답5개와 LIVE_READ02_SUMMARY를 독립 대조했�
 - 신규 사용자 승인: ‘다 하고나면 원본에도 싹 적용해줘’에 따라 사본 최종 검증 후 원본 `D:/JGY/project/drone`에도 이번 변경을 반영하는 단계가 추가됐다. 원본 적용은 아직 미시작이다. 지금까지 원본 보존 기록은 해당 시점 사실로 유지한다. 변경대상을 먼저 백업하고 필요한 Source/Config/Content·미디어·SourceArt만 선별 반영한다. 원본의 최신 사용자 설정/키 보정·SaveGames·.git·캐시·Training 맵은 사본 것으로 덮지 않으며 사본의옛4설정 baseline을 원본 복원에 쓰지 않는다. 원본 반영·Build·검증은 사본 결과와 별도 기록하며 이번 승인에 Commit/Push는 포함되지 않는다. held시각·마지막 원본/다운로드/지속설정4·최종 Source/모듈 영수증과 원본 반영이 남아 있어 전체 작업 미완료다.
 
 - 사용자 머티리얼 정정: 원본 `MI_xiwcfassc` 변경은 의도한 수정이 아니라 재질이 빠져 보여 만지다 잘못 저장한 것임을 사용자가 확인했다. 해당 자산의 기존 사용자 수정 보존/동기화 제외 방침만 철회한다. 실행 담당이 원본 적용 때 현재본을 먼저 백업하고 수정 전본·parent/texture 의존성을 확인해 해당 자산을 복구할 예정이며 실제 복구 전 완료로 기록하지 않는다. 과거 발견/보존 예정 기록은 당시 사실로 유지하며 원본 전체 reset·다른 설정 덮어쓰기는 하지 않는다.
+
+### 원본 선별 반영과 정상 Fab 후속 검증
+
+- 사용자 승인에 따라 A01에서 Source20·승인 Content/미디어/SourceArt26·실수 MI복구1=47항목을 현재본 백업 후 적용하고 byte 검증했다. 적용03:10:01`03:10:09Z. 최신 원본 Saved59는 적용 전후 일치하며 과거77개를 복원하지 않았다. 초기77→최신59 차이는 추가 원본 Editor 세션의 EditorPerProjectUserSettings 변경·CrashReportClient 추가/삭제를 포함한 새 epoch다. 원본 최신 설정/키 보정·SaveGames·.git·캐시·Training을 사본으로 덮지 않았다.
+- Source20 독립 일치 인계와 Content27 독립 영수증 SHA `AC5DD672323E483B388138BE27E7A7F3EAB685C94CC911BC510032517BC2D82F`를 확인했다. Content는26+MI1/27성공·실패0, 원본 활성 재임포트 경로6개/MD5 일치·copy/handoff 의존0, B/N/ORM3개 초기해시 유지다. 옛 copy-root Factory_UID는 활성 SourceFiles 밖 임포터 이력으로 바이너리 치환/자산 재작성을 하지 않았다. 실수 저장본79D126…을 별도 백업하고 HEAD 실제 LFS payload=초기사본=현재사본402FAA…로 해당 MI만 복구했다. LFS pointer text를 자산에 쓰지 않았다.
+- 원본 B01_NORMAL_WITH_FAB(실제 디렉터리 B01_ORIGINAL_WITH_FAB) exit0, BUILD.log Result Succeeded/100.14초·DLL `8C3262AC1E2FA7183A310C4D07C99E881ACD0CF8085B74737D4AE6866EFE12AC`. 컴파일 경고 발생행81=C4996 API폐기예정50/C4305 double→float31이며 고유 결함81개나 새 제품 실패로 세지 않는다.
+- 원본 E02_CORE_SMOKE의 실제20 leaf 모두 Success(일반18·경고포함2), failed/notRun/inProcess0·오류0·경고51. DLL8C… 전후 동일·exit0·engineCompilerProcesses[]. 경고51=Material VT요구45/콘솔 스레드·시험Cvar2/Crowd RecastNav2/Nanite WPO-RT1/VSM1이다. 앞선 사본의 같은 자산/환경/시험 진단 범주로 구분하며 무해로 단정하거나 광범위 재조사하지 않았다. 원본20은 사본23·M3지원6·M3공개단계·모델후10·중복M3관찰1과 별도 실행으로 유지한다.
+- 원본 정상 Fab E01의03:15:27Z 조회에서 /Fab/Materials/Standard/M_MS_Base 직접 로드·MI parent·B/N/ORM Texture2D3개·실제4 Actor 할당을 확인했다. Restored_Pallet_Material.png를 독립 열어 녹색 덮개·파란 끈·목재·기본 그리드 없음도 확인했다. E14 parentnull/실패를 최종 미해결로 남기지 않는다.
+- 사본 B05_COPY_WITH_FAB 정상 빌드 Result Succeeded/4.81초(타깃 메타데이터 정리), Source586은B04동결과 동일·DLLB14… 유지. 양쪽 DroneEditor.target PluginOverrides=None을 읽었다. 사본 E15 정상 세션03:21:55Z도 parent·텍스처3·4 Actor 할당 로드 성공,03:22:10Z exit0/moduleUnchanged다. 이전 Fab 비활성 타깃/세션 기록과 분리한다.
+- 사본 B04 Source/Config586개와 실제 DLLB14…를 독립 재해시해 일치, 맵75중승인M3만차이는 실행 보존 gate 범위다. copy 지속설정4개는 오늘 sealed baseline으로만 복구했다(시험으로 바뀐 MissionProgress1개 포함). 이후 양쪽 지속설정4개 SHA도 실제 재확인해 초기 사용자 값과 일치했다. 최종 전체파일/보존 영수증은 실행 담당 취합 중으로 별도 반영한다.
+- E13D의888×500 held/낙하2장을 실제 열어 새 red/metal 모델이 기체 아래와 투하 후 게임뷰에 보임을 확인했다. 같은mesh/material·실제primary release·임시camera/고정배치시험이며 과거 그리드2장/E13 API실패는 무효/이전기록으로 보존한다. 캡처 SHA held4C251D…/falling48D71F… . E06C 종료/타이틀 시각은 카메라 담당 독립 인계 범위다. 메타데이터32×32 중간 조회/중단된WBP검사를 최종 시각 실패로 확대하지 않는다.
+- 적용·Build·각 실행·시각·설정 보존 범위를 구분했다. 실물HID/손 조종·전 미션 완주·청감·Cook/패키징과1920/1280 두 규격 전체 검증은 별도다. 이번 Commit/Push·공유 변경은 없으며 검증/MD 담당의 게임 Source/Config/Content·엔진 조작0이다.
+
+- 최종 완료 인계: OriginalSyncExecution/FINAL/FINAL_EXECUTION_HANDOFF.json의 ORIGINAL_AND_EXHIBITION_COPY_REQUESTED_CHANGES_APPLIED_BUILT_VALIDATED_AND_PRESERVED를 읽어 최종47항목 해시·양쪽 Source/Config586 동결 해시·양쪽 Fab비활성 타깃 override 제거·원본 최신 Saved59 정확 복구/보존·최종 엔진/컴파일러0·Commit/Push/branch변경0을 확인했다. 추가 CrashReportClient.ini2개는 세션 시작0.8초 후 생긴 정상 startup설정이며 해당2세션 END exit0/치명적로그0으로 원본 검증크래시 증거가 없다. 생성분2개만 외부 보관해 최신59를 보존했고 과거77은 복원하지 않았다. 사본/원본의 적용·Build·실행별 검사·재질/held 시각과 보존을 구분해 요청 작업 완료로 기록한다. 실물HID/손비행·전미션 수동완주·청감·Cook/패키징과 두 해상도 전체는 기존 한계로 유지한다. 최종 실행 인계 SHA256 3140AE9A6DFA50CC942CECF905CFA5EA94143A53CBE595D46AC6FDFABCFE2B52.
+
+
+## 2026-11-06 — M3 런타임 경고 수선과 원본·사본 검증
+
+D PC, Unreal 원본 `D:/JGY/project/drone`·전시회 사본 `D:/JGY/project/drone_ops_exhibition_20261106`의 경고 후속이다. 기존 전시회 반영/비행 설정 결과와 별도 실행으로 기록한다. 원본·사본의 로비 브랜드는 최신 사용자 지시대로 각각 유지했다. 이번 Commit/Push·Trello/공유 변경은 없다.
+
+### 원래 51건과 실제 수선 범위
+
+E02 원본 핵심20의 원시 Warning51을 report pointer/시각/원문/runtime 행으로 정확히 추출했다. AutomationController 재출력을 중복 계산하지 않았다.
+
+| 원래 E02 경고 | 횟수 | 후속 처리 |
+|---|---:|---|
+| VT 타입 불일치 | 45 | 13 material-texture 조합. 정확13 texture의 `virtual_texture_streaming`만 false→true |
+| 반복 `DisableAllScreenMessages` lookup | 1 | M3 Level BP Tick→명령 실행선1개 제거. BeginPlay·노드3개 유지 |
+| Nanite instanced WPO ray tracing 미지원 | 1 | M3 embedded Nanite39그룹의 RT WPO만 false. Birch139+추가38그룹675855=총675994인스턴스 |
+| VSM one-pass light overflow | 1 | 양쪽 DefaultEngine.ini `r.Shadow.Virtual.OnePassProjection.MaxLightsPerPixel=32` 채택/실값 확인 |
+| Crowd/RecastNavMesh | 2 | 모두 BeginTearingDown 직후. 종료 시점 경고로 분리하고 플레이 중 AI 이동 결함/정상으로 단정하지 않음 |
+| `r.MotionVectorSimulation` render-thread 안전성 | 1 | 엔진 TSR/CVar 계약 문제로 분리. 엔진 패치·경고 필터 없음 |
+| 합계 | **51** | 실제 원인4종(원래48 event에 해당)을 수선하고 Nav2+엔진CVar1의 원래3 event 분류를 유지 |
+
+VT 부모 sampler와 non-VT 텍스처13의 실제 읽기를 대조했다. sRGB/압축26개 값은 직접 전후 일치 확인했으며 다른 보호속성은 이전값 전체가 없어서 writer assertion 확인과 독립 재계산을 구분했다(`compression_none` API 미제공). 콘솔 수선 전후 Actor3103 snapshot은 byte 동일했다. foliage component의 전체 instance-transform hash/위치/재질/raster WPO/RT가시성은 유지했고 비 Nanite2그룹은 기존 RT WPO=true를 유지했다. 공유 mesh·전역 Nanite·ray tracing을 끄지 않았다.
+
+W09에서 Birch 설정이 유지됐어도 warn-once 대상이 SM_Tree1로 바뀌었으므로 당시 전체 Nanite0으로 판정하지 않았다. 같은 미지원 조합을 M3 embedded 범위에서1회 census한 뒤 추가38그룹만 수선했다. VSM32는 fresh16 overflow1/fresh32 overflow0과 제품 M3 계약 통과로 채택했다. mask64→128bpp 차이의 이론 증분은882×462 약3.1MiB/1080p 약15.8MiB/4K 약63.3MiB이며 총VRAM 실측이 아니다.
+
+### 실행을 분리한 최종 결과
+
+| 실행 | 판정 | 전체 Report Warning event | VT/Nanite/VSM 원시 대상 |
+|---|---|---:|---|
+| E02 원본 핵심20 | 20 Success·오류0 | 51 | 45/1/1 |
+| W01 사본 M3+v1읽기 | 프로브의 PIE 중 editor-world 조회 오류1로 전체Fail | 65 | 61/1/1 |
+| W03 사본 M3 기준선 | Success·오류0 | 70 | 66/1/1 |
+| W06 사본 VT·콘솔 수선 | Success·오류0 | 3 | 0/1/1 |
+| W07 사본 fresh32 후보 | Success·오류0·실값32 | 2 | 0/1/0 |
+| W12 사본 최종 | 6/6 Success(일반5·경고포함검사1)·오류/미실행0 | **1**, M3 종료Crowd | **0/0/0** |
+| W13 원본 최종 | 6/6 Success(일반5·경고포함검사1)·오류/미실행0 | **2**, M3 TSR CVar+종료Crowd | **0/0/0** |
+
+경고 포함 **검사1개**와 그 검사 안의 **경고 이벤트2개**를 구분했다. E02 전체20/Warning51과 최종 M3/UI6개를 숫자로 단순 비교하거나 다른 실행·모듈/반복 사례를 합산하지 않는다. 같은 사본 M3 W03→W06은 동일DLL/원시스캔에서 VT66→0, 반복lookup경고1→0, 명령로그120→1이었다. 최종 양쪽도 명령1회·반복lookup0이다.
+
+최종6개 실제 이름은 `Drone.Mission.CombatDropActualStoryPIE.M3`, `Drone.UI.OpeningMovieContract`, `Drone.UI.OpeningMovieInterLinkCancelPIE`, `Drone.UI.OpeningMoviePIE`, `Drone.UI.OpeningMovieRuntimeSlots`, `Drone.UI.WideCameraMissionPresentation`이다. RuntimeSlots의 실제Initialize6조건은 이 검사1개 내부 사례이며 별도6개로 더하지 않는다. Main 영상 실제 재생/비율·Esc/우클릭 스킵을 확인했다. M3는 직접 재머 피해 setup·carrier hold/teleport·miss witness→수동 교대→실제 물리투하/표적 피해를 사용했으므로 손비행·전체미션 완주 인증이 아니다.
+
+최종 live 읽기는 양쪽 실제VSM32, foliage41=Nanite39(RTWPO false, 총675994instances)+비Nanite2(기존true)를 확인했다. 사본 module `6C82CFDF9E3CE4FBEB61D1190C86842A8659D6785A6B21AB589F86E7D95418B5`, 원본 module `F73C771858A4140F786153E9E0DF9A602AF5A3ECACD49AC6AB99EAC69CE0D83B`로 구분한다. 최종 M3맵은 양쪽 `E6468B9BF3ABD3C2CFF88190316AA784B5E876BD48C571CAD3BD668C3BC96C70` 일치를 직접 확인했고 VT13/양쪽 INI32/선별7소스도 저장후해시와 일치했다. 원본 반영 전14개 백업은 변경전해시와 일치했다. 후속맵/7소스는 guard 뒤 선별 반영했고 기존 브랜드 차이는 유지했다.
+
+별도 runtime 패널/Editor-only guard5개/새 slotstest의 총7소스는 사본 Editor B12 **14.27초**, 사본 Game B13 **28.36초**, 원본 Editor B14 **39.44초** Build Succeeded를 확인했다. Game compile 성공을 Cook/패키지 성공으로 표시하지 않는다.
+
+### 남은 한계와 보존
+
+최종 테스트 Report 오류0과 전체 엔진 세션을 구분한다. W13 Verbose에서 엔진 시작 smoke `FUnifiedErrorTest_CreateErrorMessage` 실패/Condition failed7, `FUnifiedErrorTest_CreateErrorMessageWithContext` 실패4, `FStructuredLogFormatTest` 실패4를 확인했다. 합계 엔진 smoke3실패/조건15오류이며 ExpectedError 정상 소비로 취급하지 않는다. 정적 소스는 `Engine/Source/Runtime/Core/Tests/Experimental/UnifiedError/UnifiedErrorTests.cpp:479,512`와 `Core/Tests/Logging/StructuredLogFormatTest.cpp:21`이다. UnifiedError11건은 한글 FText와 영문 TEXTVIEW 기대값 비교의 영향 근거가 강하지만 Culture A/B는 실행하지 않아 원인 확정으로 쓰지 않는다. StructuredLog4의 추가 원인 검증도 별도다.
+
+최종 자동요청 Shot은659×183 Editor grid라 게임 시각 근거에서 제외했다. 매칭 그림자/GI/바람 이미지 A/B, GPU/pass·총VRAM, 실물 HID/손비행·전미션·청감은 미확인이다. 광선추적 변형을 끈 설정만으로 최종 외형 동일을 주장하지 않는다.
+
+Cook 중 읽기 전용 지속설정 영수증은 이번 task baseline 대비 양쪽 각4개(`GameUserSettings.ini`, `DroneAudioSettings.sav`, `DroneMissionProgress.json`, `DroneTrainingBestLaps.json`) **8행 모두 해시 일치**, 프로젝트쓰기0이다. 이번 feature의 전체 Saved 기준은 원본59/사본34이며 과거77/초기사본4로 복원하지 않았다. 전체 Saved·패키지 최종감사는 P01 격리 UAT 이후 별도다. 현재 `P01_COPY_WIN64_DEV` 패키징은 진행 중이며 이 문서 갱신 완료를 패키징 완료로 확대하지 않는다.
+
+근거: [최신 해결·실행 취합](D:/JGY/project/drone_ops_exhibition_20261106_handoff/FlightSettings_20261106/FINAL_NARROW_VERIFICATION.json), [원래51건 원문 분류](D:/JGY/project/drone_ops_exhibition_20261106_handoff/OriginalSyncReadOnly/WARNINGS51_CLASSIFICATION.json), `FlightSettings_20261106/W12_COPY_RENDER_UI_FINAL`, `W13_ORIGINAL_RENDER_UI_FINAL`, `WarningVT/WarningConsole/WarningInstancedNanite/WarningVSM32`, `PackageCode/Original`, `PERSISTENT4_READONLY_DURING_COOK.json`. 로컬 실행 자료이며 원격에 게시됐다고 주장하지 않는다.
+
+
+### 새 사용자 범위 — 경고 완료와 전체 작업 분리
+
+이후 사용자가 Downloads/ui_텍스트_수정사항.pdf 전항목 반영→DroneOps 최종 패키징→Google Drive 업로드→전체 완료 후 Commit/Push를 명시 지시했다. 경고 분야의 위 반영/검증/기록은 완료하되 전체 작업은 진행 중이다. 원본 Droner/기존 브랜드와 Ops 사본 차이를 보호하고 PDF 페이지별 체크리스트/완료 증거를 후속 취합한다. Commit/Push는 조건부로 승인됐으며 PDF·패키지·업로드 전에 실행하지 않는다. 최종 문서·Space 쓰기는 이 채팅이 계속 소유하고 실행 담당은 동시 수정하지 않는다. 패키징·전체 Saved 감사와 업로드 완료는 후속 영수증으로 따로 판정한다.
+
+
+PDF 사용자 예외 확정: p10의 PDF4 표기는 사용자 지시로 기존13개 코스를 유지하고 안내 문구도13개로 수정한다. 게임플레이 게이트를4개로 줄이지 않는다. p5 궈장→권장 OCR정정과 p14 A04 실측9796.01m→약9.8km도 확정이다. 이는 구현/검증 완료가 아니라 UI 최종 체크리스트에 반영할 승인 결정이다. 기존 UI 소유 v2 체크리스트는 보존하고 문서 추적 보충 영수증 OriginalSyncReadOnly/PDF18_USER_DECISIONS_TRACKING.json에 old/new 문구·사용자 예외를 기록했다. 중간P01은 최종배포 대상이 아니며 PDF 후 P02와 업로드 확인을 최종 근거로 사용한다. 지정 개인Drive 계정/새DroneOps 배포폴더 준비는 진행 상태로 두고 업로드 완료로 표시하지 않는다.
+
+
+## 2026-11-06 — PDF18 UI 검증과 최종 패키지 전 진행 상태
+
+D PC 실제 보고서와 인계 영수증을 읽어 진행 상태만 갱신했다. 전체 완료·패키징·Drive 업로드·Git 완료가 아니다.
+
+- 사본 T13은 M4+8TUT의 관련9개 Success와 로딩 fixture1개 Fail이다. B20 뒤 별도 T14 로딩1개 Success/경고5로 실제 LOS Entry/Back의 첫 자연 paint·비영 backbuffer present가 PreLoad보다 앞섰다. 서로 다른 모듈/실행을 단일10/10으로 합치지 않는다. T12 LOS 캡처 실패는 T13 LOS Success로 닫혔다.
+- UI 담당의 frozen T13 27장+T14 2장=29PNG 검토 영수증 SHA256 7F249FA09599E3A54DBA5C92706A474A8062D5F088B2FA6B9329EE3FE232F242를 확인했다. 8훈련 Result/Next/최종Lobby와 M4 goal6/fullVEIL을 확인했다. M4 한 PNG에서 읽히는 표지는2개이며 실제6개는 검사 단언 근거다. 창 장식 포함1286×758과 실제 client1280×720을 구분한다. 실물 손비행·동일 세션8훈련 완료 증거는 아니다.
+- 초기 HUD6장에는 Exposure -8.5의 Lumen/실시간 sky cached-lighting 범위 경고가 보였다. A10 native CVar4.0/VSM32를 읽었고 S07은 양쪽 DefaultEngine.ini에 CachedLightingPreExposure=3.0 한 줄을 적용했다(기대범위[-9,11], SHA256 DEF3F8DCF75E766F314980A2258FEA1B3B2479ECAC77B82F41D38097F8CB8905). 자동노출 끄기·화면/로그 숨김·렌더 기능 비활성은0이다. 후속 초기화면 확인은 아직 진행 중이다. M4 VSM 비Nanite marking queue overflow와 별개이며 shader 즉시처리 fallback 근거만으로 작업손실·GPU비용을 단정하지 않는다.
+- 원형은 사용자 직접7승인이 아니라 총괄의 기존 실제코스7 유지 판단이다. A10은 Heading 보조정보/RuleDescription의9→7 두 텍스트만 바꿨고 이벤트/count/timeout/softMap/맵배치 변경0이다. 추가 사용자 선택을 P02 필수게이트로 두지 않는다. A10 FINAL_PDF_ASSETS19.json(B12BE9DB0B440A926DBD1C29D906042495F744A7422B0F27064032276648CF0D)→A11 원본 최종19개 반영 후 두 프로젝트 현 파일19개씩 SHA 일치를 독립 확인했다. 사용자 직접 확정은 복합 FreeGate13 유지다.
+- 원본 B21 Editor Build Succeeded78.24초, T15 관련6개 Success/오류0(로딩 경고7·M4 경고3)와 native18자산 reload/보호Rule 일치를 읽고 현 파일18해시도 일치했다. 이 실행은 Circle DA 제외·Lumen 수선 이전이므로 최종19 재로딩/노출후 검증으로 쓰지 않는다. 원본 Droner 실제Story 캡처와 Ops 별도브랜드를 유지한다.
+- 실행 담당의 B23 후 관련 초기UI 확인은6개 영향화면+Circle7·기존 대표M4/Racing1/메인 범위다. 전체goal/Result/Next 재검사로 확대하지 않고 완주/결과/Next는 T13 근거로 남긴다. 기존 카메라·입력 계약 및 실물 조종 미검증 경계도 유지한다.
+
+남은 순서는 기존 관련 화면 확인→최종 보존/freeze→P02 패키징→선택한 개인Drive에 최종P02 업로드 확인→조건부 승인된 Commit/Push다. P01 업로드·Trello 수정·공유변경·예약자동화는 없다. 정본 추적은 handoff/OriginalSyncReadOnly/PDF18_COVERAGE_REVIEW.json이며 최종 문서 쓰기 소유권은 이 채팅이 유지한다.
+
+
+## 2026-11-06 — P03 UI Cook 수선과 분할 Drive 배포 검증
+
+D PC, 2026-11-06 17:45:24 KST Drive 완료 영수증을 기준으로 PDF/패키지/배포의 최종 내용을 갱신했다. 원본·MD Commit/Push는 아직 실행 전이며 전체 작업의 Git 단계는 대기다. 앞선 중간 기록의 P02 예정·Circle 사용자 미확정·Lumen 화면 대기는 당시 상태이고, 아래 현재 결과가 이를 대체한다. 과거 기록/동결 영수증은 수정하지 않았다.
+
+- PDF18 관련 변경: p5 권장 OCR, p14 실제 호수Map2 9.8km, 훈련/드론 설명·결과/Next·훈련 Entry/Back·M4 VEIL6/full표시를 반영했다. 최신 사용자 답변은 원형 실제7개 유지·문구7개와 복합 실제13개·문구13개를 모두 확정했다. P03과 일치해 추가 재빌드/재패키징은 없었다. A10/v3가 당시 원형7을 총괄의 기존코스 보존 판단으로 기록한 사실은 역사로 보존한다.
+- 실행 범위: T08 관련13개 Success 뒤 T09/T11/T12의 실제 실패를 보존하고 후속 결과로 닫았다. T13은 M4+8TUT9개 Success와 로딩fixture1개 Fail이며 B20 뒤 별도 T14 로딩1개 Success가 Entry/Back 첫 자연paint·비영present<PreLoad를 확인했다. 서로 다른 실행을 한 번의10/10으로 합치지 않는다. 원본 T15 관련6개 Success/native18은 Circle/Lumen후속 이전, T16 사본9개와 T17 원본2개는 InitialUiOnly로 완주/Result/Next 재검사가 아니다. 완주·결과/Next의 근거는 T13이다. 최종 원본/사본19DA native 재로딩·Rule일치와 양쪽 현파일 동일을 별도 확인했다.
+- UI/렌더: T13/T14 frozen29PNG 결과 검토와 T16 신규10PNG 검토를 구분한다. Lumen 초기6HUD의 Exposure -8.5 범위 경고는 native기존4.0→Config3.0(지원범위[-9,11]) 뒤 관련화면에서 소멸했다. AutoExposure1/Quality2·VSM32를 유지했고 경고숨김/자동노출·Lumen끄기는 없다. M4 한 PNG에서 읽히는 fullVEIL표지는2개이며 실제6개는 자동단언이다. ContactShadows 무시설정, M4 비Nanite VSM marking queue/SurfaceCacheAtlas 및 GPU예산 미측정은 별도 잔여다. 엔진 startup smoke3실패/조건15오류, TUT 로그캡처 억제에 따른 raw경고 판단 한계도 보존한다.
+- P02 실제 결함과 P03 수선: P02 N01 패키지에서 SettingsKit/T_Arrow_Left_Focus, T_Arrow_Right_Focus, TitleKit/T_BtnBox_Select_v3의 실제Cook누락을 발견했다. 두 프로젝트 기존UI텍스처 디렉터리2개에 좁은 AlwaysCook설정을 추가했고 C++/그림은 바꾸지 않았다. P03 N03은 세 fullobjectpath를 TEXTUREGROUP_UI로 실제로드했으며 SkipPackage/Failedfindobject/TITLE-KITfallback0이다. 새 Native실행은 hidden/offscreen 객체/로그검증으로 신규SettingsPNG가 없으므로 기존Editor육안검토를 대체하지 않는다. P01/P02는 Drive파일0·배포대상 제외, 내부 증거만 보존한다.
+- 최종 P03: P03_COPY_FINAL_UI_ART_WIN64_DEV BuildCookRun Exit0, Native N03Front/N04M3는 격리사용자경로·timeoutfalse·exit0·Error/Fatal0이다. Report상 전체경고0은 아니며 N03 경고3(TSR/WASAPI/MotionVector), N04 경고4(같은3+종료Crowd)다. 영상5개 Stage byte/SHA일치와 ProjectContentDir/Movies 경로를 확인했다. 전체47파일 ZIP CRC·각Stage SHA, 최종Saved59/34·SourceConfig1180·브랜드14pair/프로젝트간브랜드차이5·19DA·Training27C2C0C2…/M3E6468B9B… 보존을 확인했다. 원본 Git HEAD는 이 단계까지 daa8dbaecd8e243642796ec2958318b356036687이다. 실물 카메라/RC 손조종·전체미션·청감·타PC코덱·GPU/FPS 인증이 아니다.
+
+최종 ZIP은 DroneOps_Exhibition_20261106_P03_COPY_FINAL_UI_ART_WIN64_DEV.zip, 12,582,806,196bytes다.
+
+- SHA256: 4e18721fb74beef652850768613a8a973a17c5bb475162ef0f3c8bb3a4948544
+- MD5: 20eda5ce8e0bddb9b630048b73ff6f34
+- 선택 개인계정 jkw6483@gmail.com의 [DroneOps 전시 배포](https://drive.google.com/drive/folders/1gKR8RwQjLfBhWMbDIeDMsBf7jHYQxzGf)에 96MiB이하 순번part125개와 복원지원5개, 총130파일을 배포했다. 모든원격ID/이름/크기/계정/parent폴더 대조·최종목록130개 일치/불일치0, 공유권한변경0이다. 단일 ZIP 업로드 완료로 쓰지 않는다.
+- 로컬에서 동등ZIP을 실제복원해 SHA256/MD5·47CRC·추출47파일SHA를 확인했다. 이후 최종96MiB125조각을 순서대로 stream한 SHA256/MD5도 원ZIP과 같아 기존 동일바이트 복원/CRC/Stage근거를 재사용했다. 새125조각을 다시 추출/CRC 실행한 것으로 쓰지 않는다. 원격MD5는130개 모두 커넥터 미제공이므로 원격 체크섬 일치는 검증하지 못했다.
+- 사용자는130파일을 이름변경 없이 같은폴더에 받아 Restore-DroneOps.cmd를 실행한다. 순서/크기/SHA/MD5·ZIP/해제47파일을 확인하고 새폴더로 해제한 뒤 Windows\Drone.exe를 실행한다. Windows 기본PowerShell/.NET/tar를 쓰며 Python/7zip은 필요 없다. 조각+ZIP+해제본으로 약38GB가 필요하고 기존출력 덮어쓰기/자동삭제는 하지 않는다. 복원지원은 DroneOpsDelivery.Common.ps1, DroneOps_P03_manifest.json, README_ko.txt, Restore-DroneOps.cmd, Restore-DroneOps.ps1이다.
+
+정본 근거는 handoff의 FlightSettings_20261106/PDF_FINAL_VERIFICATION_v3.json(SHA1BC1FA25…), P03_COPY_FINAL_UI_ART_WIN64_DEV/{ZIP_READY,DISTRIBUTION_FILES,MEDIA_PORTABILITY,NATIVE_SMOKE_RESULT}.json, FinalPreservation_P03/RESULT.json 및 DeliveryPreparation_20261106/P03_DRIVE_DELIVERY_FINAL.json(SHAD02A8F0E84CC4DCA96F11B30248E724F436B865019F9D5AB3848A9B875BCC5EA)이다. v3의 ZIP대기 표현은 더 늦은 ZIP_READY/Drive완료 영수증으로 해소됐다.
+
+이후 총괄의 별도 실행 지시에 따라 원본 Commit/Push→실제 Source SHA를 MD에 기록→MD Commit/Push→Space에 Source/MD 두 SHA만 작은 최종 갱신한다. MD에 자신의 Commit SHA를 다시 써 dirty loop를 만들지 않는다. 이 채팅은 Git Commit/Push·엔진실행·제품코드/Config/자산쓰기·Trello/권한변경·예약자동화0이며, 기존featureguide 변경과 과거 WORKLOG를 보존했다.
+
+
+## 2026-11-06 — P03 원본 Source Commit Push 확인
+
+원본 Source Commit/Push가 실제 완료됐다. 커밋은 8805ca55849f56837352529ff68abc744ef80445이며 기존 daa8dbaecd8e243642796ec2958318b356036687 부모를 보존했다. 총괄 인계는 LFS52/52 성공·실제 remote main/localHEAD 동일·ahead/behind0/0·오류/인증대기0이다. 이 채팅도 읽기전용 Git 조회로 HEAD와 origin/main이 해당 SHA이고 ahead/behind0/0임을 확인했다. 앞선 daa8 시점 스냅숏과 당시 Push대기 기록은 수정하지 않았다.
+
+현재 MD의 Source SHA/원본Push 상태만 선별 갱신했다. MD 자체 Commit/Push 최종 결과는 Drone Space 진행 정본과 저장소 밖 Git 영수증에서 확인한다. MD 자신의 Commit SHA를 다시 본문에 써서 새변경을 만드는 동작은 하지 않는다. 이후 MD Commit 뒤에는 tracked MD를 재수정하지 않고 두 실제 SHA를 Space에 한 번만 반영한다. 이 채팅의 Git Stage/Commit/Push 및 이번 Space 변경은0이다.

@@ -1,6 +1,6 @@
 # Drone 기능 시험 맵 가이드
 
-전시회 독립 사본(2026-11-06)은 `D:/JGY/project/drone_ops_exhibition_20261106/Drone.uproject`을 연다. Core23 자동 통과·시각 검토 중이며 M3 기존4개 실제 연결·단계·표준 피해3/4 미완료/4/4 성공은 별도 PIE로 확인했으며 추가 생산 폭탄 직접 명중은 피해600·HP200→0·사망1·목표0→1/4를 확인했다. held 게임뷰·최종 보존과 승인된 원본 선별 반영/별도 검증은 대기다. [조작 설정·영상 편집](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#전시회-사본의-조작-설정과-미디어)·[실제 수치와 제한](../history/DRONE_WORKLOG.md#2026-11-06--전시회-독립-사본-core-진행-검증).
+전시회 사본 `D:/JGY/project/drone_ops_exhibition_20261106/Drone.uproject`과 원본 `D:/JGY/project/drone/Drone.uproject`에 변경을 반영했다. 원본 Build·핵심20/20·정상 Fab 재질, 사본 실행별 Core/UI·M3·폭탄/held·정상 Fab 근거를 구분한다. [편집 위치](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#전시회-사본의-조작-설정과-미디어)·[실제 수치/한계](../history/DRONE_WORKLOG.md#2026-11-06--전시회-독립-사본-core-진행-검증).
 
 현재 첫 수업은 `Tutorial/TUT_LOS`의 BP_LOS 뒤쪽 고정 관찰 시점에서 이륙→전진→후진→실제 착지를 확인한다. 기존 `Mission.Tutorial.Hover` ID는 유지한다. 보존된 Observer TestMap은 별도 경량 회귀용이다. [Training 저작 가이드](../tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md)의 Observer 절을 따르며 실제 접지 전에는 완료되면 안 된다. 다른 수업/Story의 추가 귀환은 제거했다.
 
@@ -520,3 +520,14 @@ Unreal Editor를 닫은 상태에서 프로젝트 루트에서 실행한다.
 7. 소유권 감사 뒤 `Lvl_DronePrototype`, `Lvl_DronePackShowcase`, `Lvl_MilitaryBase_Test`도 TestMap 아래로 옮긴다.
 
 Story Mission의 최종 지형·수치·규칙은 아직 확정하지 않는다. 이 문서의 위치와 값은 기능 검증용 Greybox 기준이다.
+
+
+## M3 렌더 경고 확인
+
+제품 맵은 `/Game/Drone/Maps/Missions/Lvl_Story03_VeilBreaker`다. `/Game/MillitaryBase/Textures`의 해당13텍스처는 부모 sampler에 맞춰 Virtual Texture Streaming을 켠다. M3 Level BP의 `DisableAllScreenMessages`는 BeginPlay1회만 유지하고 Tick에서 반복 호출하지 않는다. 임베디드 foliage의 미지원 Nanite39그룹은 RT WPO만 끄며 일반 렌더 WPO·RT가시성·재질·배치와 비Nanite2그룹의 기존 RT설정을 유지한다. 양쪽 `Config/DefaultEngine.ini`의 `r.Shadow.Virtual.OnePassProjection.MaxLightsPerPixel=32`를 사용한다.
+
+1. fresh RHI M3에서 실제CVar32·foliage설정 유지와 제품 투하/피해 계약을 확인한다. 같은 실행의 VT/Nanite/VSM 원시 event를 세고 AutomationController 재출력은 제외한다.
+2. 반복콘솔 lookup과 명령실행 횟수를 따로 확인한다. 종료 Crowd/Nav 및 엔진 MotionVectorSimulation 경고는 별도 분류하고 검사수/경고event수를 혼동하지 않는다.
+3. 본검사 Report 오류와 엔진 시작 smoke 실패를 분리한다. Editor grid 캡처를 게임 시각 근거로 쓰지 않으며 실제 게임뷰의 그림자/GI/바람과 조종 체감을 별도로 확인한다.
+
+최신 실행별 결과·원래51건 분류·잔여 엔진 문제와 패키징 경계는 [WORKLOG 정본](../history/DRONE_WORKLOG.md#2026-11-06--m3-런타임-경고-수선과-원본사본-검증)을 따른다. 현재 task의 Saved 기준과 브랜드 차이를 보존하고 과거 설정 묶음으로 덮어 복원하지 않는다.

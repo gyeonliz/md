@@ -4,9 +4,9 @@
 
 ## 전시회 사본에서 기체값을 찾는 위치
 
-사본 `/Game/Drone/Data/Drones`의 `DA_Drone_{Racer,FPVStrike,FiberOptic,Drop,Scout}_Greybox`를 연다(디스크 `Content/Drone/Data/Drones`). 질량·추력·항력·모터 반응 등은 `FlightProfile`에 데이터화돼 있지만 접지·착륙은 Pawn/BP에도 분산되고 BP·사용자·역할 override가 실제 적용값에 영향을 준다. 관성 텐서는 Racer FixedStep 시험 경로 한정이다. 이번 사본은 비행 물리값을 유지한다. 근거는 Source 연결·기존 정상 덤프·파일 보존이며 저장 BP의 최종 적용값을 이번에 새로 엔진 조회한 답변은 아니다. [사본 진행·검증 경계](../history/DRONE_WORKLOG.md#2026-11-06--전시회-독립-사본-core-진행-검증).
+양쪽 프로젝트 Content Browser의 `/Game/Drone/Data/Drones`에서 `DA_Drone_{Racer,FPVStrike,FiberOptic,Drop,Scout}_Greybox`를 연다(디스크 `Content/Drone/Data/Drones`). 질량·추력·항력·모터 반응 등은 `FlightProfile`에 데이터화돼 있지만 접지·착륙은 Pawn/BP에도 분산되며 BP·사용자·역할 override가 실제 적용값에 영향을 준다. 관성 텐서는 Racer FixedStep 시험 경로 한정이다. 이번 브랜드·UI·폭탄 시각 작업은 기존 비행 물리값을 유지한다. 설명 근거는 Source 연결·기존 정상 덤프·파일 보존이며 각 저장 BP의 최종 적용값을 전부 새로 조회한 답변은 아니다.
 
-전시회 사본의 드랍 폭탄 시각은 사용자 `드랍폭탄.zip` 모델로 교체 진행 중이다. held/dropped 시각의 일관성과 기존 피해·질량·항력·충돌·투하/소모·선택 프리뷰 숨김 보존이 조건이다. 사본 모델 경로는 `/Game/Drone/Abilities/Payload/DropBombModel/SM_DropBomb.SM_DropBomb`, 재질은 `M_DropBomb`, BaseColor/Normal/ORM을 포함5자산 저장·새 에디터 재읽기와 현재 SHA를 확인했다. 생성자/기존 검사2파일은 경로 각1곳만 바꿨다. Native 폭탄0.75kg·시각 NoCollision, held mesh/material·stock1 visible→stock0 hidden·scale0.08098을 읽었고 기존35cm 보정식은 약10.86×10.86×35cm다. 모델 후10검사와 추가 생산 명중 관찰에서 팔레트1개의 원시 피해600·HP200→0·사망1·목표0→1/4를 확인했지만 held 게임뷰·최종 보존은 대기다. 앞선 Core23 결과는 이 새 모델 검증을 포함하지 않는다.
+드랍 폭탄 모델은 `/Game/Drone/Abilities/Payload/DropBombModel/SM_DropBomb.SM_DropBomb`, 재질 `M_DropBomb`과 BaseColor/Normal/ORM의5자산이다. 기존35cm 보정과 관측 scale0.08098로 약10.86×10.86×35cm이며 시각 Mesh는 NoCollision, Native 폭탄은0.75kg이다. 기존 별도 충돌·피해/반경·항력·투하/소모·선택 프리뷰 숨김을 유지했다. held/낙하 게임뷰와 stock1 visible→stock0 hidden을 확인했다. 직접 명중한 생산 폭탄1발의 raw600·HP200→0·사망1·목표1/4는 해당 조건의 실제 관찰이며 모든 거리/폭발 범위·손 조종을 보증하지 않는다. [실행별 근거와 한계](../history/DRONE_WORKLOG.md#2026-11-06--전시회-독립-사본-core-진행-검증).
 
 ## 기획 자료 사용 원칙
 
@@ -29,7 +29,7 @@ Racer는 실제 레이싱용 기체, Scout/Drop/FPVStrike/FiberOptic은 전쟁 �
 | 조작 방식 `EDroneControlMode` | 쉬운 조작, 모드 1, 모드 2 | 게임 조작은 목록 제거·enum Hidden, 옛 저장값은 쉬운 조작으로 이전. 모드 1/2의 기존 enum 직렬화 값2/3은 유지 |
 | 물리 성능 `FDronePhysicalFlightSettings` | 무적재 최고속도 배율, Dry Mass, 합산 최대 추력, 모터 응답, 제곱 항력, 적재 속도 하한 | 기체 고유 성능과 Payload 하중 |
 
-느림/보통/빠름 사용자 선택은 폐기했다. 각 기체는 Data Asset에 기록된 기준 속도에 `UnloadedMaximumSpeedMultiplier`를 곱한 단일 무적재 성능을 사용한다. 현재 기본 배율 `1.25`는 기존 빠름 수준을 승격한 값이다. `EDroneHandlingPreset`과 `Stable/Balanced/Agile` 이름은 저장 Asset·Blueprint 함수 호환용으로만 남고 모든 런타임 요청을 `Balanced`로 정규화한다. FPV 계열은 송신기 Mode2·기본 자세 Angle이며 Mode1/2는 같은 물리 성능을 가진다.
+느림/보통/빠름 사용자 선택은 폐기했다. 각 기체는 Data Asset에 기록된 기준 속도에 `UnloadedMaximumSpeedMultiplier`를 곱한 단일 무적재 성능을 사용한다. 현재 기본 배율 `1.25`는 기존 빠름 수준을 승격한 값이다. `EDroneHandlingPreset`과 `Stable/Balanced/Agile` 이름은 저장 Asset·Blueprint 함수 호환용으로만 남고 모든 런타임 요청을 `Balanced`로 정규화한다. FPV 계열은 송신기 Mode2·기본 자세 Horizon이며 설정에서 Acro를 선택한다. Mode1/2는 같은 물리 성능을 가진다.
 
 ## 기체 역할별 현재 상태
 
@@ -103,10 +103,10 @@ FPVStrike/FiberOptic은 기존 자동 무장·해제 잠금을 유지한다. 자
 | 역할 | 현재 경로 | 스틱 해제·전환 |
 |---|---|---|
 | 정찰·투하 | P(N)→S→A | P/S는 속도·제동/바람 보조, A는 자세/고도 보조. 수평 좌표 유지·복귀 없음. Mode1/2 스틱·짐벌 안정화 유지 |
-| FPVStrike·Racer·FiberOptic | Mode1/2·기본 Angle, Rate/Angle/Horizon 전환 | Rate는 수평 복귀 없음, Angle 최대60°·중립 수평, Horizon 중앙 복귀·스틱 끝에서 복귀 감소 |
+| FPVStrike·Racer·FiberOptic | Mode1/2·기본 Horizon, 설정에서 Horizon/Acro 선택 | Horizon은 중립 수평 복귀·스틱 끝에서 보정 감소, Acro는 자동 수평 없음. Angle은 기존 자산/내부 API 호환용 |
 | UGV | 기존 지상 주행 | 비행 모드 순환 제외 |
 
-`F`/패드 `L3`/InterLink `Button3`은 실제 사람 관찰 ViewTarget의 모드1/2에서 사람 기준 이동 방향을 ON/OFF한다. 기본OFF이며 기체가 회전해도 관찰 카메라 기준 전후좌우를 유지한다. 실제 Pawn 1인칭·기체 추적 시점과 쉬운 조작에서는 이 방향 보조를 쓸 수 없다. 실제 관찰 ViewTarget을 보는 동안 숨은 Pawn FPV/하부카메라 플래그만 바뀐 경우에는 사람 관찰 시점으로 취급한다. 그 밖의 뷰에서 같은 키는 기존 역할별 비행 모드를 순환한다. 방향 토글은 제동·스로틀·자세 모드 선택을 바꾸지 않는다. HUD 공급명은 `P-ASSIST`/`S-SPORT`/`A-ATTI`, 방향 ON은 `LOS-DIR`다. 키 재지정과 자세한 허용 조건은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#사람-기준-이동-방향-보조)을 따른다. FPV OSD는 사용자 결정대로 인공수평선·중앙 조준선을 유지하고 셀 전압·시간·LQ·스로틀 글자는 항상 숨긴다. Native 글자를 생성하지 않으며 저장/자식 WBP의 HudKitOsdVoltageText/TimerText/LinkText/ThrottleText도 숨긴다. WBP_DroneFlightHUDKit의 Drone|HUD|FPV OSD에서 bShowFpvOsd로 선 표시를 켜고 끄며 Horizon Max Pitch/Roll 기본20°/40°·Pitch Travel0.18을 조정한다. 모드1/2의 실기 송신기 1인칭에서만 보이고 Easy/3인칭에서는 숨긴다. DJI 모델값·튜닝 한계는 [물리 정본](DRONE_REALISTIC_HANDLING_PLAN.md#dji-교육-비행과-외형-기울기)을 따른다.
+`F`/패드 `L3`/InterLink `Button3`은 실제 사람 관찰 ViewTarget의 모드1/2에서 사람 기준 이동 방향을 ON/OFF한다. 기본OFF이며 기체가 회전해도 관찰 카메라 기준 전후좌우를 유지한다. 실제 Pawn 1인칭·기체 추적 시점과 쉬운 조작에서는 이 방향 보조를 쓸 수 없다. 실제 관찰 ViewTarget을 보는 동안 숨은 Pawn FPV/하부카메라 플래그만 바뀐 경우에는 사람 관찰 시점으로 취급한다. 그 밖의 뷰에서 같은 키는 정찰·투하의 P/S/A만 순환한다. FPV 계열 Horizon/Acro는 설정의 `FPV 자세 모드`에서 고르고 적용하며 단축키로 바뀌지 않는다. 방향 토글은 제동·스로틀·자세 모드 선택을 바꾸지 않는다. HUD 공급명은 `P-ASSIST`/`S-SPORT`/`A-ATTI`, 방향 ON은 `LOS-DIR`다. 키 재지정과 자세한 허용 조건은 [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md#사람-기준-이동-방향-보조)을 따른다. FPV OSD는 사용자 결정대로 인공수평선·중앙 조준선을 유지하고 셀 전압·시간·LQ·스로틀 글자는 항상 숨긴다. Native 글자를 생성하지 않으며 저장/자식 WBP의 HudKitOsdVoltageText/TimerText/LinkText/ThrottleText도 숨긴다. WBP_DroneFlightHUDKit의 Drone|HUD|FPV OSD에서 bShowFpvOsd로 선 표시를 켜고 끄며 Horizon Max Pitch/Roll 기본20°/40°·Pitch Travel0.18을 조정한다. 모드1/2의 실기 송신기 1인칭에서만 보이고 Easy/3인칭에서는 숨긴다. DJI 모델값·튜닝 한계는 [물리 정본](DRONE_REALISTIC_HANDLING_PLAN.md#dji-교육-비행과-외형-기울기)을 따른다.
 
 ## 현재 조작 방식
 
@@ -132,7 +132,7 @@ FPVStrike/FiberOptic은 기존 자동 무장·해제 잠금을 유지한다. 자
 
 #### 현재 Rate/Acro 입력표
 
-FPV 기본 조작은 Mode2·기본 자세 Angle이며, 설정 조작 목록은 `쉬운 조작 → Mode1 → Mode2`다. 비행 제어 모드 전환은 위 `F`/L3/RC Button3로 별도로 처리한다.
+FPV 기본 조작은 Mode2·기본 자세 Horizon이며 설정 조작 목록은 `쉬운 조작 → Mode1 → Mode2`다. `FPV 자세 모드`의 호라이즌/아크로는 Apply에서 저장·현재 기체에 적용하고 폭발 후 새 기체의 첫 비행 입력 전에 복원한다. Cancel은 미적용 편집을 취소하며 저장 실패는 이전 선택으로 되돌린다. 구형 저장의 F/L3 선택값은 기본 Horizon으로 옮긴다. 새 설정에서 명시적으로 적용한 값은 기존 숫자 1(Rate/Acro)·3(Horizon)에 `bHasExplicitFpvAttitudeModeChoice`를 함께 저장해 구형 단축키 선택과 구분한다. 내부/직렬화 Angle 숫자는 보존한다. 정찰·투하 P/S/A와 실제 사람 관찰 방향 토글은 기존 키를 유지한다.
 
 | 기능 | 키보드·마우스 | Gamepad Mode 1 | Gamepad Mode 2 | 비고 |
 |---|---|---|---|---|
@@ -275,6 +275,10 @@ FPV 기본값은 `/Game/Drone/Data/Drones/DA_Drone_FPVStrike_Greybox`에서 조�
 자폭 On/Off는 현재 사용자 결정으로 막았다. 무장 키 없이 차량을 직접 타격하며, 기본 피해·차량/NPC 사망 처리는 [차량·피해 가이드](DRONE_GROUND_CONFORMING_VEHICLE_AND_VISUAL_BANK.md#차량-피해자폭npc-사망)를 따른다. 정찰/드랍의 Primary·Secondary와 UGV 무장은 유지한다.
 
 역할 표적 `RoleTest_*`는 `/Game/Drone/Maps/TestMap/Lvl_DroneTutorialSystemsTest`에 있다. 직접 Play로 확인하거나 FrontEnd 타이틀 메뉴→로비 선택→브리핑→기체 선택→출격 흐름을 사용한다. Production `Lvl_DroneTraining`에는 해당 표적이 없다.
+
+### 파괴 표적의 명중 여유
+
+차량·유인/무인 포탑·시설·MissionDirector가 활성화한 Story 표적은 `UDroneTargetCapsuleComponent.PaddingCentimeters`로 메시별 캡슐의 명중 여유를 조정한다. 기본 15cm(기존 4cm), 범위 0~50cm이며 Actor Scale과 독립인 World cm다. 레이더는 `ADroneJammingRadar.DamageHitboxPaddingCentimeters`가 별도로 기본 20cm(기존 10cm), 범위 0~25cm다. 외형·체력·피해량·드론 본체의 물리 크기는 그대로 두고 기존 피해 경로를 사용한다. 표적 사망 시 판정 해제와 반복 명중의 중복 피해 방지를 유지한다. 실제 형상·축척/회전·근접 여유·멀리 빗맞음·전방 퓨즈/낙하 폭탄은 자동 검사 대상이며 실물 손 조종 확인은 별도다.
 
 Training 역할 시험 표적은 코스 진행 판정과 분리되어 있다.
 
