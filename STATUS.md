@@ -1,6 +1,6 @@
 # 현재 작업 상태
 
-검증 기준: 2026-11-05 D PC, Unreal `5a08d015`·MD `e24c5c0` + 완료된 관련 수선. 기본 RC 카메라축은 미지정이며 사용자는 Tutorial2 InterLink 자동 상향이 멈췄음을 확인했다. 공중 UI 입력 해제와 모터 정지를 분리해 pause/키 재지정 뒤 시동·스로틀·모드·LOS 방향 선택을 보존한다. 최종 B13 모듈의 UI6 포함28건 통과(오류0·경고17), 이전 모터/방향2·충돌7은 관련 코드 유지 조건으로 별도 재사용한다. 단일 실행37건으로 합산하지 않는다. 원 사용자 순간의 원인은 미확정이며 실제 재현된 UI 모터OFF 경로와 구분한다. 선택 전선/FPV 물리벽만 런타임 비차단이며 M1 전체 허공 막힘 완치를 주장하지 않는다. [최종 검증·제한 정본](docs/history/DRONE_WORKLOG.md#2026-11-05--카메라공중-ui-입력충돌-최종-검증과-전달)·[현재 절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#tutorial2-하늘-시야-재현과-판정). 입력743·사용자 저장99·맵75·보호자산29 SHA 일치를 재확인했고 Production Training을 보존했다. 게임 main `7771f549`를 정상 푸시해 원격 일치를 확인했다. MD 전달 식별자는 기존 Space 진행 페이지에서 확인한다.
+현재 기준: 2026-11-06 D PC. 사본 `D:/JGY/project/drone_ops_exhibition_20261106/Drone.uproject`의 Core23·별도 M3 실제4개 단계/완료 판정·모델 변경 후10개 검사는 실행별 근거로 유지한다. 추가 M3 재실행 관찰은 새 모델 생산 폭탄의 직접 명중1발이 xiwcfassc_tier_2에 원시 피해600·HP200→0·사망1·목표0→1/4, 다른3개 피해0임을 확인했다. 이 추가1건은10개 중 같은 M3 검사의 재실행이다. Core의 파일쓰기 경계 가로채기·실제888×500 캡처와 별도 해상도/실물 미확인 범위는 유지한다. held 기존2캡처는 그리드만 보여 무효이며 올바른 게임뷰·최종 Source/모듈/설정 보존 영수증을 기다린다. 사용자 승인으로 사본 최종 확인 뒤 원본 `D:/JGY/project/drone`에 필요한 변경을 백업·선별 반영하는 단계가 추가됐으나 원본 적용은 미시작이다. 원본 최신 사용자 설정/키 보정·SaveGames·.git/캐시·Training 맵을 사본 것으로 덮지 않으며 원본 Build/검증은 별도다. `MI_xiwcfassc`는 사용자 정정으로 실수 저장 복구 대상이며 현재본 백업·수정 전본/parent/texture 확인 후 해당 자산만 복구 예정이고 아직 미복구다. [진행 정본](docs/history/DRONE_WORKLOG.md#2026-11-06--전시회-독립-사본-core-진행-검증)·[편집 위치](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#전시회-사본의-조작-설정과-미디어). 전체 작업 미완료·이번 Commit/Push 없음.
 
 M4 저장 기본 기체를 초기 출격 정책과 같은 FiberOptic으로 맞췄고, 세 시작점→실제 재머→새 전투 기체→Patriot 진행을 확인했다. M1의 축 배율0 장식 section만 런타임 충돌을 해제하고 정상 이웃/전봇대는 보존했다. 머티리얼2개의 개별 사용 플래그도 수선했다. 로비는 첫 배치 전에 실제 미션 미리보기를 채우고 키보드 포커스로 내용이 바뀔 때만 재배치해 첫 프레임 글자/구분선 겹침을 수정했다. 미리보기로 미션을 자동 확정하지 않는다.
 
@@ -12,8 +12,9 @@ M4 저장 기본 기체를 초기 출격 정책과 같은 FiberOptic으로 맞�
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal `D:/JGY/project/drone` | main `7771f549`·origin 동일 | 최종 B13 28통과·이전9 별도 재사용, 동결 Source와 commit blob 일치·남은 WIP0 |
-| 문서 `D:/JGY/project/md` | 검증 시작 main `e24c5c0` 이후 이 문서 묶음 | 기존 관련 WIP·역사 보존, MD12파일·기존 Space3페이지 저장/readback 완료. 전달 commit은 Space 진행 페이지 참조 |
+| Unreal `D:/JGY/project/drone` | main `7771f549`·MI_xiwcfassc 1파일 미커밋 | 사용자 실수 저장 복구/선별 반영은 미시작. 최신 설정·Saved·Training 보존, 원본 Build/검증 별도 |
+| 문서 `D:/JGY/project/md` | main `7efbbf3` 이후 진행 문서 미커밋 | 전시회 Core 진행 갱신·전체 미완료·Commit/Push 없음 |
+| 전시회 사본 | `D:/JGY/project/drone_ops_exhibition_20261106/Drone.uproject` | UE5.8·별도 파일·Core23 통과·시각/M3 후속 대기·Git 작업 없음 |
 
 ## 현재 D PC 구현·검증 경계
 

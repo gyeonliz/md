@@ -1,5 +1,7 @@
 # Drone 기능 시험 맵 가이드
 
+전시회 독립 사본(2026-11-06)은 `D:/JGY/project/drone_ops_exhibition_20261106/Drone.uproject`을 연다. Core23 자동 통과·시각 검토 중이며 M3 기존4개 실제 연결·단계·표준 피해3/4 미완료/4/4 성공은 별도 PIE로 확인했으며 추가 생산 폭탄 직접 명중은 피해600·HP200→0·사망1·목표0→1/4를 확인했다. held 게임뷰·최종 보존과 승인된 원본 선별 반영/별도 검증은 대기다. [조작 설정·영상 편집](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#전시회-사본의-조작-설정과-미디어)·[실제 수치와 제한](../history/DRONE_WORKLOG.md#2026-11-06--전시회-독립-사본-core-진행-검증).
+
 현재 첫 수업은 `Tutorial/TUT_LOS`의 BP_LOS 뒤쪽 고정 관찰 시점에서 이륙→전진→후진→실제 착지를 확인한다. 기존 `Mission.Tutorial.Hover` ID는 유지한다. 보존된 Observer TestMap은 별도 경량 회귀용이다. [Training 저작 가이드](../tutorial/DRONE_TRAINING_AUTHORING_GUIDE.md)의 Observer 절을 따르며 실제 접지 전에는 완료되면 안 된다. 다른 수업/Story의 추가 귀환은 제거했다.
 
 Story 선택은 `Lvl_DroneFrontEnd`에서 Select_UI 배치·Pretendard 실제 문구·4개 목록→START→브리핑/Back을 확인한다([UI 가이드](DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)). 물리 Sandbox에서는 공유 매듭 PBD 그물의 중력/국소 접촉과 일반 벽의 로터 외곽 반발을 시험한다([물리 가이드](DRONE_CHAOS_DATAFLOW_PLAN.md)). 적용·자동 검증·수동 대기 결과의 정본은 [STATUS](../../STATUS.md)다.

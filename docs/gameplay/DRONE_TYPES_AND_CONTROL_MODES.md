@@ -2,6 +2,12 @@
 
 검증 기준: 2026-11-05 D PC, Unreal `5a08d015` + 최종 카메라·공중 UI 입력 수선. 기존 Claude 실측 정합·Antigravity 감사와 날짜별 결과는 보존하며 [최종 검증·제한 정본](../history/DRONE_WORKLOG.md#2026-11-05--카메라공중-ui-입력충돌-최종-검증과-전달)을 따른다.
 
+## 전시회 사본에서 기체값을 찾는 위치
+
+사본 `/Game/Drone/Data/Drones`의 `DA_Drone_{Racer,FPVStrike,FiberOptic,Drop,Scout}_Greybox`를 연다(디스크 `Content/Drone/Data/Drones`). 질량·추력·항력·모터 반응 등은 `FlightProfile`에 데이터화돼 있지만 접지·착륙은 Pawn/BP에도 분산되고 BP·사용자·역할 override가 실제 적용값에 영향을 준다. 관성 텐서는 Racer FixedStep 시험 경로 한정이다. 이번 사본은 비행 물리값을 유지한다. 근거는 Source 연결·기존 정상 덤프·파일 보존이며 저장 BP의 최종 적용값을 이번에 새로 엔진 조회한 답변은 아니다. [사본 진행·검증 경계](../history/DRONE_WORKLOG.md#2026-11-06--전시회-독립-사본-core-진행-검증).
+
+전시회 사본의 드랍 폭탄 시각은 사용자 `드랍폭탄.zip` 모델로 교체 진행 중이다. held/dropped 시각의 일관성과 기존 피해·질량·항력·충돌·투하/소모·선택 프리뷰 숨김 보존이 조건이다. 사본 모델 경로는 `/Game/Drone/Abilities/Payload/DropBombModel/SM_DropBomb.SM_DropBomb`, 재질은 `M_DropBomb`, BaseColor/Normal/ORM을 포함5자산 저장·새 에디터 재읽기와 현재 SHA를 확인했다. 생성자/기존 검사2파일은 경로 각1곳만 바꿨다. Native 폭탄0.75kg·시각 NoCollision, held mesh/material·stock1 visible→stock0 hidden·scale0.08098을 읽었고 기존35cm 보정식은 약10.86×10.86×35cm다. 모델 후10검사와 추가 생산 명중 관찰에서 팔레트1개의 원시 피해600·HP200→0·사망1·목표0→1/4를 확인했지만 held 게임뷰·최종 보존은 대기다. 앞선 Core23 결과는 이 새 모델 검증을 포함하지 않는다.
+
 ## 기획 자료 사용 원칙
 
 - 읽기 기준: [Figma `Project:Droner`](https://www.figma.com/design/x9CAVMxSxFdME9XUIlrf78/Project-Droner?node-id=0-1&t=tXU1hQ5hhU1MmrDq-1)

@@ -1,10 +1,10 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-11-05 D PC — 카메라·공중 UI 입력 수선 검증, 실물/전체 경로 제한은 [STATUS](STATUS.md).
+마지막 갱신: 2026-11-06 D PC — 사본 held 시각 확인·원본 반영 준비.
 
 ## Now
 
-최신 절차는 [카메라/자폭](docs/gameplay/DRONE_TYPES_AND_CONTROL_MODES.md)·[설정/UI](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md)·[Story 단계](docs/gameplay/DRONE_MISSION_FRAMEWORK_GUIDE.md)다. 기존 실행 결과는 당시 리비전이며 현재 HEAD 검증으로 합산하지 않는다.
+현재 절차와 검증 경계는 [STATUS](STATUS.md)를 따른다.
 
 ### 결정 필요 — 현재 DA 값은 채택 사양이 아님
 
@@ -30,6 +30,7 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
+| EXHIBITION-1106 | 전시회 사본 | 사본 명중 확인·held 시각 대기 | 사본 최종→원본 선별 반영·MI_xiwcfassc 복구/검증(미시작). [진행 정본](docs/history/DRONE_WORKLOG.md#2026-11-06--전시회-독립-사본-core-진행-검증) |
 | TUT-DELIVERY-1103 | 배달맵 복구/크기 | 판2.5배·화물1/3·3개 수령/태그 복구·종단 자동 성공 | 크기·집기 방향 실기, “원통 착륙장” 문구 미정. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
 | MISSION-PHOTOS-1103 | 13미션 사진 통일 | Thumbnail=BriefingImage·레이싱 번호 유지 | 전체 사진 수동 대조. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
 | UI-SELECT-3D-1103 | 선택3D 재로딩 | 지연 재생성·재촬영·프리스트림 구현 | 열기/기체 전환/재오픈 실기. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
@@ -146,7 +147,7 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 
 ## Next
 
-카메라·UI 수선 최종28통과와 이전9 별도 재사용을 확인했다. 원 사용자 순간의 원인·실물 전장치·M1 모든 경로는 미확정이다. [최종 검증·제한 정본](docs/history/DRONE_WORKLOG.md#2026-11-05--카메라공중-ui-입력충돌-최종-검증과-전달).
+사본 held 게임뷰·최종 보존 확인 후 원본을 백업·선별 반영하고 별도 Build/검증한다. 원본 최신 설정/키 보정·Saved·.git/캐시·Training은 사본으로 덮지 않는다. [진행 정본](docs/history/DRONE_WORKLOG.md#2026-11-06--전시회-독립-사본-core-진행-검증). 기존 실물/전체 미션·패키징 확인은 유지한다.
 
 1. 실제 키보드·플스·InterLink로 시동/착지·방향/키 설정·M4 세 시작점/교대와 전체 미션을 손 조종한다. 자동 주입 결과와 구분한다.
 2. 출발 카운트·체력 경고·무기/폭발음을 실제로 듣고, 실제 배달/사진과 첫 프레임 문구도 확인한다.

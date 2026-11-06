@@ -4,6 +4,26 @@
 
 설정된 InterLink Cancel(Button15)은 Esc와 같이 오프닝/미션 영상 스킵, 미션 일시정지·복귀, 시작 지점 뒤로가기, 시드 편집 취소를 처리한다. 기존 FrontEnd/Selection/Pause/로딩의 Back과 같은 키 규칙을 쓴다. 시드 편집 취소는 해당 입력을 소비하고 Pause는 이미 멈춘 상태에서도 동작한다. 위젯·실제 PlayerInput/영상 PIE 자동 검사는 통과했으며 실물 버튼·전체 화면 수동 확인은 남아 있다. [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md).
 
+## 전시회 사본의 조작 설정과 미디어
+
+현재 편집·검증 대상은 사본 `D:/JGY/project/drone_ops_exhibition_20261106/Drone.uproject`이다. 사용자 승인으로 사본 최종 확인 후 원본 반영 단계가 추가됐으나 원본 적용은 아직 미시작이며 별도 Build/검증한다. `MI_xiwcfassc`의 실수 저장은 현재본 백업과 수정 전본·parent/texture 의존성 확인 후 해당 자산만 복구 예정이며 실제 복구 완료가 아니다. 표시 이름은 `drone ops`/`드론 옵스`, 엔진은 UE5.8, 내부 모듈은 기존 `Drone`이다. Core23 자동 통과·시각 검토 중이며 전체 작업 완료가 아니다. [실제 수치·제한](../history/DRONE_WORKLOG.md#2026-11-06--전시회-독립-사본-core-진행-검증).
+
+사본 Content Browser의 `/Game/Drone/UI/WBP/FrontEnd/WBP_DroneControlsSettings` Designer에서 PSD3종 기반의 공통 조작 설정을 편집한다.
+
+| 기기 | Designer 페이지 | 탭 |
+|---|---|---|
+| 키보드·마우스 | `ControlDevicePage_0` | `ControlDeviceTab_0` |
+| 게임패드 | `ControlDevicePage_1` | `ControlDeviceTab_1` |
+| InterLink DX | `ControlDevicePage_2` | `ControlDeviceTab_2` |
+
+축 선택 항목 템플릿은 같은 폴더의 `WBP_DroneControlsAxisChoice`(`ControlAxisChoiceRoot/Button/Label`)다. 제목·설명·배치·폰트·색·버튼 Normal/Hovered/Pressed는 Designer에서 편집한다. `ControlKey_<BindingId의 점을 밑줄로 치환>` 키 값·반전·캡처/상태·호환 축 이름만 실행 데이터로 갱신한다. 필수 이름/위젯 형식을 보존하며 저장 루트/행을 실행 때 재생성하지 않는다.
+
+실제 진입은 기존 `WBP_DroneSettings.KeyboardSettingsButton → OpenKeyboardSettings → WBP_DroneControlsSettings`다. 조작창 확인은 부모 pending에 전달하고 부모 설정 Apply가 저장한다. Back/Esc는 미확정 편집을 취소하며 기본값은 현재 기기만 복원한다. Core 실제 PIE는 클래스·Designer 트리 보존·키 캡처/축 취소·3기기 전달·저장 요청1회·포커스 복귀를 확인했다. 파일쓰기 경계는 시험용으로 가로챘으므로 실제 디스크 저장/재실행·실물 HID와 구분한다.
+
+새 로고 원본은 `SourceArt/Brand/New_logo.png`, 메인 영상은 `Content/Movies/Main_cinematic.mp4`다. 로고2자산의 임포트 경로는 사본 내부를 가리키지만 크기 조회32×32와 중단된 전체 WBP 검사가 있어 품질/전체 표시 확인은 남아 있다. 창 제목은 설정값 확인이다. 영상5종의 실제 재생 비율·화면 경계·중앙 정렬은 통과했으며 메인/M1은16:9, M2`4는 각 원본 비율이다. 조작 설정 캡처 파일명1280의 실제 PNG는888×500이며 요청 해상도 두 규격을 완료한 결과가 아니다. 메인 영상 끝장면 새 로고·시각 대조는 진행 중이다.
+
+M3 2차 목표는 사용자가 확정한 `xiwcfassc_tier_2..5`의 기존4개(`StaticMeshActor_57/63/69/119`)다. 사본 `/Game/Drone/Data/Missions/DA_Mission_Story_VeilBreaker_Test`와 `Missions/Lvl_Story03_VeilBreaker`에 `Objective.Story.M3.DestroySupplyPallets`(`TARGET_DESTROYED`/Required4/`Story.M3.SupplyPallet`)를 연결했다. 별도 실제 PIE의 공개 FrontEnd→재머 해제→전투 기체 선택/출격→4개 목표 경로에서 각200HP·표준 피해200으로3/4 미완료·4/4 성공·사망 각1회를 확인했다. Core23과 다른 모듈·실행이며 추가 실제 생산 폭탄 재실행 관찰은 새 모델1발 직접 명중으로 xiwcfassc_tier_2의 원시 피해600·HP200→0·사망1·목표0→1/4, 다른3개 피해0을 확인했다. 모델 후10개 검사와 추가1건은 같은 M3 검사를 포함하므로 합산하지 않는다. held 시각의 기존2캡처는 무효이고 게임뷰 재캡처·최종 보존 확인이 대기다. 기체값은 [DA/BP 분산 안내](DRONE_TYPES_AND_CONTROL_MODES.md#전시회-사본에서-기체값을-찾는-위치)를 따른다.
+
 ## 화면별 WBP 편집 정본
 
 Content Browser에서 아래 이름으로 검색하고 Designer를 연다. 경로는 `/Game/Drone/UI/WBP`다. 실행 진입 `FrontEnd/WBP_DroneFrontEnd`와 Root는 화면을 묶는 호스트이며, 개별 화면 배치는 아래 자산에서 조정한다.
