@@ -1,12 +1,12 @@
 # 시작 화면 · 로비 탭 · 원형 코스 가이드
 
-현재 절차 기준: 2026-11-06 D PC. 전시회 사본과 원본에 브랜드·미디어·PSD 기반 편집형 조작 설정·M3/폭탄 변경을 반영했다. 기존5메뉴와 사용자 설정·내부 이름은 유지하며 실제 검증과 한계는 [STATUS](../../STATUS.md)·[WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
+현재 절차는 2026-11-10 D PC 기준이다. WBP와 게이트의 확인 범위는 [STATUS](../../STATUS.md), 실행별 이력은 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
 
 설정된 InterLink Cancel(Button15)은 Esc와 같이 오프닝/미션 영상 스킵, 미션 일시정지·복귀, 시작 지점 뒤로가기, 시드 편집 취소를 처리한다. 기존 FrontEnd/Selection/Pause/로딩의 Back과 같은 키 규칙을 쓴다. 시드 편집 취소는 해당 입력을 소비하고 Pause는 이미 멈춘 상태에서도 동작한다. 위젯·실제 PlayerInput/영상 PIE 자동 검사는 통과했으며 실물 버튼·전체 화면 수동 확인은 남아 있다. [입력 계약](../tutorial/DRONE_PROTOTYPE_INPUT_CONTRACT.md).
 
 ## 전시회 사본의 조작 설정과 미디어
 
-아래 자산 경로는 사본 `D:/JGY/project/drone_ops_exhibition_20261106`과 원본 `D:/JGY/project/drone`에 동일하게 반영했다. 각각 `Drone.uproject`을 UE5.8에서 연다. 표시 이름은 `drone ops`/`드론 옵스`, 내부 모듈/직렬화 경로는 기존 `Drone`이다. 적용·Build·검증은 두 프로젝트를 구분해 [정본](../history/DRONE_WORKLOG.md#2026-11-06--전시회-독립-사본-core-진행-검증)에 기록했다.
+전시 사본 `D:/JGY/project/drone_ops_exhibition_20261106`과 원본 `D:/JGY/project/drone`의 `Drone.uproject`을 UE5.8에서 각각 연다. 공통 WBP 경로를 사용하며 각 프로젝트의 로비 브랜딩과 내부 모듈 `Drone`을 유지한다.
 
 Content Browser의 `/Game/Drone/UI/WBP/FrontEnd/WBP_DroneControlsSettings` Designer에서 `Keyboard.psd`/`Gampad.psd`/`Interlink.psd` 기반 조작 설정을 편집한다.
 
@@ -16,11 +16,11 @@ Content Browser의 `/Game/Drone/UI/WBP/FrontEnd/WBP_DroneControlsSettings` Desig
 | 게임패드 | `ControlDevicePage_1` | `ControlDeviceTab_1` |
 | InterLink DX | `ControlDevicePage_2` | `ControlDeviceTab_2` |
 
-공통 Switcher는 `ControlDevicePages`, 축 선택 반복 항목은 같은 폴더 `WBP_DroneControlsAxisChoice`의 `ControlAxisChoiceRoot`·`ControlAxisChoiceButton`·`ControlAxisChoiceLabel`이다. 제목/설명·배치·폰트·색·버튼 Normal/Hovered/Pressed는 정적 Designer 값이다. `ControlKey_<BindingId의 점을 밑줄로 치환>` 키 값·반전·캡처/상태·호환 축 이름만 데이터가 갱신한다. 필수 이름/형식을 보존하며 저장 루트와 행을 실행 때 재생성하지 않는다.
+공통 Switcher는 `ControlDevicePages`다. 키보드 비행 행은 Hierarchy의 `ControlBindingsScroll` 아래에서 W/S → A/D → Q/E → Space/Ctrl → F 순으로 배치한다. 포커스는 저장한 Designer 행 배치를 따른다. 축 선택은 `/Game/Drone/UI/WBP/FrontEnd/WBP_DroneControlsAxisChoice`의 `ControlAxisChoiceRoot`·`ControlAxisChoiceButton`·`ControlAxisChoiceLabel`을 편집한다. 제목·배치·버튼 스타일은 Designer 값이고 `ControlKey_<BindingId의 점을 밑줄로 치환>` 키 값, 반전, 캡처 상태, 호환 축 이름은 실행 중 갱신한다. 바인딩에 쓰는 위젯 이름과 형식을 유지한다.
 
-실제 메뉴는 `WBP_DroneSettings.KeyboardSettingsButton → OpenKeyboardSettings → WBP_DroneControlsSettings`다. 조작창 확인은 부모 pending에 전달하고 부모 설정 Apply가 저장한다. Back/Esc는 미확정 편집 취소, 기본값 복원은 현재 기기만이다. 자동 검사는 실제 클래스·Designer 보존·캡처/축 취소·3기기 전달·저장 요청1회·포커스를 확인했으며 파일쓰기 경계는 시험 대역이었다. 디스크 재실행 복원·실물 HID와 구분한다.
+실제 메뉴는 `WBP_DroneSettings.KeyboardSettingsButton → OpenKeyboardSettings → WBP_DroneControlsSettings`다. 조작창 확인은 부모 pending에 전달하고 부모 설정 Apply가 저장한다. Back/Esc는 미확정 편집을 취소한다. 기본값 복원은 현재 기기에 적용한다. 실제 탭과 축 선택·취소, 장치별 반전, Space를 K로 바꾼 뒤의 순서와 격리 프로필 저장·재로드는 [WORKLOG](../history/DRONE_WORKLOG.md)를 참고한다.
 
-로고 입력은 `SourceArt/Brand/New_logo.png`, 메인은 `Content/Movies/Main_cinematic.mp4`다. 영상은 각 선택 트랙의 원본 비율로 맞추고 가운데 배치한다. 메인/M1은16:9, M2`4는 각 원본 가로 비율이다. 전체 이미지가 보이는 ScaleToFit을 유지하며 Stretch/Crop으로 바꾸지 않는다. 정상 Fab 빌드 뒤 양쪽 타깃 PluginOverrides는 None이다. 원본의 활성 재임포트 경로6개는 원본 SourceArt로 해석되고 MD5가 일치한다. 옛 copy-root Factory_UID 문자열은 비활성 임포터 이력이며 바이너리 치환하지 않는다.
+로고 입력은 `SourceArt/Brand/New_logo.png`다. 시작·엔딩 영상 경로는 [영상 절차](#시작-오프닝과-스토리-엔딩)를 따른다. 미션 영상은 선택 트랙의 원본 비율로 가운데에 ScaleToFit한다. 원본의 활성 재임포트 경로 6개는 원본 SourceArt를 사용한다.
 
 M3 목표는 `/Game/Drone/Data/Missions/DA_Mission_Story_VeilBreaker_Test`와 `Missions/Lvl_Story03_VeilBreaker`의 `Objective.Story.M3.DestroySupplyPallets`/TARGET_DESTROYED/Required4/Story.M3.SupplyPallet다. 사용자 확정 `StaticMeshActor_57/63/69/119`(`xiwcfassc_tier_2..5`) 기존4개를 쓴다. 별도 표준 피해 검사에서3/4 미완료·4/4 성공, 생산 폭탄 직접 명중 관찰에서는 대상1개 HP200→0·사망1·목표1/4를 확인했다. 전편 손 비행/모든 투하 각도나 범위를 인증한 것은 아니다.
 
@@ -40,6 +40,7 @@ Content Browser에서 아래 이름으로 검색하고 Designer를 연다. 경�
 | 미션 영상·건너뛰기 안내 | `FrontEnd/WBP_DroneCinematic` |
 | 설정 / 시드 입력 | `FrontEnd/WBP_DroneSettings` / `WBP_DroneSeedInput` |
 | 기체 선택 / 시작 안내 | `Mission/WBP_DroneSelection` / `WBP_DroneMissionStartPrompt` |
+| 미션 4 시작지점 지도 | `Mission/WBP_DroneStartLocation` |
 | 결과 / 일시정지 / 로딩 | `Mission/WBP_DroneMissionResult` / `WBP_DroneMissionPause` / `WBP_DroneProceduralLoading` |
 | 비행 중 전체 HUD | `HUD/WBP_DroneFlightHUDKit` ([세부](DRONE_MISSION_FRAMEWORK_GUIDE.md#hud-편집-정본)) |
 
@@ -179,19 +180,24 @@ Texture 위치는 `/Game/Drone/FrontEnd/Textures/Title`이다. 원본 PNG는 수
 - 패드 안내는 MCP로 실제 `IMC_DronePrototype.defaultKeyMappings.mappings`·`IMC_DroneGroundWeapons` 및 Scout/UGV BP 연결을 읽어 확인했다. 비행은 **쉬운 조작 기준**으로 표기하며 FPV는 별도, 첫 LOS의 시점 전환은 고정 예외다. R1/L1 설명은 비행 역할에 한정하고 UGV 무장은 L2/R2로 안내한다(기존 R1/L1 대체 바인딩은 삭제하지 않음). ○는 메뉴 뒤로, □는 UGV 재장전만 표시한다. 기능 없는 버튼은 설명에서 제외했다. RC 그림은 사용자가 준 기존 시뮬레이터 조종기 형태·버튼 위치를 유지했다. 실제 입력 바인딩 자체는 변경하지 않았다.
 - 첫 LOS 수업만 `ADroneTutorialObserverLesson`이 `BP_LOS` 눈높이를 읽어 **뒤400cm·옆120cm·위80cm** 보정하고 훈련 구간을 바라본다. Observer BP의 `bUsePlacedSceneAnchors`, `ObserverEyeForwardOffsetCentimeters`(기존18), `ObserverCameraBackOffsetCentimeters / ObserverCameraSideOffsetCentimeters / ObserverCameraHeightOffsetCentimeters`에서 조정한다. BP_LOS/맵은 저장하지 않는다. LOS 드론은 외부에서 보이게 하고 다른 비행 수업은 1인칭으로 시작한다. 출격 시 SpringArm 초기 지연을 한 번 정리하며 1인칭에서는 자기 본체/로터를 소유자에게만 숨긴다. 저장 카메라 선호값·충돌은 유지한다.
 - 비행 출발은 가장 가까운 `SM_helicopter_base` 상단이다. 호버 구역은 **출격 Yaw 정면6m·패드 위 중심3m**, 청록12변 테두리에서3초 유지하면 바로 클리어한다. `BP_TutorialHoverZone`의 ShowHoverGuide/GuideThicknessCentimeters/GuideMaterial과 `M_HoverGuide_Visible` Brightness(3)로 조정한다. **LOS를 제외한 Tutorial·Story의 추가 ReturnToBase 목표/귀환 표적·낡은 로비/브리핑 문구를 제거**했다. LOS 자체의 후진→실제 착지는 수업 목표이므로 유지하며 LOS DA 원본도 보존했다. 전진/원형/물자도 본목표 성공 즉시 결과로 간다. 저장 도구의 재도입 방지·검사 방법은 [귀환 정책](DRONE_TEST_MAP_GUIDE.md#귀환-정책을-유지하는-방법)을 따른다.
-- 시작 안내의 배경은 `UDroneMissionStartPromptWidget::bUseStableMissionBackdrop=true`로 `BriefingImage`(없으면 Thumbnail)를 쓴다. 기존 WBP 안내/버튼을 보존한 채 초기 카메라/조명 준비 프레임을 불투명 배경으로 가린다. [시작] 전 시간/입력 정지·확인 후 재개를 검사한다. Lumen 노출 경고 자체를 없애거나 전체 렌더 품질을 낮춘 수정은 아니다.
+- `/Game/Drone/UI/WBP/Mission/WBP_DroneMissionStartPrompt`의 `StartPromptStartButton`, `StartPromptStartHintFit`, `StartPromptStartHint`를 Designer에서 편집한다. Canvas 슬롯으로 버튼 아래 안내를 배치하고 TextBlock의 가로 정렬을 Center로 둔다. 배경은 `bUseStableMissionBackdrop`의 BriefingImage 또는 Thumbnail을 쓴다. 실제 시작 입력으로 정지 상태가 풀리는지 확인한다.
 - 물자/포탑 수업은 준비 중 표시를 해제했다. 배달 출격은 `TUT_Delivary_2`로 연결하며 빈 집게로 시작→실제 화물 접근/집기→표적 위 투하다. `TUT_UGV_Turret`는 체력200 포탑 파괴로 완료한다. 기존 `TUT_Delivary`는 보존한다. 배치된 시작/표적은 레벨에서 조정하며 [목표 매니저 편집](DRONE_MISSION_FRAMEWORK_GUIDE.md#이미-배치된-맵에서-바로-찾기)을 따른다. 제품 Story 연결/제한은 [시험 가이드](DRONE_TEST_MAP_GUIDE.md#현재-미션-연결과-확인-순서)에 있다.
 - 확인 순서: Editor 종료 후 Build → FrontEnd Play → Tutorial에서 각 사진 선택 → START → 세 장치 탭/하단 범례 확인 → LOS 사람 시점·다음 수업 드론 시점/패드 상단 확인. `Drone.UI.TrainingPresentationCapture`는 1280/1920 실제 화면과 범례 경계, `Drone.Tutorial.TUTMapLaunchPIE`는 실제 TUT 맵 시작을 검사한다. 실제 패드 비행·연속 완주는 별도다.
 - 정찰·FPV 기체 선택 사진은 실제 `DA_Drone_Scout_Greybox` / `DA_Drone_FPVStrike_Greybox`의 PawnClass를 바닥 없는 별도 PreviewScene에 불러와 푸른 배경으로 촬영했다. `SelectImage`는 `/Game/Drone/FrontEnd/UI/SelectUI/Drones/T_SelectDrone_{Scout,FPV}_Studio_20261020`에 연결한다. 재사용 PNG/메시 출처는 `SourceArt/Selection`, 촬영은 `Drone.Diagnostics.SelectionPhotos`, 가져오기는 `Tools/AssetMigration/ApplyPresentationRefresh.py`다. 기존 사진과 제품 맵은 보존한다. 튜토리얼 권장창은 제목·본문·두 버튼을 한글로 표시하며 저장된 Designer WBP/Native 경로에 함께 적용한다. 검증 근거는 [WORKLOG](../history/DRONE_WORKLOG.md)를 따른다.
 - 레이싱 사진 재촬영: `Drone.UI.RacingEditorOverview.Map1/2/3`은 각 실제 Editor 맵의 활성 코스40% 주변을 **약680m·FOV60 근접 전경**으로 촬영한다. 전체 코스 bounds Fit은 더 사용하지 않는다. 수직 Landscape Trace로 지면 높이를 맞추고 원본 World 경로·맵 해시를 확인한다. 촬영 중 Fog와 시작/목표 디버그 표시를 Editor/Game 양쪽에서만 숨기고 모두 원복하며 Atmosphere/Cloud는 표시한다. 맵은 저장하지 않는다. 결과는 `Saved/Automation/CodexRacingNear_20261020/RacingMapN_near.png`, 재사용 PNG는 `SourceArt/Racing/RacingMapN_NearView_20261020.png`다. 사진 확인 뒤 `Tools/Validation/Invoke-ControlDeviceArtworkImport.ps1 -RacingPreviews -RacingNear`가 기존 DA를 백업하고 새 `T_RacingMapN_NearView_20261020`을 Thumbnail/BriefingImage에만 연결한다. MissionMap/RecordCourseId·랜덤도시 '?'는 유지한다. 옛 Close/CoursePreview 사진과 Texture도 삭제하지 않는다.
 
-### 시작 오프닝 영상
+### 미션 4 시작지점 지도
 
-- 프로젝트 `Content/Movies/Main_cinematic.mp4`는 사용자 제공 원본과 SHA-256이 동일한 복사본이다. H.264/AAC·1920×1080·30fps·약79초·148,658,835B. 외부 E드라이브 경로를 런타임에서 참조하지 않는다.
-- `ADroneFrontEndPlayerController`가 새 GameInstance의 Boot에서 `UDroneOpeningMovieWidget`을 타이틀 위에 한 번 표시한다. 정상 종료·Esc·패드 ○는 영상/소리를 정리하고 타이틀 포커스를 복원한다. 로비/미션에서 타이틀로 돌아올 때는 다시 재생하지 않는다. 파일 없음·디코더 실패·열기 시간 초과도 타이틀로 넘어간다.
-- FrontEnd PlayerController Class Defaults의 `bPlayOpeningMovie`로 켜고 끈다. `OpeningMovieWidgetClass`에 해당 C++ 클래스의 BP 자식을 지정하면 `MovieFilename`(Content/Movies 안 파일명), `OpenTimeoutSeconds`(기본10초)를 조정할 수 있다. 영상은 16:9 비율 유지, 남는 화면은 검정 여백이다.
-- `Drone.Build.cs`에 MediaAssets/AudioMixer, `.gitattributes`에 MP4 LFS, `DefaultGame.ini`에 `bSkipMovies=False`·`NonUFSMovies=Main_cinematic`을 설정했다. StartupMovies에는 등록하지 않아 중복 재생을 피한다. 다른 PC는 사용자 Commit/Push 후 LFS 영상까지 받아야 한다. 실제 패키징/배포판은 미검증이다.
-- `Drone.UI.OpeningMoviePIE`는 실제 파일 디코딩·재생 시간 진행·1920×1080 트랙·Unreal 내부 Esc 입력→타이틀 버튼 포커스 복귀를 검사한다. 숨김 렌더 캡처로 실제 영상도 확인했다. 무음 실행이므로 청감·자연 종료까지의 전체 재생·실제 패드는 별도다. 사용자 시험은 새 Play → 영상/소리·비율 → Esc/○ → 타이틀 입력, 다음 새 Play의 자연 종료·로비 복귀 시 재재생 없음이다. 자동 마우스/키보드나 보이는 Editor 조작은 사용하지 않는다.
+`/Game/Drone/UI/WBP/Mission/WBP_DroneStartLocation`의 `StartLocationViewportFit`은 작은 화면에서 축소하고, `StartLocationMapFrame`과 `StartLocationMapRaster`는 지도 배치를 정한다. 지도 설계 크기는 1280×720이다. `StartLocationMapImage` Brush는 `/Game/Drone/UI/Textures/T_M4_StartLocationMap`을 사용한다. `StartLocationMapPin0`, `StartLocationMapPin1`, `StartLocationMapPin2`의 Style에서 번호 모양을 편집한다. 선택 시 `Pressed`와 `Pressed Foreground`가 청록 채움과 짙은 숫자를 정하며, 키보드·패드 포커스의 크기 강조는 별도로 적용한다.
+
+Class Defaults의 **Drone | Start Location Map**에서 캡처 중심·회전·Ortho 폭·이미지 크기를 확인한다. `Lvl_MilitaryCamp`의 2048×1152 정사영은 오른쪽 +X, 아래 +Y이며 StartId의 월드 좌표로 핀을 배치한다. 텍스처 교체 시 정사영 프레임과 캡처 기준을 함께 맞춘다. M4에서 지도 번호를 직접 선택한다. 지도 활성 상태에서는 출발지 카드 줄을 접고, 비지도 경로에서는 카드로 선택한다. Back과 출격은 하단 버튼에서 처리한다.
+
+### 시작 오프닝과 스토리 엔딩
+
+- 전시 사본의 사용자 영상은 `Content/Movies/Main_cinematic.mp4`와 `Content/Movies/Ending_cinematic.mp4`에 있다. 두 파일은 1920×1080, 16:9이고 길이는 79.43초와 17.93초다. 오프닝 말미 DRONER 로고는 제공 파일에 포함되어 있다. 원본은 기존 오프닝 경로를 사용한다.
+- `ADroneFrontEndPlayerController`는 새 GameInstance의 Boot에서 오프닝을 한 번 연다. 오프닝이 끝나거나 스킵되면 타이틀 포커스를 복원한다. 재생 여부는 Class Defaults의 `bPlayOpeningMovie`, 파일명과 열기 제한은 `UDroneOpeningMovieWidget`의 `MovieFilename`과 `OpenTimeoutSeconds`에서 확인한다.
+- 전시 사본의 스토리 4 성공 경로는 `/Game/Drone/UI/WBP/FrontEnd/WBP_DroneCinematic`으로 엔딩을 연 뒤 성공 결과를 표시한다. 자연 종료, Esc, 파일 없음은 같은 결과로 이어진다. 동영상은 프로젝트 `Content/Movies` 아래에서 열고 `Config/DefaultGame.ini`의 NonUFS 목록에 두 파일을 등록한다.
+- 실제 디코딩과 결과 전환 확인은 Editor·PIE의 [실행 이력](../history/DRONE_WORKLOG.md#2026-11-10--영상과-wbp-미션-4-지도-직선-게이트-검증)을 따른다. 실물 입력·청감은 수동 확인 범위다.
 
 ### Story 선택 화면: 제공 Select_UI 연결·배치
 

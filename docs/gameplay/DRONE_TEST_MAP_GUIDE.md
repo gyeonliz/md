@@ -154,8 +154,8 @@ FrontEnd → 튜토리얼/스토리 → 미션 선택 → 브리핑/기체 → �
 | 수업/미션 | 현재 연결 | 클리어/확인 경계 |
 |---|---|---|
 | LOS | `Tutorial/TUT_LOS` | 후퇴한 관찰 시점, 이륙/전진/후진/접지 수업 유지 |
-| 호버/전진/원형 | `TUT_Hover / TUT_Forward_Gate / TUT_Circle_Gate` | 3초 유지/Trigger/완주 뒤 즉시 성공, 별도 귀환 없음 |
-| 자유 게이트 | `Tutorial/TUT_FreeGate` | 준비 중/숨김 해제·코스13게이트 순서대로 완주→성공 |
+| 호버/직선/원형 | `TUT_Hover / TUT_Forward_Gate / TUT_Circle_Gate` | 3초 유지 / 직선 유효 게이트 7개 1랩 / 원형 유효 게이트 7개 1랩 |
+| 복합 게이트 | `Tutorial/TUT_FreeGate` | 유효 코스 게이트 13개를 순서와 정방향에 맞게 통과해 1랩 완료 |
 | 물자 운반 | `Tutorial/TUT_Delivary_2` | VV_grenades1·VV_highcaliber1·VV_WeaponBox2를 각각 집어 Cylinder로 운반. 고유 화물3개 뒤 성공, 귀환 없음. [스포이드/횟수](DRONE_MISSION_FRAMEWORK_GUIDE.md#이미-배치된-맵에서-바로-찾기) |
 | 포탑 파괴 | `Tutorial/TUT_UGV_Turret` | 준비 중 해제. 실제 자동포탑200HP, 유탄2발 파괴→성공 |
 | M1 골든 타임 / GoldenTime | `Lvl_Battlefield` | 구급품 DROP 전달·헬기포트 출격, 임시6종 허용/실패 시 결과·재도전 |
@@ -350,9 +350,9 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 제작 중인 실�
 `Lvl_DroneTutorialMissionTest`는 보존된 종합 시험장이다. 로비 DA는 위 수업별 맵을 사용하며 아래는 현재 목표의 요약이다. 첫 LOS와 별도 호버 수업은 구분한다.
 
 - `DA_Mission_Tutorial_Hover`: LOS, 이륙→전진→후진→실제 착지. 별도 `Hovering`은 Zone3초 유지 즉시 완료
-- `DA_Mission_Tutorial_Forward`: Scout, 전방 Trigger 통과 즉시 완료
-- `DA_Mission_Tutorial_Heading`: Scout, 원형 시작·체크포인트7개·결승 정방향 완주 즉시 완료
-- `DA_Mission_Tutorial_GateFlight`: Scout, Gate 4개를 순서·정방향으로 통과
+- `DA_Mission_Tutorial_Forward`는 `TUT_Forward_Gate`의 유효 게이트 7개를 순서대로 통과하는 `TrainingLap` 목표다. HUD는 0/7에서 시작한다. 안내 문구에는 개수를 고정하지 않는다. `Thumbnail`·`BriefingImage`는 수신 DA의 `/Game/Drone/UI/Textures/MissionPhotos_20261103/T_MissionPhoto_Tutorial03_Forward_2`를 사용한다.
+- `DA_Mission_Tutorial_Heading`은 Scout로 원형의 유효 게이트 7개를 순서대로 통과해 1랩을 완료한다.
+- `DA_Mission_Tutorial_GateFlight`는 Scout로 복합 코스의 유효 게이트 13개를 순서와 정방향에 맞게 통과해 1랩을 완료한다.
 - `DA_Mission_Tutorial_FPV`: FPV Strike, 기본 무장 상태로 차량300HP 표적 파괴
 - `DA_Mission_Tutorial_Payload`: Drop, 실제 화물 집기/투하→Payload Target 적중 즉시 완료
 - `DA_Mission_Tutorial_UGV_NPC`: Ground UGV, 체력 100의 정지 적 NPC 처치

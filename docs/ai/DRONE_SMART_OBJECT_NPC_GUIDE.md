@@ -8,7 +8,7 @@
 
 이 문서는 적군 순찰과 드론 발견 대응, 소총·샷건 분기, 기지 아군 NPC의 생활·순찰 이동, 한 명만 사용하는 MG Turret을 같은 기반 위에 구성하기 위한 실전 가이드다.
 
-현재 Source에는 **MG·체력·사망 교대·Cover·Drone 파괴 교전 종료·Rifle/Shotgun 탄창, Smart Object 도착 방향, 이동 Projectile·사격 분산, Gaze와 개인화기 추적/포기**가 반영돼 있다. `ST_NPC_HostilePatrol`은 MGTurret을 먼저 시도하고 실패한 Hostile은 Cover 1-Slot 또는 개인 무기로 대응한다. 개인화기 사거리 밖에서는 전투 리시 안에서 NavMesh를 따라 추적하고, 리시/무진행 한계를 넘으면 표적을 포기해 Patrol로 돌아간다. 사수가 사망하면 다른 MG 가능 병사가 자기 Slot을 놓고 빈 MG를 재Claim한다. 실종 Event 뒤에는 모든 Slot을 정리하고 3초 Search 후 순찰로 복귀하며, Drone 파괴 시 Search 없이 즉시 전투 자원을 정리한다. 예비 탄약·재장전 시간·FX·SFX와 최종 사망 연출은 완성 기능이 아니다.
+현재 Source에는 **MG·체력·사망 교대·Cover·Drone 파괴 교전 종료·Rifle/Shotgun 탄창, Smart Object 도착 방향, 이동 Projectile·사격 분산, Gaze와 개인화기 추적/포기**가 반영돼 있다. `ST_NPC_HostilePatrol`은 MGTurret을 먼저 시도하고 실패한 Hostile은 Cover 1-Slot 또는 개인 무기로 대응한다. 개인화기 사거리 밖에서는 전투 리시 안에서 NavMesh를 따라 추적하고, 리시/무진행 한계를 넘으면 표적을 포기해 Patrol로 돌아간다. 사수가 사망하면 다른 MG 가능 병사가 자기 Slot을 놓고 빈 MG를 재Claim한다. 실종 Event 뒤에는 모든 Slot을 정리하고 3초 Search 후 순찰로 복귀하며, Drone 파괴 시 Search 없이 즉시 전투 자원을 정리한다. 예비 탄약·FX·SFX와 최종 사망 연출은 별도 설계 범위다.
 
 ## 바로 찾는 수정 위치
 
@@ -137,7 +137,9 @@ Smart Object는 NPC를 생성하는 장치가 아니다.
 - Weapon Type: `Unarmed`, `Rifle`, `Shotgun`
 - `bCanUseMGTurret`: 적 NPC가 드론 발견 뒤 MG 후보를 검색할 수 있는지
 
-`UDroneNPCWeaponComponent`가 Rifle·Shotgun 공통 `CanFire/StartFire/StopFire/Reload`와 Target Actor·Aim Point를 관리한다. Controller의 `UsesRifle()`과 `UsesShotgun()`은 분류 API로 남기되, AI 발사 요청은 같은 경로를 사용한다. Rifle은 4,000cm·0.25초·발당 10 Damage·30발 탄창, Shotgun은 1,600cm·0.9초·8 Pellet·12도 반각·적중 Pellet당 3 Damage·8발 탄창을 현재 Greybox 기본값으로 사용한다. Volley 한 번은 Pellet 수와 무관하게 Shell 한 발만 소모한다. 예비 탄약·재장전 시간과 최종 밸런스는 아직 미정이다.
+`UDroneNPCWeaponComponent`가 Rifle·Shotgun 공통 `CanFire/StartFire/StopFire/Reload`와 Target Actor·Aim Point를 관리한다. Controller의 `UsesRifle()`과 `UsesShotgun()`은 분류 API로 남기되, AI 발사 요청은 같은 경로를 사용한다. Rifle은 4,000cm·0.25초·발당 10 Damage·30발 탄창, Shotgun은 1,600cm·0.9초·8 Pellet·12도 반각·적중 Pellet당 3 Damage·8발 탄창을 현재 Greybox 기본값으로 사용한다. Volley 한 번은 Pellet 수와 무관하게 Shell 한 발만 소모한다. 예비 탄약과 최종 밸런스는 아직 미정이다.
+
+Rifle·Shotgun 재장전은 `UDroneNPCWeaponComponent`에서 게임 시간 2.2초로 처리한다. `OnReloadStarted`로 기존 재장전 모션을 시작하고 `CanFire`가 발사를 막는다. 완료 시 탄창을 채우고 `OnReloadCompleted`를 보낸다. 재장전 중 재요청과 `StopFire`는 기존 완료 시각을 유지한다. 실제 NPC 모션과 교전 흐름은 수동으로 확인할 항목이다.
 
 추가 Shotgun NPC의 사격만 빠르게 볼 때는 `/Game/Drone/Maps/TestMap/Lvl_DroneShotgunSystemsTest`를 사용한다. 기존 Smart Object 맵의 Rifle 1·Shotgun 1·Friendly 2 구성은 유지된다. 전용 맵은 약 9m 정면에서 감지와 8개 이동 Projectile 생성을 시작한다. Cyan 예상선은 기본 Off이며 탄착 원뿔 진단이 필요할 때만 `Set Shotgun Debug Trace Enabled`로 켠다. `Get Last Shotgun Pellet Endpoints`는 Blueprint 시험 HUD/장치에서도 사용할 수 있다. 상세 절차는 [`DRONE_TEST_MAP_GUIDE.md`](../gameplay/DRONE_TEST_MAP_GUIDE.md)를 따른다.
 

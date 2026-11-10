@@ -3252,3 +3252,45 @@ D PC, 2026-11-06 17:45:24 KST Drive 완료 영수증을 기준으로 PDF/패키�
 원본 Source Commit/Push가 실제 완료됐다. 커밋은 8805ca55849f56837352529ff68abc744ef80445이며 기존 daa8dbaecd8e243642796ec2958318b356036687 부모를 보존했다. 총괄 인계는 LFS52/52 성공·실제 remote main/localHEAD 동일·ahead/behind0/0·오류/인증대기0이다. 이 채팅도 읽기전용 Git 조회로 HEAD와 origin/main이 해당 SHA이고 ahead/behind0/0임을 확인했다. 앞선 daa8 시점 스냅숏과 당시 Push대기 기록은 수정하지 않았다.
 
 현재 MD의 Source SHA/원본Push 상태만 선별 갱신했다. MD 자체 Commit/Push 최종 결과는 Drone Space 진행 정본과 저장소 밖 Git 영수증에서 확인한다. MD 자신의 Commit SHA를 다시 본문에 써서 새변경을 만드는 동작은 하지 않는다. 이후 MD Commit 뒤에는 tracked MD를 재수정하지 않고 두 실제 SHA를 Space에 한 번만 반영한다. 이 채팅의 Git Stage/Commit/Push 및 이번 Space 변경은0이다.
+
+
+## 2026-11-10 — 영상과 WBP, 미션 4 지도, 직선 게이트 검증
+
+D PC에서 원본 `D:/JGY/project/drone`은 사용자가 Pull한 `6ea35be1cd410c8e8d72f05939ce71781bc99352`(HEAD·origin/main)를 기준으로 검증했다. 전시 사본은 `D:/JGY/project/drone_ops_exhibition_20261106`이다. 공통 변경은 저장 WBP 3개, M4 지도 텍스처, 이를 연결하는 코드다. 전시 사본에는 새 영상 두 편과 엔딩 경로를 추가했다. 원본 오프닝과 각 프로젝트의 로비 브랜드를 유지했다. 이번 변경과 문서 갱신은 로컬 상태다.
+
+- **영상:** 전시 사본의 `Content/Movies/Main_cinematic.mp4`와 `Ending_cinematic.mp4`는 1920×1080·16:9, 각각 79.43초·17.93초다. 오프닝 끝 DRONER는 사용자 제공 원본에 있다. T08 3건에서 실제 WMF 오프닝/16:9·Esc와 격리 M4의 실제 Director 성공 → 엔딩 자연 종료 또는 Esc → 성공 결과를 확인했다. T09 파일 없음 1건도 같은 결과창을 한 번 열었다. T01의 엔딩 두 실패는 당시 fixture 이력이며 최종 결과는 T08/T09다.
+- **Designer 키/START:** T04 사본과 T06 원본의 관련 4건씩에서 저장 `WBP_DroneControlsSettings` 순서 W/S → A/D → Q/E → Space/Ctrl → F와 재배치된 행의 Slate 포커스 추종을 확인했다. 실제 Space → K 재할당, 격리 프로필 저장·재로드, 탭·축 선택/취소와 반전을 검증했다. `StartPromptStartHintFit`과 `StartPromptStartHint`의 가로 중심은 `StartPromptStartButton`과 1280×720·1920×1080 모두 0.000px 차이였다. 실제 START 입력으로 정지가 해제됐다. 화면별 편집 위치는 [WBP 가이드](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#화면별-wbp-편집-정본)에 둔다.
+- **M4 지도:** 내장 이미지 생성 요청은 출력 자동검토에서 `violence` 사유로 거절됐다. 실제 `Lvl_MilitaryCamp`의 v5 2048×1152 정사영을 채택했다. 초록 표시는 실제 착륙 패드 3개였으며 캡처에서만 제외했다. `T_M4_StartLocationMap` Brush와 세 StartId 월드 좌표를 `WBP_DroneStartLocation`에서 연결했다. 정사영 오른쪽은 +X, 아래는 +Y다. `StartLocationViewportFit`은 작은 화면에서 축소한다. T04 사본 초기 지도 시간 초과와 T06/T07 원본 Back·출격 실패는 그 실행 결과로 보존한다. 최종 T10 사본 1280×688 및 T11 원본 실제 PIE에서 핀↔목록, Back·재열기, 3번 출격이 통과했다. T14는 876×346 창의 실제 876×314 뷰포트에서 하단 Back/출격을 Slate 포인터로 눌렀다. Start3의 실제 XY는 13864.755, 20462.069cm이며 Z에는 기존 충돌 보정 21.302cm가 적용됐다. `Proof/Original/M4StartMap.png`와 `Proof/Ops/M4StartMap.png` 및 `M4_MapReference/Projection_Verified.json`을 함께 보관한다.
+- **게이트와 사진:** 원본 실측 유효 코스는 직선 7, 원형 7, 복합 13개다. 원형/복합의 예전 숫자 기록은 당시 맵 이력이다. 직선 `TUT_Forward_Gate`, `DA_Mission_Tutorial_Forward`, `T_MissionPhoto_Tutorial03_Forward_2`는 수신 바이트를 사본에 선별 동기화했다. 직선 목표는 `TrainingLap` 1회다. T10 사본·T11 원본 모두 HUD `0/7`에서 7번째 게이트 후 완주·성공했다. 수신 DA의 `Thumbnail`과 `BriefingImage`는 처음부터 `Forward_2`를 가리켰다. 초기 바이너리 검색의 숫자 접미사 누락과 32×32 중간 읽기는 최종 UE 로드 증거로 대체했다. P09에서 1920×1080을 확인했고 새 참조를 만들기 위한 별도 DA 저장은 없었다. `FORWARD_PHOTO_RUNTIME.json`과 `FORWARD_GATE_GIT_ASSETS_SHARED.json`이 근거다.
+- **최종 확인:** 원본 B10 및 사본 B11 DroneEditor Development 빌드가 성공했다. 기존 Saved 20개와 콘텐츠 21건을 해시 대조했고 시험 중 변경된 설정·슬롯을 복구했다. Production Training/M4 맵과 기존 P03 ZIP 해시가 일치했으며 임시 author를 제거했다. 시험은 실제 UE Editor·PIE의 Slate 합성 입력/격리 데이터 범위다. 실물 조종·청감·사람의 본편 완주와 이번 변경의 패키지 배포는 검증 범위 밖이다.
+
+실행 정본은 `D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_OpeningEndingUi/IMPLEMENTATION_RECEIPT.md`와 해당 실행 Report, `PROTECTED_AND_SHARED_VERIFIED.json`이다. 11월 6일 P03 배포 및 Drive 130파일은 [당시 이력](#2026-11-06--p03-ui-cook-수선과-분할-drive-배포-검증)에서 확인한다. 아래 완료 카드는 현재 보드에서 이력으로 옮겼다.
+
+| ID | 작업 | 당시 상태 | 완료 조건 |
+|---|---|---|---|
+| EXHIBITION-1106 | Ops 최종화 | P03·Drive·원본Push 확인 | MD 최종Git 결과는 Space/외부영수증 정본. [상태](STATUS.md) |
+
+
+## 2026-11-10 — 지도 중심 시작지점 UI와 NPC 재장전 잠금
+
+- **시작지점 UI:** 원본과 전시 사본의 `WBP_DroneStartLocation`에 지도 설계 1280×720을 적용했다. M4는 카드 줄을 접고 실좌표의 번호 1~3을 포인터·키보드·패드 입력으로 선택한다. 선택은 청록 채움과 짙은 숫자, 포커스는 크기로 표시한다. 편집 위치는 [WBP 가이드](../gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#미션-4-시작지점-지도)다. 원본 B02·사본 B03 Editor 빌드가 성공했다. T01 사본 2/2는 WBP 적용과 실제 지도 1280×688 검증, T02 원본 1/1은 876×346 창의 실제 876×314 뷰포트 검증이다. 번호 선택·Back·3번 출격과 XY 13864.755, 20462.069cm를 확인했다. T03 사본 1/1은 비지도 카드 선택 및 재출격을 확인했다. 양쪽 1920×1080 렌더는 해시가 같았고 작은 창은 원본 라이브 캡처로 확인했다. 실행은 Editor PIE의 Slate 합성 입력이다. 앞 절의 지도·목록형 결과는 당시 이력이다.
+- **NPC 재장전:** 원본 B03·사본 B02 최종 Editor 빌드가 성공했다. 양쪽 `Drone.AI.RifleTrace`·`Drone.AI.ShotgunTrace`·`Drone.AI.WeaponContract` 3/3에서 게임 시간 2.19초에는 사격 차단과 탄수 유지, 2.21초에는 탄창 충전과 사격 복귀를 확인했다. 시작 신호와 완료 신호는 각각 한 번이었다. 재요청과 `StopFire` 뒤에도 완료 시각이 유지됐다. 부분 탄창 Shotgun 잠금과 초기화 시 타이머 취소도 검사했다. 시작 이벤트가 기존 모션을 호출하고 공통 `CanFire`와 사망·`EndPlay` 정리를 사용하는 경로는 코드로 대조했다. 실제 NPC 모션과 교전 중 AI 복귀는 수동 확인 범위다. [NPC 무기 가이드](../ai/DRONE_SMART_OBJECT_NPC_GUIDE.md#역할과-무기).
+- **기존 실패와 보존:** `Drone.AI.PersonalWeaponMaintenanceTiming`은 RecastNavMesh 기대 경고가 발생하지 않아 실패했다. 원본 변경 전 T02, 적용 후 원본 T03·사본 T01에서 동일했다. 핵심 3건과 이 실패를 구분한다. 두 변경의 보호 영수증은 각각 기존 Saved 42개와 대상 파일 19건을 대조했고, 시험 설정·슬롯은 복구 또는 격리했다. 지도 임시 author 제거와 기존 애니메이션 해시는 최종 영수증에서 확인했다. 이번 검증은 로컬 Editor 빌드, 합성 입력 PIE와 컴포넌트 자동화 범위다. 실물 패드와 사람의 본편 교전은 수동 확인 범위다.
+
+지도 정본은 `D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_M4MapFirst/FINAL_RECEIPT.json`, 화면은 같은 폴더 `Proof/Copy-1920x1080.png`와 `Proof/Original-Live-876x346.png`다. 재장전 정본은 `D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_NPCReloadLock/FINAL_RECEIPT.json`이다.
+
+
+## 2026-11-10 — 맵 그물 배치 읽기 조사
+
+원본과 전시 사본의 저장본에서 PBD 물리 그물 인스턴스는 각각 10개로 대조됐다. M1 Battlefield 8개, M4 MilitaryCamp 1개, Physics Sandbox 1개다. M1의 옛 표식 8개는 숨김·무충돌 상태로 별도 집계했다. M4의 `NetStrands`는 97개 인스턴스, Pawn Block·Camera Ignore이며 얽힘 켬과 접촉 절단 끔을 읽었다.
+
+원본 A01 Editor는 요청 48개 중 47개 맵에서 Actor를 열거했다. `Lvl_DroneFrontEnd`는 Actor가 열거되지 않았다. 이번 범위는 저장된 배치와 설정의 읽기 조사이며 맵 저장 0회·PIE 0회다. 상세 위치·철망·사본 비교의 집계 경로와 원본 스캔을 함께 남긴다. [조사 집계](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_MapNetAudit/MapNetAudit.json) · [원본 A01](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_MapNetAudit/Original_A01/map_net_audit.json).
+
+
+**후속 최종 확인.** 앞의 47/48은 A01 첫 패스 수치다. 외부 레이싱 맵 2개를 추가로 열었고 FrontEnd는 Actor Subsystem 열거 0개와 참조 레벨 0개를 재확인했다. 원본 PBD 10개 모두 반경 45cm Pawn Sweep에서 NetStrands를 적중했다. 원본과 저장본이 달랐던 전시 사본 훈련 맵 4개는 각 317개 철망 배치·충돌 서명이 일치했다. M4의 장식 메시 배치 562개는 철조망 241개, 천 덮개 184개, 노출 철망 76개, 기타 61개다. 정적 철망은 저장 콜리전 설정과 제한된 지오메트리 질의 범위이며, 실제 비행과 도시 생성은 별도다. [최종 조사 집계](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_MapNetAudit/MapNetAudit.json).
+
+
+**디자인 관찰** 저장 상태의 Lit 캡처에서 M4-01 사선은 칸이 크게 벌어지고 세로줄이 휘어 보이며, 아래 지붕·철조망과 화면상 겹친다. M1-01 정면·사선은 상단 모서리 지지가 화면에서 분명하지 않고 차양과 겹친다. 검토 범위는 맵 편집과 실플레이 시뮬레이션 없이 촬영한 대표 장면이다. [M4 사선](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_NetDesignReview/V01_OriginalLit/OriginalPNG/M4-01_oblique.png) · [M1 정면](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_NetDesignReview/V01_OriginalLit/OriginalPNG/M1-01_front.png) · [M1 사선](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_NetDesignReview/V01_OriginalLit/OriginalPNG/M1-01_oblique.png)
+
+
+**M4 저장 형상 수치** 앵커 폭은 12.18m, 저장된 NetStrands 표시 폭은 14.75m이며 중심은 가로로 약 3.79m, 아래로 약 0.79m 치우쳤다. 맵 인스턴스의 NetStrands 상대 위치와 가로 1.211배 배율이 이 저장 형상 차이를 설명하며, 런타임 초기화 후 화면은 별도 확인 범위다. [디자인 검토](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_NetDesignReview/Design_Review.md)

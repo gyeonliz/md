@@ -1,6 +1,6 @@
 # Drone 작업 보드
 
-마지막 갱신: 2026-11-06 D PC — P03·Drive·원본Push 확인, MD Git결과는 Space/외부영수증 정본.
+마지막 갱신은 2026-11-10 D PC. 영상·직선 코스, 지도 중심 UI와 NPC 재장전 검증은 STATUS와 WORKLOG를 따른다.
 
 ## Now
 
@@ -30,7 +30,6 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 
 | ID | 작업 | 현재 상태 | 완료 조건 |
 |---|---|---|---|
-| EXHIBITION-1106 | Ops 최종화 | P03·Drive·원본Push 확인 | MD 최종Git 결과는 Space/외부영수증 정본. [상태](STATUS.md) |
 | TUT-DELIVERY-1103 | 배달맵 복구/크기 | 판2.5배·화물1/3·3개 수령/태그 복구·종단 자동 성공 | 크기·집기 방향 실기, “원통 착륙장” 문구 미정. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
 | MISSION-PHOTOS-1103 | 13미션 사진 통일 | Thumbnail=BriefingImage·레이싱 번호 유지 | 전체 사진 수동 대조. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |
 | UI-SELECT-3D-1103 | 선택3D 재로딩 | 지연 재생성·재촬영·프리스트림 구현 | 열기/기체 전환/재오픈 실기. [절차](docs/gameplay/DRONE_TEST_MAP_GUIDE.md#배달미션-사진선택창-확인) |

@@ -1,6 +1,6 @@
 # 현재 작업 상태
 
-현재 기준: 2026-11-06 D PC. PDF18·최종P03·개인Drive 분할 배포 검증을 완료했고 원본 Source 8805ca55849f56837352529ff68abc744ef80445의 정상Push를 확인했다(HEAD/origin/main 일치·ahead/behind0/0). MD 자체 Commit/Push 최종 결과는 [Drone Space 진행 정본](https://chatgpt.com/space/page_a81d11314f60819188530a4ea2ed4663)과 외부 Git 영수증에서 확인한다. P03은 UI텍스처3개 Cook누락을 수선해 실제Native Front로드·missing/fallback0과 Front/M3 exit0·오류0을 확인했다(신규Native 설정PNG는 없음). 사본 T13 관련9개/별도T14 로딩1개, 원본T15 6개와 초기화면T16 9개/T17 2개를 분리한다. 양쪽19DA native일치, Lumen 캐시노출3.0 및 기존6HUD 경고 소멸, 브랜드·맵·Saved보존을 확인했다. 원형7개/문구7개와 복합13개는 모두 사용자 확정이다. Drive는96MiB이하125part+복원5파일=130개 ID/이름/크기/계정/상위폴더 대조 통과이며 단일ZIP 업로드가 아니다. 로컬복원ZIP SHA/MD5·CRC47·추출47해시 및 최종125part stream일치를 확인했으나 원격MD5는 커넥터 미제공으로 검증하지 못했다. 원본 Droner/Ops 브랜드 차이·기존 카메라/입력 계약을 유지한다. 실물 조종·청감·타PC코덱·GPU예산은 미검증이며 ContactShadows/VSM marking queue/Atlas 및 엔진 진단을 전체경고0으로 쓰지 않는다. P01/P02는 배포하지 않는다. [P03 배포 정본](docs/history/DRONE_WORKLOG.md#2026-11-06--p03-ui-cook-수선과-분할-drive-배포-검증) · [Drive 폴더](https://drive.google.com/drive/folders/1gKR8RwQjLfBhWMbDIeDMsBf7jHYQxzGf).
+현재 기준은 2026-11-10 D PC다. 원본 `6ea35be1` 수신본과 전시 사본에서 공통 WBP 3개 및 미션 4 지도 텍스처를 적용했다. 새 오프닝·엔딩은 전시 사본에 적용했고 실제 미디어 재생과 엔딩 후 성공 결과를 확인했다. 키 순서 W/S → A/D → Q/E → Space/Ctrl → F, Designer 포커스, START 안내의 버튼 기준 가로 정렬을 검증했다. M4는 큰 지도에서 번호 1~3을 선택하며 원본 876×314와 사본 1280×688 뷰포트의 Back·출격을 확인했다. 소총병·샷건병 NPC는 게임 시간 2.2초 재장전 동안 사격을 잠그고 완료 시 탄창을 채운다. 유효 코스는 직선 7·원형 7·복합 13개다. 양쪽 직선 HUD 0/7에서 7번째 게이트로 1랩 완료를 확인했다. 직선의 수신 DA는 1920×1080 Forward_2를 Thumbnail과 BriefingImage에 사용한다. 양쪽 로컬 Editor 빌드, 지도 PIE, 재장전 핵심 자동화 3건씩을 확인했다. 실물 패드·청감·실제 NPC 모션과 교전은 수동 확인 범위다. [지도와 재장전 검증](docs/history/DRONE_WORKLOG.md#2026-11-10--지도-중심-시작지점-ui와-npc-재장전-잠금). [11월 10일 검증](docs/history/DRONE_WORKLOG.md#2026-11-10--영상과-wbp-미션-4-지도-직선-게이트-검증) · [WBP 편집](docs/gameplay/DRONE_TITLE_LOBBY_ORBIT_GUIDE.md#화면별-wbp-편집-정본) · [11월 6일 P03 배포 이력](docs/history/DRONE_WORKLOG.md#2026-11-06--p03-ui-cook-수선과-분할-drive-배포-검증).
 
 M4 저장 기본 기체를 초기 출격 정책과 같은 FiberOptic으로 맞췄고, 세 시작점→실제 재머→새 전투 기체→Patriot 진행을 확인했다. M1의 축 배율0 장식 section만 런타임 충돌을 해제하고 정상 이웃/전봇대는 보존했다. 머티리얼2개의 개별 사용 플래그도 수선했다. 로비는 첫 배치 전에 실제 미션 미리보기를 채우고 키보드 포커스로 내용이 바뀔 때만 재배치해 첫 프레임 글자/구분선 겹침을 수정했다. 미리보기로 미션을 자동 확정하지 않는다.
 
@@ -12,9 +12,9 @@ M4 저장 기본 기체를 초기 출격 정책과 같은 FiberOptic으로 맞�
 
 | 저장소 | 현재 기준 | 상태 |
 |---|---|---|
-| Unreal `D:/JGY/project/drone` | main `8805ca55849f56837352529ff68abc744ef80445` 정상Push | HEAD/origin/main 일치·ahead/behind0/0, LFS52/52. 원본 Droner 브랜드 보존 |
-| 문서 `D:/JGY/project/md` | 최종내용·실제 Source SHA 반영 | 자체 Commit/Push 결과는 Drone Space/외부 Git 영수증 정본. 이번 보정 뒤 tracked MD 내용 고정 |
-| 전시회 사본 | `D:/JGY/project/drone_ops_exhibition_20261106/Drone.uproject` | 최종P03 Native Front/M3 exit0·오류0, 3UI실제로드/영상5/ZIP47 검증·Drive125part+5지원 배포 확인. Ops 브랜드 분리 |
+| Unreal `D:/JGY/project/drone` | main·origin/main `6ea35be1cd410c8e8d72f05939ce71781bc99352` | 수신 직선 맵·DA·사진 바이트 확인. 공통 UI 변경은 로컬 |
+| 문서 `D:/JGY/project/md` | main·origin/main `e8a7b3a7` 기준 | 11월 10일 현재 상태·편집 위치·실행 이력 로컬 반영 |
+| 전시회 사본 | `D:/JGY/project/drone_ops_exhibition_20261106/Drone.uproject` | 11월 10일 로컬 영상·UI·직선 에디터 검증. 11월 6일 P03 ZIP 및 Drive 배포는 당시 이력 |
 
 ## 현재 D PC 구현·검증 경계
 
@@ -84,7 +84,7 @@ OilRig 근거리 사본3개만 camera-local·생성축Yaw-90°로 화면 가로�
 | 물리·역할 | 질량·추력·모터 응답·선형/제곱 항력·Drop kg 하중, Mode 1/2 공통. 속도 단계 제거. 벽/날개 접촉·그물 포획 Greybox·접촉 카메라 분리, 피해 Shake 유지 | Acro는 게임용 근사 모델, 실기체 교정 미완료. 수동 속도/하중/접촉·실제 Chaos 비교 필요 |
 | AI·차량·날씨 | AI-LOCOMOTION-01 다리 고정 후속 구현됨·자동 검증됨(10/05 C PC Claude): 아군 Retargeter Pin Bone·적 발 IK Control Rig 제거. 양손 총 파지·hand_r 부착 유지. 원인·보폭 검증은 [WORKLOG](docs/history/DRONE_WORKLOG.md). StateTree Soft 참조/AlwaysCook·Rifle/MG 디버그 기본 Off 유지. 차량·바람/비·천장 차단, D-6 HUD 방위 통일·불어오는 쪽 풍향 구현됨·자동 검증됨. 비 품질 구현됨·자동 검증됨(10/07 C PC Claude, HEAD `cb77c0d`·스테이징): 끔=전부Off·낮음/중간/높음=카메라 주변 원본 Niagara1개·판 빗줄기 기본0. Weather 전체·SettingsContract Success. [비 가이드](docs/gameplay/DRONE_GAME_READINESS_RAIN_MISSIONS_GUIDE.md#비-품질-설정과-조정)·[실측/정정](docs/history/DRONE_WORKLOG.md#2026-10-07--비-연출-도입비-품질-옵션-c-pc-claude) | NPC 걷기 다리·속도 대비 보폭/발 미끄러짐·손/총 정렬·사격/재장전 수동 확인 대기. 적 경사면 발 맞춤 없음·Pin 뒤 IK 뼈 잔존 원인 미특정. 최종 애니메이션/산탄총 전용 동작 미정·미구현. 감지 PIE KnownIssues Fail 유지, 풍향 HUD·날씨 시험 맵 수동 확인 대기. 비 입자 크기/모양·위치/양·젖음/물결·음원/실내 감쇠·설정 패드 수동 대기. 단계 최종값/음원 확정 현재 미정; 화면 물방울/바닥 Splash 미구현 |
 | 환경·기체 | D-12 2·3차 구현됨·자동 검증됨(10/06 C PC Claude): Flight 클래스/소스 경로로 변경·ClassRedirects 3개, 피격/Acro/지상 주행 컴포넌트 분리. BP 이름·자산 경로 유지. Legacy 1차·Characters 변환 원본 유지, D-13 종료. 상세 [WORKLOG](docs/history/DRONE_WORKLOG.md) | FPV 곡예·UGV 주행 분리 전 동일 체감 수동 확인 대기. 방콕 삭제 커밋/푸시 상태 별도 확인. 사람 최종 아트·애니메이션·음원 보존 |
-| 패키징 | Asset Manager/StateTree Cook계약과 기존 UI텍스처2폴더 AlwaysCook 유지. 최종P03 Cook/Stage/Archive·Native Front/M3·영상5·47CRC/Stage해시 검증 | P03 분할Drive130파일 원격metadata 확인 완료. 실물조종·청감·타PC코덱/GPU는 별도 |
+| 패키징 | 11월 6일 P03 Cook/Stage/Archive·Native Front/M3·영상 5개·ZIP 47파일 검증 | 11월 10일 변경은 Editor 빌드·PIE 범위. P03 분할 Drive 130개는 11월 6일 배포 이력 |
 
 - Acro 혼합 입력·Dead Zone·자세 적분 조사(10/04 C PC)는 [원문 보존](docs/history/archive/STATUS_2026-10.md)을 참고한다.
 - 코스 표시선 측정·재실행 도구 검증(10/04 C PC)은 [원문 보존](docs/history/archive/STATUS_2026-10.md)을 참고한다.
