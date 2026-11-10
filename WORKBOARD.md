@@ -138,7 +138,7 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 |---|---|---|---|
 | TEST-RENDER-UNPAINTED-01 | PIE 미렌더 판정 구분 | D-11 구현됨·자동 검증됨(10/05 C PC Claude). 상시 실패4개 KnownIssues 분리. 최신 전체101개 결과 STATUS 참조. 미렌더는 포커스6개 모두 화면 루트 포커스로 실패하는지로 판단 | 화면 그려진 포커스/실제 패드 수동 확인·KnownIssues 별도 실행. 같은 증상2회 상한·Production 보존 |
 | TEST-ORDER-ROUTE-01 | 전체 렌더 회귀 Route 키 순서 의존 관찰 | 2026-10-04 C PC ClaudeAcroFull 전체5회(test.log/test2.log/final.log/final2.log/test3.log) TrainingRouteSelectionPIE 모두 Success(Codex 로그 대조). 그중3회 화면 미렌더이므로 화면 검증과 구분. 지난 Fail은 날짜별 기록 보존, 원인 미특정·해결 확정 아님 | 재발 시 선행 테스트/입력 처리 순서 재현·Claude 조사. Production 맵 보존 |
-| BUILD-PACKAGE-01 | 패키징 쿠킹 설정 | 정적 자동 검증됨(10/02 C PC Claude). Mission/Drone DA AlwaysCook·MissionMap Soft 참조. 실제 패키징 미실행; 검증 WORKLOG | 실제 패키징 미실행. 패키지에서 DA 자동 등록·모든 MissionMap 진입 확인, Production Training 보존 |
+| BUILD-PACKAGE-01 | Win64 배포 확인 | 원본·전시판 패키징/ZIP 전수 대조와 개발 사본 Editor 맵 검증 완료. [작업 이력](docs/history/DRONE_WORKLOG.md#2026-11-10--원본전시판-win64-최종-패키지와-개발-사본) | 다른 PC의 전체 미션 손 조종·실물 장치 확인 대기 |
 | PERF-ZEN-START-01 | D PC Editor 시작 지연(Zen 대기) 조사 | 원인 특정(10/06 D PC Claude): Zen 세션 기록 733개 로드 약 20초 + 엔진 20초 초과 모달. 10/02 473초는 모달 미응답 대기. 세션 폴더 732개 백업 이동 완료, 재측정 대기. 상세 STATUS/WORKLOG | Claude가 같은 맵·캐시로 cold/warm 시작 로그 비교, 확인창 응답·Zen running→Editor 확인 시간 분리. 캐시 삭제·엔진 소스 수정·보안 해제 금지, Production Training 보존 |
 | SYNC-WORKPC-01 | D PC 10/27 | FINAL4 Source/Config67·보호9·최신Saved10 hash 일치/Editor0 | 다른 PC 수신·실기·패키징 별도. [등록부](docs/git/DRONE_WORK_PC_SESSIONS.md) |
 | RACING-MAPS-01 | 팀원 레이싱 맵 1·2·3 | Map2 중복 링 때문에 생기던 기록 취소 수정·93개 실행 Gate 완주/저장. 3맵 새 프로세스 복원 통과. 선택/사진/API 포커스 정합·옛 7개 안내 수정; STATUS | 사용자 실제 비행/카드별 사진 확인. 자동 기록은 전용 슬롯, 원본 맵/사진과 기존 DA 변경 보존 |
@@ -150,5 +150,5 @@ D-7 구매 자산 공개/공유·D-8 기여/AI 설명·BP/Legacy API 정리와 �
 
 1. 실제 키보드·플스·InterLink로 시동/착지·방향/키 설정·M4 세 시작점/교대와 전체 미션을 손 조종한다. 자동 주입 결과와 구분한다.
 2. 출발 카운트·체력 경고·무기/폭발음을 실제로 듣고, 실제 배달/사진과 첫 프레임 문구도 확인한다.
-3. 독립 게임창·Cook/패키징을 별도로 검증한다. 원본0배율 장식의 로딩 Body 경고는 런타임 판정 수선과 구분해 추적한다.
+3. 최종 Win64 패키지의 다른 PC 실행과 전체 미션 손 조종을 확인한다. 원본0배율 장식의 로딩 Body 경고는 런타임 판정 수선과 구분해 추적한다.
 4. 광섬유15m/s 상한 조정·실기 게인·TPA/FOV 빠른 선택/터틀은 기존 결정·미구현 범위를 유지한다.

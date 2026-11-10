@@ -311,6 +311,8 @@ Production `/Game/Drone/Maps/Lvl_DroneTraining`은 팀원이 제작 중인 실�
 
 ## 랜덤 도시 레이싱 외형·모듈 조정
 
+랜덤 도시 게임 월드는 무풍이다. 로비에서 시드로 출격해 맑음·흐림·비를 바꿔도 월드·위치별 풍속은 0이다. 로딩과 결과 조건에는 시드와 선택된 날씨가 표시된다. 비 표현과 도시·코스 재생성을 확인한 뒤, 바람 반응이나 기체 자동 보정을 비교할 때는 별도의 Weather Systems 시험 맵을 사용한다.
+
 공통 기본값은 `/Game/Drone/Procedural/BP_DroneProceduralCityGenerator`의 Class Defaults, 시험별 값은 `Lvl_ProceduralCityRaceTest`에 배치된 Generator의 Details에서 조정한다. Source 수정 뒤 Editor를 종료하고 빌드한 후 새 항목을 확인한다. 기존 지형·Production Training·원본 공급팩을 시험 때문에 다시 저장하지 않는다.
 
 - `BuildingTypes > SingleMesh`: 독립된 닫힌 컨테이너처럼 위아래 면적이 맞는 메시만 `적층 가능한 단일 메시 모듈`(`bStackableModule`)을 켜고 `MaxStackLevels`로 단수를 정한다. 야적장 대상일 때만 `bYardContainer`도 켠다.

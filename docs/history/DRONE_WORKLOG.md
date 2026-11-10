@@ -3294,3 +3294,33 @@ D PC에서 원본 `D:/JGY/project/drone`은 사용자가 Pull한 `6ea35be1cd410c
 
 
 **M4 저장 형상 수치** 앵커 폭은 12.18m, 저장된 NetStrands 표시 폭은 14.75m이며 중심은 가로로 약 3.79m, 아래로 약 0.79m 치우쳤다. 맵 인스턴스의 NetStrands 상대 위치와 가로 1.211배 배율이 이 저장 형상 차이를 설명하며, 런타임 초기화 후 화면은 별도 확인 범위다. [디자인 검토](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_NetDesignReview/Design_Review.md)
+
+
+## 2026-11-10 — M1·M4 그물 디자인 수정과 PIE 확인
+
+수정 전 디자인 관찰에 이어 원본과 전시 사본의 `Lvl_MilitaryCamp`·`Lvl_Battlefield` 두 맵 인스턴스만 변경하고 최종 저장 해시 일치를 확인했다. M4 양끝은 라디오탑·조명탑 지지면에 맞췄고 격자는 매듭 11행×25열, 줄 514개다. M1-01 좌상단을 컨테이너 벽 지지면에 맞추고, M1-05 하단 지면 여유를 조정했으며, M1-08 중앙 칸은 가로·세로 약 43cm다. [적용 영수증](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_NetDesignFix/Author_Receipt.json) · [최종 사본 동기화](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_NetDesignFix/EXHIBITION_FINAL_SYNC.json).
+
+실제 미션 PIE에서 M4는 양쪽 모두 네 코너 변위 0cm와 가로·세로 순서 역전 0을 기록했다. 최종 표본에서 상·하변은 직선 기준 약 50cm 이내였고 최소 세로 칸은 원본 42.4cm, 사본 약 35.0cm였다. 1m 이탈과 역전 2곳은 중간 보정 이력이다. M1-05의 하단 63개 지면 샘플 중 최솟값은 양쪽 약 51cm였다. 근거는 PIE의 입자·줄 데이터와 지면 질의이며, 구도로 측정한 값은 아니다. [최종 원본 M4 PIE](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_NetDesignFix/Original_M4_Tuned/PIE_Receipt.json) · [최종 사본 M4 PIE](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_NetDesignFix/Copy_M4_Final/PIE_Receipt.json) · [원본 M1 포함 PIE](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_NetDesignFix/Original_PIE02/PIE_Receipt.json) · [사본 M1 포함 PIE](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_NetDesignFix/Copy_PIE01/PIE_Receipt.json).
+
+비교 시트는 수정 전 저장 맵의 Editor Lit과 수정 후 실제 미션 PIE 드론 뷰포트다. 촬영에는 소유한 드론을 임시 PIE 월드에서 스크립트로 배치했다. 손조종 비행, 그물 접촉·포획 및 장시간 성능은 별도 검증 범위다. [수정 전후 비교 시트](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_NetDesignFix/Net_Design_Before_After.png).
+
+## 2026-11-10 — 랜덤 도시 레이싱 무풍 적용
+
+원본과 전시 사본에서 실제 로비의 랜덤 도시 `Lvl_ProceduralCityRaceTest` 게임 월드에만 전역 바람 벡터 0을 적용했다. 프로필 전환 후 최종 스냅샷에서 제한하므로 외부 바람 재정의와 프로필 돌풍도 이 월드에 전달되지 않는다. 시드가 뽑은 맑음·흐림·비, 조명, 비 Niagara와 도시·코스 생성을 사용한다. 로딩 단계는 ‘날씨 정하기’, 결과 조건은 시드와 날씨를 표시한다. 양쪽 맵·미션 DA는 원본 Git LFS 해시와 일치했고 대상 소스 5개도 양쪽 해시가 일치했다.
+
+D PC Editor Build B11 원본·B12 사본 모두 성공. 원본 T17은 선택 4/4, 사본 T18은 6/6, 원본 대조 T19는 3/3 성공이며 선택 보고서 오류·경고 0이다. T17/T18은 실제 로비에서 시드 424242로 출격, 맑음·흐림·비 월드 풍속 0, 비 강도 0.80, 빈 옵션에서 외부 7 m/s 주입 후 위치별 풍속 0, 같은 시드 도시·게이트·날씨를 확인했다. T19는 별도 맵과 건물 차폐·자동 보정 회귀를 확인했다. 시작 단계의 별도 엔진 진단과 선택 검사 결과를 구분한다. 기존 SaveGames와 Editor 설정을 검증 전 파일과 대조했다. 실물 조종과 패키징은 이번 검증 범위 밖이다. [실행 영수증](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_RandomCityCalm/FINAL_RECEIPT.json).
+
+
+## 2026-11-10 — 원본·전시판 Win64 최종 패키지와 개발 사본
+
+- D PC UE 5.8. 원본과 전시판의 로비 브랜드를 각각 확인하고 기체 속도 칸에는 모드에 따른 차이를 표시했다. FPV·스카이드론 설명을 다듬고 배터리·바람 HUD 행과 M2의 바람 무전 문구를 정리했다. 랜덤 도시에서만 무풍을 적용했다. 훈련·일반 미션의 기존 바람 프리셋과 배터리 소모·재출격 계약은 유지했다.
+- 두 Win64 Development BuildCookRun이 종료 코드 0이었다. 각 Cook 5,213개, 오류 0건, 경고 59건이며 누락 패키지 경고는 발견되지 않았다. 배포용 IoStore에서 필수 자산 52개씩과 원본 영상 5개·전시판 6개의 소스 바이트 일치를 확인했다.
+- 두 최종 바이너리에서 실제 로비와 Designer 설정·축 선택, 레이서 문구, 훈련·M2의 배터리/바람 행 접힘과 타이머/내구도, M2 무전, M4 지도 3번 출격, 시드 424242 코스 및 332 무풍·활성 비 Niagara를 확인했다. 전시판 엔딩은 성공 이벤트를 주입해 영상 열기·비율 맞춤·건너뛰기 뒤 성공 결과를 확인했다.
+- ZIP은 모든 항목을 실행 폴더와 CRC·SHA-256으로 대조했다. 전체 백업과 정리 사본은 독립 데이터 복제이며 삭제 후보는 Cook 목록·Asset Registry·코드 참조를 대조했다.
+- 드로너 원본 ZIP 12,592,938,592바이트, 47개 항목. SHA-256 `909e5079d06f0cd01ed506dc0392f657bca106331a974bc7026538bd622ee650`, MD5 `d7e86499b63bc3b8d876ac9b07c3f7ff`. 전체 백업 10,745개 파일. 정리 사본에서 확인된 데모 에셋 8개(7,933,738바이트)를 격리했고 두 사본에서 각각 실제 맵 8개를 열었다.
+- 드론 옵스 전시판 ZIP 12,626,301,506바이트, 48개 항목. SHA-256 `9cff1356295fe935eeb121968732941f843bc2980e63739d424fbf85bf34fb00`, MD5 `d358cd07a6341617dc9cc69a1ea9c212`. 전체 백업 10,747개 파일. 정리 사본에서 확인된 데모 에셋 8개(7,933,738바이트)를 격리했고 두 사본에서 각각 실제 맵 8개를 열었다.
+- 원본 `origin/main` `cb07840a6e338411c43c7fb95342c7b13d30c321`의 변경 26개를 푸시했고 LFS 5개를 원격에서 새로 받아 크기와 SHA-256을 확인했다. 승인된 M1·M4 그물 맵은 사전 검증 영수증과 두 원본 파일 해시가 일치했다.
+- 사용자 Saved 설정·저장 데이터는 원본 41개와 전시판 28개의 기준 해시를 복원했다. 콘솔과 격리 진행 파일을 사용한 자동 실행이며 전체 미션 손 조종, 실제 장치, 엔딩 자연 재생 종료는 이 확인 범위와 구분한다.
+- 최종 검수에서 현재 두 실행 폴더와 ZIP의 전체 항목 경로·크기·CRC 메타데이터, 두 런처와 네이티브 실행 파일, 영상 5개·6개, 기본 및 확장 실행 로그의 SHA-256을 각 영수증과 대조했다. 개발 사본 네 곳의 실제 파일 수·용량과 Editor DLL 해시, 정리 사본에서 격리된 8개 각각의 전체 백업·격리본 해시를 확인했다. 애니메이션 블루프린트와 BlendSpace 사이의 하드 참조 1개는 격리 목록 내부였고, 보존 패키지에서 격리 목록을 참조하는 항목은 없었다. 개발 사본 검사는 각 사본의 8개 맵 Editor 로드 범위다.
+- 원본 초기 FrontendOnlyAttempt는 종료 코드 -1·루트 실행 파일 없음이었다. 최종 바이너리 검증에서 원본 비·훈련 HUD·스토리 HUD, 전시판 비의 최초 시도는 게임 초기화 전에 중단돼 PASS가 없었다. 명령 파일 방식의 재실행에서 해당 검사를 통과했다. 원본 M4 지도 최초 시도는 종료 로그는 있으나 PASS가 없어 제외했고 StartMapRetry를 근거로 삼았다. 11월 6일 P03 및 이번 초기 V1 검사와 최종 바이너리 실행을 합산하지 않는다.
+- 배포본 검사는 패키지 실행 파일을 콘솔과 격리 슬롯으로 구동한 결과다. 전시판 엔딩은 최종 게시 경로에서 M4 3번 출격 후 성공 이벤트를 주입해 영상 열기와 스킵 뒤 결과를 확인했다. 전체 본편 손 조종이나 엔딩 자연 재생 종료는 확인 범위와 구분한다. [패키지 영수증](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_TwoWin64Packages/FINAL_RECEIPT.json) · [개발 사본 영수증](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_TwoWin64Packages/DEVELOPER_FINAL_RECEIPT.json) · [전시판 엔딩 실행](D:/JGY/project/drone_ops_exhibition_20261106_handoff/20261110_TwoWin64Packages/Exhibition/FinalEnding/M4Map/PASS.json).
